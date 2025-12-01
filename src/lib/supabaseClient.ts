@@ -1,4 +1,3 @@
-import process from "node:process";
 import { createBrowserClient, createServerClient } from "@supabase/ssr";
 import type { CookieMethodsServer } from "@supabase/ssr";
 
