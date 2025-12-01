@@ -4,10 +4,6 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 export default async function AppDashboardPage() {
   const supabase = await createSupabaseServerClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const { data: releases } = await supabase
     .from("releases")
     .select("*")
