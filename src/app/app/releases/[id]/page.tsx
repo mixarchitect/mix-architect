@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 
 type ReleasePageProps = {
@@ -13,10 +12,36 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
     .from("releases")
     .select("*")
     .eq("id", params.id)
-    .single();
+    .maybeSingle();
 
-  if (error || !release) {
-    notFound();
+  if (!release) {
+    return (
+      <div className="space-y-4">
+        <Link
+          href="/app"
+          className="text-sm text-neutral-400 hover:text-neutral-200"
+        >
+          ← Back to releases
+        </Link>
+
+        <h1 className="text-2xl font-semibold">Release not found</h1>
+        <p className="text-sm text-neutral-400">
+          Tried to load release with id:
+        </p>
+        <pre className="text-xs bg-neutral-900 border border-neutral-800 rounded-md p-3 overflow-x-auto">
+          {params.id}
+        </pre>
+
+        {error && (
+          <>
+            <p className="text-sm text-red-400">Supabase error:</p>
+            <pre className="text-xs bg-neutral-900 border border-red-800 rounded-md p-3 overflow-x-auto">
+              {error.message}
+            </pre>
+          </>
+        )}
+      </div>
+    );
   }
 
   return (
