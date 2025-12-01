@@ -1,16 +1,13 @@
 import { cookies } from "next/headers";
+import type { RequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
-
-type MutableCookies = ReturnType<typeof cookies> & {
-  set: (options: { name: string; value: string } & CookieOptions) => void;
-};
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export async function createSupabaseServerClient() {
-  const cookieStore = cookies() as MutableCookies;
+  const cookieStore = cookies() as RequestCookies;
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
