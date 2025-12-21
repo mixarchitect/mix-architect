@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/cn";
 
-type PanelVariant = "default" | "inset" | "flat";
+type PanelVariant = "default" | "float" | "inset" | "flat";
 
 type PanelProps = React.HTMLAttributes<HTMLDivElement> & {
   variant?: PanelVariant;
@@ -12,12 +12,10 @@ export function Panel({ className, variant = "default", ...props }: PanelProps) 
     <section
       className={cn(
         "relative bg-panel border border-border rounded-lg",
-        // Default has shadow + inner highlight
-        variant === "default" && "shadow-paper-inset",
-        // Inset is for nested sections (subtle, no shadow)
+        variant === "default" && "shadow-DEFAULT",
+        variant === "float" && "shadow-float",
         variant === "inset" && "bg-panel2 shadow-none",
-        // Flat has no shadow (for inside other panels)
-        variant === "flat" && "shadow-none",
+        variant === "flat" && "shadow-none border-transparent",
         className
       )}
       {...props}

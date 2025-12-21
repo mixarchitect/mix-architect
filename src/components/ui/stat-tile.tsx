@@ -4,26 +4,61 @@ import { cn } from "@/lib/cn";
 type Props = {
   label: string;
   value: string;
+  unit?: string;
   note?: string;
+  variant?: "default" | "accent";
   className?: string;
 };
 
-export function StatTile({ label, value, note, className }: Props) {
+export function StatTile({
+  label,
+  value,
+  unit,
+  note,
+  variant = "default",
+  className,
+}: Props) {
   return (
     <div
       className={cn(
-        "rounded-md border border-border bg-panel2",
-        "px-4 py-3",
+        "rounded-md border px-5 py-4",
         "transition-all duration-150 ease-out",
-        "hover:-translate-y-px hover:border-border-strong",
+        variant === "default" &&
+          "border-border bg-panel hover:-translate-y-px hover:border-border-strong hover:shadow",
+        variant === "accent" &&
+          "border-transparent bg-signal text-white shadow-lg",
         className
       )}
     >
-      <div className="label text-[11px] text-faint">{label}</div>
-      <div className="mt-2 font-mono text-xl leading-tight text-text tracking-tight">
-        {value}
+      <div
+        className={cn(
+          "label text-[11px]",
+          variant === "default" ? "text-faint" : "text-white/65"
+        )}
+      >
+        {label}
       </div>
-      {note && <div className="mt-1 text-xs text-muted">{note}</div>}
+      <div
+        className={cn(
+          "mt-2 font-mono text-2xl leading-tight tracking-tight",
+          variant === "default" ? "text-text" : "text-white"
+        )}
+      >
+        {value}
+        {unit && (
+          <span className="text-[0.5em] ml-1 opacity-60">{unit}</span>
+        )}
+      </div>
+      {note && (
+        <div
+          className={cn(
+            "mt-1 text-xs",
+            variant === "default" ? "text-muted" : "text-white/70"
+          )}
+        >
+          {note}
+        </div>
+      )}
     </div>
   );
 }

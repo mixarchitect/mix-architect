@@ -4,19 +4,27 @@ import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Rule } from "@/components/ui/rule";
 import { Pill } from "@/components/ui/pill";
 import { StatTile } from "@/components/ui/stat-tile";
+import { AccentPanel } from "@/components/ui/accent-panel";
+import { DataGrid, DataCell } from "@/components/ui/data-grid";
+import { StatusIndicator } from "@/components/ui/status-dot";
+import { Toolbar, ToolbarButton } from "@/components/ui/toolbar";
+import { Home, Layers, Settings, Mic2, FileText, Share2 } from "lucide-react";
 
 export default function HomePage() {
   return (
     <main className="min-h-screen px-6 py-8">
-      <div className="mx-auto max-w-6xl">
-        {/* Top bar */}
+      <div className="mx-auto max-w-7xl">
+        {/* Top bar with yellow highlight */}
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="text-sm font-semibold tracking-tight text-text">
+            <div className="highlight-dot">
+              <Layers size={14} className="text-charcoal" />
+            </div>
+            <div className="text-base font-semibold tracking-tight text-text">
               Mix Architect
             </div>
-            <div className="label text-[10px] text-faint hidden sm:block">
-              DRAFTING TABLE
+            <div className="label-sm text-faint hidden sm:block">
+              CONTROL ROOM
             </div>
           </div>
 
@@ -30,133 +38,197 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Main layout */}
-        <div className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          {/* Hero panel */}
-          <Panel>
-            <PanelHeader>
-              <div className="label text-[11px] text-faint">MIX ARCHITECT</div>
-              <h1 className="mt-4 text-[38px] md:text-[52px] font-semibold leading-[1.02] h1 text-text">
-                Blueprint every mix before you touch a fader.
-              </h1>
-              <p className="mt-5 text-[15px] md:text-[17px] text-muted max-w-xl leading-relaxed">
-                Plan stereo and immersive releases with clear intent. Organize
-                assets, define outcomes, and brief mixers with confidence.
-              </p>
+        {/* Main layout - inspired by Petronex */}
+        <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_380px]">
+          {/* Left column */}
+          <div className="space-y-6">
+            {/* Hero panel */}
+            <Panel variant="float">
+              <PanelHeader>
+                <div className="flex items-center gap-3 mb-4">
+                  <StatusIndicator color="green" label="System Ready" />
+                </div>
+                <h1 className="text-[42px] md:text-[56px] font-bold leading-[0.95] h1 text-text">
+                  Portfolio
+                  <br />
+                  Overview
+                </h1>
+              </PanelHeader>
+              <Rule />
+              <PanelBody className="pt-5">
+                <p className="text-[15px] md:text-[17px] text-muted max-w-xl leading-relaxed">
+                  Blueprint every mix before you touch a fader. Plan stereo and 
+                  immersive releases with clear intent.
+                </p>
+                <div className="mt-8 flex flex-wrap items-center gap-3">
+                  <Link href="/app">
+                    <Button variant="primary">Enter the control room</Button>
+                  </Link>
+                  <Link href="/#how">
+                    <Button variant="secondary">See how it works</Button>
+                  </Link>
+                </div>
+              </PanelBody>
+            </Panel>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link href="/app">
-                  <Button variant="primary">Enter the control room</Button>
-                </Link>
-                <Link href="/#how">
-                  <Button variant="secondary">See how it works</Button>
-                </Link>
-              </div>
-            </PanelHeader>
-            <Rule />
-            <PanelBody className="pt-5">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <StatTile
-                  label="Blueprints"
-                  value="Stereo + Atmos"
-                  note="One workflow"
-                />
-                <StatTile
-                  label="Outputs"
-                  value="Mix brief"
-                  note="Aligned and shareable"
-                />
-                <StatTile
-                  label="Signal"
-                  value="Clarity"
-                  note="Less second‑guessing"
-                />
-              </div>
-            </PanelBody>
-          </Panel>
+            {/* Stats row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <StatTile label="Interests" value="02" />
+              <StatTile label="Investments" value="$ 2.1m" />
+              <StatTile label="Net Acres" value="628.1" />
+              <StatTile label="Royalty Acres" value="0.0000" />
+            </div>
 
-          {/* Inspector panel (clipboard feel) */}
-          <Panel>
-            <PanelHeader className="flex items-start justify-between gap-4">
-              <div>
-                <div className="text-base font-semibold text-text">Inspector</div>
-                <div className="mt-1 text-sm text-muted">
-                  Context, next steps, shortcuts.
+            {/* Lower section - Features */}
+            <section id="how">
+              <Panel>
+                <PanelHeader className="flex items-start justify-between gap-6 flex-wrap">
+                  <div>
+                    <div className="label text-[11px] text-faint">WHAT YOU GET</div>
+                    <div className="mt-2 text-2xl font-bold h2 text-text">
+                      A mix plan you can trust
+                    </div>
+                    <div className="mt-2 text-sm text-muted max-w-2xl">
+                      Fewer &quot;what did we decide?&quot; moments. More intent, faster
+                      sessions, cleaner handoffs.
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Pill>Stereo</Pill>
+                    <Pill>Atmos</Pill>
+                    <Pill>Deliverables</Pill>
+                  </div>
+                </PanelHeader>
+                <Rule />
+                <PanelBody className="pt-5 grid gap-4 md:grid-cols-3">
+                  <Feature
+                    icon={<FileText size={20} />}
+                    title="Blueprint"
+                    body="Define outcomes, references, and constraints before the session."
+                  />
+                  <Feature
+                    icon={<Layers size={20} />}
+                    title="Organize"
+                    body="Keep assets, notes, and track intent in one place."
+                  />
+                  <Feature
+                    icon={<Share2 size={20} />}
+                    title="Brief"
+                    body="Export a clean, shareable mix brief for collaborators."
+                  />
+                </PanelBody>
+              </Panel>
+            </section>
+          </div>
+
+          {/* Right column - Accent panel + Inspector */}
+          <div className="space-y-6">
+            {/* Accent panel (Petronex orange style) */}
+            <AccentPanel>
+              <div className="flex items-center justify-between mb-4">
+                <div className="label-sm text-white/65">Survey</div>
+                <div className="flex gap-2">
+                  <button className="w-8 h-8 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+                    ←
+                  </button>
+                  <button className="w-8 h-8 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+                    →
+                  </button>
                 </div>
               </div>
-              <span className="status-stamp status-stamp-draft">Draft mode</span>
-            </PanelHeader>
-            <Rule />
-            <PanelBody className="pt-5 space-y-4">
-              <div className="flex flex-wrap gap-2">
-                <Pill>⌘K Command</Pill>
-                <Pill>Release notes</Pill>
-                <Pill>Session imports</Pill>
+              <h2 className="text-2xl font-bold h2 text-white">
+                Mix Architect
+                <br />
+                <span className="text-white/80">Control Room</span>
+              </h2>
+              <p className="mt-2 text-sm text-white/70">1 active release</p>
+
+              <div className="mt-6 pt-6 border-t border-white/15">
+                <DataGrid>
+                  <DataCell label="Blueprints" value="Stereo" />
+                  <DataCell label="Outputs" value="Brief" />
+                  <DataCell label="Depth" value="5,000" unit="ft" />
+                  <DataCell label="Signal" value="Clarity" />
+                </DataGrid>
               </div>
-              <p className="text-sm text-muted leading-relaxed">
-                Mix Architect is a planning layer. Keep releases tidy: clear
-                naming, add artist, and lock deliverables before mixing.
-              </p>
-              <div className="space-y-2">
-                <div className="row">
-                  <span className="rowKey">Step 01</span>
-                  <span className="rowVal">Create release</span>
+
+              <div className="mt-6 pt-4 border-t border-white/15 space-y-2 text-sm">
+                <div className="flex justify-between text-white/65">
+                  <span>Code</span>
+                  <span className="font-semibold text-white">MX1-Control</span>
                 </div>
-                <div className="row">
-                  <span className="rowKey">Step 02</span>
-                  <span className="rowVal">Add tracks + refs</span>
+                <div className="flex justify-between text-white/65">
+                  <span>Type</span>
+                  <span className="font-semibold text-white">Drafting</span>
                 </div>
-                <div className="row">
-                  <span className="rowKey">Step 03</span>
-                  <span className="rowVal">Export brief</span>
+                <div className="flex justify-between text-white/65">
+                  <span>Status</span>
+                  <span className="font-semibold text-white">Active</span>
                 </div>
               </div>
-              <Link href="/app" className="block">
-                <Button variant="primary" className="w-full">
-                  Start a release
-                </Button>
-              </Link>
-            </PanelBody>
-          </Panel>
+            </AccentPanel>
+
+            {/* Inspector panel */}
+            <Panel variant="float">
+              <PanelHeader className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="text-base font-semibold text-text">Inspector</div>
+                  <div className="mt-1 text-sm text-muted">
+                    Context, next steps, shortcuts.
+                  </div>
+                </div>
+                <StatusIndicator color="blue" label="Owned" />
+              </PanelHeader>
+              <Rule />
+              <PanelBody className="pt-5 space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  <Pill>⌘K Command</Pill>
+                  <Pill>Release notes</Pill>
+                </div>
+                <div className="space-y-2">
+                  <div className="row">
+                    <span className="rowKey">Step 01</span>
+                    <span className="rowVal">Create release</span>
+                  </div>
+                  <div className="row">
+                    <span className="rowKey">Step 02</span>
+                    <span className="rowVal">Add tracks + refs</span>
+                  </div>
+                  <div className="row">
+                    <span className="rowKey">Step 03</span>
+                    <span className="rowVal">Export brief</span>
+                  </div>
+                </div>
+                <Link href="/app" className="block">
+                  <Button variant="primary" className="w-full">
+                    Start a release
+                  </Button>
+                </Link>
+              </PanelBody>
+            </Panel>
+          </div>
         </div>
 
-        {/* Lower section */}
-        <section id="how" className="mt-6">
-          <Panel>
-            <PanelHeader className="flex items-start justify-between gap-6 flex-wrap">
-              <div>
-                <div className="label text-[11px] text-faint">WHAT YOU GET</div>
-                <div className="mt-2 text-xl font-semibold h2 text-text">
-                  A mix plan you can trust
-                </div>
-                <div className="mt-2 text-sm text-muted max-w-2xl">
-                  Fewer &quot;what did we decide?&quot; moments. More intent, faster
-                  sessions, cleaner handoffs.
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Pill>Stereo</Pill>
-                <Pill>Atmos</Pill>
-                <Pill>Deliverables</Pill>
-              </div>
-            </PanelHeader>
-            <Rule />
-            <PanelBody className="pt-5 grid gap-3 md:grid-cols-3">
-              <Feature
-                title="Blueprint"
-                body="Define outcomes, references, and constraints before the session."
-              />
-              <Feature
-                title="Organize"
-                body="Keep assets, notes, and track intent in one place."
-              />
-              <Feature
-                title="Brief"
-                body="Export a clean, shareable mix brief for collaborators."
-              />
-            </PanelBody>
-          </Panel>
-        </section>
+        {/* Bottom toolbar (Petronex style) */}
+        <div className="mt-8 flex justify-center">
+          <Toolbar>
+            <ToolbarButton active>
+              <Home size={18} />
+            </ToolbarButton>
+            <ToolbarButton>
+              <Layers size={18} />
+            </ToolbarButton>
+            <ToolbarButton>
+              <Mic2 size={18} />
+            </ToolbarButton>
+            <ToolbarButton>
+              <FileText size={18} />
+            </ToolbarButton>
+            <ToolbarButton>
+              <Settings size={18} />
+            </ToolbarButton>
+          </Toolbar>
+        </div>
 
         {/* Footer */}
         <footer className="mt-12 text-center text-xs text-faint">
@@ -167,9 +239,20 @@ export default function HomePage() {
   );
 }
 
-function Feature({ title, body }: { title: string; body: string }) {
+function Feature({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
   return (
-    <div className="rounded-md border border-border bg-panel2 px-5 py-4 transition-all duration-150 ease-out hover:-translate-y-px hover:border-border-strong">
+    <div className="card px-5 py-5">
+      <div className="w-10 h-10 rounded-md bg-panel2 border border-border flex items-center justify-center text-muted mb-4">
+        {icon}
+      </div>
       <div className="text-base font-semibold text-text">{title}</div>
       <div className="mt-2 text-sm text-muted leading-relaxed">{body}</div>
     </div>

@@ -12,10 +12,12 @@ export function Rail({ items }: { items: Item[] }) {
 
   return (
     <nav className="w-14 shrink-0">
-      <div className="sticky top-6 mx-1 rounded-md border border-border bg-panel shadow-paper-inset">
+      <div className="sticky top-6 rounded-lg border border-border bg-panel shadow-DEFAULT">
         <div className="flex flex-col gap-1 p-2">
           {items.map((it) => {
-            const active = pathname === it.href || (it.href !== "/app" && pathname?.startsWith(it.href));
+            const active =
+              pathname === it.href ||
+              (it.href !== "/app" && pathname?.startsWith(it.href));
             return (
               <Link
                 key={it.href}
@@ -28,7 +30,7 @@ export function Rail({ items }: { items: Item[] }) {
                   "transition-all duration-150 ease-out",
                   "hover:text-text hover:border-border hover:bg-panel2",
                   "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
-                  active && "text-text border-border-strong bg-panel2"
+                  active && "text-signal border-signal/20 bg-signal-muted"
                 )}
               >
                 {it.icon}

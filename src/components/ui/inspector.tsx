@@ -2,6 +2,7 @@ import * as React from "react";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Pill } from "@/components/ui/pill";
 import { Rule } from "@/components/ui/rule";
+import { StatusIndicator } from "@/components/ui/status-dot";
 
 type Props = {
   title?: string;
@@ -15,14 +16,14 @@ export function Inspector({
   children,
 }: Props) {
   return (
-    <Panel>
+    <Panel variant="float">
       <PanelHeader className="pb-3">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-base font-semibold h2 text-text">{title}</div>
             <div className="mt-1 text-sm text-muted">{subtitle}</div>
           </div>
-          <span className="status-stamp status-stamp-draft">Draft</span>
+          <StatusIndicator color="green" label="Active" />
         </div>
       </PanelHeader>
       <Rule />

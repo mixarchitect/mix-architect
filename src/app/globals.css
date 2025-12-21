@@ -2,42 +2,70 @@
 
 /* -------------------------------------------------------
    Mix Architect — Drafting Table Design System
-   Master token file: all visual decisions in one place
+   Refined with Petronex-inspired depth + color pops
 -------------------------------------------------------- */
 
 :root {
   /* ─────────────────────────────────────────────────────
-     PALETTE
+     PALETTE - Core
   ───────────────────────────────────────────────────── */
-  --bg: #f6f4ef;              /* warm off-white drafting surface */
-  --panel: #ffffff;           /* paper card */
-  --panel-2: #fbfaf7;         /* secondary paper (nested areas) */
+  --bg: #e9e9e9;              /* light gray surface (Petronex) */
+  --bg-warm: #f6f4ef;         /* warm off-white alternative */
+  --panel: #ffffff;           /* white paper card */
+  --panel-2: #f8f8f6;         /* secondary paper */
   --text: #141414;            /* near-black ink */
+  --text-inverse: #ffffff;    /* white text on dark */
   --muted: rgba(20, 20, 20, 0.62);
-  --faint: rgba(20, 20, 20, 0.42);
-  --border: rgba(20, 20, 20, 0.10);       /* hairline */
-  --border-strong: rgba(20, 20, 20, 0.18); /* key outlines */
-  --signal: #ff5a1a;          /* accent orange */
-  --signal-muted: rgba(255, 90, 26, 0.12);
+  --faint: rgba(20, 20, 20, 0.38);
+
+  /* ─────────────────────────────────────────────────────
+     PALETTE - Accent Colors (from Petronex)
+  ───────────────────────────────────────────────────── */
+  --signal: #FE5E0E;          /* bold orange */
+  --signal-muted: rgba(254, 94, 14, 0.12);
+  --signal-light: rgba(254, 94, 14, 0.08);
+  --highlight: #FAF5B2;       /* yellow highlight */
+  --highlight-strong: #F5EE8A;
+  --charcoal: #2E2E2E;        /* dark toolbar */
+  --charcoal-light: #3D3D3D;
+
+  /* ─────────────────────────────────────────────────────
+     PALETTE - Status Colors
+  ───────────────────────────────────────────────────── */
+  --status-blue: #3B82F6;
+  --status-green: #22C55E;
+  --status-orange: #FE5E0E;
+
+  /* ─────────────────────────────────────────────────────
+     BORDERS + LINES
+  ───────────────────────────────────────────────────── */
+  --border: rgba(20, 20, 20, 0.08);
+  --border-strong: rgba(20, 20, 20, 0.16);
+  --border-dark: rgba(255, 255, 255, 0.12);
 
   /* ─────────────────────────────────────────────────────
      SHAPE
   ───────────────────────────────────────────────────── */
+  --r-xs: 6px;
   --r-sm: 10px;
   --r-md: 14px;
-  --r-lg: 18px;
+  --r-lg: 20px;
+  --r-xl: 28px;
 
   /* ─────────────────────────────────────────────────────
-     DEPTH (paper-stack realism)
+     DEPTH - Enhanced shadows for floating panels
   ───────────────────────────────────────────────────── */
-  --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.70);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.03);
+  --shadow: 0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 8px rgba(0,0,0,0.04), 0 16px 48px rgba(0,0,0,0.12);
+  --shadow-float: 0 8px 16px rgba(0,0,0,0.06), 0 24px 64px rgba(0,0,0,0.14);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.80);
 
   /* ─────────────────────────────────────────────────────
-     GRID (visible on body, masked under panels)
+     GRID (very subtle)
   ───────────────────────────────────────────────────── */
-  --grid: rgba(20, 20, 20, 0.035);
-  --grid-strong: rgba(20, 20, 20, 0.055);
+  --grid: rgba(20, 20, 20, 0.03);
+  --grid-strong: rgba(20, 20, 20, 0.05);
 }
 
 /* ─────────────────────────────────────────────────────
@@ -51,7 +79,7 @@
 }
 
 /* ─────────────────────────────────────────────────────
-   BASE BODY + DRAFTING GRID
+   BASE BODY + SUBTLE GRID
 ───────────────────────────────────────────────────── */
 html, body {
   height: 100%;
@@ -65,72 +93,153 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Layered drafting background: vignette, wash, minor grid, major grid */
+  /* Very subtle grid background */
   background-image:
-    radial-gradient(1000px 700px at 50% 40%, rgba(0,0,0,0), rgba(0,0,0,0.035)),
-    linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,255,255,0) 50%),
     repeating-linear-gradient(0deg, var(--grid) 0 1px, transparent 1px 72px),
-    repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 72px),
-    repeating-linear-gradient(0deg, var(--grid-strong) 0 1px, transparent 1px 288px),
-    repeating-linear-gradient(90deg, var(--grid-strong) 0 1px, transparent 1px 288px);
-}
-
-/* Subtle noise overlay */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.025;
-  mix-blend-mode: multiply;
-  background-image: repeating-radial-gradient(
-    circle at 17% 23%,
-    rgba(0,0,0,0.18) 0,
-    rgba(0,0,0,0.18) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  background-size: 180px 180px;
+    repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 72px);
 }
 
 /* ─────────────────────────────────────────────────────
    TYPOGRAPHY UTILITIES
 ───────────────────────────────────────────────────── */
 .label {
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   font-size: 11px;
   font-weight: 500;
 }
 
+.label-sm {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 500;
+}
+
 .h1 {
-  letter-spacing: -0.025em;
-  line-height: 1.05;
+  letter-spacing: -0.03em;
+  line-height: 1.0;
 }
 
 .h2 {
-  letter-spacing: -0.018em;
-  line-height: 1.15;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.h3 {
+  letter-spacing: -0.015em;
+  line-height: 1.2;
 }
 
 .mono {
   font-family: var(--font-mono);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 .text-muted { color: var(--muted); }
 .text-faint { color: var(--faint); }
+.text-signal { color: var(--signal); }
+.text-inverse { color: var(--text-inverse); }
 
 /* ─────────────────────────────────────────────────────
-   SURFACE (basic panel without padding)
+   SURFACE - Enhanced floating panel
 ───────────────────────────────────────────────────── */
 .surface {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  box-shadow: var(--shadow);
-  /* Paper highlight at top edge */
   box-shadow: var(--shadow), var(--shadow-inset);
+}
+
+.surface-float {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-float), var(--shadow-inset);
+}
+
+/* ─────────────────────────────────────────────────────
+   ACCENT PANEL - Bold orange section (Petronex style)
+───────────────────────────────────────────────────── */
+.panel-accent {
+  background: var(--signal);
+  color: var(--text-inverse);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.panel-accent::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 48px);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────
+   DARK TOOLBAR (Petronex style)
+───────────────────────────────────────────────────── */
+.toolbar-dark {
+  background: var(--charcoal);
+  color: var(--text-inverse);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow);
+}
+
+.toolbar-dark-pill {
+  background: var(--charcoal);
+  color: var(--text-inverse);
+  border-radius: 999px;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ─────────────────────────────────────────────────────
+   HIGHLIGHT BAR (Yellow accent)
+───────────────────────────────────────────────────── */
+.highlight-bar {
+  background: var(--highlight);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+}
+
+.highlight-dot {
+  width: 24px;
+  height: 24px;
+  background: var(--highlight);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─────────────────────────────────────────────────────
+   STATUS DOTS (Petronex style indicators)
+───────────────────────────────────────────────────── */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.status-dot-blue { background: var(--status-blue); }
+.status-dot-green { background: var(--status-green); }
+.status-dot-orange { background: var(--status-orange); }
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 /* ─────────────────────────────────────────────────────
@@ -139,11 +248,11 @@ body::before {
 .input {
   display: block;
   width: 100%;
-  padding: 10px 14px;
+  padding: 12px 16px;
   font-size: 14px;
   color: var(--text);
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r-sm);
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
@@ -154,7 +263,7 @@ body::before {
 
 .input:focus {
   outline: none;
-  border-color: var(--border-strong);
+  border-color: var(--signal);
   box-shadow: 0 0 0 3px var(--signal-muted);
 }
 
@@ -167,61 +276,115 @@ select.input {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-opacity='0.5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 36px;
+  background-position: right 14px center;
+  padding-right: 40px;
 }
 
 /* ─────────────────────────────────────────────────────
-   CHIPS, PILLS, ROWS
+   DATA GRID (Petronex 2-column layout)
+───────────────────────────────────────────────────── */
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 24px;
+}
+
+.data-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.data-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  font-weight: 500;
+}
+
+.data-value {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.data-value-sm {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+/* Data grid on accent panel */
+.panel-accent .data-label {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.panel-accent .data-value,
+.panel-accent .data-value-sm {
+  color: var(--text-inverse);
+}
+
+/* ─────────────────────────────────────────────────────
+   CHIPS, PILLS
 ───────────────────────────────────────────────────── */
 .chip {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--border);
+  gap: 6px;
+  border: 1px solid var(--border-strong);
   border-radius: 999px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   font-size: 12px;
-  background: var(--panel-2);
+  background: var(--panel);
   color: var(--muted);
-  transition: border-color 150ms ease;
+  transition: all 150ms ease;
 }
 
 .chip:hover {
-  border-color: var(--border-strong);
+  border-color: var(--text);
+  color: var(--text);
 }
 
 .pill {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 6px 10px;
+  padding: 6px 12px;
   font-size: 12px;
   background: var(--panel-2);
   color: var(--muted);
 }
 
 .pill-active {
-  border-color: var(--border-strong);
+  border-color: var(--text);
   color: var(--text);
   background: var(--panel);
 }
 
+/* ─────────────────────────────────────────────────────
+   ROW ITEMS (checklist style)
+───────────────────────────────────────────────────── */
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  gap: 16px;
+  padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  background: var(--panel-2);
+  background: var(--panel);
 }
 
 .rowKey {
   color: var(--muted);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   font-family: var(--font-mono);
 }
@@ -233,111 +396,69 @@ select.input {
 }
 
 /* ─────────────────────────────────────────────────────
-   TITLE BLOCK (architect sheet stamp)
-───────────────────────────────────────────────────── */
-.title-block {
-  border: 1px solid var(--border);
-  background: var(--panel-2);
-  border-radius: 6px;
-  padding: 5px 8px;
-}
-
-/* ─────────────────────────────────────────────────────
-   TICK MARKS (drafting detail)
-───────────────────────────────────────────────────── */
-.ticks {
-  position: relative;
-}
-.ticks::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 -1px 0;
-  height: 1px;
-  background-image: repeating-linear-gradient(
-    to right,
-    var(--border) 0 6px,
-    transparent 6px 12px
-  );
-  opacity: 0.5;
-}
-
-/* ─────────────────────────────────────────────────────
-   RULES (dividers)
-───────────────────────────────────────────────────── */
-.rule-dashed {
-  background-image: repeating-linear-gradient(
-    to right,
-    var(--border) 0 5px,
-    transparent 5px 10px
-  );
-  height: 1px;
-}
-
-/* ─────────────────────────────────────────────────────
-   BUTTONS
+   BUTTONS - Refined with better states
 ───────────────────────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 40px;
-  padding: 0 18px;
+  gap: 8px;
+  height: 44px;
+  padding: 0 22px;
   font-size: 14px;
   font-weight: 600;
   color: white;
   background: var(--signal);
-  border: 1px solid rgba(0,0,0,0.08);
-  border-radius: 999px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.15);
-  transition: transform 150ms ease, filter 150ms ease, box-shadow 150ms ease;
+  border: none;
+  border-radius: var(--r-sm);
+  box-shadow: 0 2px 8px rgba(254, 94, 14, 0.25);
+  transition: all 150ms ease;
   cursor: pointer;
 }
 
 .btn-primary:hover {
-  filter: brightness(1.02);
+  background: #E5540D;
+  box-shadow: 0 4px 16px rgba(254, 94, 14, 0.35);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
 .btn-primary:active {
   transform: translateY(0);
-  filter: brightness(0.98);
 }
 
 .btn-primary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--signal-muted), 0 2px 6px rgba(0,0,0,0.08);
+  box-shadow: 0 0 0 3px var(--signal-muted), 0 2px 8px rgba(254, 94, 14, 0.25);
 }
 
 .btn-primary:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
-  filter: none;
 }
 
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 40px;
-  padding: 0 18px;
+  gap: 8px;
+  height: 44px;
+  padding: 0 22px;
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
   background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  box-shadow: var(--shadow);
-  transition: transform 150ms ease, border-color 150ms ease;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-sm);
+  transition: all 150ms ease;
   cursor: pointer;
 }
 
 .btn-secondary:hover {
+  border-color: var(--text);
+  box-shadow: var(--shadow);
   transform: translateY(-1px);
-  border-color: var(--border-strong);
 }
 
 .btn-secondary:active {
@@ -346,11 +467,11 @@ select.input {
 
 .btn-secondary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--signal-muted), var(--shadow);
+  box-shadow: 0 0 0 3px var(--signal-muted);
 }
 
 .btn-secondary:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -358,27 +479,22 @@ select.input {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 40px;
-  padding: 0 18px;
+  gap: 8px;
+  height: 44px;
+  padding: 0 22px;
   font-size: 14px;
   font-weight: 600;
   color: var(--text);
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 999px;
-  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+  border-radius: var(--r-sm);
+  transition: all 150ms ease;
   cursor: pointer;
 }
 
 .btn-ghost:hover {
   background: var(--panel);
   border-color: var(--border-strong);
-  transform: translateY(-1px);
-}
-
-.btn-ghost:active {
-  transform: translateY(0);
 }
 
 .btn-ghost:focus-visible {
@@ -387,24 +503,88 @@ select.input {
 }
 
 .btn-ghost:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
+/* Dark button variant */
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 22px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-inverse);
+  background: var(--charcoal);
+  border: none;
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow);
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+
+.btn-dark:hover {
+  background: var(--charcoal-light);
+  transform: translateY(-1px);
+}
+
+/* Icon buttons */
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--panel);
+  color: var(--muted);
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+
+.btn-icon:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.btn-icon-dark {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--r-sm);
+  background: var(--charcoal);
+  color: var(--text-inverse);
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+
+.btn-icon-dark:hover {
+  background: var(--charcoal-light);
+}
+
 /* ─────────────────────────────────────────────────────
-   STATUS STAMPS (mono instrument readouts)
+   STATUS STAMPS
 ───────────────────────────────────────────────────── */
 .status-stamp {
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
+  padding: 6px 10px;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--r-xs);
   background: var(--panel-2);
   color: var(--muted);
 }
@@ -416,7 +596,7 @@ select.input {
 }
 
 .status-stamp-live {
-  border-color: rgba(255, 90, 26, 0.3);
+  border-color: var(--signal);
   background: var(--signal-muted);
   color: var(--signal);
 }
@@ -428,15 +608,77 @@ select.input {
 }
 
 /* ─────────────────────────────────────────────────────
-   FOCUS RING UTILITY
+   CARD CONTAINERS - Enhanced with better definition
 ───────────────────────────────────────────────────── */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 150ms ease;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+.card-float {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-float);
+}
+
+/* ─────────────────────────────────────────────────────
+   DIVIDERS
+───────────────────────────────────────────────────── */
+.rule {
+  height: 1px;
+  background: var(--border);
+  border: none;
+}
+
+.rule-strong {
+  height: 1px;
+  background: var(--border-strong);
+  border: none;
+}
+
+.rule-dashed {
+  height: 1px;
+  background: transparent;
+  border: none;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--border-strong) 0 5px,
+    transparent 5px 10px
+  );
+}
+
+/* ─────────────────────────────────────────────────────
+   UTILITIES
+───────────────────────────────────────────────────── */
+.border-hairline { border-color: var(--border); }
+.border-strong { border-color: var(--border-strong); }
+.bg-panel { background: var(--panel); }
+.bg-panel-2 { background: var(--panel-2); }
+.bg-signal { background: var(--signal); }
+.bg-charcoal { background: var(--charcoal); }
+.bg-highlight { background: var(--highlight); }
+
 .focus-ring:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--signal-muted);
 }
 
 /* ─────────────────────────────────────────────────────
-   BORDER UTILITIES
+   RESPONSIVE HELPERS
 ───────────────────────────────────────────────────── */
-.border-hairline { border-color: var(--border); }
-.border-strong { border-color: var(--border-strong); }
+@media (max-width: 768px) {
+  .data-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
