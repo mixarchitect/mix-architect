@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 
 type ReleasePageProps = {
@@ -10,8 +10,24 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
   const supabase = await createSupabaseServerClient();
 
   if (!params?.releaseId) {
-    // If the dynamic segment is missing, return to the releases list.
-    redirect("/app");
+    return (
+      <div className="space-y-4">
+        <Link
+          href="/app"
+          className="text-sm text-neutral-400 hover:text-neutral-200"
+        >
+          ← Back to releases
+        </Link>
+
+        <h1 className="text-2xl font-semibold">Release not found</h1>
+        <p className="text-sm text-neutral-400">
+          Missing route param <code>releaseId</code>. Raw params object:
+        </p>
+        <pre className="text-xs bg-neutral-900 border border-neutral-800 rounded-md p-3 overflow-x-auto">
+          {JSON.stringify(params, null, 2)}
+        </pre>
+      </div>
+    );
   }
 
   const { data: release, error } = await supabase
@@ -20,7 +36,34 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
     .eq("id", params.releaseId)
     .maybeSingle();
 
-  if (!release || error) {
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <Link
+          href="/app"
+          className="text-sm text-neutral-400 hover:text-neutral-200"
+        >
+          ← Back to releases
+        </Link>
+
+        <h1 className="text-2xl font-semibold">Release not found</h1>
+
+        <p className="text-sm text-neutral-400">
+          Tried to load release with id:
+        </p>
+        <pre className="text-xs bg-neutral-900 border border-neutral-800 rounded-md p-3 overflow-x-auto">
+          {params.releaseId}
+        </pre>
+
+        <p className="text-sm text-red-400">Supabase error:</p>
+        <pre className="text-xs bg-neutral-900 border border-red-800 rounded-md p-3 overflow-x-auto">
+          {error.message}
+        </pre>
+      </div>
+    );
+  }
+
+  if (!release) {
     notFound();
   }
 
@@ -62,4 +105,3 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
     </div>
   );
 }
-
