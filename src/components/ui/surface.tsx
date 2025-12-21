@@ -1,6 +1,9 @@
 import * as React from "react";
 import { cn } from "@/lib/cn";
 
+/**
+ * @deprecated Use Panel instead for consistency
+ */
 export function Surface({
   className,
   ...props
@@ -8,8 +11,7 @@ export function Surface({
   return (
     <div
       className={cn(
-        "rounded-lg border border-border bg-panel shadow-paper",
-        "transition duration-200 ease-out hover:-translate-y-[1px] hover:border-black/15",
+        "rounded-lg border border-border bg-panel shadow-paper-inset",
         className
       )}
       {...props}
@@ -17,6 +19,9 @@ export function Surface({
   );
 }
 
+/**
+ * @deprecated Use PanelHeader instead for consistency
+ */
 export function SurfaceHeader({
   className,
   ...props
@@ -29,10 +34,12 @@ export function SurfaceHeader({
   );
 }
 
+/**
+ * @deprecated Use PanelBody instead for consistency
+ */
 export function SurfaceBody({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("px-6 pb-6", className)} {...props} />;
 }
-

@@ -2,34 +2,47 @@
 
 /* -------------------------------------------------------
    Mix Architect — Drafting Table Design System
-   Tokens + background + primitives (no blur/glass)
+   Master token file: all visual decisions in one place
 -------------------------------------------------------- */
 
 :root {
-  /* Color */
-  --bg: #f6f4ef;
-  --panel: #ffffff;
-  --panel-2: #fbfaf7;
-  --text: #141414;
+  /* ─────────────────────────────────────────────────────
+     PALETTE
+  ───────────────────────────────────────────────────── */
+  --bg: #f6f4ef;              /* warm off-white drafting surface */
+  --panel: #ffffff;           /* paper card */
+  --panel-2: #fbfaf7;         /* secondary paper (nested areas) */
+  --text: #141414;            /* near-black ink */
   --muted: rgba(20, 20, 20, 0.62);
   --faint: rgba(20, 20, 20, 0.42);
-  --border: rgba(20, 20, 20, 0.10);
-  --signal: #ff5a1a;
+  --border: rgba(20, 20, 20, 0.10);       /* hairline */
+  --border-strong: rgba(20, 20, 20, 0.18); /* key outlines */
+  --signal: #ff5a1a;          /* accent orange */
+  --signal-muted: rgba(255, 90, 26, 0.12);
 
-  /* Shape */
-  --r-sm: 12px;
-  --r-md: 16px;
-  --r-lg: 20px;
+  /* ─────────────────────────────────────────────────────
+     SHAPE
+  ───────────────────────────────────────────────────── */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
 
-  /* Depth (subtle, realistic) */
-  --shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  /* ─────────────────────────────────────────────────────
+     DEPTH (paper-stack realism)
+  ───────────────────────────────────────────────────── */
+  --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.70);
 
-  /* Grid */
-  --grid: rgba(20, 20, 20, 0.045);
-  --grid-strong: rgba(20, 20, 20, 0.065);
+  /* ─────────────────────────────────────────────────────
+     GRID (visible on body, masked under panels)
+  ───────────────────────────────────────────────────── */
+  --grid: rgba(20, 20, 20, 0.035);
+  --grid-strong: rgba(20, 20, 20, 0.055);
 }
 
+/* ─────────────────────────────────────────────────────
+   TAILWIND V4 THEME BRIDGE
+───────────────────────────────────────────────────── */
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
@@ -37,96 +50,67 @@
   --font-mono: var(--font-geist-mono);
 }
 
-html,
-body {
+/* ─────────────────────────────────────────────────────
+   BASE BODY + DRAFTING GRID
+───────────────────────────────────────────────────── */
+html, body {
   height: 100%;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Drafting Table backdrop: grid + noise + vignette (very subtle) */
+  /* Layered drafting background: vignette, wash, minor grid, major grid */
   background-image:
-    radial-gradient(900px 600px at 50% 35%, rgba(0, 0, 0, 0.06), transparent 60%),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0)),
-    repeating-linear-gradient(
-      0deg,
-      var(--grid),
-      var(--grid) 1px,
-      transparent 1px,
-      transparent 72px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      var(--grid),
-      var(--grid) 1px,
-      transparent 1px,
-      transparent 72px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      var(--grid-strong),
-      var(--grid-strong) 1px,
-      transparent 1px,
-      transparent 288px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      var(--grid-strong),
-      var(--grid-strong) 1px,
-      transparent 1px,
-      transparent 288px
-    );
+    radial-gradient(1000px 700px at 50% 40%, rgba(0,0,0,0), rgba(0,0,0,0.035)),
+    linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,255,255,0) 50%),
+    repeating-linear-gradient(0deg, var(--grid) 0 1px, transparent 1px 72px),
+    repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 72px),
+    repeating-linear-gradient(0deg, var(--grid-strong) 0 1px, transparent 1px 288px),
+    repeating-linear-gradient(90deg, var(--grid-strong) 0 1px, transparent 1px 288px);
 }
 
-/* Tiny noise overlay (CSS-only) */
+/* Subtle noise overlay */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.035;
+  opacity: 0.025;
   mix-blend-mode: multiply;
   background-image: repeating-radial-gradient(
-    circle at 20% 20%,
-    rgba(0, 0, 0, 0.16) 0,
-    rgba(0, 0, 0, 0.16) 1px,
+    circle at 17% 23%,
+    rgba(0,0,0,0.18) 0,
+    rgba(0,0,0,0.18) 1px,
     transparent 1px,
     transparent 3px
   );
-  background-size: 220px 220px;
+  background-size: 180px 180px;
 }
 
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    1200px 800px at 50% 45%,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0.06)
-  );
-  opacity: 0.6;
-}
-
+/* ─────────────────────────────────────────────────────
+   TYPOGRAPHY UTILITIES
+───────────────────────────────────────────────────── */
 .label {
-  letter-spacing: 0.24em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   font-size: 11px;
+  font-weight: 500;
 }
 
 .h1 {
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
 }
 
 .h2 {
-  letter-spacing: -0.02em;
+  letter-spacing: -0.018em;
+  line-height: 1.15;
 }
 
 .mono {
@@ -136,37 +120,108 @@ body::after {
 
 .text-muted { color: var(--muted); }
 .text-faint { color: var(--faint); }
-.border-hairline { border-color: var(--border); }
 
+/* ─────────────────────────────────────────────────────
+   SURFACE (basic panel without padding)
+───────────────────────────────────────────────────── */
 .surface {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow);
+  /* Paper highlight at top edge */
+  box-shadow: var(--shadow), var(--shadow-inset);
 }
 
+/* ─────────────────────────────────────────────────────
+   INPUT STYLING
+───────────────────────────────────────────────────── */
+.input {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.input::placeholder {
+  color: var(--faint);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px var(--signal-muted);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+select.input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-opacity='0.5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+/* ─────────────────────────────────────────────────────
+   CHIPS, PILLS, ROWS
+───────────────────────────────────────────────────── */
 .chip {
+  display: inline-flex;
+  align-items: center;
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 7px 10px;
+  padding: 6px 10px;
   font-size: 12px;
   background: var(--panel-2);
+  color: var(--muted);
+  transition: border-color 150ms ease;
+}
+
+.chip:hover {
+  border-color: var(--border-strong);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  background: var(--panel-2);
+  color: var(--muted);
+}
+
+.pill-active {
+  border-color: var(--border-strong);
+  color: var(--text);
+  background: var(--panel);
 }
 
 .row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--r-sm);
   background: var(--panel-2);
 }
 
 .rowKey {
   color: var(--muted);
-  font-size: 12px;
-  letter-spacing: 0.22em;
+  font-size: 11px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   font-family: var(--font-mono);
 }
@@ -174,83 +229,214 @@ body::after {
 .rowVal {
   font-size: 14px;
   font-family: var(--font-mono);
+  color: var(--text);
 }
 
+/* ─────────────────────────────────────────────────────
+   TITLE BLOCK (architect sheet stamp)
+───────────────────────────────────────────────────── */
 .title-block {
   border: 1px solid var(--border);
   background: var(--panel-2);
-  border-radius: 8px;
-  padding: 6px 8px;
-  box-shadow: var(--shadow-inset);
+  border-radius: 6px;
+  padding: 5px 8px;
 }
 
+/* ─────────────────────────────────────────────────────
+   TICK MARKS (drafting detail)
+───────────────────────────────────────────────────── */
 .ticks {
   position: relative;
 }
 .ticks::after {
   content: "";
   position: absolute;
-  inset: auto 0 -2px 0;
+  inset: auto 0 -1px 0;
   height: 1px;
   background-image: repeating-linear-gradient(
     to right,
-    var(--border),
-    var(--border) 8px,
-    transparent 8px,
-    transparent 16px
+    var(--border) 0 6px,
+    transparent 6px 12px
   );
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
+/* ─────────────────────────────────────────────────────
+   RULES (dividers)
+───────────────────────────────────────────────────── */
 .rule-dashed {
   background-image: repeating-linear-gradient(
     to right,
-    var(--border),
-    var(--border) 6px,
-    transparent 6px,
-    transparent 12px
+    var(--border) 0 5px,
+    transparent 5px 10px
   );
   height: 1px;
 }
 
+/* ─────────────────────────────────────────────────────
+   BUTTONS
+───────────────────────────────────────────────────── */
 .btn-primary {
-  background: var(--signal);
-  color: white;
-  border-radius: 999px;
-  padding: 12px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 18px;
+  font-size: 14px;
   font-weight: 600;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
-  transition: transform 180ms ease, filter 180ms ease;
+  color: white;
+  background: var(--signal);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: transform 150ms ease, filter 150ms ease, box-shadow 150ms ease;
+  cursor: pointer;
 }
 
 .btn-primary:hover {
-  filter: brightness(0.985);
+  filter: brightness(1.02);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.15);
 }
 
 .btn-primary:active {
   transform: translateY(0);
+  filter: brightness(0.98);
+}
+
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--signal-muted), 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  transition: transform 150ms ease, border-color 150ms ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--signal-muted), var(--shadow);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 12px 16px;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.6);
-  transition: background 180ms ease, transform 180ms ease;
+  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+  cursor: pointer;
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--panel);
+  border-color: var(--border-strong);
   transform: translateY(-1px);
 }
 
-.pill {
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 12px;
-  background: var(--panel-2);
+.btn-ghost:active {
+  transform: translateY(0);
 }
+
+.btn-ghost:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--signal-muted);
+}
+
+.btn-ghost:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ─────────────────────────────────────────────────────
+   STATUS STAMPS (mono instrument readouts)
+───────────────────────────────────────────────────── */
+.status-stamp {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--panel-2);
+  color: var(--muted);
+}
+
+.status-stamp-ready {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.08);
+  color: #15803d;
+}
+
+.status-stamp-live {
+  border-color: rgba(255, 90, 26, 0.3);
+  background: var(--signal-muted);
+  color: var(--signal);
+}
+
+.status-stamp-draft {
+  border-color: var(--border);
+  background: var(--panel-2);
+  color: var(--muted);
+}
+
+/* ─────────────────────────────────────────────────────
+   FOCUS RING UTILITY
+───────────────────────────────────────────────────── */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--signal-muted);
+}
+
+/* ─────────────────────────────────────────────────────
+   BORDER UTILITIES
+───────────────────────────────────────────────────── */
+.border-hairline { border-color: var(--border); }
+.border-strong { border-color: var(--border-strong); }

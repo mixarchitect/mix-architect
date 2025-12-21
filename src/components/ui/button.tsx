@@ -12,20 +12,23 @@ export function Button({ className, variant = "secondary", ...props }: Props) {
     <button
       className={cn(
         "inline-flex items-center justify-center gap-2 select-none",
-        "h-11 px-4 rounded-full text-sm font-semibold",
-        "transition duration-200 ease-out",
+        "h-10 px-[18px] rounded-full text-sm font-semibold",
+        "transition-all duration-150 ease-out",
+        "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
+        // Primary: signal orange, physical button feel
         variant === "primary" &&
-          "bg-signal text-white border border-black/5 shadow-[0_10px_22px_rgba(0,0,0,0.08)] hover:-translate-y-[1px] hover:brightness-[0.985] active:translate-y-0",
+          "bg-signal text-white border border-black/[0.08] shadow-[0_2px_6px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.15)] hover:brightness-[1.02] hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(0,0,0,0.10),inset_0_1px_0_rgba(255,255,255,0.15)] active:translate-y-0 active:brightness-[0.98]",
+        // Secondary: paper button with ink border
         variant === "secondary" &&
-          "bg-panel border border-border text-text shadow-[0_10px_26px_rgba(0,0,0,0.06)] hover:-translate-y-[1px] hover:border-black/20 active:translate-y-0",
+          "bg-panel text-text border border-border shadow-paper hover:-translate-y-px hover:border-border-strong active:translate-y-0",
+        // Ghost: minimal, just border
         variant === "ghost" &&
-          "bg-white/60 border border-border text-text hover:bg-white/85 hover:-translate-y-[1px] active:translate-y-0",
-        "disabled:opacity-50 disabled:pointer-events-none",
+          "bg-transparent text-text border border-border hover:bg-panel hover:border-border-strong hover:-translate-y-px active:translate-y-0",
+        // Disabled state
+        "disabled:opacity-55 disabled:cursor-not-allowed disabled:transform-none disabled:hover:transform-none",
         className
       )}
       {...props}
     />
   );
 }
-
-

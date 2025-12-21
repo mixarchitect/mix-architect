@@ -9,14 +9,13 @@ export function Rule({ className, dashed, ...props }: Props) {
   return (
     <hr
       className={cn(
-        "border-0 h-px bg-[var(--border)]",
-        dashed && "rule-dashed bg-none",
+        "border-0 h-px",
+        dashed
+          ? "bg-transparent bg-[repeating-linear-gradient(to_right,var(--border)_0_5px,transparent_5px_10px)]"
+          : "bg-border",
         className
       )}
       {...props}
     />
   );
 }
-
-
-

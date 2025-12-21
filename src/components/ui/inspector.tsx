@@ -17,18 +17,17 @@ export function Inspector({
   return (
     <Panel>
       <PanelHeader className="pb-3">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-base font-semibold h2">{title}</div>
+            <div className="text-base font-semibold h2 text-text">{title}</div>
             <div className="mt-1 text-sm text-muted">{subtitle}</div>
           </div>
-          <Pill>Draft</Pill>
+          <span className="status-stamp status-stamp-draft">Draft</span>
         </div>
       </PanelHeader>
       <Rule />
       <PanelBody className="pt-5 space-y-4">
-        {children}
-        {!children && (
+        {children ?? (
           <>
             <div className="flex flex-wrap gap-2">
               <Pill>⌘K Command</Pill>
@@ -36,8 +35,8 @@ export function Inspector({
               <Pill>Export brief</Pill>
             </div>
             <p className="text-sm text-muted leading-relaxed">
-              Treat Mix Architect like a drafting layer: define intent, lock deliverables, and reduce
-              second‑guessing before the session starts.
+              Treat Mix Architect like a drafting layer: define intent, lock
+              deliverables, and reduce second‑guessing before the session starts.
             </p>
             <div className="space-y-2">
               <div className="row">
@@ -59,5 +58,3 @@ export function Inspector({
     </Panel>
   );
 }
-
-

@@ -11,6 +11,7 @@ const config: Config = {
       },
       boxShadow: {
         paper: "var(--shadow)",
+        "paper-inset": "var(--shadow), var(--shadow-inset)",
       },
       colors: {
         bg: "var(--bg)",
@@ -20,7 +21,9 @@ const config: Config = {
         muted: "var(--muted)",
         faint: "var(--faint)",
         border: "var(--border)",
+        "border-strong": "var(--border-strong)",
         signal: "var(--signal)",
+        "signal-muted": "var(--signal-muted)",
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "ui-sans-serif", "system-ui"],
@@ -32,4 +35,3 @@ const config: Config = {
 };
 
 export default config;
-

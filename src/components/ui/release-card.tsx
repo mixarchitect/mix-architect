@@ -23,15 +23,17 @@ export function ReleaseCard({
     <Link
       href={`/app/releases/${id}`}
       className={cn(
-        "block rounded-md border border-border bg-panel px-5 py-4",
-        "transition duration-200 ease-out",
-        "hover:-translate-y-[2px] hover:border-black/15 hover:shadow-[0_10px_26px_rgba(0,0,0,0.06)]",
+        "group block rounded-md border border-border bg-panel",
+        "px-5 py-4",
+        "transition-all duration-150 ease-out",
+        "hover:-translate-y-[2px] hover:border-border-strong hover:shadow-paper",
+        "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
         className
       )}
     >
       <div className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <div className="text-base font-semibold text-text leading-tight truncate">
+        <div className="min-w-0 flex-1">
+          <div className="text-base font-semibold text-text leading-tight truncate group-hover:text-signal transition-colors duration-150">
             {name}
           </div>
           <div className="mt-1 text-sm text-muted truncate">
@@ -44,13 +46,13 @@ export function ReleaseCard({
       </div>
 
       <div className="mt-3 flex items-center justify-between text-xs text-faint">
-        <span className="font-mono">
+        <span className="font-mono tracking-tight">
           {createdAt ? new Date(createdAt).toLocaleDateString() : "—"}
         </span>
-        <span className="label text-[10px] text-faint">OPEN</span>
+        <span className="label text-[10px] text-faint group-hover:text-muted transition-colors">
+          OPEN →
+        </span>
       </div>
     </Link>
   );
 }
-
-

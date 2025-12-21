@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
-import { Rule } from "@/components/ui/rule";
 import { Button } from "@/components/ui/button";
+import { Rule } from "@/components/ui/rule";
 
 export default function SignInPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -50,46 +51,65 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-10">
+    <main className="min-h-screen flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         <Panel>
-          <PanelHeader className="text-center space-y-2">
-            <p className="label text-faint">ACCESS</p>
-            <h1 className="text-2xl font-semibold">
-              {mode === "signin" ? "Sign in to Mix Architect" : "Create a Mix Architect account"}
+          <PanelHeader className="text-center">
+            <div className="label text-[11px] text-faint">ACCESS</div>
+            <h1 className="mt-3 text-2xl font-semibold h1 text-text">
+              {mode === "signin"
+                ? "Sign in to Mix Architect"
+                : "Create a Mix Architect account"}
             </h1>
           </PanelHeader>
           <Rule />
-          <PanelBody className="pt-5 space-y-4">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
+          <PanelBody className="pt-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-1.5">
                 <label className="label text-faint">Email</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border border-border rounded-md px-3 py-2 text-sm bg-panel"
+                  className="input"
+                  placeholder="you@example.com"
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="label text-faint">Password</label>
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-border rounded-md px-3 py-2 text-sm bg-panel"
+                  className="input"
+                  placeholder="••••••••"
                 />
               </div>
 
-              {errorMsg && <p className="text-sm text-red-500">{errorMsg}</p>}
+              {errorMsg && (
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                  {errorMsg}
+                </p>
+              )}
 
-              <Button type="submit" disabled={loading} variant="primary" className="w-full">
-                {loading ? "Working..." : mode === "signin" ? "Sign in" : "Sign up"}
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={loading}
+                className="w-full"
+              >
+                {loading
+                  ? "Working..."
+                  : mode === "signin"
+                  ? "Sign in"
+                  : "Sign up"}
               </Button>
             </form>
+
+            <Rule className="my-5" />
 
             <p className="text-center text-sm text-muted">
               {mode === "signin" ? (
@@ -98,7 +118,7 @@ export default function SignInPage() {
                   <button
                     type="button"
                     onClick={() => setMode("signup")}
-                    className="underline underline-offset-2"
+                    className="text-text underline underline-offset-2 hover:text-signal transition-colors"
                   >
                     Sign up
                   </button>
@@ -109,17 +129,25 @@ export default function SignInPage() {
                   <button
                     type="button"
                     onClick={() => setMode("signin")}
-                    className="underline underline-offset-2"
+                    className="text-text underline underline-offset-2 hover:text-signal transition-colors"
                   >
                     Sign in
                   </button>
                 </>
               )}
             </p>
+
+            <div className="mt-5 text-center">
+              <Link
+                href="/"
+                className="text-xs text-faint hover:text-muted transition-colors"
+              >
+                ← Back to home
+              </Link>
+            </div>
           </PanelBody>
         </Panel>
       </div>
     </main>
   );
 }
-

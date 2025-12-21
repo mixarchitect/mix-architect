@@ -16,21 +16,24 @@ export default async function AppDashboardPage() {
     .select("*")
     .order("created_at", { ascending: false });
 
+  const releaseCount = releases?.length ?? 0;
+
   return (
     <div className="flex flex-col gap-4">
+      {/* Summary header */}
       <Panel>
         <PanelHeader className="flex items-start justify-between gap-6">
           <div>
             <div className="label text-[11px] text-faint">PIPELINE</div>
-            <h1 className="mt-2 text-[44px] leading-[1.05] font-semibold h1 text-text">
+            <h1 className="mt-2 text-[40px] leading-[1.05] font-semibold h1 text-text">
               Releases
             </h1>
             <p className="mt-3 text-sm text-muted max-w-2xl">
               Albums, EPs and singles you are building mix blueprints for.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Pill className="font-mono">v1</Pill>
+          <div className="flex items-center gap-3">
+            <span className="status-stamp font-mono">v1</span>
             <Link href="/app/releases/new">
               <Button variant="primary">New release</Button>
             </Link>
@@ -40,7 +43,7 @@ export default async function AppDashboardPage() {
         <PanelBody className="pt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
           <StatTile
             label="Active releases"
-            value={String(releases?.length ?? 0)}
+            value={String(releaseCount).padStart(2, "0")}
             note="In the pipeline"
           />
           <StatTile label="System" value="READY" note="Drafting table mode" />
@@ -48,14 +51,15 @@ export default async function AppDashboardPage() {
         </PanelBody>
       </Panel>
 
+      {/* List section */}
       <Panel>
         <PanelHeader className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="text-lg font-semibold h2 text-text">List</div>
-            <Pill>All</Pill>
+            <Pill active>All</Pill>
           </div>
-          <div className="text-xs text-muted font-mono">
-            {String(releases?.length ?? 0).padStart(2, "0")} items
+          <div className="text-xs text-muted font-mono tracking-tight">
+            {String(releaseCount).padStart(2, "0")} items
           </div>
         </PanelHeader>
         <Rule />
@@ -72,27 +76,30 @@ export default async function AppDashboardPage() {
               />
             ))
           ) : (
-            <div className="md:col-span-2 surface p-6">
-              <div className="label text-[11px] text-faint">EMPTY</div>
-              <div className="mt-2 text-base font-semibold">No releases yet</div>
-              <div className="mt-2 text-sm text-muted">
-                Start a blueprint to see it in your pipeline.
-              </div>
-              <div className="mt-5">
-                <Link href="/app/releases/new">
-                  <Button variant="primary">Create release</Button>
-                </Link>
-              </div>
+            <div className="md:col-span-2">
+              <Panel variant="inset" className="p-6">
+                <div className="label text-[11px] text-faint">EMPTY</div>
+                <div className="mt-2 text-base font-semibold text-text">
+                  No releases yet
+                </div>
+                <div className="mt-2 text-sm text-muted">
+                  Start a blueprint to see it in your pipeline.
+                </div>
+                <div className="mt-5">
+                  <Link href="/app/releases/new">
+                    <Button variant="primary">Create release</Button>
+                  </Link>
+                </div>
+              </Panel>
             </div>
           )}
         </PanelBody>
       </Panel>
 
-      {/* Mobile inspector lives below main; desktop uses Shell's right column */}
+      {/* Mobile inspector (stacks below on lg:hidden via Shell) */}
       <div className="lg:hidden">
         <Inspector />
       </div>
     </div>
   );
 }
-
