@@ -24,7 +24,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <main className="min-h-screen flex flex-col bg-transparent">
-      <header className="border-b border-[#1f2a3d] bg-[#0f1725]/80 backdrop-blur px-6 py-4 flex items-center justify-between">
+      <header className="border-b border-[#dcdcdc] bg-white/80 backdrop-blur px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="pill">Mix Architect</div>
           <span className="text-subtle text-xs uppercase tracking-[0.2em]">
@@ -35,7 +35,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
       </header>
 
       {debugError && (
-        <div className="bg-red-950 text-red-200 text-xs px-6 py-3 border-b border-red-700 whitespace-pre-wrap">
+        <div className="bg-red-100 text-red-700 text-xs px-6 py-3 border-b border-red-200 whitespace-pre-wrap">
           {debugError}
         </div>
       )}

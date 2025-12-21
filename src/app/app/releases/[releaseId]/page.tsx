@@ -10,10 +10,10 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
   if (!params?.releaseId) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 card p-5">
         <Link
           href="/app"
-          className="text-sm text-neutral-400 hover:text-neutral-200"
+          className="text-sm text-subtle hover:text-black"
         >
           ← Back to releases
         </Link>
@@ -37,27 +37,27 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
   if (!release || error) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 card p-5">
         <Link
           href="/app"
-          className="text-sm text-neutral-400 hover:text-neutral-200"
+          className="text-sm text-subtle hover:text-black"
         >
           ← Back to releases
         </Link>
 
         <h1 className="text-2xl font-semibold">Release not found</h1>
 
-        <p className="text-sm text-neutral-400">
+        <p className="text-sm text-subtle">
           Tried to load release with id:
         </p>
-        <pre className="text-xs bg-neutral-900 border border-neutral-800 rounded-md p-3 overflow-x-auto">
+        <pre className="text-xs bg-[#f6f6f6] border border-[#e2e2e2] rounded-md p-3 overflow-x-auto">
           {params.releaseId}
         </pre>
 
         {error && (
           <>
             <p className="text-sm text-red-400">Supabase error:</p>
-            <pre className="text-xs bg-neutral-900 border border-red-800 rounded-md p-3 overflow-x-auto">
+            <pre className="text-xs bg-[#f6f6f6] border border-red-200 rounded-md p-3 overflow-x-auto">
               {error.message}
             </pre>
           </>
@@ -68,10 +68,10 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="card p-5 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">{release.name}</h1>
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-subtle">
             {release.artist_name
               ? `${release.artist_name} · ${release.type}`
               : release.type}
@@ -80,24 +80,24 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
         <Link
           href="/app"
-          className="text-sm text-neutral-400 hover:text-neutral-200"
+          className="btn-ghost text-sm"
         >
           ← Back to releases
         </Link>
       </div>
 
-      <section className="space-y-3">
+      <section className="card p-5 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Tracks</h2>
           <Link
             href={`/app/releases/${release.id}/tracks/new`}
-            className="inline-flex items-center rounded-md border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-900"
+            className="btn-primary text-sm"
           >
             + Add track
           </Link>
         </div>
 
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-subtle">
           No tracks yet. Add a track to start a Mix Architect blueprint.
         </p>
       </section>
