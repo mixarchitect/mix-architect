@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #e9e9e9;
-  --background-strong: #f6f6f6;
+  --background: #f1f1f1;
+  --background-strong: #f8f8f8;
   --surface: #ffffff;
-  --surface-2: #e2e2e2;
-  --surface-3: #f2f2f2;
-  --foreground: #2e2e2e;
-  --muted: #6c6c6c;
+  --surface-2: #e3e3e3;
+  --surface-3: #f5f5f5;
+  --foreground: #1f1f1f;
+  --muted: #6a6a6a;
   --accent: #fe5e0e;
-  --accent-soft: #faf5b2;
+  --accent-soft: #ffe7d6;
   --success: #3dd598;
   --danger: #ff6b6b;
-  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.12);
+  --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.1);
 }
 
 @theme inline {
@@ -24,8 +24,8 @@
 }
 
 body {
-  background: radial-gradient(circle at 25% 20%, #f5f5f5 0%, #e9e9e9 55%),
-    radial-gradient(circle at 80% 10%, #f2f2f2 0%, #e9e9e9 45%),
+  background: radial-gradient(circle at 25% 20%, #fafafa 0%, #f1f1f1 55%),
+    radial-gradient(circle at 80% 10%, #f7f7f7 0%, #f1f1f1 45%),
     var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
@@ -41,14 +41,14 @@ a {
 .panel {
   background: var(--surface);
   border: 1px solid var(--surface-2);
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: var(--shadow-soft);
 }
 
 .card {
   background: var(--surface);
   border: 1px solid var(--surface-2);
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: var(--shadow-soft);
 }
 
@@ -76,7 +76,7 @@ a {
   justify-content: center;
   gap: 8px;
   padding: 10px 16px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--accent);
   background: var(--accent);
   color: #0f0f0f;
@@ -101,9 +101,9 @@ a {
   justify-content: center;
   gap: 8px;
   padding: 10px 16px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--surface-2);
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.85);
   color: var(--foreground);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
@@ -115,11 +115,11 @@ a {
 
 .input {
   width: 100%;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--surface-2);
   background: var(--surface);
   color: var(--foreground);
-  padding: 12px 14px;
+  padding: 10px 12px;
   font-size: 14px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;

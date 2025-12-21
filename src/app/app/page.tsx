@@ -13,10 +13,10 @@ export default async function AppDashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs text-subtle uppercase tracking-[0.2em]">
+          <p className="text-[11px] text-subtle uppercase tracking-[0.24em]">
             Pipeline
           </p>
-          <h1 className="text-2xl font-semibold">Releases</h1>
+          <h1 className="text-2xl font-semibold leading-tight">Releases</h1>
           <p className="text-subtle text-sm">
             Albums, EPs and singles you are building mix blueprints for.
           </p>

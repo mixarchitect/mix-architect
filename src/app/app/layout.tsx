@@ -24,10 +24,10 @@ export default async function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <main className="min-h-screen flex flex-col bg-transparent">
-      <header className="border-b border-[#dcdcdc] bg-white/80 backdrop-blur px-6 py-4 flex items-center justify-between">
+      <header className="border-b border-[#dcdcdc] bg-white/85 backdrop-blur px-5 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="pill">Mix Architect</div>
-          <span className="text-subtle text-xs uppercase tracking-[0.2em]">
+          <span className="text-subtle text-[11px] uppercase tracking-[0.24em]">
             Control Room
           </span>
         </div>

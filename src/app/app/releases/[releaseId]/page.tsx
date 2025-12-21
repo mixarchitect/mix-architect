@@ -70,7 +70,7 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
     <div className="space-y-6">
       <div className="card p-5 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">{release.name}</h1>
+          <h1 className="text-2xl font-semibold leading-tight">{release.name}</h1>
           <p className="text-sm text-subtle">
             {release.artist_name
               ? `${release.artist_name} · ${release.type}`
