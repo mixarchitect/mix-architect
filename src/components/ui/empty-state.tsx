@@ -12,8 +12,7 @@ export function EmptyState({ title, description, action, className }: Props) {
   return (
     <div
       className={cn(
-        "rounded-lg border border-stroke bg-surface/30 px-5 py-6 text-center",
-        "shadow-panel backdrop-blur-md",
+        "rounded-lg border border-border bg-panel2 px-5 py-6 text-center",
         className
       )}
     >

@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { Shell } from "@/components/ui/shell";
 
 type AppLayoutProps = {
   children: ReactNode;
@@ -23,26 +24,15 @@ export default async function AppLayout({ children }: AppLayoutProps) {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-transparent relative">
-      <div className="canvas-noise" aria-hidden />
-
-      <header className="border-b border-stroke bg-surface/70 backdrop-blur-md px-5 py-3 flex items-center justify-between shadow-panel">
-        <div className="flex items-center gap-3">
-          <div className="pill">Mix Architect</div>
-          <span className="text-subtle text-[11px] uppercase tracking-[0.24em]">
-            Control Room
-          </span>
-        </div>
-        <div className="text-sm text-subtle">{user?.email ?? "No user"}</div>
-      </header>
-
+    <>
       {debugError && (
-        <div className="bg-red-900/50 text-red-100 text-xs px-6 py-3 border-b border-red-700 whitespace-pre-wrap">
-          {debugError}
+        <div className="px-6 pt-6">
+          <div className="surface p-4 border border-hairline text-sm text-muted">
+            {debugError}
+          </div>
         </div>
       )}
-
-      <div className="flex-1">{children}</div>
-    </main>
+      <Shell userEmail={user?.email ?? null}>{children}</Shell>
+    </>
   );
 }

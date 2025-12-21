@@ -12,7 +12,7 @@ export function Rail({ items }: { items: Item[] }) {
 
   return (
     <nav className="w-14 shrink-0">
-      <div className="sticky top-4 mx-1 rounded-lg border border-stroke bg-surface/50 shadow-panel backdrop-blur-md">
+      <div className="sticky top-6 mx-1 rounded-md border border-border bg-panel shadow-paper">
         <div className="flex flex-col gap-1 p-2">
           {items.map((it) => {
             const active = pathname?.startsWith(it.href);
@@ -23,8 +23,8 @@ export function Rail({ items }: { items: Item[] }) {
                 aria-label={it.label}
                 className={cn(
                   "h-10 w-10 grid place-items-center rounded-md border border-transparent",
-                  "text-muted hover:text-text hover:border-stroke hover:bg-surface2/40 transition duration-200",
-                  active && "text-text border-stroke bg-surface2/60"
+                  "text-muted hover:text-text hover:border-border hover:bg-panel2 transition duration-200 ease-out",
+                  active && "text-text border-border bg-panel2"
                 )}
               >
                 {it.icon}

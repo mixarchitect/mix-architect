@@ -1,19 +1,20 @@
 import * as React from "react";
 import { cn } from "@/lib/cn";
 
-export function Tag({
+export function Pill({
   className,
   ...props
 }: React.HTMLAttributes<HTMLSpanElement>) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-muted",
-        "bg-panel2",
+        "inline-flex items-center rounded-full border border-border bg-panel2",
+        "px-3 py-1 text-xs text-muted",
         className
       )}
       {...props}
     />
   );
 }
+
 

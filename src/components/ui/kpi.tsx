@@ -12,15 +12,15 @@ export function Kpi({ label, value, hint, className }: Props) {
   return (
     <div
       className={cn(
-        "rounded-lg border border-stroke bg-surface/40 px-4 py-3 shadow-panel",
-        "transition duration-200 hover:border-strokeHover hover:-translate-y-[2px]",
+        "rounded-md border border-border bg-panel2 px-4 py-3",
+        "transition duration-200 ease-out hover:-translate-y-[1px] hover:border-black/15",
         className
       )}
     >
-      <div className="text-[11px] uppercase tracking-[0.08em] text-muted mb-1">
+      <div className="label text-[11px] text-faint mb-1">
         {label}
       </div>
-      <div className="text-lg font-semibold text-text leading-tight">{value}</div>
+      <div className="font-mono text-2xl text-text leading-tight">{value}</div>
       {hint && <div className="text-xs text-muted mt-0.5">{hint}</div>}
     </div>
   );

@@ -1,15 +1,15 @@
 import * as React from "react";
 import { cn } from "@/lib/cn";
 
-export function Surface({
+export function Panel({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
+    <section
       className={cn(
-        "rounded-lg border border-border bg-panel shadow-paper",
-        "transition duration-200 ease-out hover:-translate-y-[1px] hover:border-black/15",
+        "bg-panel border border-border rounded-lg shadow-paper",
+        "[box-shadow:var(--shadow),var(--shadow-inset)]",
         className
       )}
       {...props}
@@ -17,22 +17,23 @@ export function Surface({
   );
 }
 
-export function SurfaceHeader({
+export function PanelHeader({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("px-6 pt-6 pb-4 border-b border-border", className)}
+      className={cn("px-6 pt-6 pb-4", className)}
       {...props}
     />
   );
 }
 
-export function SurfaceBody({
+export function PanelBody({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("px-6 pb-6", className)} {...props} />;
 }
+
 
