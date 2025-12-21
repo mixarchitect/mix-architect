@@ -23,8 +23,10 @@ export default async function AppLayout({ children }: AppLayoutProps) {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-transparent">
-      <header className="border-b border-[#dcdcdc] bg-white/85 backdrop-blur px-5 py-3 flex items-center justify-between">
+    <main className="min-h-screen flex flex-col bg-transparent relative">
+      <div className="canvas-noise" aria-hidden />
+
+      <header className="border-b border-stroke bg-surface/70 backdrop-blur-md px-5 py-3 flex items-center justify-between shadow-panel">
         <div className="flex items-center gap-3">
           <div className="pill">Mix Architect</div>
           <span className="text-subtle text-[11px] uppercase tracking-[0.24em]">
@@ -35,12 +37,12 @@ export default async function AppLayout({ children }: AppLayoutProps) {
       </header>
 
       {debugError && (
-        <div className="bg-red-100 text-red-700 text-xs px-6 py-3 border-b border-red-200 whitespace-pre-wrap">
+        <div className="bg-red-900/50 text-red-100 text-xs px-6 py-3 border-b border-red-700 whitespace-pre-wrap">
           {debugError}
         </div>
       )}
 
-      <div className="flex-1 px-6 py-8 max-w-6xl w-full mx-auto">{children}</div>
+      <div className="flex-1">{children}</div>
     </main>
   );
 }

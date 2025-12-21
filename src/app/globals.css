@@ -1,33 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f1f1f1;
-  --background-strong: #f8f8f8;
-  --surface: #ffffff;
-  --surface-2: #e3e3e3;
-  --surface-3: #f5f5f5;
-  --foreground: #1f1f1f;
-  --muted: #6a6a6a;
-  --accent: #fe5e0e;
-  --accent-soft: #ffe7d6;
-  --success: #3dd598;
-  --danger: #ff6b6b;
-  --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.1);
+  --bg0: 7 8 10;
+  --bg1: 11 13 16;
+
+  --surface: 14 17 22;
+  --surface2: 17 22 29;
+
+  --stroke: 255 255 255;
+  --strokeA: 0.08;
+  --strokeHoverA: 0.14;
+
+  --text: 255 255 255;
+  --textA: 0.92;
+  --mutedA: 0.6;
+
+  --accent: 255 90 46;
+  --accent2: 250 245 178;
+
+  --r-xl: 22px;
+  --r-lg: 18px;
+
+  --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-2: 0 18px 60px rgba(0, 0, 0, 0.45);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: rgb(var(--bg0));
+  --color-foreground: rgba(var(--text), var(--textA));
   --font-sans: "Helvetica Neue", Helvetica, Arial, var(--font-geist-sans),
     system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
+html,
 body {
-  background: radial-gradient(circle at 25% 20%, #fafafa 0%, #f1f1f1 55%),
-    radial-gradient(circle at 80% 10%, #f7f7f7 0%, #f1f1f1 45%),
-    var(--background);
-  color: var(--foreground);
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 800px at 70% 20%, rgba(var(--accent), 0.06), transparent 60%),
+    radial-gradient(900px 700px at 20% 70%, rgba(var(--accent2), 0.05), transparent 55%),
+    linear-gradient(180deg, rgb(var(--bg1)), rgb(var(--bg0)));
+  color: rgba(var(--text), var(--textA));
   font-family: var(--font-sans);
   min-height: 100vh;
   letter-spacing: -0.01em;
@@ -39,17 +55,19 @@ a {
 }
 
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--surface-2);
-  border-radius: 12px;
-  box-shadow: var(--shadow-soft);
+  background: rgba(var(--surface), 0.75);
+  border: 1px solid rgba(var(--stroke), var(--strokeA));
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+  backdrop-filter: blur(12px);
 }
 
 .card {
-  background: var(--surface);
-  border: 1px solid var(--surface-2);
-  border-radius: 12px;
-  box-shadow: var(--shadow-soft);
+  background: rgba(var(--surface), 0.65);
+  border: 1px solid rgba(var(--stroke), var(--strokeA));
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+  backdrop-filter: blur(10px);
 }
 
 .pill {
@@ -60,7 +78,7 @@ a {
   border-radius: 999px;
   border: 1px solid var(--surface-2);
   background: var(--surface-3);
-  color: var(--foreground);
+  color: rgba(var(--text), var(--textA));
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -77,8 +95,8 @@ a {
   gap: 8px;
   padding: 10px 16px;
   border-radius: 10px;
-  border: 1px solid var(--accent);
-  background: var(--accent);
+  border: 1px solid rgb(var(--accent));
+  background: rgb(var(--accent));
   color: #0f0f0f;
   font-weight: 700;
   transition: transform 0.15s ease, box-shadow 0.15s ease,
@@ -102,9 +120,9 @@ a {
   gap: 8px;
   padding: 10px 16px;
   border-radius: 10px;
-  border: 1px solid var(--surface-2);
-  background: rgba(255, 255, 255, 0.85);
-  color: var(--foreground);
+  border: 1px solid rgba(var(--stroke), var(--strokeA));
+  background: rgba(var(--surface), 0.5);
+  color: rgba(var(--text), var(--textA));
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
@@ -116,9 +134,9 @@ a {
 .input {
   width: 100%;
   border-radius: 10px;
-  border: 1px solid var(--surface-2);
-  background: var(--surface);
-  color: var(--foreground);
+  border: 1px solid rgba(var(--stroke), var(--strokeA));
+  background: rgba(var(--surface), 0.45);
+  color: rgba(var(--text), var(--textA));
   padding: 10px 12px;
   font-size: 14px;
   outline: none;
@@ -126,18 +144,40 @@ a {
 }
 
 .input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(254, 94, 14, 0.18);
+  border-color: rgb(var(--accent));
+  box-shadow: 0 0 0 3px rgba(var(--accent), 0.2);
 }
 
 .label {
   display: block;
   font-size: 13px;
-  color: var(--muted);
+  color: rgba(var(--text), var(--mutedA));
   margin-bottom: 6px;
   letter-spacing: 0;
 }
 
 .surface-divider {
-  border-color: var(--surface-2);
+  border-color: rgba(var(--stroke), var(--strokeA));
+}
+
+.canvas-noise {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  background-size: 260px 260px;
+  z-index: 0;
+}
+
+.h1 {
+  letter-spacing: -0.03em;
+}
+.h2 {
+  letter-spacing: -0.02em;
+}
+.label-tight {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
