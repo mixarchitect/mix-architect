@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
+import { Rule } from "@/components/ui/rule";
+import { Pill } from "@/components/ui/pill";
+import { TagBadge } from "@/components/ui/tag-badge";
+import { Button } from "@/components/ui/button";
 
 type ReleasePageProps = {
   params: { releaseId?: string };
@@ -10,22 +15,20 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
   if (!params?.releaseId) {
     return (
-      <div className="space-y-4 card p-5">
-        <Link
-          href="/app"
-          className="text-sm text-subtle hover:text-black"
-        >
-          ← Back to releases
-        </Link>
-
-        <h1 className="text-2xl font-semibold">Release not found</h1>
-        <p className="text-sm text-neutral-400">
-          Missing route param <code>releaseId</code>. Raw params object:
-        </p>
-        <pre className="text-xs bg-neutral-900 border border-neutral-800 rounded-md p-3 overflow-x-auto">
-          {JSON.stringify(params, null, 2)}
-        </pre>
-      </div>
+      <Panel>
+        <PanelHeader className="space-y-3">
+          <Link href="/app" className="text-sm text-muted hover:text-text">
+            ← Back to releases
+          </Link>
+          <h1 className="text-2xl font-semibold">Release not found</h1>
+          <p className="text-sm text-muted">
+            Missing route param <code>releaseId</code>. Raw params object:
+          </p>
+          <pre className="text-xs border border-border rounded-md p-3 bg-panel-2 overflow-x-auto">
+            {JSON.stringify(params, null, 2)}
+          </pre>
+        </PanelHeader>
+      </Panel>
     );
   }
 
@@ -37,70 +40,80 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
   if (!release || error) {
     return (
-      <div className="space-y-4 card p-5">
-        <Link
-          href="/app"
-          className="text-sm text-subtle hover:text-black"
-        >
-          ← Back to releases
-        </Link>
-
-        <h1 className="text-2xl font-semibold">Release not found</h1>
-
-        <p className="text-sm text-subtle">
-          Tried to load release with id:
-        </p>
-        <pre className="text-xs bg-[#f6f6f6] border border-[#e2e2e2] rounded-md p-3 overflow-x-auto">
-          {params.releaseId}
-        </pre>
-
-        {error && (
-          <>
-            <p className="text-sm text-red-400">Supabase error:</p>
-            <pre className="text-xs bg-[#f6f6f6] border border-red-200 rounded-md p-3 overflow-x-auto">
-              {error.message}
-            </pre>
-          </>
-        )}
-      </div>
+      <Panel>
+        <PanelHeader className="space-y-3">
+          <Link href="/app" className="text-sm text-muted hover:text-text">
+            ← Back to releases
+          </Link>
+          <h1 className="text-2xl font-semibold">Release not found</h1>
+          <p className="text-sm text-muted">Tried to load release with id:</p>
+          <pre className="text-xs border border-border rounded-md p-3 bg-panel-2 overflow-x-auto">
+            {params.releaseId}
+          </pre>
+          {error && (
+            <div className="text-xs text-muted">
+              <p className="text-sm text-red-500">Supabase error:</p>
+              <pre className="mt-1 border border-border rounded-md p-3 bg-panel-2 overflow-x-auto">
+                {error.message}
+              </pre>
+            </div>
+          )}
+        </PanelHeader>
+      </Panel>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="card p-5 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold leading-tight">{release.name}</h1>
-          <p className="text-sm text-subtle">
-            {release.artist_name
-              ? `${release.artist_name} · ${release.type}`
-              : release.type}
-          </p>
-        </div>
+    <div className="flex flex-col gap-4">
+      <Panel className="ticks">
+        <PanelHeader className="flex items-start justify-between gap-4">
+          <div className="space-y-2">
+            <div className="label text-faint">RELEASE</div>
+            <h1 className="text-3xl font-semibold leading-[1.05] h1 text-text">
+              {release.name}
+            </h1>
+            <div className="text-sm text-muted">
+              {release.artist_name ? `${release.artist_name} · ${release.type}` : release.type}
+            </div>
+            <div className="flex items-center gap-2 text-xs text-faint">
+              <TagBadge>{String(release.type ?? "").toUpperCase()}</TagBadge>
+              <Pill className="mono text-xs">ID {release.id}</Pill>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-3">
+            <div className="title-block text-right">
+              <div className="flex items-center justify-between">
+                <span className="label text-[10px] text-faint">STATUS</span>
+                <span className="mono text-text">READY</span>
+              </div>
+              <div className="text-[10px] text-faint mt-1">
+                Updated {release.created_at ? new Date(release.created_at).toLocaleDateString() : "—"}
+              </div>
+            </div>
+            <Link href="/app">
+              <Button variant="ghost">← Back to releases</Button>
+            </Link>
+          </div>
+        </PanelHeader>
+      </Panel>
 
-        <Link
-          href="/app"
-          className="btn-ghost text-sm"
-        >
-          ← Back to releases
-        </Link>
-      </div>
-
-      <section className="card p-5 space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Tracks</h2>
-          <Link
-            href={`/app/releases/${release.id}/tracks/new`}
-            className="btn-primary text-sm"
-          >
-            + Add track
+      <Panel>
+        <PanelHeader className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-lg font-semibold h2 text-text">Tracks</div>
+            <Pill className="mono text-xs">0 items</Pill>
+          </div>
+          <Link href={`/app/releases/${release.id}/tracks/new`}>
+            <Button variant="primary">Add track</Button>
           </Link>
-        </div>
-
-        <p className="text-sm text-subtle">
-          No tracks yet. Add a track to start a Mix Architect blueprint.
-        </p>
-      </section>
+        </PanelHeader>
+        <Rule dashed />
+        <PanelBody className="pt-5">
+          <div className="text-sm text-muted">
+            No tracks yet. Add a track to start a Mix Architect blueprint.
+          </div>
+        </PanelBody>
+      </Panel>
     </div>
   );
 }

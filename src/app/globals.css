@@ -118,6 +118,7 @@ body::after {
 .label {
   letter-spacing: 0.24em;
   text-transform: uppercase;
+  font-size: 11px;
 }
 
 .h1 {
@@ -126,6 +127,11 @@ body::after {
 
 .h2 {
   letter-spacing: -0.02em;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
 }
 
 .text-muted { color: var(--muted); }
@@ -168,6 +174,43 @@ body::after {
 .rowVal {
   font-size: 14px;
   font-family: var(--font-mono);
+}
+
+.title-block {
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  border-radius: 8px;
+  padding: 6px 8px;
+  box-shadow: var(--shadow-inset);
+}
+
+.ticks {
+  position: relative;
+}
+.ticks::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -2px 0;
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--border),
+    var(--border) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  opacity: 0.6;
+}
+
+.rule-dashed {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--border),
+    var(--border) 6px,
+    transparent 6px,
+    transparent 12px
+  );
+  height: 1px;
 }
 
 .btn-primary {

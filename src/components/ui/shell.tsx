@@ -5,7 +5,7 @@ import { Folder, Plus, Settings } from "lucide-react";
 
 export function Shell({
   title = "Mix Architect",
-  subtitle = "CONTROL ROOM",
+  subtitle = "DRAFTING TABLE",
   userEmail,
   children,
   inspector,
