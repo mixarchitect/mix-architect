@@ -11,49 +11,41 @@ export default async function AppDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Releases</h1>
-        <p className="text-neutral-400 text-sm">
-          Albums, EPs and singles you are building mix blueprints for.
-        </p>
-      </div>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-xs text-subtle uppercase tracking-[0.2em]">
+            Pipeline
+          </p>
+          <h1 className="text-2xl font-semibold">Releases</h1>
+          <p className="text-subtle text-sm">
+            Albums, EPs and singles you are building mix blueprints for.
+          </p>
+        </div>
 
-      <div>
-        <Link
-          href="/app/releases/new"
-          className="inline-flex items-center rounded-md border border-neutral-700 px-4 py-2 text-sm hover:bg-neutral-900"
-        >
+        <Link href="/app/releases/new" className="btn-primary">
           + New release
         </Link>
       </div>
 
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {releases && releases.length > 0 ? (
           releases.map((r) => (
-            <Link
-              key={r.id}
-              href={`/app/releases/${r.id}`}
-              className="block rounded-md border border-neutral-800 px-4 py-3 hover:border-neutral-500"
-            >
+            <Link key={r.id} href={`/app/releases/${r.id}`} className="card p-4 hover:border-[#f6a43a]/60 transition-colors">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="space-y-1">
                   <div className="font-medium">{r.name}</div>
                   {r.artist_name && (
-                    <div className="text-xs text-neutral-400">
-                      {r.artist_name}
-                    </div>
+                    <div className="text-xs text-subtle">{r.artist_name}</div>
                   )}
                 </div>
-                <div className="text-xs uppercase text-neutral-500">
-                  {r.type}
-                </div>
+                <div className="pill uppercase text-xs">{r.type}</div>
               </div>
             </Link>
           ))
         ) : (
-          <p className="text-sm text-neutral-500">
+          <div className="card p-4 text-sm text-subtle">
             No releases yet. Create one to get started.
-          </p>
+          </div>
         )}
       </div>
     </div>

@@ -1,20 +1,22 @@
 export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4">
-      <div className="max-w-2xl text-center space-y-6">
-        <h1 className="text-4xl md:text-5xl font-semibold">
+      <div className="max-w-3xl text-center space-y-6 card p-10">
+        <p className="text-sm text-subtle uppercase tracking-[0.2em]">
           Mix Architect
-        </h1>
-        <p className="text-lg text-neutral-400">
-          Design your mix before you touch a fader. Plan stereo and immersive
-          mixes with clear blueprints your mixer will love.
         </p>
-        <a
-          href="/app"
-          className="inline-flex items-center justify-center rounded-md border border-neutral-700 px-6 py-2 text-base font-medium hover:bg-neutral-900"
-        >
-          Enter app
-        </a>
+        <h1 className="text-4xl md:text-5xl font-semibold">
+          Blueprint every mix before you touch a fader.
+        </h1>
+        <p className="text-lg text-subtle">
+          Plan stereo and immersive releases with clear intent. Organize assets,
+          define outcomes, and brief mixers with confidence.
+        </p>
+        <div className="flex justify-center">
+          <a href="/app" className="btn-primary">
+            Enter the control room
+          </a>
+        </div>
       </div>
     </main>
   );

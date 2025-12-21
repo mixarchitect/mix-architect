@@ -48,33 +48,38 @@ export default function SignInPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-6">
-        <h1 className="text-2xl font-semibold text-center">
-          {mode === "signin"
-            ? "Sign in to Mix Architect"
-            : "Create a Mix Architect account"}
-        </h1>
+      <div className="w-full max-w-md space-y-6 card p-6">
+        <div className="space-y-2 text-center">
+          <p className="text-xs text-subtle uppercase tracking-[0.2em]">
+            Access
+          </p>
+          <h1 className="text-2xl font-semibold">
+            {mode === "signin"
+              ? "Sign in to Mix Architect"
+              : "Create a Mix Architect account"}
+          </h1>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label className="block text-sm text-neutral-300">Email</label>
+            <label className="label">Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-neutral-700 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              className="input"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm text-neutral-300">Password</label>
+            <label className="label">Password</label>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-neutral-700 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-400"
+              className="input"
             />
           </div>
 
@@ -87,7 +92,7 @@ export default function SignInPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md border border-neutral-700 px-4 py-2 text-sm font-medium hover:bg-neutral-900 disabled:opacity-60"
+            className="btn-primary w-full disabled:opacity-70"
           >
             {loading
               ? "Working..."
@@ -97,7 +102,7 @@ export default function SignInPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-neutral-400">
+        <p className="text-center text-sm text-subtle">
           {mode === "signin" ? (
             <>
               Need an account?{" "}

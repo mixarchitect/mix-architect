@@ -23,19 +23,24 @@ export default async function AppLayout({ children }: AppLayoutProps) {
   }
 
   return (
-    <main className="min-h-screen flex flex-col">
-      <header className="border-b border-neutral-800 px-4 py-3 flex items-center justify-between">
-        <div className="font-semibold">Mix Architect</div>
-        <div className="text-sm text-neutral-400">{user?.email ?? "No user"}</div>
+    <main className="min-h-screen flex flex-col bg-transparent">
+      <header className="border-b border-[#1f2a3d] bg-[#0f1725]/80 backdrop-blur px-6 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="pill">Mix Architect</div>
+          <span className="text-subtle text-xs uppercase tracking-[0.2em]">
+            Control Room
+          </span>
+        </div>
+        <div className="text-sm text-subtle">{user?.email ?? "No user"}</div>
       </header>
 
       {debugError && (
-        <div className="bg-red-950 text-red-200 text-xs px-4 py-3 border-b border-red-700 whitespace-pre-wrap">
+        <div className="bg-red-950 text-red-200 text-xs px-6 py-3 border-b border-red-700 whitespace-pre-wrap">
           {debugError}
         </div>
       )}
 
-      <div className="flex-1 px-4 py-6">{children}</div>
+      <div className="flex-1 px-6 py-8 max-w-6xl w-full mx-auto">{children}</div>
     </main>
   );
 }

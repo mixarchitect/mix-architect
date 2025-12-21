@@ -58,39 +58,47 @@ export default function NewReleasePage() {
   }
 
   return (
-    <main className="max-w-xl space-y-6">
-      <h1 className="text-2xl font-semibold">New release</h1>
+    <main className="max-w-2xl space-y-6 card p-6">
+      <div className="space-y-2">
+        <p className="text-xs text-subtle uppercase tracking-[0.2em]">
+          Create
+        </p>
+        <h1 className="text-2xl font-semibold">New release</h1>
+        <p className="text-subtle text-sm">
+          Capture the essentials so your mixer understands the intent.
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1">
-          <label className="block text-sm text-neutral-300">Release name</label>
+          <label className="label">Release name</label>
           <input
             type="text"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-md border border-neutral-700 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-400"
+            className="input"
             placeholder="Album or project name"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="block text-sm text-neutral-300">Artist name</label>
+          <label className="label">Artist name</label>
           <input
             type="text"
             value={artistName}
             onChange={(e) => setArtistName(e.target.value)}
-            className="w-full rounded-md border border-neutral-700 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-400"
+            className="input"
             placeholder="Optional"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="block text-sm text-neutral-300">Release type</label>
+          <label className="label">Release type</label>
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
-            className="w-full rounded-md border border-neutral-700 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-400"
+            className="input"
           >
             {RELEASE_TYPES.map((t) => (
               <option key={t.value} value={t.value}>
@@ -105,7 +113,7 @@ export default function NewReleasePage() {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-md border border-neutral-700 px-4 py-2 text-sm font-medium hover:bg-neutral-900 disabled:opacity-60"
+          className="btn-primary disabled:opacity-70"
         >
           {loading ? "Creating..." : "Create release"}
         </button>

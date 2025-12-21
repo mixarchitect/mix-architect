@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 
 type ReleasePageProps = {
@@ -36,7 +35,7 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
     .eq("id", params.releaseId)
     .maybeSingle();
 
-  if (error) {
+  if (!release || error) {
     return (
       <div className="space-y-4">
         <Link
@@ -55,16 +54,16 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
           {params.releaseId}
         </pre>
 
-        <p className="text-sm text-red-400">Supabase error:</p>
-        <pre className="text-xs bg-neutral-900 border border-red-800 rounded-md p-3 overflow-x-auto">
-          {error.message}
-        </pre>
+        {error && (
+          <>
+            <p className="text-sm text-red-400">Supabase error:</p>
+            <pre className="text-xs bg-neutral-900 border border-red-800 rounded-md p-3 overflow-x-auto">
+              {error.message}
+            </pre>
+          </>
+        )}
       </div>
     );
-  }
-
-  if (!release) {
-    notFound();
   }
 
   return (
