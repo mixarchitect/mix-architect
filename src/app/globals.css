@@ -165,18 +165,28 @@ body {
   background: var(--signal);
   color: var(--text-inverse);
   border-radius: var(--r-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.15);
   position: relative;
   overflow: hidden;
 }
 
+/* More visible blueprint grid on accent */
 .panel-accent::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 48px),
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 48px);
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 40px);
+  pointer-events: none;
+}
+
+/* Technical illustration overlay effect */
+.panel-accent::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -207,16 +217,25 @@ body {
   background: var(--highlight);
   border-radius: var(--r-sm);
   padding: 10px 14px;
+  border: 1px solid var(--highlight-strong);
 }
 
 .highlight-dot {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   background: var(--highlight);
-  border-radius: 6px;
+  border: 1px solid var(--highlight-strong);
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  transition: all 150ms ease;
+}
+
+.highlight-dot:hover {
+  background: var(--highlight-strong);
+  transform: scale(1.05);
 }
 
 /* ─────────────────────────────────────────────────────
@@ -612,23 +631,38 @@ select.input {
 ───────────────────────────────────────────────────── */
 .card {
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r-md);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.8);
   transition: all 150ms ease;
 }
 
 .card:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow);
+  border-color: var(--text);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.8);
   transform: translateY(-2px);
 }
 
 .card-float {
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r-lg);
-  box-shadow: var(--shadow-float);
+  box-shadow: var(--shadow-float), inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+/* Stat tile enhanced */
+.stat-tile {
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.85);
+  transition: all 150ms ease;
+}
+
+.stat-tile:hover {
+  border-color: var(--text);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.85);
+  transform: translateY(-1px);
 }
 
 /* ─────────────────────────────────────────────────────

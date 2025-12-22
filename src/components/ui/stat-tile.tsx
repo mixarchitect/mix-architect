@@ -21,44 +21,43 @@ export function StatTile({
   return (
     <div
       className={cn(
-        "rounded-md border px-5 py-4",
-        "transition-all duration-150 ease-out",
-        variant === "default" &&
-          "border-border bg-panel hover:-translate-y-px hover:border-border-strong hover:shadow",
-        variant === "accent" &&
-          "border-transparent bg-signal text-white shadow-lg",
+        "px-5 py-4 transition-all duration-150 ease-out",
+        variant === "default" && "stat-tile",
+        variant === "accent" && "panel-accent relative overflow-hidden",
         className
       )}
     >
-      <div
-        className={cn(
-          "label text-[11px]",
-          variant === "default" ? "text-faint" : "text-white/65"
-        )}
-      >
-        {label}
-      </div>
-      <div
-        className={cn(
-          "mt-2 font-mono text-2xl leading-tight tracking-tight",
-          variant === "default" ? "text-text" : "text-white"
-        )}
-      >
-        {value}
-        {unit && (
-          <span className="text-[0.5em] ml-1 opacity-60">{unit}</span>
-        )}
-      </div>
-      {note && (
+      <div className={cn("relative z-10", variant === "accent" && "")}>
         <div
           className={cn(
-            "mt-1 text-xs",
-            variant === "default" ? "text-muted" : "text-white/70"
+            "label text-[11px]",
+            variant === "default" ? "text-faint" : "text-white/70"
           )}
         >
-          {note}
+          {label}
         </div>
-      )}
+        <div
+          className={cn(
+            "mt-2 font-mono text-2xl leading-tight tracking-tight font-semibold",
+            variant === "default" ? "text-text" : "text-white"
+          )}
+        >
+          {value}
+          {unit && (
+            <span className="text-[0.5em] ml-1 opacity-60">{unit}</span>
+          )}
+        </div>
+        {note && (
+          <div
+            className={cn(
+              "mt-1 text-xs",
+              variant === "default" ? "text-muted" : "text-white/70"
+            )}
+          >
+            {note}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

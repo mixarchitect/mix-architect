@@ -8,7 +8,7 @@ import { AccentPanel } from "@/components/ui/accent-panel";
 import { DataGrid, DataCell } from "@/components/ui/data-grid";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { Toolbar, ToolbarButton } from "@/components/ui/toolbar";
-import { Home, Layers, Settings, Mic2, FileText, Share2 } from "lucide-react";
+import { Home, Layers, Settings, Mic2, FileText, Share2, Music } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -17,9 +17,9 @@ export default function HomePage() {
         {/* Top bar with yellow highlight */}
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="highlight-dot">
-              <Layers size={14} className="text-charcoal" />
-            </div>
+            <Link href="/" className="highlight-dot">
+              <Music size={14} className="text-charcoal" />
+            </Link>
             <div className="text-base font-semibold tracking-tight text-text">
               Mix Architect
             </div>
@@ -49,16 +49,16 @@ export default function HomePage() {
                   <StatusIndicator color="green" label="System Ready" />
                 </div>
                 <h1 className="text-[42px] md:text-[56px] font-bold leading-[0.95] h1 text-text">
-                  Portfolio
+                  Blueprint
                   <br />
-                  Overview
+                  Your Mix
                 </h1>
               </PanelHeader>
               <Rule />
               <PanelBody className="pt-5">
                 <p className="text-[15px] md:text-[17px] text-muted max-w-xl leading-relaxed">
-                  Blueprint every mix before you touch a fader. Plan stereo and 
-                  immersive releases with clear intent.
+                  Plan every mix before you touch a fader. Organize stereo and 
+                  immersive releases with clear intent and defined outcomes.
                 </p>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   <Link href="/app">
@@ -71,12 +71,12 @@ export default function HomePage() {
               </PanelBody>
             </Panel>
 
-            {/* Stats row */}
+            {/* Stats row - Music relevant */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatTile label="Interests" value="02" />
-              <StatTile label="Investments" value="$ 2.1m" />
-              <StatTile label="Net Acres" value="628.1" />
-              <StatTile label="Royalty Acres" value="0.0000" />
+              <StatTile label="Formats" value="Stereo" note="+ Atmos ready" />
+              <StatTile label="Workflow" value="Unified" note="One source of truth" />
+              <StatTile label="Output" value="Brief" note="Shareable PDF" />
+              <StatTile label="Status" value="Ready" note="Start anytime" />
             </div>
 
             {/* Lower section - Features */}
@@ -126,7 +126,7 @@ export default function HomePage() {
             {/* Accent panel (Petronex orange style) */}
             <AccentPanel>
               <div className="flex items-center justify-between mb-4">
-                <div className="label-sm text-white/65">Survey</div>
+                <div className="label-sm text-white/70">RELEASE</div>
                 <div className="flex gap-2">
                   <button className="w-8 h-8 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
                     ←
@@ -141,27 +141,27 @@ export default function HomePage() {
                 <br />
                 <span className="text-white/80">Control Room</span>
               </h2>
-              <p className="mt-2 text-sm text-white/70">1 active release</p>
+              <p className="mt-2 text-sm text-white/70">Your mixing command center</p>
 
-              <div className="mt-6 pt-6 border-t border-white/15">
+              <div className="mt-6 pt-6 border-t border-white/20">
                 <DataGrid>
-                  <DataCell label="Blueprints" value="Stereo" />
-                  <DataCell label="Outputs" value="Brief" />
-                  <DataCell label="Depth" value="5,000" unit="ft" />
-                  <DataCell label="Signal" value="Clarity" />
+                  <DataCell label="Format" value="Stereo" />
+                  <DataCell label="Output" value="Brief" />
+                  <DataCell label="Tracks" value="∞" />
+                  <DataCell label="Refs" value="Unlimited" size="small" />
                 </DataGrid>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-white/15 space-y-2 text-sm">
-                <div className="flex justify-between text-white/65">
+              <div className="mt-6 pt-4 border-t border-white/20 space-y-2 text-sm">
+                <div className="flex justify-between text-white/70">
                   <span>Code</span>
-                  <span className="font-semibold text-white">MX1-Control</span>
+                  <span className="font-semibold text-white font-mono">MX-001</span>
                 </div>
-                <div className="flex justify-between text-white/65">
+                <div className="flex justify-between text-white/70">
                   <span>Type</span>
                   <span className="font-semibold text-white">Drafting</span>
                 </div>
-                <div className="flex justify-between text-white/65">
+                <div className="flex justify-between text-white/70">
                   <span>Status</span>
                   <span className="font-semibold text-white">Active</span>
                 </div>
@@ -177,13 +177,14 @@ export default function HomePage() {
                     Context, next steps, shortcuts.
                   </div>
                 </div>
-                <StatusIndicator color="blue" label="Owned" />
+                <StatusIndicator color="blue" label="Ready" />
               </PanelHeader>
               <Rule />
               <PanelBody className="pt-5 space-y-4">
                 <div className="flex flex-wrap gap-2">
                   <Pill>⌘K Command</Pill>
                   <Pill>Release notes</Pill>
+                  <Pill>Export brief</Pill>
                 </div>
                 <div className="space-y-2">
                   <div className="row">
@@ -210,7 +211,7 @@ export default function HomePage() {
         </div>
 
         {/* Bottom toolbar (Petronex style) */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-10 flex justify-center">
           <Toolbar>
             <ToolbarButton active>
               <Home size={18} />
@@ -250,7 +251,7 @@ function Feature({
 }) {
   return (
     <div className="card px-5 py-5">
-      <div className="w-10 h-10 rounded-md bg-panel2 border border-border flex items-center justify-center text-muted mb-4">
+      <div className="w-10 h-10 rounded-md bg-panel2 border border-border-strong flex items-center justify-center text-muted mb-4">
         {icon}
       </div>
       <div className="text-base font-semibold text-text">{title}</div>
