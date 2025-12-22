@@ -1,18 +1,17 @@
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Rail } from "@/components/ui/rail";
 import { Inspector } from "@/components/ui/inspector";
 import { StatusIndicator } from "@/components/ui/status-dot";
-import { Folder, Plus, Settings, Layers } from "lucide-react";
+import { Folder, Plus, Settings } from "lucide-react";
 
 export function Shell({
-  title = "Mix Architect",
   subtitle = "CONTROL ROOM",
   userEmail,
   children,
   inspector,
 }: {
-  title?: string;
   subtitle?: string;
   userEmail?: string | null;
   children: React.ReactNode;
@@ -23,14 +22,16 @@ export function Shell({
       <div className="mx-auto max-w-[1500px]">
         {/* Header */}
         <header className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/app" className="flex items-center gap-3 group">
-              <div className="highlight-dot group-hover:scale-105 transition-transform">
-                <Layers size={14} className="text-charcoal" />
-              </div>
-              <div className="text-base font-semibold tracking-tight text-text">
-                {title}
-              </div>
+          <div className="flex items-center gap-5">
+            <Link href="/app" className="flex items-center group">
+              <Image
+                src="/logo.svg"
+                alt="Mix Architect"
+                width={180}
+                height={36}
+                priority
+                className="h-8 w-auto group-hover:opacity-80 transition-opacity"
+              />
             </Link>
             <div className="label-sm text-faint hidden sm:block">
               {subtitle}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Rule } from "@/components/ui/rule";
@@ -8,21 +9,25 @@ import { AccentPanel } from "@/components/ui/accent-panel";
 import { DataGrid, DataCell } from "@/components/ui/data-grid";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { Toolbar, ToolbarButton } from "@/components/ui/toolbar";
-import { Home, Layers, Settings, Mic2, FileText, Share2, Music } from "lucide-react";
+import { Home, Layers, Settings, Mic2, FileText, Share2 } from "lucide-react";
 
 export default function HomePage() {
   return (
     <main className="min-h-screen px-6 py-8">
       <div className="mx-auto max-w-7xl">
-        {/* Top bar with yellow highlight */}
+        {/* Top bar with logo */}
         <header className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="highlight-dot">
-              <Music size={14} className="text-charcoal" />
+          <div className="flex items-center gap-5">
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo.svg"
+                alt="Mix Architect"
+                width={180}
+                height={36}
+                priority
+                className="h-8 w-auto"
+              />
             </Link>
-            <div className="text-base font-semibold tracking-tight text-text">
-              Mix Architect
-            </div>
             <div className="label-sm text-faint hidden sm:block">
               CONTROL ROOM
             </div>
