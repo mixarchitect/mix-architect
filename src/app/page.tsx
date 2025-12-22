@@ -1,266 +1,308 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
+import { Panel } from "@/components/ui/panel";
 import { Rule } from "@/components/ui/rule";
-import { Pill } from "@/components/ui/pill";
-import { StatTile } from "@/components/ui/stat-tile";
-import { AccentPanel } from "@/components/ui/accent-panel";
-import { DataGrid, DataCell } from "@/components/ui/data-grid";
-import { StatusIndicator } from "@/components/ui/status-dot";
-import { Toolbar, ToolbarButton } from "@/components/ui/toolbar";
-import { Home, Layers, Settings, Mic2, FileText, Share2 } from "lucide-react";
+import { FileText, Layers, Share2, CheckCircle2, ArrowRight } from "lucide-react";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen px-6 py-8">
-      <div className="mx-auto max-w-7xl">
-        {/* Top bar with logo */}
-        <header className="flex items-center justify-between">
-          <div className="flex items-center gap-5">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/logo.svg"
-                alt="Mix Architect"
-                width={360}
-                height={72}
-                priority
-                className="h-16 w-auto"
-              />
+    <main className="min-h-screen">
+      {/* ─────────────────────────────────────────────────────
+          HEADER
+      ───────────────────────────────────────────────────── */}
+      <header className="px-6 py-6">
+        <div className="mx-auto max-w-6xl flex items-center justify-between">
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo.svg"
+              alt="Mix Architect"
+              width={360}
+              height={72}
+              priority
+              className="h-12 w-auto"
+            />
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-8 text-sm text-muted">
+            <Link href="#features" className="hover:text-text transition-colors">
+              Features
             </Link>
-            <div className="label-sm text-faint hidden sm:block">
-              CONTROL ROOM
-            </div>
-          </div>
+            <Link href="#how-it-works" className="hover:text-text transition-colors">
+              How it works
+            </Link>
+          </nav>
 
           <div className="flex items-center gap-3">
-            <Link href="/app">
-              <Button variant="ghost">Enter</Button>
-            </Link>
             <Link href="/auth/sign-in">
-              <Button variant="primary">Sign in</Button>
+              <Button variant="ghost">Sign in</Button>
+            </Link>
+            <Link href="/app">
+              <Button variant="primary">Get started</Button>
             </Link>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Main layout - inspired by Petronex */}
-        <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_380px]">
-          {/* Left column */}
-          <div className="space-y-6">
-            {/* Hero panel */}
-            <Panel variant="float">
-              <PanelHeader>
-                <div className="flex items-center gap-3 mb-4">
-                  <StatusIndicator color="green" label="System Ready" />
-                </div>
-                <h1 className="text-[42px] md:text-[56px] font-bold leading-[0.95] h1 text-text">
-                  Blueprint
-                  <br />
-                  Your Mix
-                </h1>
-              </PanelHeader>
-              <Rule />
-              <PanelBody className="pt-5">
-                <p className="text-[15px] md:text-[17px] text-muted max-w-xl leading-relaxed">
-                  Plan every mix before you touch a fader. Organize stereo and 
-                  immersive releases with clear intent and defined outcomes.
-                </p>
-                <div className="mt-8 flex flex-wrap items-center gap-3">
-                  <Link href="/app">
-                    <Button variant="primary">Enter the control room</Button>
-                  </Link>
-                  <Link href="/#how">
-                    <Button variant="secondary">See how it works</Button>
-                  </Link>
-                </div>
-              </PanelBody>
-            </Panel>
+      {/* ─────────────────────────────────────────────────────
+          HERO
+      ───────────────────────────────────────────────────── */}
+      <section className="px-6 pt-16 pb-24">
+        <div className="mx-auto max-w-3xl text-center">
+          <h1 className="text-[44px] md:text-[64px] font-bold leading-[1.0] tracking-tight h1 text-text">
+            Plan your mix
+            <br />
+            before you mix
+          </h1>
+          
+          <p className="mt-6 text-lg md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
+            Mix Architect helps audio engineers define intent, organize references, 
+            and create shareable mix briefs—before touching a single fader.
+          </p>
 
-            {/* Stats row - Music relevant */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatTile label="Formats" value="Stereo" note="+ Atmos ready" />
-              <StatTile label="Workflow" value="Unified" note="One source of truth" />
-              <StatTile label="Output" value="Brief" note="Shareable PDF" />
-              <StatTile label="Status" value="Ready" note="Start anytime" />
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
+            <Link href="/app">
+              <Button variant="primary" className="h-12 px-8 text-base">
+                Start for free
+                <ArrowRight size={18} />
+              </Button>
+            </Link>
+            <Link href="#how-it-works">
+              <Button variant="secondary" className="h-12 px-8 text-base">
+                See how it works
+              </Button>
+            </Link>
+          </div>
+
+          <p className="mt-6 text-sm text-faint">
+            Free to use. No credit card required.
+          </p>
+        </div>
+      </section>
+
+      <Rule className="max-w-6xl mx-auto" />
+
+      {/* ─────────────────────────────────────────────────────
+          FEATURES
+      ───────────────────────────────────────────────────── */}
+      <section id="features" className="px-6 py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <div className="label text-faint mb-3">FEATURES</div>
+            <h2 className="text-3xl md:text-4xl font-bold h2 text-text">
+              Everything you need to plan a mix
+            </h2>
+            <p className="mt-4 text-muted max-w-xl mx-auto">
+              Stop guessing, start documenting. Mix Architect gives you a clear 
+              framework for every project.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <FeatureCard
+              icon={<FileText size={24} />}
+              title="Define intent"
+              description="Set clear goals for each track before you start. What should this mix feel like? What are the references?"
+            />
+            <FeatureCard
+              icon={<Layers size={24} />}
+              title="Organize assets"
+              description="Keep stems, references, notes, and revision history in one place. Never lose track of what was decided."
+            />
+            <FeatureCard
+              icon={<Share2 size={24} />}
+              title="Share briefs"
+              description="Export clean, professional mix briefs to share with clients, collaborators, or your future self."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────
+          HOW IT WORKS
+      ───────────────────────────────────────────────────── */}
+      <section id="how-it-works" className="px-6 py-24 bg-panel-2">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <div className="label text-faint mb-3">HOW IT WORKS</div>
+            <h2 className="text-3xl md:text-4xl font-bold h2 text-text">
+              Three steps to a better mix
+            </h2>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            <Step
+              number="01"
+              title="Create a release"
+              description="Start by naming your project. Is it a single, EP, or album? Stereo or Atmos?"
+            />
+            <Step
+              number="02"
+              title="Add your tracks"
+              description="For each track, define the intent, add references, and note any technical constraints."
+            />
+            <Step
+              number="03"
+              title="Export your brief"
+              description="Generate a clean, printable mix brief that captures everything in one document."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────
+          BENEFITS
+      ───────────────────────────────────────────────────── */}
+      <section className="px-6 py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-12 lg:grid-cols-2 items-center">
+            <div>
+              <div className="label text-faint mb-3">WHY MIX ARCHITECT</div>
+              <h2 className="text-3xl md:text-4xl font-bold h2 text-text">
+                Spend less time confused,
+                <br />
+                more time creating
+              </h2>
+              <p className="mt-4 text-muted leading-relaxed">
+                Most mixing problems aren&apos;t technical—they&apos;re communication problems. 
+                Mix Architect helps you clarify what success looks like before you start.
+              </p>
+
+              <ul className="mt-8 space-y-4">
+                <BenefitItem text="No more 'what did we decide?' moments" />
+                <BenefitItem text="Clear handoffs between collaborators" />
+                <BenefitItem text="Faster sessions with defined outcomes" />
+                <BenefitItem text="Professional documentation for clients" />
+              </ul>
             </div>
 
-            {/* Lower section - Features */}
-            <section id="how">
-              <Panel>
-                <PanelHeader className="flex items-start justify-between gap-6 flex-wrap">
-                  <div>
-                    <div className="label text-[11px] text-faint">WHAT YOU GET</div>
-                    <div className="mt-2 text-2xl font-bold h2 text-text">
-                      A mix plan you can trust
-                    </div>
-                    <div className="mt-2 text-sm text-muted max-w-2xl">
-                      Fewer &quot;what did we decide?&quot; moments. More intent, faster
-                      sessions, cleaner handoffs.
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Pill>Stereo</Pill>
-                    <Pill>Atmos</Pill>
-                    <Pill>Deliverables</Pill>
-                  </div>
-                </PanelHeader>
-                <Rule />
-                <PanelBody className="pt-5 grid gap-4 md:grid-cols-3">
-                  <Feature
-                    icon={<FileText size={20} />}
-                    title="Blueprint"
-                    body="Define outcomes, references, and constraints before the session."
-                  />
-                  <Feature
-                    icon={<Layers size={20} />}
-                    title="Organize"
-                    body="Keep assets, notes, and track intent in one place."
-                  />
-                  <Feature
-                    icon={<Share2 size={20} />}
-                    title="Brief"
-                    body="Export a clean, shareable mix brief for collaborators."
-                  />
-                </PanelBody>
-              </Panel>
-            </section>
-          </div>
-
-          {/* Right column - Accent panel + Inspector */}
-          <div className="space-y-6">
-            {/* Accent panel (Petronex orange style) */}
-            <AccentPanel>
-              <div className="flex items-center justify-between mb-4">
-                <div className="label-sm text-white/70">RELEASE</div>
-                <div className="flex gap-2">
-                  <button className="w-8 h-8 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
-                    ←
-                  </button>
-                  <button className="w-8 h-8 rounded-md bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
-                    →
-                  </button>
+            <Panel variant="float" className="p-8">
+              <div className="label text-faint mb-2">SAMPLE BRIEF</div>
+              <div className="text-xl font-semibold text-text mb-6">
+                &quot;Midnight Drive&quot; — Track 03
+              </div>
+              
+              <div className="space-y-4 text-sm">
+                <div className="flex justify-between py-3 border-b border-border">
+                  <span className="text-muted">Format</span>
+                  <span className="font-mono text-text">Stereo + Atmos</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border">
+                  <span className="text-muted">Target loudness</span>
+                  <span className="font-mono text-text">-14 LUFS</span>
+                </div>
+                <div className="flex justify-between py-3 border-b border-border">
+                  <span className="text-muted">Reference</span>
+                  <span className="font-mono text-text">Blinding Lights</span>
+                </div>
+                <div className="flex justify-between py-3">
+                  <span className="text-muted">Intent</span>
+                  <span className="text-text text-right max-w-[200px]">
+                    Wide, punchy, vocal-forward
+                  </span>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold h2 text-white">
-                Mix Architect
-                <br />
-                <span className="text-white/80">Control Room</span>
-              </h2>
-              <p className="mt-2 text-sm text-white/70">Your mixing command center</p>
-
-              <div className="mt-6 pt-6 border-t border-white/20">
-                <DataGrid>
-                  <DataCell label="Format" value="Stereo" />
-                  <DataCell label="Output" value="Brief" />
-                  <DataCell label="Tracks" value="∞" />
-                  <DataCell label="Refs" value="Unlimited" size="small" />
-                </DataGrid>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-white/20 space-y-2 text-sm">
-                <div className="flex justify-between text-white/70">
-                  <span>Code</span>
-                  <span className="font-semibold text-white font-mono">MX-001</span>
-                </div>
-                <div className="flex justify-between text-white/70">
-                  <span>Type</span>
-                  <span className="font-semibold text-white">Drafting</span>
-                </div>
-                <div className="flex justify-between text-white/70">
-                  <span>Status</span>
-                  <span className="font-semibold text-white">Active</span>
-                </div>
-              </div>
-            </AccentPanel>
-
-            {/* Inspector panel */}
-            <Panel variant="float">
-              <PanelHeader className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="text-base font-semibold text-text">Inspector</div>
-                  <div className="mt-1 text-sm text-muted">
-                    Context, next steps, shortcuts.
-                  </div>
-                </div>
-                <StatusIndicator color="blue" label="Ready" />
-              </PanelHeader>
-              <Rule />
-              <PanelBody className="pt-5 space-y-4">
-                <div className="flex flex-wrap gap-2">
-                  <Pill>⌘K Command</Pill>
-                  <Pill>Release notes</Pill>
-                  <Pill>Export brief</Pill>
-                </div>
-                <div className="space-y-2">
-                  <div className="row">
-                    <span className="rowKey">Step 01</span>
-                    <span className="rowVal">Create release</span>
-                  </div>
-                  <div className="row">
-                    <span className="rowKey">Step 02</span>
-                    <span className="rowVal">Add tracks + refs</span>
-                  </div>
-                  <div className="row">
-                    <span className="rowKey">Step 03</span>
-                    <span className="rowVal">Export brief</span>
-                  </div>
-                </div>
-                <Link href="/app" className="block">
-                  <Button variant="primary" className="w-full">
-                    Start a release
-                  </Button>
-                </Link>
-              </PanelBody>
             </Panel>
           </div>
         </div>
+      </section>
 
-        {/* Bottom toolbar (Petronex style) */}
-        <div className="mt-10 flex justify-center">
-          <Toolbar>
-            <ToolbarButton active>
-              <Home size={18} />
-            </ToolbarButton>
-            <ToolbarButton>
-              <Layers size={18} />
-            </ToolbarButton>
-            <ToolbarButton>
-              <Mic2 size={18} />
-            </ToolbarButton>
-            <ToolbarButton>
-              <FileText size={18} />
-            </ToolbarButton>
-            <ToolbarButton>
-              <Settings size={18} />
-            </ToolbarButton>
-          </Toolbar>
+      <Rule className="max-w-6xl mx-auto" />
+
+      {/* ─────────────────────────────────────────────────────
+          CTA
+      ───────────────────────────────────────────────────── */}
+      <section className="px-6 py-24">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl md:text-4xl font-bold h2 text-text">
+            Ready to plan your next mix?
+          </h2>
+          <p className="mt-4 text-muted">
+            Start organizing your projects today. It&apos;s free.
+          </p>
+          <div className="mt-8">
+            <Link href="/app">
+              <Button variant="primary" className="h-12 px-8 text-base">
+                Get started for free
+                <ArrowRight size={18} />
+              </Button>
+            </Link>
+          </div>
         </div>
+      </section>
 
-        {/* Footer */}
-        <footer className="mt-12 text-center text-xs text-faint">
-          <p>© 2024 Mix Architect. Blueprint your sound.</p>
-        </footer>
-      </div>
+      {/* ─────────────────────────────────────────────────────
+          FOOTER
+      ───────────────────────────────────────────────────── */}
+      <footer className="px-6 py-8 border-t border-border">
+        <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo.svg"
+              alt="Mix Architect"
+              width={120}
+              height={24}
+              className="h-6 w-auto opacity-60"
+            />
+          </div>
+          <p className="text-sm text-faint">
+            © {new Date().getFullYear()} Mix Architect. Blueprint your sound.
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
 
-function Feature({
+/* ─────────────────────────────────────────────────────
+   SUB-COMPONENTS
+───────────────────────────────────────────────────── */
+
+function FeatureCard({
   icon,
   title,
-  body,
+  description,
 }: {
   icon: React.ReactNode;
   title: string;
-  body: string;
+  description: string;
 }) {
   return (
-    <div className="card px-5 py-5">
-      <div className="w-10 h-10 rounded-md bg-panel2 border border-border-strong flex items-center justify-center text-muted mb-4">
+    <Panel className="p-6">
+      <div className="w-12 h-12 rounded-lg bg-signal-light border border-signal/20 flex items-center justify-center text-signal mb-5">
         {icon}
       </div>
-      <div className="text-base font-semibold text-text">{title}</div>
-      <div className="mt-2 text-sm text-muted leading-relaxed">{body}</div>
+      <h3 className="text-lg font-semibold text-text">{title}</h3>
+      <p className="mt-2 text-sm text-muted leading-relaxed">{description}</p>
+    </Panel>
+  );
+}
+
+function Step({
+  number,
+  title,
+  description,
+}: {
+  number: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="text-center">
+      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-panel border border-border-strong text-xl font-bold font-mono text-text mb-5">
+        {number}
+      </div>
+      <h3 className="text-lg font-semibold text-text">{title}</h3>
+      <p className="mt-2 text-sm text-muted leading-relaxed">{description}</p>
     </div>
+  );
+}
+
+function BenefitItem({ text }: { text: string }) {
+  return (
+    <li className="flex items-start gap-3">
+      <CheckCircle2 size={20} className="text-signal shrink-0 mt-0.5" />
+      <span className="text-text">{text}</span>
+    </li>
   );
 }
