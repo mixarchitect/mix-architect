@@ -27,10 +27,10 @@ export function Shell({
               <Image
                 src="/logo.svg"
                 alt="Mix Architect"
-                width={180}
-                height={36}
+                width={360}
+                height={72}
                 priority
-                className="h-8 w-auto group-hover:opacity-80 transition-opacity"
+                className="h-16 w-auto group-hover:opacity-80 transition-opacity"
               />
             </Link>
             <div className="label-sm text-faint hidden sm:block">

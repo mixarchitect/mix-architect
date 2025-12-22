@@ -22,10 +22,10 @@ export default function HomePage() {
               <Image
                 src="/logo.svg"
                 alt="Mix Architect"
-                width={180}
-                height={36}
+                width={360}
+                height={72}
                 priority
-                className="h-8 w-auto"
+                className="h-16 w-auto"
               />
             </Link>
             <div className="label-sm text-faint hidden sm:block">
