@@ -12,19 +12,19 @@ export default function HomePage() {
           FLOATING NAV
       ───────────────────────────────────────────────────── */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
-        <div className="w-[calc(100vw-24px)] sm:w-[92vw] md:w-[78vw] lg:w-[1100px] max-w-6xl flex items-center gap-2 bg-white/95 backdrop-blur-sm border border-border-strong rounded-full px-2 py-2 shadow-float">
-          <Link href="/" className="flex items-center pl-3 pr-4">
+        <div className="w-[calc(100vw-24px)] sm:w-[92vw] md:w-[78vw] lg:w-[1100px] max-w-6xl flex items-center gap-3 bg-white/95 backdrop-blur-sm border border-border-strong rounded-full px-3 py-3 shadow-float">
+          <Link href="/" className="flex items-center pl-2 pr-4">
             <Image
               src="/mixarch-logo-black.svg"
               alt="Mix Architect"
-              width={140}
-              height={28}
+              width={180}
+              height={36}
               priority
-              className="h-6 w-auto"
+              className="h-8 w-auto"
             />
           </Link>
           
-          <div className="hidden md:flex items-center gap-1 text-sm">
+          <div className="hidden md:flex flex-1 items-center justify-center gap-1 text-sm">
             <Link 
               href="#features" 
               className="px-4 py-2 rounded-full text-muted hover:text-text hover:bg-panel-2 transition-colors"
