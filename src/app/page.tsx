@@ -60,19 +60,21 @@ export default function HomePage() {
             <source src="/recordingconsole.mov" type="video/quicktime" />
             <source src="/recordingconsole.mov" type="video/mp4" />
           </video>
-          {/* Overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-bg/90 via-bg/80 to-bg" />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-black/70" />
+          {/* Bottom fade to page background */}
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-bg to-transparent" />
         </div>
 
         {/* Content */}
         <div className="relative z-10 mx-auto max-w-3xl text-center">
-          <h1 className="text-[44px] md:text-[64px] font-bold leading-[1.0] tracking-tight h1 text-text">
+          <h1 className="text-[44px] md:text-[64px] font-bold leading-[1.0] tracking-tight h1 text-white">
             Plan your mix
             <br />
             before you mix
           </h1>
           
-          <p className="mt-6 text-lg md:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-6 text-lg md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
             Mix Architect helps audio engineers define intent, organize references, 
             and create shareable mix briefs—before touching a single fader.
           </p>
@@ -85,13 +87,13 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="#how-it-works">
-              <Button variant="secondary" className="h-12 px-8 text-base">
+              <Button variant="ghost" className="h-12 px-8 text-base text-white border-white/30 hover:bg-white/10 hover:border-white/50">
                 See how it works
               </Button>
             </Link>
           </div>
 
-          <p className="mt-6 text-sm text-faint">
+          <p className="mt-6 text-sm text-white/50">
             Free to use. No credit card required.
           </p>
         </div>
