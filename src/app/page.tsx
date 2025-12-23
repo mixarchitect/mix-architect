@@ -47,8 +47,25 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────────────────
           HERO
       ───────────────────────────────────────────────────── */}
-      <section className="px-6 pt-16 pb-24">
-        <div className="mx-auto max-w-3xl text-center">
+      <section className="relative px-6 pt-24 pb-32 overflow-hidden">
+        {/* Background video */}
+        <div className="absolute inset-0 z-0">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source src="/recordingconsole.mov" type="video/quicktime" />
+            <source src="/recordingconsole.mov" type="video/mp4" />
+          </video>
+          {/* Overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-bg/90 via-bg/80 to-bg" />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 mx-auto max-w-3xl text-center">
           <h1 className="text-[44px] md:text-[64px] font-bold leading-[1.0] tracking-tight h1 text-text">
             Plan your mix
             <br />
@@ -77,23 +94,6 @@ export default function HomePage() {
           <p className="mt-6 text-sm text-faint">
             Free to use. No credit card required.
           </p>
-        </div>
-
-        {/* Hero video */}
-        <div className="mt-16 mx-auto max-w-5xl">
-          <div className="relative rounded-xl overflow-hidden border border-border-strong shadow-float">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-auto"
-            >
-              <source src="/recordingconsole.mov" type="video/quicktime" />
-              <source src="/recordingconsole.mov" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
         </div>
       </section>
 
