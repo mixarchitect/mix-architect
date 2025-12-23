@@ -12,7 +12,7 @@ export default function HomePage() {
           FLOATING NAV
       ───────────────────────────────────────────────────── */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
-        <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm border border-border-strong rounded-full px-2 py-2 shadow-float">
+        <div className="w-[calc(100vw-24px)] sm:w-[92vw] md:w-[78vw] lg:w-[1100px] max-w-6xl flex items-center gap-2 bg-white/95 backdrop-blur-sm border border-border-strong rounded-full px-2 py-2 shadow-float">
           <Link href="/" className="flex items-center pl-3 pr-4">
             <Image
               src="/mixarch-logo-black.svg"
