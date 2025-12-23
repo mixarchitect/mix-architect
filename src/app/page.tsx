@@ -78,6 +78,23 @@ export default function HomePage() {
             Free to use. No credit card required.
           </p>
         </div>
+
+        {/* Hero video */}
+        <div className="mt-16 mx-auto max-w-5xl">
+          <div className="relative rounded-xl overflow-hidden border border-border-strong shadow-float">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-auto"
+            >
+              <source src="/recordingconsole.mov" type="video/quicktime" />
+              <source src="/recordingconsole.mov" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
       </section>
 
       <Rule className="max-w-6xl mx-auto" />
