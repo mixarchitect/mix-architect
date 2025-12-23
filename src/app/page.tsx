@@ -9,45 +9,55 @@ export default function HomePage() {
   return (
     <main className="min-h-screen">
       {/* ─────────────────────────────────────────────────────
-          HEADER
+          FLOATING NAV
       ───────────────────────────────────────────────────── */}
-      <header className="px-6 py-6">
-        <div className="mx-auto max-w-6xl flex items-center justify-between">
-          <Link href="/" className="flex items-center">
+      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
+        <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm border border-border-strong rounded-full px-2 py-2 shadow-float">
+          <Link href="/" className="flex items-center pl-3 pr-4">
             <Image
-              src="/logo.svg"
+              src="/mixarch-logo-black.svg"
               alt="Mix Architect"
-              width={360}
-              height={72}
+              width={140}
+              height={28}
               priority
-              className="h-12 w-auto"
+              className="h-6 w-auto"
             />
           </Link>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm text-muted">
-            <Link href="#features" className="hover:text-text transition-colors">
+          
+          <div className="hidden md:flex items-center gap-1 text-sm">
+            <Link 
+              href="#features" 
+              className="px-4 py-2 rounded-full text-muted hover:text-text hover:bg-panel-2 transition-colors"
+            >
               Features
             </Link>
-            <Link href="#how-it-works" className="hover:text-text transition-colors">
+            <Link 
+              href="#how-it-works" 
+              className="px-4 py-2 rounded-full text-muted hover:text-text hover:bg-panel-2 transition-colors"
+            >
               How it works
             </Link>
-          </nav>
+          </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 pl-2">
             <Link href="/auth/sign-in">
-              <Button variant="ghost">Sign in</Button>
+              <button className="px-4 py-2 text-sm text-muted hover:text-text transition-colors">
+                Sign in
+              </button>
             </Link>
             <Link href="/app">
-              <Button variant="primary">Get started</Button>
+              <button className="px-5 py-2 text-sm font-semibold text-white bg-signal rounded-full hover:bg-signal/90 transition-colors">
+                Get started
+              </button>
             </Link>
           </div>
         </div>
-      </header>
+      </nav>
 
       {/* ─────────────────────────────────────────────────────
-          HERO
+          HERO (Full viewport with video)
       ───────────────────────────────────────────────────── */}
-      <section className="relative px-6 pt-24 pb-32 overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background video */}
         <div className="absolute inset-0 z-0">
           <video
@@ -63,43 +73,41 @@ export default function HomePage() {
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-black/70" />
           {/* Bottom fade to page background */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-bg to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-bg to-transparent" />
         </div>
 
         {/* Content */}
-        <div className="relative z-10 mx-auto max-w-3xl text-center">
-          <h1 className="text-[44px] md:text-[64px] font-bold leading-[1.0] tracking-tight h1 text-white">
+        <div className="relative z-10 mx-auto max-w-3xl text-center px-6 pt-24 pb-32">
+          <h1 className="text-[44px] md:text-[72px] font-bold leading-[0.95] tracking-tight h1 text-white">
             Plan your mix
             <br />
             before you mix
           </h1>
           
-          <p className="mt-6 text-lg md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-8 text-lg md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
             Mix Architect helps audio engineers define intent, organize references, 
             and create shareable mix briefs—before touching a single fader.
           </p>
 
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
+          <div className="mt-12 flex flex-wrap justify-center gap-4">
             <Link href="/app">
-              <Button variant="primary" className="h-12 px-8 text-base">
+              <Button variant="primary" className="h-14 px-10 text-base">
                 Start for free
                 <ArrowRight size={18} />
               </Button>
             </Link>
             <Link href="#how-it-works">
-              <Button variant="secondary" className="h-12 px-8 text-base bg-white text-text border-white hover:bg-white/90">
+              <Button variant="secondary" className="h-14 px-10 text-base bg-white text-text border-white hover:bg-white/90">
                 See how it works
               </Button>
             </Link>
           </div>
 
-          <p className="mt-6 text-sm text-white/50">
+          <p className="mt-8 text-sm text-white/50">
             Free to use. No credit card required.
           </p>
         </div>
       </section>
-
-      <Rule className="max-w-6xl mx-auto" />
 
       {/* ─────────────────────────────────────────────────────
           FEATURES
@@ -136,6 +144,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <Rule className="max-w-6xl mx-auto" />
 
       {/* ─────────────────────────────────────────────────────
           HOW IT WORKS
@@ -257,11 +267,11 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Image
-              src="/logo.svg"
+              src="/mixarch-logo-black.svg"
               alt="Mix Architect"
               width={120}
               height={24}
-              className="h-6 w-auto opacity-60"
+              className="h-5 w-auto opacity-60"
             />
           </div>
           <p className="text-sm text-faint">
