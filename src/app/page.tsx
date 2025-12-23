@@ -87,7 +87,7 @@ export default function HomePage() {
               </Button>
             </Link>
             <Link href="#how-it-works">
-              <Button variant="ghost" className="h-12 px-8 text-base text-white border-white/30 hover:bg-white/10 hover:border-white/50">
+              <Button variant="secondary" className="h-12 px-8 text-base bg-white text-text border-white hover:bg-white/90">
                 See how it works
               </Button>
             </Link>
