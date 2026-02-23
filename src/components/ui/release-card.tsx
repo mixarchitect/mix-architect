@@ -87,20 +87,105 @@ export function ReleaseCard({
 
   return (
     <div className={cn("relative card px-5 py-4", className)}>
+      <div className="flex items-start justify-between gap-2">
+        <Link
+          href={`/app/releases/${id}`}
+          className="group min-w-0 flex-1 focus-visible:outline-none"
+        >
+          <div className="text-base font-semibold text-text truncate group-hover:text-signal transition-colors duration-150">
+            {title}
+          </div>
+          <div className="mt-1 text-sm text-muted truncate">{artist || "\u2014"}</div>
+        </Link>
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          <StatusDot color={statusColor(status)} />
+          <div ref={menuRef} className="relative">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMenuOpen(!menuOpen);
+                setConfirming(false);
+              }}
+              className="w-7 h-7 grid place-items-center rounded-md text-faint hover:text-text hover:bg-panel2 transition-colors"
+            >
+              <MoreVertical size={15} />
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 mt-1 w-44 rounded-md border border-border bg-panel shadow-lg py-1 text-sm z-20">
+                {!confirming ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setMenuOpen(false);
+                        router.push(`/app/releases/${id}/settings`);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-panel2 transition-colors text-left"
+                    >
+                      <Pencil size={14} />
+                      Edit Release
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setConfirming(true);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 transition-colors text-left"
+                    >
+                      <Trash2 size={14} />
+                      Delete Release
+                    </button>
+                  </>
+                ) : (
+                  <div className="px-3 py-2 space-y-2">
+                    <p className="text-xs text-muted">
+                      Delete <strong className="text-text">{title}</strong>? This cannot be undone.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete();
+                        }}
+                        disabled={deleting}
+                        className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors disabled:opacity-50"
+                      >
+                        {deleting ? "Deleting\u2026" : "Confirm"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setConfirming(false);
+                        }}
+                        className="flex-1 px-2 py-1.5 text-xs font-medium text-muted hover:text-text border border-border rounded transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       <Link
         href={`/app/releases/${id}`}
         className="group block focus-visible:outline-none"
       >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="text-base font-semibold text-text truncate group-hover:text-signal transition-colors duration-150">
-              {title}
-            </div>
-            <div className="mt-1 text-sm text-muted truncate">{artist || "\u2014"}</div>
-          </div>
-          <StatusDot color={statusColor(status)} />
-        </div>
-
         <div className="mt-3 flex flex-wrap gap-1.5">
           <Pill>{typeLabel(releaseType)}</Pill>
           <Pill>{formatLabel(format)}</Pill>
@@ -113,87 +198,6 @@ export function ReleaseCard({
           {updatedAt && <span>{relativeTime(updatedAt)}</span>}
         </div>
       </Link>
-
-      {/* Three-dot menu */}
-      <div ref={menuRef} className="absolute top-3 right-3 z-10">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setMenuOpen(!menuOpen);
-            setConfirming(false);
-          }}
-          className="w-8 h-8 grid place-items-center rounded-md text-faint hover:text-text hover:bg-panel2 transition-colors"
-        >
-          <MoreVertical size={16} />
-        </button>
-
-        {menuOpen && (
-          <div className="absolute right-0 mt-1 w-44 rounded-md border border-border bg-panel shadow-lg py-1 text-sm">
-            {!confirming ? (
-              <>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setMenuOpen(false);
-                    router.push(`/app/releases/${id}/settings`);
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-panel2 transition-colors text-left"
-                >
-                  <Pencil size={14} />
-                  Edit Release
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setConfirming(true);
-                  }}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 transition-colors text-left"
-                >
-                  <Trash2 size={14} />
-                  Delete Release
-                </button>
-              </>
-            ) : (
-              <div className="px-3 py-2 space-y-2">
-                <p className="text-xs text-muted">
-                  Delete <strong className="text-text">{title}</strong>? This cannot be undone.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleDelete();
-                    }}
-                    disabled={deleting}
-                    className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors disabled:opacity-50"
-                  >
-                    {deleting ? "Deleting\u2026" : "Confirm"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setConfirming(false);
-                    }}
-                    className="flex-1 px-2 py-1.5 text-xs font-medium text-muted hover:text-text border border-border rounded transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
