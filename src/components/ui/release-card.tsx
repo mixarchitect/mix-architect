@@ -1,4 +1,10 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { StatusDot } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
 import { cn } from "@/lib/cn";
@@ -30,7 +36,7 @@ function formatLabel(f: string | undefined | null): string {
 }
 
 function typeLabel(t: string | undefined | null): string {
-  if (!t) return "—";
+  if (!t) return "\u2014";
   if (t === "ep") return "EP";
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
@@ -54,36 +60,140 @@ export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt, className,
 }: Props) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+        setConfirming(false);
+      }
+    }
+    if (menuOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
+  async function handleDelete() {
+    setDeleting(true);
+    const supabase = createSupabaseBrowserClient();
+    await supabase.from("releases").delete().eq("id", id);
+    setMenuOpen(false);
+    router.refresh();
+  }
+
   return (
-    <Link
-      href={`/app/releases/${id}`}
-      className={cn(
-        "group block card px-5 py-4",
-        "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
-        className
-      )}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="text-base font-semibold text-text truncate group-hover:text-signal transition-colors duration-150">
-            {title}
+    <div className={cn("relative card px-5 py-4", className)}>
+      <Link
+        href={`/app/releases/${id}`}
+        className="group block focus-visible:outline-none"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="text-base font-semibold text-text truncate group-hover:text-signal transition-colors duration-150">
+              {title}
+            </div>
+            <div className="mt-1 text-sm text-muted truncate">{artist || "\u2014"}</div>
           </div>
-          <div className="mt-1 text-sm text-muted truncate">{artist || "\u2014"}</div>
+          <StatusDot color={statusColor(status)} />
         </div>
-        <StatusDot color={statusColor(status)} />
-      </div>
 
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        <Pill>{typeLabel(releaseType)}</Pill>
-        <Pill>{formatLabel(format)}</Pill>
-      </div>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <Pill>{typeLabel(releaseType)}</Pill>
+          <Pill>{formatLabel(format)}</Pill>
+        </div>
 
-      <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted">
-        <span className="font-mono">
-          {completedTracks} of {trackCount} track{trackCount !== 1 ? "s" : ""} briefed
-        </span>
-        {updatedAt && <span>{relativeTime(updatedAt)}</span>}
+        <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted">
+          <span className="font-mono">
+            {completedTracks} of {trackCount} track{trackCount !== 1 ? "s" : ""} briefed
+          </span>
+          {updatedAt && <span>{relativeTime(updatedAt)}</span>}
+        </div>
+      </Link>
+
+      {/* Three-dot menu */}
+      <div ref={menuRef} className="absolute top-3 right-3 z-10">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setMenuOpen(!menuOpen);
+            setConfirming(false);
+          }}
+          className="w-8 h-8 grid place-items-center rounded-md text-faint hover:text-text hover:bg-panel2 transition-colors"
+        >
+          <MoreVertical size={16} />
+        </button>
+
+        {menuOpen && (
+          <div className="absolute right-0 mt-1 w-44 rounded-md border border-border bg-panel shadow-lg py-1 text-sm">
+            {!confirming ? (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMenuOpen(false);
+                    router.push(`/app/releases/${id}/settings`);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-panel2 transition-colors text-left"
+                >
+                  <Pencil size={14} />
+                  Edit Release
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setConfirming(true);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 transition-colors text-left"
+                >
+                  <Trash2 size={14} />
+                  Delete Release
+                </button>
+              </>
+            ) : (
+              <div className="px-3 py-2 space-y-2">
+                <p className="text-xs text-muted">
+                  Delete <strong className="text-text">{title}</strong>? This cannot be undone.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDelete();
+                    }}
+                    disabled={deleting}
+                    className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors disabled:opacity-50"
+                  >
+                    {deleting ? "Deleting\u2026" : "Confirm"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setConfirming(false);
+                    }}
+                    className="flex-1 px-2 py-1.5 text-xs font-medium text-muted hover:text-text border border-border rounded transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </Link>
+    </div>
   );
 }
