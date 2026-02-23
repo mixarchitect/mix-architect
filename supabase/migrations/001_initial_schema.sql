@@ -101,8 +101,11 @@ CREATE TABLE IF NOT EXISTS mix_references (
   artist      text,
   note        text,
   url         text,
+  artwork_url text,
   sort_order  int NOT NULL DEFAULT 0
 );
+
+ALTER TABLE mix_references ADD COLUMN IF NOT EXISTS artwork_url text;
 
 -- ── TABLE: track_specs (one-to-one with tracks) ────────────────
 

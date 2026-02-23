@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody } from "@/components/ui/panel";
@@ -26,7 +26,9 @@ const TABS = [
 const EMOTIONAL_SUGGESTIONS = [
   "aggressive", "intimate", "spacious", "gritty", "polished", "warm",
   "dark", "bright", "raw", "lush", "punchy", "dreamy", "lo-fi",
-  "cinematic", "minimal", "dense",
+  "cinematic", "minimal", "dense", "ethereal", "hypnotic", "nostalgic",
+  "euphoric", "melancholic", "organic", "synthetic", "chaotic", "smooth",
+  "haunting", "playful", "anthemic", "delicate", "heavy", "airy",
 ];
 
 const DEFAULT_ELEMENTS = [
@@ -72,6 +74,7 @@ type RefData = {
   artist?: string | null;
   note?: string | null;
   url?: string | null;
+  artwork_url?: string | null;
 };
 
 type Props = {
@@ -94,6 +97,7 @@ export function TrackDetailClient({
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const [mixVision, setMixVision] = useState(intent?.mix_vision ?? "");
+  const [editingVision, setEditingVision] = useState(!intent?.mix_vision);
   const [emotionalTags, setEmotionalTags] = useState<string[]>(intent?.emotional_tags ?? []);
   const [antiRefs, setAntiRefs] = useState(intent?.anti_references ?? "");
 
@@ -112,6 +116,11 @@ export function TrackDetailClient({
   const [refTitle, setRefTitle] = useState("");
   const [refArtist, setRefArtist] = useState("");
   const [refNote, setRefNote] = useState("");
+  const [refUrl, setRefUrl] = useState("");
+  const [refArtwork, setRefArtwork] = useState("");
+  const [itunesResults, setItunesResults] = useState<{ trackName: string; artistName: string; artworkUrl100: string; trackViewUrl: string }[]>([]);
+  const [showItunesResults, setShowItunesResults] = useState(false);
+  const itunesDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [trackStatus, setTrackStatus] = useState(track.status);
 
@@ -213,6 +222,42 @@ export function TrackDetailClient({
     }
   }
 
+  function searchItunes(query: string) {
+    if (itunesDebounceRef.current) clearTimeout(itunesDebounceRef.current);
+    if (!query.trim()) {
+      setItunesResults([]);
+      setShowItunesResults(false);
+      return;
+    }
+    itunesDebounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&entity=song&limit=5`,
+        );
+        const json = await res.json();
+        setItunesResults(
+          (json.results ?? []).map((r: Record<string, unknown>) => ({
+            trackName: r.trackName as string,
+            artistName: r.artistName as string,
+            artworkUrl100: r.artworkUrl100 as string,
+            trackViewUrl: r.trackViewUrl as string,
+          })),
+        );
+        setShowItunesResults(true);
+      } catch {
+        setItunesResults([]);
+      }
+    }, 400);
+  }
+
+  function selectItunesResult(result: { trackName: string; artistName: string; artworkUrl100: string; trackViewUrl: string }) {
+    setRefTitle(result.trackName);
+    setRefArtist(result.artistName);
+    setRefUrl(result.trackViewUrl);
+    setRefArtwork(result.artworkUrl100);
+    setShowItunesResults(false);
+  }
+
   async function handleAddRef() {
     if (!refTitle.trim()) return;
     const nextOrder =
@@ -226,6 +271,8 @@ export function TrackDetailClient({
         song_title: refTitle.trim(),
         artist: refArtist || null,
         note: refNote || null,
+        url: refUrl || null,
+        artwork_url: refArtwork || null,
         sort_order: nextOrder,
       })
       .select()
@@ -235,7 +282,10 @@ export function TrackDetailClient({
       setRefTitle("");
       setRefArtist("");
       setRefNote("");
+      setRefUrl("");
+      setRefArtwork("");
       setShowRefForm(false);
+      setShowItunesResults(false);
     }
   }
 
@@ -299,18 +349,70 @@ export function TrackDetailClient({
           {activeTab === "intent" && (
             <div className="space-y-6">
               <div className="space-y-1.5">
-                <label className="label text-faint">
-                  What should this track feel like?
-                </label>
-                <textarea
-                  value={mixVision}
-                  onChange={(e) => {
-                    setMixVision(e.target.value);
-                    saveIntent({ mix_vision: e.target.value });
-                  }}
-                  placeholder="Describe the sonic direction — mood, energy, spatial qualities, any specifics about the mix."
-                  className="input min-h-[160px] resize-y text-sm leading-relaxed"
-                />
+                <div className="flex items-center justify-between">
+                  <label className="label text-faint">
+                    What should this track feel like?
+                  </label>
+                  {!editingVision && mixVision && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingVision(true)}
+                      className="text-xs text-muted hover:text-text transition-colors"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+                {editingVision ? (
+                  <div className="space-y-2">
+                    <textarea
+                      value={mixVision}
+                      onChange={(e) => setMixVision(e.target.value)}
+                      placeholder="Describe the sonic direction — mood, energy, spatial qualities, any specifics about the mix."
+                      className="input min-h-[160px] resize-y text-sm leading-relaxed"
+                      autoFocus
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        variant="primary"
+                        className="h-8 text-xs px-4"
+                        onClick={() => {
+                          saveIntent({ mix_vision: mixVision });
+                          setEditingVision(false);
+                        }}
+                      >
+                        Save
+                      </Button>
+                      {intent?.mix_vision && (
+                        <Button
+                          variant="ghost"
+                          className="h-8 text-xs px-3"
+                          onClick={() => {
+                            setMixVision(intent.mix_vision ?? "");
+                            setEditingVision(false);
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ) : mixVision ? (
+                  <div
+                    className="p-4 rounded-md border border-border bg-panel text-sm text-text leading-relaxed whitespace-pre-wrap cursor-pointer hover:border-border-strong transition-colors"
+                    onClick={() => setEditingVision(true)}
+                  >
+                    {mixVision}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setEditingVision(true)}
+                    className="w-full p-4 rounded-md border border-dashed border-border text-sm text-muted hover:border-border-strong hover:text-text transition-colors text-left"
+                  >
+                    Click to describe the sonic direction...
+                  </button>
+                )}
               </div>
               <div className="space-y-1.5">
                 <label className="label text-faint">Emotional qualities</label>
@@ -517,7 +619,14 @@ export function TrackDetailClient({
               </div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Format</span>
-                <Pill className="text-[10px]">{formatOverride || releaseFormat}</Pill>
+                <Pill className="text-[10px]">{
+                  (() => {
+                    const f = formatOverride || releaseFormat;
+                    if (f === "both") return "Stereo & Atmos";
+                    if (f === "atmos") return "Dolby Atmos";
+                    return "Stereo";
+                  })()
+                }</Pill>
               </div>
             </PanelBody>
           </Panel>
@@ -536,22 +645,70 @@ export function TrackDetailClient({
               </div>
               {showRefForm && (
                 <div className="space-y-2 p-3 rounded-md border border-border bg-panel2">
-                  <input
-                    value={refTitle}
-                    onChange={(e) => setRefTitle(e.target.value)}
-                    placeholder="Song title"
-                    className="input text-xs h-8 py-1"
-                  />
-                  <input
-                    value={refArtist}
-                    onChange={(e) => setRefArtist(e.target.value)}
-                    placeholder="Artist"
-                    className="input text-xs h-8 py-1"
-                  />
+                  <div className="relative">
+                    <input
+                      value={refTitle}
+                      onChange={(e) => {
+                        setRefTitle(e.target.value);
+                        searchItunes(e.target.value);
+                      }}
+                      onFocus={() => { if (itunesResults.length > 0) setShowItunesResults(true); }}
+                      placeholder="Search for a song..."
+                      className="input text-xs h-8 py-1"
+                      autoFocus
+                    />
+                    {showItunesResults && itunesResults.length > 0 && (
+                      <div className="absolute z-30 left-0 right-0 mt-1 rounded-md border border-border bg-panel shadow-lg overflow-hidden">
+                        {itunesResults.map((r, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => selectItunesResult(r)}
+                            className="w-full flex items-center gap-2.5 px-2.5 py-2 hover:bg-panel2 transition-colors text-left"
+                          >
+                            {r.artworkUrl100 && (
+                              <img
+                                src={r.artworkUrl100}
+                                alt=""
+                                className="w-8 h-8 rounded-[3px] shrink-0"
+                              />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="text-xs font-medium text-text truncate">{r.trackName}</div>
+                              <div className="text-[10px] text-muted truncate">{r.artistName}</div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {refArtwork && (
+                    <div className="flex items-center gap-2">
+                      <img src={refArtwork} alt="" className="w-10 h-10 rounded-[3px]" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-medium text-text truncate">{refTitle}</div>
+                        <div className="text-[10px] text-muted truncate">{refArtist}</div>
+                      </div>
+                    </div>
+                  )}
+                  {!refArtwork && (
+                    <input
+                      value={refArtist}
+                      onChange={(e) => setRefArtist(e.target.value)}
+                      placeholder="Artist"
+                      className="input text-xs h-8 py-1"
+                    />
+                  )}
                   <input
                     value={refNote}
                     onChange={(e) => setRefNote(e.target.value)}
                     placeholder="What to reference about this song"
+                    className="input text-xs h-8 py-1"
+                  />
+                  <input
+                    value={refUrl}
+                    onChange={(e) => setRefUrl(e.target.value)}
+                    placeholder="Link (Spotify, Apple Music, YouTube...)"
                     className="input text-xs h-8 py-1"
                   />
                   <div className="flex gap-2">
@@ -565,7 +722,15 @@ export function TrackDetailClient({
                     </Button>
                     <Button
                       variant="ghost"
-                      onClick={() => setShowRefForm(false)}
+                      onClick={() => {
+                        setShowRefForm(false);
+                        setShowItunesResults(false);
+                        setRefTitle("");
+                        setRefArtist("");
+                        setRefNote("");
+                        setRefUrl("");
+                        setRefArtwork("");
+                      }}
                       className="h-7 text-xs px-3"
                     >
                       Cancel
@@ -582,6 +747,7 @@ export function TrackDetailClient({
                       artist={ref.artist}
                       note={ref.note}
                       url={ref.url}
+                      artworkUrl={ref.artwork_url}
                       onDelete={() => handleDeleteRef(ref.id)}
                     />
                   ))}

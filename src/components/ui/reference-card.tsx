@@ -8,13 +8,21 @@ type Props = {
   artist?: string | null;
   note?: string | null;
   url?: string | null;
+  artworkUrl?: string | null;
   onDelete?: () => void;
   className?: string;
 };
 
-export function ReferenceCard({ songTitle, artist, note, url, onDelete, className }: Props) {
+export function ReferenceCard({ songTitle, artist, note, url, artworkUrl, onDelete, className }: Props) {
   return (
     <div className={cn("flex items-start gap-3 p-3 rounded-md border border-border bg-panel", className)}>
+      {artworkUrl && (
+        <img
+          src={artworkUrl}
+          alt={`${songTitle} artwork`}
+          className="w-10 h-10 rounded-[3px] shrink-0"
+        />
+      )}
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-text">{songTitle}</div>
         {artist && <div className="text-xs text-muted">{artist}</div>}
