@@ -118,6 +118,7 @@ export function TrackDetailClient({
   const [refNote, setRefNote] = useState("");
   const [refUrl, setRefUrl] = useState("");
   const [refArtwork, setRefArtwork] = useState("");
+  const [refPlatform, setRefPlatform] = useState<"apple" | "spotify" | "tidal" | "youtube">("apple");
   const [itunesResults, setItunesResults] = useState<{ trackName: string; artistName: string; artworkUrl100: string; trackViewUrl: string }[]>([]);
   const [showItunesResults, setShowItunesResults] = useState(false);
   const itunesDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -250,10 +251,25 @@ export function TrackDetailClient({
     }, 400);
   }
 
+  function buildPlatformUrl(
+    platform: "apple" | "spotify" | "tidal" | "youtube",
+    trackName: string,
+    artistName: string,
+    appleUrl: string,
+  ): string {
+    const q = encodeURIComponent(`${trackName} ${artistName}`);
+    switch (platform) {
+      case "apple": return appleUrl;
+      case "spotify": return `https://open.spotify.com/search/${q}`;
+      case "tidal": return `https://tidal.com/search?q=${q}`;
+      case "youtube": return `https://music.youtube.com/search?q=${q}`;
+    }
+  }
+
   function selectItunesResult(result: { trackName: string; artistName: string; artworkUrl100: string; trackViewUrl: string }) {
     setRefTitle(result.trackName);
     setRefArtist(result.artistName);
-    setRefUrl(result.trackViewUrl);
+    setRefUrl(buildPlatformUrl(refPlatform, result.trackName, result.artistName, result.trackViewUrl));
     setRefArtwork(result.artworkUrl100);
     setShowItunesResults(false);
   }
@@ -426,6 +442,18 @@ export function TrackDetailClient({
                   placeholder="Type or click suggestions below"
                 />
               </div>
+              <div className="space-y-1.5">
+                <label className="label text-faint">Anti-references</label>
+                <textarea
+                  value={antiRefs}
+                  onChange={(e) => {
+                    setAntiRefs(e.target.value);
+                    saveIntent({ anti_references: e.target.value });
+                  }}
+                  placeholder="What should this NOT sound like? Describe sounds, styles, or specific mixes to avoid."
+                  className="input min-h-[80px] resize-y text-sm leading-relaxed"
+                />
+              </div>
             </div>
           )}
 
@@ -443,9 +471,13 @@ export function TrackDetailClient({
                     }}
                     className="input"
                   >
-                    <option value="-14 LUFS">-14 LUFS</option>
-                    <option value="-16 LUFS">-16 LUFS</option>
-                    <option value="-12 LUFS">-12 LUFS</option>
+                    <option value="-14 LUFS">-14 LUFS — Spotify / YouTube</option>
+                    <option value="-16 LUFS">-16 LUFS — Apple Music / Tidal</option>
+                    <option value="-12 LUFS">-12 LUFS — Louder master</option>
+                    <option value="-11 LUFS">-11 LUFS — Club / DJ</option>
+                    <option value="-9 LUFS">-9 LUFS — Competitive / radio</option>
+                    <option value="-23 LUFS">-23 LUFS — Broadcast (EBU R128)</option>
+                    <option value="-24 LUFS">-24 LUFS — Broadcast (ATSC A/85)</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
@@ -645,6 +677,22 @@ export function TrackDetailClient({
               </div>
               {showRefForm && (
                 <div className="space-y-2 p-3 rounded-md border border-border bg-panel2">
+                  <div className="flex gap-1">
+                    {(["apple", "spotify", "tidal", "youtube"] as const).map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setRefPlatform(p)}
+                        className={`flex-1 px-1.5 py-1 text-[10px] font-medium rounded transition-colors ${
+                          refPlatform === p
+                            ? "bg-panel text-text border border-border-strong shadow-sm"
+                            : "text-faint hover:text-muted"
+                        }`}
+                      >
+                        {p === "apple" ? "Apple" : p === "spotify" ? "Spotify" : p === "tidal" ? "Tidal" : "YouTube"}
+                      </button>
+                    ))}
+                  </div>
                   <div className="relative">
                     <input
                       value={refTitle}
@@ -758,20 +806,6 @@ export function TrackDetailClient({
             </PanelBody>
           </Panel>
 
-          <Panel>
-            <PanelBody className="py-4">
-              <div className="label text-faint text-[10px] mb-2">ANTI-REFERENCES</div>
-              <textarea
-                value={antiRefs}
-                onChange={(e) => {
-                  setAntiRefs(e.target.value);
-                  saveIntent({ anti_references: e.target.value });
-                }}
-                placeholder="What should this NOT sound like?"
-                className="w-full text-sm text-text bg-transparent border-none outline-none resize-none min-h-[60px] placeholder:text-faint"
-              />
-            </PanelBody>
-          </Panel>
         </aside>
       </div>
     </div>
