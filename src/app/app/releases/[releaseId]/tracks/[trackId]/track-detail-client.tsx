@@ -31,8 +31,17 @@ const EMOTIONAL_SUGGESTIONS = [
   "haunting", "playful", "anthemic", "delicate", "heavy", "airy",
 ];
 
+const ELEMENT_CATEGORIES: { label: string; items: string[] }[] = [
+  { label: "Drums & Percussion", items: ["Kick", "Snare", "Hi-Hats", "Toms", "Overheads/Rooms", "Percussion", "Drum Bus", "Programmed Drums"] },
+  { label: "Bass", items: ["Bass Guitar", "Synth Bass", "Sub Bass", "Upright Bass"] },
+  { label: "Guitars", items: ["Electric Guitar", "Acoustic Guitar", "Clean Guitar", "Distorted Guitar", "Guitar Bus"] },
+  { label: "Keys & Synths", items: ["Piano", "Rhodes/EP", "Organ", "Synth Pad", "Synth Lead", "Strings", "Brass/Horns", "Woodwinds"] },
+  { label: "Vocals", items: ["Lead Vocal", "BGVs", "Vocal Doubles", "Vocal Ad-libs", "Vocal Chops", "Rap/Spoken Word"] },
+  { label: "Production", items: ["FX/Ear Candy", "Samples/Loops", "808s", "Risers/Impacts", "Ambience/Atmos", "Foley", "Noise/Texture"] },
+];
+
 const DEFAULT_ELEMENTS = [
-  "Kick", "Snare", "Bass", "Guitars", "Keys/Synths",
+  "Kick", "Snare", "Bass Guitar", "Electric Guitar", "Piano",
   "Lead Vocal", "BGVs", "FX/Ear Candy",
 ];
 
@@ -61,6 +70,8 @@ type ElementData = {
   notes: string | null;
   flagged: boolean;
   sort_order: number;
+  created_at?: string;
+  updated_at?: string;
 };
 type NoteData = {
   id: string;
@@ -575,6 +586,8 @@ export function TrackDetailClient({
                   name={el.name}
                   notes={el.notes ?? ""}
                   flagged={el.flagged}
+                  createdAt={el.created_at}
+                  updatedAt={el.updated_at}
                   onUpdate={(d) => handleUpdateElement(el.id, d)}
                   onDelete={() => handleDeleteElement(el.id)}
                 />
@@ -891,15 +904,17 @@ function QuickAddElement({
   existingNames: string[];
 }) {
   const [custom, setCustom] = useState("");
-  const suggestions = DEFAULT_ELEMENTS.filter(
+  const [expanded, setExpanded] = useState(false);
+
+  const quickSuggestions = DEFAULT_ELEMENTS.filter(
     (name) => !existingNames.includes(name),
   );
 
   return (
-    <div className="space-y-2">
-      {suggestions.length > 0 && (
+    <div className="space-y-3">
+      {quickSuggestions.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {suggestions.map((name) => (
+          {quickSuggestions.map((name) => (
             <button
               key={name}
               type="button"
@@ -911,6 +926,43 @@ function QuickAddElement({
           ))}
         </div>
       )}
+
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="text-xs text-muted hover:text-text transition-colors"
+      >
+        {expanded ? "Hide all instruments" : "Browse all instruments..."}
+      </button>
+
+      {expanded && (
+        <div className="space-y-3 p-3 rounded-md border border-border bg-panel2">
+          {ELEMENT_CATEGORIES.map((cat) => {
+            const available = cat.items.filter((name) => !existingNames.includes(name));
+            if (available.length === 0) return null;
+            return (
+              <div key={cat.label}>
+                <div className="text-[10px] font-semibold text-faint uppercase tracking-wider mb-1.5">
+                  {cat.label}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {available.map((name) => (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => onAdd(name)}
+                      className="chip text-xs"
+                    >
+                      + {name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div className="flex gap-2">
         <input
           type="text"

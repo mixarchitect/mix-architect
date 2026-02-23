@@ -8,12 +8,29 @@ type Props = {
   name: string;
   notes: string;
   flagged: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   onUpdate: (data: { name?: string; notes?: string; flagged?: boolean }) => void;
   onDelete: () => void;
   className?: string;
 };
 
-export function ElementRow({ name, notes, flagged, onUpdate, onDelete, className }: Props) {
+function relativeTime(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+}
+
+export function ElementRow({ name, notes, flagged, createdAt, updatedAt, onUpdate, onDelete, className }: Props) {
   const [localName, setLocalName] = useState(name);
   const [localNotes, setLocalNotes] = useState(notes);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -22,6 +39,9 @@ export function ElementRow({ name, notes, flagged, onUpdate, onDelete, className
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => onUpdate(data), 500);
   }
+
+  const hasTimestamp = createdAt || updatedAt;
+  const wasEdited = updatedAt && createdAt && updatedAt !== createdAt;
 
   return (
     <div
@@ -69,8 +89,14 @@ export function ElementRow({ name, notes, flagged, onUpdate, onDelete, className
           debouncedUpdate({ notes: e.target.value });
         }}
         placeholder="Mix notes for this element..."
-        className="w-full text-sm text-text bg-transparent border-none outline-none resize-none min-h-[60px] placeholder:text-faint"
+        className="w-full text-sm text-text bg-transparent border-none outline-none resize-none min-h-[40px] placeholder:text-faint"
       />
+      {hasTimestamp && (
+        <div className="flex items-center gap-3 text-[10px] text-faint font-mono pt-1 border-t border-border/50">
+          {createdAt && <span>Added {relativeTime(createdAt)}</span>}
+          {wasEdited && <span>&middot; Updated {relativeTime(updatedAt)}</span>}
+        </div>
+      )}
     </div>
   );
 }

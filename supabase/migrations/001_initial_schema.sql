@@ -128,8 +128,18 @@ CREATE TABLE IF NOT EXISTS track_elements (
   name        text NOT NULL,
   notes       text,
   flagged     boolean NOT NULL DEFAULT false,
-  sort_order  int NOT NULL DEFAULT 0
+  sort_order  int NOT NULL DEFAULT 0,
+  created_at  timestamptz NOT NULL DEFAULT now(),
+  updated_at  timestamptz NOT NULL DEFAULT now()
 );
+
+ALTER TABLE track_elements ADD COLUMN IF NOT EXISTS created_at timestamptz DEFAULT now();
+ALTER TABLE track_elements ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+
+DROP TRIGGER IF EXISTS track_elements_updated_at ON track_elements;
+CREATE TRIGGER track_elements_updated_at
+  BEFORE UPDATE ON track_elements
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 -- ── TABLE: revision_notes ───────────────────────────────────────
 
