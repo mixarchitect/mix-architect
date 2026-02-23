@@ -483,17 +483,18 @@ export function TrackDetailClient({
                 <div className="space-y-1.5">
                   <label className="label text-faint">Format</label>
                   <select
-                    value={formatOverride}
+                    value={formatOverride || releaseFormat}
                     onChange={(e) => {
-                      setFormatOverride(e.target.value);
-                      saveSpecs({ format_override: e.target.value || null });
+                      const val = e.target.value;
+                      const isRelease = val === releaseFormat;
+                      setFormatOverride(isRelease ? "" : val);
+                      saveSpecs({ format_override: isRelease ? null : val });
                     }}
                     className="input"
                   >
-                    <option value="">Inherit from release ({releaseFormat})</option>
                     <option value="stereo">Stereo</option>
                     <option value="atmos">Dolby Atmos</option>
-                    <option value="both">Both</option>
+                    <option value="both">Stereo + Atmos</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
@@ -506,9 +507,11 @@ export function TrackDetailClient({
                     }}
                     className="input"
                   >
-                    <option value="44.1kHz">44.1kHz</option>
-                    <option value="48kHz">48kHz</option>
-                    <option value="96kHz">96kHz</option>
+                    <option value="44.1 kHz">44.1 kHz</option>
+                    <option value="48 kHz">48 kHz</option>
+                    <option value="88.2 kHz">88.2 kHz</option>
+                    <option value="96 kHz">96 kHz</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div className="space-y-1.5">
@@ -524,29 +527,19 @@ export function TrackDetailClient({
                     <option value="16-bit">16-bit</option>
                     <option value="24-bit">24-bit</option>
                     <option value="32-bit float">32-bit float</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
               </div>
               <div className="space-y-1.5">
                 <label className="label text-faint">Delivery formats</label>
-                <div className="flex flex-wrap gap-2">
-                  {["WAV", "AIFF", "MP3", "DDP", "FLAC"].map((fmt) => (
-                    <button
-                      key={fmt}
-                      type="button"
-                      onClick={() => {
-                        const next = deliveryFormats.includes(fmt)
-                          ? deliveryFormats.filter((f) => f !== fmt)
-                          : [...deliveryFormats, fmt];
-                        setDeliveryFormats(next);
-                        saveSpecs({ delivery_formats: next });
-                      }}
-                      className={`chip text-xs ${deliveryFormats.includes(fmt) ? "border-signal text-signal" : ""}`}
-                    >
-                      {fmt}
-                    </button>
-                  ))}
-                </div>
+                <DeliveryFormatSelector
+                  value={deliveryFormats}
+                  onChange={(next) => {
+                    setDeliveryFormats(next);
+                    saveSpecs({ delivery_formats: next });
+                  }}
+                />
               </div>
               <div className="space-y-1.5">
                 <label className="label text-faint">Special requirements</label>
@@ -807,6 +800,82 @@ export function TrackDetailClient({
           </Panel>
 
         </aside>
+      </div>
+    </div>
+  );
+}
+
+/* ── Delivery format selector sub-component ── */
+
+const DELIVERY_FORMATS = [
+  "WAV", "AIFF", "FLAC", "MP3", "AAC", "OGG",
+  "DDP", "ADM BWF (Atmos)", "MQA", "ALAC",
+];
+
+function DeliveryFormatSelector({
+  value,
+  onChange,
+}: {
+  value: string[];
+  onChange: (next: string[]) => void;
+}) {
+  const [custom, setCustom] = useState("");
+  const allFormats = [...new Set([...DELIVERY_FORMATS, ...value.filter((v) => !DELIVERY_FORMATS.includes(v))])];
+
+  function toggle(fmt: string) {
+    const next = value.includes(fmt)
+      ? value.filter((f) => f !== fmt)
+      : [...value, fmt];
+    onChange(next);
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {allFormats.map((fmt) => (
+          <button
+            key={fmt}
+            type="button"
+            onClick={() => toggle(fmt)}
+            className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+              value.includes(fmt)
+                ? "bg-signal/10 border-signal text-signal"
+                : "border-border text-muted hover:text-text hover:border-border-strong"
+            }`}
+          >
+            {value.includes(fmt) && <Check size={12} />}
+            {fmt}
+          </button>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={custom}
+          onChange={(e) => setCustom(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && custom.trim()) {
+              toggle(custom.trim().toUpperCase());
+              setCustom("");
+            }
+          }}
+          placeholder="Custom format..."
+          className="input text-sm h-9 flex-1"
+        />
+        <Button
+          variant="ghost"
+          onClick={() => {
+            if (custom.trim()) {
+              toggle(custom.trim().toUpperCase());
+              setCustom("");
+            }
+          }}
+          disabled={!custom.trim()}
+          className="h-9 text-xs"
+        >
+          <Plus size={14} />
+          Add
+        </Button>
       </div>
     </div>
   );
