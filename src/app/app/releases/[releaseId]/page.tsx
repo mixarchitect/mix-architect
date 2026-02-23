@@ -26,12 +26,14 @@ function statusLabel(s: string): string {
   return "Draft";
 }
 
-function typeLabel(t: string): string {
+function typeLabel(t: string | undefined | null): string {
+  if (!t) return "—";
   if (t === "ep") return "EP";
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-function formatLabel(f: string): string {
+function formatLabel(f: string | undefined | null): string {
+  if (!f) return "Stereo";
   if (f === "atmos") return "Dolby Atmos";
   if (f === "both") return "Stereo + Atmos";
   return "Stereo";
