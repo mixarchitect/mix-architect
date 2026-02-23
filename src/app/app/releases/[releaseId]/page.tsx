@@ -11,7 +11,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
 
 type Props = {
-  params: { releaseId: string };
+  params: Promise<{ releaseId: string }>;
 };
 
 function statusColor(s: string): "green" | "orange" | "blue" {
@@ -40,7 +40,7 @@ function formatLabel(f: string | undefined | null): string {
 }
 
 export default async function ReleasePage({ params }: Props) {
-  const { releaseId } = params;
+  const { releaseId } = await params;
   const supabase = await createSupabaseServerClient();
 
   const { data: release } = await supabase

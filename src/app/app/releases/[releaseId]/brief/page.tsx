@@ -5,10 +5,10 @@ import { Rule } from "@/components/ui/rule";
 import { ArrowLeft } from "lucide-react";
 import { BriefActions } from "./brief-actions";
 
-type Props = { params: { releaseId: string } };
+type Props = { params: Promise<{ releaseId: string }> };
 
 export default async function BriefPage({ params }: Props) {
-  const { releaseId } = params;
+  const { releaseId } = await params;
   const supabase = await createSupabaseServerClient();
 
   const { data: release } = await supabase

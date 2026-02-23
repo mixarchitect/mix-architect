@@ -2,10 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import { notFound } from "next/navigation";
 import { Rule } from "@/components/ui/rule";
 
-type Props = { params: { shareToken: string } };
+type Props = { params: Promise<{ shareToken: string }> };
 
 export default async function SharedBriefPage({ params }: Props) {
-  const { shareToken } = params;
+  const { shareToken } = await params;
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

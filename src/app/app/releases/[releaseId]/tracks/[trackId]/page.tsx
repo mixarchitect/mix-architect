@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import { TrackDetailClient } from "./track-detail-client";
 
 type Props = {
-  params: { releaseId: string; trackId: string };
+  params: Promise<{ releaseId: string; trackId: string }>;
 };
 
 export default async function TrackDetailPage({ params }: Props) {
-  const { releaseId, trackId } = params;
+  const { releaseId, trackId } = await params;
   const supabase = await createSupabaseServerClient();
 
   const { data: track } = await supabase
