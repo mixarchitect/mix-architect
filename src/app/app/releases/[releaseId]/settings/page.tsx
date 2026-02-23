@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -11,7 +11,7 @@ import { SegmentedControl } from "@/components/ui/segmented-control";
 import { TagInput } from "@/components/ui/tag-input";
 import { ArrowLeft } from "lucide-react";
 
-type Props = { params: { releaseId: string } };
+type Props = { params: Promise<{ releaseId: string }> };
 
 const TYPE_OPTIONS = [
   { value: "single", label: "Single" },
@@ -32,7 +32,7 @@ const STATUS_OPTIONS = [
 ];
 
 export default function ReleaseSettingsPage({ params }: Props) {
-  const { releaseId } = params;
+  const { releaseId } = use(params);
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
 

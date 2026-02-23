@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -11,11 +11,11 @@ import { cn } from "@/lib/cn";
 import { ArrowLeft } from "lucide-react";
 
 type Props = {
-  params: { releaseId: string };
+  params: Promise<{ releaseId: string }>;
 };
 
 export default function NewTrackPage({ params }: Props) {
-  const { releaseId } = params;
+  const { releaseId } = use(params);
   const [mode, setMode] = useState<"single" | "batch">("single");
   const [title, setTitle] = useState("");
   const [batchTitles, setBatchTitles] = useState("");
