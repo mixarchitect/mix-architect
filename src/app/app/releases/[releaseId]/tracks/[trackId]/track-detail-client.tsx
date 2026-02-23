@@ -70,6 +70,7 @@ type ElementData = {
   notes: string | null;
   flagged: boolean;
   sort_order: number;
+  version?: string;
   created_at?: string;
   updated_at?: string;
 };
@@ -120,6 +121,12 @@ export function TrackDetailClient({
   const [specialReqs, setSpecialReqs] = useState(specs?.special_reqs ?? "");
 
   const [localElements, setLocalElements] = useState(elements);
+  const allVersions = [...new Set(localElements.map((e) => e.version || "v1"))].sort();
+  const [activeVersion, setActiveVersion] = useState(allVersions[allVersions.length - 1] || "v1");
+  const [showNewVersion, setShowNewVersion] = useState(false);
+  const [newVersionName, setNewVersionName] = useState("");
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
   const [localNotes, setLocalNotes] = useState(notes);
   const [newNote, setNewNote] = useState("");
   const [localRefs, setLocalRefs] = useState(references);
@@ -178,7 +185,7 @@ export function TrackDetailClient({
         : 0;
     const { data } = await supabase
       .from("track_elements")
-      .insert({ track_id: track.id, name, sort_order: nextOrder })
+      .insert({ track_id: track.id, name, sort_order: nextOrder, version: activeVersion })
       .select()
       .single();
     if (data)
@@ -201,8 +208,9 @@ export function TrackDetailClient({
   }
 
   async function handleAddDefaults() {
+    const versionEls = localElements.filter((e) => (e.version || "v1") === activeVersion);
     const newNames = DEFAULT_ELEMENTS.filter(
-      (name) => !localElements.find((e) => e.name === name),
+      (name) => !versionEls.find((e) => e.name === name),
     );
     let nextOrder =
       localElements.length > 0
@@ -212,13 +220,56 @@ export function TrackDetailClient({
     for (const name of newNames) {
       const { data } = await supabase
         .from("track_elements")
-        .insert({ track_id: track.id, name, sort_order: nextOrder++ })
+        .insert({ track_id: track.id, name, sort_order: nextOrder++, version: activeVersion })
         .select()
         .single();
       if (data)
         added.push({ ...data, notes: data.notes ?? "", flagged: data.flagged ?? false });
     }
     setLocalElements((prev) => [...prev, ...added]);
+  }
+
+  async function handleCreateVersion(versionName: string) {
+    const prevVersionEls = localElements.filter((e) => (e.version || "v1") === activeVersion);
+    let nextOrder = localElements.length > 0
+      ? Math.max(...localElements.map((e) => e.sort_order)) + 1
+      : 0;
+    const added: ElementData[] = [];
+    for (const el of prevVersionEls) {
+      const { data } = await supabase
+        .from("track_elements")
+        .insert({
+          track_id: track.id,
+          name: el.name,
+          notes: null,
+          flagged: false,
+          sort_order: nextOrder++,
+          version: versionName,
+        })
+        .select()
+        .single();
+      if (data)
+        added.push({ ...data, notes: data.notes ?? "", flagged: data.flagged ?? false });
+    }
+    setLocalElements((prev) => [...prev, ...added]);
+    setActiveVersion(versionName);
+  }
+
+  function handleDrop(fromIdx: number, toIdx: number, versionEls: ElementData[]) {
+    if (fromIdx === toIdx) return;
+    const reordered = [...versionEls];
+    const [moved] = reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, moved);
+    const updated = reordered.map((el, i) => ({ ...el, sort_order: i }));
+    setLocalElements((prev) => {
+      const otherVersionEls = prev.filter((e) => (e.version || "v1") !== activeVersion);
+      return [...otherVersionEls, ...updated];
+    });
+    updated.forEach((el) => {
+      supabase.from("track_elements").update({ sort_order: el.sort_order }).eq("id", el.id);
+    });
+    setDragIdx(null);
+    setDragOverIdx(null);
   }
 
   async function handlePostNote() {
@@ -568,38 +619,130 @@ export function TrackDetailClient({
           )}
 
           {/* Elements */}
-          {activeTab === "elements" && (
-            <div className="space-y-3">
-              {localElements.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-sm text-muted mb-4">
-                    No elements defined. Add your stems and instruments.
-                  </p>
-                  <Button variant="secondary" onClick={handleAddDefaults}>
-                    Add default elements
-                  </Button>
+          {activeTab === "elements" && (() => {
+            const versionEls = localElements
+              .filter((e) => (e.version || "v1") === activeVersion)
+              .sort((a, b) => {
+                if (a.flagged && !b.flagged) return -1;
+                if (!a.flagged && b.flagged) return 1;
+                return a.sort_order - b.sort_order;
+              });
+
+            return (
+              <div className="space-y-4">
+                {/* Version header */}
+                <div className="flex items-center justify-between p-3 rounded-md border border-border bg-panel2">
+                  <div className="flex items-center gap-3">
+                    <label className="text-[10px] font-semibold text-faint uppercase tracking-wider">Mix Version</label>
+                    <select
+                      value={activeVersion}
+                      onChange={(e) => setActiveVersion(e.target.value)}
+                      className="text-sm font-semibold text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal"
+                    >
+                      {allVersions.map((v) => (
+                        <option key={v} value={v}>{v}</option>
+                      ))}
+                    </select>
+                    <span className="text-[10px] text-faint font-mono">
+                      {versionEls.length} element{versionEls.length !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    {!showNewVersion ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextNum = allVersions.length + 1;
+                          setNewVersionName(`v${nextNum}`);
+                          setShowNewVersion(true);
+                        }}
+                        className="text-xs text-muted hover:text-text transition-colors"
+                      >
+                        + New Version
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <input
+                          value={newVersionName}
+                          onChange={(e) => setNewVersionName(e.target.value)}
+                          className="input text-xs h-7 w-20 py-0.5 px-2"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && newVersionName.trim()) {
+                              handleCreateVersion(newVersionName.trim());
+                              setShowNewVersion(false);
+                            }
+                            if (e.key === "Escape") setShowNewVersion(false);
+                          }}
+                        />
+                        <Button
+                          variant="primary"
+                          className="h-7 text-xs px-2"
+                          disabled={!newVersionName.trim() || allVersions.includes(newVersionName.trim())}
+                          onClick={() => {
+                            handleCreateVersion(newVersionName.trim());
+                            setShowNewVersion(false);
+                          }}
+                        >
+                          Create
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="h-7 text-xs px-2"
+                          onClick={() => setShowNewVersion(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-              {localElements.map((el) => (
-                <ElementRow
-                  key={el.id}
-                  name={el.name}
-                  notes={el.notes ?? ""}
-                  flagged={el.flagged}
-                  createdAt={el.created_at}
-                  updatedAt={el.updated_at}
-                  onUpdate={(d) => handleUpdateElement(el.id, d)}
-                  onDelete={() => handleDeleteElement(el.id)}
-                />
-              ))}
-              <div className="pt-2">
-                <QuickAddElement
-                  onAdd={handleAddElement}
-                  existingNames={localElements.map((e) => e.name)}
-                />
+
+                {/* Element list */}
+                <div className="space-y-3">
+                  {versionEls.length === 0 && (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-muted mb-4">
+                        No elements in {activeVersion}. Add instruments or copy from a previous version.
+                      </p>
+                      <Button variant="secondary" onClick={handleAddDefaults}>
+                        Add default elements
+                      </Button>
+                    </div>
+                  )}
+                  {versionEls.map((el, idx) => (
+                    <ElementRow
+                      key={el.id}
+                      name={el.name}
+                      notes={el.notes ?? ""}
+                      flagged={el.flagged}
+                      createdAt={el.created_at}
+                      updatedAt={el.updated_at}
+                      isDragging={dragIdx === idx}
+                      isDragOver={dragOverIdx === idx}
+                      onDragStart={() => setDragIdx(idx)}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragOverIdx(idx);
+                      }}
+                      onDrop={() => {
+                        if (dragIdx !== null) handleDrop(dragIdx, idx, versionEls);
+                      }}
+                      onUpdate={(d) => handleUpdateElement(el.id, d)}
+                      onDelete={() => handleDeleteElement(el.id)}
+                    />
+                  ))}
+                </div>
+
+                <div className="pt-2">
+                  <QuickAddElement
+                    onAdd={handleAddElement}
+                    existingNames={versionEls.map((e) => e.name)}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Notes */}
           {activeTab === "notes" && (

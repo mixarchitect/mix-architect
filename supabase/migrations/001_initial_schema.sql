@@ -135,6 +135,7 @@ CREATE TABLE IF NOT EXISTS track_elements (
 
 ALTER TABLE track_elements ADD COLUMN IF NOT EXISTS created_at timestamptz DEFAULT now();
 ALTER TABLE track_elements ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+ALTER TABLE track_elements ADD COLUMN IF NOT EXISTS version text DEFAULT 'v1';
 
 DROP TRIGGER IF EXISTS track_elements_updated_at ON track_elements;
 CREATE TRIGGER track_elements_updated_at

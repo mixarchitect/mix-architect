@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Star, X, GripVertical } from "lucide-react";
+import { Pin, X, GripVertical } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 type Props = {
@@ -12,6 +12,11 @@ type Props = {
   updatedAt?: string;
   onUpdate: (data: { name?: string; notes?: string; flagged?: boolean }) => void;
   onDelete: () => void;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: () => void;
+  isDragging?: boolean;
+  isDragOver?: boolean;
   className?: string;
 };
 
@@ -30,7 +35,11 @@ function relativeTime(dateStr: string): string {
   return date.toLocaleDateString();
 }
 
-export function ElementRow({ name, notes, flagged, createdAt, updatedAt, onUpdate, onDelete, className }: Props) {
+export function ElementRow({
+  name, notes, flagged, createdAt, updatedAt,
+  onUpdate, onDelete, onDragStart, onDragOver, onDrop,
+  isDragging, isDragOver, className,
+}: Props) {
   const [localName, setLocalName] = useState(name);
   const [localNotes, setLocalNotes] = useState(notes);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -45,14 +54,24 @@ export function ElementRow({ name, notes, flagged, createdAt, updatedAt, onUpdat
 
   return (
     <div
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={(e) => e.currentTarget.classList.remove("opacity-40")}
       className={cn(
-        "rounded-md border bg-panel px-4 py-3 space-y-2",
-        flagged ? "border-signal/30" : "border-border",
+        "rounded-md border bg-panel px-4 py-3 space-y-2 transition-all",
+        flagged ? "border-signal/30 bg-signal/[0.02]" : "border-border",
+        isDragging && "opacity-40",
+        isDragOver && "border-signal border-dashed",
         className
       )}
     >
       <div className="flex items-center gap-2">
-        <GripVertical size={14} className="text-faint cursor-grab shrink-0" />
+        <GripVertical
+          size={14}
+          className="text-faint cursor-grab shrink-0 active:cursor-grabbing"
+        />
         <input
           type="text"
           value={localName}
@@ -69,9 +88,9 @@ export function ElementRow({ name, notes, flagged, createdAt, updatedAt, onUpdat
             "p-1 rounded transition-colors",
             flagged ? "text-signal" : "text-faint hover:text-signal"
           )}
-          title={flagged ? "Remove flag" : "Flag for attention"}
+          title={flagged ? "Unpin" : "Pin to top"}
         >
-          <Star size={14} fill={flagged ? "currentColor" : "none"} />
+          <Pin size={14} className={flagged ? "fill-current" : ""} />
         </button>
         <button
           type="button"
