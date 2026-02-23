@@ -1,202 +1,266 @@
-import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
-import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Panel, PanelBody } from "@/components/ui/panel";
 import { Rule } from "@/components/ui/rule";
 import { Pill } from "@/components/ui/pill";
-import { TagBadge } from "@/components/ui/tag-badge";
-import { Button, IconButton } from "@/components/ui/button";
-import { Inspector } from "@/components/ui/inspector";
-import { AccentPanel } from "@/components/ui/accent-panel";
-import { DataGrid, DataCell } from "@/components/ui/data-grid";
 import { StatusIndicator } from "@/components/ui/status-dot";
-import { ExternalLink, X, Plus } from "lucide-react";
+import { TrackRow } from "@/components/ui/track-row";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
 
-type ReleasePageProps = {
-  params: { releaseId?: string };
+type Props = {
+  params: { releaseId: string };
 };
 
-export default async function ReleasePage({ params }: ReleasePageProps) {
+function statusColor(s: string): "green" | "orange" | "blue" {
+  if (s === "ready") return "green";
+  if (s === "in_progress") return "orange";
+  return "blue";
+}
+
+function statusLabel(s: string): string {
+  if (s === "ready") return "Ready";
+  if (s === "in_progress") return "In Progress";
+  return "Draft";
+}
+
+function typeLabel(t: string): string {
+  if (t === "ep") return "EP";
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+function formatLabel(f: string): string {
+  if (f === "atmos") return "Dolby Atmos";
+  if (f === "both") return "Stereo + Atmos";
+  return "Stereo";
+}
+
+export default async function ReleasePage({ params }: Props) {
+  const { releaseId } = params;
   const supabase = await createSupabaseServerClient();
 
-  if (!params?.releaseId) {
-    return (
-      <Panel>
-        <PanelHeader className="space-y-3">
-          <Link href="/app" className="text-sm text-muted hover:text-text transition-colors">
-            ← Back to releases
-          </Link>
-          <h1 className="text-2xl font-bold text-text">Release not found</h1>
-          <p className="text-sm text-muted">
-            Missing route param <code className="font-mono text-xs">releaseId</code>.
-          </p>
-        </PanelHeader>
-      </Panel>
-    );
-  }
-
-  const { data: release, error } = await supabase
+  const { data: release } = await supabase
     .from("releases")
     .select("*")
-    .eq("id", params.releaseId)
+    .eq("id", releaseId)
     .maybeSingle();
 
-  if (!release || error) {
-    return (
-      <Panel>
-        <PanelHeader className="space-y-3">
-          <Link href="/app" className="text-sm text-muted hover:text-text transition-colors">
-            ← Back to releases
-          </Link>
-          <h1 className="text-2xl font-bold text-text">Release not found</h1>
-          <p className="text-sm text-muted">Tried to load release with id:</p>
-          <pre className="text-xs font-mono border border-border rounded-md p-3 bg-panel2 overflow-x-auto">
-            {params.releaseId}
-          </pre>
-          {error && (
-            <div className="mt-3">
-              <p className="text-sm text-signal">Supabase error:</p>
-              <pre className="mt-1 text-xs font-mono border border-signal/30 rounded-md p-3 bg-signal-muted overflow-x-auto">
-                {error.message}
-              </pre>
-            </div>
-          )}
-        </PanelHeader>
-      </Panel>
-    );
-  }
+  if (!release) notFound();
+
+  const { data: tracks } = await supabase
+    .from("tracks")
+    .select("*, track_intent(mix_vision)")
+    .eq("release_id", releaseId)
+    .order("track_number");
+
+  const { data: globalRefs } = await supabase
+    .from("mix_references")
+    .select("*")
+    .eq("release_id", releaseId)
+    .is("track_id", null)
+    .order("sort_order");
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Release header with accent panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5">
-        <Panel variant="float">
-          <PanelHeader className="flex items-start justify-between gap-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Link href="/app" className="text-sm text-muted hover:text-text transition-colors">
-                  ← Releases
-                </Link>
-                <StatusIndicator color="green" label="Active" />
-              </div>
-              <h1 className="text-[40px] leading-[0.95] font-bold h1 text-text">
-                {release.name}
-              </h1>
-              <div className="flex items-center gap-3">
-                <span className="text-muted">
-                  {release.artist_name || "No artist"}
-                </span>
-                <TagBadge>{String(release.type ?? "").toUpperCase()}</TagBadge>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <IconButton>
-                <ExternalLink size={16} />
-              </IconButton>
-              <IconButton>
-                <X size={16} />
-              </IconButton>
-            </div>
-          </PanelHeader>
-          <Rule />
-          <PanelBody className="pt-5">
-            <DataGrid>
-              <DataCell label="Type" value={String(release.type ?? "—").toUpperCase()} />
-              <DataCell label="Status" value="ACTIVE" />
-              <DataCell
-                label="Created"
-                value={release.created_at ? new Date(release.created_at).toLocaleDateString() : "—"}
-                size="small"
-              />
-              <DataCell label="Tracks" value="0" />
-            </DataGrid>
-          </PanelBody>
-        </Panel>
-
-        {/* Accent info panel */}
-        <AccentPanel className="flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="label-sm text-white/65">RELEASE</span>
-              <div className="flex gap-2">
-                <button className="w-6 h-6 rounded bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors">
-                  ←
-                </button>
-                <button className="w-6 h-6 rounded bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors">
-                  →
-                </button>
-              </div>
-            </div>
-            <div className="text-2xl font-bold text-white h2">
-              {release.name}
-            </div>
-            <p className="mt-1 text-sm text-white/70">
-              {release.artist_name || "No artist"} · {release.type}
-            </p>
-          </div>
-          <div className="mt-6 pt-4 border-t border-white/15 space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-white/65">ID</span>
-              <span className="font-mono text-white">{release.id.slice(0, 8)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-white/65">Status</span>
-              <span className="font-semibold text-white">In Production</span>
-            </div>
-          </div>
-        </AccentPanel>
-      </div>
-
-      {/* Tracks section */}
-      <Panel>
-        <PanelHeader className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-lg font-bold h2 text-text">Tracks</div>
-            <Pill className="font-mono text-xs">0 items</Pill>
-          </div>
-          <Link href={`/app/releases/${release.id}/tracks/new`}>
-            <Button variant="primary">
-              <Plus size={16} />
-              Add track
+    <div>
+      {/* Toolbar */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/app"
+            className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
+          >
+            <ArrowLeft size={14} />
+            Releases
+          </Link>
+          <span className="text-faint">/</span>
+          <h1 className="text-xl font-semibold h2 text-text">{release.title}</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link href={`/app/releases/${releaseId}/brief`}>
+            <Button variant="secondary">
+              <FileText size={16} />
+              Export Brief
             </Button>
           </Link>
-        </PanelHeader>
-        <Rule />
-        <PanelBody className="pt-5">
-          <Panel variant="inset" className="p-8 text-center">
-            <div className="w-12 h-12 rounded-lg bg-signal-muted mx-auto flex items-center justify-center mb-4">
-              <Plus size={24} className="text-signal" />
-            </div>
-            <div className="text-base font-semibold text-text">No tracks yet</div>
-            <div className="mt-1 text-sm text-muted">
-              Add a track to start a Mix Architect blueprint.
-            </div>
-            <div className="mt-5">
-              <Link href={`/app/releases/${release.id}/tracks/new`}>
-                <Button variant="secondary">Add your first track</Button>
-              </Link>
-            </div>
-          </Panel>
-        </PanelBody>
-      </Panel>
+          <Link href={`/app/releases/${releaseId}/settings`}>
+            <Button variant="ghost" className="px-3">
+              <Settings size={16} />
+            </Button>
+          </Link>
+        </div>
+      </div>
 
-      {/* Mobile inspector */}
-      <div className="lg:hidden">
-        <Inspector title="Release Actions" subtitle="Quick actions for this release.">
-          <div className="space-y-2">
-            <div className="row">
-              <span className="rowKey">Step 01</span>
-              <span className="rowVal">Add tracks</span>
-            </div>
-            <div className="row">
-              <span className="rowKey">Step 02</span>
-              <span className="rowVal">Define references</span>
-            </div>
-            <div className="row">
-              <span className="rowKey">Step 03</span>
-              <span className="rowVal">Export brief</span>
-            </div>
+      {/* Two-panel layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
+        {/* Main: Track list */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-text">
+              Tracks
+              <span className="ml-2 text-xs text-muted font-mono">
+                {tracks?.length ?? 0}
+              </span>
+            </h2>
+            <Link href={`/app/releases/${releaseId}/tracks/new`}>
+              <Button variant="secondary" className="h-9 text-xs">
+                <Plus size={14} />
+                Add Track
+              </Button>
+            </Link>
           </div>
-        </Inspector>
+
+          {tracks && tracks.length > 0 ? (
+            <div className="space-y-2">
+              {tracks.map((t: Record<string, unknown> & { track_intent?: { mix_vision?: string } | { mix_vision?: string }[] }) => {
+                const intent = Array.isArray(t.track_intent)
+                  ? t.track_intent[0]
+                  : t.track_intent;
+                return (
+                  <TrackRow
+                    key={t.id as string}
+                    releaseId={releaseId}
+                    trackId={t.id as string}
+                    trackNumber={t.track_number as number}
+                    title={t.title as string}
+                    status={t.status as string}
+                    intentPreview={intent?.mix_vision}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <EmptyState
+              title="No tracks yet"
+              description="Add your first track to get started."
+              action={
+                <Link href={`/app/releases/${releaseId}/tracks/new`}>
+                  <Button variant="primary">
+                    <Plus size={16} />
+                    Add Track
+                  </Button>
+                </Link>
+              }
+            />
+          )}
+        </div>
+
+        {/* Inspector sidebar */}
+        <aside className="space-y-4">
+          {/* Release Info */}
+          <Panel>
+            <PanelBody className="py-5 space-y-3">
+              <div className="label text-faint text-[10px] mb-1">RELEASE INFO</div>
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted">Artist</span>
+                  <span className="text-text font-medium">{release.artist || "\u2014"}</span>
+                </div>
+                <div className="flex justify-between text-sm items-center">
+                  <span className="text-muted">Type</span>
+                  <Pill>{typeLabel(release.release_type)}</Pill>
+                </div>
+                <div className="flex justify-between text-sm items-center">
+                  <span className="text-muted">Format</span>
+                  <Pill>{formatLabel(release.format)}</Pill>
+                </div>
+                <div className="flex justify-between text-sm items-center">
+                  <span className="text-muted">Status</span>
+                  <StatusIndicator
+                    color={statusColor(release.status)}
+                    label={statusLabel(release.status)}
+                  />
+                </div>
+                {release.target_date && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted">Target Date</span>
+                    <span className="text-text font-mono text-xs">
+                      {new Date(release.target_date).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+                {release.genre_tags?.length > 0 && (
+                  <div className="flex justify-between text-sm items-start">
+                    <span className="text-muted shrink-0 mr-3">Genre</span>
+                    <div className="flex flex-wrap gap-1 justify-end">
+                      {(release.genre_tags as string[]).map((g: string) => (
+                        <Pill key={g} className="text-[10px]">{g}</Pill>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </PanelBody>
+          </Panel>
+
+          {/* Global Mix Direction */}
+          <Panel>
+            <PanelBody className="py-5">
+              <div className="label text-faint text-[10px] mb-2">GLOBAL MIX DIRECTION</div>
+              {release.global_direction ? (
+                <p className="text-sm text-text leading-relaxed">
+                  {release.global_direction}
+                </p>
+              ) : (
+                <p className="text-sm text-muted italic">
+                  No global direction set yet.
+                </p>
+              )}
+            </PanelBody>
+          </Panel>
+
+          {/* Global References */}
+          <Panel>
+            <PanelBody className="py-5">
+              <div className="label text-faint text-[10px] mb-2">GLOBAL REFERENCES</div>
+              {globalRefs && globalRefs.length > 0 ? (
+                <div className="space-y-2">
+                  {globalRefs.map((ref: any) => (
+                    <div key={ref.id} className="text-sm">
+                      <div className="font-medium text-text">{ref.song_title}</div>
+                      {ref.artist && (
+                        <div className="text-xs text-muted">{ref.artist}</div>
+                      )}
+                      {ref.note && (
+                        <div className="text-xs text-muted mt-0.5 italic">
+                          &ldquo;{ref.note}&rdquo;
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted italic">No references added yet.</p>
+              )}
+            </PanelBody>
+          </Panel>
+
+          {/* Client Info */}
+          {(release.client_name || release.client_email) && (
+            <Panel>
+              <PanelBody className="py-5">
+                <div className="label text-faint text-[10px] mb-2">CLIENT INFO</div>
+                <div className="space-y-2 text-sm">
+                  {release.client_name && (
+                    <div className="flex justify-between">
+                      <span className="text-muted">Name</span>
+                      <span className="text-text">{release.client_name}</span>
+                    </div>
+                  )}
+                  {release.client_email && (
+                    <div className="flex justify-between">
+                      <span className="text-muted">Email</span>
+                      <span className="text-text font-mono text-xs">
+                        {release.client_email}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </PanelBody>
+            </Panel>
+          )}
+        </aside>
       </div>
     </div>
   );

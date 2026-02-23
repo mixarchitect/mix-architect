@@ -242,27 +242,36 @@ export default function StyleguidePage() {
         <PanelBody className="pt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
           <ReleaseCard
             id="demo-1"
-            name="Midnight Sessions"
-            artistName="Aurora Keys"
-            type="ALBUM"
-            createdAt="2024-12-15"
-            status="live"
+            title="Midnight Sessions"
+            artist="Aurora Keys"
+            releaseType="album"
+            format="stereo"
+            status="ready"
+            trackCount={8}
+            completedTracks={6}
+            updatedAt="2024-12-15"
           />
           <ReleaseCard
             id="demo-2"
-            name="Summer Vibes EP"
-            artistName="The Wavelengths"
-            type="EP"
-            createdAt="2024-12-10"
-            status="active"
+            title="Summer Vibes EP"
+            artist="The Wavelengths"
+            releaseType="ep"
+            format="atmos"
+            status="in_progress"
+            trackCount={5}
+            completedTracks={2}
+            updatedAt="2024-12-10"
           />
           <ReleaseCard
             id="demo-3"
-            name="First Light"
-            artistName={null}
-            type="SINGLE"
-            createdAt="2024-12-01"
+            title="First Light"
+            artist={null}
+            releaseType="single"
+            format="stereo"
             status="draft"
+            trackCount={1}
+            completedTracks={0}
+            updatedAt="2024-12-01"
           />
         </PanelBody>
       </Panel>

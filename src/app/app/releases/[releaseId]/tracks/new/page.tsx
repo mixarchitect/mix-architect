@@ -1,59 +1,193 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
+import { cn } from "@/lib/cn";
+import { ArrowLeft } from "lucide-react";
 
-type NewTrackPageProps = {
+type Props = {
   params: { releaseId: string };
 };
 
-export default function NewTrackPage({ params }: NewTrackPageProps) {
+export default function NewTrackPage({ params }: Props) {
+  const { releaseId } = params;
+  const [mode, setMode] = useState<"single" | "batch">("single");
+  const [title, setTitle] = useState("");
+  const [batchTitles, setBatchTitles] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
+  const supabase = createSupabaseBrowserClient();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const { data: maxTrack } = await supabase
+        .from("tracks")
+        .select("track_number")
+        .eq("release_id", releaseId)
+        .order("track_number", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      let nextNumber = (maxTrack?.track_number ?? 0) + 1;
+
+      if (mode === "single") {
+        const { data: track, error: trackErr } = await supabase
+          .from("tracks")
+          .insert({
+            release_id: releaseId,
+            track_number: nextNumber,
+            title: title.trim(),
+          })
+          .select()
+          .single();
+
+        if (trackErr) throw trackErr;
+
+        await Promise.all([
+          supabase.from("track_intent").insert({ track_id: track.id }),
+          supabase.from("track_specs").insert({ track_id: track.id }),
+        ]);
+
+        router.push(`/app/releases/${releaseId}/tracks/${track.id}`);
+      } else {
+        const titles = batchTitles
+          .split("\n")
+          .map((t) => t.trim())
+          .filter(Boolean);
+
+        if (titles.length === 0) throw new Error("Enter at least one track title");
+
+        for (const t of titles) {
+          const { data: track } = await supabase
+            .from("tracks")
+            .insert({
+              release_id: releaseId,
+              track_number: nextNumber++,
+              title: t,
+            })
+            .select()
+            .single();
+
+          if (track) {
+            await Promise.all([
+              supabase.from("track_intent").insert({ track_id: track.id }),
+              supabase.from("track_specs").insert({ track_id: track.id }),
+            ]);
+          }
+        }
+
+        router.push(`/app/releases/${releaseId}`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="max-w-xl mx-auto">
+      <div className="flex items-center gap-3 mb-6">
+        <Link
+          href={`/app/releases/${releaseId}`}
+          className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
+        >
+          <ArrowLeft size={14} />
+          Back to Release
+        </Link>
+      </div>
+
       <Panel>
         <PanelHeader>
-          <div className="label text-[11px] text-faint">TRACKS</div>
-          <h1 className="mt-2 text-2xl font-semibold h1 text-text">New track</h1>
-          <p className="mt-2 text-sm text-muted">
-            Add a track to your release blueprint.
+          <h1 className="text-2xl font-semibold h2 text-text">Add Track</h1>
+          <p className="mt-1 text-sm text-muted">
+            Add one track or paste a tracklist to add multiple at once.
           </p>
         </PanelHeader>
         <Rule />
-        <PanelBody className="pt-5 space-y-5 max-w-md">
-          <div className="space-y-1.5">
-            <label className="label text-faint">Track name</label>
-            <input
-              type="text"
-              className="input"
-              placeholder="Enter track name..."
-            />
+        <PanelBody className="pt-5">
+          <div className="flex items-center gap-4 mb-6">
+            <button
+              type="button"
+              onClick={() => setMode("single")}
+              className={cn(
+                "text-sm font-medium pb-1 border-b-2 transition-colors",
+                mode === "single"
+                  ? "border-signal text-text"
+                  : "border-transparent text-muted hover:text-text"
+              )}
+            >
+              Single track
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("batch")}
+              className={cn(
+                "text-sm font-medium pb-1 border-b-2 transition-colors",
+                mode === "batch"
+                  ? "border-signal text-text"
+                  : "border-transparent text-muted hover:text-text"
+              )}
+            >
+              Multiple tracks
+            </button>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="label text-faint">Track number</label>
-            <input
-              type="number"
-              className="input"
-              placeholder="1"
-              min={1}
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {mode === "single" ? (
+              <div className="space-y-1.5">
+                <label className="label text-faint">Track title</label>
+                <input
+                  type="text"
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="input"
+                  placeholder="Track name"
+                />
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label className="label text-faint">
+                  Track titles (one per line)
+                </label>
+                <textarea
+                  required
+                  value={batchTitles}
+                  onChange={(e) => setBatchTitles(e.target.value)}
+                  className="input min-h-[160px] resize-y"
+                  placeholder={
+                    "Midnight Drive\nNeon Sunset\nCoastline\nGolden Hour\nLast Light"
+                  }
+                />
+              </div>
+            )}
 
-          <Panel variant="inset" className="p-4">
-            <p className="text-sm text-muted">
-              Full track wizard coming soon. Release ID:{" "}
-              <code className="font-mono text-xs">{params.releaseId}</code>
-            </p>
-          </Panel>
+            {error && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                {error}
+              </p>
+            )}
 
-          <div className="flex items-center gap-3 pt-2">
-            <Button variant="primary" disabled>
-              Add track (coming soon)
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading
+                ? "Adding\u2026"
+                : mode === "single"
+                  ? "Add Track"
+                  : "Add Tracks"}
             </Button>
-            <Link href={`/app/releases/${params.releaseId}`}>
-              <Button variant="ghost">← Back to release</Button>
-            </Link>
-          </div>
+          </form>
         </PanelBody>
       </Panel>
     </div>
