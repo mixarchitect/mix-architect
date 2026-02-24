@@ -7,11 +7,10 @@ import { Home, Search, Settings, LogOut } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 
 type Props = {
-  userEmail?: string | null;
   onSearchClick?: () => void;
 };
 
-export function Rail({ userEmail, onSearchClick }: Props) {
+export function Rail({ onSearchClick }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -58,17 +57,6 @@ export function Rail({ userEmail, onSearchClick }: Props) {
       <Link href="/app/settings" title="Settings" className={iconClass(isSettings)}>
         <Settings size={20} strokeWidth={1.5} />
       </Link>
-
-      {/* Account */}
-      {userEmail && (
-        <Link
-          href="/app/settings"
-          className="w-9 h-9 rounded-full bg-panel2 border border-border grid place-items-center text-xs font-semibold text-muted mt-2 hover:border-border-strong transition-colors"
-          title={userEmail}
-        >
-          {userEmail.charAt(0).toUpperCase()}
-        </Link>
-      )}
 
       {/* Sign out */}
       <button
