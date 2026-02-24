@@ -174,6 +174,7 @@ CREATE TABLE IF NOT EXISTS user_defaults (
 );
 
 ALTER TABLE user_defaults ADD COLUMN IF NOT EXISTS payments_enabled boolean DEFAULT false;
+ALTER TABLE user_defaults ADD COLUMN IF NOT EXISTS company_name text;
 
 -- ── TABLE: brief_shares ─────────────────────────────────────────
 

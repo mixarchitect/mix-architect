@@ -22,7 +22,7 @@ const TYPE_OPTIONS = [
 const FORMAT_OPTIONS = [
   { value: "stereo", label: "Stereo" },
   { value: "atmos", label: "Dolby Atmos" },
-  { value: "both", label: "Both" },
+  { value: "both", label: "Stereo + Atmos" },
 ];
 
 const STATUS_OPTIONS = [

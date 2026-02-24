@@ -13,7 +13,7 @@ type Props = {
 
 export function SegmentedControl({ options, value, onChange, className }: Props) {
   return (
-    <div className={cn("inline-flex rounded-sm border border-border-strong p-0.5 bg-panel2", className)}>
+    <div className={cn("inline-flex rounded-sm border border-border p-0.5 bg-panel2", className)}>
       {options.map((opt) => (
         <button
           key={opt.value}

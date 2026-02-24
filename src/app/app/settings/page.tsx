@@ -12,7 +12,7 @@ import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 const FORMAT_OPTIONS = [
   { value: "stereo", label: "Stereo" },
   { value: "atmos", label: "Dolby Atmos" },
-  { value: "both", label: "Both" },
+  { value: "both", label: "Stereo + Atmos" },
 ];
 
 export default function SettingsPage() {
@@ -24,6 +24,7 @@ export default function SettingsPage() {
   >("idle");
 
   const [displayName, setDisplayName] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [loudness, setLoudness] = useState("-14 LUFS");
   const [format, setFormat] = useState("stereo");
@@ -57,6 +58,7 @@ export default function SettingsPage() {
           setBitDepth(data.default_bit_depth ?? "24-bit");
           setDefaultElements(data.default_elements ?? []);
           setPaymentsEnabled(data.payments_enabled ?? false);
+          setCompanyName(data.company_name ?? "");
         }
       }
       setLoading(false);
@@ -72,6 +74,10 @@ export default function SettingsPage() {
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      await supabase.auth.updateUser({
+        data: { display_name: displayName },
+      });
+
       const { error } = await supabase.from("user_defaults").upsert(
         {
           user_id: user.id,
@@ -81,6 +87,7 @@ export default function SettingsPage() {
           default_bit_depth: bitDepth,
           default_elements: defaultElements,
           payments_enabled: paymentsEnabled,
+          company_name: companyName || null,
         },
         { onConflict: "user_id" },
       );
@@ -123,6 +130,16 @@ export default function SettingsPage() {
               />
             </div>
             <div className="space-y-1.5">
+              <label className="label text-faint">Company name (optional)</label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="input"
+                placeholder="Studio or business name"
+              />
+            </div>
+            <div className="space-y-1.5">
               <label className="label text-faint">Email</label>
               <input
                 type="email"
@@ -131,6 +148,9 @@ export default function SettingsPage() {
                 className="input opacity-60"
               />
             </div>
+            <Button variant="primary" onClick={handleSave}>
+              Save Profile
+            </Button>
           </PanelBody>
         </Panel>
 
@@ -224,7 +244,17 @@ export default function SettingsPage() {
               </div>
               <button
                 type="button"
-                onClick={() => setPaymentsEnabled(!paymentsEnabled)}
+                onClick={async () => {
+                  const next = !paymentsEnabled;
+                  setPaymentsEnabled(next);
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (user) {
+                    await supabase.from("user_defaults").upsert(
+                      { user_id: user.id, payments_enabled: next },
+                      { onConflict: "user_id" },
+                    );
+                  }
+                }}
                 className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors"
                 style={{ background: paymentsEnabled ? "var(--signal)" : "#ccc" }}
               >
@@ -234,9 +264,6 @@ export default function SettingsPage() {
                 />
               </button>
             </div>
-            <Button variant="primary" onClick={handleSave}>
-              Save Settings
-            </Button>
           </PanelBody>
         </Panel>
       </div>
