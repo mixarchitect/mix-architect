@@ -443,97 +443,101 @@ export function TrackDetailClient({
         <div>
           {/* Intent */}
           {activeTab === "intent" && (
-            <div className="space-y-6">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="label-sm text-muted">
-                    What should this track feel like?
-                  </label>
-                  {!editingVision && mixVision && (
-                    <button
-                      type="button"
-                      onClick={() => setEditingVision(true)}
-                      className="text-xs text-muted hover:text-text transition-colors"
-                    >
-                      Edit
-                    </button>
-                  )}
-                </div>
-                {editingVision ? (
-                  <div className="space-y-2">
-                    <textarea
-                      value={mixVision}
-                      onChange={(e) => setMixVision(e.target.value)}
-                      placeholder="Describe the sonic direction — mood, energy, spatial qualities, any specifics about the mix."
-                      className="input min-h-[160px] resize-y text-sm leading-relaxed"
-                      autoFocus
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        variant="primary"
-                        className="h-8 text-xs px-4"
-                        onClick={() => {
-                          saveIntent({ mix_vision: mixVision });
-                          setEditingVision(false);
-                        }}
+            <div className="space-y-4">
+              <Panel>
+                <PanelBody className="py-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="label-sm text-muted">What should this track feel like?</div>
+                    {!editingVision && mixVision && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingVision(true)}
+                        className="text-xs text-muted hover:text-text transition-colors"
                       >
-                        Save
-                      </Button>
-                      {intent?.mix_vision && (
+                        Edit
+                      </button>
+                    )}
+                  </div>
+                  {editingVision ? (
+                    <div className="space-y-2">
+                      <textarea
+                        value={mixVision}
+                        onChange={(e) => setMixVision(e.target.value)}
+                        placeholder="Describe the sonic direction — mood, energy, spatial qualities, any specifics about the mix."
+                        className="input min-h-[160px] resize-y text-sm leading-relaxed"
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
                         <Button
-                          variant="ghost"
-                          className="h-8 text-xs px-3"
+                          variant="primary"
+                          className="h-8 text-xs px-4"
                           onClick={() => {
-                            setMixVision(intent.mix_vision ?? "");
+                            saveIntent({ mix_vision: mixVision });
                             setEditingVision(false);
                           }}
                         >
-                          Cancel
+                          Save
                         </Button>
-                      )}
+                        {intent?.mix_vision && (
+                          <Button
+                            variant="ghost"
+                            className="h-8 text-xs px-3"
+                            onClick={() => {
+                              setMixVision(intent.mix_vision ?? "");
+                              setEditingVision(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ) : mixVision ? (
-                  <div
-                    className="p-4 rounded-md border border-border bg-panel text-sm text-text leading-relaxed whitespace-pre-wrap cursor-pointer hover:border-border-strong transition-colors"
-                    onClick={() => setEditingVision(true)}
-                  >
-                    {mixVision}
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setEditingVision(true)}
-                    className="w-full p-4 rounded-md border border-dashed border-border text-sm text-muted hover:border-border-strong hover:text-text transition-colors text-left"
-                  >
-                    Click to describe the sonic direction...
-                  </button>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                <label className="label-sm text-muted">Emotional qualities</label>
-                <TagInput
-                  value={emotionalTags}
-                  onChange={(tags) => {
-                    setEmotionalTags(tags);
-                    saveIntent({ emotional_tags: tags });
-                  }}
-                  suggestions={EMOTIONAL_SUGGESTIONS}
-                  placeholder="Type or click suggestions below"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="label-sm text-muted">Anti-references</label>
-                <textarea
-                  value={antiRefs}
-                  onChange={(e) => {
-                    setAntiRefs(e.target.value);
-                    saveIntent({ anti_references: e.target.value });
-                  }}
-                  placeholder="What should this NOT sound like? Describe sounds, styles, or specific mixes to avoid."
-                  className="input min-h-[80px] resize-y text-sm leading-relaxed"
-                />
-              </div>
+                  ) : mixVision ? (
+                    <div
+                      className="p-4 rounded-md border border-border bg-panel text-sm text-text leading-relaxed whitespace-pre-wrap cursor-pointer hover:border-border-strong transition-colors"
+                      onClick={() => setEditingVision(true)}
+                    >
+                      {mixVision}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setEditingVision(true)}
+                      className="w-full p-4 rounded-md border border-dashed border-border text-sm text-muted hover:border-border-strong hover:text-text transition-colors text-left"
+                    >
+                      Click to describe the sonic direction...
+                    </button>
+                  )}
+                </PanelBody>
+              </Panel>
+              <Panel>
+                <PanelBody className="py-5">
+                  <div className="label-sm text-muted mb-3">Emotional qualities</div>
+                  <TagInput
+                    value={emotionalTags}
+                    onChange={(tags) => {
+                      setEmotionalTags(tags);
+                      saveIntent({ emotional_tags: tags });
+                    }}
+                    suggestions={EMOTIONAL_SUGGESTIONS}
+                    placeholder="Type or click suggestions below"
+                  />
+                </PanelBody>
+              </Panel>
+              <Panel>
+                <PanelBody className="py-5">
+                  <div className="label-sm text-muted mb-3">Anti-references</div>
+                  <textarea
+                    value={antiRefs}
+                    onChange={(e) => {
+                      setAntiRefs(e.target.value);
+                      saveIntent({ anti_references: e.target.value });
+                    }}
+                    placeholder="What should this NOT sound like? Describe sounds, styles, or specific mixes to avoid."
+                    className="input min-h-[80px] resize-y text-sm leading-relaxed"
+                  />
+                </PanelBody>
+              </Panel>
             </div>
           )}
 
