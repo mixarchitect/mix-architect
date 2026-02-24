@@ -7,7 +7,7 @@ import { searchItunesApi, buildPlatformUrl, type ItunesResult } from "@/lib/itun
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { ReferenceCard } from "@/components/ui/reference-card";
-import { Pencil, Check, X } from "lucide-react";
+import { Pencil, Check, X, ImageIcon, Upload } from "lucide-react";
 
 type DirectionEditorProps = {
   releaseId: string;
@@ -347,5 +347,197 @@ export function GlobalReferencesEditor({ releaseId, initialRefs }: RefsEditorPro
         ) : null}
       </PanelBody>
     </Panel>
+  );
+}
+
+type CoverArtEditorProps = {
+  releaseId: string;
+  initialUrl: string | null;
+};
+
+export function CoverArtEditor({ releaseId, initialUrl }: CoverArtEditorProps) {
+  const [editing, setEditing] = useState(false);
+  const [url, setUrl] = useState(initialUrl ?? "");
+  const [urlInput, setUrlInput] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  async function handleUpload(file: File) {
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      setError("Image must be under 5MB");
+      return;
+    }
+    const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError("Invalid image type. Use PNG, JPG, WebP, or GIF.");
+      return;
+    }
+    setUploading(true);
+    setError("");
+    const supabase = createSupabaseBrowserClient();
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+      const ext = file.type.split("/")[1] === "jpeg" ? "jpg" : file.type.split("/")[1];
+      const path = `${user.id}/${releaseId}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("cover-art")
+        .upload(path, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+      const { data: urlData } = supabase.storage
+        .from("cover-art")
+        .getPublicUrl(path);
+      const newUrl = urlData.publicUrl + `?t=${Date.now()}`;
+      setUrl(newUrl);
+      await supabase.from("releases").update({ cover_art_url: newUrl }).eq("id", releaseId);
+      setEditing(false);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleUrlSave() {
+    if (!urlInput.trim()) return;
+    setError("");
+    const supabase = createSupabaseBrowserClient();
+    try {
+      await supabase.from("releases").update({ cover_art_url: urlInput.trim() }).eq("id", releaseId);
+      setUrl(urlInput.trim());
+      setUrlInput("");
+      setEditing(false);
+      router.refresh();
+    } catch {
+      setError("Failed to save URL");
+    }
+  }
+
+  async function handleRemove() {
+    setError("");
+    const supabase = createSupabaseBrowserClient();
+    try {
+      await supabase.from("releases").update({ cover_art_url: null }).eq("id", releaseId);
+      setUrl("");
+      setEditing(false);
+      router.refresh();
+    } catch {
+      setError("Failed to remove cover art");
+    }
+  }
+
+  if (editing) {
+    return (
+      <div className="rounded-lg border border-border overflow-hidden">
+        {/* Preview */}
+        <div
+          className="w-full aspect-square flex items-center justify-center"
+          style={{ background: "var(--panel2)" }}
+        >
+          {url ? (
+            <img src={url} alt="Cover art" className="w-full h-full object-cover" />
+          ) : (
+            <ImageIcon size={48} className="text-muted opacity-30" />
+          )}
+        </div>
+
+        {/* Controls */}
+        <div className="p-3 space-y-2" style={{ background: "var(--panel)" }}>
+          {error && (
+            <p className="text-xs text-red-500">{error}</p>
+          )}
+
+          <div className="flex items-center gap-2">
+            <label
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors"
+              style={{ background: "var(--panel2)", color: "var(--text-muted)" }}
+            >
+              <Upload size={14} />
+              {uploading ? "Uploading\u2026" : "Upload"}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleUpload(f);
+                }}
+                disabled={uploading}
+              />
+            </label>
+            {url && (
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors"
+              >
+                <X size={12} /> Remove
+              </button>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted uppercase tracking-wider">or paste URL</span>
+            <div className="flex gap-1.5">
+              <input
+                type="url"
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                className="input text-xs flex-1"
+                placeholder="https://..."
+              />
+              <button
+                type="button"
+                onClick={handleUrlSave}
+                disabled={!urlInput.trim()}
+                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors disabled:opacity-40"
+                style={{ background: "var(--signal)", color: "#fff" }}
+              >
+                <Check size={12} />
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setUrlInput("");
+              setError("");
+              setEditing(false);
+            }}
+            className="inline-flex items-center gap-1 text-xs text-muted hover:text-text transition-colors"
+          >
+            <X size={12} /> Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Display mode
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className="group relative w-full rounded-lg overflow-hidden border border-border block cursor-pointer"
+    >
+      {url ? (
+        <img src={url} alt="Cover art" className="w-full aspect-square object-cover block" />
+      ) : (
+        <div
+          className="w-full aspect-square flex flex-col items-center justify-center gap-2"
+          style={{ background: "var(--panel2)" }}
+        >
+          <ImageIcon size={40} className="text-muted opacity-30" />
+          <span className="text-xs text-muted">Add cover art</span>
+        </div>
+      )}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+        <Pencil size={20} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+    </button>
   );
 }

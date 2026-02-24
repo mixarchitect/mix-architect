@@ -8,7 +8,7 @@ import { StatusIndicator } from "@/components/ui/status-dot";
 import { TrackRow } from "@/components/ui/track-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
-import { GlobalDirectionEditor, GlobalReferencesEditor } from "./sidebar-editors";
+import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor } from "./sidebar-editors";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
@@ -181,15 +181,7 @@ export default async function ReleasePage({ params }: Props) {
         {/* Inspector sidebar */}
         <aside className="space-y-4">
           {/* Cover Art */}
-          {release.cover_art_url && (
-            <div className="rounded-lg overflow-hidden border border-border">
-              <img
-                src={release.cover_art_url}
-                alt={`${release.title} cover art`}
-                className="w-full aspect-square object-cover block"
-              />
-            </div>
-          )}
+          <CoverArtEditor releaseId={releaseId} initialUrl={release.cover_art_url} />
 
           {/* Release Info */}
           <Panel>
