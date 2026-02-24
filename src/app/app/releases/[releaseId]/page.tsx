@@ -118,7 +118,7 @@ export default async function ReleasePage({ params }: Props) {
             </Button>
           </Link>
           <Link href={`/app/releases/${releaseId}/settings`}>
-            <Button variant="ghost" className="px-3">
+            <Button variant="secondary" className="px-3">
               <Settings size={16} />
             </Button>
           </Link>
