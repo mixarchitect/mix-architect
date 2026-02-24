@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import Link from "next/link";
+import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -9,7 +10,15 @@ function formatMoney(amount: number, currency = "USD") {
   return new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
 }
 
-export default async function DashboardPage() {
+const VALID_FILTERS = ["outstanding", "earned"] as const;
+type PaymentFilter = (typeof VALID_FILTERS)[number];
+
+type Props = {
+  searchParams: Promise<{ payment?: string }>;
+};
+
+export default async function DashboardPage({ searchParams }: Props) {
+  const { payment } = await searchParams;
   const supabase = await createSupabaseServerClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -57,6 +66,18 @@ export default async function DashboardPage() {
 
   const hasAnyFees = feeReleaseCount > 0;
 
+  const activeFilter: PaymentFilter | null =
+    paymentsEnabled && hasAnyFees && payment && VALID_FILTERS.includes(payment as PaymentFilter)
+      ? (payment as PaymentFilter)
+      : null;
+
+  const displayReleases = activeFilter && releases
+    ? releases.filter((r) => {
+        const status = (r.payment_status as string) ?? "unpaid";
+        return activeFilter === "outstanding" ? status !== "paid" : status === "paid";
+      })
+    : releases;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
@@ -79,9 +100,15 @@ export default async function DashboardPage() {
             <span className={outstandingTotal > 0 ? "font-semibold text-signal" : "font-semibold text-text"}>
               {formatMoney(outstandingTotal, primaryCurrency)}
             </span>
-            <span className="text-faint ml-1">
+            <Link
+              href={activeFilter === "outstanding" ? "/app" : "/app?payment=outstanding"}
+              className={cn(
+                "ml-1 hover:underline",
+                activeFilter === "outstanding" ? "text-text font-semibold" : "text-faint",
+              )}
+            >
               ({outstandingCount} release{outstandingCount !== 1 ? "s" : ""})
-            </span>
+            </Link>
           </span>
           <span className="text-faint hidden sm:inline">·</span>
           <span className="text-muted">
@@ -89,9 +116,15 @@ export default async function DashboardPage() {
             <span className="font-semibold text-text">
               {formatMoney(earnedTotal, primaryCurrency)}
             </span>
-            <span className="text-faint ml-1">
+            <Link
+              href={activeFilter === "earned" ? "/app" : "/app?payment=earned"}
+              className={cn(
+                "ml-1 hover:underline",
+                activeFilter === "earned" ? "text-text font-semibold" : "text-faint",
+              )}
+            >
               ({earnedCount} release{earnedCount !== 1 ? "s" : ""})
-            </span>
+            </Link>
           </span>
           <span className="text-faint hidden sm:inline">·</span>
           <span className="text-muted">
@@ -106,33 +139,53 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {releases && releases.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {releases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => {
-            const trackCount = r.tracks?.length ?? 0;
-            const completedTracks =
-              r.tracks?.filter((t) => t.status === "complete").length ?? 0;
-            return (
-              <ReleaseCard
-                key={r.id as string}
-                id={r.id as string}
-                title={r.title as string}
-                artist={r.artist as string | null}
-                releaseType={r.release_type as string}
-                format={r.format as string}
-                status={r.status as string}
-                trackCount={trackCount}
-                completedTracks={completedTracks}
-                updatedAt={r.updated_at as string | null}
-                paymentsEnabled={paymentsEnabled}
-                paymentStatus={r.payment_status as string | null}
-                feeTotal={r.fee_total as number | null}
-                feeCurrency={r.fee_currency as string | null}
-                coverArtUrl={r.cover_art_url as string | null}
-              />
-            );
-          })}
+      {activeFilter && (
+        <div className="flex items-center gap-2 mb-4 text-xs text-muted">
+          <span>
+            Showing {activeFilter} releases ({displayReleases?.length ?? 0})
+          </span>
+          <Link href="/app" className="text-signal hover:underline">
+            Show all
+          </Link>
         </div>
+      )}
+
+      {releases && releases.length > 0 ? (
+        displayReleases && displayReleases.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {displayReleases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => {
+              const trackCount = r.tracks?.length ?? 0;
+              const completedTracks =
+                r.tracks?.filter((t) => t.status === "complete").length ?? 0;
+              return (
+                <ReleaseCard
+                  key={r.id as string}
+                  id={r.id as string}
+                  title={r.title as string}
+                  artist={r.artist as string | null}
+                  releaseType={r.release_type as string}
+                  format={r.format as string}
+                  status={r.status as string}
+                  trackCount={trackCount}
+                  completedTracks={completedTracks}
+                  updatedAt={r.updated_at as string | null}
+                  paymentsEnabled={paymentsEnabled}
+                  paymentStatus={r.payment_status as string | null}
+                  feeTotal={r.fee_total as number | null}
+                  feeCurrency={r.fee_currency as string | null}
+                  coverArtUrl={r.cover_art_url as string | null}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-muted text-sm">
+            No {activeFilter} releases.{" "}
+            <Link href="/app" className="text-signal hover:underline">
+              Show all releases
+            </Link>
+          </div>
+        )
       ) : (
         <EmptyState
           title="No releases yet"
