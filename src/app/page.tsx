@@ -15,7 +15,7 @@ export default function HomePage() {
         <div className="w-[calc(100vw-24px)] sm:w-[92vw] md:w-[78vw] lg:w-[1100px] max-w-6xl flex items-center gap-3 bg-white/95 backdrop-blur-sm border border-border-strong rounded-full px-3 py-3 shadow-float">
           <Link href="/" className="flex items-center pl-2 pr-4">
             <Image
-              src="/mixarch-logo-black.svg"
+              src="/mix-architect-logo.svg"
               alt="Mix Architect"
               width={180}
               height={36}
@@ -267,7 +267,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Image
-              src="/mixarch-logo-black.svg"
+              src="/mix-architect-logo.svg"
               alt="Mix Architect"
               width={120}
               height={24}

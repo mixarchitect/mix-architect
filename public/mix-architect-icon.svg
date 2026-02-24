@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 395 571">
+  <defs>
+    <style>
+      .cls-2 {
+        fill-rule: evenodd;
+      }
+
+      .cls-2, .cls-3 {
+        fill: #ec6930;
+      }
+
+      .cls-4 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g>
+    <g>
+      <path class="cls-2" d="M288.38,297.56V63.33l106.25-22.48v494.56l-84.08-17.97v-219.88h-22.17ZM84.08,503.81l310.55,66.36H0V0h394.63L106.25,61.63v235.93h-22.17v206.25h0ZM250.44,71.66v225.9h-22.17v202.29l-61.92-13.23v-189.06h-22.17V94.37l106.25-22.71h0Z"/>
+      <rect class="cls-4" x="79.77" y="147.44" width="90.35" height="198.78"/>
+      <rect class="cls-3" x="69.73" y="335.32" width="37.36" height="177.41"/>
+      <polygon class="cls-2" points="166.36 486.63 140.18 478.68 140.18 335.24 174.06 335.24 166.36 486.63"/>
+      <polygon class="cls-2" points="310.55 517.44 228.19 499.77 228.19 478.6 313.74 478.6 310.55 517.44"/>
+      <rect class="cls-4" x="251.14" y="461.16" width="37.06" height="58.86"/>
+    </g>
+    <rect class="cls-4" x="224.32" y="297.76" width="90.35" height="183.18"/>
+  </g>
+</svg>

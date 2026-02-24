@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Settings, LogOut, Music } from "lucide-react";
+import { Home, Settings, LogOut } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 
 type Props = {
@@ -30,10 +30,10 @@ export function Rail({ userEmail }: Props) {
       {/* Logo mark */}
       <Link
         href="/app"
-        className="w-10 h-10 rounded-lg bg-signal text-white grid place-items-center mb-6 hover:opacity-90 transition-opacity"
+        className="w-10 h-10 rounded-lg grid place-items-center mb-6 hover:opacity-90 transition-opacity"
         title="Mix Architect"
       >
-        <Music size={20} strokeWidth={2} />
+        <img src="/mix-architect-icon.svg" alt="Mix Architect" className="w-8 h-8" />
       </Link>
 
       {/* Nav items */}
