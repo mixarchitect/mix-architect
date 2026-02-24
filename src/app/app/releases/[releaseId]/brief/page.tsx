@@ -81,6 +81,13 @@ export default async function BriefPage({ params }: Props) {
       <div className="max-w-3xl mx-auto bg-panel border border-border rounded-lg p-10 shadow-sm print:shadow-none print:border-none print:p-0 print:max-w-none">
         {/* Header */}
         <div className="text-center mb-10">
+          {release.cover_art_url && (
+            <img
+              src={release.cover_art_url}
+              alt={`${release.title} cover art`}
+              className="w-[120px] h-[120px] rounded-lg object-cover mx-auto mb-4"
+            />
+          )}
           <div className="label text-faint text-[10px] mb-3">MIX BRIEF</div>
           <h1 className="text-3xl font-bold h1 text-text">{release.title}</h1>
           {release.artist && (

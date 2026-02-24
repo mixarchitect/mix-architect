@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Music } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { StatusDot } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
@@ -23,6 +23,7 @@ type Props = {
   feeTotal?: number | null;
   feeCurrency?: string | null;
   paymentsEnabled?: boolean;
+  coverArtUrl?: string | null;
   className?: string;
 };
 
@@ -64,7 +65,7 @@ export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt,
   paymentStatus, feeTotal, feeCurrency, paymentsEnabled,
-  className,
+  coverArtUrl, className,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -96,12 +97,24 @@ export function ReleaseCard({
       <div className="flex items-start justify-between gap-2">
         <Link
           href={`/app/releases/${id}`}
-          className="group min-w-0 flex-1 focus-visible:outline-none"
+          className="group min-w-0 flex-1 focus-visible:outline-none flex items-start gap-3"
         >
-          <div className="text-base font-semibold text-text truncate group-hover:text-signal transition-colors duration-150">
-            {title}
+          <div
+            className="w-10 h-10 rounded-md flex-shrink-0 overflow-hidden flex items-center justify-center"
+            style={{ background: "var(--panel2)" }}
+          >
+            {coverArtUrl ? (
+              <img src={coverArtUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <Music size={18} className="text-muted opacity-30" />
+            )}
           </div>
-          <div className="mt-1 text-sm text-muted truncate">{artist || "\u2014"}</div>
+          <div className="min-w-0">
+            <div className="text-base font-semibold text-text truncate group-hover:text-signal transition-colors duration-150">
+              {title}
+            </div>
+            <div className="mt-0.5 text-sm text-muted truncate">{artist || "\u2014"}</div>
+          </div>
         </Link>
 
         <div className="flex items-center gap-1.5 shrink-0">

@@ -59,6 +59,7 @@ ALTER TABLE releases ADD COLUMN IF NOT EXISTS fee_total numeric(10,2);
 ALTER TABLE releases ADD COLUMN IF NOT EXISTS fee_currency text DEFAULT 'USD';
 ALTER TABLE releases ADD COLUMN IF NOT EXISTS payment_status text DEFAULT 'unpaid';
 ALTER TABLE releases ADD COLUMN IF NOT EXISTS payment_notes text;
+ALTER TABLE releases ADD COLUMN IF NOT EXISTS cover_art_url text;
 
 DROP TRIGGER IF EXISTS releases_updated_at ON releases;
 CREATE TRIGGER releases_updated_at

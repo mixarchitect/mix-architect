@@ -8,7 +8,7 @@ import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
 import { TagInput } from "@/components/ui/tag-input";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ImageIcon, Upload, X } from "lucide-react";
 
 type Props = { params: Promise<{ releaseId: string }> };
 
@@ -85,6 +85,9 @@ export default function ReleaseSettingsPage({ params }: Props) {
   const [feeCurrency, setFeeCurrency] = useState("USD");
   const [paymentStatus, setPaymentStatus] = useState("unpaid");
   const [paymentNotes, setPaymentNotes] = useState("");
+  const [coverArtUrl, setCoverArtUrl] = useState("");
+  const [coverArtMode, setCoverArtMode] = useState<"none" | "preview">("none");
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -109,6 +112,10 @@ export default function ReleaseSettingsPage({ params }: Props) {
         setFeeCurrency(data.fee_currency ?? "USD");
         setPaymentStatus(data.payment_status ?? "unpaid");
         setPaymentNotes(data.payment_notes ?? "");
+        if (data.cover_art_url) {
+          setCoverArtUrl(data.cover_art_url);
+          setCoverArtMode("preview");
+        }
       }
 
       if (user) {
@@ -147,6 +154,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
           fee_currency: feeCurrency,
           payment_status: paymentStatus,
           payment_notes: paymentNotes || null,
+          cover_art_url: coverArtUrl || null,
         })
         .eq("id", releaseId);
 
@@ -157,6 +165,37 @@ export default function ReleaseSettingsPage({ params }: Props) {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function handleCoverUpload(file: File) {
+    setUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/${releaseId}.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("cover-art")
+        .upload(path, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+      const { data: urlData } = supabase.storage
+        .from("cover-art")
+        .getPublicUrl(path);
+      const url = urlData.publicUrl + `?t=${Date.now()}`;
+      setCoverArtUrl(url);
+      setCoverArtMode("preview");
+      await supabase.from("releases").update({ cover_art_url: url }).eq("id", releaseId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleRemoveCover() {
+    setCoverArtUrl("");
+    setCoverArtMode("none");
+    await supabase.from("releases").update({ cover_art_url: null }).eq("id", releaseId);
   }
 
   if (loading) {
@@ -186,6 +225,73 @@ export default function ReleaseSettingsPage({ params }: Props) {
         </PanelHeader>
         <Rule />
         <PanelBody className="pt-5 space-y-6">
+          {/* Cover Art */}
+          <div className="space-y-3">
+            <label className="label text-faint">Cover Art</label>
+            <div className="flex items-start gap-4">
+              <div
+                className="relative w-[160px] h-[160px] rounded-lg border border-border overflow-hidden flex-shrink-0 flex items-center justify-center"
+                style={{ background: "var(--panel2)" }}
+              >
+                {coverArtMode === "preview" && coverArtUrl ? (
+                  <img
+                    src={coverArtUrl}
+                    alt="Cover art"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <ImageIcon size={40} className="text-muted opacity-30" />
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2 pt-1">
+                <label
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors"
+                  style={{ background: "var(--panel2)", color: "var(--text-muted)" }}
+                >
+                  <Upload size={14} />
+                  {uploading ? "Uploading\u2026" : "Upload Image"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleCoverUpload(f);
+                    }}
+                    disabled={uploading}
+                  />
+                </label>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] text-muted uppercase tracking-wider">or paste URL</span>
+                  <input
+                    type="url"
+                    value={coverArtMode === "preview" && !coverArtUrl.startsWith("http") ? "" : coverArtUrl}
+                    onChange={(e) => {
+                      setCoverArtUrl(e.target.value);
+                      setCoverArtMode(e.target.value ? "preview" : "none");
+                    }}
+                    className="input text-xs"
+                    placeholder="https://..."
+                  />
+                </div>
+
+                {coverArtMode === "preview" && coverArtUrl && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveCover}
+                    className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors"
+                  >
+                    <X size={12} /> Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <Rule />
+
           <div className="space-y-1.5">
             <label className="label text-faint">Release title</label>
             <input

@@ -31,7 +31,7 @@ export default async function TrackDetailPage({ params }: Props) {
 
   const { data: release } = await supabase
     .from("releases")
-    .select("title, format")
+    .select("title, format, cover_art_url")
     .eq("id", releaseId)
     .maybeSingle();
 
@@ -60,6 +60,7 @@ export default async function TrackDetailPage({ params }: Props) {
       releaseId={releaseId}
       releaseTitle={release?.title ?? ""}
       releaseFormat={release?.format ?? "stereo"}
+      releaseCoverArt={release?.cover_art_url ?? null}
       paymentsEnabled={paymentsEnabled}
       track={track}
       intent={intentRes.data}

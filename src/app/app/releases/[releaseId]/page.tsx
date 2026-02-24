@@ -180,6 +180,19 @@ export default async function ReleasePage({ params }: Props) {
 
         {/* Inspector sidebar */}
         <aside className="space-y-4">
+          {/* Cover Art */}
+          {release.cover_art_url && (
+            <Panel>
+              <PanelBody className="p-0 overflow-hidden rounded-lg">
+                <img
+                  src={release.cover_art_url}
+                  alt={`${release.title} cover art`}
+                  className="w-full aspect-square object-cover"
+                />
+              </PanelBody>
+            </Panel>
+          )}
+
           {/* Release Info */}
           <Panel>
             <PanelBody className="py-5 space-y-3">

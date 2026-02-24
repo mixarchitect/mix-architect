@@ -113,6 +113,7 @@ export default async function DashboardPage() {
                 paymentStatus={r.payment_status as string | null}
                 feeTotal={r.fee_total as number | null}
                 feeCurrency={r.fee_currency as string | null}
+                coverArtUrl={r.cover_art_url as string | null}
               />
             );
           })}

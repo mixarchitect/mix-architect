@@ -95,6 +95,7 @@ type Props = {
   releaseId: string;
   releaseTitle: string;
   releaseFormat: string;
+  releaseCoverArt?: string | null;
   paymentsEnabled?: boolean;
   track: TrackData;
   intent: IntentData;
@@ -105,7 +106,7 @@ type Props = {
 };
 
 export function TrackDetailClient({
-  releaseId, releaseTitle, releaseFormat, paymentsEnabled,
+  releaseId, releaseTitle, releaseFormat, releaseCoverArt, paymentsEnabled,
   track, intent, specs, elements, notes, references,
 }: Props) {
   const [activeTab, setActiveTab] = useState("intent");
@@ -395,6 +396,13 @@ export function TrackDetailClient({
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
+          {releaseCoverArt && (
+            <img
+              src={releaseCoverArt}
+              alt=""
+              className="w-8 h-8 rounded object-cover flex-shrink-0"
+            />
+          )}
           <Link
             href={`/app/releases/${releaseId}`}
             className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
