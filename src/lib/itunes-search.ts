@@ -8,8 +8,9 @@ export type ItunesResult = {
 export async function searchItunesApi(query: string): Promise<ItunesResult[]> {
   if (!query.trim()) return [];
   try {
+    // Proxy through our API route to avoid CORS issues on mobile browsers
     const res = await fetch(
-      `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&entity=song&limit=5`,
+      `/api/itunes-search?term=${encodeURIComponent(query)}`,
     );
     const json = await res.json();
     return (json.results ?? []).map((r: Record<string, unknown>) => ({
