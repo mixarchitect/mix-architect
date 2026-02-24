@@ -26,7 +26,7 @@ export function Rail({ userEmail }: Props) {
   }
 
   return (
-    <nav className="w-16 shrink-0 border-r border-border bg-panel flex flex-col items-center py-5 gap-1">
+    <nav className="hidden md:flex w-16 shrink-0 border-r border-border bg-panel flex-col items-center py-5 gap-1">
       {/* Logo mark */}
       <Link
         href="/app"

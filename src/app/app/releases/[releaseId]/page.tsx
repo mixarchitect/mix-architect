@@ -97,19 +97,19 @@ export default async function ReleasePage({ params }: Props) {
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/app"
-            className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
+            className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1 shrink-0"
           >
             <ArrowLeft size={14} />
             Releases
           </Link>
           <span className="text-faint">/</span>
-          <h1 className="text-xl font-semibold h2 text-text">{release.title}</h1>
+          <h1 className="text-2xl font-semibold h2 text-text truncate">{release.title}</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Link href={`/app/releases/${releaseId}/brief`}>
             <Button variant="secondary">
               <FileText size={16} />
@@ -194,7 +194,7 @@ export default async function ReleasePage({ params }: Props) {
           {/* Release Info */}
           <Panel>
             <PanelBody className="py-5 space-y-3">
-              <div className="label text-faint text-[10px] mb-1">RELEASE INFO</div>
+              <div className="label-sm text-faint mb-1">RELEASE INFO</div>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted">Artist</span>
@@ -261,7 +261,7 @@ export default async function ReleasePage({ params }: Props) {
           {(release.client_name || release.client_email) && (
             <Panel>
               <PanelBody className="py-5">
-                <div className="label text-faint text-[10px] mb-2">CLIENT INFO</div>
+                <div className="label-sm text-faint mb-2">CLIENT INFO</div>
                 <div className="space-y-2 text-sm">
                   {release.client_name && (
                     <div className="flex justify-between">
@@ -286,7 +286,7 @@ export default async function ReleasePage({ params }: Props) {
           {paymentsEnabled && (
             <Panel>
               <PanelBody className="py-5 space-y-3">
-                <div className="label text-faint text-[10px] mb-1">PAYMENT</div>
+                <div className="label-sm text-faint mb-1">PAYMENT</div>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm items-center">
                     <span className="text-muted">Status</span>

@@ -404,8 +404,8 @@ export function TrackDetailClient({
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
+        <div className="flex items-center gap-3 min-w-0">
           {releaseCoverArt && (
             <img
               src={releaseCoverArt}
@@ -421,7 +421,7 @@ export function TrackDetailClient({
             {releaseTitle}
           </Link>
           <span className="text-faint">/</span>
-          <h1 className="text-lg font-semibold text-text">
+          <h1 className="text-2xl font-semibold h2 text-text">
             <span className="font-mono text-muted mr-2">
               {String(track.track_number).padStart(2, "0")}
             </span>
@@ -441,9 +441,9 @@ export function TrackDetailClient({
         </div>
       </div>
 
-      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} className="mb-6" />
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} className="mb-8" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
         {/* ── Tab content ── */}
         <div>
           {/* Intent */}
@@ -656,7 +656,7 @@ export function TrackDetailClient({
                 {/* Version header */}
                 <div className="flex items-center justify-between p-3 rounded-md border border-border bg-panel2">
                   <div className="flex items-center gap-3">
-                    <label className="text-[10px] font-semibold text-faint uppercase tracking-wider">Mix Version</label>
+                    <label className="label-sm text-faint">Mix Version</label>
                     <select
                       value={activeVersion}
                       onChange={(e) => setActiveVersion(e.target.value)}
@@ -812,7 +812,7 @@ export function TrackDetailClient({
         <aside className="space-y-4">
           <Panel>
             <PanelBody className="py-4 space-y-3">
-              <div className="label text-faint text-[10px] mb-1">QUICK VIEW</div>
+              <div className="label-sm text-faint mb-1">QUICK VIEW</div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Status</span>
                 <StatusIndicator color={sColor} label={sLabel} />
@@ -878,7 +878,7 @@ export function TrackDetailClient({
           <Panel>
             <PanelBody className="py-4 space-y-3">
               <div className="flex items-center justify-between">
-                <div className="label text-faint text-[10px]">REFERENCES</div>
+                <div className="label-sm text-faint">REFERENCES</div>
                 <button
                   type="button"
                   onClick={() => setShowRefForm(!showRefForm)}

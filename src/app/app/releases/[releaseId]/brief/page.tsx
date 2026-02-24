@@ -66,7 +66,7 @@ export default async function BriefPage({ params }: Props) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6 print:hidden">
+      <div className="flex items-center justify-between mb-8 print:hidden">
         <Link
           href={`/app/releases/${releaseId}`}
           className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
@@ -88,7 +88,7 @@ export default async function BriefPage({ params }: Props) {
               className="w-[120px] h-[120px] rounded-lg object-cover mx-auto mb-4"
             />
           )}
-          <div className="label text-faint text-[10px] mb-3">MIX BRIEF</div>
+          <div className="label-sm text-faint mb-3">MIX BRIEF</div>
           <h1 className="text-3xl font-bold h1 text-text">{release.title}</h1>
           {release.artist && (
             <p className="text-lg text-muted mt-1">{release.artist}</p>
@@ -107,7 +107,7 @@ export default async function BriefPage({ params }: Props) {
 
         {/* Release overview */}
         <section className="mb-10">
-          <h2 className="label text-faint text-[10px] mb-4">RELEASE OVERVIEW</h2>
+          <h2 className="label-sm text-faint mb-4">RELEASE OVERVIEW</h2>
           <div className="flex flex-wrap gap-6 text-sm mb-4">
             <span>
               <span className="text-muted">Type: </span>

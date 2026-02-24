@@ -98,7 +98,7 @@ export default function NewTrackPage({ params }: Props) {
 
   return (
     <div className="max-w-xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-8">
         <Link
           href={`/app/releases/${releaseId}`}
           className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
@@ -144,7 +144,7 @@ export default function NewTrackPage({ params }: Props) {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {mode === "single" ? (
               <div className="space-y-1.5">
                 <label className="label text-faint">Track title</label>

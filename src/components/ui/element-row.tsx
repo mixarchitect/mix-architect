@@ -46,7 +46,7 @@ export function ElementRow({
       onDrop={onDrop}
       onDragEnd={(e) => e.currentTarget.classList.remove("opacity-40")}
       className={cn(
-        "rounded-md border bg-panel px-4 py-3 space-y-2 transition-all",
+        "rounded-md border bg-panel px-5 py-4 space-y-2 transition-all",
         flagged ? "border-signal/30 bg-signal/[0.02]" : "border-border",
         isDragging && "opacity-40",
         isDragOver && "border-signal border-dashed",

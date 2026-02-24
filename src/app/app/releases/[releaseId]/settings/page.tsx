@@ -214,7 +214,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
 
   return (
     <div className="max-w-xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-8">
         <Link
           href={`/app/releases/${releaseId}`}
           className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
@@ -407,7 +407,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
           {paymentsEnabled && (
             <>
               <Rule />
-              <div className="label text-faint text-[10px]">PAYMENT</div>
+              <div className="label-sm text-faint">PAYMENT</div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="label text-faint">Project fee</label>

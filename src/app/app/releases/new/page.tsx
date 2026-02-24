@@ -89,7 +89,7 @@ export default function NewReleasePage() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-8">
         <Link
           href="/app"
           className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"

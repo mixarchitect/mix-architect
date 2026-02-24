@@ -104,8 +104,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-xl">
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-xl mx-auto">
+      <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold h2 text-text">Settings</h1>
         <AutoSaveIndicator status={saveStatus} />
       </div>
@@ -162,7 +162,7 @@ export default function SettingsPage() {
             </p>
           </PanelHeader>
           <Rule />
-          <PanelBody className="pt-5 space-y-5">
+          <PanelBody className="pt-5 space-y-6">
             <div className="space-y-1.5">
               <label className="label text-faint">Default target loudness</label>
               <select
