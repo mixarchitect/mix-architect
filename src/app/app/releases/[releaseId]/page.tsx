@@ -252,6 +252,9 @@ export default async function ReleasePage({ params }: Props) {
               song_title: r.song_title,
               artist: r.artist,
               note: r.note,
+              url: r.url,
+              artwork_url: r.artwork_url,
+              sort_order: r.sort_order ?? 0,
             }))}
           />
 
