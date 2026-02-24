@@ -8,6 +8,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { StatusDot } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
 import { cn } from "@/lib/cn";
+import { relativeTime } from "@/lib/relative-time";
 
 type Props = {
   id: string;
@@ -46,21 +47,6 @@ function typeLabel(t: string | undefined | null): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-function relativeTime(dateStr: string): string {
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMins < 1) return "just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString();
-}
-
 export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt,
@@ -87,9 +73,14 @@ export function ReleaseCard({
   async function handleDelete() {
     setDeleting(true);
     const supabase = createSupabaseBrowserClient();
-    await supabase.from("releases").delete().eq("id", id);
-    setMenuOpen(false);
-    router.refresh();
+    try {
+      const { error } = await supabase.from("releases").delete().eq("id", id);
+      if (error) throw error;
+      setMenuOpen(false);
+      router.refresh();
+    } catch {
+      setDeleting(false);
+    }
   }
 
   return (

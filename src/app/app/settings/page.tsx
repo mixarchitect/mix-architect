@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ const FORMAT_OPTIONS = [
 ];
 
 export default function SettingsPage() {
-  const supabase = createSupabaseBrowserClient();
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<
@@ -260,14 +260,19 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={async () => {
-                  const next = !paymentsEnabled;
+                  const prev = paymentsEnabled;
+                  const next = !prev;
                   setPaymentsEnabled(next);
-                  const { data: { user } } = await supabase.auth.getUser();
-                  if (user) {
-                    await supabase.from("user_defaults").upsert(
+                  try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) throw new Error("Not authenticated");
+                    const { error } = await supabase.from("user_defaults").upsert(
                       { user_id: user.id, payments_enabled: next },
                       { onConflict: "user_id" },
                     );
+                    if (error) throw error;
+                  } catch {
+                    setPaymentsEnabled(prev);
                   }
                 }}
                 className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors"

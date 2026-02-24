@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import { searchItunesApi, buildPlatformUrl } from "@/lib/itunes-search";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
@@ -149,7 +150,7 @@ export function TrackDetailClient({
   const [trackFee, setTrackFee] = useState(track.fee != null ? String(track.fee) : "");
   const [trackFeePaid, setTrackFeePaid] = useState(track.fee_paid ?? false);
 
-  const supabase = createSupabaseBrowserClient();
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const autoSave = useCallback(
@@ -158,7 +159,16 @@ export function TrackDetailClient({
       setSaveStatus("saving");
       debounceRef.current = setTimeout(async () => {
         try {
-          const { error } = await supabase.from(table).update(data).eq(key, keyVal);
+          // Use upsert for intent/specs tables to handle missing rows gracefully
+          const useUpsert = table === "track_intent" || table === "track_specs";
+          let error;
+          if (useUpsert) {
+            ({ error } = await supabase
+              .from(table)
+              .upsert({ [key]: keyVal, ...data }, { onConflict: key }));
+          } else {
+            ({ error } = await supabase.from(table).update(data).eq(key, keyVal));
+          }
           if (error) throw error;
           setSaveStatus("saved");
           setTimeout(() => setSaveStatus("idle"), 2000);
@@ -179,9 +189,15 @@ export function TrackDetailClient({
   }
 
   async function toggleStatus() {
-    const next = trackStatus === "complete" ? "in_progress" : "complete";
+    const prev = trackStatus;
+    const next = prev === "complete" ? "in_progress" : "complete";
     setTrackStatus(next);
-    await supabase.from("tracks").update({ status: next }).eq("id", track.id);
+    try {
+      const { error } = await supabase.from("tracks").update({ status: next }).eq("id", track.id);
+      if (error) throw error;
+    } catch {
+      setTrackStatus(prev);
+    }
   }
 
   async function handleAddElement(name: string) {
@@ -209,8 +225,14 @@ export function TrackDetailClient({
   }
 
   async function handleDeleteElement(elementId: string) {
+    const removed = localElements.find((e) => e.id === elementId);
     setLocalElements((prev) => prev.filter((e) => e.id !== elementId));
-    await supabase.from("track_elements").delete().eq("id", elementId);
+    try {
+      const { error } = await supabase.from("track_elements").delete().eq("id", elementId);
+      if (error) throw error;
+    } catch {
+      if (removed) setLocalElements((prev) => [...prev, removed]);
+    }
   }
 
   async function handleAddDefaults() {
@@ -218,21 +240,22 @@ export function TrackDetailClient({
     const newNames = DEFAULT_ELEMENTS.filter(
       (name) => !versionEls.find((e) => e.name === name),
     );
+    if (newNames.length === 0) return;
     let nextOrder =
       localElements.length > 0
         ? Math.max(...localElements.map((e) => e.sort_order)) + 1
         : 0;
-    const added: ElementData[] = [];
-    for (const name of newNames) {
-      const { data } = await supabase
-        .from("track_elements")
-        .insert({ track_id: track.id, name, sort_order: nextOrder++, version: activeVersion })
-        .select()
-        .single();
-      if (data)
-        added.push({ ...data, notes: data.notes ?? "", flagged: data.flagged ?? false });
+    const rows = newNames.map((name) => ({
+      track_id: track.id, name, sort_order: nextOrder++, version: activeVersion,
+    }));
+    const { data } = await supabase
+      .from("track_elements")
+      .insert(rows)
+      .select();
+    if (data) {
+      const added = data.map((d) => ({ ...d, notes: d.notes ?? "", flagged: d.flagged ?? false }) as ElementData);
+      setLocalElements((prev) => [...prev, ...added]);
     }
-    setLocalElements((prev) => [...prev, ...added]);
   }
 
   async function handleCreateVersion(versionName: string) {
@@ -240,29 +263,32 @@ export function TrackDetailClient({
     let nextOrder = localElements.length > 0
       ? Math.max(...localElements.map((e) => e.sort_order)) + 1
       : 0;
-    const added: ElementData[] = [];
-    for (const el of prevVersionEls) {
-      const { data } = await supabase
-        .from("track_elements")
-        .insert({
-          track_id: track.id,
-          name: el.name,
-          notes: null,
-          flagged: false,
-          sort_order: nextOrder++,
-          version: versionName,
-        })
-        .select()
-        .single();
-      if (data)
-        added.push({ ...data, notes: data.notes ?? "", flagged: data.flagged ?? false });
+    if (prevVersionEls.length === 0) {
+      setActiveVersion(versionName);
+      return;
     }
-    setLocalElements((prev) => [...prev, ...added]);
+    const rows = prevVersionEls.map((el) => ({
+      track_id: track.id,
+      name: el.name,
+      notes: null,
+      flagged: false,
+      sort_order: nextOrder++,
+      version: versionName,
+    }));
+    const { data } = await supabase
+      .from("track_elements")
+      .insert(rows)
+      .select();
+    if (data) {
+      const added = data.map((d) => ({ ...d, notes: d.notes ?? "", flagged: d.flagged ?? false }) as ElementData);
+      setLocalElements((prev) => [...prev, ...added]);
+    }
     setActiveVersion(versionName);
   }
 
-  function handleDrop(fromIdx: number, toIdx: number, versionEls: ElementData[]) {
+  async function handleDrop(fromIdx: number, toIdx: number, versionEls: ElementData[]) {
     if (fromIdx === toIdx) return;
+    const prevElements = [...localElements];
     const reordered = [...versionEls];
     const [moved] = reordered.splice(fromIdx, 1);
     reordered.splice(toIdx, 0, moved);
@@ -271,11 +297,18 @@ export function TrackDetailClient({
       const otherVersionEls = prev.filter((e) => (e.version || "v1") !== activeVersion);
       return [...otherVersionEls, ...updated];
     });
-    updated.forEach((el) => {
-      supabase.from("track_elements").update({ sort_order: el.sort_order }).eq("id", el.id);
-    });
     setDragIdx(null);
     setDragOverIdx(null);
+    try {
+      const results = await Promise.all(
+        updated.map((el) =>
+          supabase.from("track_elements").update({ sort_order: el.sort_order }).eq("id", el.id)
+        ),
+      );
+      if (results.some((r) => r.error)) throw new Error("Reorder failed");
+    } catch {
+      setLocalElements(prevElements);
+    }
   }
 
   async function handlePostNote() {
@@ -299,39 +332,10 @@ export function TrackDetailClient({
       return;
     }
     itunesDebounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&entity=song&limit=5`,
-        );
-        const json = await res.json();
-        setItunesResults(
-          (json.results ?? []).map((r: Record<string, unknown>) => ({
-            trackName: r.trackName as string,
-            artistName: r.artistName as string,
-            artworkUrl100: r.artworkUrl100 as string,
-            trackViewUrl: r.trackViewUrl as string,
-          })),
-        );
-        setShowItunesResults(true);
-      } catch {
-        setItunesResults([]);
-      }
+      const results = await searchItunesApi(query);
+      setItunesResults(results);
+      setShowItunesResults(results.length > 0);
     }, 400);
-  }
-
-  function buildPlatformUrl(
-    platform: "apple" | "spotify" | "tidal" | "youtube",
-    trackName: string,
-    artistName: string,
-    appleUrl: string,
-  ): string {
-    const q = encodeURIComponent(`${trackName} ${artistName}`);
-    switch (platform) {
-      case "apple": return appleUrl;
-      case "spotify": return `https://open.spotify.com/search/${q}`;
-      case "tidal": return `https://tidal.com/search?q=${q}`;
-      case "youtube": return `https://music.youtube.com/search?q=${q}`;
-    }
   }
 
   function selectItunesResult(result: { trackName: string; artistName: string; artworkUrl100: string; trackViewUrl: string }) {
@@ -374,8 +378,14 @@ export function TrackDetailClient({
   }
 
   async function handleDeleteRef(refId: string) {
+    const removed = localRefs.find((r) => r.id === refId);
     setLocalRefs((prev) => prev.filter((r) => r.id !== refId));
-    await supabase.from("mix_references").delete().eq("id", refId);
+    try {
+      const { error } = await supabase.from("mix_references").delete().eq("id", refId);
+      if (error) throw error;
+    } catch {
+      if (removed) setLocalRefs((prev) => [...prev, removed]);
+    }
   }
 
   const sColor =
@@ -834,7 +844,7 @@ export function TrackDetailClient({
                       onChange={(e) => {
                         setTrackFee(e.target.value);
                         const val = e.target.value ? parseFloat(e.target.value) : null;
-                        supabase.from("tracks").update({ fee: val }).eq("id", track.id);
+                        autoSave("tracks", { fee: val }, "id", track.id);
                       }}
                       placeholder="0.00"
                       className="w-20 text-right text-xs font-mono text-text bg-transparent border-b border-border outline-none focus:border-signal py-0.5"

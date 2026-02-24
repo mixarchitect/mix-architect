@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -62,7 +62,7 @@ function PillSelect({ options, value, onChange }: { options: { value: string; la
 
 export default function ReleaseSettingsPage({ params }: Props) {
   const { releaseId } = use(params);
-  const supabase = createSupabaseBrowserClient();
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
@@ -168,11 +168,21 @@ export default function ReleaseSettingsPage({ params }: Props) {
   }
 
   async function handleCoverUpload(file: File) {
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    if (file.size > MAX_SIZE) {
+      setError("Image must be under 5MB");
+      return;
+    }
+    const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError("Invalid image type. Use PNG, JPG, WebP, or GIF.");
+      return;
+    }
     setUploading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      const ext = file.name.split(".").pop() || "jpg";
+      const ext = file.type.split("/")[1] === "jpeg" ? "jpg" : file.type.split("/")[1];
       const path = `${user.id}/${releaseId}.${ext}`;
       const { error: uploadErr } = await supabase.storage
         .from("cover-art")

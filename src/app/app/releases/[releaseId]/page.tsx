@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Panel, PanelBody } from "@/components/ui/panel";
-import { Rule } from "@/components/ui/rule";
 import { Pill } from "@/components/ui/pill";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { TrackRow } from "@/components/ui/track-row";
@@ -224,7 +223,7 @@ export default async function ReleasePage({ params }: Props) {
                     </span>
                   </div>
                 )}
-                {release.genre_tags?.length > 0 && (
+                {Array.isArray(release.genre_tags) && release.genre_tags.length > 0 && (
                   <div className="flex justify-between text-sm items-start">
                     <span className="text-muted shrink-0 mr-3">Genre</span>
                     <div className="flex flex-wrap gap-1 justify-end">
@@ -247,14 +246,14 @@ export default async function ReleasePage({ params }: Props) {
           {/* Global References */}
           <GlobalReferencesEditor
             releaseId={releaseId}
-            initialRefs={(globalRefs ?? []).map((r: any) => ({
-              id: r.id,
-              song_title: r.song_title,
-              artist: r.artist,
-              note: r.note,
-              url: r.url,
-              artwork_url: r.artwork_url,
-              sort_order: r.sort_order ?? 0,
+            initialRefs={(globalRefs ?? []).map((r: Record<string, unknown>) => ({
+              id: r.id as string,
+              song_title: r.song_title as string,
+              artist: r.artist as string | null,
+              note: r.note as string | null,
+              url: r.url as string | null,
+              artwork_url: r.artwork_url as string | null,
+              sort_order: (r.sort_order as number) ?? 0,
             }))}
           />
 

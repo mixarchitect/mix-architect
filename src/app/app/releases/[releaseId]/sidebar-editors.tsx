@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import { searchItunesApi, buildPlatformUrl, type ItunesResult } from "@/lib/itunes-search";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { ReferenceCard } from "@/components/ui/reference-card";
@@ -30,13 +31,19 @@ export function GlobalDirectionEditor({ releaseId, initialValue }: DirectionEdit
   async function handleSave() {
     setSaving(true);
     const supabase = createSupabaseBrowserClient();
-    await supabase
-      .from("releases")
-      .update({ global_direction: value || null })
-      .eq("id", releaseId);
-    setSaving(false);
-    setEditing(false);
-    router.refresh();
+    try {
+      const { error } = await supabase
+        .from("releases")
+        .update({ global_direction: value || null })
+        .eq("id", releaseId);
+      if (error) throw error;
+      setEditing(false);
+      router.refresh();
+    } catch {
+      // Keep editing open so user can retry
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -108,13 +115,6 @@ type Ref = {
   sort_order: number;
 };
 
-type ItunesResult = {
-  trackName: string;
-  artistName: string;
-  artworkUrl100: string;
-  trackViewUrl: string;
-};
-
 type RefsEditorProps = {
   releaseId: string;
   initialRefs: Ref[];
@@ -153,39 +153,10 @@ export function GlobalReferencesEditor({ releaseId, initialRefs }: RefsEditorPro
       return;
     }
     itunesDebounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&entity=song&limit=5`,
-        );
-        const json = await res.json();
-        setItunesResults(
-          (json.results ?? []).map((r: Record<string, unknown>) => ({
-            trackName: r.trackName as string,
-            artistName: r.artistName as string,
-            artworkUrl100: r.artworkUrl100 as string,
-            trackViewUrl: r.trackViewUrl as string,
-          })),
-        );
-        setShowItunesResults(true);
-      } catch {
-        setItunesResults([]);
-      }
+      const results = await searchItunesApi(query);
+      setItunesResults(results);
+      setShowItunesResults(results.length > 0);
     }, 400);
-  }
-
-  function buildPlatformUrl(
-    platform: "apple" | "spotify" | "tidal" | "youtube",
-    trackName: string,
-    artistName: string,
-    appleUrl: string,
-  ): string {
-    const q = encodeURIComponent(`${trackName} ${artistName}`);
-    switch (platform) {
-      case "apple": return appleUrl;
-      case "spotify": return `https://open.spotify.com/search/${q}`;
-      case "tidal": return `https://tidal.com/search?q=${q}`;
-      case "youtube": return `https://music.youtube.com/search?q=${q}`;
-    }
   }
 
   function selectItunesResult(result: ItunesResult) {
@@ -226,9 +197,15 @@ export function GlobalReferencesEditor({ releaseId, initialRefs }: RefsEditorPro
 
   async function handleDeleteRef(refId: string) {
     const supabase = createSupabaseBrowserClient();
+    const removed = refs.find((r) => r.id === refId);
     setRefs((prev) => prev.filter((r) => r.id !== refId));
-    await supabase.from("mix_references").delete().eq("id", refId);
-    router.refresh();
+    try {
+      const { error } = await supabase.from("mix_references").delete().eq("id", refId);
+      if (error) throw error;
+      router.refresh();
+    } catch {
+      if (removed) setRefs((prev) => [...prev, removed]);
+    }
   }
 
   return (
