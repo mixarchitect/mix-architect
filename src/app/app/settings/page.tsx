@@ -5,7 +5,6 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 import { TagInput } from "@/components/ui/tag-input";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 
@@ -171,19 +170,35 @@ export default function SettingsPage() {
                 onChange={(e) => setLoudness(e.target.value)}
                 className="input"
               >
-                <option value="-14 LUFS">-14 LUFS</option>
-                <option value="-16 LUFS">-16 LUFS</option>
-                <option value="-12 LUFS">-12 LUFS</option>
+                <option value="-14 LUFS">-14 LUFS — Spotify / YouTube</option>
+                <option value="-16 LUFS">-16 LUFS — Apple Music / Tidal</option>
+                <option value="-12 LUFS">-12 LUFS — Louder master</option>
+                <option value="-11 LUFS">-11 LUFS — Club / DJ</option>
+                <option value="-9 LUFS">-9 LUFS — Competitive / radio</option>
+                <option value="-23 LUFS">-23 LUFS — Broadcast (EBU R128)</option>
+                <option value="-24 LUFS">-24 LUFS — Broadcast (ATSC A/85)</option>
               </select>
             </div>
 
             <div className="space-y-1.5">
               <label className="label text-faint">Default format</label>
-              <SegmentedControl
-                options={FORMAT_OPTIONS}
-                value={format}
-                onChange={setFormat}
-              />
+              <div className="flex gap-2">
+                {FORMAT_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setFormat(opt.value)}
+                    className="px-4 py-2 text-sm font-medium rounded-md transition-colors"
+                    style={
+                      format === opt.value
+                        ? { background: "var(--signal)", color: "#fff" }
+                        : { background: "var(--panel2)", color: "var(--text-muted)" }
+                    }
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-1.5">
