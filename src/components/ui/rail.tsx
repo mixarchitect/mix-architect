@@ -61,12 +61,13 @@ export function Rail({ userEmail, onSearchClick }: Props) {
 
       {/* Account */}
       {userEmail && (
-        <div
-          className="w-9 h-9 rounded-full bg-panel2 border border-border grid place-items-center text-xs font-semibold text-muted mt-2"
+        <Link
+          href="/app/settings"
+          className="w-9 h-9 rounded-full bg-panel2 border border-border grid place-items-center text-xs font-semibold text-muted mt-2 hover:border-border-strong transition-colors"
           title={userEmail}
         >
           {userEmail.charAt(0).toUpperCase()}
-        </div>
+        </Link>
       )}
 
       {/* Sign out */}
