@@ -7,7 +7,6 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 import { TagInput } from "@/components/ui/tag-input";
 import { ArrowLeft } from "lucide-react";
 
@@ -38,6 +37,28 @@ const PAYMENT_STATUS_OPTIONS = [
 ];
 
 const CURRENCY_OPTIONS = ["USD", "EUR", "GBP", "CAD", "AUD"];
+
+function PillSelect({ options, value, onChange }: { options: { value: string; label: string }[]; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex gap-2 flex-wrap">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => onChange(opt.value)}
+          className="px-4 py-2 text-sm font-medium rounded-md transition-colors"
+          style={
+            value === opt.value
+              ? { background: "var(--signal)", color: "#fff" }
+              : { background: "var(--panel2)", color: "var(--text-muted)" }
+          }
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function ReleaseSettingsPage({ params }: Props) {
   const { releaseId } = use(params);
@@ -188,29 +209,17 @@ export default function ReleaseSettingsPage({ params }: Props) {
 
           <div className="space-y-1.5">
             <label className="label text-faint">Release type</label>
-            <SegmentedControl
-              options={TYPE_OPTIONS}
-              value={releaseType}
-              onChange={setReleaseType}
-            />
+            <PillSelect options={TYPE_OPTIONS} value={releaseType} onChange={setReleaseType} />
           </div>
 
           <div className="space-y-1.5">
             <label className="label text-faint">Format</label>
-            <SegmentedControl
-              options={FORMAT_OPTIONS}
-              value={format}
-              onChange={setFormat}
-            />
+            <PillSelect options={FORMAT_OPTIONS} value={format} onChange={setFormat} />
           </div>
 
           <div className="space-y-1.5">
             <label className="label text-faint">Status</label>
-            <SegmentedControl
-              options={STATUS_OPTIONS}
-              value={status}
-              onChange={setStatus}
-            />
+            <PillSelect options={STATUS_OPTIONS} value={status} onChange={setStatus} />
           </div>
 
           <div className="space-y-1.5">
@@ -308,11 +317,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
               </div>
               <div className="space-y-1.5">
                 <label className="label text-faint">Payment status</label>
-                <SegmentedControl
-                  options={PAYMENT_STATUS_OPTIONS}
-                  value={paymentStatus}
-                  onChange={setPaymentStatus}
-                />
+                <PillSelect options={PAYMENT_STATUS_OPTIONS} value={paymentStatus} onChange={setPaymentStatus} />
               </div>
               <div className="space-y-1.5">
                 <label className="label text-faint">Payment notes</label>
