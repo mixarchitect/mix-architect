@@ -147,6 +147,8 @@ export function TrackDetailClient({
 
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const trackStatusRef = useRef(trackStatus);
+  trackStatusRef.current = trackStatus;
 
   const autoSave = useCallback(
     (table: string, data: Record<string, unknown>, key: string, keyVal: string) => {
@@ -165,6 +167,11 @@ export function TrackDetailClient({
             ({ error } = await supabase.from(table).update(data).eq(key, keyVal));
           }
           if (error) throw error;
+          // Auto-promote from "not_started" on first save
+          if (trackStatusRef.current === "not_started") {
+            setTrackStatus("in_progress");
+            await supabase.from("tracks").update({ status: "in_progress" }).eq("id", track.id);
+          }
           setSaveStatus("saved");
           setTimeout(() => setSaveStatus("idle"), 2000);
         } catch {
@@ -172,7 +179,7 @@ export function TrackDetailClient({
         }
       }, 500);
     },
-    [supabase],
+    [supabase, track.id],
   );
 
   function saveIntent(data: Record<string, unknown>) {
@@ -183,15 +190,29 @@ export function TrackDetailClient({
     autoSave("track_specs", data, "track_id", track.id);
   }
 
-  async function toggleStatus() {
+  const TRACK_STATUSES = ["not_started", "in_progress", "complete"] as const;
+
+  async function cycleStatus() {
+    const idx = TRACK_STATUSES.indexOf(trackStatus as (typeof TRACK_STATUSES)[number]);
+    const next = TRACK_STATUSES[(idx + 1) % TRACK_STATUSES.length];
     const prev = trackStatus;
-    const next = prev === "complete" ? "in_progress" : "complete";
     setTrackStatus(next);
     try {
       const { error } = await supabase.from("tracks").update({ status: next }).eq("id", track.id);
       if (error) throw error;
     } catch {
       setTrackStatus(prev);
+    }
+  }
+
+  async function autoPromoteTrack() {
+    if (trackStatus !== "not_started") return;
+    setTrackStatus("in_progress");
+    try {
+      const { error } = await supabase.from("tracks").update({ status: "in_progress" }).eq("id", track.id);
+      if (error) throw error;
+    } catch {
+      setTrackStatus("not_started");
     }
   }
 
@@ -205,11 +226,13 @@ export function TrackDetailClient({
       .insert({ track_id: track.id, name, sort_order: nextOrder, version: activeVersion })
       .select()
       .single();
-    if (data)
+    if (data) {
       setLocalElements([
         ...localElements,
         { ...data, notes: data.notes ?? "", flagged: data.flagged ?? false },
       ]);
+      autoPromoteTrack();
+    }
   }
 
   async function handleUpdateElement(elementId: string, d: Record<string, unknown>) {
@@ -316,6 +339,7 @@ export function TrackDetailClient({
     if (data) {
       setLocalNotes([data, ...localNotes]);
       setNewNote("");
+      autoPromoteTrack();
     }
   }
 
@@ -369,6 +393,7 @@ export function TrackDetailClient({
       setRefArtwork("");
       setShowRefForm(false);
       setShowItunesResults(false);
+      autoPromoteTrack();
     }
   }
 
@@ -427,7 +452,7 @@ export function TrackDetailClient({
           <AutoSaveIndicator status={saveStatus} />
           <Button
             variant={trackStatus === "complete" ? "primary" : "secondary"}
-            onClick={toggleStatus}
+            onClick={cycleStatus}
             className="h-9 text-xs"
           >
             <Check size={14} />
@@ -826,7 +851,13 @@ export function TrackDetailClient({
               <div className="label-sm text-muted mb-1">QUICK VIEW</div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Status</span>
-                <StatusIndicator color={sColor} label={sLabel} />
+                <button
+                  type="button"
+                  onClick={cycleStatus}
+                  className="cursor-pointer hover:opacity-80 transition-opacity"
+                >
+                  <StatusIndicator color={sColor} label={sLabel} />
+                </button>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted">Loudness</span>

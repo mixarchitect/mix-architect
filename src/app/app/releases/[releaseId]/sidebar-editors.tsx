@@ -7,14 +7,86 @@ import { searchItunesApi, buildPlatformUrl, type ItunesResult } from "@/lib/itun
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { ReferenceCard } from "@/components/ui/reference-card";
+import { StatusIndicator } from "@/components/ui/status-dot";
 import { Pencil, Check, X, ImageIcon, Upload } from "lucide-react";
+
+// ── Status Editor ──
+
+const RELEASE_STATUSES = ["draft", "in_progress", "ready"] as const;
+type ReleaseStatus = (typeof RELEASE_STATUSES)[number];
+
+function releaseStatusColor(s: string): "green" | "orange" | "blue" {
+  if (s === "ready") return "green";
+  if (s === "in_progress") return "orange";
+  return "blue";
+}
+
+function releaseStatusLabel(s: string): string {
+  if (s === "ready") return "Ready";
+  if (s === "in_progress") return "In Progress";
+  return "Draft";
+}
+
+type StatusEditorProps = {
+  releaseId: string;
+  initialStatus: string;
+};
+
+export function StatusEditor({ releaseId, initialStatus }: StatusEditorProps) {
+  const [status, setStatus] = useState<ReleaseStatus>(
+    (RELEASE_STATUSES.includes(initialStatus as ReleaseStatus) ? initialStatus : "draft") as ReleaseStatus,
+  );
+  const router = useRouter();
+
+  async function cycleStatus() {
+    const idx = RELEASE_STATUSES.indexOf(status);
+    const next = RELEASE_STATUSES[(idx + 1) % RELEASE_STATUSES.length];
+    const prev = status;
+    setStatus(next);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error } = await supabase
+        .from("releases")
+        .update({ status: next })
+        .eq("id", releaseId);
+      if (error) throw error;
+      router.refresh();
+    } catch {
+      setStatus(prev);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={cycleStatus}
+      className="cursor-pointer hover:opacity-80 transition-opacity"
+    >
+      <StatusIndicator
+        color={releaseStatusColor(status)}
+        label={releaseStatusLabel(status)}
+      />
+    </button>
+  );
+}
+
+// ── Helper: auto-promote release from draft ──
+
+async function autoPromoteRelease(releaseId: string, currentStatus: string) {
+  if (currentStatus !== "draft") return;
+  const supabase = createSupabaseBrowserClient();
+  await supabase.from("releases").update({ status: "in_progress" }).eq("id", releaseId);
+}
+
+// ── Global Direction Editor ──
 
 type DirectionEditorProps = {
   releaseId: string;
   initialValue: string | null;
+  initialStatus?: string;
 };
 
-export function GlobalDirectionEditor({ releaseId, initialValue }: DirectionEditorProps) {
+export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus }: DirectionEditorProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(initialValue ?? "");
   const [saving, setSaving] = useState(false);
@@ -37,6 +109,7 @@ export function GlobalDirectionEditor({ releaseId, initialValue }: DirectionEdit
         .update({ global_direction: value || null })
         .eq("id", releaseId);
       if (error) throw error;
+      if (initialStatus) await autoPromoteRelease(releaseId, initialStatus);
       setEditing(false);
       router.refresh();
     } catch {
@@ -118,9 +191,10 @@ type Ref = {
 type RefsEditorProps = {
   releaseId: string;
   initialRefs: Ref[];
+  initialStatus?: string;
 };
 
-export function GlobalReferencesEditor({ releaseId, initialRefs }: RefsEditorProps) {
+export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus }: RefsEditorProps) {
   const [refs, setRefs] = useState<Ref[]>(initialRefs);
   const [showForm, setShowForm] = useState(false);
   const [refTitle, setRefTitle] = useState("");
@@ -191,6 +265,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs }: RefsEditorPro
     if (data) {
       setRefs([...refs, data as Ref]);
     }
+    if (initialStatus) await autoPromoteRelease(releaseId, initialStatus);
     resetForm();
     router.refresh();
   }

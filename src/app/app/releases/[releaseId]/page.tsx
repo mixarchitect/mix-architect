@@ -8,23 +8,11 @@ import { StatusIndicator } from "@/components/ui/status-dot";
 import { TrackRow } from "@/components/ui/track-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
-import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor } from "./sidebar-editors";
+import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor } from "./sidebar-editors";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
 };
-
-function statusColor(s: string): "green" | "orange" | "blue" {
-  if (s === "ready") return "green";
-  if (s === "in_progress") return "orange";
-  return "blue";
-}
-
-function statusLabel(s: string): string {
-  if (s === "ready") return "Ready";
-  if (s === "in_progress") return "In Progress";
-  return "Draft";
-}
 
 function typeLabel(t: string | undefined | null): string {
   if (!t) return "—";
@@ -202,10 +190,7 @@ export default async function ReleasePage({ params }: Props) {
                 </div>
                 <div className="flex justify-between text-sm items-center">
                   <span className="text-muted">Status</span>
-                  <StatusIndicator
-                    color={statusColor(release.status)}
-                    label={statusLabel(release.status)}
-                  />
+                  <StatusEditor releaseId={releaseId} initialStatus={release.status} />
                 </div>
                 {release.target_date && (
                   <div className="flex justify-between text-sm">
@@ -233,6 +218,7 @@ export default async function ReleasePage({ params }: Props) {
           <GlobalDirectionEditor
             releaseId={releaseId}
             initialValue={release.global_direction}
+            initialStatus={release.status}
           />
 
           {/* Global References */}
@@ -247,6 +233,7 @@ export default async function ReleasePage({ params }: Props) {
               artwork_url: r.artwork_url as string | null,
               sort_order: (r.sort_order as number) ?? 0,
             }))}
+            initialStatus={release.status}
           />
 
           {/* Client Info */}
