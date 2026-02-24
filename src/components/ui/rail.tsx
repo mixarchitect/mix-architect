@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Settings, LogOut } from "lucide-react";
+import { Home, Settings, LogOut, Search } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 
 type Props = {
   userEmail?: string | null;
+  onSearchClick?: () => void;
 };
 
 const NAV_ITEMS = [
@@ -15,7 +16,7 @@ const NAV_ITEMS = [
   { href: "/app/settings", icon: <Settings size={20} strokeWidth={1.5} />, label: "Settings", exact: false },
 ];
 
-export function Rail({ userEmail }: Props) {
+export function Rail({ userEmail, onSearchClick }: Props) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -60,6 +61,21 @@ export function Rail({ userEmail }: Props) {
           );
         })}
       </div>
+
+      {/* Search trigger */}
+      <button
+        type="button"
+        onClick={onSearchClick}
+        title="Search (Cmd+K)"
+        className={cn(
+          "w-10 h-10 grid place-items-center rounded-md",
+          "text-muted transition-all duration-150",
+          "hover:text-text hover:bg-panel2",
+          "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
+        )}
+      >
+        <Search size={20} strokeWidth={1.5} />
+      </button>
 
       {/* User / sign out */}
       <div className="flex flex-col items-center gap-2">

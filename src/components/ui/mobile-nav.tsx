@@ -3,14 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Settings } from "lucide-react";
+import { Home, Settings, Search } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/app", icon: Home, label: "Home", exact: true },
   { href: "/app/settings", icon: Settings, label: "Settings", exact: false },
 ];
 
-export function MobileNav() {
+type Props = {
+  onSearchClick?: () => void;
+};
+
+export function MobileNav({ onSearchClick }: Props) {
   const pathname = usePathname();
 
   return (
@@ -34,6 +38,14 @@ export function MobileNav() {
           </Link>
         );
       })}
+      <button
+        type="button"
+        onClick={onSearchClick}
+        className="flex flex-col items-center gap-1 px-4 py-2 transition-colors text-muted"
+      >
+        <Search size={20} strokeWidth={1.5} />
+        <span className="text-[10px] font-medium">Search</span>
+      </button>
     </nav>
   );
 }
