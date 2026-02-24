@@ -136,17 +136,14 @@ export default async function DashboardPage({ searchParams }: Props) {
               ({earnedCount} of {feeReleaseCount} paid)
             </span>
           </span>
-        </div>
-      )}
-
-      {activeFilter && (
-        <div className="flex items-center gap-2 mb-4 text-xs text-muted">
-          <span>
-            Showing {activeFilter} releases ({displayReleases?.length ?? 0})
-          </span>
-          <Link href="/app" className="text-signal hover:underline">
-            Show all
-          </Link>
+          {activeFilter && (
+            <span className="basis-full flex items-center gap-2 text-muted pt-1 border-t border-border mt-1">
+              Showing {activeFilter} releases ({displayReleases?.length ?? 0})
+              <Link href="/app" className="text-signal hover:underline">
+                Show all
+              </Link>
+            </span>
+          )}
         </div>
       )}
 
