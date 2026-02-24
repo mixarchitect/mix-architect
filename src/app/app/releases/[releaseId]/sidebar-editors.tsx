@@ -616,3 +616,166 @@ export function CoverArtEditor({ releaseId, initialUrl }: CoverArtEditorProps) {
     </button>
   );
 }
+
+// ── Payment Editor ──
+
+const PAYMENT_STATUSES = ["unpaid", "partial", "paid"] as const;
+type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
+
+function paymentStatusColor(s: string): "green" | "orange" | "blue" {
+  if (s === "paid") return "green";
+  if (s === "partial") return "orange";
+  return "blue";
+}
+
+function paymentStatusLabel(s: string): string {
+  if (s === "paid") return "Paid";
+  if (s === "partial") return "Partial";
+  return "Unpaid";
+}
+
+function formatCurrency(amount: number | null, currency: string): string {
+  if (amount == null) return "\u2014";
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
+}
+
+type PaymentEditorProps = {
+  releaseId: string;
+  initialPaymentStatus: string;
+  initialFeeTotal: number | null;
+  initialFeeCurrency: string;
+  initialPaymentNotes: string | null;
+};
+
+export function PaymentEditor({
+  releaseId,
+  initialPaymentStatus,
+  initialFeeTotal,
+  initialFeeCurrency,
+  initialPaymentNotes,
+}: PaymentEditorProps) {
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
+    (PAYMENT_STATUSES.includes(initialPaymentStatus as PaymentStatus) ? initialPaymentStatus : "unpaid") as PaymentStatus,
+  );
+  const [feeTotal, setFeeTotal] = useState(initialFeeTotal);
+  const [editingFee, setEditingFee] = useState(false);
+  const [feeInput, setFeeInput] = useState(initialFeeTotal != null ? String(initialFeeTotal) : "");
+  const router = useRouter();
+
+  async function cyclePaymentStatus() {
+    const idx = PAYMENT_STATUSES.indexOf(paymentStatus);
+    const next = PAYMENT_STATUSES[(idx + 1) % PAYMENT_STATUSES.length];
+    const prev = paymentStatus;
+    setPaymentStatus(next);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error } = await supabase
+        .from("releases")
+        .update({ payment_status: next })
+        .eq("id", releaseId);
+      if (error) throw error;
+      router.refresh();
+    } catch {
+      setPaymentStatus(prev);
+    }
+  }
+
+  async function saveFee() {
+    const parsed = feeInput.trim() ? parseFloat(feeInput) : null;
+    if (feeInput.trim() && isNaN(parsed!)) return;
+    const prev = feeTotal;
+    setFeeTotal(parsed);
+    setEditingFee(false);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error } = await supabase
+        .from("releases")
+        .update({ fee_total: parsed })
+        .eq("id", releaseId);
+      if (error) throw error;
+      router.refresh();
+    } catch {
+      setFeeTotal(prev);
+    }
+  }
+
+  return (
+    <Panel>
+      <PanelBody className="py-5 space-y-3">
+        <div className="label-sm text-muted mb-1">PAYMENT</div>
+        <div className="space-y-3">
+          <div className="flex justify-between text-sm items-center">
+            <span className="text-muted">Status</span>
+            <button
+              type="button"
+              onClick={cyclePaymentStatus}
+              className="cursor-pointer hover:opacity-80 transition-opacity"
+            >
+              <StatusIndicator
+                color={paymentStatusColor(paymentStatus)}
+                label={paymentStatusLabel(paymentStatus)}
+              />
+            </button>
+          </div>
+          <div className="flex justify-between text-sm items-center">
+            <span className="text-muted">Fee</span>
+            {editingFee ? (
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={feeInput}
+                  onChange={(e) => setFeeInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveFee();
+                    if (e.key === "Escape") {
+                      setFeeInput(feeTotal != null ? String(feeTotal) : "");
+                      setEditingFee(false);
+                    }
+                  }}
+                  className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
+                  autoFocus
+                  placeholder="0.00"
+                />
+                <button
+                  type="button"
+                  onClick={saveFee}
+                  className="text-signal hover:opacity-80 transition-opacity"
+                >
+                  <Check size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFeeInput(feeTotal != null ? String(feeTotal) : "");
+                    setEditingFee(false);
+                  }}
+                  className="text-muted hover:text-text transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setFeeInput(feeTotal != null ? String(feeTotal) : "");
+                  setEditingFee(true);
+                }}
+                className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                {formatCurrency(feeTotal, initialFeeCurrency)}
+              </button>
+            )}
+          </div>
+          {initialPaymentNotes && (
+            <div className="text-xs text-muted italic pt-1 border-t border-border/50">
+              {initialPaymentNotes}
+            </div>
+          )}
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}

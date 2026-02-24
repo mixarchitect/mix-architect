@@ -4,11 +4,10 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Pill } from "@/components/ui/pill";
-import { StatusIndicator } from "@/components/ui/status-dot";
 import { TrackRow } from "@/components/ui/track-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
-import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor } from "./sidebar-editors";
+import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
@@ -25,23 +24,6 @@ function formatLabel(f: string | undefined | null): string {
   if (f === "atmos") return "Dolby Atmos";
   if (f === "both") return "Stereo + Atmos";
   return "Stereo";
-}
-
-function paymentStatusColor(s: string): "green" | "orange" | "blue" {
-  if (s === "paid") return "green";
-  if (s === "partial") return "orange";
-  return "blue";
-}
-
-function paymentStatusLabel(s: string): string {
-  if (s === "paid") return "Paid";
-  if (s === "partial") return "Partial";
-  return "Unpaid";
-}
-
-function formatCurrency(amount: number | null, currency: string): string {
-  if (amount == null) return "\u2014";
-  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
 }
 
 export default async function ReleasePage({ params }: Props) {
@@ -263,31 +245,13 @@ export default async function ReleasePage({ params }: Props) {
 
           {/* Payment */}
           {paymentsEnabled && (
-            <Panel>
-              <PanelBody className="py-5 space-y-3">
-                <div className="label-sm text-muted mb-1">PAYMENT</div>
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm items-center">
-                    <span className="text-muted">Status</span>
-                    <StatusIndicator
-                      color={paymentStatusColor(release.payment_status ?? "unpaid")}
-                      label={paymentStatusLabel(release.payment_status ?? "unpaid")}
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted">Fee</span>
-                    <span className="text-text font-mono text-xs">
-                      {formatCurrency(release.fee_total, release.fee_currency ?? "USD")}
-                    </span>
-                  </div>
-                  {release.payment_notes && (
-                    <div className="text-xs text-muted italic pt-1 border-t border-border/50">
-                      {release.payment_notes}
-                    </div>
-                  )}
-                </div>
-              </PanelBody>
-            </Panel>
+            <PaymentEditor
+              releaseId={releaseId}
+              initialPaymentStatus={release.payment_status ?? "unpaid"}
+              initialFeeTotal={release.fee_total}
+              initialFeeCurrency={release.fee_currency ?? "USD"}
+              initialPaymentNotes={release.payment_notes}
+            />
           )}
         </aside>
       </div>
