@@ -543,100 +543,112 @@ export function TrackDetailClient({
 
           {/* Specs */}
           {activeTab === "specs" && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-1.5">
-                  <label className="label text-muted">Target loudness</label>
-                  <select
-                    value={loudness}
-                    onChange={(e) => {
-                      setLoudness(e.target.value);
-                      saveSpecs({ target_loudness: e.target.value });
-                    }}
-                    className="input"
-                  >
-                    <option value="-14 LUFS">-14 LUFS — Spotify / YouTube</option>
-                    <option value="-16 LUFS">-16 LUFS — Apple Music / Tidal</option>
-                    <option value="-12 LUFS">-12 LUFS — Louder master</option>
-                    <option value="-11 LUFS">-11 LUFS — Club / DJ</option>
-                    <option value="-9 LUFS">-9 LUFS — Competitive / radio</option>
-                    <option value="-23 LUFS">-23 LUFS — Broadcast (EBU R128)</option>
-                    <option value="-24 LUFS">-24 LUFS — Broadcast (ATSC A/85)</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="label text-muted">Format</label>
-                  <select
-                    value={formatOverride || releaseFormat}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      const isRelease = val === releaseFormat;
-                      setFormatOverride(isRelease ? "" : val);
-                      saveSpecs({ format_override: isRelease ? null : val });
-                    }}
-                    className="input"
-                  >
-                    <option value="stereo">Stereo</option>
-                    <option value="atmos">Dolby Atmos</option>
-                    <option value="both">Stereo + Atmos</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="label text-muted">Sample rate</label>
-                  <select
-                    value={sampleRate}
-                    onChange={(e) => {
-                      setSampleRate(e.target.value);
-                      saveSpecs({ sample_rate: e.target.value });
-                    }}
-                    className="input"
-                  >
-                    <option value="44.1 kHz">44.1 kHz</option>
-                    <option value="48 kHz">48 kHz</option>
-                    <option value="88.2 kHz">88.2 kHz</option>
-                    <option value="96 kHz">96 kHz</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="label text-muted">Bit depth</label>
-                  <select
-                    value={bitDepth}
-                    onChange={(e) => {
-                      setBitDepth(e.target.value);
-                      saveSpecs({ bit_depth: e.target.value });
-                    }}
-                    className="input"
-                  >
-                    <option value="16-bit">16-bit</option>
-                    <option value="24-bit">24-bit</option>
-                    <option value="32-bit float">32-bit float</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="label text-muted">Delivery formats</label>
-                <DeliveryFormatSelector
-                  value={deliveryFormats}
-                  onChange={(next) => {
-                    setDeliveryFormats(next);
-                    saveSpecs({ delivery_formats: next });
-                  }}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="label text-muted">Special requirements</label>
-                <textarea
-                  value={specialReqs}
-                  onChange={(e) => {
-                    setSpecialReqs(e.target.value);
-                    saveSpecs({ special_reqs: e.target.value });
-                  }}
-                  placeholder="e.g., Radio edit needed, TV sync version, vinyl master, stems for remix..."
-                  className="input min-h-[100px] resize-y text-sm"
-                />
-              </div>
+            <div className="space-y-4">
+              <Panel>
+                <PanelBody className="py-5">
+                  <div className="label-sm text-muted mb-4">Technical settings</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Target loudness</label>
+                      <select
+                        value={loudness}
+                        onChange={(e) => {
+                          setLoudness(e.target.value);
+                          saveSpecs({ target_loudness: e.target.value });
+                        }}
+                        className="input"
+                      >
+                        <option value="-14 LUFS">-14 LUFS — Spotify / YouTube</option>
+                        <option value="-16 LUFS">-16 LUFS — Apple Music / Tidal</option>
+                        <option value="-12 LUFS">-12 LUFS — Louder master</option>
+                        <option value="-11 LUFS">-11 LUFS — Club / DJ</option>
+                        <option value="-9 LUFS">-9 LUFS — Competitive / radio</option>
+                        <option value="-23 LUFS">-23 LUFS — Broadcast (EBU R128)</option>
+                        <option value="-24 LUFS">-24 LUFS — Broadcast (ATSC A/85)</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Format</label>
+                      <select
+                        value={formatOverride || releaseFormat}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const isRelease = val === releaseFormat;
+                          setFormatOverride(isRelease ? "" : val);
+                          saveSpecs({ format_override: isRelease ? null : val });
+                        }}
+                        className="input"
+                      >
+                        <option value="stereo">Stereo</option>
+                        <option value="atmos">Dolby Atmos</option>
+                        <option value="both">Stereo + Atmos</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Sample rate</label>
+                      <select
+                        value={sampleRate}
+                        onChange={(e) => {
+                          setSampleRate(e.target.value);
+                          saveSpecs({ sample_rate: e.target.value });
+                        }}
+                        className="input"
+                      >
+                        <option value="44.1 kHz">44.1 kHz</option>
+                        <option value="48 kHz">48 kHz</option>
+                        <option value="88.2 kHz">88.2 kHz</option>
+                        <option value="96 kHz">96 kHz</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Bit depth</label>
+                      <select
+                        value={bitDepth}
+                        onChange={(e) => {
+                          setBitDepth(e.target.value);
+                          saveSpecs({ bit_depth: e.target.value });
+                        }}
+                        className="input"
+                      >
+                        <option value="16-bit">16-bit</option>
+                        <option value="24-bit">24-bit</option>
+                        <option value="32-bit float">32-bit float</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  </div>
+                </PanelBody>
+              </Panel>
+              <Panel>
+                <PanelBody className="py-5">
+                  <div className="label-sm text-muted mb-4">Delivery</div>
+                  <div className="space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Delivery formats</label>
+                      <DeliveryFormatSelector
+                        value={deliveryFormats}
+                        onChange={(next) => {
+                          setDeliveryFormats(next);
+                          saveSpecs({ delivery_formats: next });
+                        }}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Special requirements</label>
+                      <textarea
+                        value={specialReqs}
+                        onChange={(e) => {
+                          setSpecialReqs(e.target.value);
+                          saveSpecs({ special_reqs: e.target.value });
+                        }}
+                        placeholder="e.g., Radio edit needed, TV sync version, vinyl master, stems for remix..."
+                        className="input min-h-[100px] resize-y text-sm"
+                      />
+                    </div>
+                  </div>
+                </PanelBody>
+              </Panel>
             </div>
           )}
 
