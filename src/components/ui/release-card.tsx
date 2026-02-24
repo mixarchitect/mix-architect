@@ -19,6 +19,10 @@ type Props = {
   trackCount: number;
   completedTracks: number;
   updatedAt?: string | null;
+  paymentStatus?: string | null;
+  feeTotal?: number | null;
+  feeCurrency?: string | null;
+  paymentsEnabled?: boolean;
   className?: string;
 };
 
@@ -58,7 +62,9 @@ function relativeTime(dateStr: string): string {
 
 export function ReleaseCard({
   id, title, artist, releaseType, format, status,
-  trackCount, completedTracks, updatedAt, className,
+  trackCount, completedTracks, updatedAt,
+  paymentStatus, feeTotal, feeCurrency, paymentsEnabled,
+  className,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -195,7 +201,20 @@ export function ReleaseCard({
           <span className="font-mono">
             {completedTracks} of {trackCount} track{trackCount !== 1 ? "s" : ""} briefed
           </span>
-          {updatedAt && <span>{relativeTime(updatedAt)}</span>}
+          <div className="flex items-center gap-2">
+            {paymentsEnabled && paymentStatus && (
+              <span className={cn(
+                "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium",
+                paymentStatus === "paid" && "bg-green-100 text-green-700",
+                paymentStatus === "partial" && "bg-amber-100 text-amber-700",
+                paymentStatus === "unpaid" && "bg-zinc-100 text-zinc-500",
+              )}>
+                {paymentStatus === "paid" ? "Paid" : paymentStatus === "partial" ? "Partial" : "Unpaid"}
+                {feeTotal != null && ` \u2022 ${new Intl.NumberFormat("en-US", { style: "currency", currency: feeCurrency || "USD" }).format(feeTotal)}`}
+              </span>
+            )}
+            {updatedAt && <span>{relativeTime(updatedAt)}</span>}
+          </div>
         </div>
       </Link>
     </div>

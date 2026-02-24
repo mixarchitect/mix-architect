@@ -55,6 +55,10 @@ ALTER TABLE releases ADD COLUMN IF NOT EXISTS client_name text;
 ALTER TABLE releases ADD COLUMN IF NOT EXISTS client_email text;
 ALTER TABLE releases ADD COLUMN IF NOT EXISTS delivery_notes text;
 ALTER TABLE releases ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+ALTER TABLE releases ADD COLUMN IF NOT EXISTS fee_total numeric(10,2);
+ALTER TABLE releases ADD COLUMN IF NOT EXISTS fee_currency text DEFAULT 'USD';
+ALTER TABLE releases ADD COLUMN IF NOT EXISTS payment_status text DEFAULT 'unpaid';
+ALTER TABLE releases ADD COLUMN IF NOT EXISTS payment_notes text;
 
 DROP TRIGGER IF EXISTS releases_updated_at ON releases;
 CREATE TRIGGER releases_updated_at
@@ -73,6 +77,9 @@ CREATE TABLE IF NOT EXISTS tracks (
   created_at    timestamptz NOT NULL DEFAULT now(),
   updated_at    timestamptz NOT NULL DEFAULT now()
 );
+
+ALTER TABLE tracks ADD COLUMN IF NOT EXISTS fee numeric(10,2);
+ALTER TABLE tracks ADD COLUMN IF NOT EXISTS fee_paid boolean DEFAULT false;
 
 DROP TRIGGER IF EXISTS tracks_updated_at ON tracks;
 CREATE TRIGGER tracks_updated_at
@@ -162,8 +169,11 @@ CREATE TABLE IF NOT EXISTS user_defaults (
                          CHECK (default_format IN ('stereo', 'atmos', 'both')),
   default_elements     text[] DEFAULT '{"Kick","Snare","Bass","Guitars","Keys/Synths","Lead Vocal","BGVs","FX/Ear Candy"}',
   default_sample_rate  text DEFAULT '48kHz',
-  default_bit_depth    text DEFAULT '24-bit'
+  default_bit_depth    text DEFAULT '24-bit',
+  payments_enabled     boolean DEFAULT false
 );
+
+ALTER TABLE user_defaults ADD COLUMN IF NOT EXISTS payments_enabled boolean DEFAULT false;
 
 -- ── TABLE: brief_shares ─────────────────────────────────────────
 

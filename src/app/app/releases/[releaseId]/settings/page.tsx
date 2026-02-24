@@ -31,6 +31,14 @@ const STATUS_OPTIONS = [
   { value: "ready", label: "Ready" },
 ];
 
+const PAYMENT_STATUS_OPTIONS = [
+  { value: "unpaid", label: "Unpaid" },
+  { value: "partial", label: "Partial" },
+  { value: "paid", label: "Paid" },
+];
+
+const CURRENCY_OPTIONS = ["USD", "EUR", "GBP", "CAD", "AUD"];
+
 export default function ReleaseSettingsPage({ params }: Props) {
   const { releaseId } = use(params);
   const supabase = createSupabaseBrowserClient();
@@ -51,14 +59,18 @@ export default function ReleaseSettingsPage({ params }: Props) {
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [deliveryNotes, setDeliveryNotes] = useState("");
+  const [paymentsEnabled, setPaymentsEnabled] = useState(false);
+  const [feeTotal, setFeeTotal] = useState("");
+  const [feeCurrency, setFeeCurrency] = useState("USD");
+  const [paymentStatus, setPaymentStatus] = useState("unpaid");
+  const [paymentNotes, setPaymentNotes] = useState("");
 
   useEffect(() => {
     async function load() {
-      const { data } = await supabase
-        .from("releases")
-        .select("*")
-        .eq("id", releaseId)
-        .maybeSingle();
+      const [{ data }, { data: { user } }] = await Promise.all([
+        supabase.from("releases").select("*").eq("id", releaseId).maybeSingle(),
+        supabase.auth.getUser(),
+      ]);
 
       if (data) {
         setTitle(data.title ?? "");
@@ -72,7 +84,21 @@ export default function ReleaseSettingsPage({ params }: Props) {
         setClientName(data.client_name ?? "");
         setClientEmail(data.client_email ?? "");
         setDeliveryNotes(data.delivery_notes ?? "");
+        setFeeTotal(data.fee_total != null ? String(data.fee_total) : "");
+        setFeeCurrency(data.fee_currency ?? "USD");
+        setPaymentStatus(data.payment_status ?? "unpaid");
+        setPaymentNotes(data.payment_notes ?? "");
       }
+
+      if (user) {
+        const { data: defaults } = await supabase
+          .from("user_defaults")
+          .select("payments_enabled")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        setPaymentsEnabled(defaults?.payments_enabled ?? false);
+      }
+
       setLoading(false);
     }
     load();
@@ -96,6 +122,10 @@ export default function ReleaseSettingsPage({ params }: Props) {
           client_name: clientName || null,
           client_email: clientEmail || null,
           delivery_notes: deliveryNotes || null,
+          fee_total: feeTotal ? parseFloat(feeTotal) : null,
+          fee_currency: feeCurrency,
+          payment_status: paymentStatus,
+          payment_notes: paymentNotes || null,
         })
         .eq("id", releaseId);
 
@@ -245,6 +275,56 @@ export default function ReleaseSettingsPage({ params }: Props) {
               placeholder="Global delivery specs..."
             />
           </div>
+
+          {paymentsEnabled && (
+            <>
+              <Rule />
+              <div className="label text-faint text-[10px]">PAYMENT</div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="label text-faint">Project fee</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={feeTotal}
+                    onChange={(e) => setFeeTotal(e.target.value)}
+                    className="input"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="label text-faint">Currency</label>
+                  <select
+                    value={feeCurrency}
+                    onChange={(e) => setFeeCurrency(e.target.value)}
+                    className="input"
+                  >
+                    {CURRENCY_OPTIONS.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="label text-faint">Payment status</label>
+                <SegmentedControl
+                  options={PAYMENT_STATUS_OPTIONS}
+                  value={paymentStatus}
+                  onChange={setPaymentStatus}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="label text-faint">Payment notes</label>
+                <textarea
+                  value={paymentNotes}
+                  onChange={(e) => setPaymentNotes(e.target.value)}
+                  className="input min-h-[60px] resize-y text-sm"
+                  placeholder="Payment terms, deposit info, due date..."
+                />
+              </div>
+            </>
+          )}
 
           {error && (
             <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">

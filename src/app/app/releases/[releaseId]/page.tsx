@@ -39,6 +39,23 @@ function formatLabel(f: string | undefined | null): string {
   return "Stereo";
 }
 
+function paymentStatusColor(s: string): "green" | "orange" | "blue" {
+  if (s === "paid") return "green";
+  if (s === "partial") return "orange";
+  return "blue";
+}
+
+function paymentStatusLabel(s: string): string {
+  if (s === "paid") return "Paid";
+  if (s === "partial") return "Partial";
+  return "Unpaid";
+}
+
+function formatCurrency(amount: number | null, currency: string): string {
+  if (amount == null) return "\u2014";
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
+}
+
 export default async function ReleasePage({ params }: Props) {
   const { releaseId } = await params;
   const supabase = await createSupabaseServerClient();
@@ -50,6 +67,19 @@ export default async function ReleasePage({ params }: Props) {
     .maybeSingle();
 
   if (!release) notFound();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let paymentsEnabled = false;
+  if (user) {
+    const { data: defaults } = await supabase
+      .from("user_defaults")
+      .select("payments_enabled")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    paymentsEnabled = defaults?.payments_enabled ?? false;
+  }
 
   const { data: tracks } = await supabase
     .from("tracks")
@@ -256,6 +286,35 @@ export default async function ReleasePage({ params }: Props) {
                       <span className="text-text font-mono text-xs">
                         {release.client_email}
                       </span>
+                    </div>
+                  )}
+                </div>
+              </PanelBody>
+            </Panel>
+          )}
+
+          {/* Payment */}
+          {paymentsEnabled && (
+            <Panel>
+              <PanelBody className="py-5 space-y-3">
+                <div className="label text-faint text-[10px] mb-1">PAYMENT</div>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm items-center">
+                    <span className="text-muted">Status</span>
+                    <StatusIndicator
+                      color={paymentStatusColor(release.payment_status ?? "unpaid")}
+                      label={paymentStatusLabel(release.payment_status ?? "unpaid")}
+                    />
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted">Fee</span>
+                    <span className="text-text font-mono text-xs">
+                      {formatCurrency(release.fee_total, release.fee_currency ?? "USD")}
+                    </span>
+                  </div>
+                  {release.payment_notes && (
+                    <div className="text-xs text-muted italic pt-1 border-t border-border/50">
+                      {release.payment_notes}
                     </div>
                   )}
                 </div>

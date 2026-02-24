@@ -8,5 +8,19 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return <Shell userEmail={user?.email ?? null}>{children}</Shell>;
+  let paymentsEnabled = false;
+  if (user) {
+    const { data: defaults } = await supabase
+      .from("user_defaults")
+      .select("payments_enabled")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    paymentsEnabled = defaults?.payments_enabled ?? false;
+  }
+
+  return (
+    <Shell userEmail={user?.email ?? null} paymentsEnabled={paymentsEnabled}>
+      {children}
+    </Shell>
+  );
 }

@@ -50,6 +50,8 @@ type TrackData = {
   title: string;
   status: string;
   track_number: number;
+  fee?: number | null;
+  fee_paid?: boolean;
 };
 type IntentData = {
   mix_vision?: string;
@@ -93,6 +95,7 @@ type Props = {
   releaseId: string;
   releaseTitle: string;
   releaseFormat: string;
+  paymentsEnabled?: boolean;
   track: TrackData;
   intent: IntentData;
   specs: SpecsData;
@@ -102,7 +105,7 @@ type Props = {
 };
 
 export function TrackDetailClient({
-  releaseId, releaseTitle, releaseFormat,
+  releaseId, releaseTitle, releaseFormat, paymentsEnabled,
   track, intent, specs, elements, notes, references,
 }: Props) {
   const [activeTab, setActiveTab] = useState("intent");
@@ -142,6 +145,8 @@ export function TrackDetailClient({
   const itunesDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [trackStatus, setTrackStatus] = useState(track.status);
+  const [trackFee, setTrackFee] = useState(track.fee != null ? String(track.fee) : "");
+  const [trackFeePaid, setTrackFeePaid] = useState(track.fee_paid ?? false);
 
   const supabase = createSupabaseBrowserClient();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -809,6 +814,46 @@ export function TrackDetailClient({
                   })()
                 }</Pill>
               </div>
+              {paymentsEnabled && (
+                <>
+                  <div className="flex justify-between text-sm items-center">
+                    <span className="text-muted">Fee</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={trackFee}
+                      onChange={(e) => {
+                        setTrackFee(e.target.value);
+                        const val = e.target.value ? parseFloat(e.target.value) : null;
+                        supabase.from("tracks").update({ fee: val }).eq("id", track.id);
+                      }}
+                      placeholder="0.00"
+                      className="w-20 text-right text-xs font-mono text-text bg-transparent border-b border-border outline-none focus:border-signal py-0.5"
+                    />
+                  </div>
+                  <div className="flex justify-between text-sm items-center">
+                    <span className="text-muted">Paid</span>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const next = !trackFeePaid;
+                        setTrackFeePaid(next);
+                        await supabase.from("tracks").update({ fee_paid: next }).eq("id", track.id);
+                      }}
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                        trackFeePaid ? "bg-green-500" : "bg-border-strong"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+                          trackFeePaid ? "translate-x-4.5" : "translate-x-0.5"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </>
+              )}
             </PanelBody>
           </Panel>
 

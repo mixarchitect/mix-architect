@@ -2,16 +2,61 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
+import { StatTile } from "@/components/ui/stat-tile";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Plus } from "lucide-react";
 
+function formatMoney(amount: number, currency = "USD") {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+}
+
 export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  let paymentsEnabled = false;
+  if (user) {
+    const { data: defaults } = await supabase
+      .from("user_defaults")
+      .select("payments_enabled")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    paymentsEnabled = defaults?.payments_enabled ?? false;
+  }
 
   const { data: releases } = await supabase
     .from("releases")
     .select("*, tracks(id, status)")
     .order("updated_at", { ascending: false });
+
+  let outstandingTotal = 0;
+  let outstandingCount = 0;
+  let earnedTotal = 0;
+  let earnedCount = 0;
+  let feeGrandTotal = 0;
+  let feeReleaseCount = 0;
+  let primaryCurrency = "USD";
+
+  if (releases) {
+    for (const r of releases) {
+      const fee = r.fee_total as number | null;
+      const status = (r.payment_status as string) ?? "unpaid";
+      if (fee != null) {
+        if (!feeReleaseCount) primaryCurrency = (r.fee_currency as string) || "USD";
+        feeReleaseCount++;
+        feeGrandTotal += fee;
+        if (status === "paid") {
+          earnedTotal += fee;
+          earnedCount++;
+        } else {
+          outstandingTotal += fee;
+          outstandingCount++;
+        }
+      }
+    }
+  }
+
+  const hasAnyFees = feeReleaseCount > 0;
 
   return (
     <div>
@@ -24,6 +69,27 @@ export default async function DashboardPage() {
           </Button>
         </Link>
       </div>
+
+      {paymentsEnabled && hasAnyFees && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <StatTile
+            variant="accent"
+            label="OUTSTANDING"
+            value={formatMoney(outstandingTotal, primaryCurrency)}
+            note={`${outstandingCount} release${outstandingCount !== 1 ? "s" : ""}`}
+          />
+          <StatTile
+            label="EARNED"
+            value={formatMoney(earnedTotal, primaryCurrency)}
+            note={`${earnedCount} release${earnedCount !== 1 ? "s" : ""}`}
+          />
+          <StatTile
+            label="TOTAL"
+            value={formatMoney(feeGrandTotal, primaryCurrency)}
+            note={`${earnedCount} of ${feeReleaseCount} paid`}
+          />
+        </div>
+      )}
 
       {releases && releases.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -43,6 +109,10 @@ export default async function DashboardPage() {
                 trackCount={trackCount}
                 completedTracks={completedTracks}
                 updatedAt={r.updated_at as string | null}
+                paymentsEnabled={paymentsEnabled}
+                paymentStatus={r.payment_status as string | null}
+                feeTotal={r.fee_total as number | null}
+                feeCurrency={r.fee_currency as string | null}
               />
             );
           })}

@@ -33,6 +33,7 @@ export default function SettingsPage() {
     "Kick", "Snare", "Bass", "Guitars", "Keys/Synths",
     "Lead Vocal", "BGVs", "FX/Ear Candy",
   ]);
+  const [paymentsEnabled, setPaymentsEnabled] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -55,6 +56,7 @@ export default function SettingsPage() {
           setSampleRate(data.default_sample_rate ?? "48kHz");
           setBitDepth(data.default_bit_depth ?? "24-bit");
           setDefaultElements(data.default_elements ?? []);
+          setPaymentsEnabled(data.payments_enabled ?? false);
         }
       }
       setLoading(false);
@@ -78,6 +80,7 @@ export default function SettingsPage() {
           default_sample_rate: sampleRate,
           default_bit_depth: bitDepth,
           default_elements: defaultElements,
+          payments_enabled: paymentsEnabled,
         },
         { onConflict: "user_id" },
       );
@@ -200,6 +203,41 @@ export default function SettingsPage() {
 
             <Button variant="primary" onClick={handleSave}>
               Save Defaults
+            </Button>
+          </PanelBody>
+        </Panel>
+
+        {/* Payment Tracking */}
+        <Panel>
+          <PanelHeader>
+            <h2 className="text-base font-semibold text-text">Payment Tracking</h2>
+            <p className="text-sm text-muted mt-1">
+              Track fees and payment status on releases and tracks. Turn this off if you&apos;re mixing your own projects.
+            </p>
+          </PanelHeader>
+          <Rule />
+          <PanelBody className="pt-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-text">Enable payment tracking</div>
+                <div className="text-xs text-muted mt-0.5">Shows fee and paid/unpaid status on releases and tracks</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPaymentsEnabled(!paymentsEnabled)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  paymentsEnabled ? "bg-signal" : "bg-border-strong"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+                    paymentsEnabled ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
+            <Button variant="primary" onClick={handleSave}>
+              Save Settings
             </Button>
           </PanelBody>
         </Panel>
