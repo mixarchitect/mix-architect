@@ -51,8 +51,6 @@ type TrackData = {
   title: string;
   status: string;
   track_number: number;
-  fee?: number | null;
-  fee_paid?: boolean;
 };
 type IntentData = {
   mix_vision?: string;
@@ -97,7 +95,6 @@ type Props = {
   releaseTitle: string;
   releaseFormat: string;
   releaseCoverArt?: string | null;
-  paymentsEnabled?: boolean;
   track: TrackData;
   intent: IntentData;
   specs: SpecsData;
@@ -107,7 +104,7 @@ type Props = {
 };
 
 export function TrackDetailClient({
-  releaseId, releaseTitle, releaseFormat, releaseCoverArt, paymentsEnabled,
+  releaseId, releaseTitle, releaseFormat, releaseCoverArt,
   track, intent, specs, elements, notes, references,
 }: Props) {
   const [activeTab, setActiveTab] = useState("intent");
@@ -147,8 +144,6 @@ export function TrackDetailClient({
   const itunesDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [trackStatus, setTrackStatus] = useState(track.status);
-  const [trackFee, setTrackFee] = useState(track.fee != null ? String(track.fee) : "");
-  const [trackFeePaid, setTrackFeePaid] = useState(track.fee_paid ?? false);
 
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -451,7 +446,7 @@ export function TrackDetailClient({
             <div className="space-y-6">
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="label text-faint">
+                  <label className="label-sm text-muted">
                     What should this track feel like?
                   </label>
                   {!editingVision && mixVision && (
@@ -516,7 +511,7 @@ export function TrackDetailClient({
                 )}
               </div>
               <div className="space-y-1.5">
-                <label className="label text-faint">Emotional qualities</label>
+                <label className="label-sm text-muted">Emotional qualities</label>
                 <TagInput
                   value={emotionalTags}
                   onChange={(tags) => {
@@ -528,7 +523,7 @@ export function TrackDetailClient({
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="label text-faint">Anti-references</label>
+                <label className="label-sm text-muted">Anti-references</label>
                 <textarea
                   value={antiRefs}
                   onChange={(e) => {
@@ -547,7 +542,7 @@ export function TrackDetailClient({
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
-                  <label className="label text-faint">Target loudness</label>
+                  <label className="label text-muted">Target loudness</label>
                   <select
                     value={loudness}
                     onChange={(e) => {
@@ -566,7 +561,7 @@ export function TrackDetailClient({
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="label text-faint">Format</label>
+                  <label className="label text-muted">Format</label>
                   <select
                     value={formatOverride || releaseFormat}
                     onChange={(e) => {
@@ -583,7 +578,7 @@ export function TrackDetailClient({
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="label text-faint">Sample rate</label>
+                  <label className="label text-muted">Sample rate</label>
                   <select
                     value={sampleRate}
                     onChange={(e) => {
@@ -600,7 +595,7 @@ export function TrackDetailClient({
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="label text-faint">Bit depth</label>
+                  <label className="label text-muted">Bit depth</label>
                   <select
                     value={bitDepth}
                     onChange={(e) => {
@@ -617,7 +612,7 @@ export function TrackDetailClient({
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="label text-faint">Delivery formats</label>
+                <label className="label text-muted">Delivery formats</label>
                 <DeliveryFormatSelector
                   value={deliveryFormats}
                   onChange={(next) => {
@@ -627,7 +622,7 @@ export function TrackDetailClient({
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="label text-faint">Special requirements</label>
+                <label className="label text-muted">Special requirements</label>
                 <textarea
                   value={specialReqs}
                   onChange={(e) => {
@@ -656,7 +651,7 @@ export function TrackDetailClient({
                 {/* Version header */}
                 <div className="flex items-center justify-between p-3 rounded-md border border-border bg-panel2">
                   <div className="flex items-center gap-3">
-                    <label className="label-sm text-faint">Mix Version</label>
+                    <label className="label-sm text-muted">Mix Version</label>
                     <select
                       value={activeVersion}
                       onChange={(e) => setActiveVersion(e.target.value)}
@@ -811,8 +806,8 @@ export function TrackDetailClient({
         {/* ── Inspector sidebar ── */}
         <aside className="space-y-4">
           <Panel>
-            <PanelBody className="py-4 space-y-3">
-              <div className="label-sm text-faint mb-1">QUICK VIEW</div>
+            <PanelBody className="py-5 space-y-3">
+              <div className="label-sm text-muted mb-1">QUICK VIEW</div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Status</span>
                 <StatusIndicator color={sColor} label={sLabel} />
@@ -832,53 +827,13 @@ export function TrackDetailClient({
                   })()
                 }</Pill>
               </div>
-              {paymentsEnabled && (
-                <>
-                  <div className="flex justify-between text-sm items-center">
-                    <span className="text-muted">Fee</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={trackFee}
-                      onChange={(e) => {
-                        setTrackFee(e.target.value);
-                        const val = e.target.value ? parseFloat(e.target.value) : null;
-                        autoSave("tracks", { fee: val }, "id", track.id);
-                      }}
-                      placeholder="0.00"
-                      className="w-20 text-right text-xs font-mono text-text bg-transparent border-b border-border outline-none focus:border-signal py-0.5"
-                    />
-                  </div>
-                  <div className="flex justify-between text-sm items-center">
-                    <span className="text-muted">Paid</span>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        const next = !trackFeePaid;
-                        setTrackFeePaid(next);
-                        await supabase.from("tracks").update({ fee_paid: next }).eq("id", track.id);
-                      }}
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                        trackFeePaid ? "bg-green-500" : "bg-border-strong"
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
-                          trackFeePaid ? "translate-x-4.5" : "translate-x-0.5"
-                        }`}
-                      />
-                    </button>
-                  </div>
-                </>
-              )}
             </PanelBody>
           </Panel>
 
           <Panel>
             <PanelBody className="py-4 space-y-3">
               <div className="flex items-center justify-between">
-                <div className="label-sm text-faint">REFERENCES</div>
+                <div className="label-sm text-muted">REFERENCES</div>
                 <button
                   type="button"
                   onClick={() => setShowRefForm(!showRefForm)}

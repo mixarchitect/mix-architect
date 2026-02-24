@@ -18,17 +18,6 @@ export default async function TrackDetailPage({ params }: Props) {
 
   if (!track) notFound();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  let paymentsEnabled = false;
-  if (user) {
-    const { data: defaults } = await supabase
-      .from("user_defaults")
-      .select("payments_enabled")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    paymentsEnabled = defaults?.payments_enabled ?? false;
-  }
-
   const { data: release } = await supabase
     .from("releases")
     .select("title, format, cover_art_url")
@@ -61,7 +50,6 @@ export default async function TrackDetailPage({ params }: Props) {
       releaseTitle={release?.title ?? ""}
       releaseFormat={release?.format ?? "stereo"}
       releaseCoverArt={release?.cover_art_url ?? null}
-      paymentsEnabled={paymentsEnabled}
       track={track}
       intent={intentRes.data}
       specs={specsRes.data}

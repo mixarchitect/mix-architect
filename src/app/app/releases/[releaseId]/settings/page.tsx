@@ -237,7 +237,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
         <PanelBody className="pt-5 space-y-6">
           {/* Cover Art */}
           <div className="space-y-3">
-            <label className="label text-faint">Cover Art</label>
+            <label className="label text-muted">Cover Art</label>
             <div className="flex items-start gap-4">
               <div
                 className="relative w-[160px] h-[160px] rounded-lg border border-border overflow-hidden flex-shrink-0 flex items-center justify-center"
@@ -306,7 +306,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
           <Rule />
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Release title</label>
+            <label className="label text-muted">Release title</label>
             <input
               type="text"
               value={title}
@@ -316,7 +316,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Artist / Client</label>
+            <label className="label text-muted">Artist / Client</label>
             <input
               type="text"
               value={artist}
@@ -327,22 +327,22 @@ export default function ReleaseSettingsPage({ params }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Release type</label>
+            <label className="label text-muted">Release type</label>
             <PillSelect options={TYPE_OPTIONS} value={releaseType} onChange={setReleaseType} />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Format</label>
+            <label className="label text-muted">Format</label>
             <PillSelect options={FORMAT_OPTIONS} value={format} onChange={setFormat} />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Status</label>
+            <label className="label text-muted">Status</label>
             <PillSelect options={STATUS_OPTIONS} value={status} onChange={setStatus} />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Global mix direction</label>
+            <label className="label text-muted">Global mix direction</label>
             <textarea
               value={globalDirection}
               onChange={(e) => setGlobalDirection(e.target.value)}
@@ -352,7 +352,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Genre tags</label>
+            <label className="label text-muted">Genre tags</label>
             <TagInput
               value={genreTags}
               onChange={setGenreTags}
@@ -361,7 +361,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Target release date</label>
+            <label className="label text-muted">Target release date</label>
             <input
               type="date"
               value={targetDate}
@@ -373,7 +373,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
           <Rule />
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Client name</label>
+            <label className="label text-muted">Client name</label>
             <input
               type="text"
               value={clientName}
@@ -384,7 +384,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Client email</label>
+            <label className="label text-muted">Client email</label>
             <input
               type="email"
               value={clientEmail}
@@ -395,7 +395,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-faint">Delivery notes</label>
+            <label className="label text-muted">Delivery notes</label>
             <textarea
               value={deliveryNotes}
               onChange={(e) => setDeliveryNotes(e.target.value)}
@@ -407,10 +407,10 @@ export default function ReleaseSettingsPage({ params }: Props) {
           {paymentsEnabled && (
             <>
               <Rule />
-              <div className="label-sm text-faint">PAYMENT</div>
+              <div className="label-sm text-muted">PAYMENT</div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="label text-faint">Project fee</label>
+                  <label className="label text-muted">Project fee</label>
                   <input
                     type="number"
                     step="0.01"
@@ -422,7 +422,7 @@ export default function ReleaseSettingsPage({ params }: Props) {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="label text-faint">Currency</label>
+                  <label className="label text-muted">Currency</label>
                   <select
                     value={feeCurrency}
                     onChange={(e) => setFeeCurrency(e.target.value)}
@@ -435,11 +435,11 @@ export default function ReleaseSettingsPage({ params }: Props) {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="label text-faint">Payment status</label>
+                <label className="label text-muted">Payment status</label>
                 <PillSelect options={PAYMENT_STATUS_OPTIONS} value={paymentStatus} onChange={setPaymentStatus} />
               </div>
               <div className="space-y-1.5">
-                <label className="label text-faint">Payment notes</label>
+                <label className="label text-muted">Payment notes</label>
                 <textarea
                   value={paymentNotes}
                   onChange={(e) => setPaymentNotes(e.target.value)}

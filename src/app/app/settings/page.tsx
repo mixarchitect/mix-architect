@@ -119,7 +119,7 @@ export default function SettingsPage() {
           <Rule />
           <PanelBody className="pt-5 space-y-4">
             <div className="space-y-1.5">
-              <label className="label text-faint">Display name</label>
+              <label className="label text-muted">Display name</label>
               <input
                 type="text"
                 value={displayName}
@@ -129,7 +129,7 @@ export default function SettingsPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="label text-faint">Company name (optional)</label>
+              <label className="label text-muted">Company name (optional)</label>
               <input
                 type="text"
                 value={companyName}
@@ -139,7 +139,7 @@ export default function SettingsPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="label text-faint">Email</label>
+              <label className="label text-muted">Email</label>
               <input
                 type="email"
                 value={email}
@@ -164,7 +164,7 @@ export default function SettingsPage() {
           <Rule />
           <PanelBody className="pt-5 space-y-6">
             <div className="space-y-1.5">
-              <label className="label text-faint">Default target loudness</label>
+              <label className="label text-muted">Default target loudness</label>
               <select
                 value={loudness}
                 onChange={(e) => setLoudness(e.target.value)}
@@ -181,7 +181,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-faint">Default format</label>
+              <label className="label text-muted">Default format</label>
               <div className="flex gap-2">
                 {FORMAT_OPTIONS.map((opt) => (
                   <button
@@ -202,7 +202,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-faint">Default sample rate</label>
+              <label className="label text-muted">Default sample rate</label>
               <select
                 value={sampleRate}
                 onChange={(e) => setSampleRate(e.target.value)}
@@ -215,7 +215,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-faint">Default bit depth</label>
+              <label className="label text-muted">Default bit depth</label>
               <select
                 value={bitDepth}
                 onChange={(e) => setBitDepth(e.target.value)}
@@ -228,7 +228,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-faint">Default element list</label>
+              <label className="label text-muted">Default element list</label>
               <TagInput
                 value={defaultElements}
                 onChange={setDefaultElements}

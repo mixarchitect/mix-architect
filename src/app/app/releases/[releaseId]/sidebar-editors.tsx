@@ -50,7 +50,7 @@ export function GlobalDirectionEditor({ releaseId, initialValue }: DirectionEdit
     <Panel>
       <PanelBody className="py-5">
         <div className="flex items-center justify-between mb-2">
-          <div className="label-sm text-faint">GLOBAL MIX DIRECTION</div>
+          <div className="label-sm text-muted">GLOBAL MIX DIRECTION</div>
           {!editing && (
             <button
               type="button"
@@ -212,7 +212,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs }: RefsEditorPro
     <Panel>
       <PanelBody className="py-5">
         <div className="flex items-center justify-between mb-2">
-          <div className="label-sm text-faint">GLOBAL REFERENCES</div>
+          <div className="label-sm text-muted">GLOBAL REFERENCES</div>
           {!showForm && (
             <button
               type="button"

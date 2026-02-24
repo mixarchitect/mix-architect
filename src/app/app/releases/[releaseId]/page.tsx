@@ -186,7 +186,7 @@ export default async function ReleasePage({ params }: Props) {
           {/* Release Info */}
           <Panel>
             <PanelBody className="py-5 space-y-3">
-              <div className="label-sm text-faint mb-1">RELEASE INFO</div>
+              <div className="label-sm text-muted mb-1">RELEASE INFO</div>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted">Artist</span>
@@ -253,7 +253,7 @@ export default async function ReleasePage({ params }: Props) {
           {(release.client_name || release.client_email) && (
             <Panel>
               <PanelBody className="py-5">
-                <div className="label-sm text-faint mb-2">CLIENT INFO</div>
+                <div className="label-sm text-muted mb-2">CLIENT INFO</div>
                 <div className="space-y-2 text-sm">
                   {release.client_name && (
                     <div className="flex justify-between">
@@ -278,7 +278,7 @@ export default async function ReleasePage({ params }: Props) {
           {paymentsEnabled && (
             <Panel>
               <PanelBody className="py-5 space-y-3">
-                <div className="label-sm text-faint mb-1">PAYMENT</div>
+                <div className="label-sm text-muted mb-1">PAYMENT</div>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm items-center">
                     <span className="text-muted">Status</span>
