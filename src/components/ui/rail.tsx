@@ -3,18 +3,13 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Settings, LogOut, Search } from "lucide-react";
+import { Home, Search, Settings, LogOut } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 
 type Props = {
   userEmail?: string | null;
   onSearchClick?: () => void;
 };
-
-const NAV_ITEMS = [
-  { href: "/app", icon: <Home size={20} strokeWidth={1.5} />, label: "Dashboard", exact: true },
-  { href: "/app/settings", icon: <Settings size={20} strokeWidth={1.5} />, label: "Settings", exact: false },
-];
 
 export function Rail({ userEmail, onSearchClick }: Props) {
   const pathname = usePathname();
@@ -25,6 +20,18 @@ export function Rail({ userEmail, onSearchClick }: Props) {
     await supabase.auth.signOut();
     router.push("/auth/sign-in");
   }
+
+  const isHome = pathname === "/app";
+  const isSettings = pathname?.startsWith("/app/settings");
+
+  const iconClass = (active?: boolean) =>
+    cn(
+      "w-10 h-10 grid place-items-center rounded-md",
+      "text-muted transition-all duration-150",
+      "hover:text-text hover:bg-panel2",
+      "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
+      active && "text-signal bg-signal-muted",
+    );
 
   return (
     <nav className="hidden md:flex w-16 shrink-0 border-r border-border bg-panel flex-col items-center py-5 gap-1">
@@ -37,65 +44,40 @@ export function Rail({ userEmail, onSearchClick }: Props) {
         <img src="/mix-architect-icon.svg" alt="Mix Architect" className="w-8 h-8" />
       </Link>
 
-      {/* Nav items */}
-      <div className="flex-1 flex flex-col gap-1">
-        {NAV_ITEMS.map((item) => {
-          const active = item.exact
-            ? pathname === item.href
-            : pathname?.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={item.label}
-              className={cn(
-                "w-10 h-10 grid place-items-center rounded-md",
-                "text-muted transition-all duration-150",
-                "hover:text-text hover:bg-panel2",
-                "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
-                active && "text-signal bg-signal-muted"
-              )}
-            >
-              {item.icon}
-            </Link>
-          );
-        })}
-      </div>
+      {/* Home */}
+      <Link href="/app" title="Dashboard" className={iconClass(isHome)}>
+        <Home size={20} strokeWidth={1.5} />
+      </Link>
 
-      {/* Search trigger */}
-      <button
-        type="button"
-        onClick={onSearchClick}
-        title="Search (Cmd+K)"
-        className={cn(
-          "w-10 h-10 grid place-items-center rounded-md",
-          "text-muted transition-all duration-150",
-          "hover:text-text hover:bg-panel2",
-          "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
-        )}
-      >
+      {/* Search */}
+      <button type="button" onClick={onSearchClick} title="Search (Cmd+K)" className={iconClass()}>
         <Search size={20} strokeWidth={1.5} />
       </button>
 
-      {/* User / sign out */}
-      <div className="flex flex-col items-center gap-2">
-        {userEmail && (
-          <div
-            className="w-9 h-9 rounded-full bg-panel2 border border-border grid place-items-center text-xs font-semibold text-muted"
-            title={userEmail}
-          >
-            {userEmail.charAt(0).toUpperCase()}
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={handleSignOut}
-          title="Sign out"
-          className="w-10 h-10 grid place-items-center rounded-md text-muted transition-colors hover:text-text hover:bg-panel2"
+      {/* Settings */}
+      <Link href="/app/settings" title="Settings" className={iconClass(isSettings)}>
+        <Settings size={20} strokeWidth={1.5} />
+      </Link>
+
+      {/* Account */}
+      {userEmail && (
+        <div
+          className="w-9 h-9 rounded-full bg-panel2 border border-border grid place-items-center text-xs font-semibold text-muted mt-2"
+          title={userEmail}
         >
-          <LogOut size={18} strokeWidth={1.5} />
-        </button>
-      </div>
+          {userEmail.charAt(0).toUpperCase()}
+        </div>
+      )}
+
+      {/* Sign out */}
+      <button
+        type="button"
+        onClick={handleSignOut}
+        title="Sign out"
+        className={iconClass()}
+      >
+        <LogOut size={18} strokeWidth={1.5} />
+      </button>
     </nav>
   );
 }

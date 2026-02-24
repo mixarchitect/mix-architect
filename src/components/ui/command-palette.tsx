@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Disc3, Music2, Bookmark, CornerDownLeft } from "lucide-react";
+import { Search, Disc3, Music2, Bookmark, CornerDownLeft, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useSearch, type SearchResult, type SearchResultType } from "@/hooks/use-search";
 
@@ -145,9 +145,14 @@ export function CommandPalette({ isOpen, onClose }: Props) {
             {isSearching && (
               <div className="w-4 h-4 border-2 border-signal border-t-transparent rounded-full animate-spin" />
             )}
-            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono text-faint border border-border rounded">
-              ESC
-            </kbd>
+            <button
+              type="button"
+              onClick={onClose}
+              title="Close (Esc)"
+              className="p-1 rounded text-faint hover:text-text transition-colors shrink-0"
+            >
+              <X size={16} strokeWidth={1.5} />
+            </button>
           </div>
 
           {/* Results */}

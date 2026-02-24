@@ -15,10 +15,14 @@ export function useCommandPalette() {
         e.preventDefault();
         toggle();
       }
+      if (e.key === "Escape" && isOpen) {
+        e.preventDefault();
+        close();
+      }
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [toggle]);
+  }, [toggle, isOpen, close]);
 
   return { isOpen, open, close };
 }
