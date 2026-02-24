@@ -182,15 +182,13 @@ export default async function ReleasePage({ params }: Props) {
         <aside className="space-y-4">
           {/* Cover Art */}
           {release.cover_art_url && (
-            <Panel>
-              <PanelBody className="p-0 overflow-hidden rounded-lg">
-                <img
-                  src={release.cover_art_url}
-                  alt={`${release.title} cover art`}
-                  className="w-full aspect-square object-cover"
-                />
-              </PanelBody>
-            </Panel>
+            <div className="rounded-lg overflow-hidden border border-border">
+              <img
+                src={release.cover_art_url}
+                alt={`${release.title} cover art`}
+                className="w-full aspect-square object-cover block"
+              />
+            </div>
           )}
 
           {/* Release Info */}

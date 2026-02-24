@@ -245,23 +245,26 @@ export default function ReleaseSettingsPage({ params }: Props) {
               </div>
 
               <div className="flex flex-col gap-2 pt-1">
-                <label
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors"
-                  style={{ background: "var(--panel2)", color: "var(--text-muted)" }}
-                >
-                  <Upload size={14} />
-                  {uploading ? "Uploading\u2026" : "Upload Image"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) handleCoverUpload(f);
-                    }}
-                    disabled={uploading}
-                  />
-                </label>
+                <div>
+                  <label
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors"
+                    style={{ background: "var(--panel2)", color: "var(--text-muted)" }}
+                  >
+                    <Upload size={14} />
+                    {uploading ? "Uploading\u2026" : "Upload Image"}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleCoverUpload(f);
+                      }}
+                      disabled={uploading}
+                    />
+                  </label>
+                  <p className="text-[10px] text-muted mt-1">PNG, JPG, WebP, or GIF</p>
+                </div>
 
                 <div className="space-y-1">
                   <span className="text-[10px] text-muted uppercase tracking-wider">or paste URL</span>
