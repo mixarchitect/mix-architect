@@ -643,6 +643,7 @@ type PaymentEditorProps = {
   releaseId: string;
   initialPaymentStatus: string;
   initialFeeTotal: number | null;
+  initialPaidAmount: number | null;
   initialFeeCurrency: string;
   initialPaymentNotes: string | null;
 };
@@ -651,6 +652,7 @@ export function PaymentEditor({
   releaseId,
   initialPaymentStatus,
   initialFeeTotal,
+  initialPaidAmount,
   initialFeeCurrency,
   initialPaymentNotes,
 }: PaymentEditorProps) {
@@ -658,8 +660,11 @@ export function PaymentEditor({
     (PAYMENT_STATUSES.includes(initialPaymentStatus as PaymentStatus) ? initialPaymentStatus : "unpaid") as PaymentStatus,
   );
   const [feeTotal, setFeeTotal] = useState(initialFeeTotal);
+  const [paidAmount, setPaidAmount] = useState(initialPaidAmount ?? 0);
   const [editingFee, setEditingFee] = useState(false);
   const [feeInput, setFeeInput] = useState(initialFeeTotal != null ? String(initialFeeTotal) : "");
+  const [editingPaid, setEditingPaid] = useState(false);
+  const [paidInput, setPaidInput] = useState(String(initialPaidAmount ?? 0));
   const router = useRouter();
 
   async function cyclePaymentStatus() {
@@ -698,6 +703,27 @@ export function PaymentEditor({
       setFeeTotal(prev);
     }
   }
+
+  async function savePaid() {
+    const parsed = paidInput.trim() ? parseFloat(paidInput) : 0;
+    if (paidInput.trim() && isNaN(parsed)) return;
+    const prev = paidAmount;
+    setPaidAmount(parsed);
+    setEditingPaid(false);
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error } = await supabase
+        .from("releases")
+        .update({ paid_amount: parsed })
+        .eq("id", releaseId);
+      if (error) throw error;
+      router.refresh();
+    } catch {
+      setPaidAmount(prev);
+    }
+  }
+
+  const balance = (feeTotal ?? 0) - paidAmount;
 
   return (
     <Panel>
@@ -769,6 +795,68 @@ export function PaymentEditor({
               </button>
             )}
           </div>
+          {paymentStatus === "partial" && (
+            <>
+              <div className="flex justify-between text-sm items-center">
+                <span className="text-muted">Paid</span>
+                {editingPaid ? (
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={paidInput}
+                      onChange={(e) => setPaidInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") savePaid();
+                        if (e.key === "Escape") {
+                          setPaidInput(String(paidAmount));
+                          setEditingPaid(false);
+                        }
+                      }}
+                      className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
+                      autoFocus
+                      placeholder="0.00"
+                    />
+                    <button
+                      type="button"
+                      onClick={savePaid}
+                      className="text-signal hover:opacity-80 transition-opacity"
+                    >
+                      <Check size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPaidInput(String(paidAmount));
+                        setEditingPaid(false);
+                      }}
+                      className="text-muted hover:text-text transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPaidInput(String(paidAmount));
+                      setEditingPaid(true);
+                    }}
+                    className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                  >
+                    {formatCurrency(paidAmount, initialFeeCurrency)}
+                  </button>
+                )}
+              </div>
+              <div className="flex justify-between text-sm items-center pt-1 border-t border-border/50">
+                <span className="text-muted font-medium">Balance</span>
+                <span className="font-mono text-xs font-medium" style={{ color: balance > 0 ? "var(--signal)" : "var(--text)" }}>
+                  {formatCurrency(balance, initialFeeCurrency)}
+                </span>
+              </div>
+            </>
+          )}
           {initialPaymentNotes && (
             <div className="text-xs text-muted italic pt-1 border-t border-border/50">
               {initialPaymentNotes}

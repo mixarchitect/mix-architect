@@ -249,6 +249,7 @@ export default async function ReleasePage({ params }: Props) {
               releaseId={releaseId}
               initialPaymentStatus={release.payment_status ?? "unpaid"}
               initialFeeTotal={release.fee_total}
+              initialPaidAmount={release.paid_amount ?? 0}
               initialFeeCurrency={release.fee_currency ?? "USD"}
               initialPaymentNotes={release.payment_notes}
             />
