@@ -63,7 +63,7 @@ export function Rail({ onSearchClick }: Props) {
         type="button"
         onClick={handleSignOut}
         title="Sign out"
-        className={iconClass()}
+        className={cn(iconClass(), "mt-auto")}
       >
         <LogOut size={18} strokeWidth={1.5} />
       </button>
