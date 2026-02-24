@@ -60,17 +60,27 @@ export default async function ReleasePage({ params }: Props) {
   const { releaseId } = await params;
   const supabase = await createSupabaseServerClient();
 
-  const { data: release } = await supabase
-    .from("releases")
-    .select("*")
-    .eq("id", releaseId)
-    .maybeSingle();
+  // Fire all independent queries in parallel
+  const [releaseRes, userRes, tracksRes, globalRefsRes] = await Promise.all([
+    supabase.from("releases").select("*").eq("id", releaseId).maybeSingle(),
+    supabase.auth.getUser(),
+    supabase
+      .from("tracks")
+      .select("*, track_intent(mix_vision)")
+      .eq("release_id", releaseId)
+      .order("track_number"),
+    supabase
+      .from("mix_references")
+      .select("*")
+      .eq("release_id", releaseId)
+      .is("track_id", null)
+      .order("sort_order"),
+  ]);
 
+  const release = releaseRes.data;
   if (!release) notFound();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = userRes.data.user;
   let paymentsEnabled = false;
   if (user) {
     const { data: defaults } = await supabase
@@ -81,18 +91,8 @@ export default async function ReleasePage({ params }: Props) {
     paymentsEnabled = defaults?.payments_enabled ?? false;
   }
 
-  const { data: tracks } = await supabase
-    .from("tracks")
-    .select("*, track_intent(mix_vision)")
-    .eq("release_id", releaseId)
-    .order("track_number");
-
-  const { data: globalRefs } = await supabase
-    .from("mix_references")
-    .select("*")
-    .eq("release_id", releaseId)
-    .is("track_id", null)
-    .order("sort_order");
+  const tracks = tracksRes.data;
+  const globalRefs = globalRefsRes.data;
 
   return (
     <div>

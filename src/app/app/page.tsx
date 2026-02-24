@@ -21,7 +21,16 @@ export default async function DashboardPage({ searchParams }: Props) {
   const { payment } = await searchParams;
   const supabase = await createSupabaseServerClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // Fire all independent queries in parallel
+  const [userRes, releasesRes] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from("releases")
+      .select("*, tracks(id, status)")
+      .order("updated_at", { ascending: false }),
+  ]);
+
+  const user = userRes.data.user;
   let paymentsEnabled = false;
   if (user) {
     const { data: defaults } = await supabase
@@ -32,10 +41,7 @@ export default async function DashboardPage({ searchParams }: Props) {
     paymentsEnabled = defaults?.payments_enabled ?? false;
   }
 
-  const { data: releases } = await supabase
-    .from("releases")
-    .select("*, tracks(id, status)")
-    .order("updated_at", { ascending: false });
+  const releases = releasesRes.data;
 
   let outstandingTotal = 0;
   let outstandingCount = 0;

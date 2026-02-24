@@ -10,21 +10,10 @@ export default async function TrackDetailPage({ params }: Props) {
   const { releaseId, trackId } = await params;
   const supabase = await createSupabaseServerClient();
 
-  const { data: track } = await supabase
-    .from("tracks")
-    .select("*")
-    .eq("id", trackId)
-    .maybeSingle();
-
-  if (!track) notFound();
-
-  const { data: release } = await supabase
-    .from("releases")
-    .select("title, format, cover_art_url")
-    .eq("id", releaseId)
-    .maybeSingle();
-
-  const [intentRes, specsRes, elementsRes, notesRes, refsRes] = await Promise.all([
+  // Fire all queries in parallel — track, release, and sub-tables
+  const [trackRes, releaseRes, intentRes, specsRes, elementsRes, notesRes, refsRes] = await Promise.all([
+    supabase.from("tracks").select("*").eq("id", trackId).maybeSingle(),
+    supabase.from("releases").select("title, format, cover_art_url").eq("id", releaseId).maybeSingle(),
     supabase.from("track_intent").select("*").eq("track_id", trackId).maybeSingle(),
     supabase.from("track_specs").select("*").eq("track_id", trackId).maybeSingle(),
     supabase
@@ -43,6 +32,11 @@ export default async function TrackDetailPage({ params }: Props) {
       .eq("track_id", trackId)
       .order("sort_order"),
   ]);
+
+  const track = trackRes.data;
+  if (!track) notFound();
+
+  const release = releaseRes.data;
 
   return (
     <TrackDetailClient
