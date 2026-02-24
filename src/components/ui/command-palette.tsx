@@ -122,6 +122,7 @@ export function CommandPalette({ isOpen, onClose }: Props) {
         aria-modal="true"
         aria-label="Search releases, tracks, and references"
         className="fixed inset-0 z-50 flex items-start justify-center pt-[min(20vh,160px)] px-4"
+        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
         onKeyDown={handleKeyDown}
       >
         <div className="w-full max-w-lg surface-float cmd-palette-panel overflow-hidden">
