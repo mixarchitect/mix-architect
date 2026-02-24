@@ -9,6 +9,7 @@ import { StatusIndicator } from "@/components/ui/status-dot";
 import { TrackRow } from "@/components/ui/track-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
+import { GlobalDirectionEditor, GlobalReferencesEditor } from "./sidebar-editors";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
@@ -238,46 +239,21 @@ export default async function ReleasePage({ params }: Props) {
           </Panel>
 
           {/* Global Mix Direction */}
-          <Panel>
-            <PanelBody className="py-5">
-              <div className="label text-faint text-[10px] mb-2">GLOBAL MIX DIRECTION</div>
-              {release.global_direction ? (
-                <p className="text-sm text-text leading-relaxed">
-                  {release.global_direction}
-                </p>
-              ) : (
-                <p className="text-sm text-muted italic">
-                  No global direction set yet.
-                </p>
-              )}
-            </PanelBody>
-          </Panel>
+          <GlobalDirectionEditor
+            releaseId={releaseId}
+            initialValue={release.global_direction}
+          />
 
           {/* Global References */}
-          <Panel>
-            <PanelBody className="py-5">
-              <div className="label text-faint text-[10px] mb-2">GLOBAL REFERENCES</div>
-              {globalRefs && globalRefs.length > 0 ? (
-                <div className="space-y-2">
-                  {globalRefs.map((ref: any) => (
-                    <div key={ref.id} className="text-sm">
-                      <div className="font-medium text-text">{ref.song_title}</div>
-                      {ref.artist && (
-                        <div className="text-xs text-muted">{ref.artist}</div>
-                      )}
-                      {ref.note && (
-                        <div className="text-xs text-muted mt-0.5 italic">
-                          &ldquo;{ref.note}&rdquo;
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted italic">No references added yet.</p>
-              )}
-            </PanelBody>
-          </Panel>
+          <GlobalReferencesEditor
+            releaseId={releaseId}
+            initialRefs={(globalRefs ?? []).map((r: any) => ({
+              id: r.id,
+              song_title: r.song_title,
+              artist: r.artist,
+              note: r.note,
+            }))}
+          />
 
           {/* Client Info */}
           {(release.client_name || release.client_email) && (
