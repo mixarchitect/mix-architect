@@ -2,7 +2,6 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
-import { StatTile } from "@/components/ui/stat-tile";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Plus } from "lucide-react";
 
@@ -71,23 +70,39 @@ export default async function DashboardPage() {
       </div>
 
       {paymentsEnabled && hasAnyFees && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <StatTile
-            variant="accent"
-            label="OUTSTANDING"
-            value={formatMoney(outstandingTotal, primaryCurrency)}
-            note={`${outstandingCount} release${outstandingCount !== 1 ? "s" : ""}`}
-          />
-          <StatTile
-            label="EARNED"
-            value={formatMoney(earnedTotal, primaryCurrency)}
-            note={`${earnedCount} release${earnedCount !== 1 ? "s" : ""}`}
-          />
-          <StatTile
-            label="TOTAL"
-            value={formatMoney(feeGrandTotal, primaryCurrency)}
-            note={`${earnedCount} of ${feeReleaseCount} paid`}
-          />
+        <div
+          className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5 rounded-lg text-xs mb-6"
+          style={{ background: "var(--panel2)" }}
+        >
+          <span className="text-muted">
+            Outstanding:{" "}
+            <span className={outstandingTotal > 0 ? "font-semibold text-signal" : "font-semibold text-text"}>
+              {formatMoney(outstandingTotal, primaryCurrency)}
+            </span>
+            <span className="text-faint ml-1">
+              ({outstandingCount} release{outstandingCount !== 1 ? "s" : ""})
+            </span>
+          </span>
+          <span className="text-faint hidden sm:inline">·</span>
+          <span className="text-muted">
+            Earned:{" "}
+            <span className="font-semibold text-text">
+              {formatMoney(earnedTotal, primaryCurrency)}
+            </span>
+            <span className="text-faint ml-1">
+              ({earnedCount} release{earnedCount !== 1 ? "s" : ""})
+            </span>
+          </span>
+          <span className="text-faint hidden sm:inline">·</span>
+          <span className="text-muted">
+            Total:{" "}
+            <span className="font-semibold text-text">
+              {formatMoney(feeGrandTotal, primaryCurrency)}
+            </span>
+            <span className="text-faint ml-1">
+              ({earnedCount} of {feeReleaseCount} paid)
+            </span>
+          </span>
         </div>
       )}
 
