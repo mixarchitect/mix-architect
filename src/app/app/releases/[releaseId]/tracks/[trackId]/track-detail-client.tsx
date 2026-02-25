@@ -15,8 +15,9 @@ import { NoteEntry } from "@/components/ui/note-entry";
 import { ReferenceCard } from "@/components/ui/reference-card";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { StatusIndicator } from "@/components/ui/status-dot";
-import { ArrowLeft, Check, Plus, X } from "lucide-react";
+import { ArrowLeft, Bookmark, Check, Plus, X } from "lucide-react";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
+import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
 
 const TABS = [
   { id: "intent", label: "Intent" },
@@ -195,6 +196,7 @@ export function TrackDetailClient({
   const [trackStatus, setTrackStatus] = useState(track.status);
 
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+  const { contacts: savedContacts, saveContact: saveContactToBook } = useSavedContacts();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const trackStatusRef = useRef(trackStatus);
   trackStatusRef.current = trackStatus;
@@ -1006,6 +1008,8 @@ export function TrackDetailClient({
                   deriveComposersFromSplits(next);
                 }}
                 readOnly={!canEdit(role)}
+                contacts={savedContacts}
+                onSaveContact={saveContactToBook}
               />
               <SplitEditor
                 label="Publishing Split"
@@ -1015,6 +1019,8 @@ export function TrackDetailClient({
                 onUpdate={handleUpdateSplit}
                 onDelete={handleDeleteSplit}
                 readOnly={!canEdit(role)}
+                contacts={savedContacts}
+                onSaveContact={saveContactToBook}
               />
               <SplitEditor
                 label="Master Recording Split"
@@ -1024,6 +1030,8 @@ export function TrackDetailClient({
                 onUpdate={handleUpdateSplit}
                 onDelete={handleDeleteSplit}
                 readOnly={!canEdit(role)}
+                contacts={savedContacts}
+                onSaveContact={saveContactToBook}
               />
 
               <Panel>
@@ -1598,6 +1606,8 @@ function SplitEditor({
   onUpdate,
   onDelete,
   readOnly,
+  contacts,
+  onSaveContact,
 }: {
   label: string;
   splitType: string;
@@ -1606,6 +1616,8 @@ function SplitEditor({
   onUpdate: (id: string, updates: Partial<SplitData>) => void;
   onDelete: (id: string) => void;
   readOnly?: boolean;
+  contacts: SavedContact[];
+  onSaveContact: (data: { person_name: string; pro_org?: string; member_account?: string; ipi?: string }) => void;
 }) {
   const sorted = [...splits].sort((a, b) => a.sort_order - b.sort_order);
   const total = sorted.reduce((sum, s) => sum + (s.percentage || 0), 0);
@@ -1641,6 +1653,8 @@ function SplitEditor({
                 onUpdate={onUpdate}
                 onDelete={onDelete}
                 readOnly={readOnly}
+                contacts={contacts}
+                onSaveContact={onSaveContact}
               />
             ))}
             <div className="flex items-center justify-between pt-2 border-t border-border">
@@ -1671,12 +1685,16 @@ function SplitRow({
   onUpdate,
   onDelete,
   readOnly,
+  contacts,
+  onSaveContact,
 }: {
   split: SplitData;
   splitType: string;
   onUpdate: (id: string, updates: Partial<SplitData>) => void;
   onDelete: (id: string) => void;
   readOnly?: boolean;
+  contacts: SavedContact[];
+  onSaveContact: (data: { person_name: string; pro_org?: string; member_account?: string; ipi?: string }) => void;
 }) {
   const [localName, setLocalName] = useState(split.person_name);
   const [localPct, setLocalPct] = useState(String(split.percentage));
@@ -1685,6 +1703,12 @@ function SplitRow({
   const [localIpi, setLocalIpi] = useState(split.ipi ?? "");
   const rowDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Combobox state
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const [justSaved, setJustSaved] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
   function debouncedUpdate(updates: Partial<SplitData>) {
     if (rowDebounceRef.current) clearTimeout(rowDebounceRef.current);
     rowDebounceRef.current = setTimeout(() => onUpdate(split.id, updates), 500);
@@ -1692,20 +1716,113 @@ function SplitRow({
 
   const showProFields = splitType === "writing" || splitType === "publishing";
 
+  // Filter contacts by current name input (case-insensitive)
+  const filtered = localName.trim()
+    ? contacts.filter((c) =>
+        c.person_name.toLowerCase().includes(localName.toLowerCase()) &&
+        c.person_name.toLowerCase() !== localName.toLowerCase()
+      )
+    : contacts;
+
+  function selectContact(contact: SavedContact) {
+    setLocalName(contact.person_name);
+    setLocalPro(contact.pro_org ?? "");
+    setLocalAccount(contact.member_account ?? "");
+    setLocalIpi(contact.ipi ?? "");
+    setShowDropdown(false);
+    setActiveIdx(-1);
+    // Batch update all fields
+    onUpdate(split.id, {
+      person_name: contact.person_name,
+      pro_org: contact.pro_org ?? undefined,
+      member_account: contact.member_account ?? undefined,
+      ipi: contact.ipi ?? undefined,
+    });
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (!showDropdown || filtered.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIdx((prev) => (prev < filtered.length - 1 ? prev + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIdx((prev) => (prev > 0 ? prev - 1 : filtered.length - 1));
+    } else if (e.key === "Enter" && activeIdx >= 0 && activeIdx < filtered.length) {
+      e.preventDefault();
+      selectContact(filtered[activeIdx]);
+    } else if (e.key === "Escape") {
+      setShowDropdown(false);
+      setActiveIdx(-1);
+    }
+  }
+
+  // Close dropdown when clicking outside
+  const handleBlur = useCallback(() => {
+    setTimeout(() => {
+      if (wrapperRef.current && !wrapperRef.current.contains(document.activeElement)) {
+        setShowDropdown(false);
+        setActiveIdx(-1);
+      }
+    }, 150);
+  }, []);
+
+  const canSave = !readOnly && localName.trim() && (localPro || localAccount || localIpi);
+
   return (
     <div className="rounded-md border border-border bg-panel">
       <div className="flex items-center gap-3 px-4 py-3">
-        <input
-          type="text"
-          value={localName}
-          onChange={(e) => {
-            setLocalName(e.target.value);
-            debouncedUpdate({ person_name: e.target.value });
-          }}
-          readOnly={readOnly}
-          placeholder="Person or entity name"
-          className="flex-1 text-sm text-text bg-transparent border-none outline-none placeholder:text-faint"
-        />
+        <div ref={wrapperRef} className="relative flex-1" onBlur={handleBlur}>
+          <input
+            type="text"
+            value={localName}
+            onChange={(e) => {
+              setLocalName(e.target.value);
+              debouncedUpdate({ person_name: e.target.value });
+              setShowDropdown(true);
+              setActiveIdx(-1);
+            }}
+            onFocus={() => { if (contacts.length > 0) setShowDropdown(true); }}
+            onKeyDown={handleKeyDown}
+            readOnly={readOnly}
+            placeholder="Person or entity name"
+            className="w-full text-sm text-text bg-transparent border-none outline-none placeholder:text-faint"
+            role="combobox"
+            aria-expanded={showDropdown && filtered.length > 0}
+            aria-autocomplete="list"
+            aria-controls={`contact-list-${split.id}`}
+            aria-activedescendant={activeIdx >= 0 ? `contact-${split.id}-${activeIdx}` : undefined}
+          />
+          {showDropdown && filtered.length > 0 && (
+            <div
+              id={`contact-list-${split.id}`}
+              role="listbox"
+              className="absolute left-0 top-full mt-1 w-full min-w-[240px] z-20 surface-float max-h-48 overflow-y-auto"
+            >
+              {filtered.map((c, i) => (
+                <button
+                  key={c.id}
+                  id={`contact-${split.id}-${i}`}
+                  role="option"
+                  aria-selected={activeIdx === i}
+                  type="button"
+                  onMouseDown={(e) => { e.preventDefault(); selectContact(c); }}
+                  onMouseEnter={() => setActiveIdx(i)}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-left transition-colors duration-75 ${
+                    activeIdx === i ? "bg-signal-muted" : "hover:bg-panel2"
+                  }`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-text truncate">{c.person_name}</div>
+                    {c.pro_org && (
+                      <div className="text-[10px] text-muted truncate">{c.pro_org}</div>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-1 shrink-0">
           <input
             type="number"
@@ -1723,6 +1840,25 @@ function SplitRow({
           />
           <span className="text-xs text-muted">%</span>
         </div>
+        {canSave && (
+          <button
+            type="button"
+            onClick={() => {
+              onSaveContact({
+                person_name: localName.trim(),
+                pro_org: localPro || undefined,
+                member_account: localAccount || undefined,
+                ipi: localIpi || undefined,
+              });
+              setJustSaved(true);
+              setTimeout(() => setJustSaved(false), 1500);
+            }}
+            className={`p-1 rounded transition-colors ${justSaved ? "text-emerald-500" : "text-faint hover:text-signal"}`}
+            title={justSaved ? "Contact saved!" : "Save as contact for reuse"}
+          >
+            <Bookmark size={14} />
+          </button>
+        )}
         {!readOnly && (
           <button
             type="button"
