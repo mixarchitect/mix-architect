@@ -111,6 +111,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
   const [feeTotal, setFeeTotal] = useState("");
   const [feeCurrency, setFeeCurrency] = useState("USD");
   const [paymentStatus, setPaymentStatus] = useState("unpaid");
+  const [paidAmount, setPaidAmount] = useState("");
   const [paymentNotes, setPaymentNotes] = useState("");
   const [coverArtUrl, setCoverArtUrl] = useState("");
   const [coverArtMode, setCoverArtMode] = useState<"none" | "preview">("none");
@@ -147,6 +148,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
         setFeeTotal(data.fee_total != null ? String(data.fee_total) : "");
         setFeeCurrency(data.fee_currency ?? "USD");
         setPaymentStatus(data.payment_status ?? "unpaid");
+        setPaidAmount(data.paid_amount != null ? String(data.paid_amount) : "");
         setPaymentNotes(data.payment_notes ?? "");
         if (data.cover_art_url) {
           setCoverArtUrl(data.cover_art_url);
@@ -192,6 +194,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
         updateData.fee_total = feeTotal ? parseFloat(feeTotal) : null;
         updateData.fee_currency = feeCurrency;
         updateData.payment_status = paymentStatus;
+        updateData.paid_amount = paidAmount ? parseFloat(paidAmount) : 0;
         updateData.payment_notes = paymentNotes || null;
       }
 
@@ -584,6 +587,29 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                 <label className="label text-muted">Payment status</label>
                 <PillSelect options={PAYMENT_STATUS_OPTIONS} value={paymentStatus} onChange={setPaymentStatus} disabled={!paymentEditable} />
               </div>
+              {paymentStatus === "partial" && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="label text-muted">Paid amount</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={paidAmount}
+                      onChange={(e) => setPaidAmount(e.target.value)}
+                      disabled={!paymentEditable}
+                      className="input"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="label text-muted">Balance due</label>
+                    <div className="input bg-transparent flex items-center text-sm text-muted tabular-nums">
+                      {(parseFloat(feeTotal || "0") - parseFloat(paidAmount || "0")).toFixed(2)} {feeCurrency}
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="space-y-1.5">
                 <label className="label text-muted">Payment notes</label>
                 <textarea
