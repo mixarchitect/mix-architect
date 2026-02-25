@@ -21,7 +21,7 @@ export function Shell({ paymentsEnabled = false, children }: ShellProps) {
       <div className="flex min-h-screen">
         <Rail onSearchClick={open} />
         <MobileNav onSearchClick={open} />
-        <div className="flex-1 min-w-0 overflow-y-auto p-4 pb-20 md:p-6 md:pb-6" style={{ scrollbarGutter: "stable" }}>
+        <div className="flex-1 min-w-0 overflow-y-scroll p-4 pb-20 md:p-6 md:pb-6">
           <div className="mx-auto max-w-6xl">{children}</div>
         </div>
       </div>
