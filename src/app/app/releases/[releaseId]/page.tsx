@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Pill } from "@/components/ui/pill";
-import { TrackRow } from "@/components/ui/track-row";
 import { EmptyState } from "@/components/ui/empty-state";
+import { TrackList } from "./track-list";
 import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
 import { getReleaseRole } from "@/lib/get-release-role";
@@ -123,24 +123,22 @@ export default async function ReleasePage({ params }: Props) {
           </div>
 
           {tracks && tracks.length > 0 ? (
-            <div className="space-y-2">
-              {tracks.map((t: Record<string, unknown> & { track_intent?: { mix_vision?: string } | { mix_vision?: string }[] }) => {
+            <TrackList
+              releaseId={releaseId}
+              tracks={tracks.map((t: Record<string, unknown> & { track_intent?: { mix_vision?: string } | { mix_vision?: string }[] }) => {
                 const intent = Array.isArray(t.track_intent)
                   ? t.track_intent[0]
                   : t.track_intent;
-                return (
-                  <TrackRow
-                    key={t.id as string}
-                    releaseId={releaseId}
-                    trackId={t.id as string}
-                    trackNumber={t.track_number as number}
-                    title={t.title as string}
-                    status={t.status as string}
-                    intentPreview={intent?.mix_vision}
-                  />
-                );
+                return {
+                  id: t.id as string,
+                  track_number: t.track_number as number,
+                  title: t.title as string,
+                  status: t.status as string,
+                  intentPreview: intent?.mix_vision,
+                };
               })}
-            </div>
+              canReorder={canEdit(role)}
+            />
           ) : (
             <EmptyState
               title="No tracks yet"
