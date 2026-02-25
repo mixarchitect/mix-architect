@@ -589,20 +589,20 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           <PanelBody className="pt-5 space-y-5">
             {/* Invite form */}
             <div className="space-y-3">
+              <input
+                type="email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleInvite();
+                  }
+                }}
+                placeholder="Email address"
+                className="input"
+              />
               <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleInvite();
-                    }
-                  }}
-                  placeholder="Email address"
-                  className="input flex-1"
-                />
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value as "collaborator" | "client")}
