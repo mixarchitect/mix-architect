@@ -708,6 +708,19 @@ select.input {
 }
 
 /* ─────────────────────────────────────────────────────
+   SCROLLBAR-FREE SCROLL
+   Hide scrollbar while keeping scroll functionality
+   to prevent layout shift between short/tall pages
+───────────────────────────────────────────────────── */
+.no-scrollbar {
+  -ms-overflow-style: none;   /* IE/Edge */
+  scrollbar-width: none;      /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari, Opera */
+}
+
+/* ─────────────────────────────────────────────────────
    RESPONSIVE HELPERS
 ───────────────────────────────────────────────────── */
 @media (max-width: 768px) {
