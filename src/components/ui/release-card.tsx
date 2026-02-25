@@ -9,6 +9,8 @@ import { StatusDot } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
 import { cn } from "@/lib/cn";
 import { relativeTime } from "@/lib/relative-time";
+import type { ReleaseRole } from "@/lib/permissions";
+import { canDeleteRelease, canEdit } from "@/lib/permissions";
 
 type Props = {
   id: string;
@@ -25,6 +27,7 @@ type Props = {
   feeCurrency?: string | null;
   paymentsEnabled?: boolean;
   coverArtUrl?: string | null;
+  role?: ReleaseRole;
   className?: string;
 };
 
@@ -47,11 +50,17 @@ function typeLabel(t: string | undefined | null): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
+function roleLabel(role: ReleaseRole): string | null {
+  if (role === "collaborator") return "Collaborator";
+  if (role === "client") return "Client";
+  return null;
+}
+
 export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt,
   paymentStatus, feeTotal, feeCurrency, paymentsEnabled,
-  coverArtUrl, className,
+  coverArtUrl, role, className,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -128,31 +137,35 @@ export function ReleaseCard({
               <div className="absolute right-0 mt-1 w-44 rounded-md border border-border bg-panel shadow-lg py-1 text-sm z-20">
                 {!confirming ? (
                   <>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setMenuOpen(false);
-                        router.push(`/app/releases/${id}/settings`);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-panel2 transition-colors text-left"
-                    >
-                      <Pencil size={14} />
-                      Edit Release
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setConfirming(true);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 transition-colors text-left"
-                    >
-                      <Trash2 size={14} />
-                      Delete Release
-                    </button>
+                    {canEdit(role ?? "owner") && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setMenuOpen(false);
+                          router.push(`/app/releases/${id}/settings`);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-panel2 transition-colors text-left"
+                      >
+                        <Pencil size={14} />
+                        Edit Release
+                      </button>
+                    )}
+                    {canDeleteRelease(role ?? "owner") && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setConfirming(true);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 transition-colors text-left"
+                      >
+                        <Trash2 size={14} />
+                        Delete Release
+                      </button>
+                    )}
                   </>
                 ) : (
                   <div className="px-3 py-2 space-y-2">
@@ -199,6 +212,11 @@ export function ReleaseCard({
         <div className="mt-3 flex flex-wrap gap-1.5">
           <Pill>{typeLabel(releaseType)}</Pill>
           <Pill>{formatLabel(format)}</Pill>
+          {roleLabel(role ?? null) && (
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700 border border-blue-200">
+              {roleLabel(role ?? null)}
+            </span>
+          )}
         </div>
 
         <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted">

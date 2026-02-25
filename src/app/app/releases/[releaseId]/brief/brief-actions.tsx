@@ -4,10 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Link as LinkIcon } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import { canEdit, type ReleaseRole } from "@/lib/permissions";
 
-type Props = { releaseId: string };
+type Props = { releaseId: string; role?: ReleaseRole };
 
-export function BriefActions({ releaseId }: Props) {
+export function BriefActions({ releaseId, role }: Props) {
   const [copied, setCopied] = useState(false);
 
   function handlePrint() {
@@ -49,10 +50,12 @@ export function BriefActions({ releaseId }: Props) {
         <Download size={16} />
         Download PDF
       </Button>
-      <Button variant="secondary" onClick={handleCopyLink}>
-        <LinkIcon size={16} />
-        {copied ? "Copied!" : "Copy Link"}
-      </Button>
+      {canEdit(role ?? "owner") && (
+        <Button variant="secondary" onClick={handleCopyLink}>
+          <LinkIcon size={16} />
+          {copied ? "Copied!" : "Copy Link"}
+        </Button>
+      )}
     </div>
   );
 }

@@ -6,16 +6,18 @@ import { cn } from "@/lib/cn";
 
 type Props = {
   value: string[];
-  onChange: (tags: string[]) => void;
+  onChange?: (tags: string[]) => void;
   suggestions?: string[];
   placeholder?: string;
+  disabled?: boolean;
   className?: string;
 };
 
-export function TagInput({ value, onChange, suggestions = [], placeholder, className }: Props) {
+export function TagInput({ value, onChange, suggestions = [], placeholder, disabled, className }: Props) {
   const [input, setInput] = useState("");
 
   function addTag(tag: string) {
+    if (disabled || !onChange) return;
     const trimmed = tag.trim();
     if (trimmed && !value.includes(trimmed)) {
       onChange([...value, trimmed]);
@@ -24,6 +26,7 @@ export function TagInput({ value, onChange, suggestions = [], placeholder, class
   }
 
   function removeTag(tag: string) {
+    if (disabled || !onChange) return;
     onChange(value.filter((t) => t !== tag));
   }
 
@@ -48,25 +51,32 @@ export function TagInput({ value, onChange, suggestions = [], placeholder, class
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-panel2 border border-border-strong text-xs font-medium text-text"
           >
             {tag}
-            <button
-              type="button"
-              onClick={() => removeTag(tag)}
-              className="text-muted hover:text-text transition-colors"
-            >
-              <X size={12} />
-            </button>
+            {!disabled && (
+              <button
+                type="button"
+                onClick={() => removeTag(tag)}
+                className="text-muted hover:text-text transition-colors"
+              >
+                <X size={12} />
+              </button>
+            )}
           </span>
         ))}
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={value.length === 0 ? placeholder : ""}
-          className="flex-1 min-w-[100px] bg-transparent border-none outline-none text-sm text-text placeholder:text-faint p-1"
-        />
+        {!disabled && (
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={value.length === 0 ? placeholder : ""}
+            className="flex-1 min-w-[100px] bg-transparent border-none outline-none text-sm text-text placeholder:text-faint p-1"
+          />
+        )}
+        {disabled && value.length === 0 && (
+          <span className="text-sm text-muted italic p-1">None set</span>
+        )}
       </div>
-      {unused.length > 0 && (
+      {!disabled && unused.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {unused.map((s) => (
             <button

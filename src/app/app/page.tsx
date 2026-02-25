@@ -32,16 +32,34 @@ export default async function DashboardPage({ searchParams }: Props) {
 
   const user = userRes.data.user;
   let paymentsEnabled = false;
+
+  // Fetch user defaults + shared release memberships in parallel
+  type MemberRow = { release_id: string; role: string };
+  let sharedMemberships: MemberRow[] = [];
   if (user) {
-    const { data: defaults } = await supabase
-      .from("user_defaults")
-      .select("payments_enabled")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    paymentsEnabled = defaults?.payments_enabled ?? false;
+    const [defaultsRes, membersRes] = await Promise.all([
+      supabase
+        .from("user_defaults")
+        .select("payments_enabled")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("release_members")
+        .select("release_id, role")
+        .eq("user_id", user.id)
+        .not("accepted_at", "is", null),
+    ]);
+    paymentsEnabled = defaultsRes.data?.payments_enabled ?? false;
+    sharedMemberships = (membersRes.data ?? []) as MemberRow[];
   }
 
-  const releases = releasesRes.data;
+  // Separate owned vs shared releases (RLS returns both; filter by membership)
+  const allReleases = releasesRes.data;
+  const sharedReleaseIds = new Set(sharedMemberships.map((m) => m.release_id));
+  const roleByReleaseId = new Map(sharedMemberships.map((m) => [m.release_id, m.role]));
+
+  const releases = allReleases?.filter((r) => !sharedReleaseIds.has(r.id as string)) ?? null;
+  const sharedReleases = allReleases?.filter((r) => sharedReleaseIds.has(r.id as string)) ?? [];
 
   let outstandingTotal = 0;
   let outstandingCount = 0;
@@ -177,6 +195,7 @@ export default async function DashboardPage({ searchParams }: Props) {
                   feeTotal={r.fee_total as number | null}
                   feeCurrency={r.fee_currency as string | null}
                   coverArtUrl={r.cover_art_url as string | null}
+                  role="owner"
                 />
               );
             })}
@@ -189,7 +208,7 @@ export default async function DashboardPage({ searchParams }: Props) {
             </Link>
           </div>
         )
-      ) : (
+      ) : !sharedReleases.length ? (
         <EmptyState
           title="No releases yet"
           description="Create your first release to start planning your mix."
@@ -202,6 +221,40 @@ export default async function DashboardPage({ searchParams }: Props) {
             </Link>
           }
         />
+      ) : null}
+
+      {sharedReleases.length > 0 && (
+        <>
+          <h2 className="text-lg font-semibold text-text mt-10 mb-4">Shared with You</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {sharedReleases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => {
+              const trackCount = r.tracks?.length ?? 0;
+              const completedTracks =
+                r.tracks?.filter((t) => t.status === "complete").length ?? 0;
+              const memberRole = roleByReleaseId.get(r.id as string);
+              return (
+                <ReleaseCard
+                  key={r.id as string}
+                  id={r.id as string}
+                  title={r.title as string}
+                  artist={r.artist as string | null}
+                  releaseType={r.release_type as string}
+                  format={r.format as string}
+                  status={r.status as string}
+                  trackCount={trackCount}
+                  completedTracks={completedTracks}
+                  updatedAt={r.updated_at as string | null}
+                  paymentsEnabled={paymentsEnabled}
+                  paymentStatus={r.payment_status as string | null}
+                  feeTotal={r.fee_total as number | null}
+                  feeCurrency={r.fee_currency as string | null}
+                  coverArtUrl={r.cover_art_url as string | null}
+                  role={(memberRole as "collaborator" | "client") ?? "client"}
+                />
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );

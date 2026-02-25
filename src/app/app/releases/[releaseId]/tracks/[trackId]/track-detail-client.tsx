@@ -16,6 +16,7 @@ import { ReferenceCard } from "@/components/ui/reference-card";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { ArrowLeft, Check, Plus } from "lucide-react";
+import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
 
 const TABS = [
   { id: "intent", label: "Intent" },
@@ -101,11 +102,12 @@ type Props = {
   elements: ElementData[];
   notes: NoteData[];
   references: RefData[];
+  role: ReleaseRole;
 };
 
 export function TrackDetailClient({
   releaseId, releaseTitle, releaseFormat, releaseCoverArt,
-  track, intent, specs, elements, notes, references,
+  track, intent, specs, elements, notes, references, role,
 }: Props) {
   const [activeTab, setActiveTab] = useState("intent");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -450,14 +452,18 @@ export function TrackDetailClient({
         </div>
         <div className="flex items-center gap-3">
           <AutoSaveIndicator status={saveStatus} />
-          <Button
-            variant={trackStatus === "complete" ? "primary" : "secondary"}
-            onClick={cycleStatus}
-            className="h-9 text-xs"
-          >
-            <Check size={14} />
-            {trackStatus === "complete" ? "Marked Ready" : "Mark Ready"}
-          </Button>
+          {canEdit(role) ? (
+            <Button
+              variant={trackStatus === "complete" ? "primary" : "secondary"}
+              onClick={cycleStatus}
+              className="h-9 text-xs"
+            >
+              <Check size={14} />
+              {trackStatus === "complete" ? "Marked Ready" : "Mark Ready"}
+            </Button>
+          ) : (
+            <StatusIndicator color={sColor} label={sLabel} />
+          )}
         </div>
       </div>
 
@@ -473,7 +479,7 @@ export function TrackDetailClient({
                 <PanelBody className="py-5">
                   <div className="flex items-center justify-between mb-3">
                     <div className="label-sm text-muted">What should this track feel like?</div>
-                    {!editingVision && mixVision && (
+                    {canEditCreative(role) && !editingVision && mixVision && (
                       <button
                         type="button"
                         onClick={() => setEditingVision(true)}
@@ -483,7 +489,7 @@ export function TrackDetailClient({
                       </button>
                     )}
                   </div>
-                  {editingVision ? (
+                  {canEditCreative(role) && editingVision ? (
                     <div className="space-y-2">
                       <textarea
                         value={mixVision}
@@ -519,12 +525,12 @@ export function TrackDetailClient({
                     </div>
                   ) : mixVision ? (
                     <div
-                      className="p-4 rounded-md border border-border bg-panel text-sm text-text leading-relaxed whitespace-pre-wrap cursor-pointer hover:border-border-strong transition-colors"
-                      onClick={() => setEditingVision(true)}
+                      className={`p-4 rounded-md border border-border bg-panel text-sm text-text leading-relaxed whitespace-pre-wrap${canEditCreative(role) ? " cursor-pointer hover:border-border-strong" : ""} transition-colors`}
+                      onClick={canEditCreative(role) ? () => setEditingVision(true) : undefined}
                     >
                       {mixVision}
                     </div>
-                  ) : (
+                  ) : canEditCreative(role) ? (
                     <button
                       type="button"
                       onClick={() => setEditingVision(true)}
@@ -532,6 +538,8 @@ export function TrackDetailClient({
                     >
                       Click to describe the sonic direction...
                     </button>
+                  ) : (
+                    <p className="text-sm text-muted italic">No sonic direction set.</p>
                   )}
                 </PanelBody>
               </Panel>
@@ -540,12 +548,13 @@ export function TrackDetailClient({
                   <div className="label-sm text-muted mb-3">Emotional qualities</div>
                   <TagInput
                     value={emotionalTags}
-                    onChange={(tags) => {
+                    onChange={canEditCreative(role) ? (tags) => {
                       setEmotionalTags(tags);
                       saveIntent({ emotional_tags: tags });
-                    }}
+                    } : undefined}
                     suggestions={EMOTIONAL_SUGGESTIONS}
-                    placeholder="Type or click suggestions below"
+                    placeholder={canEditCreative(role) ? "Type or click suggestions below" : ""}
+                    disabled={!canEditCreative(role)}
                   />
                 </PanelBody>
               </Panel>
@@ -554,11 +563,12 @@ export function TrackDetailClient({
                   <div className="label-sm text-muted mb-3">Anti-references</div>
                   <textarea
                     value={antiRefs}
-                    onChange={(e) => {
+                    onChange={canEditCreative(role) ? (e) => {
                       setAntiRefs(e.target.value);
                       saveIntent({ anti_references: e.target.value });
-                    }}
-                    placeholder="What should this NOT sound like? Describe sounds, styles, or specific mixes to avoid."
+                    } : undefined}
+                    readOnly={!canEditCreative(role)}
+                    placeholder={canEditCreative(role) ? "What should this NOT sound like? Describe sounds, styles, or specific mixes to avoid." : ""}
                     className="input min-h-[80px] resize-y text-sm leading-relaxed"
                   />
                 </PanelBody>
@@ -581,6 +591,7 @@ export function TrackDetailClient({
                           setLoudness(e.target.value);
                           saveSpecs({ target_loudness: e.target.value });
                         }}
+                        disabled={!canEdit(role)}
                         className="input"
                       >
                         <option value="-14 LUFS">-14 LUFS — Spotify / YouTube</option>
@@ -602,6 +613,7 @@ export function TrackDetailClient({
                           setFormatOverride(isRelease ? "" : val);
                           saveSpecs({ format_override: isRelease ? null : val });
                         }}
+                        disabled={!canEdit(role)}
                         className="input"
                       >
                         <option value="stereo">Stereo</option>
@@ -617,6 +629,7 @@ export function TrackDetailClient({
                           setSampleRate(e.target.value);
                           saveSpecs({ sample_rate: e.target.value });
                         }}
+                        disabled={!canEdit(role)}
                         className="input"
                       >
                         <option value="44.1 kHz">44.1 kHz</option>
@@ -634,6 +647,7 @@ export function TrackDetailClient({
                           setBitDepth(e.target.value);
                           saveSpecs({ bit_depth: e.target.value });
                         }}
+                        disabled={!canEdit(role)}
                         className="input"
                       >
                         <option value="16-bit">16-bit</option>
@@ -657,17 +671,19 @@ export function TrackDetailClient({
                           setDeliveryFormats(next);
                           saveSpecs({ delivery_formats: next });
                         }}
+                        disabled={!canEdit(role)}
                       />
                     </div>
                     <div className="space-y-1.5">
                       <label className="label text-muted">Special requirements</label>
                       <textarea
                         value={specialReqs}
-                        onChange={(e) => {
+                        onChange={canEdit(role) ? (e) => {
                           setSpecialReqs(e.target.value);
                           saveSpecs({ special_reqs: e.target.value });
-                        }}
-                        placeholder="e.g., Radio edit needed, TV sync version, vinyl master, stems for remix..."
+                        } : undefined}
+                        readOnly={!canEdit(role)}
+                        placeholder={canEdit(role) ? "e.g., Radio edit needed, TV sync version, vinyl master, stems for remix..." : ""}
                         className="input min-h-[100px] resize-y text-sm"
                       />
                     </div>
@@ -707,7 +723,7 @@ export function TrackDetailClient({
                     </span>
                   </div>
                   <div className="relative">
-                    {!showNewVersion ? (
+                    {canEditCreative(role) && !showNewVersion ? (
                       <button
                         type="button"
                         onClick={() => {
@@ -762,11 +778,15 @@ export function TrackDetailClient({
                   {versionEls.length === 0 && (
                     <div className="text-center py-8">
                       <p className="text-sm text-muted mb-4">
-                        No elements in {activeVersion}. Add instruments or copy from a previous version.
+                        {canEditCreative(role)
+                          ? `No elements in ${activeVersion}. Add instruments or copy from a previous version.`
+                          : `No elements in ${activeVersion}.`}
                       </p>
-                      <Button variant="secondary" onClick={handleAddDefaults}>
-                        Add default elements
-                      </Button>
+                      {canEditCreative(role) && (
+                        <Button variant="secondary" onClick={handleAddDefaults}>
+                          Add default elements
+                        </Button>
+                      )}
                     </div>
                   )}
                   {versionEls.map((el, idx) => (
@@ -779,26 +799,29 @@ export function TrackDetailClient({
                       updatedAt={el.updated_at}
                       isDragging={dragIdx === idx}
                       isDragOver={dragOverIdx === idx}
-                      onDragStart={() => setDragIdx(idx)}
-                      onDragOver={(e) => {
+                      onDragStart={canEditCreative(role) ? () => setDragIdx(idx) : undefined}
+                      onDragOver={canEditCreative(role) ? (e) => {
                         e.preventDefault();
                         setDragOverIdx(idx);
-                      }}
-                      onDrop={() => {
+                      } : undefined}
+                      onDrop={canEditCreative(role) ? () => {
                         if (dragIdx !== null) handleDrop(dragIdx, idx, versionEls);
-                      }}
-                      onUpdate={(d) => handleUpdateElement(el.id, d)}
-                      onDelete={() => handleDeleteElement(el.id)}
+                      } : undefined}
+                      onUpdate={canEditCreative(role) ? (d) => handleUpdateElement(el.id, d) : () => {}}
+                      onDelete={canEditCreative(role) ? () => handleDeleteElement(el.id) : () => {}}
+                      readOnly={!canEditCreative(role)}
                     />
                   ))}
                 </div>
 
-                <div className="pt-2">
-                  <QuickAddElement
-                    onAdd={handleAddElement}
-                    existingNames={versionEls.map((e) => e.name)}
-                  />
-                </div>
+                {canEditCreative(role) && (
+                  <div className="pt-2">
+                    <QuickAddElement
+                      onAdd={handleAddElement}
+                      existingNames={versionEls.map((e) => e.name)}
+                    />
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -806,22 +829,24 @@ export function TrackDetailClient({
           {/* Notes */}
           {activeTab === "notes" && (
             <div className="space-y-4">
-              <div className="flex gap-3">
-                <textarea
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  placeholder="Add a note..."
-                  className="input flex-1 min-h-[80px] resize-y text-sm"
-                />
-                <Button
-                  variant="primary"
-                  onClick={handlePostNote}
-                  disabled={!newNote.trim()}
-                  className="self-end h-10"
-                >
-                  Post
-                </Button>
-              </div>
+              {canEditCreative(role) && (
+                <div className="flex gap-3">
+                  <textarea
+                    value={newNote}
+                    onChange={(e) => setNewNote(e.target.value)}
+                    placeholder="Add a note..."
+                    className="input flex-1 min-h-[80px] resize-y text-sm"
+                  />
+                  <Button
+                    variant="primary"
+                    onClick={handlePostNote}
+                    disabled={!newNote.trim()}
+                    className="self-end h-10"
+                  >
+                    Post
+                  </Button>
+                </div>
+              )}
               {localNotes.length > 0 ? (
                 <div>
                   {localNotes.map((note, idx) => (
@@ -851,13 +876,17 @@ export function TrackDetailClient({
               <div className="label-sm text-muted mb-1">QUICK VIEW</div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Status</span>
-                <button
-                  type="button"
-                  onClick={cycleStatus}
-                  className="cursor-pointer hover:opacity-80 transition-opacity"
-                >
+                {canEdit(role) ? (
+                  <button
+                    type="button"
+                    onClick={cycleStatus}
+                    className="cursor-pointer hover:opacity-80 transition-opacity"
+                  >
+                    <StatusIndicator color={sColor} label={sLabel} />
+                  </button>
+                ) : (
                   <StatusIndicator color={sColor} label={sLabel} />
-                </button>
+                )}
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted">Loudness</span>
@@ -881,13 +910,15 @@ export function TrackDetailClient({
             <PanelBody className="py-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="label-sm text-muted">REFERENCES</div>
-                <button
-                  type="button"
-                  onClick={() => setShowRefForm(!showRefForm)}
-                  className="text-xs text-muted hover:text-text transition-colors"
-                >
-                  + Add
-                </button>
+                {canEditCreative(role) && (
+                  <button
+                    type="button"
+                    onClick={() => setShowRefForm(!showRefForm)}
+                    className="text-xs text-muted hover:text-text transition-colors"
+                  >
+                    + Add
+                  </button>
+                )}
               </div>
               {showRefForm && (
                 <div className="space-y-2 p-3 rounded-md border border-border bg-panel2">
@@ -1010,7 +1041,7 @@ export function TrackDetailClient({
                       note={ref.note}
                       url={ref.url}
                       artworkUrl={ref.artwork_url}
-                      onDelete={() => handleDeleteRef(ref.id)}
+                      onDelete={canEditCreative(role) ? () => handleDeleteRef(ref.id) : undefined}
                     />
                   ))}
                 </div>
@@ -1036,9 +1067,11 @@ const DELIVERY_FORMATS = [
 function DeliveryFormatSelector({
   value,
   onChange,
+  disabled,
 }: {
   value: string[];
   onChange: (next: string[]) => void;
+  disabled?: boolean;
 }) {
   const [custom, setCustom] = useState("");
   const allFormats = [...new Set([...DELIVERY_FORMATS, ...value.filter((v) => !DELIVERY_FORMATS.includes(v))])];
@@ -1057,47 +1090,50 @@ function DeliveryFormatSelector({
           <button
             key={fmt}
             type="button"
-            onClick={() => toggle(fmt)}
+            onClick={() => !disabled && toggle(fmt)}
+            disabled={disabled}
             className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
               value.includes(fmt)
                 ? "bg-signal/10 border-signal text-signal"
                 : "border-border text-muted hover:text-text hover:border-border-strong"
-            }`}
+            } ${disabled ? "opacity-60 cursor-default" : ""}`}
           >
             {value.includes(fmt) && <Check size={12} />}
             {fmt}
           </button>
         ))}
       </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={custom}
-          onChange={(e) => setCustom(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && custom.trim()) {
-              toggle(custom.trim().toUpperCase());
-              setCustom("");
-            }
-          }}
-          placeholder="Custom format..."
-          className="input text-sm h-9 flex-1"
-        />
-        <Button
-          variant="ghost"
-          onClick={() => {
-            if (custom.trim()) {
-              toggle(custom.trim().toUpperCase());
-              setCustom("");
-            }
-          }}
-          disabled={!custom.trim()}
-          className="h-9 text-xs"
-        >
-          <Plus size={14} />
-          Add
-        </Button>
-      </div>
+      {!disabled && (
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={custom}
+            onChange={(e) => setCustom(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && custom.trim()) {
+                toggle(custom.trim().toUpperCase());
+                setCustom("");
+              }
+            }}
+            placeholder="Custom format..."
+            className="input text-sm h-9 flex-1"
+          />
+          <Button
+            variant="ghost"
+            onClick={() => {
+              if (custom.trim()) {
+                toggle(custom.trim().toUpperCase());
+                setCustom("");
+              }
+            }}
+            disabled={!custom.trim()}
+            className="h-9 text-xs"
+          >
+            <Plus size={14} />
+            Add
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

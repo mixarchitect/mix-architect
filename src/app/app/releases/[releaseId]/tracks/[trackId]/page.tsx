@@ -1,6 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { notFound } from "next/navigation";
 import { TrackDetailClient } from "./track-detail-client";
+import { getReleaseRole } from "@/lib/get-release-role";
 
 type Props = {
   params: Promise<{ releaseId: string; trackId: string }>;
@@ -38,6 +39,10 @@ export default async function TrackDetailPage({ params }: Props) {
 
   const release = releaseRes.data;
 
+  // Fetch user + role
+  const { data: { user } } = await supabase.auth.getUser();
+  const role = user ? await getReleaseRole(supabase, releaseId, user.id) : null;
+
   return (
     <TrackDetailClient
       releaseId={releaseId}
@@ -50,6 +55,7 @@ export default async function TrackDetailPage({ params }: Props) {
       elements={elementsRes.data ?? []}
       notes={notesRes.data ?? []}
       references={refsRes.data ?? []}
+      role={role}
     />
   );
 }

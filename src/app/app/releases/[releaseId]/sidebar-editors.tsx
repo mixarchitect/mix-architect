@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ReferenceCard } from "@/components/ui/reference-card";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { Pencil, Check, X, ImageIcon, Upload } from "lucide-react";
+import { canEdit, canEditCreative, canEditPayment, type ReleaseRole } from "@/lib/permissions";
 
 // ── Status Editor ──
 
@@ -30,9 +31,10 @@ function releaseStatusLabel(s: string): string {
 type StatusEditorProps = {
   releaseId: string;
   initialStatus: string;
+  role?: ReleaseRole;
 };
 
-export function StatusEditor({ releaseId, initialStatus }: StatusEditorProps) {
+export function StatusEditor({ releaseId, initialStatus, role }: StatusEditorProps) {
   const [status, setStatus] = useState<ReleaseStatus>(
     (RELEASE_STATUSES.includes(initialStatus as ReleaseStatus) ? initialStatus : "draft") as ReleaseStatus,
   );
@@ -54,6 +56,15 @@ export function StatusEditor({ releaseId, initialStatus }: StatusEditorProps) {
     } catch {
       setStatus(prev);
     }
+  }
+
+  if (!canEdit(role ?? "owner")) {
+    return (
+      <StatusIndicator
+        color={releaseStatusColor(status)}
+        label={releaseStatusLabel(status)}
+      />
+    );
   }
 
   return (
@@ -84,9 +95,10 @@ type DirectionEditorProps = {
   releaseId: string;
   initialValue: string | null;
   initialStatus?: string;
+  role?: ReleaseRole;
 };
 
-export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus }: DirectionEditorProps) {
+export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus, role }: DirectionEditorProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(initialValue ?? "");
   const [saving, setSaving] = useState(false);
@@ -124,7 +136,7 @@ export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus }
       <PanelBody className="py-5">
         <div className="flex items-center justify-between mb-2">
           <div className="label-sm text-muted">GLOBAL MIX DIRECTION</div>
-          {!editing && (
+          {!editing && canEdit(role ?? "owner") && (
             <button
               type="button"
               onClick={() => setEditing(true)}
@@ -192,9 +204,10 @@ type RefsEditorProps = {
   releaseId: string;
   initialRefs: Ref[];
   initialStatus?: string;
+  role?: ReleaseRole;
 };
 
-export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus }: RefsEditorProps) {
+export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, role }: RefsEditorProps) {
   const [refs, setRefs] = useState<Ref[]>(initialRefs);
   const [showForm, setShowForm] = useState(false);
   const [refTitle, setRefTitle] = useState("");
@@ -288,7 +301,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus }
       <PanelBody className="py-5">
         <div className="flex items-center justify-between mb-2">
           <div className="label-sm text-muted">GLOBAL REFERENCES</div>
-          {!showForm && (
+          {!showForm && canEditCreative(role ?? "owner") && (
             <button
               type="button"
               onClick={() => setShowForm(true)}
@@ -413,7 +426,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus }
                 note={ref.note}
                 url={ref.url}
                 artworkUrl={ref.artwork_url}
-                onDelete={() => handleDeleteRef(ref.id)}
+                onDelete={canEditCreative(role ?? "owner") ? () => handleDeleteRef(ref.id) : undefined}
               />
             ))}
           </div>
@@ -428,9 +441,10 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus }
 type CoverArtEditorProps = {
   releaseId: string;
   initialUrl: string | null;
+  role?: ReleaseRole;
 };
 
-export function CoverArtEditor({ releaseId, initialUrl }: CoverArtEditorProps) {
+export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorProps) {
   const [editing, setEditing] = useState(false);
   const [url, setUrl] = useState(initialUrl ?? "");
   const [urlInput, setUrlInput] = useState("");
@@ -593,6 +607,15 @@ export function CoverArtEditor({ releaseId, initialUrl }: CoverArtEditorProps) {
   }
 
   // Display mode
+  if (!canEdit(role ?? "owner")) {
+    // Read-only: show image without edit overlay
+    return url ? (
+      <div className="w-full rounded-lg overflow-hidden border border-border">
+        <img src={url} alt="Cover art" className="w-full aspect-square object-cover block" />
+      </div>
+    ) : null;
+  }
+
   return (
     <button
       type="button"
@@ -646,6 +669,7 @@ type PaymentEditorProps = {
   initialPaidAmount: number | null;
   initialFeeCurrency: string;
   initialPaymentNotes: string | null;
+  role?: ReleaseRole;
 };
 
 export function PaymentEditor({
@@ -655,6 +679,7 @@ export function PaymentEditor({
   initialPaidAmount,
   initialFeeCurrency,
   initialPaymentNotes,
+  role,
 }: PaymentEditorProps) {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
     (PAYMENT_STATUSES.includes(initialPaymentStatus as PaymentStatus) ? initialPaymentStatus : "unpaid") as PaymentStatus,
@@ -732,121 +757,140 @@ export function PaymentEditor({
         <div className="space-y-3">
           <div className="flex justify-between text-sm items-center">
             <span className="text-muted">Status</span>
-            <button
-              type="button"
-              onClick={cyclePaymentStatus}
-              className="cursor-pointer hover:opacity-80 transition-opacity"
-            >
+            {canEditPayment(role ?? "owner") ? (
+              <button
+                type="button"
+                onClick={cyclePaymentStatus}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                <StatusIndicator
+                  color={paymentStatusColor(paymentStatus)}
+                  label={paymentStatusLabel(paymentStatus)}
+                />
+              </button>
+            ) : (
               <StatusIndicator
                 color={paymentStatusColor(paymentStatus)}
                 label={paymentStatusLabel(paymentStatus)}
               />
-            </button>
+            )}
           </div>
           <div className="flex justify-between text-sm items-center">
             <span className="text-muted">Fee</span>
-            {editingFee ? (
-              <div className="flex items-center gap-1.5">
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={feeInput}
-                  onChange={(e) => setFeeInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") saveFee();
-                    if (e.key === "Escape") {
+            {canEditPayment(role ?? "owner") ? (
+              editingFee ? (
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={feeInput}
+                    onChange={(e) => setFeeInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveFee();
+                      if (e.key === "Escape") {
+                        setFeeInput(feeTotal != null ? String(feeTotal) : "");
+                        setEditingFee(false);
+                      }
+                    }}
+                    className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
+                    autoFocus
+                    placeholder="0.00"
+                  />
+                  <button
+                    type="button"
+                    onClick={saveFee}
+                    className="text-signal hover:opacity-80 transition-opacity"
+                  >
+                    <Check size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
                       setFeeInput(feeTotal != null ? String(feeTotal) : "");
                       setEditingFee(false);
-                    }
-                  }}
-                  className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
-                  autoFocus
-                  placeholder="0.00"
-                />
-                <button
-                  type="button"
-                  onClick={saveFee}
-                  className="text-signal hover:opacity-80 transition-opacity"
-                >
-                  <Check size={14} />
-                </button>
+                    }}
+                    className="text-muted hover:text-text transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
                 <button
                   type="button"
                   onClick={() => {
                     setFeeInput(feeTotal != null ? String(feeTotal) : "");
-                    setEditingFee(false);
+                    setEditingFee(true);
                   }}
-                  className="text-muted hover:text-text transition-colors"
+                  className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
                 >
-                  <X size={14} />
+                  {formatCurrency(feeTotal, initialFeeCurrency)}
                 </button>
-              </div>
+              )
             ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setFeeInput(feeTotal != null ? String(feeTotal) : "");
-                  setEditingFee(true);
-                }}
-                className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
-              >
+              <span className="text-text font-mono text-xs">
                 {formatCurrency(feeTotal, initialFeeCurrency)}
-              </button>
+              </span>
             )}
           </div>
           {paymentStatus === "partial" && (
             <>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Paid</span>
-                {editingPaid ? (
-                  <div className="flex items-center gap-1.5">
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={paidInput}
-                      onChange={(e) => setPaidInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") savePaid();
-                        if (e.key === "Escape") {
+                {canEditPayment(role ?? "owner") ? (
+                  editingPaid ? (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={paidInput}
+                        onChange={(e) => setPaidInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") savePaid();
+                          if (e.key === "Escape") {
+                            setPaidInput(String(paidAmount));
+                            setEditingPaid(false);
+                          }
+                        }}
+                        className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
+                        autoFocus
+                        placeholder="0.00"
+                      />
+                      <button
+                        type="button"
+                        onClick={savePaid}
+                        className="text-signal hover:opacity-80 transition-opacity"
+                      >
+                        <Check size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
                           setPaidInput(String(paidAmount));
                           setEditingPaid(false);
-                        }
-                      }}
-                      className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
-                      autoFocus
-                      placeholder="0.00"
-                    />
-                    <button
-                      type="button"
-                      onClick={savePaid}
-                      className="text-signal hover:opacity-80 transition-opacity"
-                    >
-                      <Check size={14} />
-                    </button>
+                        }}
+                        className="text-muted hover:text-text transition-colors"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
                     <button
                       type="button"
                       onClick={() => {
                         setPaidInput(String(paidAmount));
-                        setEditingPaid(false);
+                        setEditingPaid(true);
                       }}
-                      className="text-muted hover:text-text transition-colors"
+                      className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
                     >
-                      <X size={14} />
+                      {formatCurrency(paidAmount, initialFeeCurrency)}
                     </button>
-                  </div>
+                  )
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setPaidInput(String(paidAmount));
-                      setEditingPaid(true);
-                    }}
-                    className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
-                  >
+                  <span className="text-text font-mono text-xs">
                     {formatCurrency(paidAmount, initialFeeCurrency)}
-                  </button>
+                  </span>
                 )}
               </div>
               <div className="flex justify-between text-sm items-center pt-1 border-t border-border/50">

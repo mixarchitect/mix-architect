@@ -8,6 +8,8 @@ import { TrackRow } from "@/components/ui/track-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
+import { getReleaseRole } from "@/lib/get-release-role";
+import { canEdit } from "@/lib/permissions";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
@@ -51,15 +53,18 @@ export default async function ReleasePage({ params }: Props) {
   if (!release) notFound();
 
   const user = userRes.data.user;
-  let paymentsEnabled = false;
-  if (user) {
-    const { data: defaults } = await supabase
+  if (!user) notFound();
+
+  // Fetch role + user defaults in parallel
+  const [role, defaultsRes2] = await Promise.all([
+    getReleaseRole(supabase, releaseId, user.id),
+    supabase
       .from("user_defaults")
       .select("payments_enabled")
       .eq("user_id", user.id)
-      .maybeSingle();
-    paymentsEnabled = defaults?.payments_enabled ?? false;
-  }
+      .maybeSingle(),
+  ]);
+  const paymentsEnabled = defaultsRes2.data?.payments_enabled ?? false;
 
   const tracks = tracksRes.data;
   const globalRefs = globalRefsRes.data;
@@ -86,11 +91,13 @@ export default async function ReleasePage({ params }: Props) {
               Export Brief
             </Button>
           </Link>
-          <Link href={`/app/releases/${releaseId}/settings`}>
-            <Button variant="secondary" className="px-3">
-              <Settings size={16} />
-            </Button>
-          </Link>
+          {canEdit(role) && (
+            <Link href={`/app/releases/${releaseId}/settings`}>
+              <Button variant="secondary" className="px-3">
+                <Settings size={16} />
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -105,12 +112,14 @@ export default async function ReleasePage({ params }: Props) {
                 {tracks?.length ?? 0}
               </span>
             </h2>
-            <Link href={`/app/releases/${releaseId}/tracks/new`}>
-              <Button variant="secondary" className="h-9 text-xs">
-                <Plus size={14} />
-                Add Track
-              </Button>
-            </Link>
+            {canEdit(role) && (
+              <Link href={`/app/releases/${releaseId}/tracks/new`}>
+                <Button variant="secondary" className="h-9 text-xs">
+                  <Plus size={14} />
+                  Add Track
+                </Button>
+              </Link>
+            )}
           </div>
 
           {tracks && tracks.length > 0 ? (
@@ -135,15 +144,15 @@ export default async function ReleasePage({ params }: Props) {
           ) : (
             <EmptyState
               title="No tracks yet"
-              description="Add your first track to get started."
-              action={
+              description={canEdit(role) ? "Add your first track to get started." : "No tracks have been added yet."}
+              action={canEdit(role) ? (
                 <Link href={`/app/releases/${releaseId}/tracks/new`}>
                   <Button variant="primary">
                     <Plus size={16} />
                     Add Track
                   </Button>
                 </Link>
-              }
+              ) : undefined}
             />
           )}
         </div>
@@ -151,7 +160,7 @@ export default async function ReleasePage({ params }: Props) {
         {/* Inspector sidebar */}
         <aside className="space-y-4">
           {/* Cover Art */}
-          <CoverArtEditor releaseId={releaseId} initialUrl={release.cover_art_url} />
+          <CoverArtEditor releaseId={releaseId} initialUrl={release.cover_art_url} role={role} />
 
           {/* Release Info */}
           <Panel>
@@ -172,7 +181,7 @@ export default async function ReleasePage({ params }: Props) {
                 </div>
                 <div className="flex justify-between text-sm items-center">
                   <span className="text-muted">Status</span>
-                  <StatusEditor releaseId={releaseId} initialStatus={release.status} />
+                  <StatusEditor releaseId={releaseId} initialStatus={release.status} role={role} />
                 </div>
                 {release.target_date && (
                   <div className="flex justify-between text-sm">
@@ -201,6 +210,7 @@ export default async function ReleasePage({ params }: Props) {
             releaseId={releaseId}
             initialValue={release.global_direction}
             initialStatus={release.status}
+            role={role}
           />
 
           {/* Global References */}
@@ -216,6 +226,7 @@ export default async function ReleasePage({ params }: Props) {
               sort_order: (r.sort_order as number) ?? 0,
             }))}
             initialStatus={release.status}
+            role={role}
           />
 
           {/* Client Info */}
@@ -252,6 +263,7 @@ export default async function ReleasePage({ params }: Props) {
               initialPaidAmount={release.paid_amount ?? 0}
               initialFeeCurrency={release.fee_currency ?? "USD"}
               initialPaymentNotes={release.payment_notes}
+              role={role}
             />
           )}
         </aside>

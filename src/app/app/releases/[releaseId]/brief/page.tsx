@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Rule } from "@/components/ui/rule";
 import { ArrowLeft } from "lucide-react";
 import { BriefActions } from "./brief-actions";
+import { getReleaseRole } from "@/lib/get-release-role";
 
 type Props = { params: Promise<{ releaseId: string }> };
 
@@ -11,13 +12,15 @@ export default async function BriefPage({ params }: Props) {
   const { releaseId } = await params;
   const supabase = await createSupabaseServerClient();
 
-  const { data: release } = await supabase
-    .from("releases")
-    .select("*")
-    .eq("id", releaseId)
-    .maybeSingle();
+  const [releaseRes, { data: { user } }] = await Promise.all([
+    supabase.from("releases").select("*").eq("id", releaseId).maybeSingle(),
+    supabase.auth.getUser(),
+  ]);
 
+  const release = releaseRes.data;
   if (!release) notFound();
+
+  const role = user ? await getReleaseRole(supabase, releaseId, user.id) : null;
 
   const { data: tracks } = await supabase
     .from("tracks")
@@ -74,7 +77,7 @@ export default async function BriefPage({ params }: Props) {
           <ArrowLeft size={14} />
           {release.title}
         </Link>
-        <BriefActions releaseId={releaseId} />
+        <BriefActions releaseId={releaseId} role={role} />
       </div>
 
       {/* Brief document */}

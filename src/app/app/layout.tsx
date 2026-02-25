@@ -14,13 +14,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     redirect("/auth/sign-in");
   }
 
-  let paymentsEnabled = false;
-  const { data: defaults } = await supabase
-    .from("user_defaults")
-    .select("payments_enabled")
-    .eq("user_id", user.id)
-    .maybeSingle();
-  paymentsEnabled = defaults?.payments_enabled ?? false;
+  // Run in parallel: fetch user defaults + claim any pending invites
+  const [defaultsRes] = await Promise.all([
+    supabase
+      .from("user_defaults")
+      .select("payments_enabled")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase.rpc("claim_pending_invites"),
+  ]);
+  const paymentsEnabled = defaultsRes.data?.payments_enabled ?? false;
 
   return (
     <Shell userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled}>

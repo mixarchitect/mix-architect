@@ -18,13 +18,14 @@ type Props = {
   onDrop?: () => void;
   isDragging?: boolean;
   isDragOver?: boolean;
+  readOnly?: boolean;
   className?: string;
 };
 
 export function ElementRow({
   name, notes, flagged, createdAt, updatedAt,
   onUpdate, onDelete, onDragStart, onDragOver, onDrop,
-  isDragging, isDragOver, className,
+  isDragging, isDragOver, readOnly, className,
 }: Props) {
   const [localName, setLocalName] = useState(name);
   const [localNotes, setLocalNotes] = useState(notes);
@@ -40,7 +41,7 @@ export function ElementRow({
 
   return (
     <div
-      draggable
+      draggable={!readOnly}
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDrop={onDrop}
@@ -54,46 +55,59 @@ export function ElementRow({
       )}
     >
       <div className="flex items-center gap-2">
-        <GripVertical
-          size={14}
-          className="text-faint cursor-grab shrink-0 active:cursor-grabbing"
-        />
+        {!readOnly && (
+          <GripVertical
+            size={14}
+            className="text-faint cursor-grab shrink-0 active:cursor-grabbing"
+          />
+        )}
         <input
           type="text"
           value={localName}
           onChange={(e) => {
+            if (readOnly) return;
             setLocalName(e.target.value);
             debouncedUpdate({ name: e.target.value });
           }}
+          readOnly={readOnly}
           className="flex-1 text-sm font-semibold text-text bg-transparent border-none outline-none"
         />
-        <button
-          type="button"
-          onClick={() => onUpdate({ flagged: !flagged })}
-          className={cn(
-            "p-1 rounded transition-colors",
-            flagged ? "text-signal" : "text-faint hover:text-signal"
-          )}
-          title={flagged ? "Unpin" : "Pin to top"}
-        >
-          <Pin size={14} className={flagged ? "fill-current" : ""} />
-        </button>
-        <button
-          type="button"
-          onClick={onDelete}
-          className="p-1 rounded text-faint hover:text-signal transition-colors"
-          title="Remove element"
-        >
-          <X size={14} />
-        </button>
+        {!readOnly && (
+          <>
+            <button
+              type="button"
+              onClick={() => onUpdate({ flagged: !flagged })}
+              className={cn(
+                "p-1 rounded transition-colors",
+                flagged ? "text-signal" : "text-faint hover:text-signal"
+              )}
+              title={flagged ? "Unpin" : "Pin to top"}
+            >
+              <Pin size={14} className={flagged ? "fill-current" : ""} />
+            </button>
+            <button
+              type="button"
+              onClick={onDelete}
+              className="p-1 rounded text-faint hover:text-signal transition-colors"
+              title="Remove element"
+            >
+              <X size={14} />
+            </button>
+          </>
+        )}
+        {readOnly && flagged && (
+          <Pin size={14} className="text-signal fill-current" />
+        )}
       </div>
       <textarea
         value={localNotes}
         onChange={(e) => {
+          if (readOnly) return;
           setLocalNotes(e.target.value);
           debouncedUpdate({ notes: e.target.value });
         }}
-        placeholder="Mix notes for this element..."
+        readOnly={readOnly}
+        placeholder={readOnly ? "" : "Mix notes for this element..."}
         className="w-full text-sm text-text bg-transparent border-none outline-none resize-none min-h-[40px] placeholder:text-faint"
       />
       {hasTimestamp && (
