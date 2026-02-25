@@ -451,6 +451,12 @@ export function TrackDetailClient({
     }
   }
 
+  function handleMoveElement(fromIdx: number, direction: -1 | 1, versionEls: ElementData[]) {
+    const toIdx = fromIdx + direction;
+    if (toIdx < 0 || toIdx >= versionEls.length) return;
+    handleDrop(fromIdx, toIdx, versionEls);
+  }
+
   async function handlePostNote() {
     if (!newNote.trim()) return;
     const { data } = await supabase
@@ -927,6 +933,10 @@ export function TrackDetailClient({
                       onDrop={canEditCreative(role) ? () => {
                         if (dragIdx !== null) handleDrop(dragIdx, idx, versionEls);
                       } : undefined}
+                      onMoveUp={canEditCreative(role) ? () => handleMoveElement(idx, -1, versionEls) : undefined}
+                      onMoveDown={canEditCreative(role) ? () => handleMoveElement(idx, 1, versionEls) : undefined}
+                      isFirst={idx === 0}
+                      isLast={idx === versionEls.length - 1}
                       onUpdate={canEditCreative(role) ? (d) => handleUpdateElement(el.id, d) : () => {}}
                       onDelete={canEditCreative(role) ? () => handleDeleteElement(el.id) : () => {}}
                       readOnly={!canEditCreative(role)}

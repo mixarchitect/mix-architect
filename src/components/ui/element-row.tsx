@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Pin, X, GripVertical } from "lucide-react";
+import { Pin, X, GripVertical, ChevronUp, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { relativeTime } from "@/lib/relative-time";
 
@@ -16,6 +16,10 @@ type Props = {
   onDragStart?: () => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
   isDragging?: boolean;
   isDragOver?: boolean;
   readOnly?: boolean;
@@ -25,6 +29,7 @@ type Props = {
 export function ElementRow({
   name, notes, flagged, createdAt, updatedAt,
   onUpdate, onDelete, onDragStart, onDragOver, onDrop,
+  onMoveUp, onMoveDown, isFirst, isLast,
   isDragging, isDragOver, readOnly, className,
 }: Props) {
   const [localName, setLocalName] = useState(name);
@@ -56,10 +61,42 @@ export function ElementRow({
     >
       <div className="flex items-center gap-2">
         {!readOnly && (
-          <GripVertical
-            size={14}
-            className="text-faint cursor-grab shrink-0 active:cursor-grabbing"
-          />
+          <>
+            {/* Desktop: drag handle */}
+            <GripVertical
+              size={14}
+              className="hidden md:block text-faint cursor-grab shrink-0 active:cursor-grabbing"
+            />
+            {/* Mobile: up/down arrows */}
+            {onMoveUp && onMoveDown && (
+              <div className="flex flex-col md:hidden shrink-0 -my-1">
+                <button
+                  type="button"
+                  onClick={onMoveUp}
+                  disabled={isFirst}
+                  className={cn(
+                    "p-0.5 rounded transition-colors",
+                    isFirst ? "text-transparent" : "text-faint active:text-text",
+                  )}
+                  title="Move up"
+                >
+                  <ChevronUp size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={onMoveDown}
+                  disabled={isLast}
+                  className={cn(
+                    "p-0.5 rounded transition-colors",
+                    isLast ? "text-transparent" : "text-faint active:text-text",
+                  )}
+                  title="Move down"
+                >
+                  <ChevronDown size={14} />
+                </button>
+              </div>
+            )}
+          </>
         )}
         <input
           type="text"

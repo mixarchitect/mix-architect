@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { GripVertical } from "lucide-react";
+import { GripVertical, ChevronUp, ChevronDown } from "lucide-react";
 import { StatusDot } from "@/components/ui/status-dot";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { cn } from "@/lib/cn";
@@ -65,6 +65,35 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder }: Prop
     }
   }
 
+  // Mobile: swap adjacent track_numbers
+  async function handleMove(trackId: string, direction: -1 | 1) {
+    const idx = sorted.findIndex((t) => t.id === trackId);
+    const neighborIdx = idx + direction;
+    if (neighborIdx < 0 || neighborIdx >= sorted.length) return;
+
+    const current = sorted[idx];
+    const neighbor = sorted[neighborIdx];
+    const prevTracks = [...localTracks];
+
+    setLocalTracks((prev) =>
+      prev.map((t) => {
+        if (t.id === current.id) return { ...t, track_number: neighbor.track_number };
+        if (t.id === neighbor.id) return { ...t, track_number: current.track_number };
+        return t;
+      }),
+    );
+
+    try {
+      const [r1, r2] = await Promise.all([
+        supabase.from("tracks").update({ track_number: neighbor.track_number }).eq("id", current.id),
+        supabase.from("tracks").update({ track_number: current.track_number }).eq("id", neighbor.id),
+      ]);
+      if (r1.error || r2.error) throw new Error("Reorder failed");
+    } catch {
+      setLocalTracks(prevTracks);
+    }
+  }
+
   return (
     <div className="space-y-2">
       {sorted.map((t, idx) => (
@@ -83,10 +112,40 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder }: Prop
           )}
         >
           {canReorder && (
-            <GripVertical
-              size={14}
-              className="text-faint cursor-grab shrink-0 active:cursor-grabbing"
-            />
+            <>
+              {/* Desktop: drag handle */}
+              <GripVertical
+                size={14}
+                className="hidden md:block text-faint cursor-grab shrink-0 active:cursor-grabbing"
+              />
+              {/* Mobile: up/down arrows */}
+              <div className="flex flex-col md:hidden shrink-0 -my-1">
+                <button
+                  type="button"
+                  onClick={() => handleMove(t.id, -1)}
+                  disabled={idx === 0}
+                  className={cn(
+                    "p-0.5 rounded transition-colors",
+                    idx === 0 ? "text-transparent" : "text-faint hover:text-text active:text-text",
+                  )}
+                  title="Move up"
+                >
+                  <ChevronUp size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMove(t.id, 1)}
+                  disabled={idx === sorted.length - 1}
+                  className={cn(
+                    "p-0.5 rounded transition-colors",
+                    idx === sorted.length - 1 ? "text-transparent" : "text-faint hover:text-text active:text-text",
+                  )}
+                  title="Move down"
+                >
+                  <ChevronDown size={14} />
+                </button>
+              </div>
+            </>
           )}
           <Link
             href={`/app/releases/${releaseId}/tracks/${t.id}`}
