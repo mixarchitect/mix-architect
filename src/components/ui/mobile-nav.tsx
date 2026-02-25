@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Settings, Search } from "lucide-react";
+import { Home, Settings, Search, LogOut } from "lucide-react";
+import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 
 const NAV_ITEMS = [
   { href: "/app", icon: Home, label: "Home", exact: true },
@@ -16,6 +17,13 @@ type Props = {
 
 export function MobileNav({ onSearchClick }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleSignOut() {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    router.push("/auth/sign-in");
+  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 md:hidden h-16 border-t border-border bg-panel flex items-center justify-around z-50">
@@ -45,6 +53,14 @@ export function MobileNav({ onSearchClick }: Props) {
       >
         <Search size={20} strokeWidth={1.5} />
         <span className="text-[10px] font-medium">Search</span>
+      </button>
+      <button
+        type="button"
+        onClick={handleSignOut}
+        className="flex flex-col items-center gap-1 px-4 py-2 transition-colors text-muted"
+      >
+        <LogOut size={20} strokeWidth={1.5} />
+        <span className="text-[10px] font-medium">Sign Out</span>
       </button>
     </nav>
   );

@@ -23,49 +23,73 @@ export function Rail({ onSearchClick }: Props) {
   const isHome = pathname === "/app";
   const isSettings = pathname?.startsWith("/app/settings");
 
-  const iconClass = (active?: boolean) =>
+  const itemClass = (active?: boolean) =>
     cn(
-      "w-10 h-10 grid place-items-center rounded-md",
+      "flex items-center gap-3 w-full px-3 h-10 rounded-md",
       "text-muted transition-all duration-150",
       "hover:text-text hover:bg-panel2",
       "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
       active && "text-signal bg-signal-muted",
     );
 
+  const labelClass =
+    "text-sm font-medium whitespace-nowrap opacity-0 group-hover/rail:opacity-100 transition-opacity duration-150 delay-75";
+
   return (
-    <nav className="hidden md:flex w-16 shrink-0 border-r border-border bg-panel flex-col items-center py-5 gap-1">
+    <nav
+      className={cn(
+        "group/rail hidden md:flex fixed left-0 top-0 h-screen z-20",
+        "w-16 hover:w-48 overflow-hidden",
+        "bg-panel border-r border-border",
+        "flex-col py-5 gap-1",
+        "transition-[width] duration-200 ease-out",
+      )}
+    >
       {/* Logo mark */}
       <Link
         href="/app"
-        className="w-10 h-10 rounded-lg grid place-items-center mb-6 hover:opacity-90 transition-opacity"
-        title="Mix Architect"
+        className="flex items-center gap-3 px-3 mb-5 hover:opacity-90 transition-opacity"
       >
-        <img src="/mix-architect-icon.svg" alt="Mix Architect" className="w-8 h-8" />
+        <span className="w-10 h-10 rounded-lg grid place-items-center shrink-0">
+          <img src="/mix-architect-icon.svg" alt="Mix Architect" className="w-8 h-8" />
+        </span>
+        <span className={cn(labelClass, "font-semibold")}>Mix Architect</span>
       </Link>
 
       {/* Home */}
-      <Link href="/app" title="Dashboard" className={iconClass(isHome)}>
-        <Home size={20} strokeWidth={1.5} />
+      <Link href="/app" className={itemClass(isHome)}>
+        <span className="w-10 h-10 grid place-items-center shrink-0">
+          <Home size={20} strokeWidth={1.5} />
+        </span>
+        <span className={labelClass}>Dashboard</span>
       </Link>
 
       {/* Search */}
-      <button type="button" onClick={onSearchClick} title="Search (Cmd+K)" className={iconClass()}>
-        <Search size={20} strokeWidth={1.5} />
+      <button type="button" onClick={onSearchClick} className={itemClass()}>
+        <span className="w-10 h-10 grid place-items-center shrink-0">
+          <Search size={20} strokeWidth={1.5} />
+        </span>
+        <span className={labelClass}>Search</span>
       </button>
 
       {/* Settings */}
-      <Link href="/app/settings" title="Settings" className={iconClass(isSettings)}>
-        <Settings size={20} strokeWidth={1.5} />
+      <Link href="/app/settings" className={itemClass(isSettings)}>
+        <span className="w-10 h-10 grid place-items-center shrink-0">
+          <Settings size={20} strokeWidth={1.5} />
+        </span>
+        <span className={labelClass}>Settings</span>
       </Link>
 
       {/* Sign out */}
       <button
         type="button"
         onClick={handleSignOut}
-        title="Sign out"
-        className={cn(iconClass(), "mt-auto")}
+        className={cn(itemClass(), "mt-auto")}
       >
-        <LogOut size={18} strokeWidth={1.5} />
+        <span className="w-10 h-10 grid place-items-center shrink-0">
+          <LogOut size={18} strokeWidth={1.5} />
+        </span>
+        <span className={labelClass}>Sign Out</span>
       </button>
     </nav>
   );
