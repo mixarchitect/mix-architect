@@ -9,6 +9,8 @@ export type SavedContact = {
   pro_org?: string | null;
   member_account?: string | null;
   ipi?: string | null;
+  sound_exchange_id?: string | null;
+  label_name?: string | null;
 };
 
 export function useSavedContacts() {
@@ -26,7 +28,7 @@ export function useSavedContacts() {
 
       const { data } = await supabase
         .from("saved_contacts")
-        .select("id, person_name, pro_org, member_account, ipi")
+        .select("id, person_name, pro_org, member_account, ipi, sound_exchange_id, label_name")
         .order("person_name");
 
       if (!cancelled && data) setContacts(data);
@@ -35,7 +37,7 @@ export function useSavedContacts() {
   }, [supabase]);
 
   const saveContact = useCallback(
-    async (contact: { person_name: string; pro_org?: string; member_account?: string; ipi?: string }) => {
+    async (contact: { person_name: string; pro_org?: string; member_account?: string; ipi?: string; sound_exchange_id?: string; label_name?: string }) => {
       const userId = userIdRef.current;
       if (!userId) return;
 
@@ -45,7 +47,7 @@ export function useSavedContacts() {
           { user_id: userId, ...contact },
           { onConflict: "user_id,person_name" },
         )
-        .select("id, person_name, pro_org, member_account, ipi")
+        .select("id, person_name, pro_org, member_account, ipi, sound_exchange_id, label_name")
         .single();
 
       if (error || !data) return;

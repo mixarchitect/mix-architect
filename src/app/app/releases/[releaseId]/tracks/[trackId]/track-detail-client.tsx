@@ -106,7 +106,6 @@ type DistributionData = {
   producer?: string;
   composers?: string;
   lyrics?: string;
-  sound_exchange_id?: string;
 } | null;
 type SplitData = {
   id: string;
@@ -117,6 +116,8 @@ type SplitData = {
   pro_org?: string;
   member_account?: string;
   ipi?: string;
+  sound_exchange_id?: string;
+  label_name?: string;
 };
 
 type Props = {
@@ -188,7 +189,6 @@ export function TrackDetailClient({
   const [producer, setProducer] = useState(distribution?.producer ?? "");
   const [composers, setComposers] = useState(distribution?.composers ?? "");
   const [lyrics, setLyrics] = useState(distribution?.lyrics ?? "");
-  const [soundExchangeId, setSoundExchangeId] = useState(distribution?.sound_exchange_id ?? "");
   const [localSplits, setLocalSplits] = useState<SplitData[]>(splits);
   const composersManualRef = useRef(!!distribution?.composers);
   const splitDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1061,17 +1061,6 @@ export function TrackDetailClient({
                       />
                     </div>
                   </div>
-                  <div className="space-y-1.5">
-                    <label className="label text-muted">Sound Exchange ID</label>
-                    <input
-                      type="text"
-                      value={soundExchangeId}
-                      onChange={(e) => { setSoundExchangeId(e.target.value); saveDistribution({ sound_exchange_id: e.target.value || null }); }}
-                      disabled={!canEdit(role)}
-                      className="input"
-                      placeholder="e.g., 1000139051"
-                    />
-                  </div>
                 </PanelBody>
               </Panel>
 
@@ -1617,7 +1606,7 @@ function SplitEditor({
   onDelete: (id: string) => void;
   readOnly?: boolean;
   contacts: SavedContact[];
-  onSaveContact: (data: { person_name: string; pro_org?: string; member_account?: string; ipi?: string }) => void;
+  onSaveContact: (data: { person_name: string; pro_org?: string; member_account?: string; ipi?: string; sound_exchange_id?: string; label_name?: string }) => void;
 }) {
   const sorted = [...splits].sort((a, b) => a.sort_order - b.sort_order);
   const total = sorted.reduce((sum, s) => sum + (s.percentage || 0), 0);
@@ -1694,13 +1683,15 @@ function SplitRow({
   onDelete: (id: string) => void;
   readOnly?: boolean;
   contacts: SavedContact[];
-  onSaveContact: (data: { person_name: string; pro_org?: string; member_account?: string; ipi?: string }) => void;
+  onSaveContact: (data: { person_name: string; pro_org?: string; member_account?: string; ipi?: string; sound_exchange_id?: string; label_name?: string }) => void;
 }) {
   const [localName, setLocalName] = useState(split.person_name);
   const [localPct, setLocalPct] = useState(String(split.percentage));
   const [localPro, setLocalPro] = useState(split.pro_org ?? "");
   const [localAccount, setLocalAccount] = useState(split.member_account ?? "");
   const [localIpi, setLocalIpi] = useState(split.ipi ?? "");
+  const [localSeId, setLocalSeId] = useState(split.sound_exchange_id ?? "");
+  const [localLabel, setLocalLabel] = useState(split.label_name ?? "");
   const rowDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Combobox state
@@ -1713,8 +1704,6 @@ function SplitRow({
     if (rowDebounceRef.current) clearTimeout(rowDebounceRef.current);
     rowDebounceRef.current = setTimeout(() => onUpdate(split.id, updates), 500);
   }
-
-  const showProFields = splitType === "writing" || splitType === "publishing";
 
   // Filter contacts by current name input (case-insensitive)
   const filtered = localName.trim()
@@ -1729,6 +1718,8 @@ function SplitRow({
     setLocalPro(contact.pro_org ?? "");
     setLocalAccount(contact.member_account ?? "");
     setLocalIpi(contact.ipi ?? "");
+    setLocalSeId(contact.sound_exchange_id ?? "");
+    setLocalLabel(contact.label_name ?? "");
     setShowDropdown(false);
     setActiveIdx(-1);
     // Batch update all fields
@@ -1737,6 +1728,8 @@ function SplitRow({
       pro_org: contact.pro_org ?? undefined,
       member_account: contact.member_account ?? undefined,
       ipi: contact.ipi ?? undefined,
+      sound_exchange_id: contact.sound_exchange_id ?? undefined,
+      label_name: contact.label_name ?? undefined,
     });
   }
 
@@ -1767,7 +1760,7 @@ function SplitRow({
     }, 150);
   }, []);
 
-  const canSave = !readOnly && localName.trim() && (localPro || localAccount || localIpi);
+  const canSave = !readOnly && localName.trim() && (localPro || localAccount || localIpi || localSeId || localLabel);
 
   return (
     <div className="rounded-md border border-border bg-panel">
@@ -1814,8 +1807,8 @@ function SplitRow({
                 >
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-text truncate">{c.person_name}</div>
-                    {c.pro_org && (
-                      <div className="text-[10px] text-muted truncate">{c.pro_org}</div>
+                    {(c.pro_org || c.label_name) && (
+                      <div className="text-[10px] text-muted truncate">{c.pro_org || c.label_name}</div>
                     )}
                   </div>
                 </button>
@@ -1849,6 +1842,8 @@ function SplitRow({
                 pro_org: localPro || undefined,
                 member_account: localAccount || undefined,
                 ipi: localIpi || undefined,
+                sound_exchange_id: localSeId || undefined,
+                label_name: localLabel || undefined,
               });
               setJustSaved(true);
               setTimeout(() => setJustSaved(false), 1500);
@@ -1870,7 +1865,7 @@ function SplitRow({
           </button>
         )}
       </div>
-      {showProFields && (
+      {(splitType === "writing" || splitType === "publishing") && (
         <div className="px-4 pb-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
           {splitType === "writing" && (
             <div className="space-y-1">
@@ -1908,6 +1903,32 @@ function SplitRow({
               onChange={(e) => { setLocalIpi(e.target.value); debouncedUpdate({ ipi: e.target.value || undefined }); }}
               readOnly={readOnly}
               placeholder="IPI #"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+        </div>
+      )}
+      {splitType === "master" && (
+        <div className="px-4 pb-3 grid grid-cols-2 gap-2 border-t border-border pt-3">
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">SoundExchange ID</label>
+            <input
+              type="text"
+              value={localSeId}
+              onChange={(e) => { setLocalSeId(e.target.value); debouncedUpdate({ sound_exchange_id: e.target.value || undefined }); }}
+              readOnly={readOnly}
+              placeholder="e.g., 1000139051"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">Label Name</label>
+            <input
+              type="text"
+              value={localLabel}
+              onChange={(e) => { setLocalLabel(e.target.value); debouncedUpdate({ label_name: e.target.value || undefined }); }}
+              readOnly={readOnly}
+              placeholder="e.g., Self-Released"
               className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
             />
           </div>
