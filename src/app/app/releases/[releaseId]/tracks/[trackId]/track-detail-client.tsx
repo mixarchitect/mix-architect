@@ -1715,22 +1715,30 @@ function SplitRow({
 
   function selectContact(contact: SavedContact) {
     setLocalName(contact.person_name);
-    setLocalPro(contact.pro_org ?? "");
-    setLocalAccount(contact.member_account ?? "");
-    setLocalIpi(contact.ipi ?? "");
-    setLocalSeId(contact.sound_exchange_id ?? "");
-    setLocalLabel(contact.label_name ?? "");
     setShowDropdown(false);
     setActiveIdx(-1);
-    // Batch update all fields
-    onUpdate(split.id, {
-      person_name: contact.person_name,
-      pro_org: contact.pro_org ?? undefined,
-      member_account: contact.member_account ?? undefined,
-      ipi: contact.ipi ?? undefined,
-      sound_exchange_id: contact.sound_exchange_id ?? undefined,
-      label_name: contact.label_name ?? undefined,
-    });
+
+    // Only fill fields relevant to the current split type to avoid
+    // cross-contamination (e.g., writer account # into publisher member ID)
+    const updates: Partial<SplitData> = { person_name: contact.person_name };
+
+    if (splitType === "writing") {
+      setLocalPro(contact.pro_org ?? "");
+      setLocalAccount(contact.member_account ?? "");
+      setLocalIpi(contact.ipi ?? "");
+      updates.pro_org = contact.pro_org ?? undefined;
+      updates.member_account = contact.member_account ?? undefined;
+      updates.ipi = contact.ipi ?? undefined;
+    } else if (splitType === "master") {
+      setLocalSeId(contact.sound_exchange_id ?? "");
+      setLocalLabel(contact.label_name ?? "");
+      updates.sound_exchange_id = contact.sound_exchange_id ?? undefined;
+      updates.label_name = contact.label_name ?? undefined;
+    }
+    // Publishing: only fill name — member_account/ipi have different
+    // meanings (publisher IDs vs writer IDs) so we don't cross-fill
+
+    onUpdate(split.id, updates);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
