@@ -122,6 +122,8 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
   const [inviteRole, setInviteRole] = useState<"collaborator" | "client">("collaborator");
   const [inviting, setInviting] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
+  const [resendingId, setResendingId] = useState<string | null>(null);
+  const [resentId, setResentId] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -271,12 +273,58 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
         }
       } else if (data) {
         setMembers([...members, data as MemberRow]);
+        const sentEmail = inviteEmail.trim().toLowerCase();
+        const sentRole = inviteRole;
         setInviteEmail("");
+
+        // Fire-and-forget email send
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          await fetch("/api/send-invite", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: sentEmail,
+              role: sentRole,
+              releaseTitle: title,
+              inviterEmail: user?.email ?? "A team member",
+              releaseId,
+            }),
+          });
+        } catch {
+          // Email failure doesn't affect the invite record
+        }
       }
     } catch (err) {
       setInviteError(err instanceof Error ? err.message : "Failed to invite");
     } finally {
       setInviting(false);
+    }
+  }
+
+  async function handleResendInvite(member: MemberRow) {
+    setResendingId(member.id);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const res = await fetch("/api/send-invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: member.invited_email,
+          role: member.role,
+          releaseTitle: title,
+          inviterEmail: user?.email ?? "A team member",
+          releaseId,
+        }),
+      });
+      if (res.ok) {
+        setResentId(member.id);
+        setTimeout(() => setResentId(null), 2000);
+      }
+    } catch {
+      // Silently fail
+    } finally {
+      setResendingId(null);
     }
   }
 
@@ -649,9 +697,23 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                         {m.role === "collaborator" ? "Collaborator" : "Client"}
                       </Pill>
                       {!m.accepted_at && (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700">
-                          Pending
-                        </span>
+                        <>
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700">
+                            Pending
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleResendInvite(m)}
+                            disabled={resendingId === m.id}
+                            className="text-[10px] text-muted hover:text-text transition-colors px-1.5 py-0.5 disabled:opacity-50"
+                          >
+                            {resentId === m.id
+                              ? "Sent!"
+                              : resendingId === m.id
+                                ? "Sending\u2026"
+                                : "Resend"}
+                          </button>
+                        </>
                       )}
                       <button
                         type="button"
