@@ -105,6 +105,7 @@ type DistributionData = {
   producer?: string;
   composers?: string;
   lyrics?: string;
+  sound_exchange_id?: string;
 } | null;
 type SplitData = {
   id: string;
@@ -112,6 +113,9 @@ type SplitData = {
   person_name: string;
   percentage: number;
   sort_order: number;
+  pro_org?: string;
+  member_account?: string;
+  ipi?: string;
 };
 
 type Props = {
@@ -183,6 +187,7 @@ export function TrackDetailClient({
   const [producer, setProducer] = useState(distribution?.producer ?? "");
   const [composers, setComposers] = useState(distribution?.composers ?? "");
   const [lyrics, setLyrics] = useState(distribution?.lyrics ?? "");
+  const [soundExchangeId, setSoundExchangeId] = useState(distribution?.sound_exchange_id ?? "");
   const [localSplits, setLocalSplits] = useState<SplitData[]>(splits);
   const composersManualRef = useRef(!!distribution?.composers);
   const splitDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -983,6 +988,44 @@ export function TrackDetailClient({
           {/* Distribution */}
           {activeTab === "distribution" && (
             <div className="space-y-4">
+              <SplitEditor
+                label="Writing Split"
+                splitType="writing"
+                splits={localSplits.filter((s) => s.split_type === "writing")}
+                onAdd={() => handleAddSplit("writing")}
+                onUpdate={(id, updates) => {
+                  handleUpdateSplit(id, updates);
+                  if ("person_name" in updates) {
+                    const next = localSplits.map((s) => (s.id === id ? { ...s, ...updates } : s));
+                    deriveComposersFromSplits(next);
+                  }
+                }}
+                onDelete={(id) => {
+                  handleDeleteSplit(id);
+                  const next = localSplits.filter((s) => s.id !== id);
+                  deriveComposersFromSplits(next);
+                }}
+                readOnly={!canEdit(role)}
+              />
+              <SplitEditor
+                label="Publishing Split"
+                splitType="publishing"
+                splits={localSplits.filter((s) => s.split_type === "publishing")}
+                onAdd={() => handleAddSplit("publishing")}
+                onUpdate={handleUpdateSplit}
+                onDelete={handleDeleteSplit}
+                readOnly={!canEdit(role)}
+              />
+              <SplitEditor
+                label="Master Recording Split"
+                splitType="master"
+                splits={localSplits.filter((s) => s.split_type === "master")}
+                onAdd={() => handleAddSplit("master")}
+                onUpdate={handleUpdateSplit}
+                onDelete={handleDeleteSplit}
+                readOnly={!canEdit(role)}
+              />
+
               <Panel>
                 <PanelBody className="py-5 space-y-5">
                   <div className="label-sm text-muted">CODES &amp; IDENTIFIERS</div>
@@ -1009,6 +1052,17 @@ export function TrackDetailClient({
                         placeholder="e.g., T-345246800-1"
                       />
                     </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="label text-muted">Sound Exchange ID</label>
+                    <input
+                      type="text"
+                      value={soundExchangeId}
+                      onChange={(e) => { setSoundExchangeId(e.target.value); saveDistribution({ sound_exchange_id: e.target.value || null }); }}
+                      disabled={!canEdit(role)}
+                      className="input"
+                      placeholder="e.g., 1000139051"
+                    />
                   </div>
                 </PanelBody>
               </Panel>
@@ -1126,45 +1180,6 @@ export function TrackDetailClient({
                   />
                 </PanelBody>
               </Panel>
-
-              <SplitEditor
-                label="Writing Split"
-                splitType="writing"
-                splits={localSplits.filter((s) => s.split_type === "writing")}
-                onAdd={() => handleAddSplit("writing")}
-                onUpdate={(id, updates) => {
-                  handleUpdateSplit(id, updates);
-                  // Re-derive composers after name changes
-                  if ("person_name" in updates) {
-                    const next = localSplits.map((s) => (s.id === id ? { ...s, ...updates } : s));
-                    deriveComposersFromSplits(next);
-                  }
-                }}
-                onDelete={(id) => {
-                  handleDeleteSplit(id);
-                  const next = localSplits.filter((s) => s.id !== id);
-                  deriveComposersFromSplits(next);
-                }}
-                readOnly={!canEdit(role)}
-              />
-              <SplitEditor
-                label="Publishing Split"
-                splitType="publishing"
-                splits={localSplits.filter((s) => s.split_type === "publishing")}
-                onAdd={() => handleAddSplit("publishing")}
-                onUpdate={handleUpdateSplit}
-                onDelete={handleDeleteSplit}
-                readOnly={!canEdit(role)}
-              />
-              <SplitEditor
-                label="Master Recording Split"
-                splitType="master"
-                splits={localSplits.filter((s) => s.split_type === "master")}
-                onAdd={() => handleAddSplit("master")}
-                onUpdate={handleUpdateSplit}
-                onDelete={handleDeleteSplit}
-                readOnly={!canEdit(role)}
-              />
             </div>
           )}
         </div>
@@ -1622,6 +1637,7 @@ function SplitEditor({
               <SplitRow
                 key={split.id}
                 split={split}
+                splitType={split.split_type}
                 onUpdate={onUpdate}
                 onDelete={onDelete}
                 readOnly={readOnly}
@@ -1651,17 +1667,22 @@ function SplitEditor({
 
 function SplitRow({
   split,
+  splitType,
   onUpdate,
   onDelete,
   readOnly,
 }: {
   split: SplitData;
+  splitType: string;
   onUpdate: (id: string, updates: Partial<SplitData>) => void;
   onDelete: (id: string) => void;
   readOnly?: boolean;
 }) {
   const [localName, setLocalName] = useState(split.person_name);
   const [localPct, setLocalPct] = useState(String(split.percentage));
+  const [localPro, setLocalPro] = useState(split.pro_org ?? "");
+  const [localAccount, setLocalAccount] = useState(split.member_account ?? "");
+  const [localIpi, setLocalIpi] = useState(split.ipi ?? "");
   const rowDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function debouncedUpdate(updates: Partial<SplitData>) {
@@ -1669,45 +1690,92 @@ function SplitRow({
     rowDebounceRef.current = setTimeout(() => onUpdate(split.id, updates), 500);
   }
 
+  const showProFields = splitType === "writing" || splitType === "publishing";
+
   return (
-    <div className="flex items-center gap-3 px-4 py-3 rounded-md border border-border bg-panel">
-      <input
-        type="text"
-        value={localName}
-        onChange={(e) => {
-          setLocalName(e.target.value);
-          debouncedUpdate({ person_name: e.target.value });
-        }}
-        readOnly={readOnly}
-        placeholder="Person or entity name"
-        className="flex-1 text-sm text-text bg-transparent border-none outline-none placeholder:text-faint"
-      />
-      <div className="flex items-center gap-1 shrink-0">
+    <div className="rounded-md border border-border bg-panel">
+      <div className="flex items-center gap-3 px-4 py-3">
         <input
-          type="number"
-          value={localPct}
+          type="text"
+          value={localName}
           onChange={(e) => {
-            setLocalPct(e.target.value);
-            const num = parseFloat(e.target.value);
-            if (!isNaN(num)) debouncedUpdate({ percentage: num });
+            setLocalName(e.target.value);
+            debouncedUpdate({ person_name: e.target.value });
           }}
           readOnly={readOnly}
-          min="0"
-          max="100"
-          step="0.01"
-          className="w-20 text-sm text-right font-mono text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal"
+          placeholder="Person or entity name"
+          className="flex-1 text-sm text-text bg-transparent border-none outline-none placeholder:text-faint"
         />
-        <span className="text-xs text-muted">%</span>
+        <div className="flex items-center gap-1 shrink-0">
+          <input
+            type="number"
+            value={localPct}
+            onChange={(e) => {
+              setLocalPct(e.target.value);
+              const num = parseFloat(e.target.value);
+              if (!isNaN(num)) debouncedUpdate({ percentage: num });
+            }}
+            readOnly={readOnly}
+            min="0"
+            max="100"
+            step="0.01"
+            className="w-20 text-sm text-right font-mono text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal"
+          />
+          <span className="text-xs text-muted">%</span>
+        </div>
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={() => onDelete(split.id)}
+            className="p-1 rounded text-faint hover:text-signal transition-colors"
+            title="Remove"
+          >
+            <X size={14} />
+          </button>
+        )}
       </div>
-      {!readOnly && (
-        <button
-          type="button"
-          onClick={() => onDelete(split.id)}
-          className="p-1 rounded text-faint hover:text-signal transition-colors"
-          title="Remove"
-        >
-          <X size={14} />
-        </button>
+      {showProFields && (
+        <div className="px-4 pb-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
+          {splitType === "writing" && (
+            <div className="space-y-1">
+              <label className="text-[10px] text-faint">PRO (ASCAP/BMI)</label>
+              <input
+                type="text"
+                value={localPro}
+                onChange={(e) => { setLocalPro(e.target.value); debouncedUpdate({ pro_org: e.target.value || undefined }); }}
+                readOnly={readOnly}
+                placeholder="e.g., BMI"
+                className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+              />
+            </div>
+          )}
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">
+              {splitType === "writing" ? "Member Account #" : "Publisher Member ID"}
+            </label>
+            <input
+              type="text"
+              value={localAccount}
+              onChange={(e) => { setLocalAccount(e.target.value); debouncedUpdate({ member_account: e.target.value || undefined }); }}
+              readOnly={readOnly}
+              placeholder={splitType === "writing" ? "Account #" : "Member ID"}
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">
+              {splitType === "writing" ? "Writer IPI" : "Publisher IPI"}
+            </label>
+            <input
+              type="text"
+              value={localIpi}
+              onChange={(e) => { setLocalIpi(e.target.value); debouncedUpdate({ ipi: e.target.value || undefined }); }}
+              readOnly={readOnly}
+              placeholder="IPI #"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+        </div>
       )}
     </div>
   );
