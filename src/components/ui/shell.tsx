@@ -18,7 +18,7 @@ export function Shell({ paymentsEnabled = false, children }: ShellProps) {
 
   return (
     <PaymentsProvider enabled={paymentsEnabled}>
-      <div className="flex min-h-screen">
+      <div className="flex h-screen overflow-hidden">
         <Rail onSearchClick={open} />
         <MobileNav onSearchClick={open} />
         <div className="flex-1 min-w-0 overflow-y-auto no-scrollbar p-4 pb-20 md:p-6 md:pb-6">
