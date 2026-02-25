@@ -117,6 +117,15 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
   const [coverArtMode, setCoverArtMode] = useState<"none" | "preview">("none");
   const [uploading, setUploading] = useState(false);
 
+  // Distribution state
+  const [distributor, setDistributor] = useState("");
+  const [recordLabel, setRecordLabel] = useState("");
+  const [upc, setUpc] = useState("");
+  const [copyrightHolder, setCopyrightHolder] = useState("");
+  const [copyrightYear, setCopyrightYear] = useState("");
+  const [phonogramCopyright, setPhonogramCopyright] = useState("");
+  const [catalogNumber, setCatalogNumber] = useState("");
+
   // Team state
   const [members, setMembers] = useState<MemberRow[]>(initialMembers);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -154,6 +163,13 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           setCoverArtUrl(data.cover_art_url);
           setCoverArtMode("preview");
         }
+        setDistributor(data.distributor ?? "");
+        setRecordLabel(data.record_label ?? "");
+        setUpc(data.upc ?? "");
+        setCopyrightHolder(data.copyright_holder ?? "");
+        setCopyrightYear(data.copyright_year ?? "");
+        setPhonogramCopyright(data.phonogram_copyright ?? "");
+        setCatalogNumber(data.catalog_number ?? "");
       }
 
       if (user) {
@@ -187,6 +203,13 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
         client_email: clientEmail || null,
         delivery_notes: deliveryNotes || null,
         cover_art_url: coverArtUrl || null,
+        distributor: distributor || null,
+        record_label: recordLabel || null,
+        upc: upc || null,
+        copyright_holder: copyrightHolder || null,
+        copyright_year: copyrightYear || null,
+        phonogram_copyright: phonogramCopyright || null,
+        catalog_number: catalogNumber || null,
       };
 
       // Only include payment fields if the user can edit them
@@ -548,6 +571,92 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
               disabled={!editable}
               className="input min-h-[80px] resize-y text-sm"
               placeholder="Global delivery specs..."
+            />
+          </div>
+
+          <Rule />
+          <div className="label-sm text-muted">DISTRIBUTION</div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="label text-muted">Distributor</label>
+              <input
+                type="text"
+                value={distributor}
+                onChange={(e) => setDistributor(e.target.value)}
+                disabled={!editable}
+                className="input"
+                placeholder="e.g., DistroKid, TuneCore"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="label text-muted">Record label</label>
+              <input
+                type="text"
+                value={recordLabel}
+                onChange={(e) => setRecordLabel(e.target.value)}
+                disabled={!editable}
+                className="input"
+                placeholder="e.g., Self-released"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="label text-muted">UPC</label>
+              <input
+                type="text"
+                value={upc}
+                onChange={(e) => setUpc(e.target.value)}
+                disabled={!editable}
+                className="input"
+                placeholder="Universal Product Code"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="label text-muted">Catalog number</label>
+              <input
+                type="text"
+                value={catalogNumber}
+                onChange={(e) => setCatalogNumber(e.target.value)}
+                disabled={!editable}
+                className="input"
+                placeholder="Label catalog #"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="label text-muted">&copy; Copyright holder</label>
+              <input
+                type="text"
+                value={copyrightHolder}
+                onChange={(e) => setCopyrightHolder(e.target.value)}
+                disabled={!editable}
+                className="input"
+                placeholder="e.g., Artist Name"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="label text-muted">Copyright year</label>
+              <input
+                type="text"
+                value={copyrightYear}
+                onChange={(e) => setCopyrightYear(e.target.value)}
+                disabled={!editable}
+                className="input"
+                placeholder="e.g., 2026"
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label className="label text-muted">&#8471; Phonogram copyright</label>
+            <input
+              type="text"
+              value={phonogramCopyright}
+              onChange={(e) => setPhonogramCopyright(e.target.value)}
+              disabled={!editable}
+              className="input"
+              placeholder="e.g., 2026 Artist Name"
             />
           </div>
 

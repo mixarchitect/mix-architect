@@ -15,7 +15,7 @@ import { NoteEntry } from "@/components/ui/note-entry";
 import { ReferenceCard } from "@/components/ui/reference-card";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { StatusIndicator } from "@/components/ui/status-dot";
-import { ArrowLeft, Check, Plus } from "lucide-react";
+import { ArrowLeft, Check, Plus, X } from "lucide-react";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
 
 const TABS = [
@@ -23,6 +23,7 @@ const TABS = [
   { id: "specs", label: "Specs" },
   { id: "elements", label: "Elements" },
   { id: "notes", label: "Notes" },
+  { id: "distribution", label: "Distribution" },
 ];
 
 const EMOTIONAL_SUGGESTIONS = [
@@ -91,6 +92,28 @@ type RefData = {
   artwork_url?: string | null;
 };
 
+type DistributionData = {
+  isrc?: string;
+  iswc?: string;
+  explicit_lyrics?: boolean;
+  featured_artist?: string;
+  instrumental?: boolean;
+  cover_song?: boolean;
+  language?: string;
+  copyright_number?: string;
+  copyright_filing_date?: string;
+  producer?: string;
+  composers?: string;
+  lyrics?: string;
+} | null;
+type SplitData = {
+  id: string;
+  split_type: string;
+  person_name: string;
+  percentage: number;
+  sort_order: number;
+};
+
 type Props = {
   releaseId: string;
   releaseTitle: string;
@@ -102,12 +125,14 @@ type Props = {
   elements: ElementData[];
   notes: NoteData[];
   references: RefData[];
+  distribution: DistributionData;
+  splits: SplitData[];
   role: ReleaseRole;
 };
 
 export function TrackDetailClient({
   releaseId, releaseTitle, releaseFormat, releaseCoverArt,
-  track, intent, specs, elements, notes, references, role,
+  track, intent, specs, elements, notes, references, distribution, splits, role,
 }: Props) {
   const [activeTab, setActiveTab] = useState("intent");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -145,6 +170,23 @@ export function TrackDetailClient({
   const [showItunesResults, setShowItunesResults] = useState(false);
   const itunesDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Distribution state
+  const [isrc, setIsrc] = useState(distribution?.isrc ?? "");
+  const [iswc, setIswc] = useState(distribution?.iswc ?? "");
+  const [explicitLyrics, setExplicitLyrics] = useState(distribution?.explicit_lyrics ?? false);
+  const [featuredArtist, setFeaturedArtist] = useState(distribution?.featured_artist ?? "");
+  const [instrumental, setInstrumental] = useState(distribution?.instrumental ?? false);
+  const [coverSong, setCoverSong] = useState(distribution?.cover_song ?? false);
+  const [language, setLanguage] = useState(distribution?.language ?? "English");
+  const [copyrightNumber, setCopyrightNumber] = useState(distribution?.copyright_number ?? "");
+  const [copyrightFilingDate, setCopyrightFilingDate] = useState(distribution?.copyright_filing_date ?? "");
+  const [producer, setProducer] = useState(distribution?.producer ?? "");
+  const [composers, setComposers] = useState(distribution?.composers ?? "");
+  const [lyrics, setLyrics] = useState(distribution?.lyrics ?? "");
+  const [localSplits, setLocalSplits] = useState<SplitData[]>(splits);
+  const composersManualRef = useRef(!!distribution?.composers);
+  const splitDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [trackStatus, setTrackStatus] = useState(track.status);
 
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
@@ -159,7 +201,7 @@ export function TrackDetailClient({
       debounceRef.current = setTimeout(async () => {
         try {
           // Use upsert for intent/specs tables to handle missing rows gracefully
-          const useUpsert = table === "track_intent" || table === "track_specs";
+          const useUpsert = table === "track_intent" || table === "track_specs" || table === "track_distribution";
           let error;
           if (useUpsert) {
             ({ error } = await supabase
@@ -190,6 +232,77 @@ export function TrackDetailClient({
 
   function saveSpecs(data: Record<string, unknown>) {
     autoSave("track_specs", data, "track_id", track.id);
+  }
+
+  function saveDistribution(data: Record<string, unknown>) {
+    autoSave("track_distribution", data, "track_id", track.id);
+  }
+
+  async function handleAddSplit(splitType: string) {
+    const typeSplits = localSplits.filter((s) => s.split_type === splitType);
+    const nextOrder = typeSplits.length > 0
+      ? Math.max(...typeSplits.map((s) => s.sort_order)) + 1
+      : 0;
+    const { data } = await supabase
+      .from("track_splits")
+      .insert({
+        track_id: track.id,
+        split_type: splitType,
+        person_name: "",
+        percentage: 0,
+        sort_order: nextOrder,
+      })
+      .select()
+      .single();
+    if (data) {
+      setLocalSplits((prev) => [...prev, data as SplitData]);
+    }
+  }
+
+  function handleUpdateSplit(splitId: string, updates: Partial<SplitData>) {
+    setLocalSplits((prev) =>
+      prev.map((s) => (s.id === splitId ? { ...s, ...updates } : s))
+    );
+    if (splitDebounceRef.current) clearTimeout(splitDebounceRef.current);
+    setSaveStatus("saving");
+    splitDebounceRef.current = setTimeout(async () => {
+      try {
+        const { error } = await supabase
+          .from("track_splits")
+          .update(updates)
+          .eq("id", splitId);
+        if (error) throw error;
+        setSaveStatus("saved");
+        setTimeout(() => setSaveStatus("idle"), 2000);
+      } catch {
+        setSaveStatus("error");
+      }
+    }, 500);
+  }
+
+  async function handleDeleteSplit(splitId: string) {
+    const removed = localSplits.find((s) => s.id === splitId);
+    setLocalSplits((prev) => prev.filter((s) => s.id !== splitId));
+    try {
+      const { error } = await supabase
+        .from("track_splits")
+        .delete()
+        .eq("id", splitId);
+      if (error) throw error;
+    } catch {
+      if (removed) setLocalSplits((prev) => [...prev, removed]);
+    }
+  }
+
+  // Auto-populate composers from writing splits (unless manually edited)
+  function deriveComposersFromSplits(currentSplits: SplitData[]) {
+    if (composersManualRef.current) return;
+    const names = currentSplits
+      .filter((s) => s.split_type === "writing" && s.person_name.trim())
+      .map((s) => s.person_name.trim())
+      .join(", ");
+    setComposers(names);
+    saveDistribution({ composers: names || null });
   }
 
   const TRACK_STATUSES = ["not_started", "in_progress", "complete"] as const;
@@ -867,6 +980,193 @@ export function TrackDetailClient({
               )}
             </div>
           )}
+          {/* Distribution */}
+          {activeTab === "distribution" && (
+            <div className="space-y-4">
+              <Panel>
+                <PanelBody className="py-5 space-y-5">
+                  <div className="label-sm text-muted">CODES &amp; IDENTIFIERS</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">ISRC</label>
+                      <input
+                        type="text"
+                        value={isrc}
+                        onChange={(e) => { setIsrc(e.target.value); saveDistribution({ isrc: e.target.value || null }); }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                        placeholder="e.g., USRC17607839"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">ISWC</label>
+                      <input
+                        type="text"
+                        value={iswc}
+                        onChange={(e) => { setIswc(e.target.value); saveDistribution({ iswc: e.target.value || null }); }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                        placeholder="e.g., T-345246800-1"
+                      />
+                    </div>
+                  </div>
+                </PanelBody>
+              </Panel>
+
+              <Panel>
+                <PanelBody className="py-5 space-y-5">
+                  <div className="label-sm text-muted">CREDITS</div>
+                  <div className="space-y-1.5">
+                    <label className="label text-muted">Producer</label>
+                    <input
+                      type="text"
+                      value={producer}
+                      onChange={(e) => { setProducer(e.target.value); saveDistribution({ producer: e.target.value || null }); }}
+                      disabled={!canEdit(role)}
+                      className="input"
+                      placeholder="Producer name"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <label className="label text-muted">Composer / Songwriter</label>
+                      {!composersManualRef.current && (
+                        <span className="text-[10px] text-faint">Auto-populated from writing splits</span>
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      value={composers}
+                      onChange={(e) => {
+                        composersManualRef.current = true;
+                        setComposers(e.target.value);
+                        saveDistribution({ composers: e.target.value || null });
+                      }}
+                      disabled={!canEdit(role)}
+                      className="input"
+                      placeholder="e.g., John Doe, Jane Smith"
+                    />
+                  </div>
+                </PanelBody>
+              </Panel>
+
+              <Panel>
+                <PanelBody className="py-5 space-y-5">
+                  <div className="label-sm text-muted">TRACK PROPERTIES</div>
+                  <div className="space-y-1.5">
+                    <label className="label text-muted">Featured artist</label>
+                    <input
+                      type="text"
+                      value={featuredArtist}
+                      onChange={(e) => { setFeaturedArtist(e.target.value); saveDistribution({ featured_artist: e.target.value || null }); }}
+                      disabled={!canEdit(role)}
+                      className="input"
+                      placeholder="Optional featured artist"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="label text-muted">Language</label>
+                    <select
+                      value={language}
+                      onChange={(e) => { setLanguage(e.target.value); saveDistribution({ language: e.target.value }); }}
+                      disabled={!canEdit(role)}
+                      className="input"
+                    >
+                      {["English", "Spanish", "French", "German", "Portuguese", "Japanese", "Korean", "Mandarin", "Italian", "Other"].map((l) => (
+                        <option key={l} value={l}>{l}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex flex-wrap gap-6 pt-1">
+                    <ToggleField label="Explicit Lyrics" value={explicitLyrics} onChange={(v) => { setExplicitLyrics(v); saveDistribution({ explicit_lyrics: v }); }} disabled={!canEdit(role)} />
+                    <ToggleField label="Instrumental" value={instrumental} onChange={(v) => { setInstrumental(v); saveDistribution({ instrumental: v }); }} disabled={!canEdit(role)} />
+                    <ToggleField label="Cover Song" value={coverSong} onChange={(v) => { setCoverSong(v); saveDistribution({ cover_song: v }); }} disabled={!canEdit(role)} />
+                  </div>
+                </PanelBody>
+              </Panel>
+
+              <Panel>
+                <PanelBody className="py-5 space-y-5">
+                  <div className="label-sm text-muted">COPYRIGHT</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Copyright #</label>
+                      <input
+                        type="text"
+                        value={copyrightNumber}
+                        onChange={(e) => { setCopyrightNumber(e.target.value); saveDistribution({ copyright_number: e.target.value || null }); }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                        placeholder="Registration number"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Copyright filing date</label>
+                      <input
+                        type="date"
+                        value={copyrightFilingDate}
+                        onChange={(e) => { setCopyrightFilingDate(e.target.value); saveDistribution({ copyright_filing_date: e.target.value || null }); }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      />
+                    </div>
+                  </div>
+                </PanelBody>
+              </Panel>
+
+              <Panel>
+                <PanelBody className="py-5 space-y-5">
+                  <div className="label-sm text-muted">LYRICS</div>
+                  <textarea
+                    value={lyrics}
+                    onChange={(e) => { setLyrics(e.target.value); saveDistribution({ lyrics: e.target.value || null }); }}
+                    disabled={!canEdit(role)}
+                    className="input min-h-[160px] resize-y text-sm font-mono"
+                    placeholder="Paste or type lyrics here..."
+                  />
+                </PanelBody>
+              </Panel>
+
+              <SplitEditor
+                label="Writing Split"
+                splitType="writing"
+                splits={localSplits.filter((s) => s.split_type === "writing")}
+                onAdd={() => handleAddSplit("writing")}
+                onUpdate={(id, updates) => {
+                  handleUpdateSplit(id, updates);
+                  // Re-derive composers after name changes
+                  if ("person_name" in updates) {
+                    const next = localSplits.map((s) => (s.id === id ? { ...s, ...updates } : s));
+                    deriveComposersFromSplits(next);
+                  }
+                }}
+                onDelete={(id) => {
+                  handleDeleteSplit(id);
+                  const next = localSplits.filter((s) => s.id !== id);
+                  deriveComposersFromSplits(next);
+                }}
+                readOnly={!canEdit(role)}
+              />
+              <SplitEditor
+                label="Publishing Split"
+                splitType="publishing"
+                splits={localSplits.filter((s) => s.split_type === "publishing")}
+                onAdd={() => handleAddSplit("publishing")}
+                onUpdate={handleUpdateSplit}
+                onDelete={handleDeleteSplit}
+                readOnly={!canEdit(role)}
+              />
+              <SplitEditor
+                label="Master Recording Split"
+                splitType="master"
+                splits={localSplits.filter((s) => s.split_type === "master")}
+                onAdd={() => handleAddSplit("master")}
+                onUpdate={handleUpdateSplit}
+                onDelete={handleDeleteSplit}
+                readOnly={!canEdit(role)}
+              />
+            </div>
+          )}
         </div>
 
         {/* ── Inspector sidebar ── */}
@@ -1236,6 +1536,179 @@ function QuickAddElement({
           Add
         </Button>
       </div>
+    </div>
+  );
+}
+
+/* ─── Distribution sub-components ─────────────────────────────── */
+
+function ToggleField({
+  label,
+  value,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <label className={`flex items-center gap-2 text-sm ${disabled ? "opacity-60" : "cursor-pointer"}`}>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={value}
+        onClick={() => !disabled && onChange(!value)}
+        disabled={disabled}
+        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+          value ? "bg-signal" : "bg-border"
+        }`}
+      >
+        <span
+          className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+            value ? "translate-x-4" : "translate-x-0.5"
+          }`}
+        />
+      </button>
+      <span className="text-text">{label}</span>
+    </label>
+  );
+}
+
+function SplitEditor({
+  label,
+  splits,
+  onAdd,
+  onUpdate,
+  onDelete,
+  readOnly,
+}: {
+  label: string;
+  splitType: string;
+  splits: SplitData[];
+  onAdd: () => void;
+  onUpdate: (id: string, updates: Partial<SplitData>) => void;
+  onDelete: (id: string) => void;
+  readOnly?: boolean;
+}) {
+  const sorted = [...splits].sort((a, b) => a.sort_order - b.sort_order);
+  const total = sorted.reduce((sum, s) => sum + (s.percentage || 0), 0);
+  const isValid = Math.abs(total - 100) < 0.01;
+
+  return (
+    <Panel>
+      <PanelBody className="py-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="label-sm text-muted">{label}</div>
+          {!readOnly && (
+            <button
+              type="button"
+              onClick={onAdd}
+              className="text-xs text-muted hover:text-text transition-colors"
+            >
+              + Add Person
+            </button>
+          )}
+        </div>
+
+        {sorted.length === 0 ? (
+          <p className="text-sm text-muted text-center py-4">
+            {readOnly ? "No splits configured." : "No splits yet. Add a person to get started."}
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {sorted.map((split) => (
+              <SplitRow
+                key={split.id}
+                split={split}
+                onUpdate={onUpdate}
+                onDelete={onDelete}
+                readOnly={readOnly}
+              />
+            ))}
+            <div className="flex items-center justify-between pt-2 border-t border-border">
+              <span className="text-xs font-medium text-muted">Total</span>
+              <span
+                className={`text-sm font-mono font-semibold ${
+                  isValid ? "text-emerald-500" : "text-signal"
+                }`}
+              >
+                {total.toFixed(2)}%
+                {!isValid && (
+                  <span className="text-[10px] ml-2 text-signal font-normal">
+                    Must equal 100%
+                  </span>
+                )}
+              </span>
+            </div>
+          </div>
+        )}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SplitRow({
+  split,
+  onUpdate,
+  onDelete,
+  readOnly,
+}: {
+  split: SplitData;
+  onUpdate: (id: string, updates: Partial<SplitData>) => void;
+  onDelete: (id: string) => void;
+  readOnly?: boolean;
+}) {
+  const [localName, setLocalName] = useState(split.person_name);
+  const [localPct, setLocalPct] = useState(String(split.percentage));
+  const rowDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function debouncedUpdate(updates: Partial<SplitData>) {
+    if (rowDebounceRef.current) clearTimeout(rowDebounceRef.current);
+    rowDebounceRef.current = setTimeout(() => onUpdate(split.id, updates), 500);
+  }
+
+  return (
+    <div className="flex items-center gap-3 px-4 py-3 rounded-md border border-border bg-panel">
+      <input
+        type="text"
+        value={localName}
+        onChange={(e) => {
+          setLocalName(e.target.value);
+          debouncedUpdate({ person_name: e.target.value });
+        }}
+        readOnly={readOnly}
+        placeholder="Person or entity name"
+        className="flex-1 text-sm text-text bg-transparent border-none outline-none placeholder:text-faint"
+      />
+      <div className="flex items-center gap-1 shrink-0">
+        <input
+          type="number"
+          value={localPct}
+          onChange={(e) => {
+            setLocalPct(e.target.value);
+            const num = parseFloat(e.target.value);
+            if (!isNaN(num)) debouncedUpdate({ percentage: num });
+          }}
+          readOnly={readOnly}
+          min="0"
+          max="100"
+          step="0.01"
+          className="w-20 text-sm text-right font-mono text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal"
+        />
+        <span className="text-xs text-muted">%</span>
+      </div>
+      {!readOnly && (
+        <button
+          type="button"
+          onClick={() => onDelete(split.id)}
+          className="p-1 rounded text-faint hover:text-signal transition-colors"
+          title="Remove"
+        >
+          <X size={14} />
+        </button>
+      )}
     </div>
   );
 }
