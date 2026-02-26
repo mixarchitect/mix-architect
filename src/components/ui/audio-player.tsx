@@ -13,6 +13,7 @@ import {
   SkipBack,
   SkipForward,
   Upload,
+  Download,
   MessageCircle,
   X,
 } from "lucide-react";
@@ -575,6 +576,24 @@ export function AudioPlayer({
             <span className="text-[10px] font-mono text-faint">
               · {activeVersion.file_name}
             </span>
+          )}
+          {activeVersion && (
+            <button
+              type="button"
+              onClick={() => {
+                if (!activeVersion) return;
+                const a = document.createElement("a");
+                a.href = activeVersion.audio_url;
+                a.download = activeVersion.file_name || `v${activeVersion.version_number}`;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.click();
+              }}
+              className="ml-auto text-muted hover:text-text transition-colors p-1 -m-1"
+              title={`Download ${activeVersion.file_name || `v${activeVersion.version_number}`}`}
+            >
+              <Download size={13} />
+            </button>
           )}
         </div>
 
