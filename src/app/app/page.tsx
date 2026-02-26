@@ -125,17 +125,12 @@ export default async function DashboardPage({ searchParams }: Props) {
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold h2 text-text">Your Releases</h1>
-        <div className="flex items-center gap-3">
-          <Suspense>
-            <SortSelect />
-          </Suspense>
-          <Link href="/app/releases/new">
-            <Button variant="primary">
-              <Plus size={16} />
-              New Release
-            </Button>
-          </Link>
-        </div>
+        <Link href="/app/releases/new">
+          <Button variant="primary">
+            <Plus size={16} />
+            New Release
+          </Button>
+        </Link>
       </div>
 
       {paymentsEnabled && hasAnyFees && (
@@ -192,6 +187,14 @@ export default async function DashboardPage({ searchParams }: Props) {
               </Link>
             </span>
           )}
+        </div>
+      )}
+
+      {releases && releases.length > 0 && (
+        <div className="flex justify-end mb-3">
+          <Suspense>
+            <SortSelect />
+          </Suspense>
         </div>
       )}
 
