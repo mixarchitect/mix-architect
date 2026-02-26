@@ -17,7 +17,7 @@ export function Rail({ onSearchClick }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const paymentsEnabled = usePaymentsEnabled();
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -82,9 +82,9 @@ export function Rail({ onSearchClick }: Props) {
           alt="Mix Architect"
           className="w-8 h-8 shrink-0 block group-hover/rail:hidden ml-1"
         />
-        {/* Expanded: full wordmark logo */}
+        {/* Expanded: full wordmark logo — white variant in dark mode */}
         <img
-          src="/mix-architect-logo.svg"
+          src={mounted && resolvedTheme === "dark" ? "/mix-architect-logo-white.svg" : "/mix-architect-logo.svg"}
           alt="Mix Architect"
           className="h-7 w-auto hidden group-hover/rail:block"
         />

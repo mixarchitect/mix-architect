@@ -213,7 +213,7 @@ export function AudioPlayer({
       barRadius: 1,
       height: 80,
       progressColor: "var(--signal)",
-      waveColor: "rgba(20, 20, 20, 0.15)",
+      waveColor: getComputedStyle(document.documentElement).getPropertyValue("--wave").trim() || "rgba(20, 20, 20, 0.15)",
       cursorColor: "var(--signal)",
       cursorWidth: 2,
       normalize: true,
