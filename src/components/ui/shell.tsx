@@ -22,9 +22,15 @@ export function Shell({ paymentsEnabled = false, theme = "system", children }: S
   const { isOpen, open, close } = useCommandPalette();
   const { setTheme } = useTheme();
 
-  // Sync the user's DB preference with next-themes on mount
+  // Sync the user's DB preference with next-themes once on mount.
+  // Must not re-run when setTheme reference changes, otherwise it
+  // resets user-initiated theme toggles back to the server prop.
+  const syncedRef = React.useRef(false);
   React.useEffect(() => {
-    setTheme(theme);
+    if (!syncedRef.current) {
+      setTheme(theme);
+      syncedRef.current = true;
+    }
   }, [theme, setTheme]);
 
   return (
