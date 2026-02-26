@@ -34,19 +34,18 @@ type AudioContextValue = {
   isPlaying: boolean;
   currentTime: number;
   duration: number;
-  /** Whether the full AudioPlayer is currently mounted */
-  isFullPlayerVisible: boolean;
-
   /** Load an audio version into the shared element */
-  loadVersion: (version: AudioVersionData, meta: AudioTrackMeta) => void;
+  loadVersion: (
+    version: AudioVersionData,
+    meta: AudioTrackMeta,
+    opts?: { seekTime?: number; autoPlay?: boolean },
+  ) => void;
   /** Play/pause toggle */
   togglePlayPause: () => void;
   /** Seek to a specific second */
   seekTo: (time: number) => void;
   /** Stop playback and clear state (hides mini player) */
   stop: () => void;
-  /** Called by AudioPlayer on mount/unmount */
-  setFullPlayerVisible: (visible: boolean) => void;
 };
 
 /* ------------------------------------------------------------------ */
@@ -71,8 +70,6 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [isFullPlayerVisible, setFullPlayerVisible] = useState(false);
-
   // Keep a ref to activeVersion for use in callbacks without stale closures
   const activeVersionRef = useRef(activeVersion);
   activeVersionRef.current = activeVersion;
@@ -111,7 +108,11 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   /* ---- Actions ---- */
 
   const loadVersion = useCallback(
-    (version: AudioVersionData, meta: AudioTrackMeta) => {
+    (
+      version: AudioVersionData,
+      meta: AudioTrackMeta,
+      opts?: { seekTime?: number; autoPlay?: boolean },
+    ) => {
       const el = audioRef.current;
       if (!el) return;
 
@@ -121,11 +122,25 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      const { seekTime, autoPlay } = opts ?? {};
+
+      // Attach listener BEFORE setting src to avoid race condition
+      if (seekTime != null || autoPlay) {
+        const onCanPlay = () => {
+          el.removeEventListener("canplay", onCanPlay);
+          if (seekTime != null && seekTime > 0 && seekTime <= el.duration) {
+            el.currentTime = seekTime;
+          }
+          if (autoPlay) el.play();
+        };
+        el.addEventListener("canplay", onCanPlay);
+      }
+
       el.src = version.audio_url;
       el.load();
       setActiveVersion(version);
       setTrackMeta(meta);
-      setCurrentTime(0);
+      setCurrentTime(seekTime ?? 0);
       setDuration(version.duration_seconds ?? 0);
     },
     [],
@@ -175,12 +190,10 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         isPlaying,
         currentTime,
         duration,
-        isFullPlayerVisible,
         loadVersion,
         togglePlayPause,
         seekTo,
         stop,
-        setFullPlayerVisible,
       }}
     >
       {children}

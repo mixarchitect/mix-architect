@@ -117,18 +117,21 @@ export function AudioPlayer({
 }: AudioPlayerProps) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
-  // Version state
-  const [activeVersionId, setActiveVersionId] = useState<string | null>(
-    versions.length > 0 ? versions[versions.length - 1].id : null,
-  );
+  // Shared audio context
+  const audio = useAudio();
+  const { audioElement, isPlaying, currentTime, duration } = audio;
+
+  // Version state — sync with context if it's already playing a version for this track
+  const [activeVersionId, setActiveVersionId] = useState<string | null>(() => {
+    if (audio.activeVersion && audio.activeVersion.track_id === trackId) {
+      return audio.activeVersion.id;
+    }
+    return versions.length > 0 ? versions[versions.length - 1].id : null;
+  });
   const activeVersion = useMemo(
     () => versions.find((v) => v.id === activeVersionId) ?? null,
     [versions, activeVersionId],
   );
-
-  // Shared audio context
-  const audio = useAudio();
-  const { audioElement, isPlaying, currentTime, duration } = audio;
 
   // Playback state (local to WaveSurfer readiness)
   const [isReady, setIsReady] = useState(false);
@@ -138,12 +141,6 @@ export function AudioPlayer({
     () => ({ trackId, releaseId, trackTitle, releaseTitle, coverArtUrl }),
     [trackId, releaseId, trackTitle, releaseTitle, coverArtUrl],
   );
-
-  // Signal full player visibility to context (hides mini player)
-  useEffect(() => {
-    audio.setFullPlayerVisible(true);
-    return () => audio.setFullPlayerVisible(false);
-  }, [audio]);
 
   // Load the active version into the shared audio element
   useEffect(() => {
@@ -457,27 +454,14 @@ export function AudioPlayer({
               <button
                 key={v.id}
                 onClick={() => {
-                  const wasPlaying = isPlaying;
-                  const prevTime = currentTime;
-                  const isSameVersion = v.id === activeVersionId;
-
-                  audio.loadVersion(v, trackMeta);
+                  if (v.id === activeVersionId) return;
+                  audio.loadVersion(v, trackMeta, {
+                    seekTime: currentTime,
+                    autoPlay: isPlaying,
+                  });
                   setActiveVersionId(v.id);
                   setHighlightedCommentId(null);
                   setCommentInput(null);
-
-                  // For a different version, restore position after audio loads
-                  if (!isSameVersion) {
-                    const el = audioElement;
-                    const onCanPlay = () => {
-                      el.removeEventListener("canplay", onCanPlay);
-                      if (prevTime > 0 && prevTime <= el.duration) {
-                        el.currentTime = prevTime;
-                      }
-                      if (wasPlaying) el.play();
-                    };
-                    el.addEventListener("canplay", onCanPlay);
-                  }
                 }}
                 className={cn(
                   "px-3 py-1 text-xs font-medium rounded transition-colors",

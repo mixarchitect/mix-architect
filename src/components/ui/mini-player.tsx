@@ -17,13 +17,12 @@ export function MiniPlayer() {
     isPlaying,
     currentTime,
     duration,
-    isFullPlayerVisible,
     togglePlayPause,
     stop,
   } = useAudio();
 
-  // Hide when nothing is loaded or full player is visible
-  if (!activeVersion || !trackMeta || isFullPlayerVisible) return null;
+  // Hide when nothing is loaded
+  if (!activeVersion || !trackMeta) return null;
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const trackUrl = `/app/releases/${trackMeta.releaseId}/tracks/${trackMeta.trackId}`;
