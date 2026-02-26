@@ -23,13 +23,18 @@ export function Shell({ paymentsEnabled = false, theme = "system", children }: S
   const { setTheme } = useTheme();
 
   // Sync the user's DB preference with next-themes once on mount.
-  // Must not re-run when setTheme reference changes, otherwise it
-  // resets user-initiated theme toggles back to the server prop.
+  // Only apply when the DB holds an explicit choice (light/dark).
+  // When the server prop is "system" (the default), let next-themes'
+  // own localStorage persistence take precedence — this prevents
+  // resetting user toggles when the fire-and-forget DB upsert
+  // hasn't completed before a page refresh.
   const syncedRef = React.useRef(false);
   React.useEffect(() => {
     if (!syncedRef.current) {
-      setTheme(theme);
       syncedRef.current = true;
+      if (theme !== "system") {
+        setTheme(theme);
+      }
     }
   }, [theme, setTheme]);
 
