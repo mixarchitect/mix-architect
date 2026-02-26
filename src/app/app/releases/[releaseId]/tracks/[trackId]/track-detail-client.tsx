@@ -10,19 +10,18 @@ import { Rule } from "@/components/ui/rule";
 import { Pill } from "@/components/ui/pill";
 import { TabBar } from "@/components/ui/tab-bar";
 import { TagInput } from "@/components/ui/tag-input";
-import { ElementRow } from "@/components/ui/element-row";
 import { NoteEntry } from "@/components/ui/note-entry";
 import { ReferenceCard } from "@/components/ui/reference-card";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { StatusIndicator } from "@/components/ui/status-dot";
-import { ArrowLeft, Bookmark, Check, Plus, X } from "lucide-react";
+import { ArrowLeft, Bookmark, Check, ExternalLink, Plus, X } from "lucide-react";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
 import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
 
 const TABS = [
   { id: "intent", label: "Intent" },
   { id: "specs", label: "Specs" },
-  { id: "elements", label: "Elements" },
+  { id: "samply", label: "Samply" },
   { id: "notes", label: "Notes" },
   { id: "distribution", label: "Distribution" },
 ];
@@ -35,19 +34,6 @@ const EMOTIONAL_SUGGESTIONS = [
   "haunting", "playful", "anthemic", "delicate", "heavy", "airy",
 ];
 
-const ELEMENT_CATEGORIES: { label: string; items: string[] }[] = [
-  { label: "Drums & Percussion", items: ["Kick", "Snare", "Hi-Hats", "Toms", "Overheads/Rooms", "Percussion", "Drum Bus", "Programmed Drums"] },
-  { label: "Bass", items: ["Bass Guitar", "Synth Bass", "Sub Bass", "Upright Bass"] },
-  { label: "Guitars", items: ["Electric Guitar", "Acoustic Guitar", "Clean Guitar", "Distorted Guitar", "Guitar Bus"] },
-  { label: "Keys & Synths", items: ["Piano", "Rhodes/EP", "Organ", "Synth Pad", "Synth Lead", "Strings", "Brass/Horns", "Woodwinds"] },
-  { label: "Vocals", items: ["Lead Vocal", "BGVs", "Vocal Doubles", "Vocal Ad-libs", "Vocal Chops", "Rap/Spoken Word"] },
-  { label: "Production", items: ["FX/Ear Candy", "Samples/Loops", "808s", "Risers/Impacts", "Ambience/Atmos", "Foley", "Noise/Texture"] },
-];
-
-const DEFAULT_ELEMENTS = [
-  "Kick", "Snare", "Bass Guitar", "Electric Guitar", "Piano",
-  "Lead Vocal", "BGVs", "FX/Ear Candy",
-];
 
 type TrackData = {
   id: string;
@@ -68,16 +54,6 @@ type SpecsData = {
   delivery_formats?: string[];
   special_reqs?: string;
 } | null;
-type ElementData = {
-  id: string;
-  name: string;
-  notes: string | null;
-  flagged: boolean;
-  sort_order: number;
-  version?: string;
-  created_at?: string;
-  updated_at?: string;
-};
 type NoteData = {
   id: string;
   content: string;
@@ -128,7 +104,7 @@ type Props = {
   track: TrackData;
   intent: IntentData;
   specs: SpecsData;
-  elements: ElementData[];
+  samplyUrl: string | null;
   notes: NoteData[];
   references: RefData[];
   distribution: DistributionData;
@@ -138,7 +114,7 @@ type Props = {
 
 export function TrackDetailClient({
   releaseId, releaseTitle, releaseFormat, releaseCoverArt,
-  track, intent, specs, elements, notes, references, distribution, splits, role,
+  track, intent, specs, samplyUrl, notes, references, distribution, splits, role,
 }: Props) {
   const [activeTab, setActiveTab] = useState("intent");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -155,13 +131,7 @@ export function TrackDetailClient({
   const [deliveryFormats, setDeliveryFormats] = useState<string[]>(specs?.delivery_formats ?? []);
   const [specialReqs, setSpecialReqs] = useState(specs?.special_reqs ?? "");
 
-  const [localElements, setLocalElements] = useState(elements);
-  const allVersions = [...new Set(localElements.map((e) => e.version || "v1"))].sort();
-  const [activeVersion, setActiveVersion] = useState(allVersions[allVersions.length - 1] || "v1");
-  const [showNewVersion, setShowNewVersion] = useState(false);
-  const [newVersionName, setNewVersionName] = useState("");
-  const [dragIdx, setDragIdx] = useState<number | null>(null);
-  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const [localSamplyUrl, setLocalSamplyUrl] = useState(samplyUrl ?? "");
   const [localNotes, setLocalNotes] = useState(notes);
   const [newNote, setNewNote] = useState("");
   const [localRefs, setLocalRefs] = useState(references);
@@ -338,123 +308,19 @@ export function TrackDetailClient({
     }
   }
 
-  async function handleAddElement(name: string) {
-    const nextOrder =
-      localElements.length > 0
-        ? Math.max(...localElements.map((e) => e.sort_order)) + 1
-        : 0;
-    const { data } = await supabase
-      .from("track_elements")
-      .insert({ track_id: track.id, name, sort_order: nextOrder, version: activeVersion })
-      .select()
-      .single();
-    if (data) {
-      setLocalElements([
-        ...localElements,
-        { ...data, notes: data.notes ?? "", flagged: data.flagged ?? false },
-      ]);
-      autoPromoteTrack();
-    }
-  }
-
-  async function handleUpdateElement(elementId: string, d: Record<string, unknown>) {
-    setLocalElements((prev) =>
-      prev.map((e) => (e.id === elementId ? { ...e, ...d } : e)) as ElementData[],
-    );
-    await supabase.from("track_elements").update(d).eq("id", elementId);
-  }
-
-  async function handleDeleteElement(elementId: string) {
-    const removed = localElements.find((e) => e.id === elementId);
-    setLocalElements((prev) => prev.filter((e) => e.id !== elementId));
+  async function saveSamplyUrl() {
+    const url = localSamplyUrl.trim() || null;
+    setSaveStatus("saving");
     try {
-      const { error } = await supabase.from("track_elements").delete().eq("id", elementId);
+      const { error } = await supabase
+        .from("tracks")
+        .update({ samply_url: url })
+        .eq("id", track.id);
       if (error) throw error;
+      setSaveStatus("saved");
     } catch {
-      if (removed) setLocalElements((prev) => [...prev, removed]);
+      setSaveStatus("error");
     }
-  }
-
-  async function handleAddDefaults() {
-    const versionEls = localElements.filter((e) => (e.version || "v1") === activeVersion);
-    const newNames = DEFAULT_ELEMENTS.filter(
-      (name) => !versionEls.find((e) => e.name === name),
-    );
-    if (newNames.length === 0) return;
-    let nextOrder =
-      localElements.length > 0
-        ? Math.max(...localElements.map((e) => e.sort_order)) + 1
-        : 0;
-    const rows = newNames.map((name) => ({
-      track_id: track.id, name, sort_order: nextOrder++, version: activeVersion,
-    }));
-    const { data } = await supabase
-      .from("track_elements")
-      .insert(rows)
-      .select();
-    if (data) {
-      const added = data.map((d) => ({ ...d, notes: d.notes ?? "", flagged: d.flagged ?? false }) as ElementData);
-      setLocalElements((prev) => [...prev, ...added]);
-    }
-  }
-
-  async function handleCreateVersion(versionName: string) {
-    const prevVersionEls = localElements.filter((e) => (e.version || "v1") === activeVersion);
-    let nextOrder = localElements.length > 0
-      ? Math.max(...localElements.map((e) => e.sort_order)) + 1
-      : 0;
-    if (prevVersionEls.length === 0) {
-      setActiveVersion(versionName);
-      return;
-    }
-    const rows = prevVersionEls.map((el) => ({
-      track_id: track.id,
-      name: el.name,
-      notes: null,
-      flagged: false,
-      sort_order: nextOrder++,
-      version: versionName,
-    }));
-    const { data } = await supabase
-      .from("track_elements")
-      .insert(rows)
-      .select();
-    if (data) {
-      const added = data.map((d) => ({ ...d, notes: d.notes ?? "", flagged: d.flagged ?? false }) as ElementData);
-      setLocalElements((prev) => [...prev, ...added]);
-    }
-    setActiveVersion(versionName);
-  }
-
-  async function handleDrop(fromIdx: number, toIdx: number, versionEls: ElementData[]) {
-    if (fromIdx === toIdx) return;
-    const prevElements = [...localElements];
-    const reordered = [...versionEls];
-    const [moved] = reordered.splice(fromIdx, 1);
-    reordered.splice(toIdx, 0, moved);
-    const updated = reordered.map((el, i) => ({ ...el, sort_order: i }));
-    setLocalElements((prev) => {
-      const otherVersionEls = prev.filter((e) => (e.version || "v1") !== activeVersion);
-      return [...otherVersionEls, ...updated];
-    });
-    setDragIdx(null);
-    setDragOverIdx(null);
-    try {
-      const results = await Promise.all(
-        updated.map((el) =>
-          supabase.from("track_elements").update({ sort_order: el.sort_order }).eq("id", el.id)
-        ),
-      );
-      if (results.some((r) => r.error)) throw new Error("Reorder failed");
-    } catch {
-      setLocalElements(prevElements);
-    }
-  }
-
-  function handleMoveElement(fromIdx: number, direction: -1 | 1, versionEls: ElementData[]) {
-    const toIdx = fromIdx + direction;
-    if (toIdx < 0 || toIdx >= versionEls.length) return;
-    handleDrop(fromIdx, toIdx, versionEls);
   }
 
   async function handlePostNote() {
@@ -819,142 +685,88 @@ export function TrackDetailClient({
             </div>
           )}
 
-          {/* Elements */}
-          {activeTab === "elements" && (() => {
-            const versionEls = localElements
-              .filter((e) => (e.version || "v1") === activeVersion)
-              .sort((a, b) => {
-                if (a.flagged && !b.flagged) return -1;
-                if (!a.flagged && b.flagged) return 1;
-                return a.sort_order - b.sort_order;
-              });
-
-            return (
-              <div className="space-y-4">
-                {/* Version header */}
-                <div className="flex items-center justify-between p-3 rounded-md border border-border bg-panel2">
-                  <div className="flex items-center gap-3">
-                    <label className="label-sm text-muted">Mix Version</label>
-                    <select
-                      value={activeVersion}
-                      onChange={(e) => setActiveVersion(e.target.value)}
-                      className="text-sm font-semibold text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal"
+          {/* Samply */}
+          {activeTab === "samply" && (
+            <Panel>
+              <PanelBody className="py-5 space-y-4">
+                {localSamplyUrl ? (
+                  <div className="space-y-4">
+                    <a
+                      href={localSamplyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-md bg-signal text-white font-medium text-sm hover:opacity-90 transition-opacity"
                     >
-                      {allVersions.map((v) => (
-                        <option key={v} value={v}>{v}</option>
-                      ))}
-                    </select>
-                    <span className="text-[10px] text-faint font-mono">
-                      {versionEls.length} element{versionEls.length !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <div className="relative">
-                    {canEditCreative(role) && !showNewVersion ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const nextNum = allVersions.length + 1;
-                          setNewVersionName(`v${nextNum}`);
-                          setShowNewVersion(true);
-                        }}
-                        className="text-xs text-muted hover:text-text transition-colors"
-                      >
-                        + New Version
-                      </button>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <input
-                          value={newVersionName}
-                          onChange={(e) => setNewVersionName(e.target.value)}
-                          className="input text-xs h-7 w-20 py-0.5 px-2"
-                          autoFocus
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && newVersionName.trim()) {
-                              handleCreateVersion(newVersionName.trim());
-                              setShowNewVersion(false);
-                            }
-                            if (e.key === "Escape") setShowNewVersion(false);
-                          }}
-                        />
-                        <Button
-                          variant="primary"
-                          className="h-7 text-xs px-2"
-                          disabled={!newVersionName.trim() || allVersions.includes(newVersionName.trim())}
-                          onClick={() => {
-                            handleCreateVersion(newVersionName.trim());
-                            setShowNewVersion(false);
-                          }}
-                        >
-                          Create
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          className="h-7 text-xs px-2"
-                          onClick={() => setShowNewVersion(false)}
-                        >
-                          Cancel
-                        </Button>
+                      <ExternalLink size={16} />
+                      Open in Samply
+                    </a>
+                    {canEditCreative(role) && (
+                      <div className="space-y-2">
+                        <label className="label text-muted">Samply URL</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="url"
+                            value={localSamplyUrl}
+                            onChange={(e) => setLocalSamplyUrl(e.target.value)}
+                            placeholder="https://samply.app/..."
+                            className="input text-sm flex-1"
+                          />
+                          <Button
+                            variant="secondary"
+                            onClick={saveSamplyUrl}
+                            disabled={localSamplyUrl === (samplyUrl ?? "")}
+                            className="shrink-0"
+                          >
+                            Save
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
-                </div>
-
-                {/* Element list */}
-                <div className="space-y-3">
-                  {versionEls.length === 0 && (
-                    <div className="text-center py-8">
-                      <p className="text-sm text-muted mb-4">
-                        {canEditCreative(role)
-                          ? `No elements in ${activeVersion}. Add instruments or copy from a previous version.`
-                          : `No elements in ${activeVersion}.`}
+                ) : canEditCreative(role) ? (
+                  <div className="space-y-4">
+                    <div className="text-center py-4">
+                      <p className="text-sm text-muted mb-1">
+                        Connect this track to Samply to manage elements and versions externally.
                       </p>
-                      {canEditCreative(role) && (
-                        <Button variant="secondary" onClick={handleAddDefaults}>
-                          Add default elements
-                        </Button>
-                      )}
+                      <a
+                        href="https://samply.app"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-signal hover:underline"
+                      >
+                        Learn more about Samply
+                      </a>
                     </div>
-                  )}
-                  {versionEls.map((el, idx) => (
-                    <ElementRow
-                      key={el.id}
-                      name={el.name}
-                      notes={el.notes ?? ""}
-                      flagged={el.flagged}
-                      createdAt={el.created_at}
-                      updatedAt={el.updated_at}
-                      isDragging={dragIdx === idx}
-                      isDragOver={dragOverIdx === idx}
-                      onDragStart={canEditCreative(role) ? () => setDragIdx(idx) : undefined}
-                      onDragOver={canEditCreative(role) ? (e) => {
-                        e.preventDefault();
-                        setDragOverIdx(idx);
-                      } : undefined}
-                      onDrop={canEditCreative(role) ? () => {
-                        if (dragIdx !== null) handleDrop(dragIdx, idx, versionEls);
-                      } : undefined}
-                      onMoveUp={canEditCreative(role) ? () => handleMoveElement(idx, -1, versionEls) : undefined}
-                      onMoveDown={canEditCreative(role) ? () => handleMoveElement(idx, 1, versionEls) : undefined}
-                      isFirst={idx === 0}
-                      isLast={idx === versionEls.length - 1}
-                      onUpdate={canEditCreative(role) ? (d) => handleUpdateElement(el.id, d) : () => {}}
-                      onDelete={canEditCreative(role) ? () => handleDeleteElement(el.id) : () => {}}
-                      readOnly={!canEditCreative(role)}
-                    />
-                  ))}
-                </div>
-
-                {canEditCreative(role) && (
-                  <div className="pt-2">
-                    <QuickAddElement
-                      onAdd={handleAddElement}
-                      existingNames={versionEls.map((e) => e.name)}
-                    />
+                    <div className="space-y-2">
+                      <label className="label text-muted">Samply URL</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="url"
+                          value={localSamplyUrl}
+                          onChange={(e) => setLocalSamplyUrl(e.target.value)}
+                          placeholder="https://samply.app/..."
+                          className="input text-sm flex-1"
+                        />
+                        <Button
+                          variant="primary"
+                          onClick={saveSamplyUrl}
+                          disabled={!localSamplyUrl.trim()}
+                          className="shrink-0"
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-sm text-muted">
+                    No Samply link has been added for this track.
                   </div>
                 )}
-              </div>
-            );
-          })()}
+              </PanelBody>
+            </Panel>
+          )}
 
           {/* Notes */}
           {activeTab === "notes" && (
@@ -1456,108 +1268,6 @@ function DeliveryFormatSelector({
           </Button>
         </div>
       )}
-    </div>
-  );
-}
-
-/* ── Quick-add element sub-component ── */
-
-function QuickAddElement({
-  onAdd,
-  existingNames,
-}: {
-  onAdd: (name: string) => void;
-  existingNames: string[];
-}) {
-  const [custom, setCustom] = useState("");
-  const [expanded, setExpanded] = useState(false);
-
-  const quickSuggestions = DEFAULT_ELEMENTS.filter(
-    (name) => !existingNames.includes(name),
-  );
-
-  return (
-    <div className="space-y-3">
-      {quickSuggestions.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {quickSuggestions.map((name) => (
-            <button
-              key={name}
-              type="button"
-              onClick={() => onAdd(name)}
-              className="chip text-xs"
-            >
-              + {name}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="text-xs text-muted hover:text-text transition-colors"
-      >
-        {expanded ? "Hide all instruments" : "Browse all instruments..."}
-      </button>
-
-      {expanded && (
-        <div className="space-y-3 p-3 rounded-md border border-border bg-panel2">
-          {ELEMENT_CATEGORIES.map((cat) => {
-            const available = cat.items.filter((name) => !existingNames.includes(name));
-            if (available.length === 0) return null;
-            return (
-              <div key={cat.label}>
-                <div className="text-[10px] font-semibold text-faint uppercase tracking-wider mb-1.5">
-                  {cat.label}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {available.map((name) => (
-                    <button
-                      key={name}
-                      type="button"
-                      onClick={() => onAdd(name)}
-                      className="chip text-xs"
-                    >
-                      + {name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={custom}
-          onChange={(e) => setCustom(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && custom.trim()) {
-              onAdd(custom.trim());
-              setCustom("");
-            }
-          }}
-          placeholder="Custom element name..."
-          className="input text-sm h-9 flex-1"
-        />
-        <Button
-          variant="ghost"
-          onClick={() => {
-            if (custom.trim()) {
-              onAdd(custom.trim());
-              setCustom("");
-            }
-          }}
-          disabled={!custom.trim()}
-          className="h-9 text-xs"
-        >
-          <Plus size={14} />
-          Add
-        </Button>
-      </div>
     </div>
   );
 }

@@ -30,20 +30,13 @@ export default async function BriefPage({ params }: Props) {
 
   const trackIds = (tracks ?? []).map((t: Record<string, unknown>) => t.id as string);
 
-  const [intentRes, specsRes, elementsRes, trackRefsRes, globalRefsRes] =
+  const [intentRes, specsRes, trackRefsRes, globalRefsRes] =
     await Promise.all([
       trackIds.length > 0
         ? supabase.from("track_intent").select("*").in("track_id", trackIds)
         : Promise.resolve({ data: [] as Record<string, unknown>[] }),
       trackIds.length > 0
         ? supabase.from("track_specs").select("*").in("track_id", trackIds)
-        : Promise.resolve({ data: [] as Record<string, unknown>[] }),
-      trackIds.length > 0
-        ? supabase
-            .from("track_elements")
-            .select("*")
-            .in("track_id", trackIds)
-            .order("sort_order")
         : Promise.resolve({ data: [] as Record<string, unknown>[] }),
       trackIds.length > 0
         ? supabase
@@ -63,7 +56,6 @@ export default async function BriefPage({ params }: Props) {
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const intents = (intentRes.data ?? []) as any[];
   const allSpecs = (specsRes.data ?? []) as any[];
-  const allElements = (elementsRes.data ?? []) as any[];
   const trackRefs = (trackRefsRes.data ?? []) as any[];
   const globalRefs = (globalRefsRes.data ?? []) as any[];
 
@@ -167,9 +159,6 @@ export default async function BriefPage({ params }: Props) {
           const trackSpec = allSpecs.find(
             (s: any) => s.track_id === track.id,
           );
-          const elems = allElements.filter(
-            (e: any) => e.track_id === track.id,
-          );
           const refs = trackRefs.filter(
             (r: any) => r.track_id === track.id,
           );
@@ -251,23 +240,17 @@ export default async function BriefPage({ params }: Props) {
                 </div>
               )}
 
-              {elems.length > 0 && (
+              {track.samply_url && (
                 <div className="mb-3">
-                  <div className="text-xs text-muted font-medium mb-1">
-                    Element Notes
-                  </div>
-                  <ul className="text-sm text-text space-y-1">
-                    {elems.map((el: any) => (
-                      <li key={el.id}>
-                        &bull;{" "}
-                        <span className="font-medium">{el.name}:</span>{" "}
-                        {el.notes || "\u2014"}
-                        {el.flagged && (
-                          <span className="text-signal text-xs ml-1">&starf;</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                  <span className="text-xs text-muted font-medium">Samply: </span>
+                  <a
+                    href={track.samply_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-signal hover:underline"
+                  >
+                    View on Samply &rarr;
+                  </a>
                 </div>
               )}
             </section>

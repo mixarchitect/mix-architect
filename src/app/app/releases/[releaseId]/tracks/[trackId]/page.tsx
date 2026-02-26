@@ -12,16 +12,11 @@ export default async function TrackDetailPage({ params }: Props) {
   const supabase = await createSupabaseServerClient();
 
   // Fire all queries in parallel — track, release, and sub-tables
-  const [trackRes, releaseRes, intentRes, specsRes, elementsRes, notesRes, refsRes, distributionRes, splitsRes] = await Promise.all([
+  const [trackRes, releaseRes, intentRes, specsRes, notesRes, refsRes, distributionRes, splitsRes] = await Promise.all([
     supabase.from("tracks").select("*").eq("id", trackId).maybeSingle(),
     supabase.from("releases").select("title, format, cover_art_url").eq("id", releaseId).maybeSingle(),
     supabase.from("track_intent").select("*").eq("track_id", trackId).maybeSingle(),
     supabase.from("track_specs").select("*").eq("track_id", trackId).maybeSingle(),
-    supabase
-      .from("track_elements")
-      .select("*")
-      .eq("track_id", trackId)
-      .order("sort_order"),
     supabase
       .from("revision_notes")
       .select("*")
@@ -54,7 +49,7 @@ export default async function TrackDetailPage({ params }: Props) {
       track={track}
       intent={intentRes.data}
       specs={specsRes.data}
-      elements={elementsRes.data ?? []}
+      samplyUrl={track.samply_url ?? null}
       notes={notesRes.data ?? []}
       references={refsRes.data ?? []}
       distribution={distributionRes.data}
