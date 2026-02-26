@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
@@ -22,6 +23,8 @@ export function MobileNav({ onSearchClick }: Props) {
   const router = useRouter();
   const paymentsEnabled = usePaymentsEnabled();
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   function cycleTheme() {
     const next = theme === "system" ? "light" : theme === "light" ? "dark" : "system";
@@ -37,8 +40,8 @@ export function MobileNav({ onSearchClick }: Props) {
     });
   }
 
-  const ThemeIcon = theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
-  const themeLabel = theme === "light" ? "Light" : theme === "dark" ? "Dark" : "Auto";
+  const ThemeIcon = !mounted ? Monitor : theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
+  const themeLabel = !mounted ? "Auto" : theme === "light" ? "Light" : theme === "dark" ? "Dark" : "Auto";
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
