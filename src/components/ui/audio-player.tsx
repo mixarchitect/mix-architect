@@ -631,7 +631,7 @@ export function AudioPlayer({
           </span>
         </div>
 
-        <div className="max-h-[260px] overflow-y-auto p-2">
+        <div className="p-2">
           {/* New comment input */}
           {commentInput && (
             <NewCommentInput
