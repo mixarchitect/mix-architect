@@ -684,8 +684,8 @@ function CommentRow({
       className={cn(
         "group flex gap-2.5 px-3 py-2.5 rounded-md cursor-pointer transition-colors",
         isActive
-          ? "bg-signal-muted"
-          : "bg-black/[0.03] hover:bg-black/[0.06]",
+          ? "bg-black/[0.06]"
+          : "hover:bg-black/[0.03]",
       )}
     >
       <div
