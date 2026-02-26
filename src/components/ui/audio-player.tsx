@@ -6,6 +6,7 @@ import { Timestamp } from "@/components/ui/timestamp";
 import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
+import { useTheme } from "next-themes";
 import {
   Play,
   Pause,
@@ -16,6 +17,15 @@ import {
   X,
 } from "lucide-react";
 import WaveSurfer from "wavesurfer.js";
+
+/** Read the --wave CSS variable from the live document. */
+function getWaveColor(): string {
+  return (
+    getComputedStyle(document.documentElement)
+      .getPropertyValue("--wave")
+      .trim() || "rgba(20, 20, 20, 0.15)"
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -117,6 +127,7 @@ export function AudioPlayer({
   onCommentsChange,
 }: AudioPlayerProps) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+  const { resolvedTheme } = useTheme();
 
   // Shared audio context
   const audio = useAudio();
@@ -204,80 +215,99 @@ export function AudioPlayer({
 
     setIsReady(false);
 
-    const ws = WaveSurfer.create({
-      container: containerRef.current,
-      media: audioElement,
-      url: activeVersion.audio_url,
-      barWidth: 3,
-      barGap: 1,
-      barRadius: 1,
-      height: 80,
-      progressColor: "var(--signal)",
-      waveColor: getComputedStyle(document.documentElement).getPropertyValue("--wave").trim() || "rgba(20, 20, 20, 0.15)",
-      cursorColor: "var(--signal)",
-      cursorWidth: 2,
-      normalize: true,
-      peaks: activeVersion.waveform_peaks ?? undefined,
-      duration: activeVersion.duration_seconds ?? undefined,
-    });
+    // Defer WaveSurfer creation to the next frame so the container has
+    // been laid-out and has real dimensions.  This fixes the blank
+    // waveform that sometimes appears on initial mount.
+    const container = containerRef.current;
+    let ws: WaveSurfer | null = null;
+    const raf = requestAnimationFrame(() => {
+      if (!container || !container.isConnected) return;
 
-    ws.on("ready", () => {
-      setIsReady(true);
+      ws = WaveSurfer.create({
+        container,
+        media: audioElement,
+        url: activeVersion.audio_url,
+        barWidth: 3,
+        barGap: 1,
+        barRadius: 1,
+        height: 80,
+        progressColor: "var(--signal)",
+        waveColor: getWaveColor(),
+        cursorColor: "var(--signal)",
+        cursorWidth: 2,
+        normalize: true,
+        peaks: activeVersion.waveform_peaks ?? undefined,
+        duration: activeVersion.duration_seconds ?? undefined,
+      });
 
-      // Sync context state (URL already matches so this is state-only)
-      audio.loadVersion(activeVersion, trackMeta);
+      ws.on("ready", () => {
+        setIsReady(true);
 
-      // Restore playback position and play/pause state
-      const restore = pendingRestoreRef.current;
-      pendingRestoreRef.current = null;
-      if (restore) {
-        const maxDur =
-          activeVersion.duration_seconds || audioElement.duration || Infinity;
-        if (restore.seekTime > 0 && restore.seekTime <= maxDur) {
-          audioElement.currentTime = restore.seekTime;
+        // Sync context state (URL already matches so this is state-only)
+        audio.loadVersion(activeVersion, trackMeta);
+
+        // Restore playback position and play/pause state
+        const restore = pendingRestoreRef.current;
+        pendingRestoreRef.current = null;
+        if (restore) {
+          const maxDur =
+            activeVersion.duration_seconds || audioElement.duration || Infinity;
+          if (restore.seekTime > 0 && restore.seekTime <= maxDur) {
+            audioElement.currentTime = restore.seekTime;
+          }
+          if (restore.shouldPlay) {
+            audioElement.play().catch(() => {});
+          }
         }
-        if (restore.shouldPlay) {
-          audioElement.play().catch(() => {});
+
+        // Cache peaks if not yet cached
+        if (!activeVersion.waveform_peaks) {
+          const peaks = ws!.exportPeaks();
+          supabase
+            .from("track_audio_versions")
+            .update({
+              waveform_peaks: peaks,
+              duration_seconds: ws!.getDuration(),
+            })
+            .eq("id", activeVersion.id)
+            .then(() => {
+              onVersionsChange(
+                versions.map((v) =>
+                  v.id === activeVersion.id
+                    ? { ...v, waveform_peaks: peaks, duration_seconds: ws!.getDuration() }
+                    : v,
+                ),
+              );
+            });
         }
-      }
+      });
 
-      // Cache peaks if not yet cached
-      if (!activeVersion.waveform_peaks) {
-        const peaks = ws.exportPeaks();
-        supabase
-          .from("track_audio_versions")
-          .update({
-            waveform_peaks: peaks,
-            duration_seconds: ws.getDuration(),
-          })
-          .eq("id", activeVersion.id)
-          .then(() => {
-            onVersionsChange(
-              versions.map((v) =>
-                v.id === activeVersion.id
-                  ? { ...v, waveform_peaks: peaks, duration_seconds: ws.getDuration() }
-                  : v,
-              ),
-            );
-          });
-      }
+      ws.on("dblclick", () => {
+        if (!canComment) return;
+        const time = ws!.getCurrentTime();
+        setCommentInput({ timecode: time });
+        audioElement.pause();
+      });
+
+      wavesurferRef.current = ws;
     });
-
-    ws.on("dblclick", () => {
-      if (!canComment) return;
-      const time = ws.getCurrentTime();
-      setCommentInput({ timecode: time });
-      audioElement.pause();
-    });
-
-    wavesurferRef.current = ws;
 
     return () => {
-      ws.destroy();
+      cancelAnimationFrame(raf);
+      if (ws) {
+        ws.destroy();
+      }
       wavesurferRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeVersion?.id, audioElement]);
+
+  // Update waveform bar color when the theme changes
+  useEffect(() => {
+    if (wavesurferRef.current) {
+      wavesurferRef.current.setOptions({ waveColor: getWaveColor() });
+    }
+  }, [resolvedTheme]);
 
   /* ---------------------------------------------------------------- */
   /*  Playback controls                                                */
