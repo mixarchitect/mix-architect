@@ -15,14 +15,15 @@ import { NoteEntry } from "@/components/ui/note-entry";
 import { ReferenceCard } from "@/components/ui/reference-card";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { StatusIndicator } from "@/components/ui/status-dot";
-import { ArrowLeft, Bookmark, Check, ExternalLink, Pencil, Plus, X } from "lucide-react";
+import { AudioPlayer, type AudioVersionData, type TimelineComment } from "@/components/ui/audio-player";
+import { ArrowLeft, Bookmark, Check, Plus, X } from "lucide-react";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
 import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
 
 const TABS = [
   { id: "intent", label: "Intent" },
   { id: "specs", label: "Specs" },
-  { id: "samply", label: "Samply" },
+  { id: "player", label: "Player" },
   { id: "notes", label: "Notes" },
   { id: "distribution", label: "Distribution" },
 ];
@@ -60,6 +61,8 @@ type NoteData = {
   content: string;
   author: string;
   created_at: string;
+  timecode_seconds?: number | null;
+  audio_version_id?: string | null;
 };
 type RefData = {
   id: string;
@@ -106,6 +109,7 @@ type Props = {
   intent: IntentData;
   specs: SpecsData;
   samplyUrl: string | null;
+  audioVersions: AudioVersionData[];
   notes: NoteData[];
   references: RefData[];
   distribution: DistributionData;
@@ -113,22 +117,9 @@ type Props = {
   role: ReleaseRole;
 };
 
-/** Extract a Samply player/link ID from various URL formats, or return null. */
-function getSamplyEmbedId(url: string): string | null {
-  try {
-    const parsed = new URL(url);
-    if (parsed.hostname !== "samply.app") return null;
-    // /p/<id> (player link) or /embed/<id> (embed URL)
-    const match = parsed.pathname.match(/^\/(p|embed)\/([a-zA-Z0-9_-]+)/);
-    return match ? match[2] : null;
-  } catch {
-    return null;
-  }
-}
-
 export function TrackDetailClient({
   releaseId, releaseTitle, releaseFormat, releaseCoverArt,
-  track, intent, specs, samplyUrl, notes, references, distribution, splits, role,
+  track, intent, specs, samplyUrl, audioVersions, notes, references, distribution, splits, role,
 }: Props) {
   const [activeTab, setActiveTab] = useState("intent");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -145,8 +136,7 @@ export function TrackDetailClient({
   const [deliveryFormats, setDeliveryFormats] = useState<string[]>(specs?.delivery_formats ?? []);
   const [specialReqs, setSpecialReqs] = useState(specs?.special_reqs ?? "");
 
-  const [localSamplyUrl, setLocalSamplyUrl] = useState(samplyUrl ?? "");
-  const [editingSamplyUrl, setEditingSamplyUrl] = useState(false);
+  const [localAudioVersions, setLocalAudioVersions] = useState(audioVersions);
   const [localNotes, setLocalNotes] = useState(notes);
   const [newNote, setNewNote] = useState("");
   const [localRefs, setLocalRefs] = useState(references);
@@ -320,21 +310,6 @@ export function TrackDetailClient({
       if (error) throw error;
     } catch {
       setTrackStatus("not_started");
-    }
-  }
-
-  async function saveSamplyUrl() {
-    const url = localSamplyUrl.trim() || null;
-    setSaveStatus("saving");
-    try {
-      const { error } = await supabase
-        .from("tracks")
-        .update({ samply_url: url })
-        .eq("id", track.id);
-      if (error) throw error;
-      setSaveStatus("saved");
-    } catch {
-      setSaveStatus("error");
     }
   }
 
@@ -700,117 +675,32 @@ export function TrackDetailClient({
             </div>
           )}
 
-          {/* Samply */}
-          {activeTab === "samply" && (() => {
-            const embedId = localSamplyUrl ? getSamplyEmbedId(localSamplyUrl) : null;
-            return (
-              <Panel>
-                <PanelBody className="py-5 space-y-4">
-                  {localSamplyUrl && !editingSamplyUrl ? (
-                    <div className="space-y-3">
-                      {embedId ? (
-                        <div className="rounded-md overflow-hidden border border-border">
-                          <iframe
-                            src={`https://samply.app/embed/${embedId}`}
-                            className="w-full"
-                            style={{ height: 360 }}
-                            allow="autoplay"
-                            title="Samply Player"
-                          />
-                        </div>
-                      ) : null}
-                      <div className="flex items-center gap-2">
-                        <a
-                          href={localSamplyUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={cn(
-                            "flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-opacity hover:opacity-90",
-                            embedId
-                              ? "text-signal hover:underline"
-                              : "w-full bg-signal text-white",
-                          )}
-                        >
-                          <ExternalLink size={14} />
-                          Open in Samply
-                        </a>
-                        {canEditCreative(role) && (
-                          <button
-                            type="button"
-                            onClick={() => setEditingSamplyUrl(true)}
-                            className="flex items-center gap-1.5 text-xs text-muted hover:text-text transition-colors ml-auto"
-                          >
-                            <Pencil size={12} />
-                            Edit URL
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ) : canEditCreative(role) ? (
-                    <div className="space-y-4">
-                      {!localSamplyUrl && (
-                        <div className="text-center py-4">
-                          <p className="text-sm text-muted mb-1">
-                            Connect this track to Samply to manage elements and versions externally.
-                          </p>
-                          <a
-                            href="https://samply.app"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-signal hover:underline"
-                          >
-                            Learn more about Samply
-                          </a>
-                        </div>
-                      )}
-                      <div className="space-y-2">
-                        <label className="label text-muted">Samply Player URL</label>
-                        <div className="flex gap-2">
-                          <input
-                            type="url"
-                            value={localSamplyUrl}
-                            onChange={(e) => setLocalSamplyUrl(e.target.value)}
-                            placeholder="https://samply.app/p/..."
-                            className="input text-sm flex-1"
-                          />
-                          <Button
-                            variant={editingSamplyUrl ? "secondary" : "primary"}
-                            onClick={() => {
-                              saveSamplyUrl();
-                              setEditingSamplyUrl(false);
-                            }}
-                            disabled={editingSamplyUrl ? localSamplyUrl === (samplyUrl ?? "") : !localSamplyUrl.trim()}
-                            className="shrink-0"
-                          >
-                            Save
-                          </Button>
-                          {editingSamplyUrl && (
-                            <Button
-                              variant="ghost"
-                              onClick={() => {
-                                setLocalSamplyUrl(samplyUrl ?? "");
-                                setEditingSamplyUrl(false);
-                              }}
-                              className="shrink-0"
-                            >
-                              Cancel
-                            </Button>
-                          )}
-                        </div>
-                        <p className="text-xs text-faint">
-                          Paste a Samply player link (samply.app/p/...) to embed the player, or any Samply URL to link out.
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-sm text-muted">
-                      No Samply link has been added for this track.
-                    </div>
-                  )}
-                </PanelBody>
-              </Panel>
-            );
-          })()}
+          {/* Player */}
+          {activeTab === "player" && (
+            <AudioPlayer
+              trackId={track.id}
+              versions={localAudioVersions}
+              comments={localNotes.filter(
+                (n): n is TimelineComment =>
+                  n.timecode_seconds != null && n.audio_version_id != null,
+              )}
+              canUpload={canEditCreative(role)}
+              canComment={canEditCreative(role)}
+              canDelete={canEdit(role)}
+              coverArtUrl={releaseCoverArt ?? null}
+              trackTitle={track.title}
+              releaseTitle={releaseTitle}
+              onVersionsChange={setLocalAudioVersions}
+              onCommentsChange={(updated) => {
+                setLocalNotes((prev) => {
+                  const nonTimecoded = prev.filter(
+                    (n) => n.timecode_seconds == null,
+                  );
+                  return [...updated, ...nonTimecoded];
+                });
+              }}
+            />
+          )}
 
           {/* Notes */}
           {activeTab === "notes" && (

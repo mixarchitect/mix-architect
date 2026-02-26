@@ -30,7 +30,7 @@ export default async function BriefPage({ params }: Props) {
 
   const trackIds = (tracks ?? []).map((t: Record<string, unknown>) => t.id as string);
 
-  const [intentRes, specsRes, trackRefsRes, globalRefsRes] =
+  const [intentRes, specsRes, trackRefsRes, globalRefsRes, audioVersionsRes] =
     await Promise.all([
       trackIds.length > 0
         ? supabase.from("track_intent").select("*").in("track_id", trackIds)
@@ -51,6 +51,12 @@ export default async function BriefPage({ params }: Props) {
         .eq("release_id", releaseId)
         .is("track_id", null)
         .order("sort_order"),
+      trackIds.length > 0
+        ? supabase
+            .from("track_audio_versions")
+            .select("id, track_id")
+            .in("track_id", trackIds)
+        : Promise.resolve({ data: [] as Record<string, unknown>[] }),
     ]);
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -58,6 +64,7 @@ export default async function BriefPage({ params }: Props) {
   const allSpecs = (specsRes.data ?? []) as any[];
   const trackRefs = (trackRefsRes.data ?? []) as any[];
   const globalRefs = (globalRefsRes.data ?? []) as any[];
+  const audioVersions = (audioVersionsRes.data ?? []) as any[];
 
   return (
     <div>
@@ -162,6 +169,9 @@ export default async function BriefPage({ params }: Props) {
           const refs = trackRefs.filter(
             (r: any) => r.track_id === track.id,
           );
+          const audioVersionCount = audioVersions.filter(
+            (v: any) => v.track_id === track.id,
+          ).length;
 
           return (
             <section key={track.id} className="mb-10 break-inside-avoid">
@@ -237,6 +247,15 @@ export default async function BriefPage({ params }: Props) {
                   <p className="text-sm text-text italic">
                     &ldquo;{intent.anti_references}&rdquo;
                   </p>
+                </div>
+              )}
+
+              {audioVersionCount > 0 && (
+                <div className="mb-3">
+                  <span className="text-xs text-muted font-medium">Audio: </span>
+                  <span className="text-sm text-text">
+                    {audioVersionCount} version{audioVersionCount > 1 ? "s" : ""} uploaded
+                  </span>
                 </div>
               )}
 
