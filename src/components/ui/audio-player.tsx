@@ -577,18 +577,26 @@ export function AudioPlayer({
               {activeVersion.file_name && <>· {activeVersion.file_name}</>}
               <button
                 type="button"
-                onClick={() => {
-                  const a = document.createElement("a");
-                  a.href = activeVersion.audio_url;
-                  a.download = activeVersion.file_name || `v${activeVersion.version_number}`;
-                  a.target = "_blank";
-                  a.rel = "noopener noreferrer";
-                  a.click();
+                onClick={async () => {
+                  const fileName = activeVersion.file_name || `v${activeVersion.version_number}`;
+                  try {
+                    const res = await fetch(activeVersion.audio_url);
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = fileName;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  } catch {
+                    // Fallback: open in new tab
+                    window.open(activeVersion.audio_url, "_blank");
+                  }
                 }}
                 className="text-signal hover:opacity-70 transition-opacity"
                 title={`Download ${activeVersion.file_name || `v${activeVersion.version_number}`}`}
               >
-                <Download size={12} />
+                <Download size={14} />
               </button>
             </span>
           )}
