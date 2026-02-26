@@ -8,7 +8,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { StatusDot } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
 import { cn } from "@/lib/cn";
-import { relativeTime } from "@/lib/relative-time";
+import { Timestamp } from "@/components/ui/timestamp";
 import type { ReleaseRole } from "@/lib/permissions";
 import { canDeleteRelease, canEdit } from "@/lib/permissions";
 
@@ -293,7 +293,7 @@ export function ReleaseCard({
                 {feeTotal != null && ` \u2022 ${new Intl.NumberFormat("en-US", { style: "currency", currency: feeCurrency || "USD" }).format(feeTotal)}`}
               </span>
             )}
-            {updatedAt && <span>{relativeTime(updatedAt)}</span>}
+            {updatedAt && <Timestamp date={updatedAt} />}
           </div>
         </div>
       </Link>

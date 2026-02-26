@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import { relativeTime } from "@/lib/relative-time";
+import { Timestamp } from "@/components/ui/timestamp";
 
 type Props = {
   author: string;
@@ -14,7 +14,7 @@ export function NoteEntry({ author, createdAt, content, className }: Props) {
       <div className="flex items-center gap-2 text-xs text-muted mb-2">
         <span className="font-medium">{author}</span>
         <span>&middot;</span>
-        <span>{relativeTime(createdAt)}</span>
+        <Timestamp date={createdAt} />
       </div>
       <p className="text-sm text-text leading-relaxed whitespace-pre-wrap">{content}</p>
     </div>
