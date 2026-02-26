@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreVertical, Pencil, Trash2, Music } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Music, Pin } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { StatusDot } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
@@ -27,6 +27,7 @@ type Props = {
   feeCurrency?: string | null;
   paymentsEnabled?: boolean;
   coverArtUrl?: string | null;
+  pinned?: boolean;
   role?: ReleaseRole;
   className?: string;
 };
@@ -60,11 +61,12 @@ export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt,
   paymentStatus, feeTotal, feeCurrency, paymentsEnabled,
-  coverArtUrl, role, className,
+  coverArtUrl, pinned, role, className,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [pinning, setPinning] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -89,6 +91,22 @@ export function ReleaseCard({
       router.refresh();
     } catch {
       setDeleting(false);
+    }
+  }
+
+  async function handlePinToggle() {
+    setPinning(true);
+    const supabase = createSupabaseBrowserClient();
+    try {
+      const { error } = await supabase
+        .from("releases")
+        .update({ pinned: !pinned })
+        .eq("id", id);
+      if (error) throw error;
+      setMenuOpen(false);
+      router.refresh();
+    } catch {
+      setPinning(false);
     }
   }
 
@@ -118,6 +136,7 @@ export function ReleaseCard({
         </Link>
 
         <div className="flex items-center gap-1.5 shrink-0">
+          {pinned && <Pin size={12} className="text-signal fill-current" />}
           <StatusDot color={statusColor(status)} />
           <div ref={menuRef} className="relative">
             <button
@@ -137,6 +156,21 @@ export function ReleaseCard({
               <div className="absolute right-0 mt-1 w-44 rounded-md border border-border bg-panel shadow-lg py-1 text-sm z-20">
                 {!confirming ? (
                   <>
+                    {canEdit(role ?? "owner") && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handlePinToggle();
+                        }}
+                        disabled={pinning}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-panel2 transition-colors text-left disabled:opacity-50"
+                      >
+                        <Pin size={14} className={pinned ? "fill-current" : ""} />
+                        {pinned ? "Unpin Release" : "Pin to Top"}
+                      </button>
+                    )}
                     {canEdit(role ?? "owner") && (
                       <button
                         type="button"

@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { SortSelect } from "@/components/ui/sort-select";
 import { Plus } from "lucide-react";
 
 function formatMoney(amount: number, currency = "USD") {
@@ -13,21 +15,38 @@ function formatMoney(amount: number, currency = "USD") {
 const VALID_FILTERS = ["outstanding", "earned"] as const;
 type PaymentFilter = (typeof VALID_FILTERS)[number];
 
+const VALID_SORTS = ["modified", "created", "az"] as const;
+type SortOption = (typeof VALID_SORTS)[number];
+
 type Props = {
-  searchParams: Promise<{ payment?: string }>;
+  searchParams: Promise<{ payment?: string; sort?: string }>;
 };
 
 export default async function DashboardPage({ searchParams }: Props) {
-  const { payment } = await searchParams;
+  const { payment, sort } = await searchParams;
+  const activeSort: SortOption =
+    sort && VALID_SORTS.includes(sort as SortOption) ? (sort as SortOption) : "modified";
+
   const supabase = await createSupabaseServerClient();
+
+  // Build releases query with pinned-first + user sort
+  let releasesQuery = supabase
+    .from("releases")
+    .select("*, tracks(id, status)")
+    .order("pinned", { ascending: false });
+
+  if (activeSort === "az") {
+    releasesQuery = releasesQuery.order("title", { ascending: true });
+  } else if (activeSort === "created") {
+    releasesQuery = releasesQuery.order("created_at", { ascending: false });
+  } else {
+    releasesQuery = releasesQuery.order("updated_at", { ascending: false });
+  }
 
   // Fire all independent queries in parallel
   const [userRes, releasesRes] = await Promise.all([
     supabase.auth.getUser(),
-    supabase
-      .from("releases")
-      .select("*, tracks(id, status)")
-      .order("updated_at", { ascending: false }),
+    releasesQuery,
   ]);
 
   const user = userRes.data.user;
@@ -106,12 +125,17 @@ export default async function DashboardPage({ searchParams }: Props) {
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold h2 text-text">Your Releases</h1>
-        <Link href="/app/releases/new">
-          <Button variant="primary">
-            <Plus size={16} />
-            New Release
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Suspense>
+            <SortSelect />
+          </Suspense>
+          <Link href="/app/releases/new">
+            <Button variant="primary">
+              <Plus size={16} />
+              New Release
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {paymentsEnabled && hasAnyFees && (
@@ -195,6 +219,7 @@ export default async function DashboardPage({ searchParams }: Props) {
                   feeTotal={r.fee_total as number | null}
                   feeCurrency={r.fee_currency as string | null}
                   coverArtUrl={r.cover_art_url as string | null}
+                  pinned={r.pinned as boolean}
                   role="owner"
                 />
               );
@@ -249,6 +274,7 @@ export default async function DashboardPage({ searchParams }: Props) {
                   feeTotal={r.fee_total as number | null}
                   feeCurrency={r.fee_currency as string | null}
                   coverArtUrl={r.cover_art_url as string | null}
+                  pinned={r.pinned as boolean}
                   role={(memberRole as "collaborator" | "client") ?? "client"}
                 />
               );
