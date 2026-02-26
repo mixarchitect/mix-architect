@@ -134,6 +134,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
   const [resentId, setResentId] = useState<string | null>(null);
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -850,14 +851,43 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                           </button>
                         </>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveMember(m.id)}
-                        className="p-1 rounded text-faint hover:text-red-500 transition-colors"
-                        title="Remove member"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setConfirmRemoveId(confirmRemoveId === m.id ? null : m.id)}
+                          className="p-1 rounded text-faint hover:text-red-500 transition-colors"
+                          title="Remove member"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+
+                        {confirmRemoveId === m.id && (
+                          <div className="absolute right-0 top-full mt-1 w-56 rounded-md border border-border bg-panel shadow-lg p-3 z-20 space-y-2">
+                            <p className="text-xs text-muted">
+                              Remove <strong className="text-text">{m.invited_email}</strong>? They will lose access to this release.
+                            </p>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleRemoveMember(m.id);
+                                  setConfirmRemoveId(null);
+                                }}
+                                className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setConfirmRemoveId(null)}
+                                className="flex-1 px-2 py-1.5 text-xs font-medium text-muted hover:text-text border border-border rounded transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

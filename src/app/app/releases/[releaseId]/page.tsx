@@ -138,6 +138,7 @@ export default async function ReleasePage({ params }: Props) {
                 };
               })}
               canReorder={canEdit(role)}
+              canDelete={canEdit(role)}
             />
           ) : (
             <EmptyState

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
-import { GripVertical, ChevronUp, ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { GripVertical, ChevronUp, ChevronDown, Trash2 } from "lucide-react";
 import { StatusDot } from "@/components/ui/status-dot";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { cn } from "@/lib/cn";
@@ -19,6 +20,7 @@ type Props = {
   releaseId: string;
   tracks: TrackItem[];
   canReorder: boolean;
+  canDelete?: boolean;
 };
 
 function statusColor(s: string): "green" | "orange" | "blue" {
@@ -27,11 +29,26 @@ function statusColor(s: string): "green" | "orange" | "blue" {
   return "blue";
 }
 
-export function TrackList({ releaseId, tracks: initialTracks, canReorder }: Props) {
+export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDelete }: Props) {
   const [localTracks, setLocalTracks] = useState(initialTracks);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const confirmRef = useRef<HTMLDivElement>(null);
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+  const router = useRouter();
+
+  // Close confirmation on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (confirmRef.current && !confirmRef.current.contains(e.target as Node)) {
+        setConfirmDeleteId(null);
+      }
+    }
+    if (confirmDeleteId) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [confirmDeleteId]);
 
   const sorted = [...localTracks].sort((a, b) => a.track_number - b.track_number);
 
@@ -91,6 +108,23 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder }: Prop
       if (r1.error || r2.error) throw new Error("Reorder failed");
     } catch {
       setLocalTracks(prevTracks);
+    }
+  }
+
+  async function handleDeleteTrack(trackId: string) {
+    setDeletingId(trackId);
+    const prevTracks = [...localTracks];
+    setLocalTracks((prev) => prev.filter((t) => t.id !== trackId));
+    setConfirmDeleteId(null);
+
+    try {
+      const { error } = await supabase.from("tracks").delete().eq("id", trackId);
+      if (error) throw error;
+      router.refresh();
+    } catch {
+      setLocalTracks(prevTracks);
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -169,6 +203,57 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder }: Prop
             </div>
             <StatusDot color={statusColor(t.status)} />
           </Link>
+
+          {/* Delete track */}
+          {canDelete && (
+            <div className="relative shrink-0" ref={confirmDeleteId === t.id ? confirmRef : undefined}>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setConfirmDeleteId(confirmDeleteId === t.id ? null : t.id);
+                }}
+                className="p-1.5 rounded text-faint hover:text-red-500 transition-colors"
+                title="Delete track"
+              >
+                <Trash2 size={14} />
+              </button>
+
+              {confirmDeleteId === t.id && (
+                <div className="absolute right-0 top-full mt-1 w-52 rounded-md border border-border bg-panel shadow-lg p-3 z-20 space-y-2">
+                  <p className="text-xs text-muted">
+                    Delete <strong className="text-text">{t.title}</strong>? This cannot be undone.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDeleteTrack(t.id);
+                      }}
+                      disabled={deletingId === t.id}
+                      className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors disabled:opacity-50"
+                    >
+                      {deletingId === t.id ? "Deleting\u2026" : "Confirm"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setConfirmDeleteId(null);
+                      }}
+                      className="flex-1 px-2 py-1.5 text-xs font-medium text-muted hover:text-text border border-border rounded transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ))}
     </div>
