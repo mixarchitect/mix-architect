@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { searchItunesApi, buildPlatformUrl } from "@/lib/itunes-search";
+import { cn } from "@/lib/cn";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
@@ -14,7 +15,7 @@ import { NoteEntry } from "@/components/ui/note-entry";
 import { ReferenceCard } from "@/components/ui/reference-card";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { StatusIndicator } from "@/components/ui/status-dot";
-import { ArrowLeft, Bookmark, Check, ExternalLink, Plus, X } from "lucide-react";
+import { ArrowLeft, Bookmark, Check, ExternalLink, Pencil, Plus, X } from "lucide-react";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
 import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
 
@@ -112,6 +113,19 @@ type Props = {
   role: ReleaseRole;
 };
 
+/** Extract a Samply player/link ID from various URL formats, or return null. */
+function getSamplyEmbedId(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname !== "samply.app") return null;
+    // /p/<id> (player link) or /embed/<id> (embed URL)
+    const match = parsed.pathname.match(/^\/(p|embed)\/([a-zA-Z0-9_-]+)/);
+    return match ? match[2] : null;
+  } catch {
+    return null;
+  }
+}
+
 export function TrackDetailClient({
   releaseId, releaseTitle, releaseFormat, releaseCoverArt,
   track, intent, specs, samplyUrl, notes, references, distribution, splits, role,
@@ -132,6 +146,7 @@ export function TrackDetailClient({
   const [specialReqs, setSpecialReqs] = useState(specs?.special_reqs ?? "");
 
   const [localSamplyUrl, setLocalSamplyUrl] = useState(samplyUrl ?? "");
+  const [editingSamplyUrl, setEditingSamplyUrl] = useState(false);
   const [localNotes, setLocalNotes] = useState(notes);
   const [newNote, setNewNote] = useState("");
   const [localRefs, setLocalRefs] = useState(references);
@@ -686,87 +701,116 @@ export function TrackDetailClient({
           )}
 
           {/* Samply */}
-          {activeTab === "samply" && (
-            <Panel>
-              <PanelBody className="py-5 space-y-4">
-                {localSamplyUrl ? (
-                  <div className="space-y-4">
-                    <a
-                      href={localSamplyUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-md bg-signal text-white font-medium text-sm hover:opacity-90 transition-opacity"
-                    >
-                      <ExternalLink size={16} />
-                      Open in Samply
-                    </a>
-                    {canEditCreative(role) && (
+          {activeTab === "samply" && (() => {
+            const embedId = localSamplyUrl ? getSamplyEmbedId(localSamplyUrl) : null;
+            return (
+              <Panel>
+                <PanelBody className="py-5 space-y-4">
+                  {localSamplyUrl && !editingSamplyUrl ? (
+                    <div className="space-y-3">
+                      {embedId ? (
+                        <div className="rounded-md overflow-hidden border border-border">
+                          <iframe
+                            src={`https://samply.app/embed/${embedId}`}
+                            className="w-full"
+                            style={{ height: 360 }}
+                            allow="autoplay"
+                            title="Samply Player"
+                          />
+                        </div>
+                      ) : null}
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={localSamplyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cn(
+                            "flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-opacity hover:opacity-90",
+                            embedId
+                              ? "text-signal hover:underline"
+                              : "w-full bg-signal text-white",
+                          )}
+                        >
+                          <ExternalLink size={14} />
+                          Open in Samply
+                        </a>
+                        {canEditCreative(role) && (
+                          <button
+                            type="button"
+                            onClick={() => setEditingSamplyUrl(true)}
+                            className="flex items-center gap-1.5 text-xs text-muted hover:text-text transition-colors ml-auto"
+                          >
+                            <Pencil size={12} />
+                            Edit URL
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ) : canEditCreative(role) ? (
+                    <div className="space-y-4">
+                      {!localSamplyUrl && (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-muted mb-1">
+                            Connect this track to Samply to manage elements and versions externally.
+                          </p>
+                          <a
+                            href="https://samply.app"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-signal hover:underline"
+                          >
+                            Learn more about Samply
+                          </a>
+                        </div>
+                      )}
                       <div className="space-y-2">
-                        <label className="label text-muted">Samply URL</label>
+                        <label className="label text-muted">Samply Player URL</label>
                         <div className="flex gap-2">
                           <input
                             type="url"
                             value={localSamplyUrl}
                             onChange={(e) => setLocalSamplyUrl(e.target.value)}
-                            placeholder="https://samply.app/..."
+                            placeholder="https://samply.app/p/..."
                             className="input text-sm flex-1"
                           />
                           <Button
-                            variant="secondary"
-                            onClick={saveSamplyUrl}
-                            disabled={localSamplyUrl === (samplyUrl ?? "")}
+                            variant={editingSamplyUrl ? "secondary" : "primary"}
+                            onClick={() => {
+                              saveSamplyUrl();
+                              setEditingSamplyUrl(false);
+                            }}
+                            disabled={editingSamplyUrl ? localSamplyUrl === (samplyUrl ?? "") : !localSamplyUrl.trim()}
                             className="shrink-0"
                           >
                             Save
                           </Button>
+                          {editingSamplyUrl && (
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                setLocalSamplyUrl(samplyUrl ?? "");
+                                setEditingSamplyUrl(false);
+                              }}
+                              className="shrink-0"
+                            >
+                              Cancel
+                            </Button>
+                          )}
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ) : canEditCreative(role) ? (
-                  <div className="space-y-4">
-                    <div className="text-center py-4">
-                      <p className="text-sm text-muted mb-1">
-                        Connect this track to Samply to manage elements and versions externally.
-                      </p>
-                      <a
-                        href="https://samply.app"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-signal hover:underline"
-                      >
-                        Learn more about Samply
-                      </a>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="label text-muted">Samply URL</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="url"
-                          value={localSamplyUrl}
-                          onChange={(e) => setLocalSamplyUrl(e.target.value)}
-                          placeholder="https://samply.app/..."
-                          className="input text-sm flex-1"
-                        />
-                        <Button
-                          variant="primary"
-                          onClick={saveSamplyUrl}
-                          disabled={!localSamplyUrl.trim()}
-                          className="shrink-0"
-                        >
-                          Save
-                        </Button>
+                        <p className="text-xs text-faint">
+                          Paste a Samply player link (samply.app/p/...) to embed the player, or any Samply URL to link out.
+                        </p>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-sm text-muted">
-                    No Samply link has been added for this track.
-                  </div>
-                )}
-              </PanelBody>
-            </Panel>
-          )}
+                  ) : (
+                    <div className="text-center py-8 text-sm text-muted">
+                      No Samply link has been added for this track.
+                    </div>
+                  )}
+                </PanelBody>
+              </Panel>
+            );
+          })()}
 
           {/* Notes */}
           {activeTab === "notes" && (
