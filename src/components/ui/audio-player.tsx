@@ -738,44 +738,44 @@ export function AudioPlayer({
 
         {/* Streaming normalization dropdown */}
         {showStreamingInfo && measuredLufs != null && (
-          <div className="mx-5 mt-2 rounded-md bg-panel2 border border-border overflow-hidden">
+          <div className="mx-5 mt-2 rounded-md bg-panel2 border border-border overflow-hidden inline-block">
             {LOUDNESS_GROUPS.map((group) => (
               <div key={group}>
                 <div className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider">
                   {group}
                 </div>
-                {LOUDNESS_TARGETS.filter((t) => t.group === group).map((t) => {
-                  const adj = measuredLufs - t.lufs;
-                  return (
-                    <div
-                      key={t.name}
-                      className="flex items-center justify-between px-3 py-1.5 text-[11px]"
-                    >
-                      <span className="text-muted">{t.name}</span>
-                      <span className="inline-flex items-center gap-2 font-mono">
-                        <span className="text-faint">{t.lufs} LUFS</span>
-                        <span
-                          className={cn(
-                            "min-w-[64px] text-right",
-                            Math.abs(adj) < 0.05
-                              ? "text-status-green"
+                <table className="w-full text-[11px] font-mono">
+                  <tbody>
+                    {LOUDNESS_TARGETS.filter((t) => t.group === group).map((t) => {
+                      const adj = measuredLufs - t.lufs;
+                      return (
+                        <tr key={t.name} className="leading-6">
+                          <td className="pl-3 pr-3 text-muted font-sans whitespace-nowrap">{t.name}</td>
+                          <td className="pr-2 text-faint text-right whitespace-nowrap">{t.lufs}</td>
+                          <td
+                            className={cn(
+                              "pr-3 text-right whitespace-nowrap",
+                              Math.abs(adj) < 0.05
+                                ? "text-status-green"
+                                : adj > 0
+                                  ? "text-signal"
+                                  : "text-muted",
+                            )}
+                          >
+                            {Math.abs(adj) < 0.05
+                              ? "no change"
                               : adj > 0
-                                ? "text-signal"
-                                : "text-muted",
-                          )}
-                        >
-                          {Math.abs(adj) < 0.05
-                            ? "no change"
-                            : adj > 0
-                              ? `−${adj.toFixed(1)} dB`
-                              : `+${Math.abs(adj).toFixed(1)} dB`}
-                        </span>
-                      </span>
-                    </div>
-                  );
-                })}
+                                ? `−${adj.toFixed(1)} dB`
+                                : `+${Math.abs(adj).toFixed(1)} dB`}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             ))}
+            <div className="h-1.5" />
           </div>
         )}
 
