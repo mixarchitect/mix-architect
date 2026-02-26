@@ -685,7 +685,7 @@ function CommentRow({
         "group flex gap-2.5 px-3 py-2.5 rounded-md cursor-pointer transition-colors",
         isActive
           ? "bg-signal-muted"
-          : "bg-panel2/50 hover:bg-panel2",
+          : "bg-panel2 hover:bg-panel2/80",
       )}
     >
       <div
