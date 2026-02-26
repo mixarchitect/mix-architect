@@ -540,10 +540,10 @@ export function AudioPlayer({
 
         {/* Comment markers above waveform */}
         <div className="relative px-5 mt-3 h-5">
-          {isReady &&
-            duration > 0 &&
-            versionComments.map((c) => {
-              const pos = ((c.timecode_seconds ?? 0) / duration) * 100;
+          {(() => {
+            const markerDuration = duration || activeVersion?.duration_seconds || 0;
+            return isReady && markerDuration > 0 && versionComments.map((c) => {
+              const pos = ((c.timecode_seconds ?? 0) / markerDuration) * 100;
               const color = authorColorMap.get(c.author) ?? AUTHOR_COLORS[0];
               const isActive = highlightedCommentId === c.id;
               return (
@@ -566,7 +566,8 @@ export function AudioPlayer({
                   <MessageCircle size={10} />
                 </button>
               );
-            })}
+            });
+          })()}
         </div>
 
         {/* Waveform container */}
