@@ -611,11 +611,11 @@ export function AudioPlayer({
               )}
             />
             {!isReady && (
-              <div className="flex items-end justify-center gap-[1px] h-[80px] animate-pulse">
-                {Array.from({ length: 80 }).map((_, i) => (
+              <div className="flex items-end gap-[1px] h-[80px] animate-pulse">
+                {Array.from({ length: 150 }).map((_, i) => (
                   <div
                     key={i}
-                    className="w-[3px] rounded-sm bg-faint"
+                    className="flex-1 min-w-[2px] rounded-sm bg-muted/25"
                     style={{ height: `${20 + Math.abs(Math.sin(i * 0.3)) * 55}%` }}
                   />
                 ))}
