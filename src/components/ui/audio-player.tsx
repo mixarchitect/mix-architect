@@ -142,12 +142,11 @@ export function AudioPlayer({
     [trackId, releaseId, trackTitle, releaseTitle, coverArtUrl],
   );
 
-  // Load the active version into the shared audio element
-  useEffect(() => {
-    if (activeVersion) {
-      audio.loadVersion(activeVersion, trackMeta);
-    }
-  }, [activeVersion?.id, audio, trackMeta]);
+  // Ref for restoring playback position/state after version switch or reconnect
+  const pendingRestoreRef = useRef<{
+    seekTime: number;
+    shouldPlay: boolean;
+  } | null>(null);
 
   // Comment state
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
@@ -191,11 +190,23 @@ export function AudioPlayer({
   useEffect(() => {
     if (!containerRef.current || !activeVersion) return;
 
+    // Capture current audio state before WaveSurfer potentially pauses it.
+    // On version switch the ref is already set by the onClick handler;
+    // on initial mount / reconnect we capture from the live element.
+    if (!pendingRestoreRef.current) {
+      const wasPlaying = !audioElement.paused;
+      const currentPos = audioElement.currentTime;
+      if (wasPlaying || currentPos > 0) {
+        pendingRestoreRef.current = { seekTime: currentPos, shouldPlay: wasPlaying };
+      }
+    }
+
     setIsReady(false);
 
     const ws = WaveSurfer.create({
       container: containerRef.current,
       media: audioElement,
+      url: activeVersion.audio_url,
       barWidth: 3,
       barGap: 1,
       barRadius: 1,
@@ -211,6 +222,23 @@ export function AudioPlayer({
 
     ws.on("ready", () => {
       setIsReady(true);
+
+      // Sync context state (URL already matches so this is state-only)
+      audio.loadVersion(activeVersion, trackMeta);
+
+      // Restore playback position and play/pause state
+      const restore = pendingRestoreRef.current;
+      pendingRestoreRef.current = null;
+      if (restore) {
+        const maxDur =
+          activeVersion.duration_seconds || audioElement.duration || Infinity;
+        if (restore.seekTime > 0 && restore.seekTime <= maxDur) {
+          audioElement.currentTime = restore.seekTime;
+        }
+        if (restore.shouldPlay) {
+          audioElement.play().catch(() => {});
+        }
+      }
 
       // Cache peaks if not yet cached
       if (!activeVersion.waveform_peaks) {
@@ -455,10 +483,11 @@ export function AudioPlayer({
                 key={v.id}
                 onClick={() => {
                   if (v.id === activeVersionId) return;
-                  audio.loadVersion(v, trackMeta, {
+                  // Capture current position & play state for the ready callback
+                  pendingRestoreRef.current = {
                     seekTime: currentTime,
-                    autoPlay: isPlaying,
-                  });
+                    shouldPlay: isPlaying,
+                  };
                   setActiveVersionId(v.id);
                   setHighlightedCommentId(null);
                   setCommentInput(null);

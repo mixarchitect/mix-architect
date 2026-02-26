@@ -35,11 +35,7 @@ type AudioContextValue = {
   currentTime: number;
   duration: number;
   /** Load an audio version into the shared element */
-  loadVersion: (
-    version: AudioVersionData,
-    meta: AudioTrackMeta,
-    opts?: { seekTime?: number; autoPlay?: boolean },
-  ) => void;
+  loadVersion: (version: AudioVersionData, meta: AudioTrackMeta) => void;
   /** Play/pause toggle */
   togglePlayPause: () => void;
   /** Seek to a specific second */
@@ -108,39 +104,32 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   /* ---- Actions ---- */
 
   const loadVersion = useCallback(
-    (
-      version: AudioVersionData,
-      meta: AudioTrackMeta,
-      opts?: { seekTime?: number; autoPlay?: boolean },
-    ) => {
+    (version: AudioVersionData, meta: AudioTrackMeta) => {
       const el = audioRef.current;
       if (!el) return;
 
-      // If same version is already loaded, just update meta (preserves position)
+      // Always update metadata
+      setTrackMeta(meta);
+
+      // If same version is already loaded, nothing else to do
       if (activeVersionRef.current?.id === version.id) {
-        setTrackMeta(meta);
         return;
       }
 
-      const { seekTime, autoPlay } = opts ?? {};
-
-      // Attach listener BEFORE setting src to avoid race condition
-      if (seekTime != null || autoPlay) {
-        const onCanPlay = () => {
-          el.removeEventListener("canplay", onCanPlay);
-          if (seekTime != null && seekTime > 0 && seekTime <= el.duration) {
-            el.currentTime = seekTime;
-          }
-          if (autoPlay) el.play();
-        };
-        el.addEventListener("canplay", onCanPlay);
+      // If the audio element already has this URL loaded (e.g. WaveSurfer set it),
+      // just update state without restarting the load
+      const currentUrl = el.currentSrc || el.src || "";
+      if (currentUrl && currentUrl === version.audio_url) {
+        setActiveVersion(version);
+        setDuration(version.duration_seconds ?? el.duration ?? 0);
+        return;
       }
 
+      // New audio — set src and load
       el.src = version.audio_url;
       el.load();
       setActiveVersion(version);
-      setTrackMeta(meta);
-      setCurrentTime(seekTime ?? 0);
+      setCurrentTime(0);
       setDuration(version.duration_seconds ?? 0);
     },
     [],
