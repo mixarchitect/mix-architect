@@ -45,6 +45,7 @@ const STATUS_OPTIONS = [
 ];
 
 const PAYMENT_STATUS_OPTIONS = [
+  { value: "no_fee", label: "No Fee" },
   { value: "unpaid", label: "Unpaid" },
   { value: "partial", label: "Partial" },
   { value: "paid", label: "Paid" },
@@ -116,7 +117,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
   const [paymentsEnabled, setPaymentsEnabled] = useState(false);
   const [feeTotal, setFeeTotal] = useState("");
   const [feeCurrency, setFeeCurrency] = useState("USD");
-  const [paymentStatus, setPaymentStatus] = useState("unpaid");
+  const [paymentStatus, setPaymentStatus] = useState("no_fee");
   const [paidAmount, setPaidAmount] = useState("");
   const [paymentNotes, setPaymentNotes] = useState("");
   const [coverArtUrl, setCoverArtUrl] = useState("");
@@ -163,7 +164,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
         setDeliveryNotes(data.delivery_notes ?? "");
         setFeeTotal(data.fee_total != null ? String(data.fee_total) : "");
         setFeeCurrency(data.fee_currency ?? "USD");
-        setPaymentStatus(data.payment_status ?? "unpaid");
+        setPaymentStatus(data.payment_status ?? "no_fee");
         setPaidAmount(data.paid_amount != null ? String(data.paid_amount) : "");
         setPaymentNotes(data.payment_notes ?? "");
         if (data.cover_art_url) {
@@ -672,60 +673,64 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
             <>
               <Rule />
               <div className="label-sm text-muted">PAYMENT</div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="label text-muted">Project fee</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={feeTotal}
-                    onChange={(e) => setFeeTotal(e.target.value)}
-                    disabled={!paymentEditable}
-                    className="input"
-                    placeholder="0.00"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="label text-muted">Currency</label>
-                  <select
-                    value={feeCurrency}
-                    onChange={(e) => setFeeCurrency(e.target.value)}
-                    disabled={!paymentEditable}
-                    className="input"
-                  >
-                    {CURRENCY_OPTIONS.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
               <div className="space-y-1.5">
                 <label className="label text-muted">Payment status</label>
                 <PillSelect options={PAYMENT_STATUS_OPTIONS} value={paymentStatus} onChange={setPaymentStatus} disabled={!paymentEditable} />
               </div>
-              {paymentStatus === "partial" && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="label text-muted">Paid amount</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={paidAmount}
-                      onChange={(e) => setPaidAmount(e.target.value)}
-                      disabled={!paymentEditable}
-                      className="input"
-                      placeholder="0.00"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="label text-muted">Balance due</label>
-                    <div className="input bg-transparent flex items-center text-sm text-muted tabular-nums">
-                      {(parseFloat(feeTotal || "0") - parseFloat(paidAmount || "0")).toFixed(2)} {feeCurrency}
+              {paymentStatus !== "no_fee" && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Project fee</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={feeTotal}
+                        onChange={(e) => setFeeTotal(e.target.value)}
+                        disabled={!paymentEditable}
+                        className="input"
+                        placeholder="0.00"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Currency</label>
+                      <select
+                        value={feeCurrency}
+                        onChange={(e) => setFeeCurrency(e.target.value)}
+                        disabled={!paymentEditable}
+                        className="input"
+                      >
+                        {CURRENCY_OPTIONS.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
-                </div>
+                  {paymentStatus === "partial" && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="label text-muted">Paid amount</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={paidAmount}
+                          onChange={(e) => setPaidAmount(e.target.value)}
+                          disabled={!paymentEditable}
+                          className="input"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="label text-muted">Balance due</label>
+                        <div className="input bg-transparent flex items-center text-sm text-muted tabular-nums">
+                          {(parseFloat(feeTotal || "0") - parseFloat(paidAmount || "0")).toFixed(2)} {feeCurrency}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
               <div className="space-y-1.5">
                 <label className="label text-muted">Payment notes</label>

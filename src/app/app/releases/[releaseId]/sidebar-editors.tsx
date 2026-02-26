@@ -642,7 +642,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
 
 // ── Payment Editor ──
 
-const PAYMENT_STATUSES = ["unpaid", "partial", "paid"] as const;
+const PAYMENT_STATUSES = ["no_fee", "unpaid", "partial", "paid"] as const;
 type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
 function paymentStatusColor(s: string): "green" | "orange" | "blue" {
@@ -652,6 +652,7 @@ function paymentStatusColor(s: string): "green" | "orange" | "blue" {
 }
 
 function paymentStatusLabel(s: string): string {
+  if (s === "no_fee") return "No Fee";
   if (s === "paid") return "Paid";
   if (s === "partial") return "Partial";
   return "Unpaid";
@@ -682,7 +683,7 @@ export function PaymentEditor({
   role,
 }: PaymentEditorProps) {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
-    (PAYMENT_STATUSES.includes(initialPaymentStatus as PaymentStatus) ? initialPaymentStatus : "unpaid") as PaymentStatus,
+    (PAYMENT_STATUSES.includes(initialPaymentStatus as PaymentStatus) ? initialPaymentStatus : "no_fee") as PaymentStatus,
   );
   const [feeTotal, setFeeTotal] = useState(initialFeeTotal);
   const [paidAmount, setPaidAmount] = useState(initialPaidAmount ?? 0);
@@ -775,64 +776,66 @@ export function PaymentEditor({
               />
             )}
           </div>
-          <div className="flex justify-between text-sm items-center">
-            <span className="text-muted">Fee</span>
-            {canEditPayment(role ?? "owner") ? (
-              editingFee ? (
-                <div className="flex items-center gap-1.5">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={feeInput}
-                    onChange={(e) => setFeeInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") saveFee();
-                      if (e.key === "Escape") {
+          {paymentStatus !== "no_fee" && (
+            <div className="flex justify-between text-sm items-center">
+              <span className="text-muted">Fee</span>
+              {canEditPayment(role ?? "owner") ? (
+                editingFee ? (
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={feeInput}
+                      onChange={(e) => setFeeInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveFee();
+                        if (e.key === "Escape") {
+                          setFeeInput(feeTotal != null ? String(feeTotal) : "");
+                          setEditingFee(false);
+                        }
+                      }}
+                      className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
+                      autoFocus
+                      placeholder="0.00"
+                    />
+                    <button
+                      type="button"
+                      onClick={saveFee}
+                      className="text-signal hover:opacity-80 transition-opacity"
+                    >
+                      <Check size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
                         setFeeInput(feeTotal != null ? String(feeTotal) : "");
                         setEditingFee(false);
-                      }
-                    }}
-                    className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
-                    autoFocus
-                    placeholder="0.00"
-                  />
-                  <button
-                    type="button"
-                    onClick={saveFee}
-                    className="text-signal hover:opacity-80 transition-opacity"
-                  >
-                    <Check size={14} />
-                  </button>
+                      }}
+                      className="text-muted hover:text-text transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
                   <button
                     type="button"
                     onClick={() => {
                       setFeeInput(feeTotal != null ? String(feeTotal) : "");
-                      setEditingFee(false);
+                      setEditingFee(true);
                     }}
-                    className="text-muted hover:text-text transition-colors"
+                    className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
                   >
-                    <X size={14} />
+                    {formatCurrency(feeTotal, initialFeeCurrency)}
                   </button>
-                </div>
+                )
               ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFeeInput(feeTotal != null ? String(feeTotal) : "");
-                    setEditingFee(true);
-                  }}
-                  className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
-                >
+                <span className="text-text font-mono text-xs">
                   {formatCurrency(feeTotal, initialFeeCurrency)}
-                </button>
-              )
-            ) : (
-              <span className="text-text font-mono text-xs">
-                {formatCurrency(feeTotal, initialFeeCurrency)}
-              </span>
-            )}
-          </div>
+                </span>
+              )}
+            </div>
+          )}
           {paymentStatus === "partial" && (
             <>
               <div className="flex justify-between text-sm items-center">

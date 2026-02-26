@@ -282,7 +282,7 @@ export function ReleaseCard({
             {completedTracks} of {trackCount} track{trackCount !== 1 ? "s" : ""} briefed
           </span>
           <div className="flex items-center gap-2">
-            {paymentsEnabled && paymentStatus && (
+            {paymentsEnabled && paymentStatus && paymentStatus !== "no_fee" && (
               <span className={cn(
                 "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium",
                 paymentStatus === "paid" && "bg-green-100 text-green-700",

@@ -257,7 +257,7 @@ export default async function ReleasePage({ params }: Props) {
           {paymentsEnabled && (
             <PaymentEditor
               releaseId={releaseId}
-              initialPaymentStatus={release.payment_status ?? "unpaid"}
+              initialPaymentStatus={release.payment_status ?? "no_fee"}
               initialFeeTotal={release.fee_total}
               initialPaidAmount={release.paid_amount ?? 0}
               initialFeeCurrency={release.fee_currency ?? "USD"}

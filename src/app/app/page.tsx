@@ -91,7 +91,8 @@ export default async function DashboardPage({ searchParams }: Props) {
   if (releases) {
     for (const r of releases) {
       const fee = r.fee_total as number | null;
-      const status = (r.payment_status as string) ?? "unpaid";
+      const status = (r.payment_status as string) ?? "no_fee";
+      if (status === "no_fee") continue;
       if (fee != null) {
         if (!feeReleaseCount) primaryCurrency = (r.fee_currency as string) || "USD";
         feeReleaseCount++;
@@ -116,7 +117,8 @@ export default async function DashboardPage({ searchParams }: Props) {
 
   const displayReleases = activeFilter && releases
     ? releases.filter((r) => {
-        const status = (r.payment_status as string) ?? "unpaid";
+        const status = (r.payment_status as string) ?? "no_fee";
+        if (status === "no_fee") return false;
         return activeFilter === "outstanding" ? status !== "paid" : status === "paid";
       })
     : releases;
