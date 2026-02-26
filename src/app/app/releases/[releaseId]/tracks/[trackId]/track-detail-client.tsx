@@ -24,8 +24,8 @@ const TABS = [
   { id: "intent", label: "Intent" },
   { id: "specs", label: "Specs" },
   { id: "audio", label: "Audio" },
-  { id: "notes", label: "Notes" },
   { id: "distribution", label: "Distribution" },
+  { id: "notes", label: "Notes" },
 ];
 
 const EMOTIONAL_SUGGESTIONS = [
