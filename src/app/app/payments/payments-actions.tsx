@@ -16,13 +16,17 @@ function escapeCSV(value: string): string {
 export function PaymentsActions({ releases, summary }: Props) {
   function handleExportCSV() {
     const BOM = "\uFEFF";
-    const headers = ["Release", "Artist", "Fee", "Paid", "Outstanding", "Status", "Notes"];
+    const headers = ["Release", "Date", "Artist", "Fee", "Paid", "Outstanding", "Status", "Notes"];
     const rows: string[][] = [];
 
     for (const r of releases) {
       const balance = r.feeTotal - r.paidAmount;
+      const date = new Date(r.createdAt).toLocaleDateString("en-US", {
+        month: "short", day: "numeric", year: "numeric",
+      });
       rows.push([
         r.title,
+        date,
         r.artist ?? "",
         r.feeTotal.toFixed(2),
         r.paidAmount.toFixed(2),
@@ -35,6 +39,7 @@ export function PaymentsActions({ releases, summary }: Props) {
         if (t.fee != null) {
           rows.push([
             `  Track ${t.trackNumber}: ${t.title}`,
+            "",
             "",
             t.fee.toFixed(2),
             t.feePaid ? t.fee.toFixed(2) : "0.00",
@@ -50,6 +55,7 @@ export function PaymentsActions({ releases, summary }: Props) {
     rows.push([]);
     rows.push([
       "TOTAL",
+      "",
       "",
       summary.grandTotal.toFixed(2),
       summary.earnedTotal.toFixed(2),

@@ -178,9 +178,10 @@ export default async function DashboardPage({ searchParams }: Props) {
               ({earnedCount} of {feeReleaseCount} paid)
             </span>
           </span>
+          <span className="text-faint hidden sm:inline">·</span>
           <Link
             href="/app/payments"
-            className="ml-auto text-signal text-xs font-medium hover:underline hidden sm:inline"
+            className="text-signal text-xs font-medium hover:underline hidden sm:inline"
           >
             View all &rarr;
           </Link>

@@ -47,6 +47,7 @@ export type PaymentRelease = {
   paymentStatus: "unpaid" | "partial" | "paid";
   paidAmount: number;
   paymentNotes: string | null;
+  createdAt: string;
   updatedAt: string;
   tracks: PaymentTrack[];
 };

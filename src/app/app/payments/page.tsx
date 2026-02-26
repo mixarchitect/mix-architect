@@ -24,7 +24,7 @@ export default async function PaymentsPage() {
   const { data: rawReleases } = await supabase
     .from("releases")
     .select(
-      "id, title, artist, fee_total, fee_currency, payment_status, paid_amount, payment_notes, updated_at",
+      "id, title, artist, fee_total, fee_currency, payment_status, paid_amount, payment_notes, created_at, updated_at",
     )
     .eq("user_id", user.id)
     .neq("payment_status", "no_fee")
@@ -86,6 +86,7 @@ export default async function PaymentsPage() {
       paymentStatus: status,
       paidAmount: paid,
       paymentNotes: (r.payment_notes as string) ?? null,
+      createdAt: r.created_at as string,
       updatedAt: r.updated_at as string,
       tracks: relTracks.map((t) => ({
         id: t.id as string,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ const FORMAT_OPTIONS = [
 ];
 
 export default function SettingsPage() {
+  const router = useRouter();
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
   const [loading, setLoading] = useState(true);
@@ -271,6 +273,7 @@ export default function SettingsPage() {
                       { onConflict: "user_id" },
                     );
                     if (error) throw error;
+                    router.refresh();
                   } catch {
                     setPaymentsEnabled(prev);
                   }
