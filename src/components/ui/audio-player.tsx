@@ -684,8 +684,8 @@ function CommentRow({
       className={cn(
         "group flex gap-2.5 px-3 py-2.5 rounded-md cursor-pointer transition-colors",
         isActive
-          ? "bg-signal-muted border-l-2 border-signal"
-          : "border-l-2 border-transparent hover:bg-panel2",
+          ? "bg-signal-muted"
+          : "bg-panel2/50 hover:bg-panel2",
       )}
     >
       <div
@@ -711,7 +711,7 @@ function CommentRow({
             e.stopPropagation();
             onDelete();
           }}
-          className="opacity-0 group-hover:opacity-100 p-1 rounded text-faint hover:text-red-500 transition-all shrink-0 self-center"
+          className="opacity-0 group-hover:opacity-100 p-1 rounded text-muted hover:text-red-500 transition-all shrink-0 self-center"
           title="Delete comment"
         >
           <X size={12} />
