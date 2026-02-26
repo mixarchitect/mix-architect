@@ -48,12 +48,20 @@ export function Rail({ onSearchClick }: Props) {
       {/* Logo mark */}
       <Link
         href="/app"
-        className="flex items-center gap-3 px-3 mb-5 hover:opacity-90 transition-opacity"
+        className="flex items-center px-3 mb-5 h-10 hover:opacity-90 transition-opacity"
       >
-        <span className="w-10 h-10 rounded-lg grid place-items-center shrink-0">
-          <img src="/mix-architect-icon.svg" alt="Mix Architect" className="w-8 h-8" />
-        </span>
-        <span className={cn(labelClass, "font-semibold")}>Mix Architect</span>
+        {/* Collapsed: icon only */}
+        <img
+          src="/mix-architect-icon.svg"
+          alt="Mix Architect"
+          className="w-8 h-8 shrink-0 block group-hover/rail:hidden ml-1"
+        />
+        {/* Expanded: full wordmark logo */}
+        <img
+          src="/mix-architect-logo.svg"
+          alt="Mix Architect"
+          className="h-7 w-auto hidden group-hover/rail:block"
+        />
       </Link>
 
       {/* Home */}
