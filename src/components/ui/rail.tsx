@@ -76,9 +76,9 @@ export function Rail({ onSearchClick }: Props) {
         href="/app"
         className="flex items-center px-3 mb-5 h-10 hover:opacity-90 transition-opacity"
       >
-        {/* Collapsed: icon only */}
+        {/* Collapsed: icon only — dark variant has all-white internals */}
         <img
-          src="/mix-architect-icon.svg"
+          src={mounted && resolvedTheme === "dark" ? "/mix-architect-icon-dark.svg" : "/mix-architect-icon.svg"}
           alt="Mix Architect"
           className="w-8 h-8 shrink-0 block group-hover/rail:hidden ml-1"
         />
