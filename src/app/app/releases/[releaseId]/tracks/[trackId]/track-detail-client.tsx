@@ -709,6 +709,7 @@ export function TrackDetailClient({
               trackTitle={track.title}
               releaseTitle={releaseTitle}
               currentUserName={currentUserName}
+              targetLoudness={loudness}
               onVersionsChange={setLocalAudioVersions}
               onCommentsChange={(updated) => {
                 setLocalNotes((prev) => {

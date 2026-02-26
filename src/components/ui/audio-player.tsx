@@ -15,6 +15,7 @@ import {
   Upload,
   Download,
   MessageCircle,
+  ChevronDown,
   X,
 } from "lucide-react";
 import WaveSurfer from "wavesurfer.js";
@@ -41,6 +42,7 @@ export type AudioVersionData = {
   file_size: number | null;
   duration_seconds: number | null;
   waveform_peaks: number[][] | null;
+  measured_lufs: number | null;
   uploaded_by: string;
   created_at: string;
 };
@@ -66,6 +68,7 @@ type AudioPlayerProps = {
   trackTitle: string;
   releaseTitle: string;
   currentUserName: string;
+  targetLoudness: string | null;
   onVersionsChange: (v: AudioVersionData[]) => void;
   onCommentsChange: (c: TimelineComment[]) => void;
 };
@@ -108,6 +111,33 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+/** Parse numeric LUFS value from a string like "-14 LUFS". */
+function parseLufsTarget(target: string | null): number | null {
+  if (!target) return null;
+  const match = target.match(/-?\d+(\.\d+)?/);
+  return match ? parseFloat(match[0]) : null;
+}
+
+/** Loudness targets for the streaming / broadcast / social normalization table. */
+const LOUDNESS_TARGETS = [
+  { name: "Spotify",         lufs: -14, group: "Streaming" },
+  { name: "Apple Music",     lufs: -16, group: "Streaming" },
+  { name: "YouTube",         lufs: -14, group: "Streaming" },
+  { name: "Tidal",           lufs: -14, group: "Streaming" },
+  { name: "Amazon Music",    lufs: -14, group: "Streaming" },
+  { name: "Deezer",          lufs: -15, group: "Streaming" },
+  { name: "Qobuz",           lufs: -14, group: "Streaming" },
+  { name: "Pandora",         lufs: -14, group: "Streaming" },
+  { name: "EBU R128",        lufs: -23, group: "Broadcast" },
+  { name: "ATSC A/85",       lufs: -24, group: "Broadcast" },
+  { name: "ITU-R BS.1770",   lufs: -24, group: "Broadcast" },
+  { name: "Instagram/Reels", lufs: -14, group: "Social" },
+  { name: "TikTok",          lufs: -14, group: "Social" },
+  { name: "Facebook",        lufs: -16, group: "Social" },
+] as const;
+
+const LOUDNESS_GROUPS = ["Streaming", "Broadcast", "Social"] as const;
+
 /* ------------------------------------------------------------------ */
 /*  Main AudioPlayer                                                   */
 /* ------------------------------------------------------------------ */
@@ -124,6 +154,7 @@ export function AudioPlayer({
   trackTitle,
   releaseTitle,
   currentUserName,
+  targetLoudness,
   onVersionsChange,
   onCommentsChange,
 }: AudioPlayerProps) {
@@ -161,6 +192,14 @@ export function AudioPlayer({
     shouldPlay: boolean;
   } | null>(null);
 
+  // LUFS measurement state
+  const [measuredLufs, setMeasuredLufs] = useState<number | null>(
+    activeVersion?.measured_lufs ?? null,
+  );
+  const [measuring, setMeasuring] = useState(false);
+  const [showStreamingInfo, setShowStreamingInfo] = useState(false);
+  const measureAbortRef = useRef<AbortController | null>(null);
+
   // Comment state
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
   const [commentInput, setCommentInput] = useState<{ timecode: number } | null>(null);
@@ -195,6 +234,12 @@ export function AudioPlayer({
     uniqueAuthors.forEach((a, i) => map.set(a, AUTHOR_COLORS[i % AUTHOR_COLORS.length]));
     return map;
   }, [comments]);
+
+  // Sync measuredLufs when active version changes
+  useEffect(() => {
+    setMeasuredLufs(activeVersion?.measured_lufs ?? null);
+    setShowStreamingInfo(false);
+  }, [activeVersion?.id, activeVersion?.measured_lufs]);
 
   /* ---------------------------------------------------------------- */
   /*  WaveSurfer lifecycle                                             */
@@ -282,6 +327,52 @@ export function AudioPlayer({
               );
             });
         }
+
+        // Measure LUFS if not cached
+        if (activeVersion.measured_lufs == null) {
+          measureAbortRef.current?.abort();
+          const controller = new AbortController();
+          measureAbortRef.current = controller;
+          setMeasuring(true);
+
+          (async () => {
+            try {
+              const [{ decodeAudioFromUrl }, { measureLUFS }] = await Promise.all([
+                import("@/lib/decode-audio"),
+                import("@/lib/lufs"),
+              ]);
+              const audioBuffer = await decodeAudioFromUrl(
+                activeVersion.audio_url,
+                controller.signal,
+              );
+              if (controller.signal.aborted) return;
+
+              const lufs = measureLUFS(audioBuffer);
+              if (controller.signal.aborted) return;
+
+              const rounded = Math.round(lufs * 100) / 100;
+
+              await supabase
+                .from("track_audio_versions")
+                .update({ measured_lufs: rounded })
+                .eq("id", activeVersion.id);
+
+              if (controller.signal.aborted) return;
+
+              setMeasuredLufs(rounded);
+              onVersionsChange(
+                versions.map((v) =>
+                  v.id === activeVersion.id ? { ...v, measured_lufs: rounded } : v,
+                ),
+              );
+            } catch (err) {
+              if (err instanceof DOMException && err.name === "AbortError") return;
+              console.warn("LUFS measurement failed:", err);
+            } finally {
+              if (!controller.signal.aborted) setMeasuring(false);
+            }
+          })();
+        }
       });
 
       ws.on("dblclick", () => {
@@ -296,10 +387,9 @@ export function AudioPlayer({
 
     return () => {
       cancelAnimationFrame(raf);
-      if (ws) {
-        ws.destroy();
-      }
+      if (ws) ws.destroy();
       wavesurferRef.current = null;
+      measureAbortRef.current?.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeVersion?.id, audioElement]);
@@ -600,7 +690,94 @@ export function AudioPlayer({
               </button>
             </span>
           )}
+          {/* LUFS measurement */}
+          {measuring && (
+            <span className="text-[10px] font-mono text-faint animate-pulse">
+              · measuring…
+            </span>
+          )}
+          {measuredLufs != null && !measuring && (() => {
+            const target = parseLufsTarget(targetLoudness);
+            const delta = target != null ? measuredLufs - target : null;
+            return (
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono">
+                <span className="text-faint">·</span>
+                <button
+                  type="button"
+                  onClick={() => setShowStreamingInfo((v) => !v)}
+                  className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
+                  title="Show streaming normalization"
+                >
+                  {measuredLufs.toFixed(1)} LUFS
+                  <ChevronDown
+                    size={10}
+                    className={cn(
+                      "transition-transform",
+                      showStreamingInfo && "rotate-180",
+                    )}
+                  />
+                </button>
+                {delta != null && (
+                  <span
+                    className={cn(
+                      "px-1.5 py-px rounded text-[10px]",
+                      Math.abs(delta) <= 0.5
+                        ? "bg-status-green/10 text-status-green"
+                        : Math.abs(delta) <= 1.5
+                          ? "bg-signal-muted text-signal"
+                          : "bg-red-500/10 text-red-500",
+                    )}
+                  >
+                    {delta > 0 ? "+" : ""}{delta.toFixed(1)} dB
+                  </span>
+                )}
+              </span>
+            );
+          })()}
         </div>
+
+        {/* Streaming normalization dropdown */}
+        {showStreamingInfo && measuredLufs != null && (
+          <div className="mx-5 mt-2 rounded-md bg-panel2 border border-border overflow-hidden">
+            {LOUDNESS_GROUPS.map((group) => (
+              <div key={group}>
+                <div className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider">
+                  {group}
+                </div>
+                {LOUDNESS_TARGETS.filter((t) => t.group === group).map((t) => {
+                  const adj = measuredLufs - t.lufs;
+                  return (
+                    <div
+                      key={t.name}
+                      className="flex items-center justify-between px-3 py-1.5 text-[11px]"
+                    >
+                      <span className="text-muted">{t.name}</span>
+                      <span className="inline-flex items-center gap-2 font-mono">
+                        <span className="text-faint">{t.lufs} LUFS</span>
+                        <span
+                          className={cn(
+                            "min-w-[64px] text-right",
+                            Math.abs(adj) < 0.05
+                              ? "text-status-green"
+                              : adj > 0
+                                ? "text-signal"
+                                : "text-muted",
+                          )}
+                        >
+                          {Math.abs(adj) < 0.05
+                            ? "no change"
+                            : adj > 0
+                              ? `−${adj.toFixed(1)} dB`
+                              : `+${Math.abs(adj).toFixed(1)} dB`}
+                        </span>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Comment markers above waveform */}
         <div className="relative px-5 mt-3 h-5">
