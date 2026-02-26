@@ -583,26 +583,6 @@ export function TrackDetailClient({
                   <div className="label-sm text-muted mb-4">Technical settings</div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-1.5">
-                      <label className="label text-muted">Target loudness</label>
-                      <select
-                        value={loudness}
-                        onChange={(e) => {
-                          setLoudness(e.target.value);
-                          saveSpecs({ target_loudness: e.target.value });
-                        }}
-                        disabled={!canEdit(role)}
-                        className="input"
-                      >
-                        <option value="-14 LUFS">-14 LUFS — Spotify / YouTube</option>
-                        <option value="-16 LUFS">-16 LUFS — Apple Music / Tidal</option>
-                        <option value="-12 LUFS">-12 LUFS — Louder master</option>
-                        <option value="-11 LUFS">-11 LUFS — Club / DJ</option>
-                        <option value="-9 LUFS">-9 LUFS — Competitive / radio</option>
-                        <option value="-23 LUFS">-23 LUFS — Broadcast (EBU R128)</option>
-                        <option value="-24 LUFS">-24 LUFS — Broadcast (ATSC A/85)</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
                       <label className="label text-muted">Format</label>
                       <select
                         value={formatOverride || releaseFormat}
@@ -977,8 +957,10 @@ export function TrackDetailClient({
                 )}
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted">Loudness</span>
-                <span className="font-mono text-xs text-text">{loudness}</span>
+                <span className="text-muted">Quality</span>
+                <span className="font-mono text-xs text-text">
+                  {sampleRate} / {bitDepth}
+                </span>
               </div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Format</span>
