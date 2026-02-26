@@ -136,7 +136,28 @@ export function ReleaseCard({
         </Link>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          {pinned && <Pin size={12} className="text-signal fill-current" />}
+          {canEdit(role ?? "owner") ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handlePinToggle();
+              }}
+              disabled={pinning}
+              className={cn(
+                "w-5 h-5 grid place-items-center rounded transition-colors disabled:opacity-50",
+                pinned
+                  ? "text-signal"
+                  : "text-transparent hover:text-faint",
+              )}
+              title={pinned ? "Unpin release" : "Pin to top"}
+            >
+              <Pin size={12} className={pinned ? "fill-current" : ""} />
+            </button>
+          ) : (
+            pinned && <Pin size={12} className="text-signal fill-current" />
+          )}
           <StatusDot color={statusColor(status)} />
           <div ref={menuRef} className="relative">
             <button
