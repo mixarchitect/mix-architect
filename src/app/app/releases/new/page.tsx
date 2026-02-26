@@ -7,7 +7,6 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 import { TagInput } from "@/components/ui/tag-input";
 import { ArrowLeft } from "lucide-react";
 
@@ -20,8 +19,44 @@ const TYPE_OPTIONS = [
 const FORMAT_OPTIONS = [
   { value: "stereo", label: "Stereo" },
   { value: "atmos", label: "Dolby Atmos" },
-  { value: "both", label: "Both" },
+  { value: "both", label: "Stereo + Atmos" },
 ];
+
+const GENRE_SUGGESTIONS = [
+  "Rock", "Pop", "Hip-Hop", "R&B", "Electronic", "Country", "Jazz",
+  "Classical", "Indie", "Alternative", "Metal", "Folk", "Soul", "Funk",
+  "Blues", "Reggae", "Latin", "Punk", "Lo-Fi", "Ambient",
+];
+
+function PillSelect({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex gap-2 flex-wrap">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => onChange(opt.value)}
+          className="px-4 py-2 text-sm font-medium rounded-md transition-colors"
+          style={
+            value === opt.value
+              ? { background: "var(--signal)", color: "#fff" }
+              : { background: "var(--panel2)", color: "var(--text-muted)" }
+          }
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function NewReleasePage() {
   const [title, setTitle] = useState("");
@@ -134,7 +169,7 @@ export default function NewReleasePage() {
 
             <div className="space-y-1.5">
               <label className="label text-faint">Release type</label>
-              <SegmentedControl
+              <PillSelect
                 options={TYPE_OPTIONS}
                 value={releaseType}
                 onChange={setReleaseType}
@@ -143,7 +178,7 @@ export default function NewReleasePage() {
 
             <div className="space-y-1.5">
               <label className="label text-faint">Format</label>
-              <SegmentedControl
+              <PillSelect
                 options={FORMAT_OPTIONS}
                 value={format}
                 onChange={setFormat}
@@ -155,6 +190,7 @@ export default function NewReleasePage() {
               <TagInput
                 value={genreTags}
                 onChange={setGenreTags}
+                suggestions={GENRE_SUGGESTIONS}
                 placeholder="Type and press Enter to add"
               />
             </div>

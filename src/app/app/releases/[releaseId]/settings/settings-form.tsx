@@ -52,6 +52,12 @@ const PAYMENT_STATUS_OPTIONS = [
 
 const CURRENCY_OPTIONS = ["USD", "EUR", "GBP", "CAD", "AUD"];
 
+const GENRE_SUGGESTIONS = [
+  "Rock", "Pop", "Hip-Hop", "R&B", "Electronic", "Country", "Jazz",
+  "Classical", "Indie", "Alternative", "Metal", "Folk", "Soul", "Funk",
+  "Blues", "Reggae", "Latin", "Punk", "Lo-Fi", "Ambient",
+];
+
 function PillSelect({
   options,
   value,
@@ -522,6 +528,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
             <TagInput
               value={genreTags}
               onChange={editable ? setGenreTags : undefined}
+              suggestions={GENRE_SUGGESTIONS}
               placeholder={editable ? "Type and press Enter" : ""}
               disabled={!editable}
             />
