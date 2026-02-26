@@ -111,11 +111,11 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-/** Parse numeric LUFS value from a string like "-14 LUFS". */
-function parseLufsTarget(target: string | null): number | null {
-  if (!target) return null;
+/** Parse numeric LUFS value from a string like "-14 LUFS". Defaults to -14. */
+function parseLufsTarget(target: string | null): number {
+  if (!target) return -14;
   const match = target.match(/-?\d+(\.\d+)?/);
-  return match ? parseFloat(match[0]) : null;
+  return match ? parseFloat(match[0]) : -14;
 }
 
 /** Loudness targets for the streaming / broadcast / social normalization table. */
@@ -698,7 +698,7 @@ export function AudioPlayer({
           )}
           {measuredLufs != null && !measuring && (() => {
             const target = parseLufsTarget(targetLoudness);
-            const delta = target != null ? measuredLufs - target : null;
+            const delta = measuredLufs - target;
             return (
               <span className="inline-flex items-center gap-1.5 text-[10px] font-mono">
                 <span className="text-faint">·</span>
@@ -717,20 +717,18 @@ export function AudioPlayer({
                     )}
                   />
                 </button>
-                {delta != null && (
-                  <span
-                    className={cn(
-                      "px-1.5 py-px rounded text-[10px]",
-                      Math.abs(delta) <= 0.5
-                        ? "bg-status-green/10 text-status-green"
-                        : Math.abs(delta) <= 1.5
-                          ? "bg-signal-muted text-signal"
-                          : "bg-red-500/10 text-red-500",
-                    )}
-                  >
-                    {delta > 0 ? "+" : ""}{delta.toFixed(1)} dB
-                  </span>
-                )}
+                <span
+                  className={cn(
+                    "px-1.5 py-px rounded text-[10px]",
+                    Math.abs(delta) <= 0.5
+                      ? "bg-status-green/10 text-status-green"
+                      : Math.abs(delta) <= 1.5
+                        ? "bg-signal-muted text-signal"
+                        : "bg-red-500/10 text-red-500",
+                  )}
+                >
+                  {delta > 0 ? "+" : ""}{delta.toFixed(1)} dB
+                </span>
               </span>
             );
           })()}
@@ -738,7 +736,8 @@ export function AudioPlayer({
 
         {/* Streaming normalization dropdown */}
         {showStreamingInfo && measuredLufs != null && (
-          <div className="mx-5 mt-2 rounded-md bg-panel2 border border-border overflow-hidden inline-block">
+          <div className="flex justify-end px-5 mt-2">
+          <div className="rounded-md bg-panel2 border border-border overflow-hidden inline-block">
             {LOUDNESS_GROUPS.map((group) => (
               <div key={group}>
                 <div className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider">
@@ -776,6 +775,7 @@ export function AudioPlayer({
               </div>
             ))}
             <div className="h-1.5" />
+          </div>
           </div>
         )}
 
