@@ -168,7 +168,10 @@ export function ReleaseCard({
                 setMenuOpen(!menuOpen);
                 setConfirming(false);
               }}
-              className="w-7 h-7 grid place-items-center rounded-md text-faint hover:text-text hover:bg-panel2 transition-colors"
+              className={cn(
+                "w-7 h-7 grid place-items-center rounded-md transition-colors",
+                menuOpen ? "bg-panel2 text-text" : "text-faint hover:text-text hover:bg-panel2",
+              )}
             >
               <MoreVertical size={15} />
             </button>

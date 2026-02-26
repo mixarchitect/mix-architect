@@ -229,12 +229,14 @@ export default async function DashboardPage({ searchParams }: Props) {
             })}
           </div>
         ) : (
-          <div className="text-center py-12 text-muted text-sm">
-            No {activeFilter} releases.{" "}
-            <Link href="/app" className="text-signal hover:underline">
-              Show all releases
-            </Link>
-          </div>
+          <EmptyState
+            title={`No ${activeFilter} releases`}
+            action={
+              <Link href="/app" className="text-signal text-sm hover:underline">
+                Show all releases
+              </Link>
+            }
+          />
         )
       ) : !sharedReleases.length ? (
         <EmptyState
