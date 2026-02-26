@@ -51,6 +51,7 @@ type AudioPlayerProps = {
   coverArtUrl: string | null;
   trackTitle: string;
   releaseTitle: string;
+  currentUserName: string;
   onVersionsChange: (v: AudioVersionData[]) => void;
   onCommentsChange: (c: TimelineComment[]) => void;
 };
@@ -77,14 +78,6 @@ const AUTHOR_COLORS = [
   "#FE5E0E", "#6B8AFF", "#8B5CF6", "#22C55E", "#EAB308",
   "#EC4899", "#14B8A6", "#F97316",
 ];
-
-function getAuthorColor(author: string): string {
-  let hash = 0;
-  for (let i = 0; i < author.length; i++) {
-    hash = author.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return AUTHOR_COLORS[Math.abs(hash) % AUTHOR_COLORS.length];
-}
 
 function getInitials(name: string): string {
   return name
@@ -115,6 +108,7 @@ export function AudioPlayer({
   coverArtUrl,
   trackTitle,
   releaseTitle,
+  currentUserName,
   onVersionsChange,
   onCommentsChange,
 }: AudioPlayerProps) {
@@ -161,6 +155,14 @@ export function AudioPlayer({
         .sort((a, b) => (a.timecode_seconds ?? 0) - (b.timecode_seconds ?? 0)),
     [comments, activeVersionId],
   );
+
+  // Build a stable color map — unique authors get sequential colors (no collisions)
+  const authorColorMap = useMemo(() => {
+    const uniqueAuthors = [...new Set(comments.map((c) => c.author))].sort();
+    const map = new Map<string, string>();
+    uniqueAuthors.forEach((a, i) => map.set(a, AUTHOR_COLORS[i % AUTHOR_COLORS.length]));
+    return map;
+  }, [comments]);
 
   /* ---------------------------------------------------------------- */
   /*  WaveSurfer lifecycle                                             */
@@ -303,7 +305,7 @@ export function AudioPlayer({
           audio_url: urlData.publicUrl,
           file_name: file.name,
           file_size: file.size,
-          uploaded_by: "You",
+          uploaded_by: currentUserName,
         })
         .select()
         .single();
@@ -333,7 +335,7 @@ export function AudioPlayer({
       .insert({
         track_id: trackId,
         content: newCommentText.trim(),
-        author: "You",
+        author: currentUserName,
         timecode_seconds: Math.round(commentInput.timecode * 100) / 100,
         audio_version_id: activeVersionId,
       })
@@ -479,7 +481,7 @@ export function AudioPlayer({
             duration > 0 &&
             versionComments.map((c) => {
               const pos = ((c.timecode_seconds ?? 0) / duration) * 100;
-              const color = getAuthorColor(c.author);
+              const color = authorColorMap.get(c.author) ?? AUTHOR_COLORS[0];
               const isActive = highlightedCommentId === c.id;
               return (
                 <button
@@ -588,6 +590,7 @@ export function AudioPlayer({
                 <CommentRow
                   key={c.id}
                   comment={c}
+                  color={authorColorMap.get(c.author) ?? AUTHOR_COLORS[0]}
                   isActive={highlightedCommentId === c.id}
                   onClick={() => {
                     setHighlightedCommentId(
@@ -634,14 +637,15 @@ export function AudioPlayer({
 
 function CommentRow({
   comment,
+  color,
   isActive,
   onClick,
 }: {
   comment: TimelineComment;
+  color: string;
   isActive: boolean;
   onClick: () => void;
 }) {
-  const color = getAuthorColor(comment.author);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

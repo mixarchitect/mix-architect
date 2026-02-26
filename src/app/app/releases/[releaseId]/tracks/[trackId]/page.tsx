@@ -44,6 +44,7 @@ export default async function TrackDetailPage({ params }: Props) {
   // Fetch user + role
   const { data: { user } } = await supabase.auth.getUser();
   const role = user ? await getReleaseRole(supabase, releaseId, user.id) : null;
+  const currentUserName = user?.user_metadata?.display_name || user?.email || "You";
 
   return (
     <TrackDetailClient
@@ -61,6 +62,7 @@ export default async function TrackDetailPage({ params }: Props) {
       distribution={distributionRes.data}
       splits={splitsRes.data ?? []}
       role={role}
+      currentUserName={currentUserName}
     />
   );
 }

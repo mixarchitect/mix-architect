@@ -23,7 +23,7 @@ import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts"
 const TABS = [
   { id: "intent", label: "Intent" },
   { id: "specs", label: "Specs" },
-  { id: "player", label: "Player" },
+  { id: "audio", label: "Audio" },
   { id: "notes", label: "Notes" },
   { id: "distribution", label: "Distribution" },
 ];
@@ -115,11 +115,13 @@ type Props = {
   distribution: DistributionData;
   splits: SplitData[];
   role: ReleaseRole;
+  currentUserName: string;
 };
 
 export function TrackDetailClient({
   releaseId, releaseTitle, releaseFormat, releaseCoverArt,
   track, intent, specs, samplyUrl, audioVersions, notes, references, distribution, splits, role,
+  currentUserName,
 }: Props) {
   const [activeTab, setActiveTab] = useState("intent");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -317,7 +319,7 @@ export function TrackDetailClient({
     if (!newNote.trim()) return;
     const { data } = await supabase
       .from("revision_notes")
-      .insert({ track_id: track.id, content: newNote.trim(), author: "You" })
+      .insert({ track_id: track.id, content: newNote.trim(), author: currentUserName })
       .select()
       .single();
     if (data) {
@@ -676,7 +678,7 @@ export function TrackDetailClient({
           )}
 
           {/* Player */}
-          {activeTab === "player" && (
+          {activeTab === "audio" && (
             <AudioPlayer
               trackId={track.id}
               versions={localAudioVersions}
@@ -690,6 +692,7 @@ export function TrackDetailClient({
               coverArtUrl={releaseCoverArt ?? null}
               trackTitle={track.title}
               releaseTitle={releaseTitle}
+              currentUserName={currentUserName}
               onVersionsChange={setLocalAudioVersions}
               onCommentsChange={(updated) => {
                 setLocalNotes((prev) => {
