@@ -737,20 +737,23 @@ export function AudioPlayer({
         {/* Streaming normalization dropdown */}
         {showStreamingInfo && measuredLufs != null && (
           <div className="flex justify-end px-5 mt-2">
-          <div className="rounded-md bg-panel2 border border-border overflow-hidden inline-block">
-            {LOUDNESS_GROUPS.map((group) => (
-              <div key={group}>
-                <div className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider">
-                  {group}
-                </div>
-                <table className="w-full text-[11px] font-mono">
-                  <tbody>
-                    {LOUDNESS_TARGETS.filter((t) => t.group === group).map((t) => {
+          <div className="rounded-md bg-panel2 border border-border overflow-hidden">
+            <table className="text-[11px] font-mono">
+              <tbody>
+                {LOUDNESS_GROUPS.map((group) => {
+                  const targets = LOUDNESS_TARGETS.filter((t) => t.group === group);
+                  return [
+                    <tr key={`h-${group}`}>
+                      <td colSpan={3} className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider font-sans">
+                        {group}
+                      </td>
+                    </tr>,
+                    ...targets.map((t) => {
                       const adj = measuredLufs - t.lufs;
                       return (
                         <tr key={t.name} className="leading-6">
-                          <td className="pl-3 pr-3 text-muted font-sans whitespace-nowrap">{t.name}</td>
-                          <td className="pr-2 text-faint text-right whitespace-nowrap">{t.lufs}</td>
+                          <td className="pl-3 pr-4 text-muted font-sans whitespace-nowrap">{t.name}</td>
+                          <td className="pr-4 text-faint text-right whitespace-nowrap">{t.lufs}</td>
                           <td
                             className={cn(
                               "pr-3 text-right whitespace-nowrap",
@@ -769,11 +772,11 @@ export function AudioPlayer({
                           </td>
                         </tr>
                       );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ))}
+                    }),
+                  ];
+                })}
+              </tbody>
+            </table>
             <div className="h-1.5" />
           </div>
           </div>
