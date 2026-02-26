@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { relativeTime, absoluteDate } from "@/lib/relative-time";
+import { useTimestampMode } from "@/lib/timestamp-context";
 
 type Props = {
   date: string;
@@ -9,13 +9,14 @@ type Props = {
 };
 
 export function Timestamp({ date, className }: Props) {
-  const [showAbsolute, setShowAbsolute] = useState(false);
+  const { mode, toggle } = useTimestampMode();
+  const showAbsolute = mode === "absolute";
 
   return (
     <span
       onClick={(e) => {
         e.stopPropagation();
-        setShowAbsolute((v) => !v);
+        toggle();
       }}
       className={className}
       style={{ cursor: "pointer" }}

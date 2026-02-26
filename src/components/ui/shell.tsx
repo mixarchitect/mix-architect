@@ -6,6 +6,7 @@ import { MobileNav } from "@/components/ui/mobile-nav";
 import { CommandPalette } from "@/components/ui/command-palette";
 import { PaymentsProvider } from "@/lib/payments-context";
 import { AudioProvider } from "@/lib/audio-context";
+import { TimestampProvider } from "@/lib/timestamp-context";
 import { MiniPlayer } from "@/components/ui/mini-player";
 import { useCommandPalette } from "@/hooks/use-command-palette";
 
@@ -19,6 +20,7 @@ export function Shell({ paymentsEnabled = false, children }: ShellProps) {
   const { isOpen, open, close } = useCommandPalette();
 
   return (
+    <TimestampProvider>
     <AudioProvider>
       <PaymentsProvider enabled={paymentsEnabled}>
         <div className="flex h-screen overflow-hidden">
@@ -34,5 +36,6 @@ export function Shell({ paymentsEnabled = false, children }: ShellProps) {
         <CommandPalette isOpen={isOpen} onClose={close} />
       </PaymentsProvider>
     </AudioProvider>
+    </TimestampProvider>
   );
 }
