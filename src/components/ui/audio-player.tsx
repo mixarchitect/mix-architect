@@ -18,13 +18,13 @@ import {
 } from "lucide-react";
 import WaveSurfer from "wavesurfer.js";
 
-/** Read the --wave CSS variable from the live document. */
-function getWaveColor(): string {
-  return (
-    getComputedStyle(document.documentElement)
-      .getPropertyValue("--wave")
-      .trim() || "rgba(20, 20, 20, 0.15)"
-  );
+/** Read waveform CSS variables from the live document. */
+function getWaveColors() {
+  const s = getComputedStyle(document.documentElement);
+  return {
+    wave: s.getPropertyValue("--wave").trim() || "rgba(20, 20, 20, 0.15)",
+    progress: s.getPropertyValue("--wave-progress").trim() || "rgba(20, 20, 20, 0.38)",
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -223,6 +223,7 @@ export function AudioPlayer({
     const raf = requestAnimationFrame(() => {
       if (!container || !container.isConnected) return;
 
+      const colors = getWaveColors();
       ws = WaveSurfer.create({
         container,
         media: audioElement,
@@ -231,8 +232,8 @@ export function AudioPlayer({
         barGap: 1,
         barRadius: 1,
         height: 80,
-        progressColor: "var(--signal)",
-        waveColor: getWaveColor(),
+        waveColor: colors.wave,
+        progressColor: colors.progress,
         cursorColor: "var(--signal)",
         cursorWidth: 2,
         normalize: true,
@@ -302,13 +303,17 @@ export function AudioPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeVersion?.id, audioElement]);
 
-  // Update waveform bar color when the theme changes.
+  // Update waveform colors when the theme changes.
   // Defer to the next frame so the browser has recomputed CSS variables
-  // for the new theme before we read --wave via getComputedStyle.
+  // for the new theme before we read them via getComputedStyle.
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
       if (wavesurferRef.current) {
-        wavesurferRef.current.setOptions({ waveColor: getWaveColor() });
+        const colors = getWaveColors();
+        wavesurferRef.current.setOptions({
+          waveColor: colors.wave,
+          progressColor: colors.progress,
+        });
       }
     });
     return () => cancelAnimationFrame(raf);

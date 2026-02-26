@@ -67,8 +67,9 @@
   --grid: rgba(20, 20, 20, 0.03);
   --grid-strong: rgba(20, 20, 20, 0.05);
 
-  /* Waveform idle bar color */
+  /* Waveform bar colors */
   --wave: rgba(20, 20, 20, 0.15);
+  --wave-progress: rgba(20, 20, 20, 0.38);
 }
 
 /* ─────────────────────────────────────────────────────
@@ -109,8 +110,9 @@
   --grid: rgba(255, 255, 255, 0.03);
   --grid-strong: rgba(255, 255, 255, 0.05);
 
-  /* Waveform idle bar color */
+  /* Waveform bar colors */
   --wave: rgba(232, 232, 232, 0.18);
+  --wave-progress: rgba(232, 232, 232, 0.45);
 
   color-scheme: dark;
 }
