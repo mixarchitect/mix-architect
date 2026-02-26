@@ -140,6 +140,11 @@ export function TrackDetailClient({
 
   const [localAudioVersions, setLocalAudioVersions] = useState(audioVersions);
   const [localNotes, setLocalNotes] = useState(notes);
+  // General notes only — exclude timeline comments (those with timecode + version)
+  const generalNotes = useMemo(
+    () => localNotes.filter((n) => n.timecode_seconds == null || n.audio_version_id == null),
+    [localNotes],
+  );
   const [newNote, setNewNote] = useState("");
   const [localRefs, setLocalRefs] = useState(references);
   const [showRefForm, setShowRefForm] = useState(false);
@@ -727,16 +732,16 @@ export function TrackDetailClient({
                   </Button>
                 </div>
               )}
-              {localNotes.length > 0 ? (
+              {generalNotes.length > 0 ? (
                 <div>
-                  {localNotes.map((note, idx) => (
+                  {generalNotes.map((note, idx) => (
                     <div key={note.id}>
                       <NoteEntry
                         author={note.author}
                         createdAt={note.created_at}
                         content={note.content}
                       />
-                      {idx < localNotes.length - 1 && <Rule />}
+                      {idx < generalNotes.length - 1 && <Rule />}
                     </div>
                   ))}
                 </div>
