@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { searchItunesApi, buildPlatformUrl } from "@/lib/itunes-search";
@@ -123,7 +123,17 @@ export function TrackDetailClient({
   track, intent, specs, samplyUrl, audioVersions, notes, references, distribution, splits, role,
   currentUserName,
 }: Props) {
-  const [activeTab, setActiveTab] = useState("intent");
+  const TAB_IDS = TABS.map((t) => t.id);
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window === "undefined") return "intent";
+    const hash = window.location.hash.replace("#", "");
+    return TAB_IDS.includes(hash) ? hash : "intent";
+  });
+
+  const handleTabChange = useCallback((tab: string) => {
+    setActiveTab(tab);
+    window.location.hash = tab;
+  }, []);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const [mixVision, setMixVision] = useState(intent?.mix_vision ?? "");
@@ -456,7 +466,7 @@ export function TrackDetailClient({
         </div>
       </div>
 
-      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} className="mb-8" />
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={handleTabChange} className="mb-8" />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
         {/* ── Tab content ── */}
