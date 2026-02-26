@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { cn } from "@/lib/cn";
+import { relativeTime } from "@/lib/relative-time";
 import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
@@ -747,6 +748,10 @@ function CommentRow({
           </span>
           <span className="text-[11px] font-mono text-signal bg-signal-muted px-1.5 py-px rounded">
             {formatTime(comment.timecode_seconds ?? 0)}
+          </span>
+          <span className="text-xs text-muted">&middot;</span>
+          <span className="text-xs text-muted">
+            {relativeTime(comment.created_at)}
           </span>
         </div>
         <p className="text-xs text-muted leading-relaxed">{comment.content}</p>
