@@ -350,6 +350,22 @@ export function AudioPlayer({
     }
   }
 
+  async function handleDeleteComment(commentId: string) {
+    const prev = comments;
+    onCommentsChange(comments.filter((c) => c.id !== commentId));
+    if (highlightedCommentId === commentId) setHighlightedCommentId(null);
+
+    const { error } = await supabase
+      .from("revision_notes")
+      .delete()
+      .eq("id", commentId);
+
+    if (error) {
+      // Rollback on failure
+      onCommentsChange(prev);
+    }
+  }
+
   /* ---------------------------------------------------------------- */
   /*  Empty state                                                      */
   /* ---------------------------------------------------------------- */
@@ -592,6 +608,11 @@ export function AudioPlayer({
                   comment={c}
                   color={authorColorMap.get(c.author) ?? AUTHOR_COLORS[0]}
                   isActive={highlightedCommentId === c.id}
+                  onDelete={
+                    c.author === currentUserName
+                      ? () => handleDeleteComment(c.id)
+                      : undefined
+                  }
                   onClick={() => {
                     setHighlightedCommentId(
                       highlightedCommentId === c.id ? null : c.id,
@@ -639,11 +660,13 @@ function CommentRow({
   comment,
   color,
   isActive,
+  onDelete,
   onClick,
 }: {
   comment: TimelineComment;
   color: string;
   isActive: boolean;
+  onDelete?: () => void;
   onClick: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -659,7 +682,7 @@ function CommentRow({
       ref={ref}
       onClick={onClick}
       className={cn(
-        "flex gap-2.5 px-3 py-2.5 rounded-md cursor-pointer transition-colors",
+        "group flex gap-2.5 px-3 py-2.5 rounded-md cursor-pointer transition-colors",
         isActive
           ? "bg-signal-muted border-l-2 border-signal"
           : "border-l-2 border-transparent hover:bg-panel2",
@@ -682,6 +705,18 @@ function CommentRow({
         </div>
         <p className="text-xs text-muted leading-relaxed">{comment.content}</p>
       </div>
+      {onDelete && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          className="opacity-0 group-hover:opacity-100 p-1 rounded text-faint hover:text-red-500 transition-all shrink-0 self-center"
+          title="Delete comment"
+        >
+          <X size={12} />
+        </button>
+      )}
     </div>
   );
 }
