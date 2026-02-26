@@ -572,28 +572,25 @@ export function AudioPlayer({
             · {versionComments.length} comment
             {versionComments.length !== 1 ? "s" : ""}
           </span>
-          {activeVersion?.file_name && (
-            <span className="text-[10px] font-mono text-faint">
-              · {activeVersion.file_name}
-            </span>
-          )}
           {activeVersion && (
-            <button
-              type="button"
-              onClick={() => {
-                if (!activeVersion) return;
-                const a = document.createElement("a");
-                a.href = activeVersion.audio_url;
-                a.download = activeVersion.file_name || `v${activeVersion.version_number}`;
-                a.target = "_blank";
-                a.rel = "noopener noreferrer";
-                a.click();
-              }}
-              className="ml-auto text-muted hover:text-text transition-colors p-1 -m-1"
-              title={`Download ${activeVersion.file_name || `v${activeVersion.version_number}`}`}
-            >
-              <Download size={13} />
-            </button>
+            <span className="text-[10px] font-mono text-faint inline-flex items-center gap-1.5">
+              {activeVersion.file_name && <>· {activeVersion.file_name}</>}
+              <button
+                type="button"
+                onClick={() => {
+                  const a = document.createElement("a");
+                  a.href = activeVersion.audio_url;
+                  a.download = activeVersion.file_name || `v${activeVersion.version_number}`;
+                  a.target = "_blank";
+                  a.rel = "noopener noreferrer";
+                  a.click();
+                }}
+                className="text-signal hover:opacity-70 transition-opacity"
+                title={`Download ${activeVersion.file_name || `v${activeVersion.version_number}`}`}
+              >
+                <Download size={12} />
+              </button>
+            </span>
           )}
         </div>
 
