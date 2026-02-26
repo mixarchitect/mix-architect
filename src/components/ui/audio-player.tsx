@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
 import {
   Play,
   Pause,
@@ -42,6 +43,7 @@ export type TimelineComment = {
 };
 
 type AudioPlayerProps = {
+  releaseId: string;
   trackId: string;
   versions: AudioVersionData[];
   comments: TimelineComment[];
@@ -99,6 +101,7 @@ function formatTime(seconds: number): string {
 /* ------------------------------------------------------------------ */
 
 export function AudioPlayer({
+  releaseId,
   trackId,
   versions,
   comments,
@@ -123,13 +126,31 @@ export function AudioPlayer({
     [versions, activeVersionId],
   );
 
-  // Playback state
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  // Shared audio context
+  const audio = useAudio();
+  const { audioElement, isPlaying, currentTime, duration } = audio;
+
+  // Playback state (local to WaveSurfer readiness)
   const [isReady, setIsReady] = useState(false);
-  const resumeTimeRef = useRef(0);
-  const resumePlayingRef = useRef(false);
+
+  // Build track metadata for the audio context
+  const trackMeta: AudioTrackMeta = useMemo(
+    () => ({ trackId, releaseId, trackTitle, releaseTitle, coverArtUrl }),
+    [trackId, releaseId, trackTitle, releaseTitle, coverArtUrl],
+  );
+
+  // Signal full player visibility to context (hides mini player)
+  useEffect(() => {
+    audio.setFullPlayerVisible(true);
+    return () => audio.setFullPlayerVisible(false);
+  }, [audio]);
+
+  // Load the active version into the shared audio element
+  useEffect(() => {
+    if (activeVersion) {
+      audio.loadVersion(activeVersion, trackMeta);
+    }
+  }, [activeVersion?.id, audio, trackMeta]);
 
   // Comment state
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
@@ -174,10 +195,10 @@ export function AudioPlayer({
     if (!containerRef.current || !activeVersion) return;
 
     setIsReady(false);
-    setDuration(0);
 
     const ws = WaveSurfer.create({
       container: containerRef.current,
+      media: audioElement,
       barWidth: 3,
       barGap: 1,
       barRadius: 1,
@@ -188,20 +209,11 @@ export function AudioPlayer({
       cursorWidth: 2,
       normalize: true,
       peaks: activeVersion.waveform_peaks ?? undefined,
-      url: activeVersion.audio_url,
+      duration: activeVersion.duration_seconds ?? undefined,
     });
 
     ws.on("ready", () => {
-      setDuration(ws.getDuration());
       setIsReady(true);
-
-      // Resume playback position from version switch
-      if (resumeTimeRef.current > 0 && resumeTimeRef.current <= ws.getDuration()) {
-        ws.setTime(resumeTimeRef.current);
-        if (resumePlayingRef.current) ws.play();
-      }
-      resumeTimeRef.current = 0;
-      resumePlayingRef.current = false;
 
       // Cache peaks if not yet cached
       if (!activeVersion.waveform_peaks) {
@@ -214,7 +226,6 @@ export function AudioPlayer({
           })
           .eq("id", activeVersion.id)
           .then(() => {
-            // Update local version data
             onVersionsChange(
               versions.map((v) =>
                 v.id === activeVersion.id
@@ -226,16 +237,11 @@ export function AudioPlayer({
       }
     });
 
-    ws.on("timeupdate", (time: number) => setCurrentTime(time));
-    ws.on("play", () => setIsPlaying(true));
-    ws.on("pause", () => setIsPlaying(false));
-    ws.on("finish", () => setIsPlaying(false));
-
     ws.on("dblclick", () => {
       if (!canComment) return;
       const time = ws.getCurrentTime();
       setCommentInput({ timecode: time });
-      ws.pause();
+      audioElement.pause();
     });
 
     wavesurferRef.current = ws;
@@ -245,29 +251,30 @@ export function AudioPlayer({
       wavesurferRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeVersion?.id, activeVersion?.audio_url]);
+  }, [activeVersion?.id, audioElement]);
 
   /* ---------------------------------------------------------------- */
   /*  Playback controls                                                */
   /* ---------------------------------------------------------------- */
 
   const togglePlayPause = useCallback(() => {
-    wavesurferRef.current?.playPause();
-  }, []);
+    audio.togglePlayPause();
+  }, [audio]);
 
   const skipBack = useCallback(() => {
-    wavesurferRef.current?.setTime(0);
-  }, []);
+    audio.seekTo(0);
+  }, [audio]);
 
   const skipForward = useCallback(() => {
-    const ws = wavesurferRef.current;
-    if (!ws) return;
-    ws.setTime(Math.min(ws.getDuration(), ws.getCurrentTime() + 10));
-  }, []);
+    audio.seekTo(Math.min(duration, currentTime + 10));
+  }, [audio, duration, currentTime]);
 
-  const seekToTime = useCallback((seconds: number) => {
-    wavesurferRef.current?.setTime(seconds);
-  }, []);
+  const seekToTime = useCallback(
+    (seconds: number) => {
+      audio.seekTo(seconds);
+    },
+    [audio],
+  );
 
   /* ---------------------------------------------------------------- */
   /*  Upload handler                                                   */
@@ -450,11 +457,27 @@ export function AudioPlayer({
               <button
                 key={v.id}
                 onClick={() => {
-                  resumeTimeRef.current = currentTime;
-                  resumePlayingRef.current = isPlaying;
+                  const wasPlaying = isPlaying;
+                  const prevTime = currentTime;
+                  const isSameVersion = v.id === activeVersionId;
+
+                  audio.loadVersion(v, trackMeta);
                   setActiveVersionId(v.id);
                   setHighlightedCommentId(null);
                   setCommentInput(null);
+
+                  // For a different version, restore position after audio loads
+                  if (!isSameVersion) {
+                    const el = audioElement;
+                    const onCanPlay = () => {
+                      el.removeEventListener("canplay", onCanPlay);
+                      if (prevTime > 0 && prevTime <= el.duration) {
+                        el.currentTime = prevTime;
+                      }
+                      if (wasPlaying) el.play();
+                    };
+                    el.addEventListener("canplay", onCanPlay);
+                  }
                 }}
                 className={cn(
                   "px-3 py-1 text-xs font-medium rounded transition-colors",

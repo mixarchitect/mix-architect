@@ -680,6 +680,7 @@ export function TrackDetailClient({
           {/* Player */}
           {activeTab === "audio" && (
             <AudioPlayer
+              releaseId={releaseId}
               trackId={track.id}
               versions={localAudioVersions}
               comments={localNotes.filter(
