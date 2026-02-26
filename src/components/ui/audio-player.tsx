@@ -128,6 +128,8 @@ export function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isReady, setIsReady] = useState(false);
+  const resumeTimeRef = useRef(0);
+  const resumePlayingRef = useRef(false);
 
   // Comment state
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
@@ -172,8 +174,6 @@ export function AudioPlayer({
     if (!containerRef.current || !activeVersion) return;
 
     setIsReady(false);
-    setIsPlaying(false);
-    setCurrentTime(0);
     setDuration(0);
 
     const ws = WaveSurfer.create({
@@ -194,6 +194,14 @@ export function AudioPlayer({
     ws.on("ready", () => {
       setDuration(ws.getDuration());
       setIsReady(true);
+
+      // Resume playback position from version switch
+      if (resumeTimeRef.current > 0 && resumeTimeRef.current <= ws.getDuration()) {
+        ws.setTime(resumeTimeRef.current);
+        if (resumePlayingRef.current) ws.play();
+      }
+      resumeTimeRef.current = 0;
+      resumePlayingRef.current = false;
 
       // Cache peaks if not yet cached
       if (!activeVersion.waveform_peaks) {
@@ -442,6 +450,8 @@ export function AudioPlayer({
               <button
                 key={v.id}
                 onClick={() => {
+                  resumeTimeRef.current = currentTime;
+                  resumePlayingRef.current = isPlaying;
                   setActiveVersionId(v.id);
                   setHighlightedCommentId(null);
                   setCommentInput(null);
