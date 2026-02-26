@@ -302,11 +302,16 @@ export function AudioPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeVersion?.id, audioElement]);
 
-  // Update waveform bar color when the theme changes
+  // Update waveform bar color when the theme changes.
+  // Defer to the next frame so the browser has recomputed CSS variables
+  // for the new theme before we read --wave via getComputedStyle.
   useEffect(() => {
-    if (wavesurferRef.current) {
-      wavesurferRef.current.setOptions({ waveColor: getWaveColor() });
-    }
+    const raf = requestAnimationFrame(() => {
+      if (wavesurferRef.current) {
+        wavesurferRef.current.setOptions({ waveColor: getWaveColor() });
+      }
+    });
+    return () => cancelAnimationFrame(raf);
   }, [resolvedTheme]);
 
   /* ---------------------------------------------------------------- */
