@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { notFound } from "next/navigation";
 import { Rule } from "@/components/ui/rule";
+import type { BriefTrack, BriefIntent, BriefSpec, BriefReference, BriefAudioVersion } from "@/lib/db-types";
 
 type Props = { params: Promise<{ shareToken: string }> };
 
@@ -13,21 +14,21 @@ export default async function SharedBriefPage({ params }: Props) {
     { cookies: { getAll: () => [], setAll: () => {} } },
   );
 
-  const { data: share } = await supabase
+  const { data: share, error: shareErr } = await supabase
     .from("brief_shares")
     .select("release_id")
     .eq("share_token", shareToken)
     .maybeSingle();
 
-  if (!share) notFound();
+  if (shareErr || !share) notFound();
 
-  const { data: release } = await supabase
+  const { data: release, error: releaseErr } = await supabase
     .from("releases")
     .select("*")
     .eq("id", share.release_id)
     .maybeSingle();
 
-  if (!release) notFound();
+  if (releaseErr || !release) notFound();
 
   const { data: tracks } = await supabase
     .from("tracks")
@@ -35,23 +36,25 @@ export default async function SharedBriefPage({ params }: Props) {
     .eq("release_id", share.release_id)
     .order("track_number");
 
-  const trackIds = (tracks ?? []).map((t: Record<string, unknown>) => t.id as string);
+  const trackIds = (tracks ?? []).map((t) => t.id as string);
+
+  const empty = <T,>() => Promise.resolve({ data: [] as T[] });
 
   const [intentRes, specsRes, trackRefsRes, globalRefsRes, audioVersionsRes] =
     await Promise.all([
       trackIds.length > 0
         ? supabase.from("track_intent").select("*").in("track_id", trackIds)
-        : Promise.resolve({ data: [] as Record<string, unknown>[] }),
+        : empty<BriefIntent>(),
       trackIds.length > 0
         ? supabase.from("track_specs").select("*").in("track_id", trackIds)
-        : Promise.resolve({ data: [] as Record<string, unknown>[] }),
+        : empty<BriefSpec>(),
       trackIds.length > 0
         ? supabase
             .from("mix_references")
             .select("*")
             .in("track_id", trackIds)
             .order("sort_order")
-        : Promise.resolve({ data: [] as Record<string, unknown>[] }),
+        : empty<BriefReference>(),
       supabase
         .from("mix_references")
         .select("*")
@@ -63,15 +66,14 @@ export default async function SharedBriefPage({ params }: Props) {
             .from("track_audio_versions")
             .select("id, track_id")
             .in("track_id", trackIds)
-        : Promise.resolve({ data: [] as Record<string, unknown>[] }),
+        : empty<BriefAudioVersion>(),
     ]);
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const intents = (intentRes.data ?? []) as any[];
-  const allSpecs = (specsRes.data ?? []) as any[];
-  const trackRefs = (trackRefsRes.data ?? []) as any[];
-  const globalRefs = (globalRefsRes.data ?? []) as any[];
-  const audioVersions = (audioVersionsRes.data ?? []) as any[];
+  const intents = (intentRes.data ?? []) as BriefIntent[];
+  const allSpecs = (specsRes.data ?? []) as BriefSpec[];
+  const trackRefs = (trackRefsRes.data ?? []) as BriefReference[];
+  const globalRefs = (globalRefsRes.data ?? []) as BriefReference[];
+  const audioVersions = (audioVersionsRes.data ?? []) as BriefAudioVersion[];
 
   return (
     <main className="min-h-screen bg-bg py-12 px-6">
@@ -135,8 +137,8 @@ export default async function SharedBriefPage({ params }: Props) {
               </div>
               <ul className="text-sm text-text space-y-1">
                 {globalRefs.map((ref) => (
-                  <li key={ref.id as string}>
-                    &bull; {ref.song_title as string}
+                  <li key={ref.id}>
+                    &bull; {ref.song_title}
                     {ref.artist ? ` \u2014 ${ref.artist}` : ""}
                   </li>
                 ))}
@@ -146,12 +148,12 @@ export default async function SharedBriefPage({ params }: Props) {
         </section>
 
         {/* Tracks */}
-        {tracks?.map((track: any) => {
-          const intent = intents.find((i: any) => i.track_id === track.id);
-          const trackSpec = allSpecs.find((s: any) => s.track_id === track.id);
-          const refs = trackRefs.filter((r: any) => r.track_id === track.id);
+        {(tracks as BriefTrack[] | null)?.map((track) => {
+          const intent = intents.find((i) => i.track_id === track.id);
+          const trackSpec = allSpecs.find((s) => s.track_id === track.id);
+          const refs = trackRefs.filter((r) => r.track_id === track.id);
           const audioVersionCount = audioVersions.filter(
-            (v: any) => v.track_id === track.id,
+            (v) => v.track_id === track.id,
           ).length;
 
           return (
@@ -171,11 +173,11 @@ export default async function SharedBriefPage({ params }: Props) {
                 </div>
               )}
 
-              {intent?.emotional_tags?.length > 0 && (
+              {(intent?.emotional_tags?.length ?? 0) > 0 && (
                 <div className="mb-3">
                   <span className="text-xs text-muted font-medium">Keywords: </span>
                   <span className="text-sm text-text">
-                    {intent.emotional_tags.join(", ")}
+                    {intent!.emotional_tags!.join(", ")}
                   </span>
                 </div>
               )}
@@ -203,7 +205,7 @@ export default async function SharedBriefPage({ params }: Props) {
                     References
                   </div>
                   <ul className="text-sm text-text space-y-1">
-                    {refs.map((ref: any, idx: number) => (
+                    {refs.map((ref, idx) => (
                       <li key={ref.id}>
                         {idx + 1}. {ref.song_title}
                         {ref.artist ? ` \u2014 ${ref.artist}` : ""}
