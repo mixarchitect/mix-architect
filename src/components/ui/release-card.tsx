@@ -105,7 +105,7 @@ export function ReleaseCard({
       if (error) throw error;
       setMenuOpen(false);
       router.refresh();
-    } catch {
+    } finally {
       setPinning(false);
     }
   }
