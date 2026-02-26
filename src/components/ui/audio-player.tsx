@@ -602,13 +602,26 @@ export function AudioPlayer({
 
         {/* Waveform container */}
         <div className="px-5">
-          <div
-            ref={containerRef}
-            className={cn(
-              "w-full transition-opacity",
-              !isReady && "opacity-30",
+          <div className="relative">
+            <div
+              ref={containerRef}
+              className={cn(
+                "w-full transition-opacity",
+                isReady ? "opacity-100" : "opacity-0 absolute inset-0",
+              )}
+            />
+            {!isReady && (
+              <div className="flex items-end justify-center gap-[1px] h-[80px] animate-pulse">
+                {Array.from({ length: 80 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-[3px] rounded-sm bg-faint"
+                    style={{ height: `${20 + Math.abs(Math.sin(i * 0.3)) * 55}%` }}
+                  />
+                ))}
+              </div>
             )}
-          />
+          </div>
           {canComment && isReady && (
             <p className="text-center text-[10px] text-faint mt-1.5 select-none">
               double-click waveform to add comment
