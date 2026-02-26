@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTheme } from "next-themes";
 import { Rail } from "@/components/ui/rail";
 import { MobileNav } from "@/components/ui/mobile-nav";
 import { CommandPalette } from "@/components/ui/command-palette";
@@ -13,11 +14,18 @@ import { useCommandPalette } from "@/hooks/use-command-palette";
 type ShellProps = {
   userEmail?: string | null;
   paymentsEnabled?: boolean;
+  theme?: string;
   children: React.ReactNode;
 };
 
-export function Shell({ paymentsEnabled = false, children }: ShellProps) {
+export function Shell({ paymentsEnabled = false, theme = "system", children }: ShellProps) {
   const { isOpen, open, close } = useCommandPalette();
+  const { setTheme } = useTheme();
+
+  // Sync the user's DB preference with next-themes on mount
+  React.useEffect(() => {
+    setTheme(theme);
+  }, [theme, setTheme]);
 
   return (
     <TimestampProvider>

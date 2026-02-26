@@ -18,15 +18,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const [defaultsRes] = await Promise.all([
     supabase
       .from("user_defaults")
-      .select("payments_enabled")
+      .select("payments_enabled, theme")
       .eq("user_id", user.id)
       .maybeSingle(),
     supabase.rpc("claim_pending_invites"),
   ]);
   const paymentsEnabled = defaultsRes.data?.payments_enabled ?? false;
+  const theme = (defaultsRes.data?.theme as string) ?? "system";
 
   return (
-    <Shell userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled}>
+    <Shell userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled} theme={theme}>
       {children}
     </Shell>
   );

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import { Sun, Moon, Monitor } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -15,8 +17,15 @@ const FORMAT_OPTIONS = [
   { value: "both", label: "Stereo + Atmos" },
 ];
 
+const THEME_OPTIONS = [
+  { value: "light", label: "Light", Icon: Sun },
+  { value: "dark", label: "Dark", Icon: Moon },
+  { value: "system", label: "System", Icon: Monitor },
+] as const;
+
 export default function SettingsPage() {
   const router = useRouter();
+  const { theme: currentTheme, setTheme } = useTheme();
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
 
   const [loading, setLoading] = useState(true);
@@ -113,6 +122,49 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-6">
+        {/* Appearance */}
+        <Panel>
+          <PanelHeader>
+            <h2 className="text-base font-semibold text-text">Appearance</h2>
+            <p className="text-sm text-muted mt-1">
+              Choose your preferred color theme.
+            </p>
+          </PanelHeader>
+          <Rule />
+          <PanelBody className="pt-5">
+            <div className="flex gap-2">
+              {THEME_OPTIONS.map((opt) => {
+                const active = currentTheme === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={async () => {
+                      setTheme(opt.value);
+                      const { data: { user } } = await supabase.auth.getUser();
+                      if (user) {
+                        await supabase.from("user_defaults").upsert(
+                          { user_id: user.id, theme: opt.value },
+                          { onConflict: "user_id" },
+                        );
+                      }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors"
+                    style={
+                      active
+                        ? { background: "var(--signal)", color: "#fff" }
+                        : { background: "var(--panel-2)", color: "var(--muted)" }
+                    }
+                  >
+                    <opt.Icon size={16} strokeWidth={1.5} />
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </PanelBody>
+        </Panel>
+
         {/* Profile */}
         <Panel>
           <PanelHeader>
@@ -279,7 +331,7 @@ export default function SettingsPage() {
                   }
                 }}
                 className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors"
-                style={{ background: paymentsEnabled ? "var(--signal)" : "#ccc" }}
+                style={{ background: paymentsEnabled ? "var(--signal)" : "var(--faint)" }}
               >
                 <span
                   className="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform"

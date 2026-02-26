@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Settings, Search, LogOut, DollarSign } from "lucide-react";
+import { Home, Settings, Search, LogOut, DollarSign, Sun, Moon, Monitor } from "lucide-react";
+import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { usePaymentsEnabled } from "@/lib/payments-context";
 
@@ -20,6 +21,24 @@ export function MobileNav({ onSearchClick }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const paymentsEnabled = usePaymentsEnabled();
+  const { theme, setTheme } = useTheme();
+
+  function cycleTheme() {
+    const next = theme === "system" ? "light" : theme === "light" ? "dark" : "system";
+    setTheme(next);
+    const supabase = createSupabaseBrowserClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        supabase.from("user_defaults").upsert(
+          { user_id: user.id, theme: next },
+          { onConflict: "user_id" },
+        );
+      }
+    });
+  }
+
+  const ThemeIcon = theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
+  const themeLabel = theme === "light" ? "Light" : theme === "dark" ? "Dark" : "Auto";
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
@@ -67,6 +86,14 @@ export function MobileNav({ onSearchClick }: Props) {
       >
         <Search size={20} strokeWidth={1.5} />
         <span className="text-[10px] font-medium">Search</span>
+      </button>
+      <button
+        type="button"
+        onClick={cycleTheme}
+        className="flex flex-col items-center gap-1 px-4 py-2 transition-colors text-muted"
+      >
+        <ThemeIcon size={20} strokeWidth={1.5} />
+        <span className="text-[10px] font-medium">{themeLabel}</span>
       </button>
       <button
         type="button"
