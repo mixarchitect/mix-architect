@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Search, Settings, LogOut } from "lucide-react";
+import { Home, Search, Settings, LogOut, DollarSign } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import { usePaymentsEnabled } from "@/lib/payments-context";
 
 type Props = {
   onSearchClick?: () => void;
@@ -13,6 +14,7 @@ type Props = {
 export function Rail({ onSearchClick }: Props) {
   const pathname = usePathname();
   const router = useRouter();
+  const paymentsEnabled = usePaymentsEnabled();
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
@@ -21,6 +23,7 @@ export function Rail({ onSearchClick }: Props) {
   }
 
   const isHome = pathname === "/app";
+  const isPayments = pathname?.startsWith("/app/payments");
   const isSettings = pathname?.startsWith("/app/settings");
 
   const itemClass = (active?: boolean) =>
@@ -79,6 +82,16 @@ export function Rail({ onSearchClick }: Props) {
         </span>
         <span className={labelClass}>Search</span>
       </button>
+
+      {/* Payments (conditional) */}
+      {paymentsEnabled && (
+        <Link href="/app/payments" className={itemClass(isPayments)}>
+          <span className="w-10 h-10 grid place-items-center shrink-0">
+            <DollarSign size={20} strokeWidth={1.5} />
+          </span>
+          <span className={labelClass}>Payments</span>
+        </Link>
+      )}
 
       {/* Settings */}
       <Link href="/app/settings" className={itemClass(isSettings)}>

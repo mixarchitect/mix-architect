@@ -7,10 +7,7 @@ import { ReleaseCard } from "@/components/ui/release-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SortSelect } from "@/components/ui/sort-select";
 import { Plus } from "lucide-react";
-
-function formatMoney(amount: number, currency = "USD") {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
-}
+import { formatMoney } from "@/lib/format-money";
 
 const VALID_FILTERS = ["outstanding", "earned"] as const;
 type PaymentFilter = (typeof VALID_FILTERS)[number];
@@ -181,6 +178,12 @@ export default async function DashboardPage({ searchParams }: Props) {
               ({earnedCount} of {feeReleaseCount} paid)
             </span>
           </span>
+          <Link
+            href="/app/payments"
+            className="ml-auto text-signal text-xs font-medium hover:underline hidden sm:inline"
+          >
+            View all &rarr;
+          </Link>
           {activeFilter && (
             <span className="basis-full flex items-center gap-2 text-muted pt-1 border-t border-border mt-1">
               Showing {activeFilter} releases ({displayReleases?.length ?? 0})

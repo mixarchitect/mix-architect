@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Settings, Search, LogOut } from "lucide-react";
+import { Home, Settings, Search, LogOut, DollarSign } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import { usePaymentsEnabled } from "@/lib/payments-context";
 
 const NAV_ITEMS = [
   { href: "/app", icon: Home, label: "Home", exact: true },
@@ -18,6 +19,7 @@ type Props = {
 export function MobileNav({ onSearchClick }: Props) {
   const pathname = usePathname();
   const router = useRouter();
+  const paymentsEnabled = usePaymentsEnabled();
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
@@ -46,6 +48,18 @@ export function MobileNav({ onSearchClick }: Props) {
           </Link>
         );
       })}
+      {paymentsEnabled && (
+        <Link
+          href="/app/payments"
+          className={cn(
+            "flex flex-col items-center gap-1 px-4 py-2 transition-colors",
+            pathname?.startsWith("/app/payments") ? "text-signal" : "text-muted",
+          )}
+        >
+          <DollarSign size={20} strokeWidth={1.5} />
+          <span className="text-[10px] font-medium">Payments</span>
+        </Link>
+      )}
       <button
         type="button"
         onClick={onSearchClick}

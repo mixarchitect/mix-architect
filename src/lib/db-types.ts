@@ -35,3 +35,36 @@ export type BriefAudioVersion = {
   id: string;
   track_id: string;
 };
+
+/* ── Payment tracker types ────────────────────────────────────────── */
+
+export type PaymentRelease = {
+  id: string;
+  title: string;
+  artist: string | null;
+  feeTotal: number;
+  feeCurrency: string;
+  paymentStatus: "unpaid" | "partial" | "paid";
+  paidAmount: number;
+  paymentNotes: string | null;
+  updatedAt: string;
+  tracks: PaymentTrack[];
+};
+
+export type PaymentTrack = {
+  id: string;
+  title: string;
+  trackNumber: number;
+  fee: number | null;
+  feePaid: boolean;
+};
+
+export type PaymentSummary = {
+  outstandingTotal: number;
+  earnedTotal: number;
+  grandTotal: number;
+  outstandingCount: number;
+  paidCount: number;
+  totalCount: number;
+  primaryCurrency: string;
+};
