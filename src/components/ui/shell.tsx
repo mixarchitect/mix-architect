@@ -43,7 +43,7 @@ export function Shell({ paymentsEnabled = false, theme = "system", children }: S
     <TimestampProvider>
     <AudioProvider>
       <PaymentsProvider enabled={paymentsEnabled}>
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex h-dvh overflow-hidden">
           {/* Spacer for fixed-position Rail */}
           <div className="hidden md:block w-16 shrink-0" />
           <Rail onSearchClick={open} />

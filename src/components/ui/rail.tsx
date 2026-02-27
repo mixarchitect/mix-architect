@@ -64,7 +64,7 @@ export function Rail({ onSearchClick }: Props) {
   return (
     <nav
       className={cn(
-        "group/rail hidden md:flex fixed left-0 top-0 h-screen z-20",
+        "group/rail hidden md:flex fixed left-0 top-0 h-dvh z-20",
         "w-16 hover:w-48 overflow-hidden",
         "bg-panel border-r border-border",
         "flex-col py-5 gap-1",
