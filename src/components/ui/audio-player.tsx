@@ -700,87 +700,86 @@ export function AudioPlayer({
             const target = parseLufsTarget(targetLoudness);
             const delta = measuredLufs - target;
             return (
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono">
-                <span className="text-faint">·</span>
-                <button
-                  type="button"
-                  onClick={() => setShowStreamingInfo((v) => !v)}
-                  className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
-                  title="Show streaming normalization"
-                >
-                  {measuredLufs.toFixed(1)} LUFS
-                  <ChevronDown
-                    size={10}
+              <span className="relative">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-mono">
+                  <span className="text-faint">·</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowStreamingInfo((v) => !v)}
+                    className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
+                    title="Show streaming normalization"
+                  >
+                    {measuredLufs.toFixed(1)} LUFS
+                    <ChevronDown
+                      size={10}
+                      className={cn(
+                        "transition-transform",
+                        showStreamingInfo && "rotate-180",
+                      )}
+                    />
+                  </button>
+                  <span
                     className={cn(
-                      "transition-transform",
-                      showStreamingInfo && "rotate-180",
+                      "px-1.5 py-px rounded text-[10px]",
+                      Math.abs(delta) <= 0.5
+                        ? "bg-status-green/10 text-status-green"
+                        : Math.abs(delta) <= 1.5
+                          ? "bg-signal-muted text-signal"
+                          : "bg-red-500/10 text-red-500",
                     )}
-                  />
-                </button>
-                <span
-                  className={cn(
-                    "px-1.5 py-px rounded text-[10px]",
-                    Math.abs(delta) <= 0.5
-                      ? "bg-status-green/10 text-status-green"
-                      : Math.abs(delta) <= 1.5
-                        ? "bg-signal-muted text-signal"
-                        : "bg-red-500/10 text-red-500",
-                  )}
-                >
-                  {delta > 0 ? "+" : ""}{delta.toFixed(1)} dB
+                  >
+                    {delta > 0 ? "+" : ""}{delta.toFixed(1)} dB
+                  </span>
                 </span>
+                {/* Streaming normalization dropdown */}
+                {showStreamingInfo && (
+                  <div className="absolute left-0 top-full mt-2 z-20 rounded-md bg-panel2 border border-border overflow-hidden">
+                    <table className="text-[11px] font-mono">
+                      <tbody>
+                        {LOUDNESS_GROUPS.map((group) => {
+                          const targets = LOUDNESS_TARGETS.filter((t) => t.group === group);
+                          return [
+                            <tr key={`h-${group}`}>
+                              <td colSpan={3} className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider font-sans">
+                                {group}
+                              </td>
+                            </tr>,
+                            ...targets.map((t) => {
+                              const adj = measuredLufs - t.lufs;
+                              return (
+                                <tr key={t.name} className="leading-6">
+                                  <td className="pl-3 pr-4 text-muted font-sans whitespace-nowrap">{t.name}</td>
+                                  <td className="pr-4 text-faint text-right whitespace-nowrap">{t.lufs}</td>
+                                  <td
+                                    className={cn(
+                                      "pr-3 text-right whitespace-nowrap",
+                                      Math.abs(adj) < 0.05
+                                        ? "text-status-green"
+                                        : adj > 0
+                                          ? "text-signal"
+                                          : "text-muted",
+                                    )}
+                                  >
+                                    {Math.abs(adj) < 0.05
+                                      ? "no change"
+                                      : adj > 0
+                                        ? `−${adj.toFixed(1)} dB`
+                                        : `+${Math.abs(adj).toFixed(1)} dB`}
+                                  </td>
+                                </tr>
+                              );
+                            }),
+                          ];
+                        })}
+                      </tbody>
+                    </table>
+                    <div className="h-1.5" />
+                  </div>
+                )}
               </span>
             );
           })()}
         </div>
-
-        {/* Streaming normalization dropdown */}
-        {showStreamingInfo && measuredLufs != null && (
-          <div className="px-5 mt-2">
-          <div className="rounded-md bg-panel2 border border-border overflow-hidden inline-block">
-            <table className="text-[11px] font-mono">
-              <tbody>
-                {LOUDNESS_GROUPS.map((group) => {
-                  const targets = LOUDNESS_TARGETS.filter((t) => t.group === group);
-                  return [
-                    <tr key={`h-${group}`}>
-                      <td colSpan={3} className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider font-sans">
-                        {group}
-                      </td>
-                    </tr>,
-                    ...targets.map((t) => {
-                      const adj = measuredLufs - t.lufs;
-                      return (
-                        <tr key={t.name} className="leading-6">
-                          <td className="pl-3 pr-4 text-muted font-sans whitespace-nowrap">{t.name}</td>
-                          <td className="pr-4 text-faint text-right whitespace-nowrap">{t.lufs}</td>
-                          <td
-                            className={cn(
-                              "pr-3 text-right whitespace-nowrap",
-                              Math.abs(adj) < 0.05
-                                ? "text-status-green"
-                                : adj > 0
-                                  ? "text-signal"
-                                  : "text-muted",
-                            )}
-                          >
-                            {Math.abs(adj) < 0.05
-                              ? "no change"
-                              : adj > 0
-                                ? `−${adj.toFixed(1)} dB`
-                                : `+${Math.abs(adj).toFixed(1)} dB`}
-                          </td>
-                        </tr>
-                      );
-                    }),
-                  ];
-                })}
-              </tbody>
-            </table>
-            <div className="h-1.5" />
-          </div>
-          </div>
-        )}
 
         {/* Comment markers above waveform */}
         <div className="relative px-5 mt-3 h-5">
