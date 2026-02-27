@@ -200,7 +200,7 @@ export function AudioPlayer({
   const [showStreamingInfo, setShowStreamingInfo] = useState(false);
   const measureAbortRef = useRef<AbortController | null>(null);
   const lufsButtonRef = useRef<HTMLButtonElement | null>(null);
-  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
 
   // Position the streaming dropdown under the LUFS button (fixed, escapes overflow)
   useEffect(() => {
@@ -210,7 +210,7 @@ export function AudioPlayer({
     }
     const update = () => {
       const rect = lufsButtonRef.current?.getBoundingClientRect();
-      if (rect) setDropdownPos({ top: rect.bottom + 6, left: rect.left });
+      if (rect) setDropdownPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
     };
     update();
     window.addEventListener("scroll", update, true);
@@ -721,7 +721,7 @@ export function AudioPlayer({
             const target = parseLufsTarget(targetLoudness);
             const delta = measuredLufs - target;
             return (
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono">
+              <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-mono">
                 <span className="text-faint">·</span>
                 <button
                   ref={lufsButtonRef}
@@ -915,7 +915,7 @@ export function AudioPlayer({
       {showStreamingInfo && measuredLufs != null && dropdownPos && (
         <div
           className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden"
-          style={{ top: dropdownPos.top, left: dropdownPos.left, background: "var(--panel-2)" }}
+          style={{ top: dropdownPos.top, right: dropdownPos.right, background: "var(--panel-2)" }}
         >
           <table className="text-[11px] font-mono">
             <tbody>
