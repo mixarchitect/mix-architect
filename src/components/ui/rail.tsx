@@ -80,7 +80,7 @@ export function Rail({ onSearchClick }: Props) {
         <img
           src={mounted && resolvedTheme === "dark" ? "/mix-architect-icon-dark.svg" : "/mix-architect-icon.svg"}
           alt="Mix Architect"
-          className="w-8 h-8 shrink-0 block group-hover/rail:hidden ml-1"
+          className="w-8 h-8 shrink-0 block group-hover/rail:hidden"
         />
         {/* Expanded: full wordmark logo — white variant in dark mode */}
         <img
