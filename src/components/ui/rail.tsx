@@ -77,11 +77,13 @@ export function Rail({ onSearchClick }: Props) {
         className="flex items-center px-3 mb-5 h-10 hover:opacity-90 transition-opacity"
       >
         {/* Collapsed: icon only — dark variant has all-white internals */}
-        <img
-          src={mounted && resolvedTheme === "dark" ? "/mix-architect-icon-dark.svg" : "/mix-architect-icon.svg"}
-          alt="Mix Architect"
-          className="w-8 h-8 shrink-0 block group-hover/rail:hidden"
-        />
+        <span className="w-10 h-10 grid place-items-center shrink-0 group-hover/rail:hidden">
+          <img
+            src={mounted && resolvedTheme === "dark" ? "/mix-architect-icon-dark.svg" : "/mix-architect-icon.svg"}
+            alt="Mix Architect"
+            className="w-7 h-7"
+          />
+        </span>
         {/* Expanded: full wordmark logo — white variant in dark mode */}
         <img
           src={mounted && resolvedTheme === "dark" ? "/mix-architect-logo-white.svg" : "/mix-architect-logo.svg"}
