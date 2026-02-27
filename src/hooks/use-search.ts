@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 
-export type SearchResultType = "release" | "track" | "reference";
+export type SearchResultType = "artist" | "release" | "track" | "reference";
 
 export type SearchResult = {
   id: string;
@@ -48,7 +48,7 @@ export function useSearch() {
 
           supabase
             .from("tracks")
-            .select("id, title, status, track_number, release_id, releases(id, title)")
+            .select("id, title, status, track_number, release_id, releases(id, title, artist)")
             .ilike("title", pattern)
             .order("updated_at", { ascending: false })
             .limit(5),
@@ -62,7 +62,23 @@ export function useSearch() {
 
         const mapped: SearchResult[] = [];
 
+        // Deduplicate artist names from matching releases
         if (releasesRes.data) {
+          const seenArtists = new Set<string>();
+          for (const r of releasesRes.data) {
+            const artist = r.artist as string | null;
+            if (artist && !seenArtists.has(artist.toLowerCase())) {
+              seenArtists.add(artist.toLowerCase());
+              mapped.push({
+                id: `artist-${artist}`,
+                type: "artist",
+                title: artist,
+                subtitle: null,
+                href: `/app?artist=${encodeURIComponent(artist)}`,
+              });
+            }
+          }
+
           for (const r of releasesRes.data) {
             mapped.push({
               id: r.id,
@@ -78,11 +94,13 @@ export function useSearch() {
         if (tracksRes.data) {
           for (const t of tracksRes.data) {
             const release = Array.isArray(t.releases) ? t.releases[0] : t.releases;
+            const rel = release as { title?: string; artist?: string } | null;
+            const parts = [rel?.artist, rel?.title].filter(Boolean);
             mapped.push({
               id: t.id,
               type: "track",
               title: t.title,
-              subtitle: (release as { title?: string } | null)?.title ?? null,
+              subtitle: parts.length > 0 ? parts.join(" · ") : null,
               href: `/app/releases/${t.release_id}/tracks/${t.id}`,
               status: t.status,
             });

@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Disc3, Music2, Bookmark, CornerDownLeft, X } from "lucide-react";
+import { Search, Disc3, Music2, Bookmark, CornerDownLeft, X, User } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useSearch, type SearchResult, type SearchResultType } from "@/hooks/use-search";
 
@@ -12,12 +12,14 @@ type Props = {
 };
 
 const TYPE_ICON: Record<SearchResultType, typeof Disc3> = {
+  artist: User,
   release: Disc3,
   track: Music2,
   reference: Bookmark,
 };
 
 const TYPE_LABEL: Record<SearchResultType, string> = {
+  artist: "Artists",
   release: "Releases",
   track: "Tracks",
   reference: "References",
@@ -99,7 +101,7 @@ export function CommandPalette({ isOpen, onClose }: Props) {
 
   // Group results by type: releases, tracks, references
   const grouped: { type: SearchResultType; items: SearchResult[] }[] = [];
-  const order: SearchResultType[] = ["release", "track", "reference"];
+  const order: SearchResultType[] = ["artist", "release", "track", "reference"];
   for (const type of order) {
     const items = results.filter((r) => r.type === type);
     if (items.length > 0) grouped.push({ type, items });
