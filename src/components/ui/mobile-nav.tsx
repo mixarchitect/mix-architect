@@ -30,7 +30,7 @@ export function MobileNav({ onSearchClick }: Props) {
     const next = theme === "system" ? "light" : theme === "light" ? "dark" : "system";
     setTheme(next);
     const supabase = createSupabaseBrowserClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: { data: { user: { id: string } | null } }) => {
       if (user) {
         supabase.from("user_defaults").upsert(
           { user_id: user.id, theme: next },

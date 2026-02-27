@@ -26,7 +26,7 @@ export function Rail({ onSearchClick }: Props) {
     setTheme(next);
     // Fire-and-forget DB persist
     const supabase = createSupabaseBrowserClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: { data: { user: { id: string } | null } }) => {
       if (user) {
         supabase.from("user_defaults").upsert(
           { user_id: user.id, theme: next },

@@ -22,14 +22,14 @@ export function PaymentsProvider({
   // Also verify from the DB on mount so stale server-rendered values get corrected
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: { data: { user: { id: string } | null } }) => {
       if (!user) return;
       supabase
         .from("user_defaults")
         .select("payments_enabled")
         .eq("user_id", user.id)
         .maybeSingle()
-        .then(({ data }) => {
+        .then(({ data }: { data: { payments_enabled?: boolean } | null }) => {
           setClientEnabled(data?.payments_enabled ?? false);
         });
     });
