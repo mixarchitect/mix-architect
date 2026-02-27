@@ -16,11 +16,11 @@ const VALID_SORTS = ["modified", "created", "az"] as const;
 type SortOption = (typeof VALID_SORTS)[number];
 
 type Props = {
-  searchParams: Promise<{ payment?: string; sort?: string }>;
+  searchParams: Promise<{ payment?: string; sort?: string; artist?: string }>;
 };
 
 export default async function DashboardPage({ searchParams }: Props) {
-  const { payment, sort } = await searchParams;
+  const { payment, sort, artist: artistFilter } = await searchParams;
   const activeSort: SortOption =
     sort && VALID_SORTS.includes(sort as SortOption) ? (sort as SortOption) : "modified";
 
@@ -112,13 +112,21 @@ export default async function DashboardPage({ searchParams }: Props) {
       ? (payment as PaymentFilter)
       : null;
 
-  const displayReleases = activeFilter && releases
+  let displayReleases = activeFilter && releases
     ? releases.filter((r) => {
         const status = (r.payment_status as string) ?? "no_fee";
         if (status === "no_fee") return false;
         return activeFilter === "outstanding" ? status !== "paid" : status === "paid";
       })
     : releases;
+
+  // Artist filter
+  if (artistFilter && displayReleases) {
+    const lowerArtist = artistFilter.toLowerCase();
+    displayReleases = displayReleases.filter(
+      (r) => (r.artist as string | null)?.toLowerCase() === lowerArtist,
+    );
+  }
 
   return (
     <div>
@@ -131,6 +139,15 @@ export default async function DashboardPage({ searchParams }: Props) {
           </Button>
         </Link>
       </div>
+
+      {artistFilter && (
+        <div className="flex items-center gap-2 text-sm text-muted mb-6">
+          Showing releases by <span className="font-semibold text-text">{artistFilter}</span>
+          <Link href="/app" className="text-signal hover:underline text-xs">
+            Show all
+          </Link>
+        </div>
+      )}
 
       {paymentsEnabled && hasAnyFees && (
         <div

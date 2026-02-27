@@ -14,7 +14,7 @@ export default async function TrackDetailPage({ params }: Props) {
   // Fire all queries in parallel — track, release, and sub-tables
   const [trackRes, releaseRes, intentRes, specsRes, notesRes, refsRes, distributionRes, splitsRes, audioVersionsRes] = await Promise.all([
     supabase.from("tracks").select("*").eq("id", trackId).maybeSingle(),
-    supabase.from("releases").select("title, format, cover_art_url").eq("id", releaseId).maybeSingle(),
+    supabase.from("releases").select("title, artist, format, cover_art_url").eq("id", releaseId).maybeSingle(),
     supabase.from("track_intent").select("*").eq("track_id", trackId).maybeSingle(),
     supabase.from("track_specs").select("*").eq("track_id", trackId).maybeSingle(),
     supabase
@@ -50,6 +50,7 @@ export default async function TrackDetailPage({ params }: Props) {
     <TrackDetailClient
       releaseId={releaseId}
       releaseTitle={release?.title ?? ""}
+      artistName={release?.artist ?? null}
       releaseFormat={release?.format ?? "stereo"}
       releaseCoverArt={release?.cover_art_url ?? null}
       track={track}

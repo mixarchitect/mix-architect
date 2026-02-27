@@ -103,6 +103,7 @@ type SplitData = {
 type Props = {
   releaseId: string;
   releaseTitle: string;
+  artistName?: string | null;
   releaseFormat: string;
   releaseCoverArt?: string | null;
   track: TrackData;
@@ -119,7 +120,7 @@ type Props = {
 };
 
 export function TrackDetailClient({
-  releaseId, releaseTitle, releaseFormat, releaseCoverArt,
+  releaseId, releaseTitle, artistName, releaseFormat, releaseCoverArt,
   track, intent, specs, samplyUrl, audioVersions, notes, references, distribution, splits, role,
   currentUserName,
 }: Props) {
@@ -433,6 +434,17 @@ export function TrackDetailClient({
               alt=""
               className="w-8 h-8 rounded object-cover flex-shrink-0"
             />
+          )}
+          {artistName && (
+            <>
+              <Link
+                href={`/app?artist=${encodeURIComponent(artistName)}`}
+                className="text-sm text-muted hover:text-signal transition-colors shrink-0"
+              >
+                {artistName}
+              </Link>
+              <span className="text-faint">·</span>
+            </>
           )}
           <Link
             href={`/app/releases/${releaseId}`}

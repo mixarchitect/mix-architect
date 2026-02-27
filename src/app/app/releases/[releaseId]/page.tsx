@@ -82,6 +82,17 @@ export default async function ReleasePage({ params }: Props) {
             Releases
           </Link>
           <span className="text-faint">/</span>
+          {release.artist && (
+            <>
+              <Link
+                href={`/app?artist=${encodeURIComponent(release.artist as string)}`}
+                className="text-sm text-muted hover:text-signal transition-colors shrink-0"
+              >
+                {release.artist as string}
+              </Link>
+              <span className="text-faint">·</span>
+            </>
+          )}
           <h1 className="text-2xl font-semibold h2 text-text truncate">{release.title}</h1>
         </div>
         <div className="flex items-center gap-2 shrink-0">
