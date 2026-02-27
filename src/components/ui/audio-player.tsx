@@ -914,8 +914,8 @@ export function AudioPlayer({
       {/* Streaming normalization dropdown — fixed position to escape overflow-hidden */}
       {showStreamingInfo && measuredLufs != null && dropdownPos && (
         <div
-          className="fixed z-50 rounded-md bg-panel2 border border-border shadow-lg overflow-hidden"
-          style={{ top: dropdownPos.top, left: dropdownPos.left }}
+          className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden"
+          style={{ top: dropdownPos.top, left: dropdownPos.left, background: "var(--panel-2)" }}
         >
           <table className="text-[11px] font-mono">
             <tbody>
