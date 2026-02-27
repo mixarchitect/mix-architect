@@ -68,7 +68,6 @@ type AudioPlayerProps = {
   trackTitle: string;
   releaseTitle: string;
   currentUserName: string;
-  targetLoudness: string | null;
   onVersionsChange: (v: AudioVersionData[]) => void;
   onCommentsChange: (c: TimelineComment[]) => void;
 };
@@ -111,12 +110,8 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-/** Parse numeric LUFS value from a string like "-14 LUFS". Defaults to -14. */
-function parseLufsTarget(target: string | null): number {
-  if (!target) return -14;
-  const match = target.match(/-?\d+(\.\d+)?/);
-  return match ? parseFloat(match[0]) : -14;
-}
+/** Reference LUFS target used for the delta badge comparison. */
+const LUFS_REFERENCE = -14;
 
 /** Loudness targets for the streaming / broadcast / social normalization table. */
 const LOUDNESS_TARGETS = [
@@ -154,7 +149,6 @@ export function AudioPlayer({
   trackTitle,
   releaseTitle,
   currentUserName,
-  targetLoudness,
   onVersionsChange,
   onCommentsChange,
 }: AudioPlayerProps) {
@@ -718,8 +712,7 @@ export function AudioPlayer({
             </span>
           )}
           {measuredLufs != null && !measuring && (() => {
-            const target = parseLufsTarget(targetLoudness);
-            const delta = measuredLufs - target;
+            const delta = measuredLufs - LUFS_REFERENCE;
             return (
               <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-mono">
                 <span className="text-faint">·</span>
