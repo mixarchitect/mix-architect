@@ -736,8 +736,8 @@ export function AudioPlayer({
 
         {/* Streaming normalization dropdown */}
         {showStreamingInfo && measuredLufs != null && (
-          <div className="flex justify-end px-5 mt-2">
-          <div className="rounded-md bg-panel2 border border-border overflow-hidden">
+          <div className="px-5 mt-2">
+          <div className="rounded-md bg-panel2 border border-border overflow-hidden inline-block">
             <table className="text-[11px] font-mono">
               <tbody>
                 {LOUDNESS_GROUPS.map((group) => {
