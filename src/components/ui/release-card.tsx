@@ -162,6 +162,9 @@ export function ReleaseCard({
           <div ref={menuRef} className="relative">
             <button
               type="button"
+              aria-label="Release options"
+              aria-haspopup="true"
+              aria-expanded={menuOpen}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -177,12 +180,13 @@ export function ReleaseCard({
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-1 w-44 rounded-md border border-border bg-panel shadow-lg py-1 text-sm z-20">
+              <div role="menu" className="absolute right-0 mt-1 w-44 rounded-md border border-border bg-panel shadow-lg py-1 text-sm z-20">
                 {!confirming ? (
                   <>
                     {canEdit(role ?? "owner") && (
                       <button
                         type="button"
+                        role="menuitem"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -198,6 +202,7 @@ export function ReleaseCard({
                     {canEdit(role ?? "owner") && (
                       <button
                         type="button"
+                        role="menuitem"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -213,12 +218,13 @@ export function ReleaseCard({
                     {canDeleteRelease(role ?? "owner") && (
                       <button
                         type="button"
+                        role="menuitem"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           setConfirming(true);
                         }}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-red-500 hover:bg-red-50 transition-colors text-left"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-left"
                       >
                         <Trash2 size={14} />
                         Delete Release
@@ -285,9 +291,9 @@ export function ReleaseCard({
             {paymentsEnabled && paymentStatus && paymentStatus !== "no_fee" && (
               <span className={cn(
                 "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium",
-                paymentStatus === "paid" && "bg-green-100 text-green-700",
-                paymentStatus === "partial" && "bg-amber-100 text-amber-700",
-                paymentStatus === "unpaid" && "bg-zinc-100 text-zinc-500",
+                paymentStatus === "paid" && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+                paymentStatus === "partial" && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+                paymentStatus === "unpaid" && "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
               )}>
                 {paymentStatus === "paid" ? "Paid" : paymentStatus === "partial" ? "Partial" : "Unpaid"}
                 {feeTotal != null && ` \u2022 ${new Intl.NumberFormat("en-US", { style: "currency", currency: feeCurrency || "USD" }).format(feeTotal)}`}

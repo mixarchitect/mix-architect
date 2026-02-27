@@ -13,11 +13,13 @@ type Props = {
 
 export function TabBar({ tabs, activeTab, onTabChange, className }: Props) {
   return (
-    <div className={cn("flex gap-0 border-b border-border", className)}>
+    <div role="tablist" className={cn("flex gap-0 border-b border-border", className)}>
       {tabs.map((tab) => (
         <button
           key={tab.id}
           type="button"
+          role="tab"
+          aria-selected={activeTab === tab.id}
           onClick={() => onTabChange(tab.id)}
           className={cn(
             "px-4 py-2.5 text-sm font-medium transition-colors relative",

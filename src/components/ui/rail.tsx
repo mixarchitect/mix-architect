@@ -63,6 +63,7 @@ export function Rail({ onSearchClick }: Props) {
 
   return (
     <nav
+      aria-label="App navigation"
       className={cn(
         "group/rail hidden md:flex fixed left-0 top-0 h-dvh z-20",
         "w-16 hover:w-48 overflow-hidden",
@@ -138,6 +139,7 @@ export function Rail({ onSearchClick }: Props) {
       <button
         type="button"
         onClick={handleSignOut}
+        aria-label="Sign out"
         className={itemClass()}
       >
         <span className="w-10 h-10 grid place-items-center shrink-0">

@@ -1,4 +1,3 @@
-import * as React from "react";
 import { cn } from "@/lib/cn";
 
 type Props = {
@@ -27,7 +26,7 @@ export function StatTile({
         className
       )}
     >
-      <div className={cn("relative z-10", variant === "accent" && "")}>
+      <div className="relative z-10">
         <div
           className={cn(
             "label text-[11px]",

@@ -221,6 +221,12 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
   const itunesDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
+  useEffect(() => {
+    return () => {
+      if (itunesDebounceRef.current) clearTimeout(itunesDebounceRef.current);
+    };
+  }, []);
+
   function resetForm() {
     setRefTitle("");
     setRefArtist("");

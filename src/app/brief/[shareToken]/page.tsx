@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { notFound } from "next/navigation";
 import { Rule } from "@/components/ui/rule";
 import type { BriefTrack, BriefIntent, BriefSpec, BriefReference, BriefAudioVersion } from "@/lib/db-types";
@@ -8,11 +8,7 @@ type Props = { params: Promise<{ shareToken: string }> };
 export default async function SharedBriefPage({ params }: Props) {
   const { shareToken } = await params;
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => [], setAll: () => {} } },
-  );
+  const supabase = await createSupabaseServerClient();
 
   const { data: share, error: shareErr } = await supabase
     .from("brief_shares")

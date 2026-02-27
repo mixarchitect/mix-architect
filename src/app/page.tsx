@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
 import { Rule } from "@/components/ui/rule";
 import { FileText, Layers, Share2, CheckCircle2, ArrowRight } from "lucide-react";
@@ -11,7 +10,7 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────────────────
           FLOATING NAV
       ───────────────────────────────────────────────────── */}
-      <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
+      <nav aria-label="Main" className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
         <div className="w-[calc(100vw-24px)] sm:w-[92vw] md:w-[78vw] lg:w-[1100px] max-w-6xl flex items-center gap-3 bg-white/95 backdrop-blur-sm border border-border-strong rounded-full px-3 py-3 shadow-float">
           <Link href="/" className="flex items-center pl-2 pr-4">
             <Image
@@ -25,30 +24,26 @@ export default function HomePage() {
           </Link>
           
           <div className="hidden md:flex flex-1 items-center justify-center gap-1 text-sm">
-            <Link 
-              href="#features" 
+            <a
+              href="#features"
               className="px-4 py-2 rounded-full text-muted hover:text-text hover:bg-panel-2 transition-colors"
             >
               Features
-            </Link>
-            <Link 
-              href="#how-it-works" 
+            </a>
+            <a
+              href="#how-it-works"
               className="px-4 py-2 rounded-full text-muted hover:text-text hover:bg-panel-2 transition-colors"
             >
               How it works
-            </Link>
+            </a>
           </div>
 
           <div className="flex items-center gap-2 pl-2">
-            <Link href="/auth/sign-in">
-              <button className="px-4 py-2 text-sm text-muted hover:text-text transition-colors">
-                Sign in
-              </button>
+            <Link href="/auth/sign-in" className="px-4 py-2 text-sm text-muted hover:text-text transition-colors">
+              Sign in
             </Link>
-            <Link href="/app">
-              <button className="px-5 py-2 text-sm font-semibold text-white bg-signal rounded-full hover:bg-signal/90 transition-colors">
-                Get started
-              </button>
+            <Link href="/app" className="px-5 py-2 text-sm font-semibold text-white bg-signal rounded-full hover:bg-signal/90 transition-colors">
+              Get started
             </Link>
           </div>
         </div>
@@ -90,17 +85,13 @@ export default function HomePage() {
           </p>
 
           <div className="mt-12 flex flex-wrap justify-center gap-4">
-            <Link href="/app">
-              <Button variant="primary" className="h-14 px-10 text-base">
-                Start for free
-                <ArrowRight size={18} />
-              </Button>
+            <Link href="/app" className="btn-primary h-14 px-10 text-base inline-flex items-center gap-2">
+              Start for free
+              <ArrowRight size={18} />
             </Link>
-            <Link href="#how-it-works">
-              <Button variant="secondary" className="h-14 px-10 text-base bg-white text-text border-white hover:bg-white/90">
-                See how it works
-              </Button>
-            </Link>
+            <a href="#how-it-works" className="btn-secondary h-14 px-10 text-base inline-flex items-center gap-2 bg-white text-text border-white hover:bg-white/90">
+              See how it works
+            </a>
           </div>
 
           <p className="mt-8 text-sm text-white/50">
@@ -250,11 +241,9 @@ export default function HomePage() {
             Start organizing your projects today. It&apos;s free.
           </p>
           <div className="mt-8">
-            <Link href="/app">
-              <Button variant="primary" className="h-12 px-8 text-base">
-                Get started for free
-                <ArrowRight size={18} />
-              </Button>
+            <Link href="/app" className="btn-primary h-12 px-8 text-base inline-flex items-center gap-2">
+              Get started for free
+              <ArrowRight size={18} />
             </Link>
           </div>
         </div>

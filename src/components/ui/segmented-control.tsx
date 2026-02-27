@@ -13,11 +13,13 @@ type Props = {
 
 export function SegmentedControl({ options, value, onChange, className }: Props) {
   return (
-    <div className={cn("inline-flex rounded-sm border border-border p-0.5 bg-panel2", className)}>
+    <div role="radiogroup" className={cn("inline-flex rounded-sm border border-border p-0.5 bg-panel2", className)}>
       {options.map((opt) => (
         <button
           key={opt.value}
           type="button"
+          role="radio"
+          aria-checked={value === opt.value}
           onClick={() => onChange(opt.value)}
           className={cn(
             "px-4 py-2 text-sm font-medium rounded-[7px] transition-all duration-150",

@@ -7,10 +7,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
 
   // Defense-in-depth: middleware should catch this, but guard here too
-  if (!user) {
+  if (error || !user) {
     redirect("/auth/sign-in");
   }
 

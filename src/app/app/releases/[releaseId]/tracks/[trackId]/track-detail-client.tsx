@@ -226,6 +226,13 @@ export function TrackDetailClient({
     [supabase, track.id],
   );
 
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (itunesDebounceRef.current) clearTimeout(itunesDebounceRef.current);
+    };
+  }, []);
+
   function saveIntent(data: Record<string, unknown>) {
     autoSave("track_intent", data, "track_id", track.id);
   }
@@ -376,6 +383,7 @@ export function TrackDetailClient({
     const { data } = await supabase
       .from("mix_references")
       .insert({
+        release_id: releaseId,
         track_id: track.id,
         song_title: refTitle.trim(),
         artist: refArtist || null,
