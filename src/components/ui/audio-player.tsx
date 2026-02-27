@@ -199,17 +199,17 @@ export function AudioPlayer({
   const [measuring, setMeasuring] = useState(false);
   const [showStreamingInfo, setShowStreamingInfo] = useState(false);
   const measureAbortRef = useRef<AbortController | null>(null);
-  const lufsButtonRef = useRef<HTMLButtonElement | null>(null);
+  const lufsBadgeRef = useRef<HTMLSpanElement | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
 
   // Position the streaming dropdown under the LUFS button (fixed, escapes overflow)
   useEffect(() => {
-    if (!showStreamingInfo || !lufsButtonRef.current) {
+    if (!showStreamingInfo || !lufsBadgeRef.current) {
       setDropdownPos(null);
       return;
     }
     const update = () => {
-      const rect = lufsButtonRef.current?.getBoundingClientRect();
+      const rect = lufsBadgeRef.current?.getBoundingClientRect();
       if (rect) setDropdownPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
     };
     update();
@@ -724,7 +724,6 @@ export function AudioPlayer({
               <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-mono">
                 <span className="text-faint">·</span>
                 <button
-                  ref={lufsButtonRef}
                   type="button"
                   onClick={() => setShowStreamingInfo((v) => !v)}
                   className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
@@ -740,6 +739,7 @@ export function AudioPlayer({
                   />
                 </button>
                 <span
+                  ref={lufsBadgeRef}
                   className={cn(
                     "px-1.5 py-px rounded text-[10px]",
                     Math.abs(delta) <= 0.5
