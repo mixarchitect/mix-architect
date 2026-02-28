@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
 import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
+import { PortalSettingsEditor } from "./portal-settings-editor";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
 
@@ -33,7 +34,7 @@ export default async function ReleasePage({ params }: Props) {
   const supabase = await createSupabaseServerClient();
 
   // Fire all independent queries in parallel
-  const [releaseRes, userRes, tracksRes, globalRefsRes] = await Promise.all([
+  const [releaseRes, userRes, tracksRes, globalRefsRes, briefShareRes] = await Promise.all([
     supabase.from("releases").select("*").eq("id", releaseId).maybeSingle(),
     supabase.auth.getUser(),
     supabase
@@ -47,6 +48,11 @@ export default async function ReleasePage({ params }: Props) {
       .eq("release_id", releaseId)
       .is("track_id", null)
       .order("sort_order"),
+    supabase
+      .from("brief_shares")
+      .select("*")
+      .eq("release_id", releaseId)
+      .maybeSingle(),
   ]);
 
   const release = releaseRes.data;
@@ -276,6 +282,23 @@ export default async function ReleasePage({ params }: Props) {
               role={role}
             />
           )}
+
+          {/* Client Portal */}
+          <PortalSettingsEditor
+            releaseId={releaseId}
+            initialShare={briefShareRes.data ? {
+              id: briefShareRes.data.id,
+              share_token: briefShareRes.data.share_token,
+              portal_mode: briefShareRes.data.portal_mode ?? "brief",
+              show_direction: briefShareRes.data.show_direction ?? true,
+              show_specs: briefShareRes.data.show_specs ?? true,
+              show_references: briefShareRes.data.show_references ?? true,
+              show_payment_status: briefShareRes.data.show_payment_status ?? false,
+              show_distribution: briefShareRes.data.show_distribution ?? false,
+              require_payment_for_download: briefShareRes.data.require_payment_for_download ?? false,
+            } : null}
+            role={role}
+          />
         </aside>
       </div>
     </div>

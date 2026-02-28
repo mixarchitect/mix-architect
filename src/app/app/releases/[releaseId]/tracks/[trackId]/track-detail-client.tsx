@@ -19,6 +19,7 @@ import { AudioPlayer, type AudioVersionData, type TimelineComment } from "@/comp
 import { ArrowLeft, Bookmark, Check, Plus, X } from "lucide-react";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
 import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
+import { PortalTrackEditor } from "./portal-track-editor";
 
 const TABS = [
   { id: "intent", label: "Intent" },
@@ -117,12 +118,13 @@ type Props = {
   splits: SplitData[];
   role: ReleaseRole;
   currentUserName: string;
+  portalShareId: string | null;
 };
 
 export function TrackDetailClient({
   releaseId, releaseTitle, artistName, releaseFormat, releaseCoverArt,
   track, intent, specs, samplyUrl, audioVersions, notes, references, distribution, splits, role,
-  currentUserName,
+  currentUserName, portalShareId,
 }: Props) {
   const TAB_IDS = TABS.map((t) => t.id);
   const [activeTab, setActiveTab] = useState(() => {
@@ -689,6 +691,15 @@ export function TrackDetailClient({
                   </div>
                 </PanelBody>
               </Panel>
+              <PortalTrackEditor
+                briefShareId={portalShareId}
+                trackId={track.id}
+                audioVersions={localAudioVersions.map((v) => ({
+                  id: v.id,
+                  version_number: v.version_number,
+                }))}
+                role={role}
+              />
             </div>
           )}
 

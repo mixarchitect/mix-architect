@@ -12,7 +12,7 @@ export default async function TrackDetailPage({ params }: Props) {
   const supabase = await createSupabaseServerClient();
 
   // Fire all queries in parallel — track, release, and sub-tables
-  const [trackRes, releaseRes, intentRes, specsRes, notesRes, refsRes, distributionRes, splitsRes, audioVersionsRes] = await Promise.all([
+  const [trackRes, releaseRes, intentRes, specsRes, notesRes, refsRes, distributionRes, splitsRes, audioVersionsRes, briefShareRes] = await Promise.all([
     supabase.from("tracks").select("*").eq("id", trackId).eq("release_id", releaseId).maybeSingle(),
     supabase.from("releases").select("title, artist, format, cover_art_url").eq("id", releaseId).maybeSingle(),
     supabase.from("track_intent").select("*").eq("track_id", trackId).maybeSingle(),
@@ -34,6 +34,11 @@ export default async function TrackDetailPage({ params }: Props) {
       .select("*")
       .eq("track_id", trackId)
       .order("version_number"),
+    supabase
+      .from("brief_shares")
+      .select("id, portal_mode")
+      .eq("release_id", releaseId)
+      .maybeSingle(),
   ]);
 
   const track = trackRes.data;
@@ -64,6 +69,7 @@ export default async function TrackDetailPage({ params }: Props) {
       splits={splitsRes.data ?? []}
       role={role}
       currentUserName={currentUserName}
+      portalShareId={briefShareRes.data?.id ?? null}
     />
   );
 }
