@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
-import { Globe, Share2, Check } from "lucide-react";
+import { Globe, Share2, Check, ExternalLink } from "lucide-react";
 
 type ShareData = {
   id: string;
@@ -108,14 +108,8 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
         disabled={toggling}
         className="btn-secondary !px-3 !gap-2"
       >
-        <Globe
-          size={16}
-          className="cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation();
-            active && setOpen((v) => !v);
-          }}
-        />
+        <Globe size={16} />
+        <span className="text-sm font-semibold">Portal</span>
 
         {/* Toggle switch */}
         <span
@@ -133,15 +127,27 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
           />
         </span>
 
-        {/* Share icon (only when active) */}
+        {/* Actions (only when active) */}
         {active && (
-          <span
-            onClick={handleShare}
-            className="inline-flex items-center cursor-pointer text-muted hover:text-text transition-colors"
-            title={copied ? "Copied!" : "Copy portal link"}
-          >
-            {copied ? <Check size={16} /> : <Share2 size={16} />}
-          </span>
+          <>
+            <span
+              onClick={handleShare}
+              className="inline-flex items-center cursor-pointer text-muted hover:text-text transition-colors"
+              title={copied ? "Copied!" : "Copy portal link"}
+            >
+              {copied ? <Check size={16} /> : <Share2 size={16} />}
+            </span>
+            <a
+              href={`${typeof window !== "undefined" ? window.location.origin : ""}/portal/${share!.share_token}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center text-muted hover:text-text transition-colors"
+              title="Open portal"
+            >
+              <ExternalLink size={16} />
+            </a>
+          </>
         )}
       </button>
 
