@@ -116,6 +116,7 @@ export default async function ReleasePage({ params }: Props) {
               releaseId={releaseId}
               initialActive={briefShareRes.data?.active ?? false}
               initialShareId={briefShareRes.data?.id ?? null}
+              initialShareToken={briefShareRes.data?.share_token ?? null}
             />
           )}
           {canEdit(role) && (

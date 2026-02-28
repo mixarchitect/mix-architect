@@ -3,23 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
-import { Globe } from "lucide-react";
+import { Globe, ExternalLink } from "lucide-react";
 
 type PortalToggleProps = {
   releaseId: string;
   initialActive: boolean;
   initialShareId: string | null;
+  initialShareToken: string | null;
 };
 
 export function PortalToggle({
   releaseId,
   initialActive,
   initialShareId,
+  initialShareToken,
 }: PortalToggleProps) {
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
   const [active, setActive] = useState(initialActive);
   const [shareId, setShareId] = useState(initialShareId);
+  const [shareToken, setShareToken] = useState(initialShareToken);
   const [toggling, setToggling] = useState(false);
 
   async function handleToggle() {
@@ -46,10 +49,11 @@ export function PortalToggle({
         const { data } = await supabase
           .from("brief_shares")
           .insert({ release_id: releaseId, active: true })
-          .select("id")
+          .select("id, share_token")
           .single();
         if (data) {
           setShareId(data.id);
+          setShareToken(data.share_token);
           setActive(true);
         }
       }
@@ -59,31 +63,44 @@ export function PortalToggle({
     }
   }
 
+  const portalUrl =
+    active && shareToken
+      ? `${typeof window !== "undefined" ? window.location.origin : ""}/portal/${shareToken}`
+      : null;
+
   return (
-    <button
-      type="button"
-      onClick={handleToggle}
-      disabled={toggling}
-      className={`inline-flex items-center gap-2 h-11 px-4 rounded-sm text-sm font-semibold transition-all duration-150 ease-out select-none ${
-        active
-          ? "bg-signal text-text-inverse"
-          : "btn-secondary"
-      } disabled:opacity-50 disabled:cursor-not-allowed`}
-      title={active ? "Portal is active" : "Portal is off"}
-    >
-      <Globe size={16} />
-      Portal
-      <span
-        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-          active ? "bg-white/25" : "bg-black/20 dark:bg-white/20"
-        }`}
+    <div className="flex items-center gap-1">
+      <button
+        type="button"
+        onClick={handleToggle}
+        disabled={toggling}
+        className="btn-secondary !px-3 !gap-1.5"
+        title={active ? "Portal is active" : "Portal is off"}
       >
+        <Globe size={16} />
         <span
-          className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
-            active ? "translate-x-[18px]" : "translate-x-[3px]"
+          className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors ${
+            active ? "bg-signal" : "bg-black/20 dark:bg-white/20"
           }`}
-        />
-      </span>
-    </button>
+        >
+          <span
+            className={`inline-block h-3 w-3 rounded-full bg-white transition-transform ${
+              active ? "translate-x-[13px]" : "translate-x-[2px]"
+            }`}
+          />
+        </span>
+      </button>
+      {portalUrl && (
+        <a
+          href={portalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-secondary !px-3"
+          title="Open portal"
+        >
+          <ExternalLink size={16} />
+        </a>
+      )}
+    </div>
   );
 }
