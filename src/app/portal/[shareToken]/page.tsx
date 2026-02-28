@@ -72,7 +72,7 @@ export default async function PortalPage({ params }: Props) {
     .eq("share_token", shareToken)
     .maybeSingle();
 
-  if (shareErr || !share) notFound();
+  if (shareErr || !share || !share.active) notFound();
 
   const portalShare = share as PortalShare;
 

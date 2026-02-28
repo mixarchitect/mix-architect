@@ -6,6 +6,7 @@ export type PortalShare = {
   id: string;
   release_id: string;
   share_token: string;
+  active: boolean;
   show_direction: boolean;
   show_specs: boolean;
   show_references: boolean;

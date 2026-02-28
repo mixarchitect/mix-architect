@@ -14,6 +14,7 @@ type PortalSettingsEditorProps = {
   initialShare: {
     id: string;
     share_token: string;
+    active: boolean;
     show_direction: boolean;
     show_specs: boolean;
     show_references: boolean;
@@ -75,6 +76,7 @@ export function PortalSettingsEditor({
   }, [share?.id, releaseId, supabase]);
 
   if (!canEdit(role ?? "owner")) return null;
+  if (!share?.active) return null;
 
   async function ensureShare() {
     if (share) return share;

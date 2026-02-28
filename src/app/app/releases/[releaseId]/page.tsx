@@ -6,7 +6,8 @@ import { Panel, PanelBody } from "@/components/ui/panel";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
-import { Plus, FileText, Settings, ArrowLeft } from "lucide-react";
+import { Plus, Settings, ArrowLeft } from "lucide-react";
+import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
 import { PortalSettingsEditor } from "./portal-settings-editor";
 import { getReleaseRole } from "@/lib/get-release-role";
@@ -110,12 +111,13 @@ export default async function ReleasePage({ params }: Props) {
           <h1 className="text-2xl font-semibold h2 text-text truncate">{release.title}</h1>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Link href={`/app/releases/${releaseId}/brief`}>
-            <Button variant="secondary">
-              <FileText size={16} />
-              Export Brief
-            </Button>
-          </Link>
+          {canEdit(role) && (
+            <PortalToggle
+              releaseId={releaseId}
+              initialActive={briefShareRes.data?.active ?? false}
+              initialShareId={briefShareRes.data?.id ?? null}
+            />
+          )}
           {canEdit(role) && (
             <Link href={`/app/releases/${releaseId}/settings`}>
               <Button variant="secondary" className="px-3">
@@ -298,6 +300,7 @@ export default async function ReleasePage({ params }: Props) {
             initialShare={briefShareRes.data ? {
               id: briefShareRes.data.id,
               share_token: briefShareRes.data.share_token,
+              active: briefShareRes.data.active ?? true,
               show_direction: briefShareRes.data.show_direction ?? true,
               show_specs: briefShareRes.data.show_specs ?? true,
               show_references: briefShareRes.data.show_references ?? true,
