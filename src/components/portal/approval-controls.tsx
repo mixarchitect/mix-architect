@@ -3,56 +3,86 @@
 import { useState } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
-import { Check, MessageCircle, RefreshCw } from "lucide-react";
+import { Check, MessageCircle, RefreshCw, Package } from "lucide-react";
 
 import type { ApprovalStatus } from "@/lib/portal-types";
 
 const CLIENT_NAME_KEY = "portal_client_name";
 
-type ApprovalControlsProps = {
-  shareToken: string;
-  trackId: string;
-  initialStatus: ApprovalStatus;
-};
-
-const STATUS_CONFIG: Record<
+export const STATUS_CONFIG: Record<
   ApprovalStatus,
-  { label: string; color: string; bg: string }
+  { label: string; color: string; bg: string; dot: string }
 > = {
   awaiting_review: {
     label: "Awaiting Review",
     color: "text-muted",
-    bg: "bg-muted/10",
+    bg: "bg-black/[0.04] dark:bg-white/[0.06]",
+    dot: "bg-muted",
   },
   changes_requested: {
     label: "Changes Requested",
     color: "text-signal",
     bg: "bg-signal-muted",
+    dot: "bg-signal",
   },
   approved: {
     label: "Approved",
     color: "text-status-green",
     bg: "bg-status-green/10",
+    dot: "bg-status-green",
   },
   delivered: {
     label: "Delivered",
-    color: "text-blue-500",
-    bg: "bg-blue-500/10",
+    color: "text-status-blue",
+    bg: "bg-status-blue/10",
+    dot: "bg-status-blue",
   },
+};
+
+/* ------------------------------------------------------------------ */
+/*  Standalone Status Badge (used in track card header)                 */
+/* ------------------------------------------------------------------ */
+
+export function PortalStatusBadge({ status }: { status: ApprovalStatus }) {
+  const config = STATUS_CONFIG[status];
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full whitespace-nowrap",
+        config.bg,
+        config.color,
+      )}
+    >
+      <span className={cn("w-1.5 h-1.5 rounded-full", config.dot)} />
+      {config.label}
+    </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Approval Controls (action buttons + request changes form)           */
+/* ------------------------------------------------------------------ */
+
+type ApprovalControlsProps = {
+  shareToken: string;
+  trackId: string;
+  initialStatus: ApprovalStatus;
+  approvalDate: string | null;
+  onStatusChange?: (newStatus: ApprovalStatus) => void;
 };
 
 export function ApprovalControls({
   shareToken,
   trackId,
   initialStatus,
+  approvalDate,
+  onStatusChange,
 }: ApprovalControlsProps) {
   const [status, setStatus] = useState<ApprovalStatus>(initialStatus);
   const clientName = typeof window !== "undefined" ? localStorage.getItem(CLIENT_NAME_KEY) || "Client" : "Client";
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [changeNote, setChangeNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  const config = STATUS_CONFIG[status];
 
   async function handleApprove() {
     setSubmitting(true);
@@ -69,6 +99,7 @@ export function ApprovalControls({
       });
       if (res.ok) {
         setStatus("approved");
+        onStatusChange?.("approved");
       }
     } finally {
       setSubmitting(false);
@@ -92,6 +123,7 @@ export function ApprovalControls({
       });
       if (res.ok) {
         setStatus("changes_requested");
+        onStatusChange?.("changes_requested");
         setChangeNote("");
         setShowRequestForm(false);
       }
@@ -100,49 +132,43 @@ export function ApprovalControls({
     }
   }
 
+  async function handleUndo() {
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/portal/approve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          share_token: shareToken,
+          track_id: trackId,
+          action: "reopen",
+          actor_name: clientName || "Client",
+        }),
+      });
+      if (res.ok) {
+        setStatus("awaiting_review");
+        onStatusChange?.("awaiting_review");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   // Delivered is read-only — set by the engineer
   if (status === "delivered") {
-    return (
-      <div className="flex items-center gap-2 mt-3">
-        <span
-          className={cn(
-            "inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full",
-            config.bg,
-            config.color,
-          )}
-        >
-          <Check size={12} />
-          {config.label}
-        </span>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="mt-3 space-y-2">
-      {/* Status badge */}
-      <div className="flex items-center gap-2">
-        <span
-          className={cn(
-            "inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full",
-            config.bg,
-            config.color,
-          )}
-        >
-          {status === "approved" && <Check size={12} />}
-          {status === "changes_requested" && <RefreshCw size={12} />}
-          {config.label}
-        </span>
-      </div>
-
-      {/* Action buttons — only show if not already approved */}
-      {status !== "approved" && (
+    <div className="space-y-3">
+      {/* Action buttons — awaiting or changes_requested */}
+      {(status === "awaiting_review" || status === "changes_requested") && (
         <div className="flex items-center gap-2">
           <Button
             variant="primary"
             onClick={handleApprove}
             disabled={submitting}
-            className="!h-8 !text-xs !bg-status-green hover:!bg-status-green/90"
+            className="!h-9 !text-xs !bg-status-green hover:!bg-status-green/90"
           >
             <Check size={14} />
             Approve
@@ -150,7 +176,7 @@ export function ApprovalControls({
           <button
             onClick={() => setShowRequestForm(!showRequestForm)}
             disabled={submitting}
-            className="inline-flex items-center gap-1.5 h-8 px-3 text-xs font-medium text-muted hover:text-text border border-border rounded-md transition-colors"
+            className="inline-flex items-center gap-1.5 h-9 px-3.5 text-xs font-medium text-muted hover:text-text border border-border rounded-md transition-colors"
           >
             <MessageCircle size={14} />
             Request Changes
@@ -158,16 +184,28 @@ export function ApprovalControls({
         </div>
       )}
 
-      {/* Approved confirmation — allow reopening */}
+      {/* Approved confirmation — show date + undo */}
       {status === "approved" && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 bg-status-green/[0.06] rounded-lg px-4 py-3">
+          <div className="flex items-center gap-1.5 text-sm text-status-green font-medium">
+            <Check size={14} />
+            Approved
+            {approvalDate && (
+              <span className="text-status-green/70 font-normal ml-1">
+                on{" "}
+                {new Date(approvalDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            )}
+          </div>
           <button
-            onClick={() => setShowRequestForm(true)}
+            onClick={handleUndo}
             disabled={submitting}
-            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-text transition-colors"
+            className="text-xs text-muted hover:text-text transition-colors ml-auto underline underline-offset-2"
           >
-            <MessageCircle size={12} />
-            Actually, request changes…
+            Undo
           </button>
         </div>
       )}
@@ -176,12 +214,12 @@ export function ApprovalControls({
       {showRequestForm && (
         <div className="bg-signal-muted border border-signal/20 rounded-lg p-3">
           <div className="text-[11px] text-signal font-medium mb-2">
-            Describe the changes needed
+            What needs to change?
           </div>
           <textarea
             value={changeNote}
             onChange={(e) => setChangeNote(e.target.value)}
-            placeholder="What changes would you like to see?"
+            placeholder="e.g., Vocals too quiet in the chorus, needs more low end..."
             rows={3}
             className="input text-sm w-full resize-none"
             autoFocus
@@ -208,7 +246,7 @@ export function ApprovalControls({
               disabled={!changeNote.trim() || submitting}
               className="!h-auto !py-1.5 !px-3 !text-xs"
             >
-              Submit Request
+              Submit
             </Button>
           </div>
         </div>

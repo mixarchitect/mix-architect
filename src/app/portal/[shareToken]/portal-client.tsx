@@ -3,8 +3,7 @@
 import { PortalHeader } from "@/components/portal/portal-header";
 import { PortalTrackCard } from "@/components/portal/portal-track-card";
 import { PortalFooter } from "@/components/portal/portal-footer";
-import { Rule } from "@/components/ui/rule";
-import { Download } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import type { PortalRelease, PortalTrack, PortalShare } from "@/lib/portal-types";
 import type { BriefReference } from "@/lib/db-types";
 
@@ -28,102 +27,78 @@ export function PortalClient({
   const paymentGated =
     share.require_payment_for_download && release.payment_status !== "paid";
 
+  // Compute approval counts for the progress bar
+  const approvalCounts = {
+    approved: tracks.filter((t) => t.approvalStatus === "approved").length,
+    awaiting: tracks.filter((t) => t.approvalStatus === "awaiting_review").length,
+    changesRequested: tracks.filter((t) => t.approvalStatus === "changes_requested").length,
+    delivered: tracks.filter((t) => t.approvalStatus === "delivered").length,
+  };
+
+  const hasGlobalContext =
+    (share.show_direction && globalDirection) ||
+    (share.show_references && globalRefs.length > 0);
+
   return (
-    <main className="min-h-screen bg-bg py-12 px-6">
+    <main className="portal-page min-h-screen bg-white dark:bg-[#1a1a1a] py-12 px-4 md:px-6 pb-24">
       <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <PortalHeader release={release} trackCount={tracks.length} />
+        {/* ═══ Zone 1: Release Header ═══ */}
+        <PortalHeader
+          release={release}
+          trackCount={tracks.length}
+          engineerName={release.engineer_name}
+          approvalCounts={approvalCounts}
+        />
 
-        {/* Download PDF — hidden during print */}
-        <div className="flex flex-col items-center gap-2 mb-8 print:hidden">
-          <p className="text-xs text-muted">
-            Review your mixes, leave feedback, and approve tracks below.
-          </p>
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted hover:text-text border border-border rounded-lg hover:bg-panel transition-colors"
-          >
-            <Download size={16} />
-            Download PDF
-          </button>
-        </div>
-
-        {/* Global direction + references */}
-        {(share.show_direction && globalDirection) ||
-        (share.show_references && globalRefs.length > 0) ? (
-          <div className="rounded-lg border border-border bg-panel p-8 mb-8">
-            {share.show_direction && globalDirection && (
-              <div className="mb-4">
-                <div className="text-xs text-muted font-medium mb-1">
-                  Global Direction
-                </div>
-                <p className="text-sm text-text leading-relaxed italic">
-                  &ldquo;{globalDirection}&rdquo;
-                </p>
-              </div>
-            )}
-
-            {share.show_references && globalRefs.length > 0 && (
-              <div>
-                <div className="text-xs text-muted font-medium mb-1">
-                  Global References
-                </div>
-                <ul className="text-sm text-text space-y-1">
-                  {globalRefs.map((ref) => (
-                    <li key={ref.id}>
-                      &bull; {ref.song_title}
-                      {ref.artist ? ` \u2014 ${ref.artist}` : ""}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        ) : null}
-
-        {/* Payment status banner */}
-        {share.show_payment_status && release.fee_total != null && (
-          <div className="rounded-lg border border-border bg-panel px-6 py-4 mb-8">
-            <div className="flex items-center justify-between">
-              <div className="space-y-1">
-                <span className="text-xs text-muted font-medium uppercase tracking-wider">
-                  Payment
-                </span>
-                <div className="text-sm text-text font-medium">
-                  {release.payment_status === "partial" && release.paid_amount ? (
-                    <>
-                      {new Intl.NumberFormat(undefined, { style: "currency", currency: release.fee_currency }).format(release.paid_amount)}
-                      {" "}
-                      <span className="text-muted font-normal">of</span>
-                      {" "}
-                      {new Intl.NumberFormat(undefined, { style: "currency", currency: release.fee_currency }).format(release.fee_total!)}
-                    </>
-                  ) : (
-                    new Intl.NumberFormat(undefined, { style: "currency", currency: release.fee_currency }).format(release.fee_total!)
-                  )}
-                </div>
-              </div>
-              <span
-                className={`text-xs font-medium px-2 py-0.5 rounded ${
-                  release.payment_status === "paid"
-                    ? "bg-status-green/10 text-status-green"
-                    : release.payment_status === "partial"
-                      ? "bg-signal-muted text-signal"
-                      : "bg-muted/10 text-muted"
-                }`}
-              >
-                {release.payment_status === "paid"
-                  ? "Paid"
-                  : release.payment_status === "partial"
-                    ? "Partial"
-                    : "Unpaid"}
+        {/* ═══ Mix Brief (collapsible) ═══ */}
+        {hasGlobalContext && (
+          <details className="mb-8 group">
+            <summary className="cursor-pointer list-none flex items-center gap-2 rounded-lg border border-border bg-panel px-5 py-3.5 hover:bg-panel transition-colors">
+              <ChevronRight
+                size={16}
+                className="text-muted transition-transform group-open:rotate-90 shrink-0"
+              />
+              <span className="text-sm font-semibold text-muted">
+                Mix Brief
               </span>
+            </summary>
+            <div className="rounded-b-lg border border-t-0 border-border bg-panel px-5 py-5 space-y-4 -mt-px">
+              {share.show_direction && globalDirection && (
+                <div>
+                  <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
+                    Global Direction
+                  </div>
+                  <p className="text-sm text-text leading-relaxed italic">
+                    &ldquo;{globalDirection}&rdquo;
+                  </p>
+                </div>
+              )}
+              {share.show_references && globalRefs.length > 0 && (
+                <div>
+                  <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
+                    Global References
+                  </div>
+                  <ul className="text-sm text-text space-y-1">
+                    {globalRefs.map((ref) => (
+                      <li key={ref.id}>
+                        {ref.song_title}
+                        {ref.artist ? ` \u2014 ${ref.artist}` : ""}
+                        {ref.note && (
+                          <span className="text-muted italic ml-1">
+                            &ldquo;{ref.note}&rdquo;
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
-          </div>
+          </details>
         )}
 
-        {/* Tracks */}
-        <div className="rounded-lg border border-border bg-panel p-8 space-y-10">
+        {/* ═══ Zone 2: Track List ═══ */}
+        <div className="space-y-4 md:space-y-6">
           {tracks.map((track) => (
             <PortalTrackCard
               key={track.id}
@@ -136,19 +111,30 @@ export function PortalClient({
               showDirection={share.show_direction}
               showSpecs={share.show_specs}
               showReferences={share.show_references}
+              showDistribution={share.show_distribution}
               paymentGated={paymentGated}
             />
           ))}
 
           {tracks.length === 0 && (
-            <p className="text-center text-sm text-muted py-8">
-              No tracks are available on this portal yet.
-            </p>
+            <div className="rounded-lg border border-border bg-panel p-12 text-center">
+              <p className="text-sm text-muted">
+                No tracks are available on this portal yet.
+              </p>
+            </div>
           )}
         </div>
 
-        <Rule className="my-8" />
-        <PortalFooter />
+        {/* ═══ Zone 3: Footer ═══ */}
+        <PortalFooter
+          showPayment={share.show_payment_status}
+          release={release}
+          showDistribution={share.show_distribution}
+          releaseDistribution={release.distribution}
+          tracks={tracks}
+          engineerName={release.engineer_name}
+          paymentGated={paymentGated}
+        />
       </div>
     </main>
   );

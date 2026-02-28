@@ -428,7 +428,7 @@ export function PortalAudioPlayer({
   const showDownload = downloadEnabled && !paymentGated;
 
   return (
-    <div className="space-y-2">
+    <div>
       <div className="rounded-lg border border-border bg-panel overflow-hidden">
         {/* Version pills + metadata */}
         <div className="flex items-center justify-between px-5 pt-4">
@@ -645,21 +645,9 @@ export function PortalAudioPlayer({
             {formatTime(duration)}
           </span>
         </div>
-      </div>
 
-      {/* Comments section */}
-      <div className="rounded-lg border border-border bg-panel overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-          <span className="text-[11px] font-semibold text-muted uppercase tracking-wider">
-            Feedback
-          </span>
-          <span className="text-[11px] font-mono text-faint">
-            {versionComments.length} note
-            {versionComments.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-
-        <div className="p-2">
+        {/* Comments section (inline below transport) */}
+        <div className="border-t border-border p-2">
           {/* Name input prompt */}
           {showNameInput && (
             <div className="bg-signal-muted border border-signal/20 rounded-lg p-3 mb-2">

@@ -148,6 +148,14 @@ body {
     repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 72px);
 }
 
+/* Remove grid background on the client portal */
+body:has(.portal-page) {
+  background-image: none;
+}
+
+/* Hide default details/summary marker (custom chevron used) */
+summary.list-none::-webkit-details-marker { display: none; }
+
 /* ─────────────────────────────────────────────────────
    TYPOGRAPHY UTILITIES
 ───────────────────────────────────────────────────── */

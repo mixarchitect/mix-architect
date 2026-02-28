@@ -35,6 +35,30 @@ export type PortalVersionSetting = {
   visible: boolean;
 };
 
+/** Per-track distribution metadata (from track_distribution table). */
+export type PortalDistribution = {
+  isrc: string | null;
+  iswc: string | null;
+  producer: string | null;
+  composers: string | null;
+  language: string | null;
+  explicit_lyrics: boolean;
+  featured_artist: string | null;
+  instrumental: boolean;
+  cover_song: boolean;
+};
+
+/** Release-level distribution metadata (from releases table columns). */
+export type PortalReleaseDistribution = {
+  distributor: string | null;
+  record_label: string | null;
+  upc: string | null;
+  copyright_holder: string | null;
+  copyright_year: string | null;
+  phonogram_copyright: string | null;
+  catalog_number: string | null;
+};
+
 /** A track enriched with all portal-visible data. */
 export type PortalTrack = {
   id: string;
@@ -47,6 +71,8 @@ export type PortalTrack = {
   comments: TimelineComment[];
   downloadEnabled: boolean;
   approvalStatus: ApprovalStatus;
+  distribution: PortalDistribution | null;
+  approvalDate: string | null;
 };
 
 /** Release metadata passed to the portal client. */
@@ -62,4 +88,6 @@ export type PortalRelease = {
   fee_total: number | null;
   fee_currency: string;
   paid_amount: number | null;
+  engineer_name: string | null;
+  distribution: PortalReleaseDistribution | null;
 };

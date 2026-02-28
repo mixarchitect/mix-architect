@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { notFound } from "next/navigation";
 import { PortalClient } from "./portal-client";
 import type { Metadata } from "next";
@@ -8,6 +9,8 @@ import type {
   PortalVersionSetting,
   PortalTrack,
   PortalRelease,
+  PortalDistribution,
+  PortalReleaseDistribution,
 } from "@/lib/portal-types";
 import type {
   BriefIntent,
@@ -93,7 +96,7 @@ export default async function PortalPage({ params }: Props) {
 
   const trackIds = (tracks ?? []).map((t) => t.id as string);
 
-  /* ── 4. Parallel fetch: intents, specs, refs, versions, settings ─ */
+  /* ── 4. Parallel fetch: intents, specs, refs, versions, settings, distribution, approvals ─ */
 
   const empty = <T,>() => Promise.resolve({ data: [] as T[] });
 
@@ -106,6 +109,8 @@ export default async function PortalPage({ params }: Props) {
     commentsRes,
     trackSettingsRes,
     versionSettingsRes,
+    distributionRes,
+    approvalEventsRes,
   ] = await Promise.all([
     trackIds.length > 0
       ? supabase.from("track_intent").select("*").in("track_id", trackIds)
@@ -148,6 +153,15 @@ export default async function PortalPage({ params }: Props) {
       .from("portal_version_settings")
       .select("*")
       .eq("brief_share_id", portalShare.id),
+    trackIds.length > 0 && portalShare.show_distribution
+      ? supabase.from("track_distribution").select("*").in("track_id", trackIds)
+      : empty<PortalDistribution & { track_id: string }>(),
+    supabase
+      .from("portal_approval_events")
+      .select("track_id, event_type, created_at")
+      .eq("brief_share_id", portalShare.id)
+      .eq("event_type", "approve")
+      .order("created_at", { ascending: false }),
   ]);
 
   const intents = (intentRes.data ?? []) as BriefIntent[];
@@ -158,8 +172,25 @@ export default async function PortalPage({ params }: Props) {
   const allComments = (commentsRes.data ?? []) as (TimelineComment & { track_id: string })[];
   const trackSettings = (trackSettingsRes.data ?? []) as PortalTrackSetting[];
   const versionSettings = (versionSettingsRes.data ?? []) as PortalVersionSetting[];
+  const allDistribution = (distributionRes.data ?? []) as (PortalDistribution & { track_id: string })[];
+  const approvalEvents = (approvalEventsRes.data ?? []) as { track_id: string; event_type: string; created_at: string }[];
 
-  /* ── 5. Build visibility maps ───────────────────────────────────── */
+  /* ── 4b. Fetch engineer name (requires service client for RLS) ── */
+
+  let engineerName: string | null = null;
+  try {
+    const serviceClient = createSupabaseServiceClient();
+    const { data: userDefaults } = await serviceClient
+      .from("user_defaults")
+      .select("company_name")
+      .eq("user_id", release.user_id)
+      .maybeSingle();
+    engineerName = userDefaults?.company_name ?? null;
+  } catch {
+    // Silently fail — engineer name is optional
+  }
+
+  /* ── 5. Build visibility + approval maps ──────────────────────── */
 
   const trackSettingsMap = new Map(
     trackSettings.map((ts) => [ts.track_id, ts]),
@@ -167,6 +198,14 @@ export default async function PortalPage({ params }: Props) {
   const versionSettingsMap = new Map(
     versionSettings.map((vs) => [vs.audio_version_id, vs]),
   );
+
+  // Build approval date map (latest approve event per track)
+  const approvalDateMap = new Map<string, string>();
+  for (const event of approvalEvents) {
+    if (!approvalDateMap.has(event.track_id)) {
+      approvalDateMap.set(event.track_id, event.created_at);
+    }
+  }
 
   /* ── 6. Build filtered portal tracks ────────────────────────────── */
 
@@ -192,6 +231,29 @@ export default async function PortalPage({ params }: Props) {
 
       const trackComments = allComments.filter((c) => c.track_id === track.id);
 
+      // Distribution metadata
+      const distRow = allDistribution.find((d) => d.track_id === track.id);
+      const distribution: PortalDistribution | null = distRow
+        ? {
+            isrc: distRow.isrc,
+            iswc: distRow.iswc,
+            producer: distRow.producer,
+            composers: distRow.composers,
+            language: distRow.language,
+            explicit_lyrics: distRow.explicit_lyrics,
+            featured_artist: distRow.featured_artist,
+            instrumental: distRow.instrumental,
+            cover_song: distRow.cover_song,
+          }
+        : null;
+
+      // Approval date
+      const approvalStatus = setting?.approval_status ?? "awaiting_review";
+      const approvalDate =
+        approvalStatus === "approved" || approvalStatus === "delivered"
+          ? approvalDateMap.get(track.id) ?? null
+          : null;
+
       return {
         id: track.id,
         track_number: track.track_number,
@@ -202,11 +264,25 @@ export default async function PortalPage({ params }: Props) {
         versions: trackVersions,
         comments: trackComments,
         downloadEnabled: setting ? setting.download_enabled : true,
-        approvalStatus: setting?.approval_status ?? "awaiting_review",
+        approvalStatus,
+        distribution,
+        approvalDate,
       };
     });
 
   /* ── 7. Build release props ─────────────────────────────────────── */
+
+  const releaseDistribution: PortalReleaseDistribution | null = portalShare.show_distribution
+    ? {
+        distributor: release.distributor ?? null,
+        record_label: release.record_label ?? null,
+        upc: release.upc ?? null,
+        copyright_holder: release.copyright_holder ?? null,
+        copyright_year: release.copyright_year ?? null,
+        phonogram_copyright: release.phonogram_copyright ?? null,
+        catalog_number: release.catalog_number ?? null,
+      }
+    : null;
 
   const portalRelease: PortalRelease = {
     id: release.id,
@@ -220,6 +296,8 @@ export default async function PortalPage({ params }: Props) {
     fee_total: release.fee_total,
     fee_currency: release.fee_currency,
     paid_amount: release.paid_amount ?? 0,
+    engineer_name: engineerName,
+    distribution: releaseDistribution,
   };
 
   /* ── 8. Render ──────────────────────────────────────────────────── */
