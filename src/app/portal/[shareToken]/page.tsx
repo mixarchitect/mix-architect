@@ -196,7 +196,6 @@ export default async function PortalPage({ params }: Props) {
         id: track.id,
         track_number: track.track_number,
         title: track.title,
-        samply_url: track.samply_url ?? null,
         intent,
         specs,
         references: refs,
@@ -220,6 +219,7 @@ export default async function PortalPage({ params }: Props) {
     payment_status: release.payment_status,
     fee_total: release.fee_total,
     fee_currency: release.fee_currency,
+    paid_amount: release.paid_amount ?? 0,
   };
 
   /* ── 8. Render ──────────────────────────────────────────────────── */

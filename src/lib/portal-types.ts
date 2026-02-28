@@ -40,7 +40,6 @@ export type PortalTrack = {
   id: string;
   track_number: number;
   title: string;
-  samply_url: string | null;
   intent: BriefIntent | null;
   specs: BriefSpec | null;
   references: BriefReference[];
@@ -62,4 +61,5 @@ export type PortalRelease = {
   payment_status: string;
   fee_total: number | null;
   fee_currency: string;
+  paid_amount: number | null;
 };

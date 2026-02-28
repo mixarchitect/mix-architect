@@ -35,7 +35,10 @@ export function PortalClient({
         <PortalHeader release={release} trackCount={tracks.length} />
 
         {/* Download PDF — hidden during print */}
-        <div className="flex justify-center mb-8 print:hidden">
+        <div className="flex flex-col items-center gap-2 mb-8 print:hidden">
+          <p className="text-xs text-muted">
+            Review your mixes, leave feedback, and approve tracks below.
+          </p>
           <button
             onClick={() => window.print()}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted hover:text-text border border-border rounded-lg hover:bg-panel transition-colors"
@@ -82,9 +85,24 @@ export function PortalClient({
         {share.show_payment_status && release.fee_total != null && (
           <div className="rounded-lg border border-border bg-panel px-6 py-4 mb-8">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted font-medium uppercase tracking-wider">
-                Payment
-              </span>
+              <div className="space-y-1">
+                <span className="text-xs text-muted font-medium uppercase tracking-wider">
+                  Payment
+                </span>
+                <div className="text-sm text-text font-medium">
+                  {release.payment_status === "partial" && release.paid_amount ? (
+                    <>
+                      {new Intl.NumberFormat(undefined, { style: "currency", currency: release.fee_currency }).format(release.paid_amount)}
+                      {" "}
+                      <span className="text-muted font-normal">of</span>
+                      {" "}
+                      {new Intl.NumberFormat(undefined, { style: "currency", currency: release.fee_currency }).format(release.fee_total!)}
+                    </>
+                  ) : (
+                    new Intl.NumberFormat(undefined, { style: "currency", currency: release.fee_currency }).format(release.fee_total!)
+                  )}
+                </div>
+              </div>
               <span
                 className={`text-xs font-medium px-2 py-0.5 rounded ${
                   release.payment_status === "paid"
