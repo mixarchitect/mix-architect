@@ -699,6 +699,7 @@ export function TrackDetailClient({
           {activeTab === "portal" && (
             <PortalTrackEditor
               briefShareId={portalShareId}
+              releaseId={releaseId}
               trackId={track.id}
               audioVersions={localAudioVersions.map((v) => ({
                 id: v.id,

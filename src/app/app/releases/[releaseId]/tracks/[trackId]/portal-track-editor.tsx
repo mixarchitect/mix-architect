@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody } from "@/components/ui/panel";
@@ -10,6 +11,7 @@ type VersionInfo = { id: string; version_number: number };
 
 type PortalTrackEditorProps = {
   briefShareId: string | null;
+  releaseId: string;
   trackId: string;
   audioVersions: VersionInfo[];
   role?: ReleaseRole;
@@ -29,6 +31,7 @@ type VersionSetting = {
 
 export function PortalTrackEditor({
   briefShareId,
+  releaseId,
   trackId,
   audioVersions,
   role,
@@ -143,7 +146,7 @@ export function PortalTrackEditor({
     return (
       <Panel>
         <PanelBody className="py-5">
-          <div className="label-sm text-muted mb-1">PORTAL VISIBILITY</div>
+          <div className="label-sm text-muted mb-1">TRACK PORTAL VISIBILITY</div>
           <div className="text-xs text-muted">Loading…</div>
         </PanelBody>
       </Panel>
@@ -151,40 +154,56 @@ export function PortalTrackEditor({
   }
 
   return (
-    <Panel>
-      <PanelBody className="py-5 space-y-3">
-        <div className="label-sm text-muted mb-1">PORTAL VISIBILITY</div>
+    <div className="space-y-4">
+      <Panel>
+        <PanelBody className="py-5 space-y-3">
+          <div className="label-sm text-muted mb-1">TRACK PORTAL VISIBILITY</div>
+          <p className="text-xs text-muted">
+            Control what your client sees for this track on the portal.
+          </p>
 
-        <ToggleRow
-          label="Visible on portal"
-          checked={isVisible}
-          onChange={toggleTrackVisible}
-        />
-        <ToggleRow
-          label="Enable download"
-          checked={isDownloadEnabled}
-          onChange={toggleDownloadEnabled}
-        />
+          <ToggleRow
+            label="Visible on portal"
+            checked={isVisible}
+            onChange={toggleTrackVisible}
+          />
+          <ToggleRow
+            label="Enable download"
+            checked={isDownloadEnabled}
+            onChange={toggleDownloadEnabled}
+          />
 
-        {audioVersions.length > 1 && (
-          <div className="space-y-2 pt-2 border-t border-border/50">
-            <div className="text-xs text-muted font-medium">Version visibility</div>
-            {audioVersions.map((v) => {
-              const setting = versionSettings.find((s) => s.audio_version_id === v.id);
-              const versionVisible = setting?.visible ?? true;
-              return (
-                <ToggleRow
-                  key={v.id}
-                  label={`Version ${v.version_number}`}
-                  checked={versionVisible}
-                  onChange={(checked) => toggleVersionVisible(v.id, checked)}
-                />
-              );
-            })}
-          </div>
-        )}
-      </PanelBody>
-    </Panel>
+          {audioVersions.length > 1 && (
+            <div className="space-y-2 pt-2 border-t border-border/50">
+              <div className="text-xs text-muted font-medium">Track version visibility</div>
+              {audioVersions.map((v) => {
+                const setting = versionSettings.find((s) => s.audio_version_id === v.id);
+                const versionVisible = setting?.visible ?? true;
+                return (
+                  <ToggleRow
+                    key={v.id}
+                    label={`Version ${v.version_number}`}
+                    checked={versionVisible}
+                    onChange={(checked) => toggleVersionVisible(v.id, checked)}
+                  />
+                );
+              })}
+            </div>
+          )}
+        </PanelBody>
+      </Panel>
+
+      <p className="text-xs text-muted text-center">
+        Portal activation and link can be found on the{" "}
+        <Link
+          href={`/app/releases/${releaseId}`}
+          className="text-signal hover:underline"
+        >
+          release page
+        </Link>
+        .
+      </p>
+    </div>
   );
 }
 
@@ -210,7 +229,7 @@ function ToggleRow({
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-          checked ? "bg-signal" : "bg-border"
+          checked ? "bg-signal" : "bg-muted/30"
         }`}
       >
         <span
