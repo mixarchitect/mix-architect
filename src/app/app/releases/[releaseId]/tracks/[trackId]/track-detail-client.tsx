@@ -103,6 +103,13 @@ type SplitData = {
   label_name?: string;
 };
 
+type PortalApprovalEvent = {
+  event_type: string;
+  actor_name: string;
+  note: string | null;
+  created_at: string;
+};
+
 type Props = {
   releaseId: string;
   releaseTitle: string;
@@ -121,12 +128,14 @@ type Props = {
   role: ReleaseRole;
   currentUserName: string;
   portalShareId: string | null;
+  portalApprovalStatus?: string | null;
+  portalApprovalEvents?: PortalApprovalEvent[];
 };
 
 export function TrackDetailClient({
   releaseId, releaseTitle, artistName, releaseFormat, releaseCoverArt,
   track, intent, specs, samplyUrl, audioVersions, notes, references, distribution, splits, role,
-  currentUserName, portalShareId,
+  currentUserName, portalShareId, portalApprovalStatus, portalApprovalEvents = [],
 }: Props) {
   const TAB_IDS = TABS.map((t) => t.id);
   const [activeTab, setActiveTab] = useState(() => {
@@ -707,6 +716,8 @@ export function TrackDetailClient({
                 version_number: v.version_number,
               }))}
               role={role}
+              portalApprovalStatus={portalApprovalStatus}
+              portalApprovalEvents={portalApprovalEvents}
             />
           )}
 
@@ -762,16 +773,24 @@ export function TrackDetailClient({
               )}
               {generalNotes.length > 0 ? (
                 <div>
-                  {generalNotes.map((note, idx) => (
-                    <div key={note.id}>
-                      <NoteEntry
-                        author={note.author}
-                        createdAt={note.created_at}
-                        content={note.content}
-                      />
-                      {idx < generalNotes.length - 1 && <Rule />}
-                    </div>
-                  ))}
+                  {generalNotes.map((note, idx) => {
+                    // Identify client-authored notes: if the author matches
+                    // a portal event actor (and is not the current user)
+                    const isClientNote =
+                      note.author !== currentUserName &&
+                      portalApprovalEvents.some((e) => e.actor_name === note.author);
+                    return (
+                      <div key={note.id}>
+                        <NoteEntry
+                          author={note.author}
+                          createdAt={note.created_at}
+                          content={note.content}
+                          isClientNote={isClientNote}
+                        />
+                        {idx < generalNotes.length - 1 && <Rule />}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-sm text-muted text-center py-8">

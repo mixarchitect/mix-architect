@@ -69,6 +69,20 @@ export default async function ReleasePage({ params }: Props) {
   const tracks = tracksRes.data;
   const globalRefs = globalRefsRes.data;
 
+  // Fetch portal approval statuses if a brief share exists
+  let portalApprovalMap: Record<string, string> = {};
+  if (briefShareRes.data?.id) {
+    const { data: portalSettings } = await supabase
+      .from("portal_track_settings")
+      .select("track_id, approval_status")
+      .eq("brief_share_id", briefShareRes.data.id);
+    if (portalSettings) {
+      portalApprovalMap = Object.fromEntries(
+        portalSettings.map((s) => [s.track_id, s.approval_status]),
+      );
+    }
+  }
+
   return (
     <div>
       {/* Toolbar */}
@@ -146,6 +160,7 @@ export default async function ReleasePage({ params }: Props) {
                   title: t.title as string,
                   status: t.status as string,
                   intentPreview: intent?.mix_vision,
+                  portalApprovalStatus: portalApprovalMap[t.id as string] ?? null,
                 };
               })}
               canReorder={canEdit(role)}

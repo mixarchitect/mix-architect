@@ -51,6 +51,28 @@ export default async function TrackDetailPage({ params }: Props) {
   const role = user ? await getReleaseRole(supabase, releaseId, user.id) : null;
   const currentUserName = user?.user_metadata?.display_name || user?.email || "You";
 
+  // Fetch portal approval data if brief share exists
+  let portalApprovalStatus: string | null = null;
+  let portalApprovalEvents: { event_type: string; actor_name: string; note: string | null; created_at: string }[] = [];
+  if (briefShareRes.data?.id) {
+    const [settingRes, eventsRes] = await Promise.all([
+      supabase
+        .from("portal_track_settings")
+        .select("approval_status")
+        .eq("brief_share_id", briefShareRes.data.id)
+        .eq("track_id", trackId)
+        .maybeSingle(),
+      supabase
+        .from("portal_approval_events")
+        .select("event_type, actor_name, note, created_at")
+        .eq("brief_share_id", briefShareRes.data.id)
+        .eq("track_id", trackId)
+        .order("created_at", { ascending: false }),
+    ]);
+    portalApprovalStatus = settingRes.data?.approval_status ?? null;
+    portalApprovalEvents = (eventsRes.data ?? []) as typeof portalApprovalEvents;
+  }
+
   return (
     <TrackDetailClient
       releaseId={releaseId}
@@ -70,6 +92,8 @@ export default async function TrackDetailPage({ params }: Props) {
       role={role}
       currentUserName={currentUserName}
       portalShareId={briefShareRes.data?.id ?? null}
+      portalApprovalStatus={portalApprovalStatus}
+      portalApprovalEvents={portalApprovalEvents}
     />
   );
 }

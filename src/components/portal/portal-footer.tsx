@@ -27,7 +27,10 @@ export function PortalFooter({
   engineerName,
   paymentGated,
 }: PortalFooterProps) {
-  const hasPaymentData = showPayment && release.fee_total != null;
+  const hasPaymentData =
+    showPayment &&
+    release.fee_total != null &&
+    release.payment_status !== "no_fee";
   const hasDistribution =
     showDistribution &&
     (releaseDistribution != null || tracks.some((t) => t.distribution != null));

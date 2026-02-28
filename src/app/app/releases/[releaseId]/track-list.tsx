@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { GripVertical, ChevronUp, ChevronDown, Trash2 } from "lucide-react";
+import { GripVertical, ChevronUp, ChevronDown, Trash2, Check, MessageCircle, Package } from "lucide-react";
 import { StatusDot } from "@/components/ui/status-dot";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { cn } from "@/lib/cn";
@@ -14,6 +14,7 @@ type TrackItem = {
   title: string;
   status: string;
   intentPreview?: string | null;
+  portalApprovalStatus?: string | null;
 };
 
 type Props = {
@@ -201,6 +202,9 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
                   : "No intent defined"}
               </div>
             </div>
+            {t.portalApprovalStatus && t.portalApprovalStatus !== "awaiting_review" && (
+              <PortalApprovalBadge status={t.portalApprovalStatus} />
+            )}
             <StatusDot color={statusColor(t.status)} />
           </Link>
 
@@ -257,5 +261,30 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
         </div>
       ))}
     </div>
+  );
+}
+
+/* ── Portal Approval Badge ───────────────────────────────────────── */
+
+const APPROVAL_CONFIG: Record<string, { label: string; icon: typeof Check; color: string }> = {
+  approved: { label: "Approved", icon: Check, color: "text-status-green bg-status-green/10" },
+  delivered: { label: "Delivered", icon: Package, color: "text-status-blue bg-status-blue/10" },
+  changes_requested: { label: "Changes", icon: MessageCircle, color: "text-signal bg-signal-muted" },
+};
+
+function PortalApprovalBadge({ status }: { status: string }) {
+  const config = APPROVAL_CONFIG[status];
+  if (!config) return null;
+  const Icon = config.icon;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0",
+        config.color,
+      )}
+    >
+      <Icon size={10} />
+      {config.label}
+    </span>
   );
 }

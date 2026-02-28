@@ -6,8 +6,17 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { canEdit, type ReleaseRole } from "@/lib/permissions";
+import { cn } from "@/lib/cn";
+import { Check, MessageCircle, Package, RotateCcw } from "lucide-react";
 
 type VersionInfo = { id: string; version_number: number };
+
+type PortalApprovalEvent = {
+  event_type: string;
+  actor_name: string;
+  note: string | null;
+  created_at: string;
+};
 
 type PortalTrackEditorProps = {
   briefShareId: string | null;
@@ -15,6 +24,8 @@ type PortalTrackEditorProps = {
   trackId: string;
   audioVersions: VersionInfo[];
   role?: ReleaseRole;
+  portalApprovalStatus?: string | null;
+  portalApprovalEvents?: PortalApprovalEvent[];
 };
 
 type TrackSetting = {
@@ -35,6 +46,8 @@ export function PortalTrackEditor({
   trackId,
   audioVersions,
   role,
+  portalApprovalStatus,
+  portalApprovalEvents = [],
 }: PortalTrackEditorProps) {
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
@@ -155,6 +168,38 @@ export function PortalTrackEditor({
 
   return (
     <div className="space-y-4">
+      {/* Client Approval Status */}
+      {portalApprovalStatus && portalApprovalStatus !== "awaiting_review" && (
+        <Panel>
+          <PanelBody className="py-5 space-y-3">
+            <div className="label-sm text-muted mb-1">CLIENT APPROVAL</div>
+            <ApprovalStatusDisplay status={portalApprovalStatus} />
+            {portalApprovalEvents.length > 0 && (
+              <div className="pt-3 border-t border-border/50 space-y-3">
+                {portalApprovalEvents.slice(0, 5).map((event, i) => (
+                  <ApprovalEventRow key={i} event={event} />
+                ))}
+              </div>
+            )}
+          </PanelBody>
+        </Panel>
+      )}
+
+      {/* Approval event history when awaiting but has past events */}
+      {portalApprovalStatus === "awaiting_review" && portalApprovalEvents.length > 0 && (
+        <Panel>
+          <PanelBody className="py-5 space-y-3">
+            <div className="label-sm text-muted mb-1">CLIENT APPROVAL</div>
+            <ApprovalStatusDisplay status="awaiting_review" />
+            <div className="pt-3 border-t border-border/50 space-y-3">
+              {portalApprovalEvents.slice(0, 5).map((event, i) => (
+                <ApprovalEventRow key={i} event={event} />
+              ))}
+            </div>
+          </PanelBody>
+        </Panel>
+      )}
+
       <Panel>
         <PanelBody className="py-5 space-y-3">
           <div className="label-sm text-muted mb-1">TRACK PORTAL VISIBILITY</div>
@@ -203,6 +248,62 @@ export function PortalTrackEditor({
         </Link>
         .
       </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Approval Display Components                                        */
+/* ------------------------------------------------------------------ */
+
+const APPROVAL_STYLES: Record<string, { label: string; icon: typeof Check; color: string; bg: string }> = {
+  approved: { label: "Approved", icon: Check, color: "text-status-green", bg: "bg-status-green/10" },
+  delivered: { label: "Delivered", icon: Package, color: "text-status-blue", bg: "bg-status-blue/10" },
+  changes_requested: { label: "Changes Requested", icon: MessageCircle, color: "text-signal", bg: "bg-signal-muted" },
+  awaiting_review: { label: "Awaiting Review", icon: RotateCcw, color: "text-muted", bg: "bg-black/[0.04] dark:bg-white/[0.06]" },
+};
+
+function ApprovalStatusDisplay({ status }: { status: string }) {
+  const style = APPROVAL_STYLES[status];
+  if (!style) return null;
+  const Icon = style.icon;
+  return (
+    <div className={cn("flex items-center gap-2 px-3 py-2 rounded-lg", style.bg)}>
+      <Icon size={14} className={style.color} />
+      <span className={cn("text-sm font-medium", style.color)}>{style.label}</span>
+    </div>
+  );
+}
+
+const EVENT_LABELS: Record<string, { label: string; icon: typeof Check; color: string }> = {
+  approve: { label: "approved", icon: Check, color: "text-status-green" },
+  request_changes: { label: "requested changes", icon: MessageCircle, color: "text-signal" },
+  deliver: { label: "marked delivered", icon: Package, color: "text-status-blue" },
+  reopen: { label: "reopened for review", icon: RotateCcw, color: "text-muted" },
+};
+
+function ApprovalEventRow({ event }: { event: PortalApprovalEvent }) {
+  const config = EVENT_LABELS[event.event_type];
+  if (!config) return null;
+  const Icon = config.icon;
+  return (
+    <div className="text-xs">
+      <div className="flex items-center gap-1.5">
+        <Icon size={11} className={config.color} />
+        <span className="text-text font-medium">{event.actor_name}</span>
+        <span className="text-muted">{config.label}</span>
+        <span className="text-faint ml-auto whitespace-nowrap">
+          {new Date(event.created_at).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          })}
+        </span>
+      </div>
+      {event.note && (
+        <p className="mt-1 ml-4 text-text italic leading-relaxed">
+          &ldquo;{event.note}&rdquo;
+        </p>
+      )}
     </div>
   );
 }
