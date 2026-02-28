@@ -26,6 +26,7 @@ const TABS = [
   { id: "specs", label: "Specs" },
   { id: "audio", label: "Audio" },
   { id: "distribution", label: "Distribution" },
+  { id: "portal", label: "Portal" },
   { id: "notes", label: "Notes" },
 ];
 
@@ -691,16 +692,20 @@ export function TrackDetailClient({
                   </div>
                 </PanelBody>
               </Panel>
-              <PortalTrackEditor
-                briefShareId={portalShareId}
-                trackId={track.id}
-                audioVersions={localAudioVersions.map((v) => ({
-                  id: v.id,
-                  version_number: v.version_number,
-                }))}
-                role={role}
-              />
             </div>
+          )}
+
+          {/* Portal */}
+          {activeTab === "portal" && (
+            <PortalTrackEditor
+              briefShareId={portalShareId}
+              trackId={track.id}
+              audioVersions={localAudioVersions.map((v) => ({
+                id: v.id,
+                version_number: v.version_number,
+              }))}
+              role={role}
+            />
           )}
 
           {/* Player */}
