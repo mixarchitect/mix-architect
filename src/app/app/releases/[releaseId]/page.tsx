@@ -289,7 +289,6 @@ export default async function ReleasePage({ params }: Props) {
             initialShare={briefShareRes.data ? {
               id: briefShareRes.data.id,
               share_token: briefShareRes.data.share_token,
-              portal_mode: briefShareRes.data.portal_mode ?? "brief",
               show_direction: briefShareRes.data.show_direction ?? true,
               show_specs: briefShareRes.data.show_specs ?? true,
               show_references: briefShareRes.data.show_references ?? true,

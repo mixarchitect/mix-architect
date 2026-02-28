@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { PortalClient } from "./portal-client";
 import type { Metadata } from "next";
 import type {
@@ -72,11 +72,6 @@ export default async function PortalPage({ params }: Props) {
   if (shareErr || !share) notFound();
 
   const portalShare = share as PortalShare;
-
-  // If in brief mode, redirect to the existing brief page
-  if (portalShare.portal_mode === "brief") {
-    redirect(`/brief/${shareToken}`);
-  }
 
   /* ── 2. Fetch release ───────────────────────────────────────────── */
 

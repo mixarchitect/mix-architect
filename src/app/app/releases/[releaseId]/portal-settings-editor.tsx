@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Copy, Check, ExternalLink } from "lucide-react";
 import { canEdit, type ReleaseRole } from "@/lib/permissions";
 import type { ApprovalStatus } from "@/lib/portal-types";
@@ -15,7 +14,6 @@ type PortalSettingsEditorProps = {
   initialShare: {
     id: string;
     share_token: string;
-    portal_mode: "brief" | "portal";
     show_direction: boolean;
     show_specs: boolean;
     show_references: boolean;
@@ -109,10 +107,7 @@ export function PortalSettingsEditor({
   async function handleCopyLink() {
     const s = await ensureShare();
     if (!s) return;
-    const url =
-      s.portal_mode === "portal"
-        ? `${window.location.origin}/portal/${s.share_token}`
-        : `${window.location.origin}/brief/${s.share_token}`;
+    const url = `${window.location.origin}/portal/${s.share_token}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -130,9 +125,7 @@ export function PortalSettingsEditor({
   }
 
   const portalUrl = share
-    ? share.portal_mode === "portal"
-      ? `${typeof window !== "undefined" ? window.location.origin : ""}/portal/${share.share_token}`
-      : `${typeof window !== "undefined" ? window.location.origin : ""}/brief/${share.share_token}`
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/portal/${share.share_token}`
     : null;
 
   return (
@@ -170,21 +163,8 @@ export function PortalSettingsEditor({
           </div>
         </div>
 
-        {/* Mode Toggle */}
-        <div className="space-y-1.5">
-          <div className="text-xs text-muted">Mode</div>
-          <SegmentedControl
-            options={[
-              { value: "brief", label: "Brief" },
-              { value: "portal", label: "Portal" },
-            ]}
-            value={share?.portal_mode ?? "brief"}
-            onChange={(v) => updateField("portal_mode", v)}
-          />
-        </div>
-
-        {/* Visibility Toggles — only show when in portal mode */}
-        {share?.portal_mode === "portal" && (
+        {/* Visibility Toggles */}
+        {share && (
           <div className="space-y-2 pt-2 border-t border-border/50">
             <div className="text-xs text-muted font-medium">Show on portal</div>
             <ToggleRow

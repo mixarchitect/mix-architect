@@ -36,7 +36,7 @@ export default async function TrackDetailPage({ params }: Props) {
       .order("version_number"),
     supabase
       .from("brief_shares")
-      .select("id, portal_mode")
+      .select("id")
       .eq("release_id", releaseId)
       .maybeSingle(),
   ]);

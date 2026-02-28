@@ -4,6 +4,7 @@ import { PortalHeader } from "@/components/portal/portal-header";
 import { PortalTrackCard } from "@/components/portal/portal-track-card";
 import { PortalFooter } from "@/components/portal/portal-footer";
 import { Rule } from "@/components/ui/rule";
+import { Download } from "lucide-react";
 import type { PortalRelease, PortalTrack, PortalShare } from "@/lib/portal-types";
 import type { BriefReference } from "@/lib/db-types";
 
@@ -32,6 +33,17 @@ export function PortalClient({
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <PortalHeader release={release} trackCount={tracks.length} />
+
+        {/* Download PDF — hidden during print */}
+        <div className="flex justify-center mb-8 print:hidden">
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted hover:text-text border border-border rounded-lg hover:bg-panel transition-colors"
+          >
+            <Download size={16} />
+            Download PDF
+          </button>
+        </div>
 
         {/* Global direction + references */}
         {(share.show_direction && globalDirection) ||
