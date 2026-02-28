@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
-import { Globe, ExternalLink } from "lucide-react";
+import { Globe, ExternalLink, Copy, Check } from "lucide-react";
 
 type PortalToggleProps = {
   releaseId: string;
@@ -24,6 +24,7 @@ export function PortalToggle({
   const [shareId, setShareId] = useState(initialShareId);
   const [shareToken, setShareToken] = useState(initialShareToken);
   const [toggling, setToggling] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   async function handleToggle() {
     if (toggling) return;
@@ -63,6 +64,14 @@ export function PortalToggle({
     }
   }
 
+  async function handleCopyLink() {
+    if (!shareToken) return;
+    const url = `${window.location.origin}/portal/${shareToken}`;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
   const portalUrl =
     active && shareToken
       ? `${typeof window !== "undefined" ? window.location.origin : ""}/portal/${shareToken}`
@@ -91,15 +100,25 @@ export function PortalToggle({
         </span>
       </button>
       {portalUrl && (
-        <a
-          href={portalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-secondary !px-3"
-          title="Open portal"
-        >
-          <ExternalLink size={16} />
-        </a>
+        <>
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="btn-secondary !px-3"
+            title={copied ? "Copied!" : "Copy portal link"}
+          >
+            {copied ? <Check size={16} /> : <Copy size={16} />}
+          </button>
+          <a
+            href={portalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary !px-3"
+            title="Open portal"
+          >
+            <ExternalLink size={16} />
+          </a>
+        </>
       )}
     </div>
   );
