@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { searchItunesApi, buildPlatformUrl } from "@/lib/itunes-search";
 import { cn } from "@/lib/cn";
+import { formatLabel } from "@/lib/format-labels";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
@@ -1000,14 +1001,7 @@ export function TrackDetailClient({
               </div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Format</span>
-                <Pill className="text-[10px]">{
-                  (() => {
-                    const f = formatOverride || releaseFormat;
-                    if (f === "both") return "Stereo & Atmos";
-                    if (f === "atmos") return "Dolby Atmos";
-                    return "Stereo";
-                  })()
-                }</Pill>
+                <Pill className="text-[10px]">{formatLabel(formatOverride || releaseFormat)}</Pill>
               </div>
             </PanelBody>
           </Panel>

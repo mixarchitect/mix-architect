@@ -11,6 +11,7 @@ import { cn } from "@/lib/cn";
 import { Timestamp } from "@/components/ui/timestamp";
 import type { ReleaseRole } from "@/lib/permissions";
 import { canDeleteRelease, canEdit } from "@/lib/permissions";
+import { formatLabel } from "@/lib/format-labels";
 
 type Props = {
   id: string;
@@ -36,13 +37,6 @@ function statusColor(status: string): "green" | "orange" | "blue" {
   if (status === "ready") return "green";
   if (status === "in_progress") return "orange";
   return "blue";
-}
-
-function formatLabel(f: string | undefined | null): string {
-  if (!f) return "Stereo";
-  if (f === "atmos") return "Dolby Atmos";
-  if (f === "both") return "Stereo + Atmos";
-  return "Stereo";
 }
 
 function typeLabel(t: string | undefined | null): string {

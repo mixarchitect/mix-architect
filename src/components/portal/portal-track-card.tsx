@@ -6,6 +6,7 @@ import { ApprovalControls, PortalStatusBadge } from "@/components/portal/approva
 import { PortalReferenceItem } from "@/components/portal/portal-reference-item";
 import { ChevronRight } from "lucide-react";
 import type { PortalTrack } from "@/lib/portal-types";
+import { formatLabel } from "@/lib/format-labels";
 
 type PortalTrackCardProps = {
   shareToken: string;
@@ -208,7 +209,7 @@ export function PortalTrackCard({
                   <span>
                     <span className="text-muted">Format: </span>
                     <span className="font-mono text-text">
-                      {track.specs?.format_override || releaseFormat}
+                      {formatLabel(track.specs?.format_override || releaseFormat)}
                     </span>
                   </span>
                 </div>

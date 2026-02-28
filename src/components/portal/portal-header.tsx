@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import type { PortalRelease } from "@/lib/portal-types";
+import { formatLabel } from "@/lib/format-labels";
 
 type ApprovalCounts = {
   approved: number;
@@ -95,7 +96,7 @@ export function PortalHeader({
         <div className="flex items-center justify-center gap-2 mt-3 text-xs text-faint flex-wrap">
           <span>{typeLabel}</span>
           <span>&middot;</span>
-          <span>{release.format}</span>
+          <span>{formatLabel(release.format)}</span>
           <span>&middot;</span>
           <span>
             {trackCount} track{trackCount !== 1 ? "s" : ""}
