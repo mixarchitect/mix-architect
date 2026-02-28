@@ -1,3 +1,4 @@
+import { cn } from "@/lib/cn";
 import type { PortalRelease, PortalTrack, PortalReleaseDistribution } from "@/lib/portal-types";
 
 type PortalFooterProps = {
@@ -34,51 +35,100 @@ export function PortalFooter({
   return (
     <div className="mt-8 space-y-4">
       {/* Payment status */}
-      {hasPaymentData && (
-        <div className="rounded-lg border border-border bg-panel px-6 py-5">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <div className="text-[10px] text-faint font-medium uppercase tracking-wider">
-                Payment
-              </div>
-              <div className="text-xl font-bold text-text">
-                {release.payment_status === "partial" && release.paid_amount ? (
-                  <>
-                    {formatCurrency(release.paid_amount, release.fee_currency)}
-                    {" "}
-                    <span className="text-muted font-normal text-sm">of</span>
-                    {" "}
-                    {formatCurrency(release.fee_total!, release.fee_currency)}
-                  </>
-                ) : (
-                  formatCurrency(release.fee_total!, release.fee_currency)
-                )}
-              </div>
-            </div>
-            <span
-              className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                release.payment_status === "paid"
-                  ? "bg-status-green/10 text-status-green"
-                  : release.payment_status === "partial"
-                    ? "bg-signal-muted text-signal"
-                    : "bg-black/[0.04] dark:bg-white/[0.06] text-muted"
-              }`}
+      {hasPaymentData && (() => {
+        const isPaid = release.payment_status === "paid";
+        const isPartial = release.payment_status === "partial";
+        const outstanding = (release.fee_total ?? 0) - (release.paid_amount ?? 0);
+
+        return (
+          <div
+            className={cn(
+              "rounded-lg border bg-panel overflow-hidden border-l-[3px]",
+              isPaid
+                ? "border-l-status-green border-border"
+                : isPartial
+                  ? "border-l-signal border-border"
+                  : "border-l-signal/60 border-border",
+            )}
+          >
+            {/* Colored header bar */}
+            <div
+              className={cn(
+                "px-6 py-4",
+                isPaid
+                  ? "bg-status-green/[0.04] dark:bg-status-green/[0.06]"
+                  : isPartial
+                    ? "bg-signal/[0.03] dark:bg-signal/[0.05]"
+                    : "",
+              )}
             >
-              {release.payment_status === "paid"
-                ? "Paid"
-                : release.payment_status === "partial"
-                  ? "Partial"
-                  : "Unpaid"}
-            </span>
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="text-[10px] text-faint font-medium uppercase tracking-wider">
+                    Payment
+                  </div>
+                  <div className="text-xl font-bold">
+                    {isPartial && release.paid_amount ? (
+                      <>
+                        <span className="text-status-green">
+                          {formatCurrency(release.paid_amount, release.fee_currency)}
+                        </span>
+                        {" "}
+                        <span className="text-muted font-normal text-sm">of</span>
+                        {" "}
+                        <span className="text-text">
+                          {formatCurrency(release.fee_total!, release.fee_currency)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className={isPaid ? "text-status-green" : "text-text"}>
+                        {formatCurrency(release.fee_total!, release.fee_currency)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full",
+                    isPaid && "bg-status-green/10 text-status-green",
+                    isPartial && "bg-signal-muted text-signal",
+                    !isPaid && !isPartial && "bg-black/[0.04] dark:bg-white/[0.06] text-muted",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "w-1.5 h-1.5 rounded-full",
+                      isPaid && "bg-status-green",
+                      isPartial && "bg-signal",
+                      !isPaid && !isPartial && "bg-muted",
+                    )}
+                  />
+                  {isPaid ? "Paid" : isPartial ? "Partial" : "Unpaid"}
+                </span>
+              </div>
+
+              {/* Outstanding balance callout for partial/unpaid */}
+              {!isPaid && outstanding > 0 && (
+                <div className="mt-3 flex items-center gap-2 text-sm">
+                  <span className="text-muted">Outstanding:</span>
+                  <span className="font-mono font-semibold text-signal">
+                    {formatCurrency(outstanding, release.fee_currency)}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {paymentGated && (
+              <div className="px-6 py-3 border-t border-border bg-black/[0.02] dark:bg-white/[0.02]">
+                <p className="text-xs text-muted">
+                  Final downloads will be available once payment is confirmed
+                  {engineerName ? ` by ${engineerName}` : ""}.
+                </p>
+              </div>
+            )}
           </div>
-          {paymentGated && (
-            <p className="text-xs text-muted mt-3">
-              Final downloads will be available once payment is confirmed
-              {engineerName ? ` by ${engineerName}` : ""}.
-            </p>
-          )}
-        </div>
-      )}
+        );
+      })()}
 
       {/* Distribution metadata */}
       {hasDistribution && (

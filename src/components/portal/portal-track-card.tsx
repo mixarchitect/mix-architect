@@ -3,6 +3,7 @@
 import { cn } from "@/lib/cn";
 import { PortalAudioPlayer } from "@/components/portal/portal-audio-player";
 import { ApprovalControls, PortalStatusBadge } from "@/components/portal/approval-controls";
+import { PortalReferenceItem } from "@/components/portal/portal-reference-item";
 import { ChevronRight } from "lucide-react";
 import type { PortalTrack } from "@/lib/portal-types";
 
@@ -36,7 +37,6 @@ export function PortalTrackCard({
   const hasAudio = track.versions.length > 0;
   const isApproved = track.approvalStatus === "approved";
   const isDelivered = track.approvalStatus === "delivered";
-  const isActioned = isApproved || isDelivered;
 
   // Detail sections
   const hasDirection =
@@ -45,10 +45,14 @@ export function PortalTrackCard({
     (track.intent.mix_vision ||
       (track.intent.emotional_tags?.length ?? 0) > 0 ||
       track.intent.anti_references);
-  const hasSpecs = showSpecs && track.specs?.target_loudness;
+  const hasSpecs = showSpecs && (track.specs?.format_override || releaseFormat);
   const hasRefs = showReferences && track.references.length > 0;
   const hasDist = showDistribution && track.distribution != null;
   const hasDetails = hasDirection || hasSpecs || hasRefs || hasDist;
+
+  // Measured LUFS from the latest audio version (live measurement, not target)
+  const latestVersion = track.versions.length > 0 ? track.versions[track.versions.length - 1] : null;
+  const measuredLufs = latestVersion?.measured_lufs ?? null;
 
   // Latest change request note (for highlighting)
   const latestChangeNote =
@@ -76,14 +80,16 @@ export function PortalTrackCard({
       )}
     >
       {/* Track header with inline status badge */}
-      <div className="flex items-center justify-between px-4 md:px-6 pt-5 pb-3 gap-3">
-        <h2 className="text-base md:text-lg font-bold text-text min-w-0">
+      <div className="flex items-start justify-between px-4 md:px-6 pt-5 pb-3 gap-3">
+        <h2 className="text-base md:text-lg font-bold text-text min-w-0 pt-0.5">
           <span className="font-mono text-muted text-sm mr-2">
             {String(track.track_number).padStart(2, "0")}
           </span>
           {track.title}
         </h2>
-        <PortalStatusBadge status={track.approvalStatus} />
+        <div className="shrink-0">
+          <PortalStatusBadge status={track.approvalStatus} />
+        </div>
       </div>
 
       {/* ── Audio player (primary content) ── */}
@@ -184,49 +190,42 @@ export function PortalTrackCard({
               </div>
             )}
 
-            {/* Specs */}
+            {/* Specs — show measured LUFS (live) + format */}
             {hasSpecs && (
               <div>
                 <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
                   Specs
                 </div>
                 <div className="flex flex-wrap gap-4 text-sm">
-                  <span>
-                    <span className="text-muted">Loudness: </span>
-                    <span className="font-mono text-text">
-                      {track.specs!.target_loudness}
+                  {measuredLufs != null && (
+                    <span>
+                      <span className="text-muted">Loudness: </span>
+                      <span className="font-mono text-text">
+                        {measuredLufs.toFixed(1)} LUFS
+                      </span>
                     </span>
-                  </span>
+                  )}
                   <span>
                     <span className="text-muted">Format: </span>
                     <span className="font-mono text-text">
-                      {track.specs!.format_override || releaseFormat}
+                      {track.specs?.format_override || releaseFormat}
                     </span>
                   </span>
                 </div>
               </div>
             )}
 
-            {/* References */}
+            {/* References — with artwork + links */}
             {hasRefs && (
               <div>
-                <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
+                <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-2">
                   References
                 </div>
-                <ul className="text-sm text-text space-y-1">
-                  {track.references.map((ref, idx) => (
-                    <li key={ref.id}>
-                      {idx + 1}. {ref.song_title}
-                      {ref.artist ? ` \u2014 ${ref.artist}` : ""}
-                      {ref.note && (
-                        <span className="text-muted italic">
-                          {" "}
-                          &ldquo;{ref.note}&rdquo;
-                        </span>
-                      )}
-                    </li>
+                <div className="space-y-2">
+                  {track.references.map((ref) => (
+                    <PortalReferenceItem key={ref.id} reference={ref} />
                   ))}
-                </ul>
+                </div>
               </div>
             )}
 

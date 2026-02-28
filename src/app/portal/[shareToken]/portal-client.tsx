@@ -3,6 +3,7 @@
 import { PortalHeader } from "@/components/portal/portal-header";
 import { PortalTrackCard } from "@/components/portal/portal-track-card";
 import { PortalFooter } from "@/components/portal/portal-footer";
+import { PortalReferenceItem } from "@/components/portal/portal-reference-item";
 import { ChevronRight } from "lucide-react";
 import type { PortalRelease, PortalTrack, PortalShare } from "@/lib/portal-types";
 import type { BriefReference } from "@/lib/db-types";
@@ -50,23 +51,23 @@ export function PortalClient({
           approvalCounts={approvalCounts}
         />
 
-        {/* ═══ Mix Brief (collapsible) ═══ */}
+        {/* ═══ Global Mix Brief (collapsible) ═══ */}
         {hasGlobalContext && (
-          <details className="mb-8 group">
-            <summary className="cursor-pointer list-none flex items-center gap-2 rounded-lg border border-border bg-panel px-5 py-3.5 hover:bg-panel transition-colors">
+          <details className="mb-8 group rounded-lg border border-border bg-panel overflow-hidden">
+            <summary className="cursor-pointer list-none flex items-center gap-2 px-5 py-3.5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors">
               <ChevronRight
                 size={16}
                 className="text-muted transition-transform group-open:rotate-90 shrink-0"
               />
               <span className="text-sm font-semibold text-muted">
-                Mix Brief
+                Global Mix Brief
               </span>
             </summary>
-            <div className="rounded-b-lg border border-t-0 border-border bg-panel px-5 py-5 space-y-4 -mt-px">
+            <div className="border-t border-border px-5 py-5 space-y-4">
               {share.show_direction && globalDirection && (
                 <div>
                   <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
-                    Global Direction
+                    Direction
                   </div>
                   <p className="text-sm text-text leading-relaxed italic">
                     &ldquo;{globalDirection}&rdquo;
@@ -76,21 +77,13 @@ export function PortalClient({
               {share.show_references && globalRefs.length > 0 && (
                 <div>
                   <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
-                    Global References
+                    References
                   </div>
-                  <ul className="text-sm text-text space-y-1">
+                  <div className="space-y-2">
                     {globalRefs.map((ref) => (
-                      <li key={ref.id}>
-                        {ref.song_title}
-                        {ref.artist ? ` \u2014 ${ref.artist}` : ""}
-                        {ref.note && (
-                          <span className="text-muted italic ml-1">
-                            &ldquo;{ref.note}&rdquo;
-                          </span>
-                        )}
-                      </li>
+                      <PortalReferenceItem key={ref.id} reference={ref} />
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
             </div>

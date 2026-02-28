@@ -29,6 +29,8 @@ export type BriefReference = {
   song_title: string;
   artist: string | null;
   note: string | null;
+  url: string | null;
+  artwork_url: string | null;
 };
 
 export type BriefAudioVersion = {
