@@ -123,6 +123,26 @@
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--text);
+
+  /* Custom palette — registered here so Tailwind v4 generates
+     all utility variants (text-*, bg-*, border-*, border-l-*, /opacity, etc.) */
+  --color-panel: var(--panel);
+  --color-panel2: var(--panel-2);
+  --color-text: var(--text);
+  --color-text-inverse: var(--text-inverse);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-signal: var(--signal);
+  --color-signal-muted: var(--signal-muted);
+  --color-highlight: var(--highlight);
+  --color-charcoal: var(--charcoal);
+  --color-charcoal-light: var(--charcoal-light);
+  --color-status-blue: var(--status-blue);
+  --color-status-green: var(--status-green);
+  --color-status-orange: var(--status-orange);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

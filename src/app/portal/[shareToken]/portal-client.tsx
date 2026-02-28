@@ -1,11 +1,12 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { PortalHeader } from "@/components/portal/portal-header";
 import { PortalTrackCard } from "@/components/portal/portal-track-card";
 import { PortalFooter } from "@/components/portal/portal-footer";
 import { PortalReferenceItem } from "@/components/portal/portal-reference-item";
 import { ChevronRight } from "lucide-react";
-import type { PortalRelease, PortalTrack, PortalShare } from "@/lib/portal-types";
+import type { PortalRelease, PortalTrack, PortalShare, ApprovalStatus } from "@/lib/portal-types";
 import type { BriefReference } from "@/lib/db-types";
 
 type PortalClientProps = {
@@ -21,14 +22,24 @@ export function PortalClient({
   shareToken,
   share,
   release,
-  tracks,
+  tracks: initialTracks,
   globalDirection,
   globalRefs,
 }: PortalClientProps) {
+  const [tracks, setTracks] = useState(initialTracks);
   const paymentGated =
     share.require_payment_for_download && release.payment_status !== "paid";
 
-  // Compute approval counts for the progress bar
+  // Update a single track's approval status reactively (no page reload)
+  const handleStatusChange = useCallback((trackId: string, newStatus: ApprovalStatus) => {
+    setTracks((prev) =>
+      prev.map((t) =>
+        t.id === trackId ? { ...t, approvalStatus: newStatus } : t,
+      ),
+    );
+  }, []);
+
+  // Compute approval counts for the progress bar (re-derived on each render)
   const approvalCounts = {
     approved: tracks.filter((t) => t.approvalStatus === "approved").length,
     awaiting: tracks.filter((t) => t.approvalStatus === "awaiting_review").length,
@@ -106,6 +117,7 @@ export function PortalClient({
               showReferences={share.show_references}
               showDistribution={share.show_distribution}
               paymentGated={paymentGated}
+              onStatusChange={(newStatus) => handleStatusChange(track.id, newStatus)}
             />
           ))}
 

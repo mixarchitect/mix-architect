@@ -330,8 +330,9 @@ export default function SettingsPage() {
                     setPaymentsEnabled(prev);
                   }
                 }}
-                className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors"
-                style={{ background: paymentsEnabled ? "var(--signal)" : "var(--faint)" }}
+                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                  paymentsEnabled ? "bg-signal" : "bg-black/20 dark:bg-white/20"
+                }`}
               >
                 <span
                   className="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform"

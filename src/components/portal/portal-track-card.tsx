@@ -1,11 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/cn";
 import { PortalAudioPlayer } from "@/components/portal/portal-audio-player";
 import { ApprovalControls, PortalStatusBadge } from "@/components/portal/approval-controls";
 import { PortalReferenceItem } from "@/components/portal/portal-reference-item";
 import { ChevronRight } from "lucide-react";
-import type { PortalTrack } from "@/lib/portal-types";
+import type { PortalTrack, ApprovalStatus } from "@/lib/portal-types";
 import { formatLabel } from "@/lib/format-labels";
 
 type PortalTrackCardProps = {
@@ -20,6 +19,7 @@ type PortalTrackCardProps = {
   showReferences: boolean;
   showDistribution: boolean;
   paymentGated: boolean;
+  onStatusChange?: (newStatus: ApprovalStatus) => void;
 };
 
 export function PortalTrackCard({
@@ -34,6 +34,7 @@ export function PortalTrackCard({
   showReferences,
   showDistribution,
   paymentGated,
+  onStatusChange,
 }: PortalTrackCardProps) {
   const hasAudio = track.versions.length > 0;
   const isApproved = track.approvalStatus === "approved";
@@ -61,24 +62,22 @@ export function PortalTrackCard({
       ? track.comments.find((c) => !c.timecode_seconds && !c.audio_version_id)
       : null;
 
-  // Status-colored left border
-  const borderColor =
+  // Status-colored left border (inline style to avoid CSS cascade issues with border-border shorthand)
+  const borderLeftColor =
     track.approvalStatus === "approved"
-      ? "border-l-status-green"
+      ? "var(--status-green)"
       : track.approvalStatus === "delivered"
-        ? "border-l-status-blue"
+        ? "var(--status-blue)"
         : track.approvalStatus === "changes_requested"
-          ? "border-l-signal"
+          ? "var(--signal)"
           : hasAudio
-            ? "border-l-signal/40"
-            : "border-l-border";
+            ? "color-mix(in srgb, var(--signal) 40%, transparent)"
+            : "var(--border)";
 
   return (
     <section
-      className={cn(
-        "rounded-lg border border-border bg-panel overflow-hidden border-l-[3px]",
-        borderColor,
-      )}
+      className="rounded-lg border border-border bg-panel overflow-hidden border-l-[3px]"
+      style={{ borderLeftColor }}
     >
       {/* Track header with inline status badge */}
       <div className="flex items-start justify-between px-4 md:px-6 pt-5 pb-3 gap-3">
@@ -138,6 +137,7 @@ export function PortalTrackCard({
             trackId={track.id}
             initialStatus={track.approvalStatus}
             approvalDate={track.approvalDate}
+            onStatusChange={onStatusChange}
           />
         </div>
       )}

@@ -45,14 +45,12 @@ export function PortalFooter({
 
         return (
           <div
-            className={cn(
-              "rounded-lg border bg-panel overflow-hidden border-l-[3px]",
-              isPaid
-                ? "border-l-status-green border-border"
-                : isPartial
-                  ? "border-l-signal border-border"
-                  : "border-l-signal/60 border-border",
-            )}
+            className="rounded-lg border border-border bg-panel overflow-hidden border-l-[3px]"
+            style={{
+              borderLeftColor: isPaid
+                ? "var(--status-green)"
+                : "var(--signal)",
+            }}
           >
             {/* Colored header bar */}
             <div
