@@ -9,7 +9,6 @@ import { TrackList } from "./track-list";
 import { Plus, Settings, ArrowLeft } from "lucide-react";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
-import { PortalSettingsEditor } from "./portal-settings-editor";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
 import { formatLabel } from "@/lib/format-labels";
@@ -114,9 +113,17 @@ export default async function ReleasePage({ params }: Props) {
           {canEdit(role) && (
             <PortalToggle
               releaseId={releaseId}
-              initialActive={briefShareRes.data?.active ?? false}
-              initialShareId={briefShareRes.data?.id ?? null}
-              initialShareToken={briefShareRes.data?.share_token ?? null}
+              initialShare={briefShareRes.data ? {
+                id: briefShareRes.data.id,
+                share_token: briefShareRes.data.share_token,
+                active: briefShareRes.data.active ?? true,
+                show_direction: briefShareRes.data.show_direction ?? true,
+                show_specs: briefShareRes.data.show_specs ?? true,
+                show_references: briefShareRes.data.show_references ?? true,
+                show_payment_status: briefShareRes.data.show_payment_status ?? false,
+                show_distribution: briefShareRes.data.show_distribution ?? false,
+                require_payment_for_download: briefShareRes.data.require_payment_for_download ?? false,
+              } : null}
             />
           )}
           {canEdit(role) && (
@@ -295,22 +302,6 @@ export default async function ReleasePage({ params }: Props) {
             />
           )}
 
-          {/* Client Portal */}
-          <PortalSettingsEditor
-            releaseId={releaseId}
-            initialShare={briefShareRes.data ? {
-              id: briefShareRes.data.id,
-              share_token: briefShareRes.data.share_token,
-              active: briefShareRes.data.active ?? true,
-              show_direction: briefShareRes.data.show_direction ?? true,
-              show_specs: briefShareRes.data.show_specs ?? true,
-              show_references: briefShareRes.data.show_references ?? true,
-              show_payment_status: briefShareRes.data.show_payment_status ?? false,
-              show_distribution: briefShareRes.data.show_distribution ?? false,
-              require_payment_for_download: briefShareRes.data.require_payment_for_download ?? false,
-            } : null}
-            role={role}
-          />
         </aside>
       </div>
     </div>
