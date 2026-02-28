@@ -37,26 +37,38 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log("[portal/approve]", action, track_id, share_token?.slice(0, 8));
+
     const supabase = createSupabaseServiceClient();
 
     // Validate share_token
-    const { data: share } = await supabase
+    const { data: share, error: shareErr } = await supabase
       .from("brief_shares")
       .select("id, release_id")
       .eq("share_token", share_token)
       .maybeSingle();
+
+    if (shareErr) {
+      console.error("[portal/approve] share lookup failed:", shareErr);
+      return NextResponse.json({ error: "Failed to validate share token", detail: shareErr.message }, { status: 500 });
+    }
 
     if (!share) {
       return NextResponse.json({ error: "Invalid share token" }, { status: 401 });
     }
 
     // Verify the track belongs to this release
-    const { data: track } = await supabase
+    const { data: track, error: trackErr } = await supabase
       .from("tracks")
       .select("id")
       .eq("id", track_id)
       .eq("release_id", share.release_id)
       .maybeSingle();
+
+    if (trackErr) {
+      console.error("[portal/approve] track lookup failed:", trackErr);
+      return NextResponse.json({ error: "Failed to validate track", detail: trackErr.message }, { status: 500 });
+    }
 
     if (!track) {
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
@@ -71,22 +83,29 @@ export async function POST(req: NextRequest) {
     };
     const newStatus = statusMap[action];
 
-    // Upsert the portal_track_settings with approval_status
-    await supabase
+    // Upsert the portal_track_settings with ONLY approval_status
+    // (don't overwrite visible/download_enabled — those are owner-managed)
+    const { error: upsertErr } = await supabase
       .from("portal_track_settings")
       .upsert(
         {
           brief_share_id: share.id,
           track_id,
           approval_status: newStatus,
-          visible: true,
-          download_enabled: true,
         },
         { onConflict: "brief_share_id,track_id" },
       );
 
+    if (upsertErr) {
+      console.error("[portal/approve] portal_track_settings upsert failed:", upsertErr);
+      return NextResponse.json(
+        { error: "Failed to update approval status", detail: upsertErr.message },
+        { status: 500 },
+      );
+    }
+
     // Log approval event
-    await supabase.from("portal_approval_events").insert({
+    const { error: eventErr } = await supabase.from("portal_approval_events").insert({
       brief_share_id: share.id,
       track_id,
       event_type: action,
@@ -94,20 +113,34 @@ export async function POST(req: NextRequest) {
       note: note?.trim() || null,
     });
 
+    if (eventErr) {
+      console.error("[portal/approve] portal_approval_events insert failed:", eventErr);
+      // Non-fatal: the status was already updated, so continue
+    }
+
     // If request_changes, also create a revision_note with the feedback
     if (action === "request_changes" && note?.trim()) {
-      await supabase.from("revision_notes").insert({
+      const { error: noteErr } = await supabase.from("revision_notes").insert({
         track_id,
         content: note.trim(),
         author: actor_name?.trim() || "Client",
       });
+
+      if (noteErr) {
+        console.error("[portal/approve] revision_notes insert failed:", noteErr);
+        // Non-fatal: the status was already updated
+      }
     }
 
     // Recompute release-level portal_status rollup
-    const { data: allTrackSettings } = await supabase
+    const { data: allTrackSettings, error: rollupErr } = await supabase
       .from("portal_track_settings")
       .select("approval_status")
       .eq("brief_share_id", share.id);
+
+    if (rollupErr) {
+      console.error("[portal/approve] rollup query failed:", rollupErr);
+    }
 
     let portalStatus = "in_review";
     if (allTrackSettings && allTrackSettings.length > 0) {
@@ -119,16 +152,23 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    await supabase
+    const { error: statusErr } = await supabase
       .from("brief_shares")
       .update({ portal_status: portalStatus })
       .eq("id", share.id);
+
+    if (statusErr) {
+      console.error("[portal/approve] brief_shares status update failed:", statusErr);
+    }
+
+    console.log("[portal/approve] success:", { action, newStatus, portalStatus });
 
     return NextResponse.json({
       approval_status: newStatus,
       portal_status: portalStatus,
     });
-  } catch {
+  } catch (err) {
+    console.error("[portal/approve] unhandled error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

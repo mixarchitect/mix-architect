@@ -83,9 +83,11 @@ export function ApprovalControls({
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [changeNote, setChangeNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleApprove() {
     setSubmitting(true);
+    setError(null);
     try {
       const res = await fetch("/api/portal/approve", {
         method: "POST",
@@ -100,7 +102,12 @@ export function ApprovalControls({
       if (res.ok) {
         setStatus("approved");
         onStatusChange?.("approved");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to approve — please try again");
       }
+    } catch {
+      setError("Network error — please check your connection");
     } finally {
       setSubmitting(false);
     }
@@ -109,6 +116,7 @@ export function ApprovalControls({
   async function handleRequestChanges() {
     if (!changeNote.trim()) return;
     setSubmitting(true);
+    setError(null);
     try {
       const res = await fetch("/api/portal/approve", {
         method: "POST",
@@ -126,7 +134,12 @@ export function ApprovalControls({
         onStatusChange?.("changes_requested");
         setChangeNote("");
         setShowRequestForm(false);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to submit changes — please try again");
       }
+    } catch {
+      setError("Network error — please check your connection");
     } finally {
       setSubmitting(false);
     }
@@ -134,6 +147,7 @@ export function ApprovalControls({
 
   async function handleUndo() {
     setSubmitting(true);
+    setError(null);
     try {
       const res = await fetch("/api/portal/approve", {
         method: "POST",
@@ -148,7 +162,12 @@ export function ApprovalControls({
       if (res.ok) {
         setStatus("awaiting_review");
         onStatusChange?.("awaiting_review");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to undo — please try again");
       }
+    } catch {
+      setError("Network error — please check your connection");
     } finally {
       setSubmitting(false);
     }
@@ -208,6 +227,11 @@ export function ApprovalControls({
             Undo
           </button>
         </div>
+      )}
+
+      {/* Error feedback */}
+      {error && (
+        <p className="text-xs text-red-500">{error}</p>
       )}
 
       {/* Request changes form */}
