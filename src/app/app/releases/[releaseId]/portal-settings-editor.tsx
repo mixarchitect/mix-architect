@@ -251,7 +251,7 @@ function ToggleRow({
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-          checked ? "bg-signal" : "bg-muted/30"
+          checked ? "bg-signal" : "bg-muted/60"
         }`}
       >
         <span
