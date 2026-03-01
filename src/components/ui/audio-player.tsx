@@ -896,7 +896,7 @@ export function AudioPlayer({
         {activeVersion && (
           <div className="px-5 pt-1 flex items-center gap-1 text-[10px] text-faint">
             {activeVersion.file_name && (
-              <span className="truncate max-w-[200px]">{activeVersion.file_name}</span>
+              <span className="truncate max-w-[360px]">{activeVersion.file_name}</span>
             )}
             {activeVersion.file_format && (
               <>
