@@ -17,7 +17,8 @@ import { ReferenceCard } from "@/components/ui/reference-card";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { AudioPlayer, type AudioVersionData, type TimelineComment } from "@/components/ui/audio-player";
-import { ArrowLeft, Bookmark, Check, Plus, X } from "lucide-react";
+import { ArrowLeft, Bookmark, Check, Disc3, Plus, StickyNote, Users, X } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { EditableTitle } from "@/components/ui/editable-title";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
 import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
@@ -808,9 +809,12 @@ export function TrackDetailClient({
                   })}
                 </div>
               ) : (
-                <p className="text-sm text-muted text-center py-8">
-                  No notes yet. Start documenting decisions and feedback.
-                </p>
+                <EmptyState
+                  icon={StickyNote}
+                  size="sm"
+                  title="No notes yet"
+                  description="Document mix decisions, client feedback, and revision history."
+                />
               )}
             </div>
           )}
@@ -1180,7 +1184,12 @@ export function TrackDetailClient({
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-muted italic">No references added yet.</p>
+                <EmptyState
+                  icon={Disc3}
+                  size="sm"
+                  title="No reference tracks"
+                  description="Add tracks that capture the sound, mix, or vibe you're aiming for."
+                />
               )}
             </PanelBody>
           </Panel>
@@ -1349,9 +1358,12 @@ function SplitEditor({
         </div>
 
         {sorted.length === 0 ? (
-          <p className="text-sm text-muted text-center py-4">
-            {readOnly ? "No splits configured." : "No splits yet. Add a person to get started."}
-          </p>
+          <EmptyState
+            icon={Users}
+            size="sm"
+            title="No splits defined"
+            description={readOnly ? "No splits configured." : "Add contributors and their ownership percentages."}
+          />
         ) : (
           <div className="space-y-2">
             {sorted.map((split) => (

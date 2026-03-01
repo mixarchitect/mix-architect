@@ -5,7 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function ReleaseError({
+export default function TrackError({
   error,
   reset,
 }: {
@@ -22,11 +22,11 @@ export default function ReleaseError({
         <AlertTriangle className="w-6 h-6 text-signal" />
       </div>
       <h2 className="text-lg font-semibold text-text">
-        Couldn&apos;t load this release
+        Couldn&apos;t load this track
       </h2>
       <p className="text-sm text-muted max-w-md">
-        Something went wrong loading the release. You can try again, or head
-        back to the dashboard.
+        Something went wrong loading the track. You can try again, or head back
+        to the dashboard.
       </p>
       <div className="flex gap-3 mt-2">
         <Button variant="ghost" onClick={() => reset()}>

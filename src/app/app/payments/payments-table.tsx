@@ -3,7 +3,8 @@
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/format-money";
-import { ChevronRight, ChevronDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ChevronRight, ChevronDown, ArrowUp, ArrowDown, DollarSign } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { PaymentRelease } from "@/lib/db-types";
 
 type Props = {
@@ -101,9 +102,12 @@ export function PaymentsTable({ releases, currency }: Props) {
 
   if (releases.length === 0) {
     return (
-      <div className="p-8 text-center text-muted text-sm">
-        No releases with fees yet.
-      </div>
+      <EmptyState
+        icon={DollarSign}
+        size="md"
+        title="No payments tracked"
+        description="Add payment milestones to track what's owed and what's been collected."
+      />
     );
   }
 

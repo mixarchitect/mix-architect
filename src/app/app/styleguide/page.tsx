@@ -10,7 +10,9 @@ import { AccentPanel } from "@/components/ui/accent-panel";
 import { DataGrid, DataCell } from "@/components/ui/data-grid";
 import { StatusDot, StatusIndicator } from "@/components/ui/status-dot";
 import { Toolbar, ToolbarButton } from "@/components/ui/toolbar";
-import { Home, Layers, Settings, Plus, ExternalLink } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SectionErrorFallback } from "@/components/error-boundary";
+import { Home, Layers, Settings, Plus, ExternalLink, Music, ListMusic, Upload, Search, StickyNote, AlertTriangle } from "lucide-react";
 
 export default function StyleguidePage() {
   return (
@@ -306,6 +308,101 @@ export default function StyleguidePage() {
       <div className="max-w-md">
         <Inspector />
       </div>
+
+      {/* Empty States */}
+      <Panel>
+        <PanelHeader>
+          <h2 className="text-lg font-bold h2 text-text">Empty States</h2>
+          <p className="mt-1 text-sm text-muted">
+            Three sizes: lg (full-page), md (panel), sm (inline section).
+          </p>
+        </PanelHeader>
+        <Rule />
+        <PanelBody className="pt-5 space-y-6">
+          <div>
+            <div className="label text-faint mb-2">SIZE: LG</div>
+            <EmptyState
+              icon={Music}
+              size="lg"
+              title="No releases yet"
+              description="Create your first release to start building track briefs, managing specs, and organizing your mix workflow."
+              action={{ label: "Create your first release", href: "#", variant: "primary" }}
+            />
+          </div>
+          <div>
+            <div className="label text-faint mb-2">SIZE: MD</div>
+            <EmptyState
+              icon={ListMusic}
+              size="md"
+              title="No tracks added"
+              description="Add tracks to start building out this release."
+              action={{ label: "Add a track", href: "#", variant: "primary" }}
+            />
+          </div>
+          <div>
+            <div className="label text-faint mb-2">SIZE: SM</div>
+            <EmptyState
+              icon={StickyNote}
+              size="sm"
+              title="No notes yet"
+              description="Document mix decisions, client feedback, and revision history."
+            />
+          </div>
+          <div>
+            <div className="label text-faint mb-2">SIZE: MD (SEARCH)</div>
+            <EmptyState
+              icon={Search}
+              size="md"
+              title="No matching releases"
+              description="Try adjusting your search or filters."
+              action={{ label: "Clear filters", href: "#", variant: "ghost" }}
+            />
+          </div>
+          <div>
+            <div className="label text-faint mb-2">SIZE: MD (UPLOAD)</div>
+            <EmptyState
+              icon={Upload}
+              size="md"
+              title="No audio files yet"
+              description="Upload a mix to start the review process with waveform playback, versioning, and timestamped comments."
+              action={{ label: "Upload audio", href: "#", variant: "primary" }}
+            />
+          </div>
+        </PanelBody>
+      </Panel>
+
+      {/* Error Fallbacks */}
+      <Panel>
+        <PanelHeader>
+          <h2 className="text-lg font-bold h2 text-text">Error Fallbacks</h2>
+          <p className="mt-1 text-sm text-muted">
+            Section-level error fallbacks for isolated component failures.
+          </p>
+        </PanelHeader>
+        <Rule />
+        <PanelBody className="pt-5 space-y-4">
+          <SectionErrorFallback title="Payments" />
+          <SectionErrorFallback title="Audio Player" />
+          <SectionErrorFallback />
+
+          <div className="mt-4">
+            <div className="label text-faint mb-2">PAGE-LEVEL ERROR</div>
+            <div className="rounded-lg border border-dashed border-border p-8 text-center">
+              <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-signal-muted mb-4">
+                <AlertTriangle className="w-6 h-6 text-signal" />
+              </div>
+              <div className="text-lg font-semibold text-text">Something went wrong</div>
+              <p className="text-sm text-muted mt-1.5 max-w-md mx-auto">
+                We hit an unexpected error loading this page. You can try again, or head back to the dashboard.
+              </p>
+              <div className="flex items-center justify-center gap-3 mt-5">
+                <Button variant="ghost">Try again</Button>
+                <Button variant="primary">Go to Dashboard</Button>
+              </div>
+            </div>
+          </div>
+        </PanelBody>
+      </Panel>
     </div>
   );
 }

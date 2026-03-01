@@ -183,7 +183,7 @@ export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus, 
         ) : value ? (
           <p className="text-sm text-text leading-relaxed">{value}</p>
         ) : (
-          <p className="text-sm text-muted italic">No global direction set yet.</p>
+          <p className="text-sm text-muted italic px-1 py-3">No global direction set yet.</p>
         )}
       </PanelBody>
     </Panel>
@@ -437,7 +437,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
             ))}
           </div>
         ) : !showForm ? (
-          <p className="text-sm text-muted italic">No references added yet.</p>
+          <p className="text-sm text-muted italic px-1 py-3">No references added yet.</p>
         ) : null}
       </PanelBody>
     </Panel>

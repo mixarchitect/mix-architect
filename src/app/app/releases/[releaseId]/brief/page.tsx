@@ -2,7 +2,8 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Rule } from "@/components/ui/rule";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 import { BriefActions } from "./brief-actions";
 import { getReleaseRole } from "@/lib/get-release-role";
 import type { BriefTrack, BriefIntent, BriefSpec, BriefReference, BriefAudioVersion } from "@/lib/db-types";
@@ -161,6 +162,16 @@ export default async function BriefPage({ params }: Props) {
         </section>
 
         {/* Per-track briefs */}
+        {(!tracks || tracks.length === 0) && (
+          <EmptyState
+            icon={FileText}
+            size="md"
+            title="No tracks in this release"
+            description="Add tracks to the release to generate a complete mix brief."
+            action={{ label: "Add a track", href: `/app/releases/${releaseId}/tracks/new`, variant: "primary" }}
+          />
+        )}
+
         {(tracks as BriefTrack[] | null)?.map((track) => {
           const intent = intents.find(
             (i) => i.track_id === track.id,
@@ -201,6 +212,15 @@ export default async function BriefPage({ params }: Props) {
                 </div>
               )}
 
+              {!intent?.mix_vision && !(intent?.emotional_tags?.length) && (
+                <div className="py-3 px-4 border border-dashed border-border rounded-md text-sm text-muted">
+                  <span>Intent not yet defined.</span>
+                  <Link href={`/app/releases/${releaseId}/tracks/${track.id}?tab=intent`} className="ml-2 text-signal hover:underline">
+                    Add intent &rarr;
+                  </Link>
+                </div>
+              )}
+
               {trackSpec && (
                 <div className="mb-3 flex flex-wrap gap-4 text-sm">
                   {trackSpec.target_loudness && (
@@ -217,6 +237,15 @@ export default async function BriefPage({ params }: Props) {
                       {trackSpec.format_override || release.format}
                     </span>
                   </span>
+                </div>
+              )}
+
+              {!trackSpec && (
+                <div className="py-3 px-4 border border-dashed border-border rounded-md text-sm text-muted">
+                  <span>Specs not configured.</span>
+                  <Link href={`/app/releases/${releaseId}/tracks/${track.id}?tab=specs`} className="ml-2 text-signal hover:underline">
+                    Configure specs &rarr;
+                  </Link>
                 </div>
               )}
 
@@ -238,6 +267,15 @@ export default async function BriefPage({ params }: Props) {
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {refs.length === 0 && (
+                <div className="py-3 px-4 border border-dashed border-border rounded-md text-sm text-muted">
+                  <span>No reference tracks.</span>
+                  <Link href={`/app/releases/${releaseId}/tracks/${track.id}?tab=intent`} className="ml-2 text-signal hover:underline">
+                    Add references &rarr;
+                  </Link>
                 </div>
               )}
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SortSelect } from "@/components/ui/sort-select";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Sparkles, Music, Search } from "lucide-react";
 import { formatMoney } from "@/lib/format-money";
 
 const VALID_FILTERS = ["outstanding", "earned"] as const;
@@ -277,26 +277,20 @@ export default async function DashboardPage({ searchParams }: Props) {
           </div>
         ) : (
           <EmptyState
+            icon={Search}
+            size="md"
             title={`No ${activeFilter} releases`}
-            action={
-              <Link href="/app" className="text-signal text-sm hover:underline">
-                Show all releases
-              </Link>
-            }
+            description="Try adjusting your search or filters."
+            action={{ label: "Clear filters", href: "/app", variant: "ghost" }}
           />
         )
       ) : !sharedReleases.length ? (
         <EmptyState
+          icon={Music}
+          size="lg"
           title="No releases yet"
-          description="Create your first release to start planning your mix."
-          action={
-            <Link href="/app/releases/new">
-              <Button variant="primary">
-                <Plus size={16} />
-                Create Release
-              </Button>
-            </Link>
-          }
+          description="Create your first release to start building track briefs, managing specs, and organizing your mix workflow."
+          action={{ label: "Create your first release", href: "/app/releases/new", variant: "primary" }}
         />
       ) : null}
 

@@ -524,13 +524,16 @@ export function AudioPlayer({
 
   if (versions.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-panel p-8 text-center">
-        <div className="text-3xl mb-3 opacity-20">♪</div>
-        <p className="text-sm text-muted mb-4">
-          Upload an audio file to start reviewing this track.
+      <div className="rounded-lg border border-dashed border-border px-6 py-10 text-center">
+        <div className="mx-auto flex items-center justify-center text-muted mb-4">
+          <Upload size={32} strokeWidth={1.5} />
+        </div>
+        <div className="text-sm font-semibold text-text">No audio files yet</div>
+        <p className="text-sm text-muted mt-1.5 mx-auto max-w-sm">
+          Upload a mix to start the review process with waveform playback, versioning, and timestamped comments.
         </p>
         {canUpload && (
-          <>
+          <div className="mt-5">
             <input
               ref={fileInputRef}
               type="file"
@@ -547,12 +550,12 @@ export function AudioPlayer({
               disabled={uploading}
             >
               <Upload size={16} />
-              {uploading ? "Uploading…" : "Upload Audio"}
+              {uploading ? "Uploading..." : "Upload audio"}
             </Button>
             {uploadError && (
-              <p className="text-xs text-red-500 mt-2">{uploadError}</p>
+              <p className="text-xs text-signal mt-2">{uploadError}</p>
             )}
-          </>
+          </div>
         )}
       </div>
     );
@@ -861,9 +864,11 @@ export function AudioPlayer({
             </div>
           ) : (
             !commentInput && (
-              <p className="text-center py-8 text-sm text-faint">
-                No comments on this version yet
-              </p>
+              <div className="text-center py-8">
+                <MessageCircle size={24} strokeWidth={1.5} className="mx-auto text-muted mb-2" />
+                <p className="text-sm font-semibold text-text">No comments yet</p>
+                <p className="text-xs text-muted mt-1">Click anywhere on the waveform to leave a timestamped note.</p>
+              </div>
             )
           )}
         </div>

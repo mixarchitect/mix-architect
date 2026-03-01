@@ -6,7 +6,7 @@ import { Panel, PanelBody } from "@/components/ui/panel";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
-import { Plus, Settings, ArrowLeft } from "lucide-react";
+import { Plus, Settings, ArrowLeft, ListMusic } from "lucide-react";
 import { EditableTitle } from "@/components/ui/editable-title";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
@@ -189,16 +189,11 @@ export default async function ReleasePage({ params }: Props) {
             />
           ) : (
             <EmptyState
-              title="No tracks yet"
-              description={canEdit(role) ? "Add your first track to get started." : "No tracks have been added yet."}
-              action={canEdit(role) ? (
-                <Link href={`/app/releases/${releaseId}/tracks/new`}>
-                  <Button variant="primary">
-                    <Plus size={16} />
-                    Add Track
-                  </Button>
-                </Link>
-              ) : undefined}
+              icon={ListMusic}
+              size="md"
+              title="No tracks added"
+              description={canEdit(role) ? "Add tracks to start building out this release." : "No tracks have been added yet."}
+              action={canEdit(role) ? { label: "Add a track", href: `/app/releases/${releaseId}/tracks/new`, variant: "primary" } : undefined}
             />
           )}
         </div>
