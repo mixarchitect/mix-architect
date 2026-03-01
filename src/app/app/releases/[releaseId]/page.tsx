@@ -7,6 +7,7 @@ import { Pill } from "@/components/ui/pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
 import { Plus, Settings, ArrowLeft } from "lucide-react";
+import { EditableTitle } from "@/components/ui/editable-title";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
 import { getReleaseRole } from "@/lib/get-release-role";
@@ -107,7 +108,16 @@ export default async function ReleasePage({ params }: Props) {
               <span className="text-faint">·</span>
             </>
           )}
-          <h1 className="text-2xl font-semibold h2 text-text truncate">{release.title}</h1>
+          {canEdit(role) ? (
+            <EditableTitle
+              value={release.title as string}
+              table="releases"
+              id={releaseId}
+              className="text-2xl font-semibold h2 text-text"
+            />
+          ) : (
+            <h1 className="text-2xl font-semibold h2 text-text truncate">{release.title}</h1>
+          )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {canEdit(role) && (

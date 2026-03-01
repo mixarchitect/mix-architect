@@ -18,6 +18,7 @@ import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { AudioPlayer, type AudioVersionData, type TimelineComment } from "@/components/ui/audio-player";
 import { ArrowLeft, Bookmark, Check, Plus, X } from "lucide-react";
+import { EditableTitle } from "@/components/ui/editable-title";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
 import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
 import { PortalTrackEditor } from "./portal-track-editor";
@@ -475,12 +476,26 @@ export function TrackDetailClient({
             {releaseTitle}
           </Link>
           <span className="text-faint">/</span>
-          <h1 className="text-2xl font-semibold h2 text-text">
-            <span className="font-mono text-muted mr-2">
-              {String(track.track_number).padStart(2, "0")}
-            </span>
-            {track.title}
-          </h1>
+          {canEdit(role) ? (
+            <EditableTitle
+              value={track.title}
+              table="tracks"
+              id={track.id}
+              className="text-2xl font-semibold h2 text-text"
+              prefix={
+                <span className="font-mono text-muted text-2xl font-semibold">
+                  {String(track.track_number).padStart(2, "0")}
+                </span>
+              }
+            />
+          ) : (
+            <h1 className="text-2xl font-semibold h2 text-text">
+              <span className="font-mono text-muted mr-2">
+                {String(track.track_number).padStart(2, "0")}
+              </span>
+              {track.title}
+            </h1>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <AutoSaveIndicator status={saveStatus} />
