@@ -150,7 +150,7 @@ export default function SettingsPage() {
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors"
                     style={
                       active
-                        ? { background: "var(--signal)", color: "#fff" }
+                        ? { background: "var(--signal)", color: "var(--signal-on)" }
                         : { background: "var(--panel-2)", color: "var(--muted)" }
                     }
                   >
@@ -226,7 +226,7 @@ export default function SettingsPage() {
                     className="px-4 py-2 text-sm font-medium rounded-md transition-colors"
                     style={
                       format === opt.value
-                        ? { background: "var(--signal)", color: "#fff" }
+                        ? { background: "var(--signal)", color: "var(--signal-on)" }
                         : { background: "var(--panel2)", color: "var(--text-muted)" }
                     }
                   >
@@ -422,7 +422,7 @@ function SubscriptionPanel() {
             className="px-2.5 py-1 text-xs font-semibold rounded-full"
             style={{
               background: isPro ? "var(--signal)" : "var(--panel-2)",
-              color: isPro ? "#fff" : "var(--muted)",
+              color: isPro ? "var(--signal-on)" : "var(--muted)",
             }}
           >
             {isPro ? "PRO" : "FREE"}

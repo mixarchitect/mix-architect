@@ -29,6 +29,7 @@ const config: Config = {
         border: "var(--border)",
         "border-strong": "var(--border-strong)",
         signal: "var(--signal)",
+        "signal-on": "var(--signal-on)",
         "signal-muted": "var(--signal-muted)",
         highlight: "var(--highlight)",
         charcoal: "var(--charcoal)",

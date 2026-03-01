@@ -48,7 +48,7 @@ function PillSelect({
           className="px-4 py-2 text-sm font-medium rounded-md transition-colors"
           style={
             value === opt.value
-              ? { background: "var(--signal)", color: "#fff" }
+              ? { background: "var(--signal)", color: "var(--signal-on)" }
               : { background: "var(--panel2)", color: "var(--text-muted)" }
           }
         >

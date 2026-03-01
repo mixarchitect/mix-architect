@@ -42,7 +42,7 @@ export default function HomePage() {
             <Link href="/auth/sign-in" className="px-4 py-2 text-sm text-muted hover:text-text transition-colors">
               Sign in
             </Link>
-            <Link href="/app" className="px-5 py-2 text-sm font-semibold text-white bg-signal rounded-full hover:bg-signal/90 transition-colors">
+            <Link href="/app" className="px-5 py-2 text-sm font-semibold text-signal-on bg-signal rounded-full hover:bg-signal/90 transition-colors">
               Get started
             </Link>
           </div>

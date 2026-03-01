@@ -48,7 +48,7 @@ export default function StyleguidePage() {
             </div>
             <div className="space-y-2">
               <div className="h-16 rounded-md bg-signal" />
-              <div className="text-xs text-muted">#FE5E0E signal</div>
+              <div className="text-xs text-muted">#D9AF30 signal</div>
             </div>
             <div className="space-y-2">
               <div className="h-16 rounded-md bg-highlight border border-border" />

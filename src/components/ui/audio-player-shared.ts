@@ -41,7 +41,7 @@ export const LOUDNESS_TARGETS = [
 export const LOUDNESS_GROUPS = ["Streaming", "Broadcast", "Social"] as const;
 
 export const AUTHOR_COLORS = [
-  "#FE5E0E",
+  "#D9AF30",
   "#6B8AFF",
   "#8B5CF6",
   "#22C55E",

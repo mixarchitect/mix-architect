@@ -161,7 +161,7 @@ export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus, 
                 onClick={handleSave}
                 disabled={saving}
                 className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors"
-                style={{ background: "var(--signal)", color: "#fff" }}
+                style={{ background: "var(--signal)", color: "var(--signal-on)" }}
               >
                 <Check size={12} />
                 {saving ? "Saving…" : "Save"}
@@ -589,7 +589,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
                 onClick={handleUrlSave}
                 disabled={!urlInput.trim()}
                 className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors disabled:opacity-40"
-                style={{ background: "var(--signal)", color: "#fff" }}
+                style={{ background: "var(--signal)", color: "var(--signal-on)" }}
               >
                 <Check size={12} />
               </button>

@@ -450,7 +450,7 @@ export function PortalAudioPlayer({
                   className={cn(
                     "px-3 py-1 text-xs font-medium rounded transition-colors",
                     v.id === activeVersionId
-                      ? "bg-signal text-white"
+                      ? "bg-signal text-signal-on"
                       : "text-muted hover:text-text",
                   )}
                 >
@@ -649,7 +649,7 @@ export function PortalAudioPlayer({
             <button
               onClick={togglePlayPause}
               disabled={!isReady}
-              className="w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md"
+              className="w-10 h-10 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md"
             >
               {isPlaying ? (
                 <Pause size={18} />

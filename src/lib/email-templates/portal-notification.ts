@@ -20,10 +20,10 @@ function wrap(content: string): string {
 <tr><td align="center">
 <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e5e5e5">
 <tr><td style="padding:32px 40px">
-  <div style="font-size:14px;font-weight:600;color:#FE5E0E;margin-bottom:24px">MIX ARCHITECT</div>
+  <div style="font-size:14px;font-weight:600;color:#D9AF30;margin-bottom:24px">MIX ARCHITECT</div>
   ${content}
   <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999">
-    Sent by <a href="https://mixarchitect.com" style="color:#FE5E0E;text-decoration:none">Mix Architect</a>
+    Sent by <a href="https://mixarchitect.com" style="color:#D9AF30;text-decoration:none">Mix Architect</a>
   </div>
 </td></tr>
 </table>
@@ -48,7 +48,7 @@ export function buildNewVersionEmail({ releaseTitle, trackTitle, portalUrl }: Ne
         A new version of <strong>${escapeHtml(trackTitle)}</strong> on
         <strong>${escapeHtml(releaseTitle)}</strong> is ready for your review.
       </p>
-      <a href="${escapeHtml(portalUrl)}" style="display:inline-block;padding:10px 24px;background:#FE5E0E;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:6px">
+      <a href="${escapeHtml(portalUrl)}" style="display:inline-block;padding:10px 24px;background:#D9AF30;color:#1a1a1a;font-size:14px;font-weight:600;text-decoration:none;border-radius:6px">
         Review on Portal
       </a>
     `),
@@ -97,10 +97,10 @@ export function buildChangesRequestedEmail({ releaseTitle, trackTitle, actorName
         <strong>${escapeHtml(trackTitle)}</strong> on
         <strong>${escapeHtml(releaseTitle)}</strong>:
       </p>
-      <div style="margin:0 0 16px;padding:12px 16px;background:#f9f5f0;border-left:3px solid #FE5E0E;border-radius:4px;font-size:14px;color:#333;line-height:1.5">
+      <div style="margin:0 0 16px;padding:12px 16px;background:#f9f5f0;border-left:3px solid #D9AF30;border-radius:4px;font-size:14px;color:#333;line-height:1.5">
         ${escapeHtml(note)}
       </div>
-      <a href="${escapeHtml(portalUrl)}" style="display:inline-block;padding:10px 24px;background:#FE5E0E;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:6px">
+      <a href="${escapeHtml(portalUrl)}" style="display:inline-block;padding:10px 24px;background:#D9AF30;color:#1a1a1a;font-size:14px;font-weight:600;text-decoration:none;border-radius:6px">
         View Portal
       </a>
     `),

@@ -67,7 +67,7 @@ export function PortalMiniPlayer() {
         {/* Play / Pause */}
         <button
           onClick={togglePlayPause}
-          className="w-9 h-9 rounded-full bg-signal text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm shrink-0"
+          className="w-9 h-9 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm shrink-0"
         >
           {isPlaying ? (
             <Pause size={16} />
