@@ -13,7 +13,7 @@ type Props = {
 
 export function SegmentedControl({ options, value, onChange, className }: Props) {
   return (
-    <div role="radiogroup" className={cn("inline-flex rounded-sm border border-border p-0.5 bg-panel2", className)}>
+    <div role="radiogroup" className={cn("inline-flex gap-1", className)}>
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -22,10 +22,10 @@ export function SegmentedControl({ options, value, onChange, className }: Props)
           aria-checked={value === opt.value}
           onClick={() => onChange(opt.value)}
           className={cn(
-            "px-4 py-2 text-sm font-medium rounded-[7px] transition-all duration-150",
+            "px-4 py-2 text-sm font-medium rounded-md transition-all duration-150",
             value === opt.value
               ? "bg-signal text-signal-on shadow-sm"
-              : "text-muted hover:text-text"
+              : "text-muted hover:text-text hover:bg-panel2"
           )}
         >
           {opt.label}

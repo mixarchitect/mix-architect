@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAudio } from "@/lib/audio-context";
 import { useToast } from "@/components/ui/toast";
@@ -26,7 +26,7 @@ type Props = {
   tracks: FlowTrack[];
   hiddenCount: number;
   releaseId: string;
-  releaseTitle: string;
+  releaseTitle?: string;
   onClose: () => void;
 };
 
@@ -34,7 +34,7 @@ type Props = {
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, releaseTitle, onClose }: Props) {
+export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, onClose }: Props) {
   const router = useRouter();
   const sharedAudio = useAudio();
   const { toast } = useToast();
@@ -184,25 +184,19 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, r
   );
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col"
-      style={{ background: "var(--bg)" }}
-    >
+    <div className="space-y-3">
       {/* ── Header ──────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
+          <h2 className="text-sm font-semibold text-text">Flow Simulator</h2>
           <button
             type="button"
             onClick={handleClose}
-            className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1 shrink-0"
+            className="p-1 rounded text-faint hover:text-text transition-colors"
+            title="Close"
           >
-            <ArrowLeft size={14} />
-            {releaseTitle}
+            <X size={14} />
           </button>
-          <span className="text-faint">/</span>
-          <h2 className="text-sm font-semibold text-text shrink-0">
-            Flow Simulator
-          </h2>
         </div>
 
         <div className="flex items-center gap-2">
@@ -252,7 +246,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, r
       </div>
 
       {/* ── Timeline ────────────────────────────────────────────── */}
-      <div className="px-6 pt-4 pb-2">
+      <div className="pt-2 pb-1">
         <FlowTimeline
           tracks={orderedTracks}
           mode={mode}
@@ -266,7 +260,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, r
       </div>
 
       {/* ── Transport ───────────────────────────────────────────── */}
-      <div className="px-6 border-b border-border">
+      <div className="border-b border-border">
         <FlowTransport
           isPlaying={audio.isPlaying}
           currentTrackTitle={orderedTracks[audio.currentTrackIndex]?.title ?? ""}
@@ -285,7 +279,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, r
       </div>
 
       {/* ── Track List ──────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 no-scrollbar">
+      <div className="py-2">
         <FlowTrackList
           tracks={orderedTracks}
           currentTrackIndex={audio.currentTrackIndex}
@@ -298,7 +292,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, r
       </div>
 
       {/* ── Keyboard hints ──────────────────────────────────────── */}
-      <div className="px-6 py-2 border-t border-border flex items-center gap-4 text-[10px] text-faint">
+      <div className="flex items-center gap-4 text-[10px] text-faint pt-2 border-t border-border">
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-[10px]">Space</kbd> Play/Pause</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-[10px]">←</kbd><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-[10px] ml-0.5">→</kbd> Skip</span>
         <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-[10px]">⌘Z</kbd> Undo</span>

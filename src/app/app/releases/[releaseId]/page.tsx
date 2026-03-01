@@ -11,6 +11,7 @@ import { EditableTitle } from "@/components/ui/editable-title";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
 import { FlowSimulatorButton } from "@/components/flow-simulator/flow-simulator-button";
+import { ReleaseFlowWrapper } from "@/components/flow-simulator/release-flow-context";
 import type { FlowTrack } from "@/components/flow-simulator/use-flow-audio";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
@@ -193,7 +194,13 @@ export default async function ReleasePage({ params }: Props) {
         </div>
       </div>
 
-      {/* Two-panel layout */}
+      {/* Two-panel layout (wrapped for Flow Simulator toggle) */}
+      <ReleaseFlowWrapper
+        flowTracks={flowTracks}
+        flowHiddenCount={flowHiddenCount}
+        releaseId={releaseId}
+        releaseTitle={release.title as string}
+      >
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
         {/* Main: Track list */}
         <div className="space-y-3">
@@ -207,9 +214,6 @@ export default async function ReleasePage({ params }: Props) {
             <div className="flex items-center gap-2">
               <FlowSimulatorButton
                 tracks={flowTracks}
-                hiddenCount={flowHiddenCount}
-                releaseId={releaseId}
-                releaseTitle={release.title as string}
               />
               {canEdit(role) && (
                 <Link href={`/app/releases/${releaseId}/tracks/new`}>
@@ -364,6 +368,7 @@ export default async function ReleasePage({ params }: Props) {
 
         </aside>
       </div>
+      </ReleaseFlowWrapper>
     </div>
   );
 }

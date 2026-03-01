@@ -290,7 +290,15 @@ export function useFlowAudio(
         if (currentTrack) {
           const tw = transitionWindowRef.current;
           const crossfadeDuration = Math.min(3, tw * 0.2);
-          const remaining = currentTrack.durationSeconds - localTime;
+          const isFirstTrack = s.currentTrackIndex === 0;
+
+          // Determine remaining time in this track's play region
+          // First track: plays from tail to end of file
+          // Non-first tracks: play from 0 to tw
+          const playRegionEnd = isFirstTrack
+            ? currentTrack.durationSeconds
+            : Math.min(tw, currentTrack.durationSeconds);
+          const remaining = playRegionEnd - localTime;
 
           // Start crossfade when we're crossfadeDuration away from the end of this track's play region
           if (remaining <= crossfadeDuration && s.currentTrackIndex < tracksRef.current.length - 1) {
@@ -354,11 +362,9 @@ export function useFlowAudio(
     active.load();
 
     const handleCanPlay = () => {
-      if (modeRef.current === "condensed") {
-        const tw = transitionWindowRef.current;
-        const startAt = Math.max(0, nextTrack.durationSeconds - tw);
-        active.currentTime = startAt;
-      }
+      // In condensed mode, non-first tracks always start from 0 (play the head).
+      // The first track starts from the tail, but advanceToNext is never called
+      // for the first track (it's handled in play()).
       active.play();
       active.removeEventListener("canplay", handleCanPlay);
     };
@@ -438,13 +444,18 @@ export function useFlowAudio(
     if (!a || !b) return;
 
     const handleEndedA = () => {
-      if (primaryRef.current === "A" && modeRef.current === "full") {
-        advanceToNext();
+      if (primaryRef.current === "A") {
+        // Full mode: always advance. Condensed mode: advance as fallback if crossfade didn't fire.
+        if (modeRef.current === "full" || !crossfadeInitiatedRef.current) {
+          advanceToNext();
+        }
       }
     };
     const handleEndedB = () => {
-      if (primaryRef.current === "B" && modeRef.current === "full") {
-        advanceToNext();
+      if (primaryRef.current === "B") {
+        if (modeRef.current === "full" || !crossfadeInitiatedRef.current) {
+          advanceToNext();
+        }
       }
     };
 
