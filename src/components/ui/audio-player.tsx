@@ -23,6 +23,8 @@ import WaveSurfer from "wavesurfer.js";
 import {
   getWaveColors,
   formatTime,
+  formatSampleRate,
+  formatBitDepth,
   LUFS_REFERENCE,
   LOUDNESS_TARGETS,
   LOUDNESS_GROUPS,
@@ -43,6 +45,9 @@ export type AudioVersionData = {
   duration_seconds: number | null;
   waveform_peaks: number[][] | null;
   measured_lufs: number | null;
+  sample_rate: number | null;
+  bit_depth: number | null;
+  file_format: string | null;
   uploaded_by: string;
   created_at: string;
 };
@@ -334,46 +339,83 @@ export function AudioPlayer({
             });
         }
 
-        // Measure LUFS if not cached
-        if (activeVersion.measured_lufs == null) {
+        // Measure LUFS + extract file metadata if not cached.
+        // Both share the same fetch/decode pipeline to avoid double-downloading.
+        const needsLufs = activeVersion.measured_lufs == null;
+        const needsMeta = activeVersion.sample_rate == null;
+
+        if (needsLufs || needsMeta) {
           measureAbortRef.current?.abort();
           const controller = new AbortController();
           measureAbortRef.current = controller;
-          setMeasuring(true);
+          if (needsLufs) setMeasuring(true);
 
           (async () => {
             try {
-              const [{ decodeAudioFromUrl }, { measureLUFS }] = await Promise.all([
-                import("@/lib/decode-audio"),
-                import("@/lib/lufs"),
-              ]);
-              const audioBuffer = await decodeAudioFromUrl(
+              const [{ decodeAudioWithRawBuffer }, { measureLUFS }, { parseAudioHeaderMetadata }] =
+                await Promise.all([
+                  import("@/lib/decode-audio"),
+                  import("@/lib/lufs"),
+                  import("@/lib/parse-audio-metadata"),
+                ]);
+
+              const { audioBuffer, rawBuffer } = await decodeAudioWithRawBuffer(
                 activeVersion.audio_url,
                 controller.signal,
               );
               if (controller.signal.aborted || cancelled) return;
 
-              const lufs = measureLUFS(audioBuffer);
+              // Parse binary headers for bit depth + format
+              const headerMeta = needsMeta
+                ? parseAudioHeaderMetadata(rawBuffer, activeVersion.file_name)
+                : null;
+
+              // Measure LUFS
+              const lufs = needsLufs ? measureLUFS(audioBuffer) : null;
               if (controller.signal.aborted || cancelled) return;
 
-              const rounded = Math.round(lufs * 100) / 100;
+              // Build DB update payload
+              const dbUpdate: Record<string, unknown> = {};
+              let roundedLufs: number | null = null;
+              if (lufs != null) {
+                roundedLufs = Math.round(lufs * 100) / 100;
+                dbUpdate.measured_lufs = roundedLufs;
+              }
+              if (headerMeta) {
+                dbUpdate.sample_rate = audioBuffer.sampleRate;
+                dbUpdate.bit_depth = headerMeta.bitDepth;
+                dbUpdate.file_format = headerMeta.fileFormat;
+              }
 
               await supabase
                 .from("track_audio_versions")
-                .update({ measured_lufs: rounded })
+                .update(dbUpdate)
                 .eq("id", activeVersion.id);
 
               if (controller.signal.aborted || cancelled) return;
 
-              setMeasuredLufs(rounded);
+              if (roundedLufs != null) setMeasuredLufs(roundedLufs);
+
               onVersionsChange(
                 versionsRef.current.map((v) =>
-                  v.id === activeVersion.id ? { ...v, measured_lufs: rounded } : v,
+                  v.id === activeVersion.id
+                    ? {
+                        ...v,
+                        ...(roundedLufs != null ? { measured_lufs: roundedLufs } : {}),
+                        ...(headerMeta
+                          ? {
+                              sample_rate: audioBuffer.sampleRate,
+                              bit_depth: headerMeta.bitDepth,
+                              file_format: headerMeta.fileFormat,
+                            }
+                          : {}),
+                      }
+                    : v,
                 ),
               );
             } catch (err) {
               if (err instanceof DOMException && err.name === "AbortError") return;
-              console.warn("LUFS measurement failed:", err);
+              console.warn("Audio analysis failed:", err);
             } finally {
               if (!controller.signal.aborted && !cancelled) setMeasuring(false);
             }
@@ -627,7 +669,7 @@ export function AudioPlayer({
 
   if (versions.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border px-6 py-10 text-center">
+      <div className="rounded-lg border border-dashed border-border bg-panel px-6 py-10 text-center">
         <div className="mx-auto flex items-center justify-center text-muted mb-4">
           <Upload size={32} strokeWidth={1.5} />
         </div>
@@ -751,6 +793,16 @@ export function AudioPlayer({
           {activeVersion && (
             <span className="text-[10px] text-faint inline-flex items-center gap-1.5">
               {activeVersion.file_name && <>· {activeVersion.file_name}</>}
+              {activeVersion.file_format && (
+                <>&middot; {activeVersion.file_format}
+                  {activeVersion.sample_rate != null && (
+                    <> &middot; {formatSampleRate(activeVersion.sample_rate)}</>
+                  )}
+                  {activeVersion.bit_depth != null && (
+                    <> &middot; {formatBitDepth(activeVersion.bit_depth, activeVersion.file_format)}</>
+                  )}
+                </>
+              )}
               <button
                 type="button"
                 onClick={async () => {

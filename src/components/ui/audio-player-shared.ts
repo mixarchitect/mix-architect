@@ -50,3 +50,29 @@ export const AUTHOR_COLORS = [
   "#14B8A6",
   "#F97316",
 ];
+
+/* ------------------------------------------------------------------ */
+/*  Audio metadata formatters                                          */
+/* ------------------------------------------------------------------ */
+
+/** Format a sample rate in Hz to a human-readable string, e.g. "48kHz", "44.1kHz". */
+export function formatSampleRate(hz: number): string {
+  const khz = hz / 1000;
+  // One decimal for non-integer kHz (44.1, 88.2), none for round values (48, 96)
+  return khz % 1 === 0 ? `${khz}kHz` : `${khz}kHz`;
+}
+
+/** Format bit depth for display, e.g. "24-bit" or "32-bit float". */
+export function formatBitDepth(
+  bitDepth: number,
+  fileFormat?: string | null,
+): string {
+  // 32-bit WAV/AIFF is typically IEEE float
+  if (
+    bitDepth === 32 &&
+    (fileFormat === "WAV" || fileFormat === "AIFF")
+  ) {
+    return "32-bit float";
+  }
+  return `${bitDepth}-bit`;
+}

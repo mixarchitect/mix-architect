@@ -19,6 +19,8 @@ import WaveSurfer from "wavesurfer.js";
 import {
   getWaveColors,
   formatTime,
+  formatSampleRate,
+  formatBitDepth,
   LUFS_REFERENCE,
   LOUDNESS_TARGETS,
   LOUDNESS_GROUPS,
@@ -493,6 +495,17 @@ export function PortalAudioPlayer({
           {activeVersion?.file_name && (
             <span className="text-[10px] text-faint">
               &middot; {activeVersion.file_name}
+            </span>
+          )}
+          {activeVersion?.file_format && (
+            <span className="text-[10px] text-faint">
+              &middot; {activeVersion.file_format}
+              {activeVersion.sample_rate != null && (
+                <> &middot; {formatSampleRate(activeVersion.sample_rate)}</>
+              )}
+              {activeVersion.bit_depth != null && (
+                <> &middot; {formatBitDepth(activeVersion.bit_depth, activeVersion.file_format)}</>
+              )}
             </span>
           )}
           <span className="text-[10px] text-faint">
