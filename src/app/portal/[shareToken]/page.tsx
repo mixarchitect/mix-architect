@@ -153,7 +153,7 @@ export default async function PortalPage({ params }: Props) {
       .from("portal_version_settings")
       .select("*")
       .eq("brief_share_id", portalShare.id),
-    trackIds.length > 0 && portalShare.show_distribution
+    trackIds.length > 0 && (portalShare.show_distribution || portalShare.show_lyrics)
       ? supabase.from("track_distribution").select("*").in("track_id", trackIds)
       : empty<PortalDistribution & { track_id: string }>(),
     supabase
@@ -172,7 +172,7 @@ export default async function PortalPage({ params }: Props) {
   const allComments = (commentsRes.data ?? []) as (TimelineComment & { track_id: string })[];
   const trackSettings = (trackSettingsRes.data ?? []) as PortalTrackSetting[];
   const versionSettings = (versionSettingsRes.data ?? []) as PortalVersionSetting[];
-  const allDistribution = (distributionRes.data ?? []) as (PortalDistribution & { track_id: string })[];
+  const allDistribution = (distributionRes.data ?? []) as (PortalDistribution & { track_id: string; lyrics: string | null })[];
   const approvalEvents = (approvalEventsRes.data ?? []) as { track_id: string; event_type: string; created_at: string }[];
 
   /* ── 4b. Fetch engineer name (requires service client for RLS) ── */
@@ -265,7 +265,8 @@ export default async function PortalPage({ params }: Props) {
         comments: trackComments,
         downloadEnabled: setting ? setting.download_enabled : true,
         approvalStatus,
-        distribution,
+        distribution: portalShare.show_distribution ? distribution : null,
+        lyrics: portalShare.show_lyrics ? (distRow?.lyrics ?? null) : null,
         approvalDate,
       };
     });

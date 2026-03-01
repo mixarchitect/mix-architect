@@ -18,6 +18,7 @@ type PortalTrackCardProps = {
   showSpecs: boolean;
   showReferences: boolean;
   showDistribution: boolean;
+  showLyrics?: boolean;
   paymentGated: boolean;
   onStatusChange?: (newStatus: ApprovalStatus) => void;
 };
@@ -33,6 +34,7 @@ export function PortalTrackCard({
   showSpecs,
   showReferences,
   showDistribution,
+  showLyrics,
   paymentGated,
   onStatusChange,
 }: PortalTrackCardProps) {
@@ -50,7 +52,8 @@ export function PortalTrackCard({
   const hasSpecs = showSpecs && (track.specs?.format_override || releaseFormat);
   const hasRefs = showReferences && track.references.length > 0;
   const hasDist = showDistribution && track.distribution != null;
-  const hasDetails = hasDirection || hasSpecs || hasRefs || hasDist;
+  const hasLyrics = showLyrics && !!track.lyrics;
+  const hasDetails = hasDirection || hasSpecs || hasRefs || hasDist || hasLyrics;
 
   // Measured LUFS from the latest audio version (live measurement, not target)
   const latestVersion = track.versions.length > 0 ? track.versions[track.versions.length - 1] : null;
@@ -278,6 +281,17 @@ export function PortalTrackCard({
                     </span>
                   )}
                 </div>
+              </div>
+            )}
+
+            {hasLyrics && (
+              <div>
+                <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
+                  Lyrics
+                </div>
+                <pre className="text-sm whitespace-pre-wrap font-sans text-text leading-relaxed">
+                  {track.lyrics}
+                </pre>
               </div>
             )}
           </div>

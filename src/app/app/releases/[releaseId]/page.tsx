@@ -122,6 +122,7 @@ export default async function ReleasePage({ params }: Props) {
                 show_references: briefShareRes.data.show_references ?? true,
                 show_payment_status: briefShareRes.data.show_payment_status ?? false,
                 show_distribution: briefShareRes.data.show_distribution ?? false,
+                show_lyrics: briefShareRes.data.show_lyrics ?? false,
                 require_payment_for_download: briefShareRes.data.require_payment_for_download ?? false,
               } : null}
             />

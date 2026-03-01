@@ -12,6 +12,7 @@ export type PortalShare = {
   show_references: boolean;
   show_payment_status: boolean;
   show_distribution: boolean;
+  show_lyrics: boolean;
   require_payment_for_download: boolean;
   portal_status: "in_review" | "approved" | "delivered";
 };
@@ -73,6 +74,7 @@ export type PortalTrack = {
   downloadEnabled: boolean;
   approvalStatus: ApprovalStatus;
   distribution: PortalDistribution | null;
+  lyrics: string | null;
   approvalDate: string | null;
 };
 

@@ -116,6 +116,7 @@ export function PortalClient({
               showSpecs={share.show_specs}
               showReferences={share.show_references}
               showDistribution={share.show_distribution}
+              showLyrics={share.show_lyrics}
               paymentGated={paymentGated}
               onStatusChange={(newStatus) => handleStatusChange(track.id, newStatus)}
             />

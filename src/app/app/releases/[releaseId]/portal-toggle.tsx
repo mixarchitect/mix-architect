@@ -14,6 +14,7 @@ type ShareData = {
   show_references: boolean;
   show_payment_status: boolean;
   show_distribution: boolean;
+  show_lyrics: boolean;
   require_payment_for_download: boolean;
 };
 
@@ -181,6 +182,11 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
             label="Distribution"
             checked={share!.show_distribution}
             onChange={(v) => updateField("show_distribution", v)}
+          />
+          <ToggleRow
+            label="Lyrics"
+            checked={share!.show_lyrics}
+            onChange={(v) => updateField("show_lyrics", v)}
           />
           <ToggleRow
             label="Require payment"
