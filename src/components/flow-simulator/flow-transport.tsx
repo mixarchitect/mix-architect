@@ -2,7 +2,6 @@
 
 import { SkipBack, SkipForward } from "lucide-react";
 import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 import { formatTime } from "@/components/ui/audio-player-shared";
 import { cn } from "@/lib/cn";
 import type { FlowMode } from "./use-flow-audio";
@@ -31,8 +30,6 @@ type Props = {
 /*  Transition Window Slider                                           */
 /* ------------------------------------------------------------------ */
 
-const TRANSITION_STEPS = [5, 10, 15, 20, 30];
-
 function TransitionSlider({
   value,
   onChange,
@@ -53,6 +50,59 @@ function TransitionSlider({
         className="w-20 h-1 accent-signal cursor-pointer"
       />
       <span className="text-xs text-text font-medium w-6 text-right">{value}s</span>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Mode Toggle                                                        */
+/* ------------------------------------------------------------------ */
+
+function ModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: FlowMode;
+  onChange: (mode: FlowMode) => void;
+}) {
+  const isCondensed = mode === "condensed";
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className={cn(
+          "text-xs font-medium transition-colors cursor-pointer select-none",
+          !isCondensed ? "text-text" : "text-muted",
+        )}
+        onClick={() => onChange("full")}
+      >
+        Full
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={isCondensed}
+        onClick={() => onChange(isCondensed ? "full" : "condensed")}
+        className={cn(
+          "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
+          isCondensed ? "bg-signal" : "bg-black/20 dark:bg-white/20",
+        )}
+      >
+        <span
+          className={cn(
+            "inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform",
+            isCondensed ? "translate-x-[18px]" : "translate-x-[3px]",
+          )}
+        />
+      </button>
+      <span
+        className={cn(
+          "text-xs font-medium transition-colors cursor-pointer select-none",
+          isCondensed ? "text-text" : "text-muted",
+        )}
+        onClick={() => onChange("condensed")}
+      >
+        Condensed
+      </span>
     </div>
   );
 }
@@ -142,14 +192,7 @@ export function FlowTransport({
             onChange={onTransitionWindowChange}
           />
         )}
-        <SegmentedControl
-          options={[
-            { value: "full", label: "Full" },
-            { value: "condensed", label: "Condensed" },
-          ]}
-          value={mode}
-          onChange={(v) => onModeChange(v as FlowMode)}
-        />
+        <ModeToggle mode={mode} onChange={onModeChange} />
       </div>
     </div>
   );

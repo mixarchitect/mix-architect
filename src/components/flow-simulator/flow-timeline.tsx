@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useCallback } from "react";
 import type { FlowTrack, FlowMode } from "./use-flow-audio";
-import { computeOffsets, computeTotalDuration, computeCondensedLayout } from "./use-flow-audio";
+import { computeOffsets, computeCondensedLayout } from "./use-flow-audio";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -85,44 +85,71 @@ export function FlowTimeline({
     ctx.clearRect(0, 0, w, h);
 
     const colors = getColors();
-    const offsets = mode === "full"
-      ? computeOffsets(tracks)
-      : computeCondensedLayout(tracks, transitionWindow).offsets;
 
-    // Draw track segments
-    for (let i = 0; i < tracks.length; i++) {
-      const startX = (offsets[i] / totalDuration) * w;
-      let segWidth: number;
-      if (i < tracks.length - 1) {
-        segWidth = ((offsets[i + 1] - offsets[i]) / totalDuration) * w;
-      } else {
-        segWidth = w - startX;
-      }
+    if (mode === "full") {
+      // Full mode: one block per track
+      const offsets = computeOffsets(tracks);
+      for (let i = 0; i < tracks.length; i++) {
+        const startX = (offsets[i] / totalDuration) * w;
+        const segWidth = i < tracks.length - 1
+          ? ((offsets[i + 1] - offsets[i]) / totalDuration) * w
+          : w - startX;
 
-      // Background segment
-      ctx.fillStyle =
-        i === currentTrackIndex
+        ctx.fillStyle = i === currentTrackIndex
           ? colors.signalMuted
           : colors.segmentColors[i % 2];
-      ctx.fillRect(startX, 0, segWidth, h);
+        ctx.fillRect(startX, 0, segWidth, h);
 
-      // Segment border
-      if (i > 0) {
-        ctx.fillStyle = colors.faint;
-        ctx.fillRect(startX, 0, 1, h);
-      }
+        if (i > 0) {
+          ctx.fillStyle = colors.faint;
+          ctx.fillRect(startX, 0, 1, h);
+        }
 
-      // Track label (if segment wide enough)
-      if (segWidth > 60) {
-        ctx.fillStyle = colors.text;
-        ctx.font = "11px -apple-system, BlinkMacSystemFont, sans-serif";
-        ctx.globalAlpha = 0.5;
-        const label =
-          tracks[i].title.length > segWidth / 7
+        if (segWidth > 60) {
+          ctx.fillStyle = colors.text;
+          ctx.font = "11px -apple-system, BlinkMacSystemFont, sans-serif";
+          ctx.globalAlpha = 0.5;
+          const label = tracks[i].title.length > segWidth / 7
             ? tracks[i].title.slice(0, Math.floor(segWidth / 7)) + "…"
             : tracks[i].title;
-        ctx.fillText(label, startX + 8, h / 2 + 4);
-        ctx.globalAlpha = 1;
+          ctx.fillText(label, startX + 8, h / 2 + 4);
+          ctx.globalAlpha = 1;
+        }
+      }
+    } else {
+      // Condensed mode: one block per segment (head/tail/full)
+      const { segments, offsets } = computeCondensedLayout(tracks, transitionWindow);
+      for (let i = 0; i < segments.length; i++) {
+        const seg = segments[i];
+        const startX = (offsets[i] / totalDuration) * w;
+        const segWidth = i < segments.length - 1
+          ? ((offsets[i + 1] - offsets[i]) / totalDuration) * w
+          : w - startX;
+
+        ctx.fillStyle = seg.trackIndex === currentTrackIndex
+          ? colors.signalMuted
+          : colors.segmentColors[seg.trackIndex % 2];
+        ctx.fillRect(startX, 0, segWidth, h);
+
+        if (i > 0) {
+          ctx.fillStyle = colors.faint;
+          ctx.fillRect(startX, 0, 1, h);
+        }
+
+        // Label: track title + (start)/(end) suffix
+        if (segWidth > 50) {
+          ctx.fillStyle = colors.text;
+          ctx.font = "11px -apple-system, BlinkMacSystemFont, sans-serif";
+          ctx.globalAlpha = 0.5;
+          const suffix = seg.part === "head" ? " (start)" : seg.part === "tail" ? " (end)" : "";
+          const fullLabel = tracks[seg.trackIndex].title + suffix;
+          const maxChars = Math.floor(segWidth / 7);
+          const label = fullLabel.length > maxChars
+            ? fullLabel.slice(0, maxChars) + "…"
+            : fullLabel;
+          ctx.fillText(label, startX + 6, h / 2 + 4);
+          ctx.globalAlpha = 1;
+        }
       }
     }
 

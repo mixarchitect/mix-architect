@@ -183,20 +183,35 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
     [audio],
   );
 
+  // ── Waveform seek handler ───────────────────────────────────────
+  const handleSeekTrack = useCallback(
+    (trackIndex: number, localTime: number) => {
+      audio.seekToTrackLocal(trackIndex, localTime);
+    },
+    [audio],
+  );
+
   return (
     <div className="space-y-3">
       {/* ── Header ──────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          <h2 className="text-sm font-semibold text-text">Flow Simulator</h2>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="p-1 rounded text-faint hover:text-text transition-colors"
-            title="Close"
-          >
-            <X size={14} />
-          </button>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-text">Flow Simulator</h2>
+              <button
+                type="button"
+                onClick={handleClose}
+                className="p-1 rounded text-faint hover:text-text transition-colors"
+                title="Close"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <p className="text-xs text-muted mt-0.5">
+              Audition your track order. Drag to reorder, then apply changes to your release.
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -278,6 +293,20 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
         />
       </div>
 
+      {/* ── Mode explainer ──────────────────────────────────────── */}
+      {mode === "condensed" && (
+        <p className="text-[11px] text-faint">
+          Playing the first and last {transitionWindow}s of each track to preview transitions.
+        </p>
+      )}
+
+      {/* ── Audio error ──────────────────────────────────────────── */}
+      {audio.error && (
+        <div className="text-xs text-signal bg-signal-muted rounded-md px-3 py-2">
+          {audio.error}
+        </div>
+      )}
+
       {/* ── Track List ──────────────────────────────────────────── */}
       <div className="py-2">
         <FlowTrackList
@@ -287,6 +316,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
           currentTime={audio.currentTime}
           onReorder={handleReorder}
           onTrackClick={handleTrackClick}
+          onSeekTrack={handleSeekTrack}
           hiddenCount={hiddenCount}
         />
       </div>

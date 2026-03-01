@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { GripVertical, ChevronUp, ChevronDown } from "lucide-react";
 import { formatTime, getWaveColors } from "@/components/ui/audio-player-shared";
 import { cn } from "@/lib/cn";
@@ -17,6 +17,7 @@ type Props = {
   currentTime: number;
   onReorder: (fromIndex: number, toIndex: number) => void;
   onTrackClick: (index: number) => void;
+  onSeekTrack?: (trackIndex: number, localTime: number) => void;
   hiddenCount: number;
 };
 
@@ -27,9 +28,11 @@ type Props = {
 function MiniWaveform({
   peaks,
   progress,
+  onClick,
 }: {
   peaks: number[][] | null;
   progress: number; // 0-1
+  onClick?: (ratio: number) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -79,10 +82,24 @@ function MiniWaveform({
     }
   }, [peaks, progress]);
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (!onClick) return;
+      e.stopPropagation();
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      onClick(ratio);
+    },
+    [onClick],
+  );
+
   return (
     <canvas
       ref={canvasRef}
-      className="flex-1 h-6 min-w-[80px]"
+      className={cn("flex-1 h-6 min-w-[80px]", onClick && "cursor-pointer")}
+      onClick={handleClick}
     />
   );
 }
@@ -98,6 +115,7 @@ export function FlowTrackList({
   currentTime,
   onReorder,
   onTrackClick,
+  onSeekTrack,
   hiddenCount,
 }: Props) {
   const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -213,6 +231,11 @@ export function FlowTrackList({
                   ? currentTime / track.durationSeconds
                   : 0
                 : 0
+            }
+            onClick={
+              onSeekTrack
+                ? (ratio) => onSeekTrack(idx, ratio * track.durationSeconds)
+                : undefined
             }
           />
 

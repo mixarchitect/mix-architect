@@ -144,17 +144,6 @@ export default async function ReleasePage({ params }: Props) {
             Releases
           </Link>
           <span className="text-faint">/</span>
-          {release.artist && (
-            <>
-              <Link
-                href={`/app?artist=${encodeURIComponent(release.artist as string)}`}
-                className="text-sm text-muted hover:text-signal transition-colors shrink-0"
-              >
-                {release.artist as string}
-              </Link>
-              <span className="text-faint">·</span>
-            </>
-          )}
           {canEdit(role) ? (
             <EditableTitle
               value={release.title as string}
