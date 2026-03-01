@@ -192,7 +192,7 @@ export default function NewReleasePage() {
         <PanelBody className="pt-5">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-1.5">
-              <label className="label text-faint">Release title *</label>
+              <label className="label text-muted">Release title *</label>
               <input
                 type="text"
                 required
@@ -204,7 +204,7 @@ export default function NewReleasePage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-faint">Artist / Client</label>
+              <label className="label text-muted">Artist / Client</label>
               <input
                 type="text"
                 value={artist}
@@ -215,7 +215,7 @@ export default function NewReleasePage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-faint">Release type</label>
+              <label className="label text-muted">Release type</label>
               <PillSelect
                 options={TYPE_OPTIONS}
                 value={releaseType}
@@ -224,7 +224,7 @@ export default function NewReleasePage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-faint">Format</label>
+              <label className="label text-muted">Format</label>
               <PillSelect
                 options={FORMAT_OPTIONS}
                 value={format}
@@ -233,7 +233,7 @@ export default function NewReleasePage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-faint">Genre tags</label>
+              <label className="label text-muted">Genre tags</label>
               <TagInput
                 value={genreTags}
                 onChange={setGenreTags}
@@ -243,7 +243,7 @@ export default function NewReleasePage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-faint">Target release date</label>
+              <label className="label text-muted">Target release date</label>
               <input
                 type="date"
                 value={targetDate}

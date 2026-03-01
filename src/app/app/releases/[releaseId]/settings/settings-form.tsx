@@ -776,7 +776,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
       {teamEditable && (
         <Panel className="mt-6">
           <PanelHeader>
-            <h2 className="text-lg font-semibold text-text">Team</h2>
+            <h2 className="text-base font-semibold text-text">Team</h2>
             <p className="mt-1 text-sm text-muted">
               Invite collaborators and clients to this release.
             </p>

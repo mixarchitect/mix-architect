@@ -146,7 +146,7 @@ export function NewTrackForm({ releaseId }: Props) {
           <form onSubmit={handleSubmit} className="space-y-6">
             {mode === "single" ? (
               <div className="space-y-1.5">
-                <label className="label text-faint">Track title</label>
+                <label className="label text-muted">Track title</label>
                 <input
                   type="text"
                   required
@@ -158,7 +158,7 @@ export function NewTrackForm({ releaseId }: Props) {
               </div>
             ) : (
               <div className="space-y-1.5">
-                <label className="label text-faint">
+                <label className="label text-muted">
                   Track titles (one per line)
                 </label>
                 <textarea

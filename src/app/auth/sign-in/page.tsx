@@ -66,7 +66,7 @@ export default function SignInPage() {
           <PanelBody className="pt-5">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="label text-faint">Email</label>
+                <label className="label text-muted">Email</label>
                 <input
                   type="email"
                   required
@@ -78,7 +78,7 @@ export default function SignInPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="label text-faint">Password</label>
+                <label className="label text-muted">Password</label>
                 <input
                   type="password"
                   required
