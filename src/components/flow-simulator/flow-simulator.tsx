@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAudio } from "@/lib/audio-context";
@@ -28,14 +27,15 @@ type Props = {
   releaseId: string;
   releaseTitle?: string;
   onClose: () => void;
+  /** Called after track order is successfully saved — signals parent to refresh */
+  onOrderApplied?: () => void;
 };
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, onClose }: Props) {
-  const router = useRouter();
+export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, onClose, onOrderApplied }: Props) {
   const sharedAudio = useAudio();
   const { toast } = useToast();
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
@@ -144,18 +144,18 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
       );
       if (results.some((r) => r.error)) throw new Error("Reorder failed");
       toast("Track order applied to release", { variant: "success" });
-      // Close first, then defer refresh to the next tick so React
-      // finishes unmounting FlowSimulator and mounting the release
-      // page children before the server re-render fires.
+      // Signal parent to refresh BEFORE closing — the parent component
+      // (ReleaseFlowContent) stays mounted and will call router.refresh()
+      // after the flow simulator unmounts.
+      onOrderApplied?.();
       onClose();
-      setTimeout(() => router.refresh(), 0);
     } catch {
       toast("Failed to update track order", { variant: "error" });
     } finally {
       setIsApplying(false);
       setConfirmApply(false);
     }
-  }, [orderedTracks, supabase, toast, router, onClose]);
+  }, [orderedTracks, supabase, toast, onClose, onOrderApplied]);
 
   // ── Close handler (with dirty check) ──────────────────────────────
   const handleClose = useCallback(() => {

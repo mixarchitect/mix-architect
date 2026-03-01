@@ -6,8 +6,10 @@ import {
   useState,
   useEffect,
   useCallback,
+  useRef,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import { FlowSimulator } from "./flow-simulator";
 import type { FlowTrack } from "./use-flow-audio";
 
@@ -93,7 +95,26 @@ export function ReleaseFlowContent({
   releaseTitle,
   children,
 }: ContentProps) {
+  const router = useRouter();
   const { isFlowOpen, closeFlow } = useFlowOpen();
+
+  // Ref to signal that a server refresh is needed after simulator closes.
+  // Set by onOrderApplied callback before onClose triggers unmount.
+  const pendingRefreshRef = useRef(false);
+
+  // When flow closes with a pending refresh, trigger router.refresh()
+  // from this component which stays mounted through the transition.
+  useEffect(() => {
+    if (!isFlowOpen && pendingRefreshRef.current) {
+      pendingRefreshRef.current = false;
+      router.refresh();
+    }
+  }, [isFlowOpen, router]);
+
+  // Callback for FlowSimulator: signals a refresh is needed on close
+  const handleOrderApplied = useCallback(() => {
+    pendingRefreshRef.current = true;
+  }, []);
 
   if (isFlowOpen) {
     return (
@@ -103,6 +124,7 @@ export function ReleaseFlowContent({
         releaseId={releaseId}
         releaseTitle={releaseTitle}
         onClose={closeFlow}
+        onOrderApplied={handleOrderApplied}
       />
     );
   }
