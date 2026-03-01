@@ -136,6 +136,16 @@ export function FlowTransport({
     <div className="flex items-center justify-between gap-4 px-4 py-3">
       {/* Left: Transport controls */}
       <div className="flex items-center gap-3">
+        {/* Return to start */}
+        <button
+          type="button"
+          onClick={onReturnToStart}
+          className="p-1.5 rounded-md text-muted hover:text-text transition-colors"
+          title="Return to start"
+        >
+          <RotateCcw size={14} />
+        </button>
+
         <button
           type="button"
           onClick={onSkipPrev}
@@ -175,23 +185,6 @@ export function FlowTransport({
           <SkipForward size={16} />
         </button>
 
-        {/* Time display */}
-        <div className="text-xs text-muted tabular-nums ml-1">
-          <span className="text-text font-medium">{formatTime(currentTime)}</span>
-          {" / "}
-          {formatTime(totalDuration)}
-        </div>
-
-        {/* Return to start */}
-        <button
-          type="button"
-          onClick={onReturnToStart}
-          className="p-1.5 rounded-md text-muted hover:text-text transition-colors"
-          title="Return to start"
-        >
-          <RotateCcw size={14} />
-        </button>
-
         {/* Loop toggle: off → one → all */}
         <button
           type="button"
@@ -210,6 +203,13 @@ export function FlowTransport({
         >
           {loopMode === "one" ? <Repeat1 size={14} /> : <Repeat size={14} />}
         </button>
+
+        {/* Time display */}
+        <div className="text-xs text-muted tabular-nums ml-1">
+          <span className="text-text font-medium">{formatTime(currentTime)}</span>
+          {" / "}
+          {formatTime(totalDuration)}
+        </div>
 
         {/* Currently playing track name */}
         {currentTrackTitle && (
