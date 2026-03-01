@@ -166,13 +166,13 @@ export function PaymentsTable({ releases, currency }: Props) {
                   {formatShortDate(r.createdAt)}
                 </td>
                 <td className="px-4 py-3 text-muted hidden sm:table-cell">{r.artist ?? "—"}</td>
-                <td className="px-4 py-3 text-right font-mono text-text">
+                <td className="px-4 py-3 text-right text-text">
                   {formatMoney(r.feeTotal, r.feeCurrency)}
                 </td>
-                <td className="px-4 py-3 text-right font-mono text-text">
+                <td className="px-4 py-3 text-right text-text">
                   {formatMoney(r.paidAmount, r.feeCurrency)}
                 </td>
-                <td className="px-4 py-3 text-right font-mono hidden sm:table-cell">
+                <td className="px-4 py-3 text-right hidden sm:table-cell">
                   <span className={balance > 0 ? "text-signal" : "text-muted"}>
                     {formatMoney(balance, r.feeCurrency)}
                   </span>
@@ -196,18 +196,18 @@ export function PaymentsTable({ releases, currency }: Props) {
                     >
                       <td className="print:hidden" />
                       <td className="px-4 py-2 pl-8 text-muted" colSpan={3}>
-                        <span className="font-mono mr-2">
+                        <span className="mr-2">
                           {String(t.trackNumber).padStart(2, "0")}
                         </span>
                         {t.title}
                       </td>
-                      <td className="px-4 py-2 text-right font-mono text-muted">
+                      <td className="px-4 py-2 text-right text-muted">
                         {formatMoney(t.fee!, r.feeCurrency)}
                       </td>
-                      <td className="px-4 py-2 text-right font-mono text-muted">
+                      <td className="px-4 py-2 text-right text-muted">
                         {t.feePaid ? formatMoney(t.fee!, r.feeCurrency) : "—"}
                       </td>
-                      <td className="px-4 py-2 text-right font-mono text-muted hidden sm:table-cell">
+                      <td className="px-4 py-2 text-right text-muted hidden sm:table-cell">
                         {t.feePaid ? "—" : formatMoney(t.fee!, r.feeCurrency)}
                       </td>
                       <td className="px-4 py-2">
@@ -224,13 +224,13 @@ export function PaymentsTable({ releases, currency }: Props) {
             <td className="px-4 py-3">Total</td>
             <td className="hidden sm:table-cell" />
             <td className="hidden sm:table-cell" />
-            <td className="px-4 py-3 text-right font-mono">
+            <td className="px-4 py-3 text-right">
               {formatMoney(totalFee, currency)}
             </td>
-            <td className="px-4 py-3 text-right font-mono">
+            <td className="px-4 py-3 text-right">
               {formatMoney(totalPaid, currency)}
             </td>
-            <td className="px-4 py-3 text-right font-mono hidden sm:table-cell">
+            <td className="px-4 py-3 text-right hidden sm:table-cell">
               <span className={totalBalance > 0 ? "text-signal" : "text-muted"}>
                 {formatMoney(totalBalance, currency)}
               </span>

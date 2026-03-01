@@ -240,15 +240,15 @@ export function CommandPalette({ isOpen, onClose }: Props) {
           {results.length > 0 && (
             <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-[10px] text-faint">
               <span className="inline-flex items-center gap-1">
-                <kbd className="px-1 py-0.5 border border-border rounded font-mono">&uarr;&darr;</kbd>
+                <kbd className="px-1 py-0.5 border border-border rounded">&uarr;&darr;</kbd>
                 navigate
               </span>
               <span className="inline-flex items-center gap-1">
-                <kbd className="px-1 py-0.5 border border-border rounded font-mono">&crarr;</kbd>
+                <kbd className="px-1 py-0.5 border border-border rounded">&crarr;</kbd>
                 open
               </span>
               <span className="inline-flex items-center gap-1">
-                <kbd className="px-1 py-0.5 border border-border rounded font-mono">esc</kbd>
+                <kbd className="px-1 py-0.5 border border-border rounded">esc</kbd>
                 close
               </span>
             </div>

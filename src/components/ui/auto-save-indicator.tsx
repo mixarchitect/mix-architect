@@ -13,7 +13,7 @@ export function AutoSaveIndicator({ status, className }: Props) {
   return (
     <span
       className={cn(
-        "text-xs font-mono transition-opacity",
+        "text-xs transition-opacity",
         status === "saving" && "text-muted animate-pulse",
         status === "saved" && "text-status-green",
         status === "error" && "text-signal",

@@ -205,15 +205,15 @@ export default function HomePage() {
               <div className="space-y-4 text-sm">
                 <div className="flex justify-between py-3 border-b border-border">
                   <span className="text-muted">Format</span>
-                  <span className="font-mono text-text">Stereo + Atmos</span>
+                  <span className="text-text">Stereo + Atmos</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-border">
                   <span className="text-muted">Target loudness</span>
-                  <span className="font-mono text-text">-14 LUFS</span>
+                  <span className="text-text">-14 LUFS</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-border">
                   <span className="text-muted">Reference</span>
-                  <span className="font-mono text-text">Blinding Lights</span>
+                  <span className="text-text">Blinding Lights</span>
                 </div>
                 <div className="flex justify-between py-3">
                   <span className="text-muted">Intent</span>
@@ -307,7 +307,7 @@ function Step({
 }) {
   return (
     <div className="text-center">
-      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-panel border border-border-strong text-xl font-bold font-mono text-text mb-5">
+      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-panel border border-border-strong text-xl font-bold text-text mb-5">
         {number}
       </div>
       <h3 className="text-lg font-semibold text-text">{title}</h3>

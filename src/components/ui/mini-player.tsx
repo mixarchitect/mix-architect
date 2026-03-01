@@ -65,7 +65,7 @@ export function MiniPlayer() {
         </Link>
 
         {/* Time display */}
-        <span className="font-mono text-xs text-muted hidden sm:block whitespace-nowrap">
+        <span className="text-xs text-muted hidden sm:block whitespace-nowrap">
           {formatTime(currentTime)} / {formatTime(duration)}
         </span>
 

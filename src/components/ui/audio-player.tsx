@@ -629,7 +629,7 @@ export function AudioPlayer({
 
         {/* Version metadata line */}
         <div className="px-5 pt-2 flex items-center gap-2">
-          <span className="text-[10px] font-mono text-faint uppercase tracking-wider">
+          <span className="text-[10px] text-faint uppercase tracking-wider">
             v{activeVersion?.version_number} ·{" "}
             {activeVersion?.created_at
               ? new Date(activeVersion.created_at).toLocaleDateString("en-US", {
@@ -638,12 +638,12 @@ export function AudioPlayer({
                 })
               : ""}
           </span>
-          <span className="text-[10px] font-mono text-faint">
+          <span className="text-[10px] text-faint">
             · {versionComments.length} comment
             {versionComments.length !== 1 ? "s" : ""}
           </span>
           {activeVersion && (
-            <span className="text-[10px] font-mono text-faint inline-flex items-center gap-1.5">
+            <span className="text-[10px] text-faint inline-flex items-center gap-1.5">
               {activeVersion.file_name && <>· {activeVersion.file_name}</>}
               <button
                 type="button"
@@ -672,14 +672,14 @@ export function AudioPlayer({
           )}
           {/* LUFS measurement */}
           {measuring && (
-            <span className="text-[10px] font-mono text-faint animate-pulse">
+            <span className="text-[10px] text-faint animate-pulse">
               · measuring…
             </span>
           )}
           {measuredLufs != null && !measuring && (() => {
             const delta = measuredLufs - LUFS_REFERENCE;
             return (
-              <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-mono">
+              <span className="ml-auto inline-flex items-center gap-1.5 text-[10px]">
                 <span className="text-faint">·</span>
                 <button
                   type="button"
@@ -777,7 +777,7 @@ export function AudioPlayer({
 
         {/* Transport controls */}
         <div className="flex items-center justify-between px-5 py-3">
-          <span className="font-mono text-xs text-muted min-w-[42px]">
+          <span className="text-xs text-muted min-w-[42px]">
             {formatTime(currentTime)}
           </span>
           <div className="flex items-center gap-3">
@@ -803,7 +803,7 @@ export function AudioPlayer({
               <SkipForward size={16} />
             </button>
           </div>
-          <span className="font-mono text-xs text-faint min-w-[42px] text-right">
+          <span className="text-xs text-faint min-w-[42px] text-right">
             {formatTime(duration)}
           </span>
         </div>
@@ -815,7 +815,7 @@ export function AudioPlayer({
           <span className="text-[11px] font-semibold text-muted uppercase tracking-wider">
             Feedback
           </span>
-          <span className="text-[11px] font-mono text-faint">
+          <span className="text-[11px] text-faint">
             {versionComments.length} note
             {versionComments.length !== 1 ? "s" : ""}
           </span>
@@ -875,7 +875,7 @@ export function AudioPlayer({
           className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden"
           style={{ top: dropdownPos.top, right: dropdownPos.right, background: "var(--panel-2)" }}
         >
-          <table className="text-[11px] font-mono">
+          <table className="text-[11px]">
             <tbody>
               {LOUDNESS_GROUPS.map((group) => {
                 const targets = LOUDNESS_TARGETS.filter((t) => t.group === group);
@@ -985,7 +985,7 @@ function CommentRow({
           <span className="text-xs font-semibold text-text">
             {comment.author}
           </span>
-          <span className="text-[11px] font-mono text-signal bg-signal-muted px-1.5 py-px rounded">
+          <span className="text-[11px] text-signal bg-signal-muted px-1.5 py-px rounded">
             {formatTime(comment.timecode_seconds ?? 0)}
           </span>
           <span className="text-xs text-muted">&middot;</span>
@@ -1034,7 +1034,7 @@ function NewCommentInput({
 
   return (
     <div className="bg-signal-muted border border-signal/20 rounded-lg p-3 mb-2">
-      <div className="flex items-center gap-1.5 mb-2 text-[11px] font-mono text-signal">
+      <div className="flex items-center gap-1.5 mb-2 text-[11px] text-signal">
         <MessageCircle size={12} />
         Comment at {formatTime(timecode)}
       </div>

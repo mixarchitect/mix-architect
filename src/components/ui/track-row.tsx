@@ -30,7 +30,7 @@ export function TrackRow({
         className
       )}
     >
-      <span className="w-8 text-right font-mono text-sm font-medium text-faint shrink-0">
+      <span className="w-8 text-right text-sm font-medium text-faint shrink-0">
         {String(trackNumber).padStart(2, "0")}
       </span>
       <div className="flex-1 min-w-0">

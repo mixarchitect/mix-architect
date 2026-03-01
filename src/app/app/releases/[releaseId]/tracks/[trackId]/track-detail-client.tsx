@@ -483,14 +483,14 @@ export function TrackDetailClient({
               id={track.id}
               className="text-2xl font-semibold h2 text-text"
               prefix={
-                <span className="font-mono text-muted text-2xl font-semibold">
+                <span className="text-muted text-2xl font-semibold">
                   {String(track.track_number).padStart(2, "0")}
                 </span>
               }
             />
           ) : (
             <h1 className="text-2xl font-semibold h2 text-text">
-              <span className="font-mono text-muted mr-2">
+              <span className="text-muted mr-2">
                 {String(track.track_number).padStart(2, "0")}
               </span>
               {track.title}
@@ -999,7 +999,7 @@ export function TrackDetailClient({
                     value={lyrics}
                     onChange={(e) => { setLyrics(e.target.value); saveDistribution({ lyrics: e.target.value || null }); }}
                     disabled={!canEdit(role)}
-                    className="input min-h-[160px] resize-y text-sm font-mono"
+                    className="input min-h-[160px] resize-y text-sm"
                     placeholder="Paste or type lyrics here..."
                   />
                 </PanelBody>
@@ -1029,7 +1029,7 @@ export function TrackDetailClient({
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted">Quality</span>
-                <span className="font-mono text-xs text-text">
+                <span className="text-xs text-text">
                   {sampleRate} / {bitDepth}
                 </span>
               </div>
@@ -1369,7 +1369,7 @@ function SplitEditor({
             <div className="flex items-center justify-between pt-2 border-t border-border">
               <span className="text-xs font-medium text-muted">Total</span>
               <span
-                className={`text-sm font-mono font-semibold ${
+                className={`text-sm font-semibold ${
                   isValid ? "text-emerald-500" : "text-signal"
                 }`}
               >
@@ -1557,7 +1557,7 @@ function SplitRow({
             min="0"
             max="100"
             step="0.01"
-            className="w-20 text-sm text-right font-mono text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal"
+            className="w-20 text-sm text-right text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal"
           />
           <span className="text-xs text-muted">%</span>
         </div>

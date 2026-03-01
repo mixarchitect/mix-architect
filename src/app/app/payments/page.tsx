@@ -135,7 +135,7 @@ export default async function PaymentsPage() {
           <div className="text-[10px] uppercase tracking-wide text-faint font-medium mb-1">
             Outstanding
           </div>
-          <div className={outstandingTotal > 0 ? "text-lg font-semibold text-signal font-mono" : "text-lg font-semibold text-text font-mono"}>
+          <div className={outstandingTotal > 0 ? "text-lg font-semibold text-signal" : "text-lg font-semibold text-text"}>
             {formatMoney(outstandingTotal, primaryCurrency)}
           </div>
           <div className="text-xs text-muted mt-0.5">
@@ -146,7 +146,7 @@ export default async function PaymentsPage() {
           <div className="text-[10px] uppercase tracking-wide text-faint font-medium mb-1">
             Earned
           </div>
-          <div className="text-lg font-semibold text-text font-mono">
+          <div className="text-lg font-semibold text-text">
             {formatMoney(earnedTotal, primaryCurrency)}
           </div>
           <div className="text-xs text-muted mt-0.5">
@@ -157,7 +157,7 @@ export default async function PaymentsPage() {
           <div className="text-[10px] uppercase tracking-wide text-faint font-medium mb-1">
             Total Fees
           </div>
-          <div className="text-lg font-semibold text-text font-mono">
+          <div className="text-lg font-semibold text-text">
             {formatMoney(grandTotal, primaryCurrency)}
           </div>
           <div className="text-xs text-muted mt-0.5">

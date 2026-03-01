@@ -112,7 +112,7 @@ export function PortalFooter({
               {!isPaid && outstanding > 0 && (
                 <div className="mt-3 flex items-center gap-2 text-sm">
                   <span className="text-muted">Outstanding:</span>
-                  <span className="font-mono font-semibold text-signal">
+                  <span className="font-semibold text-signal">
                     {formatCurrency(outstanding, release.fee_currency)}
                   </span>
                 </div>
@@ -176,11 +176,11 @@ export function PortalFooter({
                   .filter((t) => t.distribution?.isrc)
                   .map((t) => (
                     <div key={t.id} className="flex items-center gap-3 text-sm">
-                      <span className="text-muted font-mono text-xs">
+                      <span className="text-muted text-xs">
                         {String(t.track_number).padStart(2, "0")}
                       </span>
                       <span className="text-text">{t.title}</span>
-                      <span className="text-faint font-mono text-xs ml-auto">
+                      <span className="text-faint text-xs ml-auto">
                         {t.distribution!.isrc}
                       </span>
                     </div>

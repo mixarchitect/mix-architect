@@ -278,7 +278,7 @@ export function ReleaseCard({
         </div>
 
         <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted">
-          <span className="font-mono">
+          <span className="">
             {completedTracks} of {trackCount} track{trackCount !== 1 ? "s" : ""} briefed
           </span>
           <div className="flex items-center gap-2">

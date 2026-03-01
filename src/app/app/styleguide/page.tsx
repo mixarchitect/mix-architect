@@ -38,27 +38,27 @@ export default function StyleguidePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-2">
               <div className="h-16 rounded-md bg-bg border border-border" />
-              <div className="text-xs font-mono text-muted">#E9E9E9 bg</div>
+              <div className="text-xs text-muted">#E9E9E9 bg</div>
             </div>
             <div className="space-y-2">
               <div className="h-16 rounded-md bg-panel border border-border" />
-              <div className="text-xs font-mono text-muted">#FFFFFF panel</div>
+              <div className="text-xs text-muted">#FFFFFF panel</div>
             </div>
             <div className="space-y-2">
               <div className="h-16 rounded-md bg-signal" />
-              <div className="text-xs font-mono text-muted">#FE5E0E signal</div>
+              <div className="text-xs text-muted">#FE5E0E signal</div>
             </div>
             <div className="space-y-2">
               <div className="h-16 rounded-md bg-highlight border border-border" />
-              <div className="text-xs font-mono text-muted">#FAF5B2 highlight</div>
+              <div className="text-xs text-muted">#FAF5B2 highlight</div>
             </div>
             <div className="space-y-2">
               <div className="h-16 rounded-md bg-charcoal" />
-              <div className="text-xs font-mono text-muted">#2E2E2E charcoal</div>
+              <div className="text-xs text-muted">#2E2E2E charcoal</div>
             </div>
             <div className="space-y-2">
               <div className="h-16 rounded-md bg-text" />
-              <div className="text-xs font-mono text-muted">#141414 text</div>
+              <div className="text-xs text-muted">#141414 text</div>
             </div>
           </div>
         </PanelBody>

@@ -481,7 +481,7 @@ export function PortalAudioPlayer({
 
         {/* Version metadata line */}
         <div className="px-5 pt-2 flex items-center gap-2">
-          <span className="text-[10px] font-mono text-faint uppercase tracking-wider">
+          <span className="text-[10px] text-faint uppercase tracking-wider">
             v{activeVersion?.version_number} &middot;{" "}
             {activeVersion?.created_at
               ? new Date(activeVersion.created_at).toLocaleDateString("en-US", {
@@ -491,11 +491,11 @@ export function PortalAudioPlayer({
               : ""}
           </span>
           {activeVersion?.file_name && (
-            <span className="text-[10px] font-mono text-faint">
+            <span className="text-[10px] text-faint">
               &middot; {activeVersion.file_name}
             </span>
           )}
-          <span className="text-[10px] font-mono text-faint">
+          <span className="text-[10px] text-faint">
             &middot; {versionComments.length} comment
             {versionComments.length !== 1 ? "s" : ""}
           </span>
@@ -504,7 +504,7 @@ export function PortalAudioPlayer({
             (() => {
               const delta = measuredLufs - LUFS_REFERENCE;
               return (
-                <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-mono">
+                <span className="ml-auto inline-flex items-center gap-1.5 text-[10px]">
                   <span className="text-faint">&middot;</span>
                   <button
                     type="button"
@@ -611,7 +611,7 @@ export function PortalAudioPlayer({
 
         {/* Transport controls */}
         <div className="flex items-center justify-between px-5 py-3">
-          <span className="font-mono text-xs text-muted min-w-[42px]">
+          <span className="text-xs text-muted min-w-[42px]">
             {formatTime(currentTime)}
           </span>
           <div className="flex items-center gap-3">
@@ -641,7 +641,7 @@ export function PortalAudioPlayer({
               <SkipForward size={16} />
             </button>
           </div>
-          <span className="font-mono text-xs text-faint min-w-[42px] text-right">
+          <span className="text-xs text-faint min-w-[42px] text-right">
             {formatTime(duration)}
           </span>
         </div>
@@ -692,7 +692,7 @@ export function PortalAudioPlayer({
           {/* New comment input */}
           {commentInput && !showNameInput && (
             <div className="bg-signal-muted border border-signal/20 rounded-lg p-3 mb-2">
-              <div className="flex items-center gap-1.5 mb-2 text-[11px] font-mono text-signal">
+              <div className="flex items-center gap-1.5 mb-2 text-[11px] text-signal">
                 <MessageCircle size={12} />
                 Comment at {formatTime(commentInput.timecode)}
                 {clientName && (
@@ -787,7 +787,7 @@ export function PortalAudioPlayer({
             background: "var(--panel-2)",
           }}
         >
-          <table className="text-[11px] font-mono">
+          <table className="text-[11px]">
             <tbody>
               {LOUDNESS_GROUPS.map((group) => {
                 const targets = LOUDNESS_TARGETS.filter(
@@ -887,7 +887,7 @@ function CommentRow({
           <span className="text-xs font-semibold text-text">
             {comment.author}
           </span>
-          <span className="text-[11px] font-mono text-signal bg-signal-muted px-1.5 py-px rounded">
+          <span className="text-[11px] text-signal bg-signal-muted px-1.5 py-px rounded">
             {formatTime(comment.timecode_seconds ?? 0)}
           </span>
           <span className="text-xs text-muted">&middot;</span>

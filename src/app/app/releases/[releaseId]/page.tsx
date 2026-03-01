@@ -154,7 +154,7 @@ export default async function ReleasePage({ params }: Props) {
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold text-text">
               Tracks
-              <span className="ml-2 text-xs text-muted font-mono">
+              <span className="ml-2 text-xs text-muted">
                 {tracks?.length ?? 0}
               </span>
             </h2>
@@ -232,7 +232,7 @@ export default async function ReleasePage({ params }: Props) {
                 {release.target_date && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Target Date</span>
-                    <span className="text-text font-mono text-xs">
+                    <span className="text-text text-xs">
                       {new Date(release.target_date).toLocaleDateString()}
                     </span>
                   </div>
@@ -290,7 +290,7 @@ export default async function ReleasePage({ params }: Props) {
                   {release.client_email && (
                     <div className="flex justify-between">
                       <span className="text-muted">Email</span>
-                      <span className="text-text font-mono text-xs">
+                      <span className="text-text text-xs">
                         {release.client_email}
                       </span>
                     </div>

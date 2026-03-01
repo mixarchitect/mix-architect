@@ -85,7 +85,7 @@ export function PortalTrackCard({
       {/* Track header with inline status badge */}
       <div className="flex items-start justify-between px-4 md:px-6 pt-5 pb-3 gap-3">
         <h2 className="text-base md:text-lg font-bold text-text min-w-0 pt-0.5">
-          <span className="font-mono text-muted text-sm mr-2">
+          <span className="text-muted text-sm mr-2">
             {String(track.track_number).padStart(2, "0")}
           </span>
           {track.title}
@@ -204,14 +204,14 @@ export function PortalTrackCard({
                   {measuredLufs != null && (
                     <span>
                       <span className="text-muted">Loudness: </span>
-                      <span className="font-mono text-text">
+                      <span className="text-text">
                         {measuredLufs.toFixed(1)} LUFS
                       </span>
                     </span>
                   )}
                   <span>
                     <span className="text-muted">Format: </span>
-                    <span className="font-mono text-text">
+                    <span className="text-text">
                       {formatLabel(track.specs?.format_override || releaseFormat)}
                     </span>
                   </span>
@@ -243,7 +243,7 @@ export function PortalTrackCard({
                   {track.distribution.isrc && (
                     <span>
                       <span className="text-muted">ISRC: </span>
-                      <span className="font-mono text-text">
+                      <span className="text-text">
                         {track.distribution.isrc}
                       </span>
                     </span>
@@ -251,7 +251,7 @@ export function PortalTrackCard({
                   {track.distribution.iswc && (
                     <span>
                       <span className="text-muted">ISWC: </span>
-                      <span className="font-mono text-text">
+                      <span className="text-text">
                         {track.distribution.iswc}
                       </span>
                     </span>

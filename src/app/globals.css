@@ -209,7 +209,6 @@ summary.list-none::-webkit-details-marker { display: none; }
 }
 
 .mono {
-  font-family: var(--font-mono);
   letter-spacing: -0.02em;
 }
 
@@ -403,7 +402,6 @@ select.input {
 }
 
 .data-value {
-  font-family: var(--font-mono);
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -411,7 +409,6 @@ select.input {
 }
 
 .data-value-sm {
-  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -486,12 +483,10 @@ select.input {
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  font-family: var(--font-mono);
 }
 
 .rowVal {
   font-size: 14px;
-  font-family: var(--font-mono);
   color: var(--text);
 }
 
@@ -678,7 +673,6 @@ select.input {
   display: inline-flex;
   align-items: center;
   padding: 6px 10px;
-  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;

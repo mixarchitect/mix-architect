@@ -37,7 +37,7 @@ export function StatTile({
         </div>
         <div
           className={cn(
-            "mt-2 font-mono text-2xl leading-tight tracking-tight font-semibold",
+            "mt-2 text-2xl leading-tight tracking-tight font-semibold",
             variant === "default" ? "text-text" : "text-white"
           )}
         >

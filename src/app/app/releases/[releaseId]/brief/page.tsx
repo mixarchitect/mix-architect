@@ -97,7 +97,7 @@ export default async function BriefPage({ params }: Props) {
           {release.artist && (
             <p className="text-lg text-muted mt-1">{release.artist}</p>
           )}
-          <p className="text-sm text-faint mt-3 font-mono">
+          <p className="text-sm text-faint mt-3">
             Prepared:{" "}
             {new Date().toLocaleDateString("en-US", {
               month: "long",
@@ -179,7 +179,7 @@ export default async function BriefPage({ params }: Props) {
             <section key={track.id} className="mb-10 break-inside-avoid">
               <Rule className="mb-6" />
               <h2 className="text-lg font-bold text-text mb-4">
-                <span className="font-mono text-muted mr-2">
+                <span className="text-muted mr-2">
                   TRACK {String(track.track_number).padStart(2, "0")}
                 </span>
                 &mdash; {String(track.title).toUpperCase()}
@@ -206,14 +206,14 @@ export default async function BriefPage({ params }: Props) {
                   {trackSpec.target_loudness && (
                     <span>
                       <span className="text-muted">Loudness: </span>
-                      <span className="font-mono text-text">
+                      <span className="text-text">
                         {trackSpec.target_loudness}
                       </span>
                     </span>
                   )}
                   <span>
                     <span className="text-muted">Format: </span>
-                    <span className="font-mono text-text">
+                    <span className="text-text">
                       {trackSpec.format_override || release.format}
                     </span>
                   </span>

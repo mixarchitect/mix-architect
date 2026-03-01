@@ -187,7 +187,7 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
             className="group flex-1 flex items-center gap-4 min-w-0"
             draggable={false}
           >
-            <span className="w-8 text-right font-mono text-sm font-medium text-faint shrink-0">
+            <span className="w-8 text-right text-sm font-medium text-faint shrink-0">
               {String(t.track_number).padStart(2, "0")}
             </span>
             <div className="flex-1 min-w-0">

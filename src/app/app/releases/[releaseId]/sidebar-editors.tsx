@@ -801,7 +801,7 @@ export function PaymentEditor({
                           setEditingFee(false);
                         }
                       }}
-                      className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
+                      className="input text-xs h-7 w-24 py-0.5 px-2 text-right"
                       autoFocus
                       placeholder="0.00"
                     />
@@ -830,13 +830,13 @@ export function PaymentEditor({
                       setFeeInput(feeTotal != null ? String(feeTotal) : "");
                       setEditingFee(true);
                     }}
-                    className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                    className="text-text text-xs cursor-pointer hover:opacity-80 transition-opacity"
                   >
                     {formatCurrency(feeTotal, initialFeeCurrency)}
                   </button>
                 )
               ) : (
-                <span className="text-text font-mono text-xs">
+                <span className="text-text text-xs">
                   {formatCurrency(feeTotal, initialFeeCurrency)}
                 </span>
               )}
@@ -862,7 +862,7 @@ export function PaymentEditor({
                             setEditingPaid(false);
                           }
                         }}
-                        className="input text-xs h-7 w-24 py-0.5 px-2 font-mono text-right"
+                        className="input text-xs h-7 w-24 py-0.5 px-2 text-right"
                         autoFocus
                         placeholder="0.00"
                       />
@@ -891,20 +891,20 @@ export function PaymentEditor({
                         setPaidInput(String(paidAmount));
                         setEditingPaid(true);
                       }}
-                      className="text-text font-mono text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                      className="text-text text-xs cursor-pointer hover:opacity-80 transition-opacity"
                     >
                       {formatCurrency(paidAmount, initialFeeCurrency)}
                     </button>
                   )
                 ) : (
-                  <span className="text-text font-mono text-xs">
+                  <span className="text-text text-xs">
                     {formatCurrency(paidAmount, initialFeeCurrency)}
                   </span>
                 )}
               </div>
               <div className="flex justify-between text-sm items-center pt-1 border-t border-border/50">
                 <span className="text-muted font-medium">Balance</span>
-                <span className="font-mono text-xs font-medium" style={{ color: balance > 0 ? "var(--signal)" : "var(--text)" }}>
+                <span className="text-xs font-medium" style={{ color: balance > 0 ? "var(--signal)" : "var(--text)" }}>
                   {formatCurrency(balance, initialFeeCurrency)}
                 </span>
               </div>
