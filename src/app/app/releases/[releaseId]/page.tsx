@@ -7,11 +7,11 @@ import { Pill } from "@/components/ui/pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
 import { Plus, Settings, ArrowLeft, ListMusic } from "lucide-react";
-import { EditableTitle } from "@/components/ui/editable-title";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
 import { FlowSimulatorButton } from "@/components/flow-simulator/flow-simulator-button";
-import { ReleaseFlowWrapper } from "@/components/flow-simulator/release-flow-context";
+import { FlowProvider, ReleaseFlowContent } from "@/components/flow-simulator/release-flow-context";
+import { FlowBreadcrumbTitle } from "@/components/flow-simulator/flow-breadcrumb-title";
 import type { FlowTrack } from "@/components/flow-simulator/use-flow-audio";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
@@ -132,6 +132,7 @@ export default async function ReleasePage({ params }: Props) {
   }
 
   return (
+    <FlowProvider>
     <div>
       {/* Toolbar */}
       <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
@@ -144,16 +145,11 @@ export default async function ReleasePage({ params }: Props) {
             Releases
           </Link>
           <span className="text-faint">/</span>
-          {canEdit(role) ? (
-            <EditableTitle
-              value={release.title as string}
-              table="releases"
-              id={releaseId}
-              className="text-2xl font-semibold h2 text-text"
-            />
-          ) : (
-            <h1 className="text-2xl font-semibold h2 text-text truncate">{release.title}</h1>
-          )}
+          <FlowBreadcrumbTitle
+            title={release.title as string}
+            releaseId={releaseId}
+            canEdit={canEdit(role)}
+          />
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {canEdit(role) && (
@@ -184,7 +180,7 @@ export default async function ReleasePage({ params }: Props) {
       </div>
 
       {/* Two-panel layout (wrapped for Flow Simulator toggle) */}
-      <ReleaseFlowWrapper
+      <ReleaseFlowContent
         flowTracks={flowTracks}
         flowHiddenCount={flowHiddenCount}
         releaseId={releaseId}
@@ -357,7 +353,8 @@ export default async function ReleasePage({ params }: Props) {
 
         </aside>
       </div>
-      </ReleaseFlowWrapper>
+      </ReleaseFlowContent>
     </div>
+    </FlowProvider>
   );
 }

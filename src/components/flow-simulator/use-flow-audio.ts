@@ -334,7 +334,9 @@ export function useFlowAudio(
         const seg = segments[segmentIndexRef.current];
         if (seg && localTime >= seg.startTime + seg.duration - 0.05) {
           advanceToNextSegment();
-          return; // Don't schedule another frame; advanceToNextSegment handles it
+          // advanceToNextSegment will call stopRAFLoop if we've reached the end,
+          // which cancels the frame we schedule below. Otherwise, keep ticking
+          // so we can monitor the next segment's boundary.
         }
       }
 
