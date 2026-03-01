@@ -144,8 +144,10 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
       );
       if (results.some((r) => r.error)) throw new Error("Reorder failed");
       toast("Track order applied to release", { variant: "success" });
-      router.refresh();
+      // Close first so the release page children are mounted,
+      // then refresh so the server re-render updates them in place.
       onClose();
+      router.refresh();
     } catch {
       toast("Failed to update track order", { variant: "error" });
     } finally {
