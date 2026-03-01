@@ -14,6 +14,7 @@ import {
   SkipForward,
   Upload,
   Download,
+  Trash2,
   MessageCircle,
   ChevronDown,
   X,
@@ -189,6 +190,10 @@ export function AudioPlayer({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Delete state
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // WaveSurfer ref
   const wavesurferRef = useRef<WaveSurfer | null>(null);
@@ -519,6 +524,69 @@ export function AudioPlayer({
   }
 
   /* ---------------------------------------------------------------- */
+  /*  Delete version handler                                           */
+  /* ---------------------------------------------------------------- */
+
+  async function handleDeleteVersion(versionId: string) {
+    const version = versions.find((v) => v.id === versionId);
+    if (!version) return;
+
+    setDeleting(true);
+    try {
+      // Stop playback if this version is active
+      if (versionId === activeVersionId) {
+        audioElement.pause();
+        audioElement.src = "";
+      }
+
+      // Delete from storage — extract path from public URL
+      try {
+        const url = new URL(version.audio_url);
+        const pathMatch = url.pathname.match(/\/track-audio\/(.+)$/);
+        if (pathMatch) {
+          await supabase.storage.from("track-audio").remove([decodeURIComponent(pathMatch[1])]);
+        }
+      } catch {
+        // Storage delete is best-effort; row delete is what matters
+      }
+
+      // Delete associated timeline comments
+      await supabase
+        .from("revision_notes")
+        .delete()
+        .eq("audio_version_id", versionId);
+
+      // Delete the audio version row
+      const { error } = await supabase
+        .from("track_audio_versions")
+        .delete()
+        .eq("id", versionId);
+
+      if (error) throw error;
+
+      // Update local state
+      const remaining = versions.filter((v) => v.id !== versionId);
+      onVersionsChange(remaining);
+
+      // Remove associated comments from parent state
+      const remainingComments = comments.filter((c) => c.audio_version_id !== versionId);
+      onCommentsChange(remainingComments);
+
+      // Switch active version
+      if (versionId === activeVersionId) {
+        const next = remaining.length > 0 ? remaining[remaining.length - 1].id : null;
+        setActiveVersionId(next);
+      }
+
+      setDeleteConfirmId(null);
+    } catch (err) {
+      console.error("Failed to delete version:", err);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
   /*  Empty state                                                      */
   /* ---------------------------------------------------------------- */
 
@@ -671,6 +739,37 @@ export function AudioPlayer({
               >
                 <Download size={14} />
               </button>
+              {canDelete && (
+                deleteConfirmId === activeVersion.id ? (
+                  <span className="inline-flex items-center gap-1 ml-1">
+                    <span className="text-signal">Delete v{activeVersion.version_number}?</span>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteVersion(activeVersion.id)}
+                      disabled={deleting}
+                      className="text-signal hover:text-red-500 transition-colors font-semibold"
+                    >
+                      {deleting ? "…" : "Yes"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeleteConfirmId(null)}
+                      className="text-muted hover:text-text transition-colors"
+                    >
+                      No
+                    </button>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setDeleteConfirmId(activeVersion.id)}
+                    className="text-faint hover:text-signal transition-colors"
+                    title={`Delete v${activeVersion.version_number}`}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                )
+              )}
             </span>
           )}
           {/* LUFS measurement */}
