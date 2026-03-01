@@ -775,7 +775,7 @@ export function AudioPlayer({
           </div>
         </div>
 
-        {/* Version metadata line */}
+        {/* Version metadata lines */}
         <div className="px-5 pt-2 flex items-center gap-2">
           <span className="text-[10px] text-faint uppercase tracking-wider">
             v{activeVersion?.version_number} ·{" "}
@@ -792,17 +792,6 @@ export function AudioPlayer({
           </span>
           {activeVersion && (
             <span className="text-[10px] text-faint inline-flex items-center gap-1.5">
-              {activeVersion.file_name && <>· {activeVersion.file_name}</>}
-              {activeVersion.file_format && (
-                <>&middot; {activeVersion.file_format}
-                  {activeVersion.sample_rate != null && (
-                    <> &middot; {formatSampleRate(activeVersion.sample_rate)}</>
-                  )}
-                  {activeVersion.bit_depth != null && (
-                    <> &middot; {formatBitDepth(activeVersion.bit_depth, activeVersion.file_format)}</>
-                  )}
-                </>
-              )}
               <button
                 type="button"
                 onClick={async () => {
@@ -902,6 +891,33 @@ export function AudioPlayer({
             );
           })()}
         </div>
+
+        {/* File info line */}
+        {activeVersion && (
+          <div className="px-5 pt-1 flex items-center gap-1 text-[10px] text-faint">
+            {activeVersion.file_name && (
+              <span className="truncate max-w-[200px]">{activeVersion.file_name}</span>
+            )}
+            {activeVersion.file_format && (
+              <>
+                {activeVersion.file_name && <span>·</span>}
+                <span>{activeVersion.file_format}</span>
+              </>
+            )}
+            {activeVersion.sample_rate != null && (
+              <>
+                <span>·</span>
+                <span>{formatSampleRate(activeVersion.sample_rate)}</span>
+              </>
+            )}
+            {activeVersion.bit_depth != null && (
+              <>
+                <span>·</span>
+                <span>{formatBitDepth(activeVersion.bit_depth, activeVersion.file_format)}</span>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Comment markers above waveform */}
         <div className="relative px-5 mt-3 h-5">

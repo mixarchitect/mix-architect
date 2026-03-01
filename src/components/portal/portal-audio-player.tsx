@@ -492,22 +492,6 @@ export function PortalAudioPlayer({
                 })
               : ""}
           </span>
-          {activeVersion?.file_name && (
-            <span className="text-[10px] text-faint">
-              &middot; {activeVersion.file_name}
-            </span>
-          )}
-          {activeVersion?.file_format && (
-            <span className="text-[10px] text-faint">
-              &middot; {activeVersion.file_format}
-              {activeVersion.sample_rate != null && (
-                <> &middot; {formatSampleRate(activeVersion.sample_rate)}</>
-              )}
-              {activeVersion.bit_depth != null && (
-                <> &middot; {formatBitDepth(activeVersion.bit_depth, activeVersion.file_format)}</>
-              )}
-            </span>
-          )}
           <span className="text-[10px] text-faint">
             &middot; {versionComments.length} comment
             {versionComments.length !== 1 ? "s" : ""}
@@ -552,6 +536,33 @@ export function PortalAudioPlayer({
               );
             })()}
         </div>
+
+        {/* File info line */}
+        {activeVersion && (
+          <div className="px-5 pt-1 flex items-center gap-1 text-[10px] text-faint">
+            {activeVersion.file_name && (
+              <span className="truncate max-w-[200px]">{activeVersion.file_name}</span>
+            )}
+            {activeVersion.file_format && (
+              <>
+                {activeVersion.file_name && <span>·</span>}
+                <span>{activeVersion.file_format}</span>
+              </>
+            )}
+            {activeVersion.sample_rate != null && (
+              <>
+                <span>·</span>
+                <span>{formatSampleRate(activeVersion.sample_rate)}</span>
+              </>
+            )}
+            {activeVersion.bit_depth != null && (
+              <>
+                <span>·</span>
+                <span>{formatBitDepth(activeVersion.bit_depth, activeVersion.file_format)}</span>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Comment markers above waveform */}
         <div className="relative px-5 mt-3 h-5">
