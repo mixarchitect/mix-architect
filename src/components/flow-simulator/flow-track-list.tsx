@@ -14,6 +14,7 @@ type Props = {
   tracks: FlowTrack[];
   currentTrackIndex: number;
   isPlaying: boolean;
+  currentTime: number;
   onReorder: (fromIndex: number, toIndex: number) => void;
   onTrackClick: (index: number) => void;
   hiddenCount: number;
@@ -94,6 +95,7 @@ export function FlowTrackList({
   tracks,
   currentTrackIndex,
   isPlaying,
+  currentTime,
   onReorder,
   onTrackClick,
   hiddenCount,
@@ -205,7 +207,13 @@ export function FlowTrackList({
           {/* Mini waveform */}
           <MiniWaveform
             peaks={track.waveformPeaks}
-            progress={idx === currentTrackIndex && isPlaying ? 0.5 : 0}
+            progress={
+              idx === currentTrackIndex
+                ? track.durationSeconds > 0
+                  ? currentTime / track.durationSeconds
+                  : 0
+                : 0
+            }
           />
 
           {/* Duration */}

@@ -155,7 +155,6 @@ export function useFlowAudio(
 
   // State refs for use in callbacks
   const tracksRef = useRef(tracks);
-  tracksRef.current = tracks;
   const modeRef = useRef(mode);
   modeRef.current = mode;
   const transitionWindowRef = useRef(transitionWindow);
@@ -167,6 +166,23 @@ export function useFlowAudio(
   const rafRef = useRef<number>(0);
   // Whether crossfade has been initiated for current track
   const crossfadeInitiatedRef = useRef(false);
+
+  // When tracks array changes (reorder), remap currentTrackIndex to follow the same track by ID
+  useEffect(() => {
+    const prevTracks = tracksRef.current;
+    tracksRef.current = tracks;
+
+    // If the tracks array identity changed and we have a current track, remap
+    if (prevTracks !== tracks && stateRef.current.isPlaying) {
+      const currentId = prevTracks[stateRef.current.currentTrackIndex]?.id;
+      if (currentId) {
+        const newIdx = tracks.findIndex((t) => t.id === currentId);
+        if (newIdx !== -1 && newIdx !== stateRef.current.currentTrackIndex) {
+          setState((prev) => ({ ...prev, currentTrackIndex: newIdx }));
+        }
+      }
+    }
+  }, [tracks]);
 
   /* ---- Initialize audio elements ---- */
   useEffect(() => {

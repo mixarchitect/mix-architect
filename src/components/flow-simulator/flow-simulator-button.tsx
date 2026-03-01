@@ -10,9 +10,10 @@ type Props = {
   tracks: FlowTrack[];
   hiddenCount: number;
   releaseId: string;
+  releaseTitle: string;
 };
 
-export function FlowSimulatorButton({ tracks, hiddenCount, releaseId }: Props) {
+export function FlowSimulatorButton({ tracks, hiddenCount, releaseId, releaseTitle }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
   // Need at least 2 tracks with audio to use the simulator
@@ -21,7 +22,7 @@ export function FlowSimulatorButton({ tracks, hiddenCount, releaseId }: Props) {
   return (
     <>
       <Button
-        variant="ghost"
+        variant="secondary"
         className="h-9 text-xs"
         onClick={() => setIsOpen(true)}
         title="Audition track flow and order"
@@ -35,6 +36,7 @@ export function FlowSimulatorButton({ tracks, hiddenCount, releaseId }: Props) {
           tracks={tracks}
           hiddenCount={hiddenCount}
           releaseId={releaseId}
+          releaseTitle={releaseTitle}
           onClose={() => setIsOpen(false)}
         />
       )}

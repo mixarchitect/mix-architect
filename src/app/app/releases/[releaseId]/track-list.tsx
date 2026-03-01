@@ -32,6 +32,12 @@ function statusColor(s: string): "green" | "orange" | "blue" {
 
 export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDelete }: Props) {
   const [localTracks, setLocalTracks] = useState(initialTracks);
+
+  // Sync local state when server data changes (e.g. after Flow Simulator applies new order)
+  useEffect(() => {
+    setLocalTracks(initialTracks);
+  }, [initialTracks]);
+
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);

@@ -24,7 +24,7 @@ export function SegmentedControl({ options, value, onChange, className }: Props)
           className={cn(
             "px-4 py-2 text-sm font-medium rounded-[7px] transition-all duration-150",
             value === opt.value
-              ? "bg-panel text-text shadow-sm"
+              ? "bg-signal text-signal-on shadow-sm"
               : "text-muted hover:text-text"
           )}
         >

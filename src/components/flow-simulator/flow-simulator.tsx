@@ -2,12 +2,11 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
-import { Button, IconButton } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useAudio } from "@/lib/audio-context";
 import { useToast } from "@/components/ui/toast";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
-import { cn } from "@/lib/cn";
 import {
   useFlowAudio,
   computeTotalDuration,
@@ -27,6 +26,7 @@ type Props = {
   tracks: FlowTrack[];
   hiddenCount: number;
   releaseId: string;
+  releaseTitle: string;
   onClose: () => void;
 };
 
@@ -34,7 +34,7 @@ type Props = {
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, onClose }: Props) {
+export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, releaseTitle, onClose }: Props) {
   const router = useRouter();
   const sharedAudio = useAudio();
   const { toast } = useToast();
@@ -46,7 +46,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
   const [undoStack, setUndoStack] = useState<FlowTrack[][]>([]);
 
   // ── Mode state ────────────────────────────────────────────────────
-  const [mode, setMode] = useState<FlowMode>("full");
+  const [mode, setMode] = useState<FlowMode>("condensed");
   const [transitionWindow, setTransitionWindow] = useState(15);
 
   // ── Apply order state ─────────────────────────────────────────────
@@ -190,11 +190,17 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
     >
       {/* ── Header ──────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-        <div className="flex items-center gap-3">
-          <IconButton onClick={handleClose} title="Close">
-            <X size={16} />
-          </IconButton>
-          <h2 className="text-sm font-semibold text-text uppercase tracking-wider">
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1 shrink-0"
+          >
+            <ArrowLeft size={14} />
+            {releaseTitle}
+          </button>
+          <span className="text-faint">/</span>
+          <h2 className="text-sm font-semibold text-text shrink-0">
             Flow Simulator
           </h2>
         </div>
@@ -284,6 +290,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
           tracks={orderedTracks}
           currentTrackIndex={audio.currentTrackIndex}
           isPlaying={audio.isPlaying}
+          currentTime={audio.currentTime}
           onReorder={handleReorder}
           onTrackClick={handleTrackClick}
           hiddenCount={hiddenCount}

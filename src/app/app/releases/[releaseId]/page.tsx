@@ -209,6 +209,7 @@ export default async function ReleasePage({ params }: Props) {
                 tracks={flowTracks}
                 hiddenCount={flowHiddenCount}
                 releaseId={releaseId}
+                releaseTitle={release.title as string}
               />
               {canEdit(role) && (
                 <Link href={`/app/releases/${releaseId}/tracks/new`}>
