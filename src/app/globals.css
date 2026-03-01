@@ -30,10 +30,10 @@
   /* ─────────────────────────────────────────────────────
      PALETTE - Accent Colors (from Petronex)
   ───────────────────────────────────────────────────── */
-  --signal: #D9AF30;          /* gold accent */
-  --signal-on: #1a1a1a;       /* dark text ON signal bg */
-  --signal-muted: rgba(217, 175, 48, 0.14);
-  --signal-light: rgba(217, 175, 48, 0.10);
+  --signal: #A8841E;          /* plaque gold accent */
+  --signal-on: #ffffff;       /* white text ON signal bg (light mode) */
+  --signal-muted: rgba(168, 132, 30, 0.10);
+  --signal-light: rgba(168, 132, 30, 0.08);
   --highlight: #FAF5B2;       /* yellow highlight */
   --highlight-strong: #F5EE8A;
   --charcoal: #2E2E2E;        /* dark toolbar */
@@ -95,10 +95,10 @@
   --muted: rgba(232, 232, 232, 0.62);
   --faint: rgba(232, 232, 232, 0.38);
 
-  --signal: #D9AF30;
+  --signal: #A8841E;
   --signal-on: #1a1a1a;
-  --signal-muted: rgba(217, 175, 48, 0.18);
-  --signal-light: rgba(217, 175, 48, 0.10);
+  --signal-muted: rgba(168, 132, 30, 0.15);
+  --signal-light: rgba(168, 132, 30, 0.08);
   --highlight: #3D3820;
   --highlight-strong: #4A4528;
   --charcoal: #0e0e0e;
@@ -518,14 +518,14 @@ select.input {
   background: var(--signal);
   border: none;
   border-radius: var(--r-sm);
-  box-shadow: 0 2px 8px rgba(217, 175, 48, 0.25);
+  box-shadow: 0 2px 8px rgba(168, 132, 30, 0.25);
   transition: all 150ms ease;
   cursor: pointer;
 }
 
 .btn-primary:hover {
-  background: #C49A28;
-  box-shadow: 0 4px 16px rgba(217, 175, 48, 0.35);
+  background: #8A6E18;
+  box-shadow: 0 4px 16px rgba(168, 132, 30, 0.35);
   transform: translateY(-1px);
 }
 
@@ -535,7 +535,7 @@ select.input {
 
 .btn-primary:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--signal-muted), 0 2px 8px rgba(217, 175, 48, 0.25);
+  box-shadow: 0 0 0 3px var(--signal-muted), 0 2px 8px rgba(168, 132, 30, 0.25);
 }
 
 .btn-primary:disabled {

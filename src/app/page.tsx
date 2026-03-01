@@ -2,7 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Panel } from "@/components/ui/panel";
 import { Rule } from "@/components/ui/rule";
-import { FileText, Layers, Share2, CheckCircle2, ArrowRight } from "lucide-react";
+import { FileText, Layers, Share2, CheckCircle2 } from "lucide-react";
+import { FilledArrowRight } from "@/components/ui/filled-icon";
 
 export default function HomePage() {
   return (
@@ -87,7 +88,7 @@ export default function HomePage() {
           <div className="mt-12 flex flex-wrap justify-center gap-4">
             <Link href="/app" className="btn-primary h-14 px-10 text-base inline-flex items-center gap-2">
               Start for free
-              <ArrowRight size={18} />
+              <FilledArrowRight size={18} />
             </Link>
             <a href="#how-it-works" className="btn-secondary h-14 px-10 text-base inline-flex items-center gap-2 bg-white text-text border-white hover:bg-white/90">
               See how it works
@@ -243,7 +244,7 @@ export default function HomePage() {
           <div className="mt-8">
             <Link href="/app" className="btn-primary h-12 px-8 text-base inline-flex items-center gap-2">
               Get started for free
-              <ArrowRight size={18} />
+              <FilledArrowRight size={18} />
             </Link>
           </div>
         </div>

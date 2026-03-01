@@ -8,8 +8,6 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
 import { useTheme } from "next-themes";
 import {
-  Play,
-  Pause,
   SkipBack,
   SkipForward,
   Upload,
@@ -30,6 +28,7 @@ import {
   LOUDNESS_GROUPS,
   AUTHOR_COLORS,
 } from "@/components/ui/audio-player-shared";
+import { FilledPlay, FilledPause, FilledUpload } from "@/components/ui/filled-icon";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -694,7 +693,7 @@ export function AudioPlayer({
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
             >
-              <Upload size={16} />
+              <FilledUpload size={16} />
               {uploading ? "Uploading..." : "Upload audio"}
             </Button>
             {uploadError && (
@@ -827,12 +826,12 @@ export function AudioPlayer({
               {canDelete && (
                 deleteConfirmId === activeVersion.id ? (
                   <span className="inline-flex items-center gap-1 ml-1">
-                    <span className="text-signal">Delete v{activeVersion.version_number}?</span>
+                    <span className="text-red-500">Delete v{activeVersion.version_number}?</span>
                     <button
                       type="button"
                       onClick={() => handleDeleteVersion(activeVersion.id)}
                       disabled={deleting}
-                      className="text-signal hover:text-red-500 transition-colors font-semibold"
+                      className="text-red-500 hover:opacity-70 transition-colors font-semibold"
                     >
                       {deleting ? "…" : "Yes"}
                     </button>
@@ -1007,7 +1006,7 @@ export function AudioPlayer({
               disabled={!isReady}
               className="w-10 h-10 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md"
             >
-              {isPlaying ? <Pause size={18} /> : <Play size={18} className="ml-0.5" />}
+              {isPlaying ? <FilledPause size={18} /> : <FilledPlay size={18} className="ml-0.5" />}
             </button>
             <button
               onClick={skipForward}

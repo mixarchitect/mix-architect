@@ -5,8 +5,6 @@ import { cn } from "@/lib/cn";
 import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
 import { useTheme } from "next-themes";
 import {
-  Play,
-  Pause,
   SkipBack,
   SkipForward,
   Download,
@@ -26,6 +24,7 @@ import {
   LOUDNESS_GROUPS,
   AUTHOR_COLORS,
 } from "@/components/ui/audio-player-shared";
+import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
 import { Button } from "@/components/ui/button";
 import type { AudioVersionData, TimelineComment } from "@/components/ui/audio-player";
 
@@ -652,9 +651,9 @@ export function PortalAudioPlayer({
               className="w-10 h-10 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md"
             >
               {isPlaying ? (
-                <Pause size={18} />
+                <FilledPause size={18} />
               ) : (
-                <Play size={18} className="ml-0.5" />
+                <FilledPlay size={18} className="ml-0.5" />
               )}
             </button>
             <button

@@ -1,6 +1,7 @@
 "use client";
 
-import { Play, Pause, X } from "lucide-react";
+import { X } from "lucide-react";
+import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
 import { useAudio } from "@/lib/audio-context";
 
 function formatTime(seconds: number): string {
@@ -70,9 +71,9 @@ export function PortalMiniPlayer() {
           className="w-9 h-9 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm shrink-0"
         >
           {isPlaying ? (
-            <Pause size={16} />
+            <FilledPause size={16} />
           ) : (
-            <Play size={16} className="ml-0.5" />
+            <FilledPlay size={16} className="ml-0.5" />
           )}
         </button>
 
