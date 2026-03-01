@@ -10,6 +10,8 @@ import { Plus, Settings, ArrowLeft, ListMusic } from "lucide-react";
 import { EditableTitle } from "@/components/ui/editable-title";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
+import { FlowSimulatorButton } from "@/components/flow-simulator/flow-simulator-button";
+import type { FlowTrack } from "@/components/flow-simulator/use-flow-audio";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
 import { formatLabel } from "@/lib/format-labels";
@@ -69,6 +71,50 @@ export default async function ReleasePage({ params }: Props) {
 
   const tracks = tracksRes.data;
   const globalRefs = globalRefsRes.data;
+
+  // Fetch audio versions for Flow Simulator (latest version per track)
+  const trackIds = (tracks ?? []).map((t: Record<string, unknown>) => t.id as string);
+  let flowTracks: FlowTrack[] = [];
+  let flowHiddenCount = 0;
+
+  if (trackIds.length > 0) {
+    const { data: audioVersions } = await supabase
+      .from("track_audio_versions")
+      .select("id, track_id, version_number, audio_url, duration_seconds, waveform_peaks")
+      .in("track_id", trackIds)
+      .order("version_number", { ascending: false });
+
+    if (audioVersions && tracks) {
+      // Pick the highest version_number per track_id
+      const latestByTrack = new Map<string, typeof audioVersions[0]>();
+      for (const av of audioVersions) {
+        if (!latestByTrack.has(av.track_id)) {
+          latestByTrack.set(av.track_id, av);
+        }
+      }
+
+      // Build FlowTrack array in track_number order, only for tracks with audio
+      const sorted = [...tracks].sort(
+        (a: Record<string, unknown>, b: Record<string, unknown>) =>
+          (a.track_number as number) - (b.track_number as number),
+      );
+      for (const t of sorted) {
+        const av = latestByTrack.get(t.id as string);
+        if (av && av.audio_url && av.duration_seconds) {
+          flowTracks.push({
+            id: t.id as string,
+            title: t.title as string,
+            durationSeconds: Number(av.duration_seconds),
+            audioUrl: av.audio_url,
+            waveformPeaks: av.waveform_peaks as number[][] | null,
+            versionId: av.id,
+          });
+        } else {
+          flowHiddenCount++;
+        }
+      }
+    }
+  }
 
   // Fetch portal approval statuses if a brief share exists
   let portalApprovalMap: Record<string, string> = {};
@@ -158,14 +204,21 @@ export default async function ReleasePage({ params }: Props) {
                 {tracks?.length ?? 0}
               </span>
             </h2>
-            {canEdit(role) && (
-              <Link href={`/app/releases/${releaseId}/tracks/new`}>
-                <Button variant="secondary" className="h-9 text-xs">
-                  <Plus size={14} />
-                  Add Track
-                </Button>
-              </Link>
-            )}
+            <div className="flex items-center gap-2">
+              <FlowSimulatorButton
+                tracks={flowTracks}
+                hiddenCount={flowHiddenCount}
+                releaseId={releaseId}
+              />
+              {canEdit(role) && (
+                <Link href={`/app/releases/${releaseId}/tracks/new`}>
+                  <Button variant="secondary" className="h-9 text-xs">
+                    <Plus size={14} />
+                    Add Track
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
 
           {tracks && tracks.length > 0 ? (
