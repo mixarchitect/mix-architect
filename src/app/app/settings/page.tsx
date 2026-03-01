@@ -3,13 +3,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
 import { TagInput } from "@/components/ui/tag-input";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
+import { useSubscription } from "@/lib/subscription-context";
 
 const FORMAT_OPTIONS = [
   { value: "stereo", label: "Stereo" },
@@ -342,7 +343,145 @@ export default function SettingsPage() {
             </div>
           </PanelBody>
         </Panel>
+
+        {/* Subscription */}
+        <SubscriptionPanel />
       </div>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Subscription Panel                                                 */
+/* ------------------------------------------------------------------ */
+
+function SubscriptionPanel() {
+  const sub = useSubscription();
+  const [upgrading, setUpgrading] = useState(false);
+  const [managingBilling, setManagingBilling] = useState(false);
+
+  const isPro = sub.plan === "pro" && (sub.status === "active" || sub.status === "trialing");
+  const isCanceling = isPro && sub.cancelAtPeriodEnd;
+  const isAdminGranted = sub.grantedByAdmin;
+
+  async function handleUpgrade() {
+    setUpgrading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", { method: "POST" });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("[settings] checkout error:", data.error);
+        setUpgrading(false);
+      }
+    } catch (err) {
+      console.error("[settings] checkout failed:", err);
+      setUpgrading(false);
+    }
+  }
+
+  async function handleManageBilling() {
+    setManagingBilling(true);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("[settings] portal error:", data.error);
+        setManagingBilling(false);
+      }
+    } catch (err) {
+      console.error("[settings] portal failed:", err);
+      setManagingBilling(false);
+    }
+  }
+
+  return (
+    <Panel>
+      <PanelHeader>
+        <h2 className="text-base font-semibold text-text">Subscription</h2>
+        <p className="text-sm text-muted mt-1">
+          Manage your Mix Architect plan.
+        </p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-5 space-y-4">
+        {/* Current plan display */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {isPro ? (
+              isAdminGranted ? (
+                <Gift size={18} className="text-signal" />
+              ) : (
+                <Sparkles size={18} className="text-signal" />
+              )
+            ) : (
+              <CreditCard size={18} className="text-muted" />
+            )}
+            <div>
+              <div className="text-sm font-semibold text-text">
+                {isPro ? "Pro" : "Free"}
+                {isAdminGranted && (
+                  <span className="ml-1.5 text-xs font-medium text-signal">Complimentary</span>
+                )}
+              </div>
+              <div className="text-xs text-muted mt-0.5">
+                {isPro
+                  ? isAdminGranted
+                    ? "Unlimited releases"
+                    : "$9/month \u00b7 Unlimited releases"
+                  : "1 release included"}
+              </div>
+            </div>
+          </div>
+
+          {/* Plan badge */}
+          <span
+            className="px-2.5 py-1 text-xs font-semibold rounded-full"
+            style={{
+              background: isPro ? "var(--signal)" : "var(--panel-2)",
+              color: isPro ? "#fff" : "var(--muted)",
+            }}
+          >
+            {isPro ? "PRO" : "FREE"}
+          </span>
+        </div>
+
+        {/* Canceling notice */}
+        {isCanceling && sub.currentPeriodEnd && (
+          <div
+            className="text-xs px-3 py-2 rounded-md"
+            style={{ background: "var(--panel-2)" }}
+          >
+            Your Pro plan will end on{" "}
+            <span className="font-semibold text-text">
+              {new Date(sub.currentPeriodEnd).toLocaleDateString(undefined, {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+            . You can resubscribe from Manage Billing.
+          </div>
+        )}
+
+        {/* Actions */}
+        {!isPro && (
+          <Button variant="primary" onClick={handleUpgrade} disabled={upgrading}>
+            <Sparkles size={16} />
+            {upgrading ? "Redirecting\u2026" : "Upgrade to Pro \u2014 $9/mo"}
+          </Button>
+        )}
+
+        {isPro && !isAdminGranted && (
+          <Button variant="secondary" onClick={handleManageBilling} disabled={managingBilling}>
+            <CreditCard size={16} />
+            {managingBilling ? "Redirecting\u2026" : "Manage Billing"}
+          </Button>
+        )}
+      </PanelBody>
+    </Panel>
   );
 }

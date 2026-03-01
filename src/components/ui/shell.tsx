@@ -7,6 +7,7 @@ import { Rail } from "@/components/ui/rail";
 import { MobileNav } from "@/components/ui/mobile-nav";
 import { CommandPalette } from "@/components/ui/command-palette";
 import { PaymentsProvider } from "@/lib/payments-context";
+import { SubscriptionProvider, type SubscriptionState } from "@/lib/subscription-context";
 import { AudioProvider, useAudio } from "@/lib/audio-context";
 import { TimestampProvider } from "@/lib/timestamp-context";
 import { MiniPlayer } from "@/components/ui/mini-player";
@@ -16,10 +17,19 @@ type ShellProps = {
   userEmail?: string | null;
   paymentsEnabled?: boolean;
   theme?: string;
+  subscription?: SubscriptionState;
   children: React.ReactNode;
 };
 
-export function Shell({ paymentsEnabled = false, theme = "system", children }: ShellProps) {
+const DEFAULT_SUB: SubscriptionState = {
+  plan: "free",
+  status: "active",
+  cancelAtPeriodEnd: false,
+  currentPeriodEnd: null,
+  grantedByAdmin: false,
+};
+
+export function Shell({ paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, children }: ShellProps) {
   const { isOpen, open, close } = useCommandPalette();
   const { setTheme } = useTheme();
 
@@ -43,6 +53,7 @@ export function Shell({ paymentsEnabled = false, theme = "system", children }: S
     <TimestampProvider>
     <AudioProvider>
       <PaymentsProvider enabled={paymentsEnabled}>
+      <SubscriptionProvider initial={subscription}>
         <div className="flex h-dvh overflow-hidden">
           {/* Spacer for fixed-position Rail */}
           <div className="hidden md:block w-16 shrink-0" />
@@ -52,6 +63,7 @@ export function Shell({ paymentsEnabled = false, theme = "system", children }: S
         </div>
         <MiniPlayer />
         <CommandPalette isOpen={isOpen} onClose={close} />
+      </SubscriptionProvider>
       </PaymentsProvider>
     </AudioProvider>
     </TimestampProvider>

@@ -8,7 +8,8 @@ import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
 import { TagInput } from "@/components/ui/tag-input";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
+import { useSubscription } from "@/lib/subscription-context";
 
 const TYPE_OPTIONS = [
   { value: "single", label: "Single" },
@@ -67,9 +68,12 @@ export default function NewReleasePage() {
   const [targetDate, setTargetDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [upgrading, setUpgrading] = useState(false);
 
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
+  const sub = useSubscription();
+  const isFree = sub.plan !== "pro" || (sub.status !== "active" && sub.status !== "trialing");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -82,6 +86,18 @@ export default function NewReleasePage() {
         error: userErr,
       } = await supabase.auth.getUser();
       if (userErr || !user) throw userErr ?? new Error("Not authenticated");
+
+      // Check release limit on free plan
+      const { data: canCreate } = await supabase.rpc("can_create_release", {
+        p_user_id: user.id,
+      });
+      if (canCreate === false) {
+        setError(
+          "You\u2019ve reached the release limit on the Free plan. Upgrade to Pro for unlimited releases.",
+        );
+        setLoading(false);
+        return;
+      }
 
       const { data: release, error: insertErr } = await supabase
         .from("releases")
@@ -133,6 +149,37 @@ export default function NewReleasePage() {
           Back to Releases
         </Link>
       </div>
+
+      {isFree && (
+        <div
+          className="flex items-center gap-3 px-4 py-3 rounded-lg mb-4 text-sm"
+          style={{ background: "var(--panel-2)" }}
+        >
+          <Sparkles size={16} className="text-signal shrink-0" />
+          <span className="text-muted">
+            Free plan includes 1 release.{" "}
+            <button
+              type="button"
+              onClick={async () => {
+                setUpgrading(true);
+                try {
+                  const res = await fetch("/api/stripe/checkout", { method: "POST" });
+                  const data = await res.json();
+                  if (data.url) window.location.href = data.url;
+                  else setUpgrading(false);
+                } catch {
+                  setUpgrading(false);
+                }
+              }}
+              disabled={upgrading}
+              className="text-signal font-semibold hover:underline"
+            >
+              {upgrading ? "Redirecting\u2026" : "Upgrade to Pro"}
+            </button>
+            {" "}for unlimited releases.
+          </span>
+        </div>
+      )}
 
       <Panel>
         <PanelHeader>

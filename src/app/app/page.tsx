@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SortSelect } from "@/components/ui/sort-select";
-import { Plus } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import { formatMoney } from "@/lib/format-money";
 
 const VALID_FILTERS = ["outstanding", "earned"] as const;
@@ -52,8 +52,11 @@ export default async function DashboardPage({ searchParams }: Props) {
   // Fetch user defaults + shared release memberships in parallel
   type MemberRow = { release_id: string; role: string };
   let sharedMemberships: MemberRow[] = [];
+  let subPlan = "free";
+  let subStatus = "active";
+
   if (user) {
-    const [defaultsRes, membersRes] = await Promise.all([
+    const [defaultsRes, membersRes, subRes] = await Promise.all([
       supabase
         .from("user_defaults")
         .select("payments_enabled")
@@ -64,9 +67,16 @@ export default async function DashboardPage({ searchParams }: Props) {
         .select("release_id, role")
         .eq("user_id", user.id)
         .not("accepted_at", "is", null),
+      supabase
+        .from("subscriptions")
+        .select("plan, status")
+        .eq("user_id", user.id)
+        .maybeSingle(),
     ]);
     paymentsEnabled = defaultsRes.data?.payments_enabled ?? false;
     sharedMemberships = (membersRes.data ?? []) as MemberRow[];
+    subPlan = (subRes.data?.plan as string) ?? "free";
+    subStatus = (subRes.data?.status as string) ?? "active";
   }
 
   // Separate owned vs shared releases (RLS returns both; filter by membership)
@@ -76,6 +86,10 @@ export default async function DashboardPage({ searchParams }: Props) {
 
   const releases = allReleases?.filter((r) => !sharedReleaseIds.has(r.id as string)) ?? null;
   const sharedReleases = allReleases?.filter((r) => sharedReleaseIds.has(r.id as string)) ?? [];
+
+  const isPro = subPlan === "pro" && (subStatus === "active" || subStatus === "trialing");
+  const ownedReleaseCount = releases?.length ?? 0;
+  const atFreeLimit = !isPro && ownedReleaseCount >= 1;
 
   let outstandingTotal = 0;
   let outstandingCount = 0;
@@ -132,12 +146,22 @@ export default async function DashboardPage({ searchParams }: Props) {
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold h2 text-text">Your Releases</h1>
-        <Link href="/app/releases/new">
-          <Button variant="primary">
-            <Plus size={16} />
-            New Release
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          {atFreeLimit && (
+            <Link href="/app/settings">
+              <Button variant="secondary">
+                <Sparkles size={16} />
+                Upgrade
+              </Button>
+            </Link>
+          )}
+          <Link href="/app/releases/new">
+            <Button variant="primary">
+              <Plus size={16} />
+              New Release
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {artistFilter && (
