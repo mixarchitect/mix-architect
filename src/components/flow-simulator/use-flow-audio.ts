@@ -17,6 +17,8 @@ export type FlowTrack = {
 
 export type FlowMode = "full" | "condensed";
 
+export type LoopMode = "off" | "one" | "all";
+
 export type CondensedSegment = {
   trackIndex: number;
   part: "head" | "tail" | "full";
@@ -144,9 +146,9 @@ export function useFlowAudio(
 ) {
   const [state, setState] = useState<PlaybackState>(INITIAL_STATE);
   const [error, setError] = useState<string | null>(null);
-  const [isLooping, setIsLooping] = useState(false);
-  const isLoopingRef = useRef(isLooping);
-  isLoopingRef.current = isLooping;
+  const [loopMode, setLoopMode] = useState<LoopMode>("off");
+  const loopModeRef = useRef(loopMode);
+  loopModeRef.current = loopMode;
 
   // Refs for audio element (single element — no crossfade)
   const elementA = useRef<HTMLAudioElement | null>(null);
@@ -287,17 +289,29 @@ export function useFlowAudio(
   /* ---- Advance to next track (Full mode) ---- */
   const advanceToNextFull = useCallback(() => {
     const s = stateRef.current;
+    const lm = loopModeRef.current;
+
+    // Loop One: repeat the current track
+    if (lm === "one") {
+      const currentTrack = tracksRef.current[s.currentTrackIndex];
+      if (currentTrack) {
+        loadAndSeek(currentTrack.audioUrl, 0, true);
+        setState((prev) => ({ ...prev, currentTime: 0 }));
+      }
+      return;
+    }
+
     const nextIdx = s.currentTrackIndex + 1;
     if (nextIdx >= tracksRef.current.length) {
-      if (isLoopingRef.current) {
-        // Loop: restart from track 0
+      if (lm === "all") {
+        // Loop All: restart from track 0
         const firstTrack = tracksRef.current[0];
         if (firstTrack) {
           setState({ isPlaying: true, currentTrackIndex: 0, currentTime: 0, globalTime: 0 });
           loadAndSeek(firstTrack.audioUrl, 0, true);
         }
       } else {
-        // Reset to start and stop
+        // Off: reset to start and stop
         cancelAnimationFrame(rafRef.current);
         setState({ isPlaying: false, currentTrackIndex: 0, currentTime: 0, globalTime: 0 });
         segmentIndexRef.current = 0;
@@ -334,26 +348,42 @@ export function useFlowAudio(
 
         if (seg && localTime >= seg.startTime + seg.duration - 0.05) {
           isAdvancingRef.current = true;
+          const lm = loopModeRef.current;
+          const nextSegIdx = segIdx + 1;
+          const nextSeg = segments[nextSegIdx];
 
-          if (segIdx + 1 >= segments.length) {
-            // Last segment ended
-            if (isLoopingRef.current) {
-              // Loop: restart from first segment
+          // Check if the next segment belongs to a different track (or doesn't exist)
+          const isLastSegForTrack = !nextSeg || nextSeg.trackIndex !== seg.trackIndex;
+
+          // Loop One: when last segment for this track ends, restart from first segment of same track
+          if (lm === "one" && isLastSegForTrack) {
+            const currentTrackIdx = seg.trackIndex;
+            const firstSegForTrack = segments.findIndex((s) => s.trackIndex === currentTrackIdx);
+            if (firstSegForTrack >= 0) {
+              playSegment(firstSegForTrack);
+              const { offsets } = computeCondensedLayout(tracksRef.current, transitionWindowRef.current);
+              setState((prev) => ({ ...prev, isPlaying: true, globalTime: offsets[firstSegForTrack] ?? 0 }));
+            }
+            isAdvancingRef.current = false;
+          } else if (nextSegIdx >= segments.length) {
+            // Last segment overall ended
+            if (lm === "all") {
+              // Loop All: restart from first segment
               playSegment(0);
               setState((prev) => ({ ...prev, isPlaying: true, globalTime: 0 }));
             } else {
-              // Reset to start and stop
+              // Off: reset to start and stop
               active.pause();
               setState({ isPlaying: false, currentTrackIndex: 0, currentTime: 0, globalTime: 0 });
               segmentIndexRef.current = 0;
             }
             isAdvancingRef.current = false;
-            if (!isLoopingRef.current) return; // Don't schedule next frame when not looping
+            if (lm !== "all") return; // Don't schedule next frame when not looping
+          } else {
+            // Advance to next segment
+            playSegment(nextSegIdx);
+            isAdvancingRef.current = false;
           }
-
-          // Advance to next segment
-          playSegment(segIdx + 1);
-          isAdvancingRef.current = false;
         }
       }
 
@@ -563,14 +593,18 @@ export function useFlowAudio(
 
   const clearError = useCallback(() => setError(null), []);
 
-  const toggleLoop = useCallback(() => {
-    setIsLooping((prev) => !prev);
+  const cycleLoopMode = useCallback(() => {
+    setLoopMode((prev) => {
+      if (prev === "off") return "one";
+      if (prev === "one") return "all";
+      return "off";
+    });
   }, []);
 
   return {
     ...state,
     error,
-    isLooping,
+    loopMode,
     clearError,
     play,
     pause,
@@ -580,6 +614,6 @@ export function useFlowAudio(
     seekToGlobal,
     seekToTrackLocal,
     stop,
-    toggleLoop,
+    cycleLoopMode,
   };
 }

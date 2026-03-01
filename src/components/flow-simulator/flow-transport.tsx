@@ -1,10 +1,10 @@
 "use client";
 
-import { SkipBack, SkipForward, RotateCcw, Repeat } from "lucide-react";
+import { SkipBack, SkipForward, RotateCcw, Repeat, Repeat1 } from "lucide-react";
 import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
 import { formatTime } from "@/components/ui/audio-player-shared";
 import { cn } from "@/lib/cn";
-import type { FlowMode } from "./use-flow-audio";
+import type { FlowMode, LoopMode } from "./use-flow-audio";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -12,7 +12,7 @@ import type { FlowMode } from "./use-flow-audio";
 
 type Props = {
   isPlaying: boolean;
-  isLooping: boolean;
+  loopMode: LoopMode;
   currentTrackTitle: string;
   currentTime: number;
   totalDuration: number;
@@ -24,7 +24,7 @@ type Props = {
   onSkipPrev: () => void;
   onSkipNext: () => void;
   onReturnToStart: () => void;
-  onToggleLoop: () => void;
+  onCycleLoopMode: () => void;
   onModeChange: (mode: FlowMode) => void;
   onTransitionWindowChange: (seconds: number) => void;
 };
@@ -116,7 +116,7 @@ function ModeToggle({
 
 export function FlowTransport({
   isPlaying,
-  isLooping,
+  loopMode,
   currentTrackTitle,
   currentTime,
   totalDuration,
@@ -128,7 +128,7 @@ export function FlowTransport({
   onSkipPrev,
   onSkipNext,
   onReturnToStart,
-  onToggleLoop,
+  onCycleLoopMode,
   onModeChange,
   onTransitionWindowChange,
 }: Props) {
@@ -192,17 +192,23 @@ export function FlowTransport({
           <RotateCcw size={14} />
         </button>
 
-        {/* Loop toggle */}
+        {/* Loop toggle: off → one → all */}
         <button
           type="button"
-          onClick={onToggleLoop}
+          onClick={onCycleLoopMode}
           className={cn(
             "p-1.5 rounded-md transition-colors",
-            isLooping ? "text-signal" : "text-muted hover:text-text",
+            loopMode !== "off" ? "text-signal" : "text-muted hover:text-text",
           )}
-          title={isLooping ? "Loop (on)" : "Loop"}
+          title={
+            loopMode === "one"
+              ? "Loop (track)"
+              : loopMode === "all"
+                ? "Loop (all)"
+                : "Loop"
+          }
         >
-          <Repeat size={14} />
+          {loopMode === "one" ? <Repeat1 size={14} /> : <Repeat size={14} />}
         </button>
 
         {/* Currently playing track name */}

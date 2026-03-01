@@ -283,7 +283,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
       <div className="border-b border-border">
         <FlowTransport
           isPlaying={audio.isPlaying}
-          isLooping={audio.isLooping}
+          loopMode={audio.loopMode}
           currentTrackTitle={orderedTracks[audio.currentTrackIndex]?.title ?? ""}
           currentTime={audio.globalTime}
           totalDuration={totalDuration}
@@ -295,7 +295,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
           onSkipPrev={audio.skipPrev}
           onSkipNext={audio.skipNext}
           onReturnToStart={handleReturnToStart}
-          onToggleLoop={audio.toggleLoop}
+          onCycleLoopMode={audio.cycleLoopMode}
           onModeChange={handleModeChange}
           onTransitionWindowChange={setTransitionWindow}
         />

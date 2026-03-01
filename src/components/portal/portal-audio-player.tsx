@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import {
   SkipBack,
   SkipForward,
+  RotateCcw,
   Download,
   ChevronDown,
   Lock,
@@ -296,9 +297,13 @@ export function PortalAudioPlayer({
     audio.togglePlayPause();
   }, [audio]);
 
-  const skipBack = useCallback(() => {
+  const returnToStart = useCallback(() => {
     audio.seekTo(0);
   }, [audio]);
+
+  const skipBack = useCallback(() => {
+    audio.seekTo(Math.max(0, currentTime - 10));
+  }, [audio, currentTime]);
 
   const skipForward = useCallback(() => {
     audio.seekTo(Math.min(duration, currentTime + 10));
@@ -640,9 +645,16 @@ export function PortalAudioPlayer({
           </span>
           <div className="flex items-center gap-3">
             <button
+              onClick={returnToStart}
+              className="text-muted hover:text-text transition-colors p-1"
+              title="Return to start"
+            >
+              <RotateCcw size={14} />
+            </button>
+            <button
               onClick={skipBack}
               className="text-muted hover:text-text transition-colors p-1"
-              title="Restart"
+              title="Skip -10s"
             >
               <SkipBack size={16} />
             </button>
