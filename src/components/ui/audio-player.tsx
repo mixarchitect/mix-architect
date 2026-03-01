@@ -199,6 +199,10 @@ export function AudioPlayer({
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Keep a ref to latest versions so ready/LUFS callbacks never use stale closures
+  const versionsRef = useRef(versions);
+  versionsRef.current = versions;
+
   // Filtered comments for active version
   const versionComments = useMemo(
     () =>
@@ -246,13 +250,15 @@ export function AudioPlayer({
 
     setIsReady(false);
 
-    // Defer WaveSurfer creation to the next frame so the container has
-    // been laid-out and has real dimensions.  This fixes the blank
-    // waveform that sometimes appears on initial mount.
-    const container = containerRef.current;
+    // Use a cancelled flag so nested RAFs & retry timeouts are safely ignored
+    // after the effect cleans up (e.g. rapid version switches).
+    let cancelled = false;
     let ws: WaveSurfer | null = null;
-    const raf = requestAnimationFrame(() => {
-      if (!container || !container.isConnected) return;
+    let retryTimeout: ReturnType<typeof setTimeout> | null = null;
+    const container = containerRef.current;
+
+    function createWaveSurfer() {
+      if (cancelled || !container || !container.isConnected || !activeVersion) return;
 
       const colors = getWaveColors();
       ws = WaveSurfer.create({
@@ -272,7 +278,23 @@ export function AudioPlayer({
         duration: activeVersion.duration_seconds ?? undefined,
       });
 
+      // Error handling — retry once after a short delay.
+      // Freshly uploaded files may not be available at the CDN immediately.
+      let retried = false;
+      ws.on("error", (err) => {
+        console.warn("[audio-player] WaveSurfer load error:", err);
+        if (!retried && !cancelled && ws) {
+          retried = true;
+          retryTimeout = setTimeout(() => {
+            if (!cancelled && ws && container.isConnected) {
+              ws.load(activeVersion.audio_url);
+            }
+          }, 1500);
+        }
+      });
+
       ws.on("ready", () => {
+        if (cancelled) return;
         setIsReady(true);
 
         // Sync context state (URL already matches so this is state-only)
@@ -295,18 +317,17 @@ export function AudioPlayer({
         // Cache peaks if not yet cached
         if (!activeVersion.waveform_peaks) {
           const peaks = ws!.exportPeaks();
+          const dur = ws!.getDuration();
           supabase
             .from("track_audio_versions")
-            .update({
-              waveform_peaks: peaks,
-              duration_seconds: ws!.getDuration(),
-            })
+            .update({ waveform_peaks: peaks, duration_seconds: dur })
             .eq("id", activeVersion.id)
             .then(() => {
+              if (cancelled) return;
               onVersionsChange(
-                versions.map((v) =>
+                versionsRef.current.map((v) =>
                   v.id === activeVersion.id
-                    ? { ...v, waveform_peaks: peaks, duration_seconds: ws!.getDuration() }
+                    ? { ...v, waveform_peaks: peaks, duration_seconds: dur }
                     : v,
                 ),
               );
@@ -330,10 +351,10 @@ export function AudioPlayer({
                 activeVersion.audio_url,
                 controller.signal,
               );
-              if (controller.signal.aborted) return;
+              if (controller.signal.aborted || cancelled) return;
 
               const lufs = measureLUFS(audioBuffer);
-              if (controller.signal.aborted) return;
+              if (controller.signal.aborted || cancelled) return;
 
               const rounded = Math.round(lufs * 100) / 100;
 
@@ -342,11 +363,11 @@ export function AudioPlayer({
                 .update({ measured_lufs: rounded })
                 .eq("id", activeVersion.id);
 
-              if (controller.signal.aborted) return;
+              if (controller.signal.aborted || cancelled) return;
 
               setMeasuredLufs(rounded);
               onVersionsChange(
-                versions.map((v) =>
+                versionsRef.current.map((v) =>
                   v.id === activeVersion.id ? { ...v, measured_lufs: rounded } : v,
                 ),
               );
@@ -354,7 +375,7 @@ export function AudioPlayer({
               if (err instanceof DOMException && err.name === "AbortError") return;
               console.warn("LUFS measurement failed:", err);
             } finally {
-              if (!controller.signal.aborted) setMeasuring(false);
+              if (!controller.signal.aborted && !cancelled) setMeasuring(false);
             }
           })();
         }
@@ -368,10 +389,24 @@ export function AudioPlayer({
       });
 
       wavesurferRef.current = ws;
+    }
+
+    // Double-RAF: defer WaveSurfer creation by two frames so the container
+    // has been fully laid-out with real dimensions. This is especially
+    // important when transitioning from the empty state to the player
+    // (v1 upload) where the DOM restructure is significant.
+    const raf = requestAnimationFrame(() => {
+      if (cancelled) return;
+      requestAnimationFrame(() => {
+        if (cancelled) return;
+        createWaveSurfer();
+      });
     });
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(raf);
+      if (retryTimeout) clearTimeout(retryTimeout);
       if (ws) ws.destroy();
       wavesurferRef.current = null;
       measureAbortRef.current?.abort();
