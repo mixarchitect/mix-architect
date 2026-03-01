@@ -145,7 +145,7 @@ export function useFlowAudio(
   const [state, setState] = useState<PlaybackState>(INITIAL_STATE);
   const [error, setError] = useState<string | null>(null);
 
-  // Refs for audio element (only using element A for playback now — no crossfade)
+  // Refs for audio element (single element — no crossfade)
   const elementA = useRef<HTMLAudioElement | null>(null);
 
   // State refs for use in callbacks
@@ -161,6 +161,10 @@ export function useFlowAudio(
   const rafRef = useRef<number>(0);
   // Current condensed segment index
   const segmentIndexRef = useRef(0);
+  // Track the currently loaded audio URL to avoid fragile URL comparison
+  const loadedUrlRef = useRef<string>("");
+  // Guard: true while a segment advance is in progress (prevents double-advance)
+  const isAdvancingRef = useRef(false);
 
   // When tracks array changes (reorder), remap currentTrackIndex by ID
   useEffect(() => {
@@ -223,9 +227,36 @@ export function useFlowAudio(
     [],
   );
 
-  const stopRAFLoop = useCallback(() => {
-    cancelAnimationFrame(rafRef.current);
-  }, []);
+  /** Load a track into the audio element and seek to a position, then optionally play */
+  const loadAndSeek = useCallback(
+    (
+      audioUrl: string,
+      seekTo: number,
+      shouldPlay: boolean,
+    ) => {
+      const active = getActive();
+      const isSame = loadedUrlRef.current === audioUrl;
+
+      if (isSame) {
+        // Same file — just seek
+        active.currentTime = seekTo;
+        if (shouldPlay) active.play().catch(() => {});
+      } else {
+        // Different file — load first, then seek in canplay
+        loadedUrlRef.current = audioUrl;
+        const handleCanPlay = () => {
+          active.removeEventListener("canplay", handleCanPlay);
+          active.currentTime = seekTo;
+          if (shouldPlay) active.play().catch(() => {});
+        };
+        // Add listener BEFORE setting src to avoid missing a synchronous canplay
+        active.addEventListener("canplay", handleCanPlay);
+        active.src = audioUrl;
+        active.load();
+      }
+    },
+    [getActive],
+  );
 
   /* ---- Play a condensed segment ---- */
   const playSegment = useCallback(
@@ -237,40 +268,17 @@ export function useFlowAudio(
       segmentIndexRef.current = segIdx;
       const track = tracksRef.current[seg.trackIndex];
       if (!track) return;
-      const active = getActive();
 
       setError(null);
+      loadAndSeek(track.audioUrl, seg.startTime, true);
 
-      // Check if same track audio is already loaded (e.g., head → tail of same track)
-      const currentSrc = active.src || "";
-      const targetFile = track.audioUrl.split("/").pop() || "";
-      const isSameTrack = currentSrc.includes(targetFile) && targetFile.length > 0;
-
-      if (isSameTrack) {
-        active.currentTime = seg.startTime;
-        active.play();
-        setState((prev) => ({
-          ...prev,
-          currentTrackIndex: seg.trackIndex,
-          currentTime: seg.startTime,
-        }));
-      } else {
-        active.src = track.audioUrl;
-        active.load();
-        const handleCanPlay = () => {
-          active.currentTime = seg.startTime;
-          active.play();
-          active.removeEventListener("canplay", handleCanPlay);
-        };
-        active.addEventListener("canplay", handleCanPlay);
-        setState((prev) => ({
-          ...prev,
-          currentTrackIndex: seg.trackIndex,
-          currentTime: seg.startTime,
-        }));
-      }
+      setState((prev) => ({
+        ...prev,
+        currentTrackIndex: seg.trackIndex,
+        currentTime: seg.startTime,
+      }));
     },
-    [getActive],
+    [loadAndSeek],
   );
 
   /* ---- Advance to next track (Full mode) ---- */
@@ -279,38 +287,14 @@ export function useFlowAudio(
     const nextIdx = s.currentTrackIndex + 1;
     if (nextIdx >= tracksRef.current.length) {
       setState((prev) => ({ ...prev, isPlaying: false }));
-      stopRAFLoop();
+      cancelAnimationFrame(rafRef.current);
       return;
     }
 
-    const active = getActive();
     const nextTrack = tracksRef.current[nextIdx];
-
     setState((prev) => ({ ...prev, currentTrackIndex: nextIdx, currentTime: 0 }));
-
-    active.src = nextTrack.audioUrl;
-    active.load();
-    const handleCanPlay = () => {
-      active.play();
-      active.removeEventListener("canplay", handleCanPlay);
-    };
-    active.addEventListener("canplay", handleCanPlay);
-  }, [getActive, stopRAFLoop]);
-
-  /* ---- Advance to next segment (Condensed mode) ---- */
-  const advanceToNextSegment = useCallback(() => {
-    const segments = buildCondensedSegments(tracksRef.current, transitionWindowRef.current);
-    const nextSegIdx = segmentIndexRef.current + 1;
-    if (nextSegIdx >= segments.length) {
-      // End of all segments
-      const active = getActive();
-      active.pause();
-      setState((prev) => ({ ...prev, isPlaying: false }));
-      stopRAFLoop();
-      return;
-    }
-    playSegment(nextSegIdx);
-  }, [getActive, stopRAFLoop, playSegment]);
+    loadAndSeek(nextTrack.audioUrl, 0, true);
+  }, [loadAndSeek]);
 
   /* ---- RAF update loop ---- */
   const startRAFLoop = useCallback(() => {
@@ -318,8 +302,8 @@ export function useFlowAudio(
       const active = getActive();
       if (!active) return;
 
-      const s = stateRef.current;
       const localTime = active.currentTime;
+      const s = stateRef.current;
       const globalTime = computeGlobalTime(s.currentTrackIndex, localTime);
 
       setState((prev) => ({
@@ -329,14 +313,25 @@ export function useFlowAudio(
       }));
 
       // In condensed mode, check if current segment has ended
-      if (modeRef.current === "condensed") {
+      if (modeRef.current === "condensed" && !isAdvancingRef.current) {
         const segments = buildCondensedSegments(tracksRef.current, transitionWindowRef.current);
-        const seg = segments[segmentIndexRef.current];
+        const segIdx = segmentIndexRef.current;
+        const seg = segments[segIdx];
+
         if (seg && localTime >= seg.startTime + seg.duration - 0.05) {
-          advanceToNextSegment();
-          // advanceToNextSegment will call stopRAFLoop if we've reached the end,
-          // which cancels the frame we schedule below. Otherwise, keep ticking
-          // so we can monitor the next segment's boundary.
+          isAdvancingRef.current = true;
+
+          if (segIdx + 1 >= segments.length) {
+            // Last segment — stop playback, exit RAF loop
+            active.pause();
+            setState((prev) => ({ ...prev, isPlaying: false }));
+            isAdvancingRef.current = false;
+            return; // Don't schedule next frame
+          }
+
+          // Advance to next segment
+          playSegment(segIdx + 1);
+          isAdvancingRef.current = false;
         }
       }
 
@@ -344,7 +339,7 @@ export function useFlowAudio(
     };
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(tick);
-  }, [getActive, computeGlobalTime, advanceToNextSegment]);
+  }, [getActive, computeGlobalTime, playSegment]);
 
   /* ---- Handle track ended (Full mode auto-advance) ---- */
   useEffect(() => {
@@ -355,32 +350,12 @@ export function useFlowAudio(
       if (modeRef.current === "full") {
         advanceToNextFull();
       }
-      // In condensed mode, the RAF loop and timeupdate handle segment transitions
+      // In condensed mode, the RAF loop handles segment transitions
     };
 
     a.addEventListener("ended", handleEnded);
     return () => a.removeEventListener("ended", handleEnded);
   }, [advanceToNextFull]);
-
-  /* ---- Condensed mode: segment boundary check via timeupdate (fallback) ---- */
-  useEffect(() => {
-    const a = elementA.current;
-    if (!a) return;
-
-    const checkSegmentEnd = () => {
-      if (modeRef.current !== "condensed") return;
-      const segments = buildCondensedSegments(tracksRef.current, transitionWindowRef.current);
-      const seg = segments[segmentIndexRef.current];
-      if (!seg) return;
-
-      if (a.currentTime >= seg.startTime + seg.duration) {
-        advanceToNextSegment();
-      }
-    };
-
-    a.addEventListener("timeupdate", checkSegmentEnd);
-    return () => a.removeEventListener("timeupdate", checkSegmentEnd);
-  }, [advanceToNextSegment]);
 
   /* ---- Public actions ---- */
 
@@ -408,20 +383,14 @@ export function useFlowAudio(
       // Full mode (or condensed fallback)
       // If resuming same track
       if (idx === stateRef.current.currentTrackIndex && active.src && !active.ended) {
-        active.play();
+        active.play().catch(() => {});
         setState((prev) => ({ ...prev, isPlaying: true }));
         startRAFLoop();
         return;
       }
 
       // Load new track
-      active.src = track.audioUrl;
-      active.load();
-      const handleCanPlay = () => {
-        active.play();
-        active.removeEventListener("canplay", handleCanPlay);
-      };
-      active.addEventListener("canplay", handleCanPlay);
+      loadAndSeek(track.audioUrl, 0, true);
 
       setState((prev) => ({
         ...prev,
@@ -431,15 +400,15 @@ export function useFlowAudio(
       }));
       startRAFLoop();
     },
-    [getActive, playSegment, startRAFLoop],
+    [getActive, playSegment, startRAFLoop, loadAndSeek],
   );
 
   const pause = useCallback(() => {
     const active = getActive();
     active.pause();
     setState((prev) => ({ ...prev, isPlaying: false }));
-    stopRAFLoop();
-  }, [getActive, stopRAFLoop]);
+    cancelAnimationFrame(rafRef.current);
+  }, [getActive]);
 
   const togglePlayPause = useCallback(() => {
     if (stateRef.current.isPlaying) {
@@ -493,7 +462,6 @@ export function useFlowAudio(
         transitionWindowRef.current,
       );
 
-      const active = getActive();
       const track = tracksRef.current[result.trackIndex];
       if (!track) return;
 
@@ -504,33 +472,16 @@ export function useFlowAudio(
         segmentIndexRef.current = result.segmentIndex;
       }
 
-      const seekPos = result.localTime;
-      const currentSrc = active.src || "";
-      const targetFile = track.audioUrl.split("/").pop() || "";
-      const isSameTrack = currentSrc.includes(targetFile) && targetFile.length > 0;
-
-      if (isSameTrack) {
-        active.currentTime = seekPos;
-        if (wasPlaying) active.play();
-      } else {
-        active.src = track.audioUrl;
-        active.load();
-        const handleCanPlay = () => {
-          active.currentTime = seekPos;
-          if (wasPlaying) active.play();
-          active.removeEventListener("canplay", handleCanPlay);
-        };
-        active.addEventListener("canplay", handleCanPlay);
-      }
+      loadAndSeek(track.audioUrl, result.localTime, wasPlaying);
 
       setState((prev) => ({
         ...prev,
         currentTrackIndex: result.trackIndex,
-        currentTime: seekPos,
+        currentTime: result.localTime,
         globalTime,
       }));
     },
-    [getActive],
+    [loadAndSeek],
   );
 
   /** Seek to a specific local time within a specific track */
@@ -539,7 +490,6 @@ export function useFlowAudio(
       const track = tracksRef.current[trackIndex];
       if (!track) return;
 
-      const active = getActive();
       const wasPlaying = stateRef.current.isPlaying;
 
       // For condensed mode, find the matching segment
@@ -560,23 +510,7 @@ export function useFlowAudio(
         }
       }
 
-      const currentSrc = active.src || "";
-      const targetFile = track.audioUrl.split("/").pop() || "";
-      const isSameTrack = currentSrc.includes(targetFile) && targetFile.length > 0;
-
-      if (isSameTrack) {
-        active.currentTime = localTime;
-        if (wasPlaying) active.play();
-      } else {
-        active.src = track.audioUrl;
-        active.load();
-        const handleCanPlay = () => {
-          active.currentTime = localTime;
-          if (wasPlaying) active.play();
-          active.removeEventListener("canplay", handleCanPlay);
-        };
-        active.addEventListener("canplay", handleCanPlay);
-      }
+      loadAndSeek(track.audioUrl, localTime, wasPlaying);
 
       const globalTime = computeGlobalTime(trackIndex, localTime);
       setState((prev) => ({
@@ -588,7 +522,7 @@ export function useFlowAudio(
 
       if (wasPlaying) startRAFLoop();
     },
-    [getActive, computeGlobalTime, startRAFLoop],
+    [loadAndSeek, computeGlobalTime, startRAFLoop],
   );
 
   /** Stop all playback and reset */
@@ -599,10 +533,11 @@ export function useFlowAudio(
       a.removeAttribute("src");
       a.load();
     }
+    loadedUrlRef.current = "";
     segmentIndexRef.current = 0;
-    stopRAFLoop();
+    cancelAnimationFrame(rafRef.current);
     setState(INITIAL_STATE);
-  }, [stopRAFLoop]);
+  }, []);
 
   const clearError = useCallback(() => setError(null), []);
 
