@@ -223,14 +223,6 @@ export default async function BriefPage({ params }: Props) {
 
               {trackSpec && (
                 <div className="mb-3 flex flex-wrap gap-4 text-sm">
-                  {trackSpec.target_loudness && (
-                    <span>
-                      <span className="text-muted">Loudness: </span>
-                      <span className="text-text">
-                        {trackSpec.target_loudness}
-                      </span>
-                    </span>
-                  )}
                   <span>
                     <span className="text-muted">Format: </span>
                     <span className="text-text">

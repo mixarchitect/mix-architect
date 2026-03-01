@@ -37,7 +37,6 @@ export default function SettingsPage() {
   const [displayName, setDisplayName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
-  const [loudness, setLoudness] = useState("-14 LUFS");
   const [format, setFormat] = useState("stereo");
   const [sampleRate, setSampleRate] = useState("48kHz");
   const [bitDepth, setBitDepth] = useState("24-bit");
@@ -63,7 +62,6 @@ export default function SettingsPage() {
           .maybeSingle();
 
         if (data) {
-          setLoudness(data.default_loudness ?? "-14 LUFS");
           setFormat(data.default_format ?? "stereo");
           setSampleRate(data.default_sample_rate ?? "48kHz");
           setBitDepth(data.default_bit_depth ?? "24-bit");
@@ -92,7 +90,6 @@ export default function SettingsPage() {
       const { error } = await supabase.from("user_defaults").upsert(
         {
           user_id: user.id,
-          default_loudness: loudness,
           default_format: format,
           default_sample_rate: sampleRate,
           default_bit_depth: bitDepth,
@@ -218,23 +215,6 @@ export default function SettingsPage() {
           </PanelHeader>
           <Rule />
           <PanelBody className="pt-5 space-y-6">
-            <div className="space-y-1.5">
-              <label className="label text-muted">Default target loudness</label>
-              <select
-                value={loudness}
-                onChange={(e) => setLoudness(e.target.value)}
-                className="input"
-              >
-                <option value="-14 LUFS">-14 LUFS — Spotify / YouTube</option>
-                <option value="-16 LUFS">-16 LUFS — Apple Music / Tidal</option>
-                <option value="-12 LUFS">-12 LUFS — Louder master</option>
-                <option value="-11 LUFS">-11 LUFS — Club / DJ</option>
-                <option value="-9 LUFS">-9 LUFS — Competitive / radio</option>
-                <option value="-23 LUFS">-23 LUFS — Broadcast (EBU R128)</option>
-                <option value="-24 LUFS">-24 LUFS — Broadcast (ATSC A/85)</option>
-              </select>
-            </div>
-
             <div className="space-y-1.5">
               <label className="label text-muted">Default format</label>
               <div className="flex gap-2">

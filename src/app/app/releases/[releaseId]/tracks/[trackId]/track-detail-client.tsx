@@ -54,7 +54,6 @@ type IntentData = {
   anti_references?: string;
 } | null;
 type SpecsData = {
-  target_loudness?: string;
   format_override?: string | null;
   sample_rate?: string;
   bit_depth?: string;
@@ -157,7 +156,6 @@ export function TrackDetailClient({
   const [emotionalTags, setEmotionalTags] = useState<string[]>(intent?.emotional_tags ?? []);
   const [antiRefs, setAntiRefs] = useState(intent?.anti_references ?? "");
 
-  const [loudness, setLoudness] = useState(specs?.target_loudness ?? "-14 LUFS");
   const [formatOverride, setFormatOverride] = useState(specs?.format_override ?? "");
   const [sampleRate, setSampleRate] = useState(specs?.sample_rate ?? "48kHz");
   const [bitDepth, setBitDepth] = useState(specs?.bit_depth ?? "24-bit");

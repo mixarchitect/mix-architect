@@ -19,7 +19,6 @@ export type BriefIntent = {
 
 export type BriefSpec = {
   track_id: string;
-  target_loudness: string | null;
   format_override: string | null;
 };
 
