@@ -713,7 +713,16 @@ export function AudioPlayer({
   return (
     <div className="space-y-2">
       {/* Main player card */}
-      <div className="rounded-lg border border-border bg-panel overflow-hidden">
+      <div className="relative rounded-lg border border-border bg-panel overflow-hidden">
+        {/* Upload overlay */}
+        {uploading && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-panel/80 backdrop-blur-sm rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-muted">
+              <Upload size={16} className="animate-pulse" />
+              Uploading…
+            </div>
+          </div>
+        )}
         {/* Header: track info + version switcher */}
         <div className="flex items-center justify-between px-5 pt-4">
           <div className="flex items-center gap-3">

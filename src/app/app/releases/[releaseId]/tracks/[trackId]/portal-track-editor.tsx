@@ -7,7 +7,8 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { canEdit, type ReleaseRole } from "@/lib/permissions";
 import { cn } from "@/lib/cn";
-import { Check, MessageCircle, Package, RotateCcw } from "lucide-react";
+import { Check, Globe, MessageCircle, Package, RotateCcw } from "lucide-react";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type VersionInfo = { id: string; version_number: number };
 
@@ -56,8 +57,6 @@ export function PortalTrackEditor({
   const [versionSettings, setVersionSettings] = useState<VersionSetting[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const shouldRender = !!briefShareId && canEdit(role ?? "owner");
-
   useEffect(() => {
     if (!briefShareId) return;
     async function load() {
@@ -84,7 +83,23 @@ export function PortalTrackEditor({
     load();
   }, [briefShareId, trackId, audioVersions, supabase]);
 
-  if (!shouldRender) return null;
+  // Portal not activated at release level — show empty state for everyone
+  if (!briefShareId) {
+    return (
+      <EmptyState
+        icon={Globe}
+        title="Client portal not active"
+        description="Activate the client portal on the release page to share tracks, collect feedback, and manage approvals."
+        action={{
+          label: "Go to release",
+          href: `/app/releases/${releaseId}`,
+        }}
+      />
+    );
+  }
+
+  // Portal is active but user doesn't have edit permissions
+  if (!canEdit(role ?? "owner")) return null;
 
   async function toggleTrackVisible(visible: boolean) {
     if (trackSetting) {
