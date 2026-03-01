@@ -90,6 +90,7 @@ export function PortalTrackEditor({
         icon={Globe}
         title="Client portal not active"
         description="Activate the client portal on the release page to share tracks, collect feedback, and manage approvals."
+        className="bg-panel"
         action={{
           label: "Go to release",
           href: `/app/releases/${releaseId}`,
