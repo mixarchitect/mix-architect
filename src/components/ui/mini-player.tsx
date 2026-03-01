@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { X } from "lucide-react";
+import { X, Repeat } from "lucide-react";
+import { cn } from "@/lib/cn";
 import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
 import { useAudio } from "@/lib/audio-context";
 
@@ -18,7 +19,9 @@ export function MiniPlayer() {
     isPlaying,
     currentTime,
     duration,
+    isLooping,
     togglePlayPause,
+    toggleLoop,
     stop,
   } = useAudio();
 
@@ -80,6 +83,18 @@ export function MiniPlayer() {
           ) : (
             <FilledPlay size={16} className="ml-0.5" />
           )}
+        </button>
+
+        {/* Loop toggle */}
+        <button
+          onClick={toggleLoop}
+          className={cn(
+            "p-2 transition-colors shrink-0",
+            isLooping ? "text-signal" : "text-muted hover:text-text",
+          )}
+          title={isLooping ? "Loop (on)" : "Loop"}
+        >
+          <Repeat size={14} />
         </button>
 
         {/* Stop / Close */}

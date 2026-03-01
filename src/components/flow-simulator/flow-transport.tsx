@@ -1,6 +1,6 @@
 "use client";
 
-import { SkipBack, SkipForward } from "lucide-react";
+import { SkipBack, SkipForward, RotateCcw, Repeat } from "lucide-react";
 import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
 import { formatTime } from "@/components/ui/audio-player-shared";
 import { cn } from "@/lib/cn";
@@ -12,6 +12,7 @@ import type { FlowMode } from "./use-flow-audio";
 
 type Props = {
   isPlaying: boolean;
+  isLooping: boolean;
   currentTrackTitle: string;
   currentTime: number;
   totalDuration: number;
@@ -22,6 +23,8 @@ type Props = {
   onTogglePlayPause: () => void;
   onSkipPrev: () => void;
   onSkipNext: () => void;
+  onReturnToStart: () => void;
+  onToggleLoop: () => void;
   onModeChange: (mode: FlowMode) => void;
   onTransitionWindowChange: (seconds: number) => void;
 };
@@ -113,6 +116,7 @@ function ModeToggle({
 
 export function FlowTransport({
   isPlaying,
+  isLooping,
   currentTrackTitle,
   currentTime,
   totalDuration,
@@ -123,6 +127,8 @@ export function FlowTransport({
   onTogglePlayPause,
   onSkipPrev,
   onSkipNext,
+  onReturnToStart,
+  onToggleLoop,
   onModeChange,
   onTransitionWindowChange,
 }: Props) {
@@ -175,6 +181,29 @@ export function FlowTransport({
           {" / "}
           {formatTime(totalDuration)}
         </div>
+
+        {/* Return to start */}
+        <button
+          type="button"
+          onClick={onReturnToStart}
+          className="p-1.5 rounded-md text-muted hover:text-text transition-colors"
+          title="Return to start"
+        >
+          <RotateCcw size={14} />
+        </button>
+
+        {/* Loop toggle */}
+        <button
+          type="button"
+          onClick={onToggleLoop}
+          className={cn(
+            "p-1.5 rounded-md transition-colors",
+            isLooping ? "text-signal" : "text-muted hover:text-text",
+          )}
+          title={isLooping ? "Loop (on)" : "Loop"}
+        >
+          <Repeat size={14} />
+        </button>
 
         {/* Currently playing track name */}
         {currentTrackTitle && (

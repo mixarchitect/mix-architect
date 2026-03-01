@@ -191,6 +191,11 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
     [audio],
   );
 
+  // ── Return to start handler ────────────────────────────────────
+  const handleReturnToStart = useCallback(() => {
+    audio.seekToGlobal(0);
+  }, [audio]);
+
   return (
     <div className="space-y-3">
       {/* ── Header ──────────────────────────────────────────────── */}
@@ -278,6 +283,7 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
       <div className="border-b border-border">
         <FlowTransport
           isPlaying={audio.isPlaying}
+          isLooping={audio.isLooping}
           currentTrackTitle={orderedTracks[audio.currentTrackIndex]?.title ?? ""}
           currentTime={audio.globalTime}
           totalDuration={totalDuration}
@@ -288,6 +294,8 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
           onTogglePlayPause={audio.togglePlayPause}
           onSkipPrev={audio.skipPrev}
           onSkipNext={audio.skipNext}
+          onReturnToStart={handleReturnToStart}
+          onToggleLoop={audio.toggleLoop}
           onModeChange={handleModeChange}
           onTransitionWindowChange={setTransitionWindow}
         />

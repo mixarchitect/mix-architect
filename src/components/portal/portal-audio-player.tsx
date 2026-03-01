@@ -12,6 +12,7 @@ import {
   Lock,
   MessageCircle,
   X,
+  Repeat,
 } from "lucide-react";
 import WaveSurfer from "wavesurfer.js";
 import {
@@ -662,6 +663,18 @@ export function PortalAudioPlayer({
               title="Skip +10s"
             >
               <SkipForward size={16} />
+            </button>
+            <button
+              onClick={audio.toggleLoop}
+              className={cn(
+                "transition-colors p-1",
+                audio.isLooping
+                  ? "text-signal"
+                  : "text-muted hover:text-text",
+              )}
+              title={audio.isLooping ? "Loop (on)" : "Loop"}
+            >
+              <Repeat size={16} />
             </button>
           </div>
           <span className="text-xs text-faint min-w-[42px] text-right">

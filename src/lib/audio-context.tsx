@@ -34,6 +34,8 @@ type AudioContextValue = {
   isPlaying: boolean;
   currentTime: number;
   duration: number;
+  /** Whether playback loops back to the start on track end */
+  isLooping: boolean;
   /** Load an audio version into the shared element */
   loadVersion: (version: AudioVersionData, meta: AudioTrackMeta) => void;
   /** Play/pause toggle */
@@ -42,6 +44,8 @@ type AudioContextValue = {
   seekTo: (time: number) => void;
   /** Stop playback and clear state (hides mini player) */
   stop: () => void;
+  /** Toggle loop on/off */
+  toggleLoop: () => void;
 };
 
 /* ------------------------------------------------------------------ */
@@ -66,9 +70,13 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isLooping, setIsLooping] = useState(false);
   // Keep a ref to activeVersion for use in callbacks without stale closures
   const activeVersionRef = useRef(activeVersion);
   activeVersionRef.current = activeVersion;
+  // Ref for isLooping to avoid stale closures in event listeners
+  const isLoopingRef = useRef(isLooping);
+  isLoopingRef.current = isLooping;
 
   /* ---- Native audio element event listeners ---- */
   useEffect(() => {
@@ -77,7 +85,14 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
-    const onEnded = () => setIsPlaying(false);
+    const onEnded = () => {
+      if (isLoopingRef.current) {
+        el.currentTime = 0;
+        el.play().catch(() => {});
+      } else {
+        setIsPlaying(false);
+      }
+    };
     const onTimeUpdate = () => setCurrentTime(el.currentTime);
     const onLoadedMetadata = () => setDuration(el.duration);
     const onDurationChange = () => {
@@ -165,6 +180,10 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     setDuration(0);
   }, []);
 
+  const toggleLoop = useCallback(() => {
+    setIsLooping((prev) => !prev);
+  }, []);
+
   // SSR guard — render nothing useful on server
   if (!audioRef.current) {
     return <>{children}</>;
@@ -179,10 +198,12 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         isPlaying,
         currentTime,
         duration,
+        isLooping,
         loadVersion,
         togglePlayPause,
         seekTo,
         stop,
+        toggleLoop,
       }}
     >
       {children}

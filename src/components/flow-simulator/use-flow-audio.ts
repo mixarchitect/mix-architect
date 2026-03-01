@@ -144,6 +144,9 @@ export function useFlowAudio(
 ) {
   const [state, setState] = useState<PlaybackState>(INITIAL_STATE);
   const [error, setError] = useState<string | null>(null);
+  const [isLooping, setIsLooping] = useState(false);
+  const isLoopingRef = useRef(isLooping);
+  isLoopingRef.current = isLooping;
 
   // Refs for audio element (single element — no crossfade)
   const elementA = useRef<HTMLAudioElement | null>(null);
@@ -286,8 +289,19 @@ export function useFlowAudio(
     const s = stateRef.current;
     const nextIdx = s.currentTrackIndex + 1;
     if (nextIdx >= tracksRef.current.length) {
-      setState((prev) => ({ ...prev, isPlaying: false }));
-      cancelAnimationFrame(rafRef.current);
+      if (isLoopingRef.current) {
+        // Loop: restart from track 0
+        const firstTrack = tracksRef.current[0];
+        if (firstTrack) {
+          setState({ isPlaying: true, currentTrackIndex: 0, currentTime: 0, globalTime: 0 });
+          loadAndSeek(firstTrack.audioUrl, 0, true);
+        }
+      } else {
+        // Reset to start and stop
+        cancelAnimationFrame(rafRef.current);
+        setState({ isPlaying: false, currentTrackIndex: 0, currentTime: 0, globalTime: 0 });
+        segmentIndexRef.current = 0;
+      }
       return;
     }
 
@@ -322,11 +336,19 @@ export function useFlowAudio(
           isAdvancingRef.current = true;
 
           if (segIdx + 1 >= segments.length) {
-            // Last segment — stop playback, exit RAF loop
-            active.pause();
-            setState((prev) => ({ ...prev, isPlaying: false }));
+            // Last segment ended
+            if (isLoopingRef.current) {
+              // Loop: restart from first segment
+              playSegment(0);
+              setState((prev) => ({ ...prev, isPlaying: true, globalTime: 0 }));
+            } else {
+              // Reset to start and stop
+              active.pause();
+              setState({ isPlaying: false, currentTrackIndex: 0, currentTime: 0, globalTime: 0 });
+              segmentIndexRef.current = 0;
+            }
             isAdvancingRef.current = false;
-            return; // Don't schedule next frame
+            if (!isLoopingRef.current) return; // Don't schedule next frame when not looping
           }
 
           // Advance to next segment
@@ -541,9 +563,14 @@ export function useFlowAudio(
 
   const clearError = useCallback(() => setError(null), []);
 
+  const toggleLoop = useCallback(() => {
+    setIsLooping((prev) => !prev);
+  }, []);
+
   return {
     ...state,
     error,
+    isLooping,
     clearError,
     play,
     pause,
@@ -553,5 +580,6 @@ export function useFlowAudio(
     seekToGlobal,
     seekToTrackLocal,
     stop,
+    toggleLoop,
   };
 }
