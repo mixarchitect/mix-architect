@@ -6,10 +6,8 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   type ReactNode,
 } from "react";
-import { useRouter } from "next/navigation";
 import { FlowSimulator } from "./flow-simulator";
 import type { FlowTrack } from "./use-flow-audio";
 
@@ -95,25 +93,14 @@ export function ReleaseFlowContent({
   releaseTitle,
   children,
 }: ContentProps) {
-  const router = useRouter();
   const { isFlowOpen, closeFlow } = useFlowOpen();
 
-  // Ref to signal that a server refresh is needed after simulator closes.
-  // Set by onOrderApplied callback before onClose triggers unmount.
-  const pendingRefreshRef = useRef(false);
-
-  // When flow closes with a pending refresh, trigger router.refresh()
-  // from this component which stays mounted through the transition.
-  useEffect(() => {
-    if (!isFlowOpen && pendingRefreshRef.current) {
-      pendingRefreshRef.current = false;
-      router.refresh();
-    }
-  }, [isFlowOpen, router]);
-
-  // Callback for FlowSimulator: signals a refresh is needed on close
+  // Full page reload to pick up the new track order from the server.
+  // router.refresh() doesn't reliably bust the RSC cache, so we navigate
+  // to the same URL (minus the #flow hash) which guarantees fresh data.
   const handleOrderApplied = useCallback(() => {
-    pendingRefreshRef.current = true;
+    window.location.href =
+      window.location.pathname + window.location.search;
   }, []);
 
   if (isFlowOpen) {
