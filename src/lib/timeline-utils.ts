@@ -281,11 +281,11 @@ export function getCountdown(targetDateStr: string): Countdown {
     return { totalMs, months, days, hours, isToday: false, isOverdue: true, label };
   }
 
-  // Future
+  // Future — always show hours
   const parts: string[] = [];
   if (months > 0) parts.push(`${months}m`);
-  if (days > 0 || months === 0) parts.push(`${days}d`);
-  if (months === 0) parts.push(`${hours}h`);
+  parts.push(`${days}d`);
+  parts.push(`${hours}h`);
   const label = parts.join(" ");
 
   return { totalMs, months, days, hours, isToday: false, isOverdue: false, label };
