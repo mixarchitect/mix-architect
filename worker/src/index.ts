@@ -1,0 +1,194 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+import os from "node:os";
+import {
+  supabase,
+  downloadSourceAudio,
+  uploadConvertedFile,
+  getFileSize,
+  getTrackTitle,
+  getAudioVersionUrl,
+  sanitizeFilename,
+  getContentType,
+} from "./storage.js";
+import {
+  probeSource,
+  isSourceFormat,
+  convertAudio,
+  getExtension,
+} from "./converter.js";
+
+/* ------------------------------------------------------------------ */
+/*  Config                                                             */
+/* ------------------------------------------------------------------ */
+
+const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS ?? "5000", 10);
+const TEMP_DIR = path.join(os.tmpdir(), "mix-architect-worker");
+
+/* ------------------------------------------------------------------ */
+/*  Types                                                              */
+/* ------------------------------------------------------------------ */
+
+type ConversionJob = {
+  id: string;
+  audio_version_id: string;
+  track_id: string;
+  source_format: string;
+  target_format: string;
+  requested_by: string;
+};
+
+/* ------------------------------------------------------------------ */
+/*  Main loop                                                          */
+/* ------------------------------------------------------------------ */
+
+async function main() {
+  await fs.mkdir(TEMP_DIR, { recursive: true });
+
+  console.log("🎵 Mix Architect audio converter worker started");
+  console.log(`   Poll interval: ${POLL_INTERVAL}ms`);
+  console.log(`   Temp directory: ${TEMP_DIR}`);
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    try {
+      await processNextJob();
+    } catch (err) {
+      console.error("Worker loop error:", err);
+    }
+    await sleep(POLL_INTERVAL);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Process a single job                                               */
+/* ------------------------------------------------------------------ */
+
+async function processNextJob() {
+  // Grab the oldest pending job
+  const { data: jobs } = await supabase
+    .from("conversion_jobs")
+    .select("id, audio_version_id, track_id, source_format, target_format, requested_by")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true })
+    .limit(1);
+
+  if (!jobs?.length) return;
+  const job = jobs[0] as ConversionJob;
+
+  // Claim the job (optimistic lock)
+  const { error: claimError } = await supabase
+    .from("conversion_jobs")
+    .update({ status: "processing", started_at: new Date().toISOString() })
+    .eq("id", job.id)
+    .eq("status", "pending");
+
+  if (claimError) {
+    console.warn(`Failed to claim job ${job.id}:`, claimError.message);
+    return;
+  }
+
+  console.log(
+    `Processing job ${job.id}: ${job.source_format} → ${job.target_format}`,
+  );
+
+  const jobDir = path.join(TEMP_DIR, job.id);
+  await fs.mkdir(jobDir, { recursive: true });
+
+  try {
+    // 1. Get the source audio URL
+    const audioUrl = await getAudioVersionUrl(job.audio_version_id);
+
+    // 2. Download source audio
+    const sourceExt = job.source_format || "wav";
+    const sourcePath = path.join(jobDir, `source.${sourceExt}`);
+    await downloadSourceAudio(audioUrl, sourcePath);
+    console.log(`  Downloaded source (${sourceExt})`);
+
+    // 3. Probe source properties
+    const sourceInfo = await probeSource(sourcePath);
+    console.log(
+      `  Source: ${sourceInfo.codecName}, ${sourceInfo.sampleRate}Hz, ${sourceInfo.bitDepth}-bit, ${sourceInfo.channels}ch`,
+    );
+
+    // 4. Convert (or use source directly if already in target format)
+    let outputPath: string;
+
+    if (isSourceFormat(job.target_format, sourceInfo)) {
+      console.log(`  Source is already ${job.target_format} — using as-is`);
+      outputPath = sourcePath;
+    } else {
+      const ext = getExtension(job.target_format);
+      outputPath = path.join(jobDir, `output.${ext}`);
+      await convertAudio(sourcePath, outputPath, job.target_format, sourceInfo);
+      console.log(`  Converted to ${job.target_format}`);
+    }
+
+    // 5. Upload to Supabase Storage
+    const trackTitle = await getTrackTitle(job.track_id);
+    const ext = getExtension(job.target_format);
+    const safeName = sanitizeFilename(trackTitle);
+    const storagePath = `${job.requested_by}/${job.track_id}/${job.audio_version_id}/${safeName}.${ext}`;
+    const mimeType = getContentType(ext);
+
+    const signedUrl = await uploadConvertedFile(
+      outputPath,
+      storagePath,
+      mimeType,
+    );
+    console.log(`  Uploaded to storage`);
+
+    // 6. Get output file size
+    const fileSize = await getFileSize(outputPath);
+
+    // 7. Mark job complete
+    const expiresAt = new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+
+    await supabase
+      .from("conversion_jobs")
+      .update({
+        status: "completed",
+        output_url: signedUrl,
+        output_file_size: fileSize,
+        completed_at: new Date().toISOString(),
+        expires_at: expiresAt,
+      })
+      .eq("id", job.id);
+
+    console.log(`✅ Job ${job.id} complete`);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`❌ Job ${job.id} failed:`, message);
+
+    await supabase
+      .from("conversion_jobs")
+      .update({
+        status: "failed",
+        error_message: message,
+        completed_at: new Date().toISOString(),
+      })
+      .eq("id", job.id);
+  } finally {
+    // Cleanup temp files
+    await fs.rm(jobDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/* ------------------------------------------------------------------ */
+/*  Start                                                              */
+/* ------------------------------------------------------------------ */
+
+main().catch((err) => {
+  console.error("Fatal error:", err);
+  process.exit(1);
+});

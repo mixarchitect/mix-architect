@@ -17,6 +17,8 @@ import { ReferenceCard } from "@/components/ui/reference-card";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { AudioPlayer, type AudioVersionData, type TimelineComment } from "@/components/ui/audio-player";
+import { DeliveryFormatSelector } from "@/components/ui/delivery-format-selector";
+import { useConversion } from "@/hooks/use-conversion";
 import { ArrowLeft, Bookmark, Check, Disc3, Plus, StickyNote, Users, X } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { EditableTitle } from "@/components/ui/editable-title";
@@ -161,6 +163,9 @@ export function TrackDetailClient({
   const [bitDepth, setBitDepth] = useState(specs?.bit_depth ?? "24-bit");
   const [deliveryFormats, setDeliveryFormats] = useState<string[]>(specs?.delivery_formats ?? []);
   const [specialReqs, setSpecialReqs] = useState(specs?.special_reqs ?? "");
+
+  // ── Audio conversion ──
+  const { requestConversion, getJobStatus } = useConversion();
 
   const [localAudioVersions, setLocalAudioVersions] = useState(audioVersions);
   const [localNotes, setLocalNotes] = useState(notes);
@@ -698,6 +703,32 @@ export function TrackDetailClient({
                           saveSpecs({ delivery_formats: next });
                         }}
                         disabled={!canEdit(role)}
+                        activeAudioVersion={
+                          localAudioVersions.length > 0
+                            ? localAudioVersions[localAudioVersions.length - 1]
+                            : null
+                        }
+                        onConvert={(format) => {
+                          const version =
+                            localAudioVersions[localAudioVersions.length - 1];
+                          if (version) {
+                            requestConversion(
+                              version.id,
+                              track.id,
+                              format.toLowerCase(),
+                              version.file_name || `v${version.version_number}`,
+                            );
+                          }
+                        }}
+                        getJobStatus={
+                          localAudioVersions.length > 0
+                            ? (format) =>
+                                getJobStatus(
+                                  localAudioVersions[localAudioVersions.length - 1].id,
+                                  format,
+                                )
+                            : undefined
+                        }
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -1194,87 +1225,6 @@ export function TrackDetailClient({
 
         </aside>
       </div>
-    </div>
-  );
-}
-
-/* ── Delivery format selector sub-component ── */
-
-const DELIVERY_FORMATS = [
-  "WAV", "AIFF", "FLAC", "MP3", "AAC", "OGG",
-  "DDP", "ADM BWF (Atmos)", "MQA", "ALAC",
-];
-
-function DeliveryFormatSelector({
-  value,
-  onChange,
-  disabled,
-}: {
-  value: string[];
-  onChange: (next: string[]) => void;
-  disabled?: boolean;
-}) {
-  const [custom, setCustom] = useState("");
-  const allFormats = [...new Set([...DELIVERY_FORMATS, ...value.filter((v) => !DELIVERY_FORMATS.includes(v))])];
-
-  function toggle(fmt: string) {
-    const next = value.includes(fmt)
-      ? value.filter((f) => f !== fmt)
-      : [...value, fmt];
-    onChange(next);
-  }
-
-  return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        {allFormats.map((fmt) => (
-          <button
-            key={fmt}
-            type="button"
-            onClick={() => !disabled && toggle(fmt)}
-            disabled={disabled}
-            className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
-              value.includes(fmt)
-                ? "bg-signal/10 border-signal text-signal"
-                : "border-border text-muted hover:text-text hover:border-border-strong"
-            } ${disabled ? "opacity-60 cursor-default" : ""}`}
-          >
-            {value.includes(fmt) && <Check size={12} />}
-            {fmt}
-          </button>
-        ))}
-      </div>
-      {!disabled && (
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={custom}
-            onChange={(e) => setCustom(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && custom.trim()) {
-                toggle(custom.trim().toUpperCase());
-                setCustom("");
-              }
-            }}
-            placeholder="Custom format..."
-            className="input text-sm h-9 flex-1"
-          />
-          <Button
-            variant="ghost"
-            onClick={() => {
-              if (custom.trim()) {
-                toggle(custom.trim().toUpperCase());
-                setCustom("");
-              }
-            }}
-            disabled={!custom.trim()}
-            className="h-9 text-xs"
-          >
-            <Plus size={14} />
-            Add
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
