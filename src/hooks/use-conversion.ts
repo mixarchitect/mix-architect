@@ -84,10 +84,13 @@ export function useConversion() {
       jobId: string,
       fileName: string,
       targetFormat: string,
+      versionNumber?: number,
     ) => {
       // Clear any existing poll for this key
       const existing = pollTimers.current.get(key);
       if (existing) clearInterval(existing);
+
+      const vLabel = versionNumber ? ` (v${versionNumber})` : "";
 
       const timer = setInterval(async () => {
         try {
@@ -116,7 +119,7 @@ export function useConversion() {
               triggerDownload(data.output_url, fileName, targetFormat);
             }
 
-            toast(`${targetFormat.toUpperCase()} export ready`, {
+            toast(`${targetFormat.toUpperCase()} export ready${vLabel}`, {
               variant: "success",
             });
           } else if (data.status === "failed") {
@@ -145,6 +148,7 @@ export function useConversion() {
       trackId: string,
       targetFormat: string,
       fileName: string,
+      versionNumber?: number,
     ) => {
       const key = `${audioVersionId}:${targetFormat.toLowerCase()}`;
 
@@ -200,7 +204,8 @@ export function useConversion() {
             return next;
           });
           triggerDownload(data.outputUrl, fileName, targetFormat);
-          toast(`${targetFormat.toUpperCase()} export ready`, {
+          const vLabel = versionNumber ? ` (v${versionNumber})` : "";
+          toast(`${targetFormat.toUpperCase()} export ready${vLabel}`, {
             variant: "success",
           });
           return;
@@ -219,7 +224,7 @@ export function useConversion() {
           return next;
         });
 
-        startPolling(key, data.jobId, fileName, targetFormat);
+        startPolling(key, data.jobId, fileName, targetFormat, versionNumber);
       } catch (err) {
         const msg =
           err instanceof Error ? err.message : "Conversion failed";

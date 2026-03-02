@@ -712,11 +712,16 @@ export function TrackDetailClient({
                           const version =
                             localAudioVersions[localAudioVersions.length - 1];
                           if (version) {
+                            const baseName =
+                              version.file_name?.replace(/\.[^.]+$/, "") ??
+                              "audio";
+                            const fileName = `${baseName}_v${version.version_number}`;
                             requestConversion(
                               version.id,
                               track.id,
                               format.toLowerCase(),
-                              version.file_name || `v${version.version_number}`,
+                              fileName,
+                              version.version_number,
                             );
                           }
                         }}
