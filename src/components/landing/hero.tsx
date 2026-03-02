@@ -39,7 +39,7 @@ export function Hero() {
 
         {/* Persona callouts */}
         <div className="mt-14 grid gap-5 sm:grid-cols-2 max-w-2xl mx-auto">
-          <div className="flex items-start gap-4 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 p-6 text-left">
+          <div className="flex items-start gap-4 rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
             <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center">
               <Music size={20} className="text-[#0D9488]" />
             </div>
@@ -54,7 +54,7 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="flex items-start gap-4 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 p-6 text-left">
+          <div className="flex items-start gap-4 rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
             <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center">
               <Headphones size={20} className="text-[#0D9488]" />
             </div>
@@ -71,24 +71,24 @@ export function Hero() {
         </div>
 
         {/* CTAs */}
-        <div className="mt-12 flex flex-wrap justify-center gap-4">
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/auth/sign-in"
-            className="h-14 px-10 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D9488] text-white hover:bg-[#0fb9ab] transition-colors"
+            className="h-14 w-full sm:w-56 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D9488] text-white hover:bg-[#0fb9ab] transition-colors"
           >
             Start Free
             <FilledArrowRight size={18} />
           </Link>
           <a
             href="#features"
-            className="h-14 px-10 text-base font-medium inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 text-white/80 hover:border-white/40 hover:text-white transition-colors"
+            className="h-14 w-full sm:w-56 text-base font-medium inline-flex items-center justify-center gap-2 rounded-xl bg-[#1a1a1a] border border-white/20 text-white/80 hover:border-white/40 hover:text-white transition-colors"
           >
             See How It Works
           </a>
         </div>
 
         <p className="mt-8 text-sm text-white/40">
-          Free to use. No credit card required.
+          Free to try. No credit card required.
         </p>
       </div>
     </section>

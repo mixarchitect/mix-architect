@@ -9,12 +9,12 @@ import { FinalCTA } from "@/components/landing/final-cta";
 import { LandingFooter } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
-  title: "Mix Architect — Release Management for Artists & Audio Professionals",
+  title: "Mix Architect | Release Management for Artists & Audio Professionals",
   description:
     "Plan releases, build mix briefs, review audio with timestamped comments, and track payments. Free to start.",
   openGraph: {
     title:
-      "Mix Architect — Release Management for Artists & Audio Professionals",
+      "Mix Architect | Release Management for Artists & Audio Professionals",
     description:
       "Plan releases, build mix briefs, review audio with timestamped comments, and track payments. Free to start.",
     siteName: "Mix Architect",

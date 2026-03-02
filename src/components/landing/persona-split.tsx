@@ -82,7 +82,7 @@ export function PersonaSplit() {
             features={[
               "Everything artists get, plus:",
               "Payment tracking with export",
-              "Client delivery portal with your branding",
+              "Web portal for client delivery",
               "Download gating until payment confirmed",
               "Multi-project dashboard with outstanding balances",
               "Audio format conversion (WAV, AIFF, FLAC, MP3)",

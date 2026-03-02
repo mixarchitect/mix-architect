@@ -8,6 +8,8 @@ import {
   Music,
   MessageSquare,
   Clock,
+  Copy,
+  Layers,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -63,7 +65,7 @@ function FeatureSection({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Placeholder screenshot components (realistic mock UI)              */
+/*  Mock UI components                                                  */
 /* ------------------------------------------------------------------ */
 
 function ReleasePlanningMock() {
@@ -115,43 +117,67 @@ function ReleasePlanningMock() {
   );
 }
 
-function MixBriefMock() {
-  const tags = ["Warm", "Spacious", "Punchy", "Vocal-forward"];
+function WebPortalMock() {
+  const tracks = [
+    { title: "Midnight Drive", approved: true },
+    { title: "Neon Bloom", approved: false },
+    { title: "Golden Hour", approved: false },
+  ];
 
   return (
     <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
-      <div className="text-xs text-white/40 mb-1">Mix Vision</div>
-      <div className="text-sm font-semibold text-white mb-3">
-        &quot;Midnight Drive&quot; &mdash; Track 01
-      </div>
-      <div className="rounded-lg bg-white/4 p-3 mb-4">
-        <p className="text-sm text-white/60 leading-relaxed italic">
-          &quot;Big and open, with the vocal sitting on top of a wide reverb
-          tail. Think late-night highway energy — spacious but driving.&quot;
-        </p>
-      </div>
-      <div className="text-xs text-white/40 mb-2">Emotional Qualities</div>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="px-2.5 py-1 text-xs rounded-full bg-[#0D9488]/12 text-[#0D9488] border border-[#0D9488]/20"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-      <div className="text-xs text-white/40 mb-2">Reference Tracks</div>
-      <div className="space-y-2">
-        <div className="flex items-center gap-3 py-2 px-3 rounded-lg bg-white/4">
-          <Headphones size={14} className="text-white/30" />
-          <div>
-            <div className="text-sm text-white/80">Blinding Lights</div>
-            <div className="text-xs text-white/40">
-              &quot;The reverb on vocals around 1:20&quot;
-            </div>
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-5">
+        <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-[#0D9488]/30 to-[#3B82F6]/20 flex items-center justify-center">
+          <Music size={24} className="text-[#0D9488]" />
+        </div>
+        <div>
+          <div className="text-lg font-semibold text-white">
+            Late Night Drive
+          </div>
+          <div className="text-sm text-white/50">
+            Shared by Marcus Chen Audio
           </div>
         </div>
+      </div>
+      {/* Track list with approval status */}
+      <div className="space-y-2 mb-4">
+        {tracks.map((t) => (
+          <div
+            key={t.title}
+            className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-white/4"
+          >
+            <div className="flex items-center gap-3">
+              {t.approved ? (
+                <CheckCircle2 size={16} className="text-[#22C55E]" />
+              ) : (
+                <Clock size={16} className="text-white/30" />
+              )}
+              <span className="text-sm text-white/80">{t.title}</span>
+            </div>
+            <span
+              className={`text-xs font-medium ${
+                t.approved ? "text-[#22C55E]" : "text-white/40"
+              }`}
+            >
+              {t.approved ? "Approved" : "Pending review"}
+            </span>
+          </div>
+        ))}
+      </div>
+      {/* Download gating notice */}
+      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#FE5E0E]/8 border border-[#FE5E0E]/15 mb-3">
+        <span className="text-xs text-[#FF6D22]">
+          Downloads available after payment
+        </span>
+        <DollarSign size={12} className="text-[#FE5E0E]" />
+      </div>
+      {/* Footer */}
+      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#0D9488]/8 border border-[#0D9488]/15">
+        <span className="text-xs text-white/50">
+          Powered by Mix Architect
+        </span>
+        <Share2 size={12} className="text-[#0D9488]" />
       </div>
     </div>
   );
@@ -220,7 +246,7 @@ function AudioReviewMock() {
               0:47 &middot; Aria Voss
             </div>
             <div className="text-sm text-white/70">
-              Vocal feels a bit buried here — can we push it forward?
+              Vocal feels a bit buried here. Can we push it forward?
             </div>
           </div>
         </div>
@@ -312,57 +338,75 @@ function PaymentsMock() {
   );
 }
 
-function ClientPortalMock() {
-  const tracks = [
-    { title: "Midnight Drive", approved: true },
-    { title: "Neon Bloom", approved: false },
-    { title: "Golden Hour", approved: false },
+function TemplatesMock() {
+  const templates = [
+    {
+      name: "Standard EP (4 tracks)",
+      artist: "Aria Voss",
+      tracks: 4,
+      specs: "WAV 24-bit/48kHz",
+      tier: "PRO",
+    },
+    {
+      name: "Single Release",
+      artist: "Jay Park",
+      tracks: 1,
+      specs: "WAV 16-bit/44.1kHz",
+      tier: "PRO",
+    },
+    {
+      name: "Full Album (10 tracks)",
+      artist: "Luna Ray",
+      tracks: 10,
+      specs: "WAV 24-bit/96kHz",
+      tier: "PRO",
+    },
   ];
 
   return (
     <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
-      <div className="flex items-center gap-4 mb-5">
-        <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-[#0D9488]/30 to-[#3B82F6]/20 flex items-center justify-center">
-          <Music size={24} className="text-[#0D9488]" />
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm font-semibold text-white">
+          Saved Templates
         </div>
-        <div>
-          <div className="text-lg font-semibold text-white">
-            Late Night Drive
-          </div>
-          <div className="text-sm text-white/50">
-            Shared by Marcus Chen Audio
-          </div>
-        </div>
+        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0D9488]/15 text-[#0D9488]">
+          PRO
+        </span>
       </div>
-      <div className="space-y-2 mb-4">
-        {tracks.map((t) => (
+      <div className="space-y-2">
+        {templates.map((t) => (
           <div
-            key={t.title}
-            className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-white/4"
+            key={t.name}
+            className="py-3 px-3 rounded-lg bg-white/4"
           >
-            <div className="flex items-center gap-3">
-              {t.approved ? (
-                <CheckCircle2 size={16} className="text-[#22C55E]" />
-              ) : (
-                <Clock size={16} className="text-white/30" />
-              )}
-              <span className="text-sm text-white/80">{t.title}</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#0D9488]/12 flex items-center justify-center">
+                  <Layers size={14} className="text-[#0D9488]" />
+                </div>
+                <div>
+                  <div className="text-sm text-white/80 font-medium">{t.name}</div>
+                  <div className="text-xs text-white/40">{t.artist}</div>
+                </div>
+              </div>
+              <button className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/50 hover:bg-white/12 transition-colors flex items-center gap-1">
+                <Copy size={10} />
+                Apply
+              </button>
             </div>
-            <span
-              className={`text-xs font-medium ${
-                t.approved ? "text-[#22C55E]" : "text-white/40"
-              }`}
-            >
-              {t.approved ? "Approved" : "Pending review"}
-            </span>
+            <div className="flex gap-2 ml-[42px]">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/40">
+                {t.tracks} {t.tracks === 1 ? "track" : "tracks"}
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/40">
+                {t.specs}
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#0D9488]/12 text-[#0D9488]">
+                {t.tier}
+              </span>
+            </div>
           </div>
         ))}
-      </div>
-      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#0D9488]/8 border border-[#0D9488]/15">
-        <span className="text-xs text-white/50">
-          Powered by Mix Architect
-        </span>
-        <Share2 size={12} className="text-[#0D9488]" />
       </div>
     </div>
   );
@@ -378,15 +422,15 @@ export function FeatureShowcase() {
       <div className="mx-auto max-w-6xl">
         <FeatureSection
           headline="Every release, organized from day one"
-          body="Create a release, add your tracks, set your timeline. Mix Architect tracks everything from first rough mix to final delivery — so nothing falls through the cracks."
+          body="Create a release, add your tracks, set your timeline. Mix Architect tracks everything from first rough mix to final delivery so nothing falls through the cracks."
           visual={<ReleasePlanningMock />}
         />
 
         <FeatureSection
-          headline="Tell your mixer exactly what you want"
-          body="Describe the sonic direction with mix vision notes, emotional quality tags, and reference tracks with specific context. No more back-and-forth guessing."
-          badge="The mix brief — a new category of creative document"
-          visual={<MixBriefMock />}
+          headline="Share work that looks as professional as it sounds"
+          body="Give clients a web portal to review mixes, approve tracks, and download deliverables. Optionally gate downloads until payment is confirmed. Every shared link is a calling card for your business."
+          badge="Client delivery, simplified"
+          visual={<WebPortalMock />}
           reverse
         />
 
@@ -397,7 +441,7 @@ export function FeatureShowcase() {
         />
 
         <FeatureSection
-          headline="Know who owes what — at a glance"
+          headline="Know who owes what, at a glance"
           body="Track project fees, partial payments, and outstanding balances across every release. See your total revenue and what's still pending. Export for invoicing and tax time."
           badge="Built for freelance engineers and producers"
           badgeColor="orange"
@@ -406,9 +450,11 @@ export function FeatureShowcase() {
         />
 
         <FeatureSection
-          headline="Share work that looks as professional as it sounds"
-          body="Give clients a branded portal to review mixes, approve tracks, and download deliverables. Optionally gate downloads until payment is confirmed. Every shared link is a calling card for your business."
-          visual={<ClientPortalMock />}
+          headline="Save your setup, skip the busywork"
+          body="Create templates from your existing releases and apply them to new projects in one click. Pre-fill track counts, specs, and references for the artists you work with regularly."
+          badge="Templates"
+          badgeColor="blue"
+          visual={<TemplatesMock />}
         />
       </div>
     </section>
