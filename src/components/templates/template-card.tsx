@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MoreVertical, Pencil, Trash2, Copy, Star } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
-import { Pill } from "@/components/ui/pill";
-import { Timestamp } from "@/components/ui/timestamp";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import type { ReleaseTemplate } from "@/types/template";
@@ -24,9 +22,28 @@ function typeLabel(t: string | null): string | null {
 function formatLabel(f: string | null): string | null {
   if (!f) return null;
   if (f === "stereo") return "Stereo";
-  if (f === "atmos") return "Dolby Atmos";
+  if (f === "atmos") return "Atmos";
   if (f === "both") return "Stereo + Atmos";
   return f;
+}
+
+/** Build a concise one-line summary from template fields */
+function buildSummary(t: ReleaseTemplate): string {
+  const parts: string[] = [];
+
+  // Type + format combined
+  const tf = [typeLabel(t.release_type), formatLabel(t.format)].filter(Boolean);
+  if (tf.length > 0) parts.push(tf.join(" \u00B7 "));
+
+  // Specs
+  const specs = [t.default_sample_rate, t.default_bit_depth].filter(Boolean);
+  if (specs.length > 0) parts.push(specs.join(" / "));
+
+  // Delivery format count
+  if (t.delivery_formats.length > 0)
+    parts.push(`${t.delivery_formats.length} delivery format${t.delivery_formats.length !== 1 ? "s" : ""}`);
+
+  return parts.join(" \u00B7 ") || "No settings configured";
 }
 
 /* ------------------------------------------------------------------ */
@@ -47,7 +64,7 @@ export function TemplateCard({ template, className }: Props) {
   const router = useRouter();
   const { toast } = useToast();
 
-  // Click-outside (same pattern as release-card.tsx)
+  // Click-outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -114,13 +131,6 @@ export function TemplateCard({ template, className }: Props) {
     }
   }
 
-  // Build spec summary
-  const specParts = [
-    template.default_sample_rate,
-    template.default_bit_depth,
-    template.delivery_formats.length > 0 && template.delivery_formats.join(", "),
-  ].filter(Boolean);
-
   return (
     <div className={cn("relative card px-5 py-4", className)}>
       <div className="flex items-start justify-between gap-2">
@@ -141,6 +151,11 @@ export function TemplateCard({ template, className }: Props) {
               {template.description}
             </div>
           )}
+
+          {/* Single summary line */}
+          <div className="mt-2 text-xs text-faint truncate">
+            {buildSummary(template)}
+          </div>
         </Link>
 
         {/* Action menu */}
@@ -185,7 +200,7 @@ export function TemplateCard({ template, className }: Props) {
                     className="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-panel2 transition-colors text-left"
                   >
                     <Pencil size={14} />
-                    Edit Template
+                    Edit
                   </button>
                   <button
                     type="button"
@@ -212,7 +227,7 @@ export function TemplateCard({ template, className }: Props) {
                     className="w-full flex items-center gap-2 px-3 py-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-left"
                   >
                     <Trash2 size={14} />
-                    Delete Template
+                    Delete
                   </button>
                 </>
               ) : (
@@ -255,43 +270,6 @@ export function TemplateCard({ template, className }: Props) {
           )}
         </div>
       </div>
-
-      <Link
-        href={`/app/templates/${template.id}`}
-        className="group block focus-visible:outline-none"
-      >
-        {/* Pills for type/format */}
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {typeLabel(template.release_type) && (
-            <Pill>{typeLabel(template.release_type)}</Pill>
-          )}
-          {formatLabel(template.format) && (
-            <Pill>{formatLabel(template.format)}</Pill>
-          )}
-          {template.genre_tags.length > 0 && (
-            <Pill>{template.genre_tags.length} genre{template.genre_tags.length !== 1 ? "s" : ""}</Pill>
-          )}
-          {template.delivery_formats.length > 0 && (
-            <Pill>{template.delivery_formats.length} format{template.delivery_formats.length !== 1 ? "s" : ""}</Pill>
-          )}
-        </div>
-
-        {/* Spec summary */}
-        <div className="mt-3 text-xs text-muted truncate">
-          {specParts.length > 0
-            ? specParts.join(" \u00B7 ")
-            : "No specs configured"}
-        </div>
-
-        {/* Footer */}
-        <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted">
-          <span>
-            Used {template.usage_count}{" "}
-            {template.usage_count === 1 ? "time" : "times"}
-          </span>
-          {template.updated_at && <Timestamp date={template.updated_at} />}
-        </div>
-      </Link>
     </div>
   );
 }

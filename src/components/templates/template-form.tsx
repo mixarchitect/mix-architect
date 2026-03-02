@@ -347,7 +347,7 @@ export function TemplateForm({ initialData }: Props) {
           .single();
         if (insertErr) throw insertErr;
         toast("Template created", { variant: "success" });
-        router.push(`/app/templates/${template.id}`);
+        router.push("/app/templates");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
