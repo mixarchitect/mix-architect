@@ -233,31 +233,33 @@ export interface Countdown {
   isToday: boolean;
   /** true when target_date is in the past */
   isOverdue: boolean;
-  /** Formatted string: "2m 14d 8h", "Today", or "3d overdue" */
+  /** Formatted string: "2:14:8" (M:D:H), "Today", or "0:3:12 overdue" */
   label: string;
 }
 
 /**
  * Calculate countdown from now to a target date.
  * Returns months / days / hours remaining, or overdue info.
+ *
+ * IMPORTANT: target_date from DB is a date-only string ("2026-06-15").
+ * We parse it manually as local time to avoid the UTC-midnight
+ * off-by-one bug that `new Date("2026-06-15")` causes in US timezones.
  */
 export function getCountdown(targetDateStr: string): Countdown {
   const now = new Date();
-  const target = new Date(targetDateStr);
 
-  // Check if today (same calendar day in local time)
+  // Parse "2026-06-15" as LOCAL midnight (not UTC)
+  const [y, mo, d] = targetDateStr.split("-").map(Number);
+  const targetLocal = new Date(y, mo - 1, d); // midnight local
+
+  // Check if today
   const isToday =
-    now.getFullYear() === target.getFullYear() &&
-    now.getMonth() === target.getMonth() &&
-    now.getDate() === target.getDate();
+    now.getFullYear() === y &&
+    now.getMonth() === mo - 1 &&
+    now.getDate() === d;
 
-  // Target end-of-day for comparison (23:59:59 on target date, local)
-  const targetEOD = new Date(
-    target.getFullYear(),
-    target.getMonth(),
-    target.getDate(),
-    23, 59, 59, 999,
-  );
+  // End of target day in local time
+  const targetEOD = new Date(y, mo - 1, d, 23, 59, 59, 999);
   const totalMs = targetEOD.getTime() - now.getTime();
   const isOverdue = totalMs < 0 && !isToday;
 
@@ -272,21 +274,12 @@ export function getCountdown(targetDateStr: string): Countdown {
   const hours = Math.floor((absMs % 86_400_000) / 3_600_000);
 
   if (isOverdue) {
-    const label =
-      totalDays === 0
-        ? `${hours}h overdue`
-        : totalDays < 30
-          ? `${totalDays}d overdue`
-          : `${months}m ${days}d overdue`;
+    const label = `${months}:${days}:${hours} overdue`;
     return { totalMs, months, days, hours, isToday: false, isOverdue: true, label };
   }
 
-  // Future — always show hours
-  const parts: string[] = [];
-  if (months > 0) parts.push(`${months}m`);
-  parts.push(`${days}d`);
-  parts.push(`${hours}h`);
-  const label = parts.join(" ");
+  // Future — M:D:H format
+  const label = `${months}:${days}:${hours}`;
 
   return { totalMs, months, days, hours, isToday: false, isOverdue: false, label };
 }
