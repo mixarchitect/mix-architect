@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift } from "lucide-react";
@@ -11,6 +11,7 @@ import { Rule } from "@/components/ui/rule";
 import { TagInput } from "@/components/ui/tag-input";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { useSubscription } from "@/lib/subscription-context";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 
 const FORMAT_OPTIONS = [
   { value: "stereo", label: "Stereo" },
@@ -46,6 +47,14 @@ export default function SettingsPage() {
   ]);
   const [paymentsEnabled, setPaymentsEnabled] = useState(false);
 
+  // ── Unsaved-changes guard ──
+  const initialSnapshot = useRef("");
+  const currentSnapshot = JSON.stringify({
+    displayName, companyName, format, sampleRate, bitDepth, defaultElements,
+  });
+  const isDirty = initialSnapshot.current !== "" && currentSnapshot !== initialSnapshot.current;
+  useUnsavedChanges(isDirty);
+
   useEffect(() => {
     async function load() {
       const {
@@ -69,6 +78,18 @@ export default function SettingsPage() {
           setPaymentsEnabled(data.payments_enabled ?? false);
           setCompanyName(data.company_name ?? "");
         }
+
+        // Capture initial snapshot for dirty detection
+        requestAnimationFrame(() => {
+          initialSnapshot.current = JSON.stringify({
+            displayName: user.user_metadata?.display_name ?? "",
+            companyName: data?.company_name ?? "",
+            format: data?.default_format ?? "stereo",
+            sampleRate: data?.default_sample_rate ?? "48kHz",
+            bitDepth: data?.default_bit_depth ?? "24-bit",
+            defaultElements: data?.default_elements ?? [],
+          });
+        });
       }
       setLoading(false);
     }
@@ -101,6 +122,7 @@ export default function SettingsPage() {
       );
 
       if (error) throw error;
+      initialSnapshot.current = currentSnapshot; // reset dirty state
       setSaveStatus("saved");
       setTimeout(() => setSaveStatus("idle"), 2000);
     } catch {

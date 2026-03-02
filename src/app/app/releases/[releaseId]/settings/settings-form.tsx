@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -11,6 +11,7 @@ import { Pill } from "@/components/ui/pill";
 import { TagInput } from "@/components/ui/tag-input";
 import { ArrowLeft, ImageIcon, Upload, X, Trash2, UserPlus } from "lucide-react";
 import { canEdit, canEditPayment, canManageTeam, type ReleaseRole } from "@/lib/permissions";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 
 type MemberRow = {
   id: string;
@@ -143,6 +144,17 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
   const [resentId, setResentId] = useState<string | null>(null);
   const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
 
+  // ── Unsaved-changes guard ──
+  const initialSnapshot = useRef("");
+  const currentSnapshot = JSON.stringify({
+    title, artist, releaseType, format, status, globalDirection, genreTags,
+    targetDate, clientName, clientEmail, deliveryNotes, feeTotal, feeCurrency,
+    paymentStatus, paidAmount, paymentNotes, distributor, recordLabel, upc,
+    copyrightHolder, copyrightYear, phonogramCopyright, catalogNumber,
+  });
+  const isDirty = initialSnapshot.current !== "" && currentSnapshot !== initialSnapshot.current;
+  const guardedNavigate = useUnsavedChanges(isDirty);
+
   useEffect(() => {
     async function load() {
       const [{ data }, { data: { user } }] = await Promise.all([
@@ -190,6 +202,37 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
       }
 
       setLoading(false);
+
+      // Capture initial snapshot for dirty detection
+      if (data) {
+        requestAnimationFrame(() => {
+          initialSnapshot.current = JSON.stringify({
+            title: data.title ?? "",
+            artist: data.artist ?? "",
+            releaseType: data.release_type ?? "single",
+            format: data.format ?? "stereo",
+            status: data.status ?? "draft",
+            globalDirection: data.global_direction ?? "",
+            genreTags: data.genre_tags ?? [],
+            targetDate: data.target_date ?? "",
+            clientName: data.client_name ?? "",
+            clientEmail: data.client_email ?? "",
+            deliveryNotes: data.delivery_notes ?? "",
+            feeTotal: data.fee_total != null ? String(data.fee_total) : "",
+            feeCurrency: data.fee_currency ?? "USD",
+            paymentStatus: data.payment_status ?? "no_fee",
+            paidAmount: data.paid_amount != null ? String(data.paid_amount) : "",
+            paymentNotes: data.payment_notes ?? "",
+            distributor: data.distributor ?? "",
+            recordLabel: data.record_label ?? "",
+            upc: data.upc ?? "",
+            copyrightHolder: data.copyright_holder ?? "",
+            copyrightYear: data.copyright_year ?? "",
+            phonogramCopyright: data.phonogram_copyright ?? "",
+            catalogNumber: data.catalog_number ?? "",
+          });
+        });
+      }
     }
     load();
   }, [supabase, releaseId]);
@@ -383,13 +426,14 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
   return (
     <div className="max-w-xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <Link
-          href={`/app/releases/${releaseId}`}
+        <button
+          type="button"
+          onClick={() => guardedNavigate(() => router.push(`/app/releases/${releaseId}`))}
           className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
         >
           <ArrowLeft size={14} />
           Back to Release
-        </Link>
+        </button>
       </div>
 
       <Panel>
@@ -756,9 +800,12 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
               <Button variant="primary" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving\u2026" : "Save Changes"}
               </Button>
-              <Link href={`/app/releases/${releaseId}`}>
-                <Button variant="ghost">Cancel</Button>
-              </Link>
+              <Button
+                variant="ghost"
+                onClick={() => guardedNavigate(() => router.push(`/app/releases/${releaseId}`))}
+              >
+                Cancel
+              </Button>
             </div>
           )}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelHeader, PanelBody } from "@/components/ui/panel";
@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/toast";
 import { ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { DELIVERY_FORMATS } from "@/lib/conversion-formats";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import type { ReleaseTemplate } from "@/types/template";
 
 /* ------------------------------------------------------------------ */
@@ -236,6 +237,51 @@ export function TemplateForm({ initialData }: Props) {
     rightsHolders.length > 0;
   const hasClient = !!clientName || !!clientEmail;
   const hasPayment = !!paymentStatus || !!feeCurrency || !!paymentNotes;
+
+  // ── Unsaved-changes guard ──
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const d = (initialData?.distribution_fields ?? {}) as Record<string, any>;
+  const initialSnapshot = useMemo(
+    () =>
+      JSON.stringify({
+        name: initialData?.name ?? "",
+        description: initialData?.description ?? "",
+        isDefault: initialData?.is_default ?? false,
+        releaseType: initialData?.release_type ?? null,
+        format: initialData?.format ?? null,
+        genreTags: initialData?.genre_tags ?? [],
+        sampleRate: initialData?.default_sample_rate ?? "",
+        bitDepth: initialData?.default_bit_depth ?? "",
+        deliveryFormats: initialData?.delivery_formats ?? [],
+        specialReqs: initialData?.default_special_reqs ?? "",
+        emotionalTags: initialData?.default_emotional_tags ?? [],
+        clientName: initialData?.client_name ?? "",
+        clientEmail: initialData?.client_email ?? "",
+        paymentStatus: initialData?.default_payment_status ?? "",
+        feeCurrency: initialData?.default_fee_currency ?? "",
+        paymentNotes: initialData?.default_payment_notes ?? "",
+        distributor: d.distributor ?? "",
+        recordLabel: d.record_label ?? "",
+        copyrightHolder: d.copyright_holder ?? "",
+        language: d.language ?? "",
+        primaryGenre: d.primary_genre ?? "",
+        secondaryGenre: d.secondary_genre ?? "",
+        rightsHolders: (d.rights_holders ?? []).map(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (rh: any) => ({ ...rh, id: undefined }),
+        ),
+      }),
+    [initialData, d],
+  );
+  const currentSnapshot = JSON.stringify({
+    name, description, isDefault, releaseType, format, genreTags, sampleRate,
+    bitDepth, deliveryFormats, specialReqs, emotionalTags, clientName, clientEmail,
+    paymentStatus, feeCurrency, paymentNotes, distributor, recordLabel,
+    copyrightHolder, language, primaryGenre, secondaryGenre,
+    rightsHolders: rightsHolders.map(({ id: _id, ...rest }) => rest),
+  });
+  const isDirty = currentSnapshot !== initialSnapshot;
+  useUnsavedChanges(isDirty);
 
   // ── Rights holder helpers ──
   function addRightsHolder() {
