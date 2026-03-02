@@ -125,8 +125,8 @@ export function TimelineView({ releases }: TimelineViewProps) {
             className="shrink-0 border-r border-white/5 z-10"
             style={{ width: SIDEBAR_WIDTH, background: "var(--panel)" }}
           >
-            {/* Sidebar header (matches timeline header height) */}
-            <div className="h-8 border-b border-white/5 flex items-end px-3 pb-1.5">
+            {/* Sidebar header (matches timeline header height: h-4 + h-6) */}
+            <div className="border-b border-white/5 flex items-end px-3 pb-1" style={{ height: 40 }}>
               <span className="text-[11px] font-medium text-muted uppercase tracking-wider select-none">
                 Releases
               </span>
@@ -144,7 +144,7 @@ export function TimelineView({ releases }: TimelineViewProps) {
                 <StatusDot color={getStatusColor(r.status)} className="shrink-0" />
                 <div className="min-w-0 flex-1">
                   {r.artist && (
-                    <div className="text-[10px] text-muted font-mono truncate leading-tight">
+                    <div className="text-[10px] text-muted truncate leading-tight">
                       {r.artist}
                     </div>
                   )}

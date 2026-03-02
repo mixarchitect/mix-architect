@@ -41,10 +41,8 @@ export function DashboardContent({
   releases,
   gridContent,
 }: DashboardContentProps) {
-  // Determine default view: timeline if 4+ releases, else grid
-  const defaultView: DashboardView = releases.length >= 4 ? "timeline" : "grid";
-
-  const [view, setView] = useState<DashboardView>(defaultView);
+  // Always default to grid; timeline is opt-in via toggle or localStorage
+  const [view, setView] = useState<DashboardView>("grid");
 
   // On mount, check localStorage for persisted preference
   useEffect(() => {

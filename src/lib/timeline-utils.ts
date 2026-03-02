@@ -169,23 +169,23 @@ export function getWeekLines(
 export interface ReleaseBarGeometry {
   /** Left edge in pixels */
   x: number;
-  /** Width in pixels (0 if point marker) */
+  /** Width in pixels */
   width: number;
-  /** true → render as a dot/diamond, false → render as a bar */
-  isPoint: boolean;
   /** Is the bar clipped on the left edge? */
   clippedLeft: boolean;
   /** Is the bar clipped on the right edge? */
   clippedRight: boolean;
 }
 
+/** Minimum bar width so very short-span releases are still visible */
+const MIN_BAR_PX = 24;
+
 /**
  * Calculate the position and width of a release bar on the timeline.
  *
- * Singles always render as a point marker.
- * EPs/Albums render as a bar from created_at → target_date,
- * unless the span is < 3 days (then also a point marker).
- * If created_at > target_date, treat as a point at target_date.
+ * All release types render as a bar from created_at → target_date.
+ * Very short spans (< 3 days) get a minimum width so they're clickable.
+ * If created_at > target_date, bar starts at target_date with min width.
  */
 export function getReleaseBarGeometry(
   release: DashboardRelease,
@@ -198,24 +198,8 @@ export function getReleaseBarGeometry(
   const created = toUTCMidnight(release.created_at);
   const totalWidth = daysBetween(range.start, range.end) * pxPerDay;
 
-  // Determine if this should be a bar or point
-  const isSingle = release.release_type === "single";
-  const spanDays = daysBetween(created, target);
-  const isPoint = isSingle || spanDays < 3;
-
-  if (isPoint) {
-    const x = dateToPixel(target, range.start, pxPerDay);
-    return {
-      x: Math.max(0, Math.min(x, totalWidth)),
-      width: 0,
-      isPoint: true,
-      clippedLeft: x < 0,
-      clippedRight: x > totalWidth,
-    };
-  }
-
   // Bar: from created_at to target_date
-  // If created > target (user set past date), clamp to point at target
+  // If created > target (user set past date), use target as start with min width
   const barStart = created <= target ? created : target;
   const barEnd = target;
 
@@ -229,8 +213,7 @@ export function getReleaseBarGeometry(
 
   return {
     x,
-    width: Math.max(x2 - x, 4), // minimum 4px so it's visible
-    isPoint: false,
+    width: Math.max(x2 - x, MIN_BAR_PX),
     clippedLeft,
     clippedRight,
   };
