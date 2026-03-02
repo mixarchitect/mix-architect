@@ -241,46 +241,49 @@ export interface Countdown {
  * Calculate countdown from now to a target date.
  * Returns months / days / hours remaining, or overdue info.
  *
- * IMPORTANT: target_date from DB is a date-only string ("2026-06-15").
- * We parse it manually as local time to avoid the UTC-midnight
- * off-by-one bug that `new Date("2026-06-15")` causes in US timezones.
+ * Days are computed via UTC calendar math (immune to DST shifts).
+ * Hours are computed from the local clock (hours remaining in the day).
  */
 export function getCountdown(targetDateStr: string): Countdown {
   const now = new Date();
 
-  // Parse "2026-06-15" as LOCAL midnight (not UTC)
   const [y, mo, d] = targetDateStr.split("-").map(Number);
-  const target = new Date(y, mo - 1, d); // midnight local
 
-  // Check if today
-  const isToday =
-    now.getFullYear() === y &&
-    now.getMonth() === mo - 1 &&
-    now.getDate() === d;
+  // Calendar days between today and target — DST-safe via UTC
+  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const targetUTC = Date.UTC(y, mo - 1, d);
+  const calendarDays = Math.round((targetUTC - todayUTC) / 86_400_000);
 
-  // Count down to the start of the target day (midnight)
+  // totalMs for sorting (local timestamps — DST skew acceptable here)
+  const target = new Date(y, mo - 1, d);
   const totalMs = target.getTime() - now.getTime();
-  const isOverdue = totalMs < 0 && !isToday;
+
+  const isToday = calendarDays === 0;
+  const isOverdue = calendarDays < 0;
 
   if (isToday) {
     return { totalMs: 0, months: 0, days: 0, hours: 0, isToday: true, isOverdue: false, label: "Today" };
   }
 
-  const absMs = Math.abs(totalMs);
-  const totalDays = Math.floor(absMs / 86_400_000);
-  const months = Math.floor(totalDays / 30);
-  const days = totalDays % 30;
-  const hours = Math.floor((absMs % 86_400_000) / 3_600_000);
-
   const pad = (n: number) => String(n).padStart(2, "0");
 
   if (isOverdue) {
+    const overdueDays = -calendarDays;
+    const months = Math.floor(overdueDays / 30);
+    const days = overdueDays % 30;
+    const hours = now.getHours();
     const label = `${pad(months)}m ${pad(days)}d ${pad(hours)}h overdue`;
     return { totalMs, months, days, hours, isToday: false, isOverdue: true, label };
   }
 
-  const label = `${pad(months)}m ${pad(days)}d ${pad(hours)}h`;
+  // Future: today is partially elapsed, so full remaining days = calendarDays - 1
+  const fullDays = calendarDays - 1;
+  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  const hours = Math.floor((nextMidnight.getTime() - now.getTime()) / 3_600_000);
+  const months = Math.floor(fullDays / 30);
+  const days = fullDays % 30;
 
+  const label = `${pad(months)}m ${pad(days)}d ${pad(hours)}h`;
   return { totalMs, months, days, hours, isToday: false, isOverdue: false, label };
 }
 
