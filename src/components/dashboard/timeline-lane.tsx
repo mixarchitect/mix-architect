@@ -15,7 +15,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const LANE_HEIGHT = 56;
+const LANE_HEIGHT = 64;
 const BAR_HEIGHT = 30;
 
 /* ------------------------------------------------------------------ */

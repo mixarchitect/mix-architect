@@ -16,6 +16,7 @@ import {
   daysBetween,
   toUTCMidnight,
   getStatusColor,
+  getCountdown,
 } from "@/lib/timeline-utils";
 import type { DashboardRelease } from "@/types/release";
 import { Calendar, ChevronDown, ChevronRight } from "lucide-react";
@@ -26,7 +27,7 @@ import { Calendar, ChevronDown, ChevronRight } from "lucide-react";
 
 const SIDEBAR_WIDTH = 200;
 const SIDEBAR_WIDTH_TABLET = 160;
-const LANE_HEIGHT = 56;
+const LANE_HEIGHT = 64;
 
 /* ------------------------------------------------------------------ */
 /*  TimelineView                                                       */
@@ -151,6 +152,7 @@ export function TimelineView({ releases }: TimelineViewProps) {
                   <div className="text-sm font-medium text-text truncate leading-tight">
                     {r.title}
                   </div>
+                  {r.target_date && <CountdownLabel targetDate={r.target_date} />}
                 </div>
               </button>
             ))}
@@ -234,6 +236,36 @@ export function TimelineView({ releases }: TimelineViewProps) {
         />
       )}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  CountdownLabel — compact time-remaining badge in the sidebar       */
+/* ------------------------------------------------------------------ */
+
+function CountdownLabel({ targetDate }: { targetDate: string }) {
+  const cd = getCountdown(targetDate);
+
+  if (cd.isToday) {
+    return (
+      <span className="text-[10px] font-semibold leading-tight" style={{ color: "var(--signal)" }}>
+        Release day!
+      </span>
+    );
+  }
+
+  if (cd.isOverdue) {
+    return (
+      <span className="text-[10px] text-faint leading-tight">
+        {cd.label}
+      </span>
+    );
+  }
+
+  return (
+    <span className="text-[10px] text-faint leading-tight">
+      {cd.label}
+    </span>
   );
 }
 

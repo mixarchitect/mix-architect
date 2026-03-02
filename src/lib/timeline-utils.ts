@@ -220,6 +220,78 @@ export function getReleaseBarGeometry(
 }
 
 /* ------------------------------------------------------------------ */
+/*  Countdown — time remaining until target_date                       */
+/* ------------------------------------------------------------------ */
+
+export interface Countdown {
+  /** Total milliseconds remaining (negative = overdue) */
+  totalMs: number;
+  months: number;
+  days: number;
+  hours: number;
+  /** true when target_date is today */
+  isToday: boolean;
+  /** true when target_date is in the past */
+  isOverdue: boolean;
+  /** Formatted string: "2m 14d 8h", "Today", or "3d overdue" */
+  label: string;
+}
+
+/**
+ * Calculate countdown from now to a target date.
+ * Returns months / days / hours remaining, or overdue info.
+ */
+export function getCountdown(targetDateStr: string): Countdown {
+  const now = new Date();
+  const target = new Date(targetDateStr);
+
+  // Check if today (same calendar day in local time)
+  const isToday =
+    now.getFullYear() === target.getFullYear() &&
+    now.getMonth() === target.getMonth() &&
+    now.getDate() === target.getDate();
+
+  // Target end-of-day for comparison (23:59:59 on target date, local)
+  const targetEOD = new Date(
+    target.getFullYear(),
+    target.getMonth(),
+    target.getDate(),
+    23, 59, 59, 999,
+  );
+  const totalMs = targetEOD.getTime() - now.getTime();
+  const isOverdue = totalMs < 0 && !isToday;
+
+  if (isToday) {
+    return { totalMs: 0, months: 0, days: 0, hours: 0, isToday: true, isOverdue: false, label: "Today" };
+  }
+
+  const absMs = Math.abs(totalMs);
+  const totalDays = Math.floor(absMs / 86_400_000);
+  const months = Math.floor(totalDays / 30);
+  const days = totalDays % 30;
+  const hours = Math.floor((absMs % 86_400_000) / 3_600_000);
+
+  if (isOverdue) {
+    const label =
+      totalDays === 0
+        ? `${hours}h overdue`
+        : totalDays < 30
+          ? `${totalDays}d overdue`
+          : `${months}m ${days}d overdue`;
+    return { totalMs, months, days, hours, isToday: false, isOverdue: true, label };
+  }
+
+  // Future
+  const parts: string[] = [];
+  if (months > 0) parts.push(`${months}m`);
+  if (days > 0 || months === 0) parts.push(`${days}d`);
+  if (months === 0) parts.push(`${hours}h`);
+  const label = parts.join(" ");
+
+  return { totalMs, months, days, hours, isToday: false, isOverdue: false, label };
+}
+
+/* ------------------------------------------------------------------ */
 /*  Status → color mapping                                             */
 /* ------------------------------------------------------------------ */
 
