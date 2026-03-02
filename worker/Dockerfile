@@ -7,9 +7,16 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-RUN npm ci --production
+# Install ALL dependencies (including devDependencies for tsc)
+COPY package.json ./
+RUN npm install
 
-COPY dist/ ./dist/
+# Copy source and compile TypeScript
+COPY tsconfig.json ./
+COPY src/ ./src/
+RUN npm run build
+
+# Remove devDependencies after build
+RUN npm prune --production
 
 CMD ["node", "dist/index.js"]
