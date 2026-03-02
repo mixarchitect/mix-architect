@@ -250,7 +250,7 @@ export function getCountdown(targetDateStr: string): Countdown {
 
   // Parse "2026-06-15" as LOCAL midnight (not UTC)
   const [y, mo, d] = targetDateStr.split("-").map(Number);
-  const targetLocal = new Date(y, mo - 1, d); // midnight local
+  const target = new Date(y, mo - 1, d); // midnight local
 
   // Check if today
   const isToday =
@@ -258,9 +258,8 @@ export function getCountdown(targetDateStr: string): Countdown {
     now.getMonth() === mo - 1 &&
     now.getDate() === d;
 
-  // End of target day in local time
-  const targetEOD = new Date(y, mo - 1, d, 23, 59, 59, 999);
-  const totalMs = targetEOD.getTime() - now.getTime();
+  // Count down to the start of the target day (midnight)
+  const totalMs = target.getTime() - now.getTime();
   const isOverdue = totalMs < 0 && !isToday;
 
   if (isToday) {
