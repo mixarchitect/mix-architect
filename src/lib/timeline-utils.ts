@@ -233,7 +233,7 @@ export interface Countdown {
   isToday: boolean;
   /** true when target_date is in the past */
   isOverdue: boolean;
-  /** Formatted string: "2:14:8" (M:D:H), "Today", or "0:3:12 overdue" */
+  /** Formatted string: "02m 14d 08h", "Today", or "00m 03d 12h overdue" */
   label: string;
 }
 
@@ -273,13 +273,14 @@ export function getCountdown(targetDateStr: string): Countdown {
   const days = totalDays % 30;
   const hours = Math.floor((absMs % 86_400_000) / 3_600_000);
 
+  const pad = (n: number) => String(n).padStart(2, "0");
+
   if (isOverdue) {
-    const label = `${months}:${days}:${hours} overdue`;
+    const label = `${pad(months)}m ${pad(days)}d ${pad(hours)}h overdue`;
     return { totalMs, months, days, hours, isToday: false, isOverdue: true, label };
   }
 
-  // Future — M:D:H format
-  const label = `${months}:${days}:${hours}`;
+  const label = `${pad(months)}m ${pad(days)}d ${pad(hours)}h`;
 
   return { totalMs, months, days, hours, isToday: false, isOverdue: false, label };
 }
