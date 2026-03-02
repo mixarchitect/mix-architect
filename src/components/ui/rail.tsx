@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Search, Settings, LogOut, DollarSign, Sun, Moon, Monitor } from "lucide-react";
+import { Home, Search, Settings, LogOut, DollarSign, Sun, Moon, Monitor, LayoutTemplate } from "lucide-react";
 import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { usePaymentsEnabled } from "@/lib/payments-context";
@@ -46,6 +46,7 @@ export function Rail({ onSearchClick }: Props) {
   }
 
   const isHome = pathname === "/app";
+  const isTemplates = pathname?.startsWith("/app/templates");
   const isPayments = pathname?.startsWith("/app/payments");
   const isSettings = pathname?.startsWith("/app/settings");
 
@@ -108,6 +109,14 @@ export function Rail({ onSearchClick }: Props) {
         </span>
         <span className={labelClass}>Search</span>
       </button>
+
+      {/* Templates */}
+      <Link href="/app/templates" className={itemClass(isTemplates)}>
+        <span className="w-10 h-10 grid place-items-center shrink-0">
+          <LayoutTemplate size={20} strokeWidth={1.5} />
+        </span>
+        <span className={labelClass}>Templates</span>
+      </Link>
 
       {/* Payments (conditional) */}
       {paymentsEnabled && (

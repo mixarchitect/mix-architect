@@ -12,6 +12,7 @@ import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEd
 import { FlowSimulatorButton } from "@/components/flow-simulator/flow-simulator-button";
 import { FlowProvider, ReleaseFlowContent } from "@/components/flow-simulator/release-flow-context";
 import { FlowBreadcrumbTitle } from "@/components/flow-simulator/flow-breadcrumb-title";
+import { SaveAsTemplateButton } from "@/components/templates/save-as-template-button";
 import type { FlowTrack } from "@/components/flow-simulator/use-flow-audio";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
@@ -167,6 +168,12 @@ export default async function ReleasePage({ params }: Props) {
                 show_lyrics: briefShareRes.data.show_lyrics ?? false,
                 require_payment_for_download: briefShareRes.data.require_payment_for_download ?? false,
               } : null}
+            />
+          )}
+          {canEdit(role) && (
+            <SaveAsTemplateButton
+              releaseId={releaseId}
+              releaseTitle={release.title as string}
             />
           )}
           {canEdit(role) && (
