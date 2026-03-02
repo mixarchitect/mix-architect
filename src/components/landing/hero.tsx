@@ -25,7 +25,7 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-4xl text-center px-6 pt-32 pb-24">
-        <h1 className="text-[36px] sm:text-[48px] md:text-[64px] font-bold leading-[1.0] tracking-tight text-white">
+        <h1 className="text-[28px] sm:text-[40px] md:text-[56px] font-bold leading-[1.05] tracking-tight text-white">
           Plan releases. Review mixes.
           <br />
           Track payments.{" "}
@@ -38,8 +38,8 @@ export function Hero() {
         </p>
 
         {/* Persona callouts */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 max-w-2xl mx-auto">
-          <div className="flex items-start gap-4 rounded-xl bg-white/6 backdrop-blur-sm border border-white/8 p-5 text-left">
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 max-w-2xl mx-auto">
+          <div className="flex items-start gap-4 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 p-6 text-left">
             <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center">
               <Music size={20} className="text-[#0D9488]" />
             </div>
@@ -47,14 +47,14 @@ export function Hero() {
               <div className="text-sm font-semibold text-white">
                 For Artists
               </div>
-              <p className="mt-1 text-sm text-white/50 leading-relaxed">
+              <p className="mt-1.5 text-sm text-white/60 leading-relaxed">
                 Releasing your own music? Organize every step from mix brief to
                 distribution.
               </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-4 rounded-xl bg-white/6 backdrop-blur-sm border border-white/8 p-5 text-left">
+          <div className="flex items-start gap-4 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 p-6 text-left">
             <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center">
               <Headphones size={20} className="text-[#0D9488]" />
             </div>
@@ -62,7 +62,7 @@ export function Hero() {
               <div className="text-sm font-semibold text-white">
                 For Engineers & Producers
               </div>
-              <p className="mt-1 text-sm text-white/50 leading-relaxed">
+              <p className="mt-1.5 text-sm text-white/60 leading-relaxed">
                 Working with clients? Manage projects, share reviews, and track
                 who owes what.
               </p>

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { LandingNav } from "@/components/landing/nav";
 import { Hero } from "@/components/landing/hero";
 import { FeatureShowcase } from "@/components/landing/feature-showcase";
-import { PersonaSplit } from "@/components/landing/persona-split";
 import { AudioToolsGrid } from "@/components/landing/audio-tools-grid";
 import { Pricing } from "@/components/landing/pricing";
 import { FounderNote } from "@/components/landing/founder-note";
@@ -28,7 +27,6 @@ export default function HomePage() {
       <LandingNav />
       <Hero />
       <FeatureShowcase />
-      <PersonaSplit />
       <AudioToolsGrid />
       <Pricing />
       <FounderNote />

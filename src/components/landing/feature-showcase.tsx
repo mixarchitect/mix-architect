@@ -393,8 +393,6 @@ export function FeatureShowcase() {
         <FeatureSection
           headline="Review mixes with precision, not paragraphs"
           body="Upload audio, see the waveform, drop timestamped comments exactly where you hear the issue. Switch between versions instantly. No more 'around the 2-minute mark' emails."
-          badge="Included with Pro"
-          badgeColor="teal"
           visual={<AudioReviewMock />}
         />
 

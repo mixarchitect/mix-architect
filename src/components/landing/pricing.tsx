@@ -84,12 +84,14 @@ export function Pricing() {
           <PriceCard
             title="FREE"
             price="$0"
-            subtitle="Perfect for trying it out"
+            subtitle="Perfect for independent artists getting started"
             features={[
               "1 release",
-              "All core features included",
-              "Mix brief builder",
+              "Mix brief builder with intent & references",
               "Release planning & timeline",
+              "Audio review with waveform & comments",
+              "Technical specs (LUFS, format, sample rate)",
+              "Audio format conversion",
             ]}
             ctaLabel="Start Free"
           />
@@ -97,15 +99,15 @@ export function Pricing() {
             title="PRO"
             price="$9"
             period="/month"
-            subtitle="Everything you need"
+            subtitle="Everything you need to run a professional operation"
             features={[
               "Unlimited releases",
-              "All core features included",
+              "Everything in Free, plus:",
               "Audio file storage",
-              "Audio review with waveform & comments",
-              "Audio format conversion",
-              "Client delivery portal",
+              "Client delivery portal with your branding",
+              "Download gating until payment confirmed",
               "Payment tracking with export",
+              "Multi-project dashboard",
               "Priority support",
             ]}
             ctaLabel="Start Pro"
