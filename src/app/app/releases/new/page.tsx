@@ -227,7 +227,7 @@ export default function NewReleasePage() {
       // Find the selected template for metadata
       const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
 
-      // Build release insert data with optional payment defaults from template
+      // Build release insert data with optional template defaults
       const releaseInsert: Record<string, unknown> = {
         user_id: user.id,
         title,
@@ -236,15 +236,17 @@ export default function NewReleasePage() {
         format,
         genre_tags: genreTags,
         target_date: targetDate || null,
-        template_id: selectedTemplate?.id ?? null,
-        template_name: selectedTemplate?.name ?? null,
       };
-      if (selectedTemplate?.default_payment_status)
-        releaseInsert.payment_status = selectedTemplate.default_payment_status;
-      if (selectedTemplate?.default_fee_currency)
-        releaseInsert.fee_currency = selectedTemplate.default_fee_currency;
-      if (selectedTemplate?.default_payment_notes)
-        releaseInsert.payment_notes = selectedTemplate.default_payment_notes;
+      if (selectedTemplate) {
+        releaseInsert.template_id = selectedTemplate.id;
+        releaseInsert.template_name = selectedTemplate.name;
+        if (selectedTemplate.default_payment_status)
+          releaseInsert.payment_status = selectedTemplate.default_payment_status;
+        if (selectedTemplate.default_fee_currency)
+          releaseInsert.fee_currency = selectedTemplate.default_fee_currency;
+        if (selectedTemplate.default_payment_notes)
+          releaseInsert.payment_notes = selectedTemplate.default_payment_notes;
+      }
 
       const { data: release, error: insertErr } = await supabase
         .from("releases")
@@ -297,8 +299,9 @@ export default function NewReleasePage() {
       }
 
       router.push(`/app/releases/${release.id}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setError(err?.message || String(err) || "Something went wrong");
     } finally {
       setLoading(false);
     }
