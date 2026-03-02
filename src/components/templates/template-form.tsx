@@ -338,7 +338,7 @@ export function TemplateForm({ initialData }: Props) {
           .eq("id", initialData.id);
         if (updateErr) throw updateErr;
         toast("Template updated", { variant: "success" });
-        router.refresh();
+        router.push("/app/templates");
       } else {
         const { data: template, error: insertErr } = await supabase
           .from("release_templates")
