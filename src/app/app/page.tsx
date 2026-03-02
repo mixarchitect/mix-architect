@@ -1,13 +1,13 @@
-import { Suspense } from "react";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { SortSelect } from "@/components/ui/sort-select";
+import { DashboardContent } from "@/components/dashboard/dashboard-content";
 import { Plus, Sparkles, Music, Search } from "lucide-react";
 import { formatMoney } from "@/lib/format-money";
+import type { DashboardRelease } from "@/types/release";
 
 const VALID_FILTERS = ["outstanding", "earned"] as const;
 type PaymentFilter = (typeof VALID_FILTERS)[number];
@@ -142,6 +142,69 @@ export default async function DashboardPage({ searchParams }: Props) {
     );
   }
 
+  // ── Build DashboardRelease[] for the timeline ──
+  const dashboardReleases: DashboardRelease[] = (displayReleases ?? []).map(
+    (r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => ({
+      id: r.id as string,
+      title: r.title as string,
+      artist: (r.artist as string | null) ?? null,
+      release_type: r.release_type as DashboardRelease["release_type"],
+      format: r.format as DashboardRelease["format"],
+      status: r.status as DashboardRelease["status"],
+      target_date: (r.target_date as string | null) ?? null,
+      created_at: r.created_at as string,
+      updated_at: r.updated_at as string,
+      track_count: r.tracks?.length ?? 0,
+      completed_tracks: r.tracks?.filter((t) => t.status === "complete").length ?? 0,
+      pinned: (r.pinned as boolean) ?? false,
+      payment_status: (r.payment_status as string | null) ?? null,
+      fee_total: (r.fee_total as number | null) ?? null,
+      fee_currency: (r.fee_currency as string | null) ?? null,
+      cover_art_url: (r.cover_art_url as string | null) ?? null,
+    }),
+  );
+
+  // ── Grid content (server-rendered cards) ──
+  const gridContent =
+    displayReleases && displayReleases.length > 0 ? (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {displayReleases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => {
+          const trackCount = r.tracks?.length ?? 0;
+          const completedTracks =
+            r.tracks?.filter((t) => t.status === "complete").length ?? 0;
+          return (
+            <ReleaseCard
+              key={r.id as string}
+              id={r.id as string}
+              title={r.title as string}
+              artist={r.artist as string | null}
+              releaseType={r.release_type as string}
+              format={r.format as string}
+              status={r.status as string}
+              trackCount={trackCount}
+              completedTracks={completedTracks}
+              updatedAt={r.updated_at as string | null}
+              paymentsEnabled={paymentsEnabled}
+              paymentStatus={r.payment_status as string | null}
+              feeTotal={r.fee_total as number | null}
+              feeCurrency={r.fee_currency as string | null}
+              coverArtUrl={r.cover_art_url as string | null}
+              pinned={r.pinned as boolean}
+              role="owner"
+            />
+          );
+        })}
+      </div>
+    ) : (
+      <EmptyState
+        icon={Search}
+        size="md"
+        title={`No ${activeFilter} releases`}
+        description="Try adjusting your search or filters."
+        action={{ label: "Clear filters", href: "/app", variant: "ghost" }}
+      />
+    );
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
@@ -237,53 +300,11 @@ export default async function DashboardPage({ searchParams }: Props) {
         </div>
       )}
 
-      {releases && releases.length > 0 && (
-        <div className="flex justify-end mb-3">
-          <Suspense>
-            <SortSelect />
-          </Suspense>
-        </div>
-      )}
-
       {releases && releases.length > 0 ? (
-        displayReleases && displayReleases.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {displayReleases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => {
-              const trackCount = r.tracks?.length ?? 0;
-              const completedTracks =
-                r.tracks?.filter((t) => t.status === "complete").length ?? 0;
-              return (
-                <ReleaseCard
-                  key={r.id as string}
-                  id={r.id as string}
-                  title={r.title as string}
-                  artist={r.artist as string | null}
-                  releaseType={r.release_type as string}
-                  format={r.format as string}
-                  status={r.status as string}
-                  trackCount={trackCount}
-                  completedTracks={completedTracks}
-                  updatedAt={r.updated_at as string | null}
-                  paymentsEnabled={paymentsEnabled}
-                  paymentStatus={r.payment_status as string | null}
-                  feeTotal={r.fee_total as number | null}
-                  feeCurrency={r.fee_currency as string | null}
-                  coverArtUrl={r.cover_art_url as string | null}
-                  pinned={r.pinned as boolean}
-                  role="owner"
-                />
-              );
-            })}
-          </div>
-        ) : (
-          <EmptyState
-            icon={Search}
-            size="md"
-            title={`No ${activeFilter} releases`}
-            description="Try adjusting your search or filters."
-            action={{ label: "Clear filters", href: "/app", variant: "ghost" }}
-          />
-        )
+        <DashboardContent
+          releases={dashboardReleases}
+          gridContent={gridContent}
+        />
       ) : !sharedReleases.length ? (
         <EmptyState
           icon={Music}

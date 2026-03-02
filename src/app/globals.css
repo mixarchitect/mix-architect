@@ -847,3 +847,12 @@ select.input {
     transform: scale(1) translateY(0);
   }
 }
+
+/* Timeline today-line pulse on mount */
+@keyframes timeline-today-pulse {
+  0%   { box-shadow: 0 0 8px 2px var(--signal); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.timeline-today-line {
+  animation: timeline-today-pulse 2s ease-out;
+}
