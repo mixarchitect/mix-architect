@@ -83,7 +83,6 @@ function TemplateMiniCard({
   onClick: () => void;
 }) {
   const specParts = [
-    template.default_loudness,
     template.default_sample_rate,
     template.default_bit_depth,
     template.delivery_formats.length > 0 && template.delivery_formats.join(", "),
@@ -228,19 +227,28 @@ export default function NewReleasePage() {
       // Find the selected template for metadata
       const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
 
+      // Build release insert data with optional payment defaults from template
+      const releaseInsert: Record<string, unknown> = {
+        user_id: user.id,
+        title,
+        artist: artist || null,
+        release_type: releaseType,
+        format,
+        genre_tags: genreTags,
+        target_date: targetDate || null,
+        template_id: selectedTemplate?.id ?? null,
+        template_name: selectedTemplate?.name ?? null,
+      };
+      if (selectedTemplate?.default_payment_status)
+        releaseInsert.payment_status = selectedTemplate.default_payment_status;
+      if (selectedTemplate?.default_fee_currency)
+        releaseInsert.fee_currency = selectedTemplate.default_fee_currency;
+      if (selectedTemplate?.default_payment_notes)
+        releaseInsert.payment_notes = selectedTemplate.default_payment_notes;
+
       const { data: release, error: insertErr } = await supabase
         .from("releases")
-        .insert({
-          user_id: user.id,
-          title,
-          artist: artist || null,
-          release_type: releaseType,
-          format,
-          genre_tags: genreTags,
-          target_date: targetDate || null,
-          template_id: selectedTemplate?.id ?? null,
-          template_name: selectedTemplate?.name ?? null,
-        })
+        .insert(releaseInsert)
         .select()
         .single();
 
@@ -272,8 +280,6 @@ export default function NewReleasePage() {
             specDefaults.sample_rate = selectedTemplate.default_sample_rate;
           if (selectedTemplate?.default_bit_depth)
             specDefaults.bit_depth = selectedTemplate.default_bit_depth;
-          if (selectedTemplate?.default_loudness)
-            specDefaults.target_loudness = selectedTemplate.default_loudness;
           if (selectedTemplate?.delivery_formats?.length)
             specDefaults.delivery_formats = selectedTemplate.delivery_formats;
           if (selectedTemplate?.default_special_reqs)

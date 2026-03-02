@@ -154,7 +154,6 @@ export function TemplateForm({ initialData }: Props) {
   );
 
   // ── Specs ──
-  const [loudness, setLoudness] = useState(initialData?.default_loudness ?? "");
   const [sampleRate, setSampleRate] = useState(
     initialData?.default_sample_rate ?? "",
   );
@@ -186,6 +185,11 @@ export function TemplateForm({ initialData }: Props) {
   const [clientName, setClientName] = useState(initialData?.client_name ?? "");
   const [clientEmail, setClientEmail] = useState(initialData?.client_email ?? "");
 
+  // ── Payment ──
+  const [paymentStatus, setPaymentStatus] = useState(initialData?.default_payment_status ?? "");
+  const [feeCurrency, setFeeCurrency] = useState(initialData?.default_fee_currency ?? "");
+  const [paymentNotes, setPaymentNotes] = useState(initialData?.default_payment_notes ?? "");
+
   // ── Submit state ──
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -193,11 +197,12 @@ export function TemplateForm({ initialData }: Props) {
   // ── Configured indicators ──
   const hasRelease = !!releaseType || !!format || genreTags.length > 0;
   const hasSpecs =
-    !!loudness || !!sampleRate || !!bitDepth || deliveryFormats.length > 0 || !!specialReqs;
+    !!sampleRate || !!bitDepth || deliveryFormats.length > 0 || !!specialReqs;
   const hasIntent = emotionalTags.length > 0;
   const hasDist =
     !!distributor || !!recordLabel || !!copyrightHolder || !!language || !!primaryGenre;
   const hasClient = !!clientName || !!clientEmail;
+  const hasPayment = !!paymentStatus || !!feeCurrency || !!paymentNotes;
 
   // ── Format pill toggle ──
   function toggleFormat(fmt: string) {
@@ -258,7 +263,6 @@ export function TemplateForm({ initialData }: Props) {
         release_type: releaseType,
         format,
         genre_tags: genreTags,
-        default_loudness: loudness || null,
         default_sample_rate: sampleRate || null,
         default_bit_depth: bitDepth || null,
         delivery_formats: deliveryFormats,
@@ -267,6 +271,9 @@ export function TemplateForm({ initialData }: Props) {
         distribution_fields: distributionFields,
         client_name: clientName || null,
         client_email: clientEmail || null,
+        default_payment_status: paymentStatus || null,
+        default_fee_currency: feeCurrency || null,
+        default_payment_notes: paymentNotes || null,
         is_default: isDefault,
       };
 
@@ -379,16 +386,6 @@ export function TemplateForm({ initialData }: Props) {
 
           {/* ── Technical Specs ── */}
           <Section title="Technical Specs" configured={hasSpecs}>
-            <div className="space-y-1.5">
-              <label className="label text-muted">Target loudness</label>
-              <input
-                type="text"
-                value={loudness}
-                onChange={(e) => setLoudness(e.target.value)}
-                className="input"
-                placeholder="e.g. -14 LUFS"
-              />
-            </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="label text-muted">Sample rate</label>
@@ -566,6 +563,55 @@ export function TemplateForm({ initialData }: Props) {
                   placeholder="client@example.com"
                 />
               </div>
+            </div>
+          </Section>
+
+          <Rule />
+
+          {/* ── Payment Defaults ── */}
+          <Section title="Payment Defaults" configured={hasPayment} defaultOpen={false}>
+            <p className="text-[11px] text-muted leading-relaxed -mt-2 mb-2">
+              Pre-fill payment status and currency for new releases.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="label text-muted">Payment status</label>
+                <select
+                  value={paymentStatus}
+                  onChange={(e) => setPaymentStatus(e.target.value)}
+                  className="input"
+                >
+                  <option value="">Not set</option>
+                  <option value="no_fee">No Fee</option>
+                  <option value="unpaid">Unpaid</option>
+                  <option value="partial">Partial</option>
+                  <option value="paid">Paid</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="label text-muted">Currency</label>
+                <select
+                  value={feeCurrency}
+                  onChange={(e) => setFeeCurrency(e.target.value)}
+                  className="input"
+                >
+                  <option value="">Not set</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                  <option value="CAD">CAD</option>
+                  <option value="AUD">AUD</option>
+                </select>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="label text-muted">Payment notes</label>
+              <textarea
+                value={paymentNotes}
+                onChange={(e) => setPaymentNotes(e.target.value)}
+                className="input min-h-[72px] resize-y text-sm"
+                placeholder="e.g. Net 30, 50% deposit upfront..."
+              />
             </div>
           </Section>
 

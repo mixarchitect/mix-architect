@@ -116,7 +116,6 @@ export function TemplateCard({ template, className }: Props) {
 
   // Build spec summary
   const specParts = [
-    template.default_loudness,
     template.default_sample_rate,
     template.default_bit_depth,
     template.delivery_formats.length > 0 && template.delivery_formats.join(", "),

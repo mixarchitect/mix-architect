@@ -33,6 +33,7 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
   const [includeIntent, setIncludeIntent] = useState(true);
   const [includeDistribution, setIncludeDistribution] = useState(true);
   const [includeClient, setIncludeClient] = useState(true);
+  const [includePayment, setIncludePayment] = useState(true);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -121,7 +122,6 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
         release_type: null,
         format: null,
         genre_tags: [],
-        default_loudness: null,
         default_sample_rate: null,
         default_bit_depth: null,
         delivery_formats: [],
@@ -130,6 +130,9 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
         distribution_fields: {},
         client_name: null,
         client_email: null,
+        default_payment_status: null,
+        default_fee_currency: null,
+        default_payment_notes: null,
         is_default: false,
       };
 
@@ -142,7 +145,6 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
       if (includeTechSpecs && trackSpecs) {
         templateData.default_sample_rate = trackSpecs.sample_rate ?? null;
         templateData.default_bit_depth = trackSpecs.bit_depth ?? null;
-        templateData.default_loudness = trackSpecs.target_loudness ?? null;
         templateData.delivery_formats = trackSpecs.delivery_formats ?? [];
         templateData.default_special_reqs = trackSpecs.special_reqs ?? null;
       }
@@ -164,6 +166,12 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
       if (includeClient) {
         templateData.client_name = release.client_name ?? null;
         templateData.client_email = release.client_email ?? null;
+      }
+
+      if (includePayment) {
+        templateData.default_payment_status = release.payment_status ?? null;
+        templateData.default_fee_currency = release.fee_currency ?? null;
+        templateData.default_payment_notes = release.payment_notes ?? null;
       }
 
       const { error: insertErr } = await supabase
@@ -259,7 +267,7 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
                 />
                 <Checkbox
                   label="Technical specs"
-                  detail="Sample rate, bit depth, loudness, delivery formats"
+                  detail="Sample rate, bit depth, delivery formats"
                   checked={includeTechSpecs}
                   onChange={setIncludeTechSpecs}
                 />
@@ -280,6 +288,12 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
                   detail="Client name, email"
                   checked={includeClient}
                   onChange={setIncludeClient}
+                />
+                <Checkbox
+                  label="Payment defaults"
+                  detail="Payment status, currency, notes"
+                  checked={includePayment}
+                  onChange={setIncludePayment}
                 />
               </div>
             </div>

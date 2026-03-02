@@ -7,7 +7,6 @@ export type ReleaseTemplate = {
   release_type: "single" | "ep" | "album" | null;
   format: "stereo" | "atmos" | "both" | null;
   genre_tags: string[];
-  default_loudness: string | null;
   default_sample_rate: string | null;
   default_bit_depth: string | null;
   delivery_formats: string[];
@@ -16,6 +15,9 @@ export type ReleaseTemplate = {
   distribution_fields: Record<string, unknown>;
   client_name: string | null;
   client_email: string | null;
+  default_payment_status: string | null;
+  default_fee_currency: string | null;
+  default_payment_notes: string | null;
   is_default: boolean;
   usage_count: number;
   last_used_at: string | null;

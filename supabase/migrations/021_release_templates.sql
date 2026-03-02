@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS release_templates (
   genre_tags            text[] DEFAULT '{}',
 
   -- Track spec defaults
-  default_loudness      text,
   default_sample_rate   text,
   default_bit_depth     text,
   delivery_formats      text[] DEFAULT '{}',
@@ -28,6 +27,11 @@ CREATE TABLE IF NOT EXISTS release_templates (
   -- Client defaults
   client_name           text,
   client_email          text,
+
+  -- Payment defaults
+  default_payment_status text,
+  default_fee_currency   text,
+  default_payment_notes  text,
 
   -- Metadata
   is_default            boolean DEFAULT false,
