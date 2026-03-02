@@ -6,7 +6,7 @@ export function FinalCTA() {
     <section className="px-6 py-20 md:py-28">
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white">
-          Your next release deserves better
+          Your next release deserves better{" "}
           <br className="hidden sm:block" />
           than a spreadsheet
         </h2>
