@@ -180,6 +180,10 @@ export function TemplateForm({ initialData }: Props) {
   const [language, setLanguage] = useState(dist.language ?? "");
   const [primaryGenre, setPrimaryGenre] = useState(dist.primary_genre ?? "");
   const [secondaryGenre, setSecondaryGenre] = useState(dist.secondary_genre ?? "");
+  const [songwriter, setSongwriter] = useState(dist.songwriter ?? "");
+  const [publisher, setPublisher] = useState(dist.publisher ?? "");
+  const [pro, setPro] = useState(dist.pro ?? "");
+  const [masterOwner, setMasterOwner] = useState(dist.master_owner ?? "");
 
   // ── Client ──
   const [clientName, setClientName] = useState(initialData?.client_name ?? "");
@@ -200,7 +204,8 @@ export function TemplateForm({ initialData }: Props) {
     !!sampleRate || !!bitDepth || deliveryFormats.length > 0 || !!specialReqs;
   const hasIntent = emotionalTags.length > 0;
   const hasDist =
-    !!distributor || !!recordLabel || !!copyrightHolder || !!language || !!primaryGenre;
+    !!distributor || !!recordLabel || !!copyrightHolder || !!language || !!primaryGenre ||
+    !!songwriter || !!publisher || !!pro || !!masterOwner;
   const hasClient = !!clientName || !!clientEmail;
   const hasPayment = !!paymentStatus || !!feeCurrency || !!paymentNotes;
 
@@ -225,19 +230,6 @@ export function TemplateForm({ initialData }: Props) {
       } = await supabase.auth.getUser();
       if (userErr || !user) throw userErr ?? new Error("Not authenticated");
 
-      // Check soft cap (50 templates) on create
-      if (!isEdit) {
-        const { count } = await supabase
-          .from("release_templates")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id);
-        if (count != null && count >= 50) {
-          setError("You've reached the limit of 50 templates.");
-          setLoading(false);
-          return;
-        }
-      }
-
       // If setting as default, clear existing default
       if (isDefault) {
         await supabase
@@ -256,6 +248,10 @@ export function TemplateForm({ initialData }: Props) {
       if (language) distributionFields.language = language;
       if (primaryGenre) distributionFields.primary_genre = primaryGenre;
       if (secondaryGenre) distributionFields.secondary_genre = secondaryGenre;
+      if (songwriter) distributionFields.songwriter = songwriter;
+      if (publisher) distributionFields.publisher = publisher;
+      if (pro) distributionFields.pro = pro;
+      if (masterOwner) distributionFields.master_owner = masterOwner;
 
       const payload = {
         name,
@@ -533,6 +529,54 @@ export function TemplateForm({ initialData }: Props) {
                 />
               </div>
             )}
+
+            <div className="pt-2 pb-1">
+              <div className="label-sm text-muted">RIGHTS &amp; PUBLISHING</div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="label text-muted">Songwriter(s)</label>
+                <input
+                  type="text"
+                  value={songwriter}
+                  onChange={(e) => setSongwriter(e.target.value)}
+                  className="input"
+                  placeholder="e.g. Jane Doe, John Smith"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="label text-muted">Publisher</label>
+                <input
+                  type="text"
+                  value={publisher}
+                  onChange={(e) => setPublisher(e.target.value)}
+                  className="input"
+                  placeholder="e.g. Song Publishing Co."
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="label text-muted">PRO</label>
+                <input
+                  type="text"
+                  value={pro}
+                  onChange={(e) => setPro(e.target.value)}
+                  className="input"
+                  placeholder="e.g. ASCAP, BMI, SoundExchange"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="label text-muted">Master recording owner</label>
+                <input
+                  type="text"
+                  value={masterOwner}
+                  onChange={(e) => setMasterOwner(e.target.value)}
+                  className="input"
+                  placeholder="e.g. Artist Name, Label"
+                />
+              </div>
+            </div>
           </Section>
 
           <Rule />

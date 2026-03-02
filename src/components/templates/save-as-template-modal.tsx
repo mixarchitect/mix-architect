@@ -67,17 +67,6 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
       } = await supabase.auth.getUser();
       if (userErr || !user) throw userErr ?? new Error("Not authenticated");
 
-      // Soft cap: 50 templates per user
-      const { count } = await supabase
-        .from("release_templates")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id);
-      if (count !== null && count >= 50) {
-        setError("You've reached the template limit (50). Delete an existing template first.");
-        setSaving(false);
-        return;
-      }
-
       // Fetch release data
       const { data: release, error: releaseErr } = await supabase
         .from("releases")

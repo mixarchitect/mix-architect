@@ -38,17 +38,19 @@ export default async function TemplatesPage() {
       </div>
 
       {templates.length === 0 ? (
-        <EmptyState
-          icon={LayoutTemplate}
-          size="lg"
-          title="No templates yet"
-          description="Templates save your go-to release settings — specs, delivery formats, client info — so you can start new projects in seconds."
-          action={{
-            label: "Create your first template",
-            href: "/app/templates/new",
-            variant: "primary",
-          }}
-        />
+        <div className="rounded-lg" style={{ background: "var(--panel)" }}>
+          <EmptyState
+            icon={LayoutTemplate}
+            size="lg"
+            title="No templates yet"
+            description="Templates save your go-to release settings — specs, delivery formats, client info — so you can start new projects in seconds."
+            action={{
+              label: "Create your first template",
+              href: "/app/templates/new",
+              variant: "primary",
+            }}
+          />
+        </div>
       ) : (
         <>
           {templates.length >= 5 && <TemplateSearch templates={templates} />}
