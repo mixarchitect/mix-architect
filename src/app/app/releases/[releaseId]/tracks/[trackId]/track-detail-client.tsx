@@ -703,36 +703,22 @@ export function TrackDetailClient({
                           saveSpecs({ delivery_formats: next });
                         }}
                         disabled={!canEdit(role)}
-                        activeAudioVersion={
-                          localAudioVersions.length > 0
-                            ? localAudioVersions[localAudioVersions.length - 1]
-                            : null
-                        }
-                        onConvert={(format) => {
-                          const version =
-                            localAudioVersions[localAudioVersions.length - 1];
-                          if (version) {
-                            const baseName =
-                              version.file_name?.replace(/\.[^.]+$/, "") ??
-                              "audio";
-                            const fileName = `${baseName}_v${version.version_number}`;
-                            requestConversion(
-                              version.id,
-                              track.id,
-                              format.toLowerCase(),
-                              fileName,
-                              version.version_number,
-                            );
-                          }
+                        audioVersions={localAudioVersions}
+                        onConvert={(format, version) => {
+                          const baseName =
+                            version.file_name?.replace(/\.[^.]+$/, "") ??
+                            "audio";
+                          const fileName = `${baseName}_v${version.version_number}`;
+                          requestConversion(
+                            version.id,
+                            track.id,
+                            format.toLowerCase(),
+                            fileName,
+                            version.version_number,
+                          );
                         }}
-                        getJobStatus={
-                          localAudioVersions.length > 0
-                            ? (format) =>
-                                getJobStatus(
-                                  localAudioVersions[localAudioVersions.length - 1].id,
-                                  format,
-                                )
-                            : undefined
+                        getJobStatus={(audioVersionId, format) =>
+                          getJobStatus(audioVersionId, format)
                         }
                       />
                     </div>
