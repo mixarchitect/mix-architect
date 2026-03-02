@@ -206,11 +206,11 @@ export default function NewReleasePage() {
     setLoading(true);
 
     try {
-      const {
-        data: { user },
-        error: userErr,
-      } = await supabase.auth.getUser();
-      if (userErr || !user) throw userErr ?? new Error("Not authenticated");
+      // Force a fresh session so the JWT used for DB requests is valid
+      const { data: sessionData, error: sessionErr } =
+        await supabase.auth.refreshSession();
+      const user = sessionData?.session?.user;
+      if (sessionErr || !user) throw sessionErr ?? new Error("Not authenticated");
 
       // Check release limit on free plan
       const { data: canCreate } = await supabase.rpc("can_create_release", {
@@ -227,8 +227,12 @@ export default function NewReleasePage() {
       // Find the selected template for metadata
       const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
 
+      // Generate ID client-side so we don't need .select() after insert
+      const releaseId = crypto.randomUUID();
+
       // Build release insert data with optional template defaults
       const releaseInsert: Record<string, unknown> = {
+        id: releaseId,
         user_id: user.id,
         title,
         artist: artist || null,
@@ -248,11 +252,9 @@ export default function NewReleasePage() {
           releaseInsert.payment_notes = selectedTemplate.default_payment_notes;
       }
 
-      const { data: release, error: insertErr } = await supabase
+      const { error: insertErr } = await supabase
         .from("releases")
-        .insert(releaseInsert)
-        .select()
-        .single();
+        .insert(releaseInsert);
 
       if (insertErr) throw insertErr;
 
@@ -271,7 +273,7 @@ export default function NewReleasePage() {
       if (releaseType === "single") {
         const { data: track } = await supabase
           .from("tracks")
-          .insert({ release_id: release.id, track_number: 1, title })
+          .insert({ release_id: releaseId, track_number: 1, title })
           .select()
           .single();
 
@@ -298,7 +300,7 @@ export default function NewReleasePage() {
         }
       }
 
-      router.push(`/app/releases/${release.id}`);
+      router.push(`/app/releases/${releaseId}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err?.message || String(err) || "Something went wrong");
