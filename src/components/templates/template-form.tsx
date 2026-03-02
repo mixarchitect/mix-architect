@@ -372,7 +372,7 @@ export function TemplateForm({ initialData }: Props) {
       <PanelBody className="pt-5">
         <form onSubmit={handleSubmit} className="space-y-1">
           {/* ── Basics ── */}
-          <Section title="Basics" configured={!!name || !!description} defaultOpen>
+          <Section title="Basics" configured={!!name || !!description || hasClient} defaultOpen>
             <div className="space-y-1.5">
               <label className="label text-muted">Template name *</label>
               <input
@@ -403,6 +403,28 @@ export function TemplateForm({ initialData }: Props) {
               <span className="text-sm text-text">Set as default template</span>
               <span className="text-xs text-muted">(auto-selected for new releases)</span>
             </label>
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="space-y-1.5">
+                <label className="label text-muted">Artist / Client Name</label>
+                <input
+                  type="text"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  className="input"
+                  placeholder="Client or artist name"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="label text-muted">Artist / Client Email</label>
+                <input
+                  type="email"
+                  value={clientEmail}
+                  onChange={(e) => setClientEmail(e.target.value)}
+                  className="input"
+                  placeholder="client@example.com"
+                />
+              </div>
+            </div>
           </Section>
 
           <Rule />
@@ -613,37 +635,6 @@ export function TemplateForm({ initialData }: Props) {
                 onRemove={() => removeRightsHolder(rh.id)}
               />
             ))}
-          </Section>
-
-          <Rule />
-
-          {/* ── Client Defaults ── */}
-          <Section title="Client Defaults" configured={hasClient} defaultOpen={false}>
-            <p className="text-[11px] text-muted leading-relaxed -mt-2 mb-2">
-              Pre-fill client info for mix engineers who work with repeat clients.
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="label text-muted">Client name</label>
-                <input
-                  type="text"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  className="input"
-                  placeholder="Client or artist name"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="label text-muted">Client email</label>
-                <input
-                  type="email"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  className="input"
-                  placeholder="client@example.com"
-                />
-              </div>
-            </div>
           </Section>
 
           <Rule />
