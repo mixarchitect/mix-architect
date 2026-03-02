@@ -74,14 +74,14 @@ export function Hero() {
         <div className="mt-12 flex flex-wrap justify-center gap-4">
           <Link
             href="/auth/sign-in"
-            className="btn-primary h-14 px-10 text-base inline-flex items-center gap-2"
+            className="h-14 px-10 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D9488] text-white hover:bg-[#0fb9ab] transition-colors"
           >
             Start Free
             <FilledArrowRight size={18} />
           </Link>
           <a
             href="#features"
-            className="h-14 px-10 text-base inline-flex items-center gap-2 rounded-xl border border-white/20 text-white/80 font-medium hover:border-white/40 hover:text-white transition-colors"
+            className="h-14 px-10 text-base font-medium inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 text-white/80 hover:border-white/40 hover:text-white transition-colors"
           >
             See How It Works
           </a>
