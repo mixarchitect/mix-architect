@@ -8,7 +8,7 @@ import { Rule } from "@/components/ui/rule";
 import { Button } from "@/components/ui/button";
 import { TagInput } from "@/components/ui/tag-input";
 import { useToast } from "@/components/ui/toast";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { DELIVERY_FORMATS } from "@/lib/conversion-formats";
 import type { ReleaseTemplate } from "@/types/template";
@@ -173,17 +173,45 @@ export function TemplateForm({ initialData }: Props) {
   );
 
   // ── Distribution ──
-  const dist = (initialData?.distribution_fields ?? {}) as Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dist = (initialData?.distribution_fields ?? {}) as Record<string, any>;
   const [distributor, setDistributor] = useState(dist.distributor ?? "");
   const [recordLabel, setRecordLabel] = useState(dist.record_label ?? "");
   const [copyrightHolder, setCopyrightHolder] = useState(dist.copyright_holder ?? "");
   const [language, setLanguage] = useState(dist.language ?? "");
   const [primaryGenre, setPrimaryGenre] = useState(dist.primary_genre ?? "");
   const [secondaryGenre, setSecondaryGenre] = useState(dist.secondary_genre ?? "");
-  const [songwriter, setSongwriter] = useState(dist.songwriter ?? "");
-  const [publisher, setPublisher] = useState(dist.publisher ?? "");
-  const [pro, setPro] = useState(dist.pro ?? "");
-  const [masterOwner, setMasterOwner] = useState(dist.master_owner ?? "");
+
+  // ── Rights holders (per-person entries) ──
+  type RightsHolder = {
+    id: string;
+    person_name: string;
+    pro_org: string;
+    member_account: string;
+    writer_ipi: string;
+    publisher_name: string;
+    publisher_member_id: string;
+    publisher_ipi: string;
+    sound_exchange_id: string;
+    label_name: string;
+  };
+  const [rightsHolders, setRightsHolders] = useState<RightsHolder[]>(
+    () => {
+      const saved = (dist.rights_holders ?? []) as Partial<RightsHolder>[];
+      return Array.isArray(saved) ? saved.map((rh, i) => ({
+        id: rh.id ?? `rh-${i}-${Date.now()}`,
+        person_name: rh.person_name ?? "",
+        pro_org: rh.pro_org ?? "",
+        member_account: rh.member_account ?? "",
+        writer_ipi: rh.writer_ipi ?? "",
+        publisher_name: rh.publisher_name ?? "",
+        publisher_member_id: rh.publisher_member_id ?? "",
+        publisher_ipi: rh.publisher_ipi ?? "",
+        sound_exchange_id: rh.sound_exchange_id ?? "",
+        label_name: rh.label_name ?? "",
+      })) : [];
+    },
+  );
 
   // ── Client ──
   const [clientName, setClientName] = useState(initialData?.client_name ?? "");
@@ -205,9 +233,38 @@ export function TemplateForm({ initialData }: Props) {
   const hasIntent = emotionalTags.length > 0;
   const hasDist =
     !!distributor || !!recordLabel || !!copyrightHolder || !!language || !!primaryGenre ||
-    !!songwriter || !!publisher || !!pro || !!masterOwner;
+    rightsHolders.length > 0;
   const hasClient = !!clientName || !!clientEmail;
   const hasPayment = !!paymentStatus || !!feeCurrency || !!paymentNotes;
+
+  // ── Rights holder helpers ──
+  function addRightsHolder() {
+    setRightsHolders((prev) => [
+      ...prev,
+      {
+        id: `rh-${Date.now()}`,
+        person_name: "",
+        pro_org: "",
+        member_account: "",
+        writer_ipi: "",
+        publisher_name: "",
+        publisher_member_id: "",
+        publisher_ipi: "",
+        sound_exchange_id: "",
+        label_name: "",
+      },
+    ]);
+  }
+
+  function updateRightsHolder(id: string, field: keyof RightsHolder, value: string) {
+    setRightsHolders((prev) =>
+      prev.map((rh) => (rh.id === id ? { ...rh, [field]: value } : rh)),
+    );
+  }
+
+  function removeRightsHolder(id: string) {
+    setRightsHolders((prev) => prev.filter((rh) => rh.id !== id));
+  }
 
   // ── Format pill toggle ──
   function toggleFormat(fmt: string) {
@@ -241,17 +298,18 @@ export function TemplateForm({ initialData }: Props) {
       }
 
       // Build distribution_fields jsonb
-      const distributionFields: Record<string, string> = {};
+      const distributionFields: Record<string, unknown> = {};
       if (distributor) distributionFields.distributor = distributor;
       if (recordLabel) distributionFields.record_label = recordLabel;
       if (copyrightHolder) distributionFields.copyright_holder = copyrightHolder;
       if (language) distributionFields.language = language;
       if (primaryGenre) distributionFields.primary_genre = primaryGenre;
       if (secondaryGenre) distributionFields.secondary_genre = secondaryGenre;
-      if (songwriter) distributionFields.songwriter = songwriter;
-      if (publisher) distributionFields.publisher = publisher;
-      if (pro) distributionFields.pro = pro;
-      if (masterOwner) distributionFields.master_owner = masterOwner;
+      if (rightsHolders.length > 0) {
+        distributionFields.rights_holders = rightsHolders
+          .filter((rh) => rh.person_name.trim())
+          .map(({ id: _id, ...rest }) => rest);
+      }
 
       const payload = {
         name,
@@ -531,52 +589,30 @@ export function TemplateForm({ initialData }: Props) {
             )}
 
             <div className="pt-2 pb-1">
-              <div className="label-sm text-muted">RIGHTS &amp; PUBLISHING</div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="label text-muted">Songwriter(s)</label>
-                <input
-                  type="text"
-                  value={songwriter}
-                  onChange={(e) => setSongwriter(e.target.value)}
-                  className="input"
-                  placeholder="e.g. Jane Doe, John Smith"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="label text-muted">Publisher</label>
-                <input
-                  type="text"
-                  value={publisher}
-                  onChange={(e) => setPublisher(e.target.value)}
-                  className="input"
-                  placeholder="e.g. Song Publishing Co."
-                />
+              <div className="flex items-center justify-between">
+                <div className="label-sm text-muted">RIGHTS &amp; PUBLISHING</div>
+                <button
+                  type="button"
+                  onClick={addRightsHolder}
+                  className="text-xs text-muted hover:text-text transition-colors"
+                >
+                  + Add Person
+                </button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="label text-muted">PRO</label>
-                <input
-                  type="text"
-                  value={pro}
-                  onChange={(e) => setPro(e.target.value)}
-                  className="input"
-                  placeholder="e.g. ASCAP, BMI, SoundExchange"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="label text-muted">Master recording owner</label>
-                <input
-                  type="text"
-                  value={masterOwner}
-                  onChange={(e) => setMasterOwner(e.target.value)}
-                  className="input"
-                  placeholder="e.g. Artist Name, Label"
-                />
-              </div>
-            </div>
+            {rightsHolders.length === 0 && (
+              <p className="text-xs text-muted text-center py-3">
+                Add people to pre-fill songwriters, publishers, and master owners on new releases.
+              </p>
+            )}
+            {rightsHolders.map((rh) => (
+              <RightsHolderRow
+                key={rh.id}
+                holder={rh}
+                onUpdate={(field, value) => updateRightsHolder(rh.id, field as keyof RightsHolder, value)}
+                onRemove={() => removeRightsHolder(rh.id)}
+              />
+            ))}
           </Section>
 
           <Rule />
@@ -685,5 +721,142 @@ export function TemplateForm({ initialData }: Props) {
         </form>
       </PanelBody>
     </Panel>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  RightsHolderRow                                                    */
+/* ------------------------------------------------------------------ */
+
+function RightsHolderRow({
+  holder,
+  onUpdate,
+  onRemove,
+}: {
+  holder: {
+    person_name: string;
+    pro_org: string;
+    member_account: string;
+    writer_ipi: string;
+    publisher_name: string;
+    publisher_member_id: string;
+    publisher_ipi: string;
+    sound_exchange_id: string;
+    label_name: string;
+  };
+  onUpdate: (field: string, value: string) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="rounded-md border border-border" style={{ background: "var(--panel)" }}>
+      {/* Name + remove */}
+      <div className="flex items-center gap-3 px-4 py-3">
+        <input
+          type="text"
+          value={holder.person_name}
+          onChange={(e) => onUpdate("person_name", e.target.value)}
+          placeholder="Person or entity name"
+          className="flex-1 text-sm text-text bg-transparent border-none outline-none placeholder:text-faint"
+        />
+        <button
+          type="button"
+          onClick={onRemove}
+          className="p-1 rounded text-faint hover:text-red-500 transition-colors shrink-0"
+          title="Remove"
+        >
+          <X size={14} />
+        </button>
+      </div>
+
+      {/* Fields grid */}
+      <div className="px-4 pb-3 border-t border-border pt-3 space-y-2">
+        <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">PRO (ASCAP/BMI)</label>
+            <input
+              type="text"
+              value={holder.pro_org}
+              onChange={(e) => onUpdate("pro_org", e.target.value)}
+              placeholder="e.g., BMI"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">Member Account #</label>
+            <input
+              type="text"
+              value={holder.member_account}
+              onChange={(e) => onUpdate("member_account", e.target.value)}
+              placeholder="Account #"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">Writer IPI</label>
+            <input
+              type="text"
+              value={holder.writer_ipi}
+              onChange={(e) => onUpdate("writer_ipi", e.target.value)}
+              placeholder="IPI #"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">Publisher Name</label>
+            <input
+              type="text"
+              value={holder.publisher_name}
+              onChange={(e) => onUpdate("publisher_name", e.target.value)}
+              placeholder="Publisher"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">Publisher Member ID</label>
+            <input
+              type="text"
+              value={holder.publisher_member_id}
+              onChange={(e) => onUpdate("publisher_member_id", e.target.value)}
+              placeholder="Member ID"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">Publisher IPI</label>
+            <input
+              type="text"
+              value={holder.publisher_ipi}
+              onChange={(e) => onUpdate("publisher_ipi", e.target.value)}
+              placeholder="IPI #"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">SoundExchange ID</label>
+            <input
+              type="text"
+              value={holder.sound_exchange_id}
+              onChange={(e) => onUpdate("sound_exchange_id", e.target.value)}
+              placeholder="e.g., 1000139051"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] text-faint">Label Name</label>
+            <input
+              type="text"
+              value={holder.label_name}
+              onChange={(e) => onUpdate("label_name", e.target.value)}
+              placeholder="e.g., Self-Released"
+              className="w-full text-xs text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal placeholder:text-faint"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
