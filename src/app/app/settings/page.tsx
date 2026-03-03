@@ -509,10 +509,12 @@ function SubscriptionPanel() {
 
 function ExportDataButton() {
   const [exporting, setExporting] = useState(false);
+  const [downloadedMB, setDownloadedMB] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   async function handleExport() {
     setExporting(true);
+    setDownloadedMB(0);
     setError(null);
     try {
       const res = await fetch("/api/export");
@@ -520,7 +522,23 @@ function ExportDataButton() {
         const body = await res.json().catch(() => ({ error: "Export failed" }));
         throw new Error(body.error || "Export failed");
       }
-      const blob = await res.blob();
+
+      // Stream the response to track progress
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No response body");
+
+      const chunks: Uint8Array[] = [];
+      let received = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        setDownloadedMB(received / (1024 * 1024));
+      }
+
+      const blob = new Blob(chunks as BlobPart[], { type: "application/zip" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -542,6 +560,13 @@ function ExportDataButton() {
         <Download size={16} />
         {exporting ? "Preparing export\u2026" : "Export My Data"}
       </Button>
+      {exporting && downloadedMB > 0 && (
+        <p className="text-xs text-muted">
+          {downloadedMB < 1
+            ? `${Math.round(downloadedMB * 1024)} KB downloaded`
+            : `${downloadedMB.toFixed(1)} MB downloaded`}
+        </p>
+      )}
       {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );

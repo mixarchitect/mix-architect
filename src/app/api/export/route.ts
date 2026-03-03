@@ -312,8 +312,10 @@ export async function GET(_req: NextRequest) {
       const trackDir = sanitizeFilename(
         `${String(track.track_number).padStart(2, "0")}-${track.title || "Untitled"}`
       );
-      const ext = av.file_name?.split(".").pop() ?? "wav";
-      const fileName = `v${av.version_number}.${ext}`;
+      const originalName = av.file_name
+        ? sanitizeFilename(av.file_name)
+        : `v${av.version_number}.wav`;
+      const fileName = `v${av.version_number}-${originalName}`;
 
       try {
         const audioFetch = await fetch(av.audio_url);
