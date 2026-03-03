@@ -10,6 +10,9 @@ import {
   Clock,
   Copy,
   Layers,
+  Download,
+  FolderOpen,
+  FileJson,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -412,6 +415,67 @@ function TemplatesMock() {
   );
 }
 
+function DataExportMock() {
+  return (
+    <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-[#0D9488]/12 flex items-center justify-center">
+            <Download size={18} className="text-[#0D9488]" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-white">
+              mix-architect-export.zip
+            </div>
+            <div className="text-xs text-white/40">24.8 MB</div>
+          </div>
+        </div>
+        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#22C55E]/15 text-[#22C55E]">
+          Ready
+        </span>
+      </div>
+      {/* File tree */}
+      <div className="rounded-lg bg-white/4 p-3 space-y-1.5 text-[11px]">
+        <div className="flex items-center gap-2 text-white/70">
+          <FileJson size={12} className="text-[#0D9488] shrink-0" />
+          metadata.json
+        </div>
+        <div className="flex items-center gap-2 text-white/70">
+          <FileText size={12} className="text-[#60A5FA] shrink-0" />
+          payments.csv
+        </div>
+        <div className="flex items-center gap-2 text-white/50 mt-1">
+          <FolderOpen size={12} className="text-[#0D9488] shrink-0" />
+          releases/
+        </div>
+        <div className="ml-5 space-y-1.5">
+          <div className="flex items-center gap-2 text-white/50">
+            <FolderOpen size={12} className="text-white/30 shrink-0" />
+            Late Night Drive/
+          </div>
+          <div className="ml-5 space-y-1">
+            <div className="flex items-center gap-2 text-white/40">
+              <Music size={10} className="text-white/25 shrink-0" />
+              01-Midnight Drive/
+              <span className="text-white/25">v1.wav, v2.wav</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/40">
+              <Music size={10} className="text-white/25 shrink-0" />
+              02-Neon Bloom/
+              <span className="text-white/25">v1.wav</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-white/50">
+            <FolderOpen size={12} className="text-white/30 shrink-0" />
+            Concrete Jungle/
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Main export                                                        */
 /* ------------------------------------------------------------------ */
@@ -455,6 +519,14 @@ export function FeatureShowcase() {
           badge="Templates"
           badgeColor="blue"
           visual={<TemplatesMock />}
+        />
+
+        <FeatureSection
+          headline="Export everything, anytime"
+          body="Download a complete copy of your account. Metadata, payment records, and every audio file, neatly organized in a single zip. Your work is always yours."
+          badge="Your data, your way"
+          visual={<DataExportMock />}
+          reverse
         />
       </div>
     </section>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift } from "lucide-react";
+import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -346,6 +346,21 @@ export default function SettingsPage() {
           </PanelBody>
         </Panel>
 
+        {/* Your Data */}
+        <Panel>
+          <PanelHeader>
+            <h2 className="text-base font-semibold text-text">Your Data</h2>
+            <p className="text-sm text-muted mt-1">
+              Download a complete copy of your Mix Architect data, including all
+              release metadata, payment records, and audio files.
+            </p>
+          </PanelHeader>
+          <Rule />
+          <PanelBody className="pt-5">
+            <ExportDataButton />
+          </PanelBody>
+        </Panel>
+
         {/* Subscription */}
         <SubscriptionPanel />
       </div>
@@ -485,5 +500,49 @@ function SubscriptionPanel() {
         )}
       </PanelBody>
     </Panel>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Export Data Button                                                  */
+/* ------------------------------------------------------------------ */
+
+function ExportDataButton() {
+  const [exporting, setExporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleExport() {
+    setExporting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/export");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ error: "Export failed" }));
+        throw new Error(body.error || "Export failed");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const timestamp = new Date().toISOString().slice(0, 10);
+      a.download = `mix-architect-export-${timestamp}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("[settings] export failed:", err);
+      setError(err instanceof Error ? err.message : "Export failed");
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <Button variant="secondary" onClick={handleExport} disabled={exporting}>
+        <Download size={16} />
+        {exporting ? "Preparing export\u2026" : "Export My Data"}
+      </Button>
+      {error && <p className="text-xs text-red-500">{error}</p>}
+    </div>
   );
 }
