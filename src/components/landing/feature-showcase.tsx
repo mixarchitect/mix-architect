@@ -603,12 +603,20 @@ export function FeatureShowcase() {
         />
 
         <FeatureSection
+          headline="Hear your tracklist before you commit"
+          body="Audition your album flow with the built-in simulator. Preview transitions between tracks in full-length or condensed mode, drag to reorder, then apply your final sequence to the release."
+          badge="Flow Simulator"
+          badgeColor="blue"
+          visual={<FlowSimulatorMock />}
+          reverse
+        />
+
+        <FeatureSection
           headline="Know who owes what, at a glance"
           body="Track project fees, partial payments, and outstanding balances across every release. See your total revenue and what's still pending. Export for invoicing and tax time."
           badge="Built for freelance engineers and producers"
           badgeColor="orange"
           visual={<PaymentsMock />}
-          reverse
         />
 
         <FeatureSection
@@ -617,6 +625,7 @@ export function FeatureShowcase() {
           badge="Templates"
           badgeColor="blue"
           visual={<TemplatesMock />}
+          reverse
         />
 
         <FeatureSection
@@ -624,15 +633,6 @@ export function FeatureShowcase() {
           body="Download a complete copy of your account. Metadata, payment records, and every audio file, neatly organized in a single zip. Your work is always yours."
           badge="Your data, your way"
           visual={<DataExportMock />}
-          reverse
-        />
-
-        <FeatureSection
-          headline="Hear your tracklist before you commit"
-          body="Audition your album flow with the built-in simulator. Preview transitions between tracks in full-length or condensed mode, drag to reorder, then apply your final sequence to the release."
-          badge="Flow Simulator"
-          badgeColor="blue"
-          visual={<FlowSimulatorMock />}
         />
       </div>
     </section>
