@@ -13,6 +13,10 @@ import {
   Download,
   FolderOpen,
   FileJson,
+  Shuffle,
+  Play,
+  SkipForward,
+  GripVertical,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -476,6 +480,100 @@ function DataExportMock() {
   );
 }
 
+function FlowSimulatorMock() {
+  const tracks = [
+    { title: "Midnight Drive", duration: "3:42", color: "#0D9488", width: "28%" },
+    { title: "Neon Bloom", duration: "4:15", color: "#3B82F6", width: "32%" },
+    { title: "Golden Hour", duration: "3:18", color: "#FE5E0E", width: "24%" },
+    { title: "Afterglow", duration: "2:08", color: "#22C55E", width: "16%" },
+  ];
+
+  return (
+    <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Shuffle size={14} className="text-[#0D9488]" />
+          <span className="text-sm font-semibold text-white">Flow Simulator</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {["Condensed", "Full"].map((m, i) => (
+            <span
+              key={m}
+              className={`text-[10px] px-2 py-0.5 rounded-full ${
+                i === 0
+                  ? "bg-[#0D9488] text-[#1a1a1a] font-semibold"
+                  : "bg-white/8 text-white/40"
+              }`}
+            >
+              {m}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Timeline bar */}
+      <div className="flex h-8 rounded-lg overflow-hidden mb-3 gap-[2px]">
+        {tracks.map((t) => (
+          <div
+            key={t.title}
+            className="relative flex items-center justify-center"
+            style={{ width: t.width, background: `${t.color}25` }}
+          >
+            <span className="text-[9px] font-medium text-white/60 truncate px-1">
+              {t.title}
+            </span>
+            {/* Playhead indicator on first track */}
+            {t.title === "Midnight Drive" && (
+              <div
+                className="absolute top-0 bottom-0 w-[2px] bg-white/90"
+                style={{ left: "60%" }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Transport controls */}
+      <div className="flex items-center justify-center gap-4 mb-4 py-2">
+        <button className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
+          <SkipForward size={12} className="text-white/50 rotate-180" />
+        </button>
+        <button className="w-9 h-9 rounded-full bg-[#0D9488] flex items-center justify-center">
+          <Play size={14} className="text-[#1a1a1a] ml-0.5" />
+        </button>
+        <button className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
+          <SkipForward size={12} className="text-white/50" />
+        </button>
+      </div>
+
+      {/* Track list with drag handles */}
+      <div className="space-y-1.5">
+        {tracks.map((t, i) => (
+          <div
+            key={t.title}
+            className={`flex items-center gap-3 py-2 px-3 rounded-lg ${
+              i === 0 ? "bg-white/8 border border-white/10" : "bg-white/4"
+            }`}
+          >
+            <GripVertical size={12} className="text-white/20 shrink-0" />
+            <div
+              className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold shrink-0"
+              style={{ background: `${t.color}20`, color: t.color }}
+            >
+              {i + 1}
+            </div>
+            <span className={`text-sm flex-1 ${i === 0 ? "text-white" : "text-white/60"}`}>
+              {t.title}
+            </span>
+            <span className="text-xs text-white/30">{t.duration}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Main export                                                        */
 /* ------------------------------------------------------------------ */
@@ -527,6 +625,14 @@ export function FeatureShowcase() {
           badge="Your data, your way"
           visual={<DataExportMock />}
           reverse
+        />
+
+        <FeatureSection
+          headline="Hear your tracklist before you commit"
+          body="Audition your album flow with the built-in simulator. Preview transitions between tracks in full-length or condensed mode, drag to reorder, then apply your final sequence to the release."
+          badge="Flow Simulator"
+          badgeColor="blue"
+          visual={<FlowSimulatorMock />}
         />
       </div>
     </section>
