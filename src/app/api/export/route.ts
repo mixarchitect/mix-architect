@@ -6,8 +6,11 @@ import archiver from "archiver";
  * GET /api/export
  * Streams a zip of the user's complete account data:
  *   metadata.json, payments.csv (if enabled), and audio files.
+ *
+ * GET /api/export?estimate=true
+ * Returns estimated export size without downloading.
  */
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient({
       allowCookieWrite: true,
@@ -20,6 +23,8 @@ export async function GET(_req: NextRequest) {
     if (authErr || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const isEstimate = req.nextUrl.searchParams.get("estimate") === "true";
 
     /* -------------------------------------------------------------- */
     /*  Fetch all owned releases                                       */
@@ -47,6 +52,34 @@ export async function GET(_req: NextRequest) {
         : { data: [] as any[] };
 
     const trackIds = (tracks ?? []).map((t) => t.id);
+
+    /* -------------------------------------------------------------- */
+    /*  Estimate mode: return size info without streaming              */
+    /* -------------------------------------------------------------- */
+
+    if (isEstimate) {
+      const { data: audioVersions } =
+        trackIds.length > 0
+          ? await supabase
+              .from("track_audio_versions")
+              .select("file_size")
+              .in("track_id", trackIds)
+          : { data: [] };
+
+      const audioBytes = (audioVersions ?? []).reduce(
+        (sum, av) => sum + (av.file_size ?? 0),
+        0
+      );
+      // Add ~50KB overhead for metadata.json + payments.csv
+      const estimatedBytes = audioBytes + 50_000;
+
+      return NextResponse.json({
+        estimatedBytes,
+        releaseCount: releaseIds.length,
+        trackCount: trackIds.length,
+        audioFileCount: (audioVersions ?? []).length,
+      });
+    }
 
     /* -------------------------------------------------------------- */
     /*  Batch-fetch all related tables in parallel                     */

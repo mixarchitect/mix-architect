@@ -507,14 +507,50 @@ function SubscriptionPanel() {
 /*  Export Data Button                                                  */
 /* ------------------------------------------------------------------ */
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
+
+type ExportEstimate = {
+  estimatedBytes: number;
+  releaseCount: number;
+  trackCount: number;
+  audioFileCount: number;
+};
+
 function ExportDataButton() {
+  const [loading, setLoading] = useState(false);
+  const [estimate, setEstimate] = useState<ExportEstimate | null>(null);
   const [exporting, setExporting] = useState(false);
-  const [downloadedMB, setDownloadedMB] = useState(0);
+  const [downloadedBytes, setDownloadedBytes] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleExport() {
+  async function handleEstimate() {
+    setLoading(true);
+    setError(null);
+    setEstimate(null);
+    try {
+      const res = await fetch("/api/export?estimate=true");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ error: "Failed to estimate" }));
+        throw new Error(body.error || "Failed to estimate");
+      }
+      const data: ExportEstimate = await res.json();
+      setEstimate(data);
+    } catch (err) {
+      console.error("[settings] estimate failed:", err);
+      setError(err instanceof Error ? err.message : "Failed to estimate");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDownload() {
     setExporting(true);
-    setDownloadedMB(0);
+    setDownloadedBytes(0);
     setError(null);
     try {
       const res = await fetch("/api/export");
@@ -523,7 +559,6 @@ function ExportDataButton() {
         throw new Error(body.error || "Export failed");
       }
 
-      // Stream the response to track progress
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No response body");
 
@@ -535,7 +570,7 @@ function ExportDataButton() {
         if (done) break;
         chunks.push(value);
         received += value.length;
-        setDownloadedMB(received / (1024 * 1024));
+        setDownloadedBytes(received);
       }
 
       const blob = new Blob(chunks as BlobPart[], { type: "application/zip" });
@@ -546,6 +581,7 @@ function ExportDataButton() {
       a.download = `mix-architect-export-${timestamp}.zip`;
       a.click();
       URL.revokeObjectURL(url);
+      setEstimate(null);
     } catch (err) {
       console.error("[settings] export failed:", err);
       setError(err instanceof Error ? err.message : "Export failed");
@@ -554,18 +590,54 @@ function ExportDataButton() {
     }
   }
 
+  const totalBytes = estimate?.estimatedBytes ?? 0;
+  const progress = totalBytes > 0 ? Math.min((downloadedBytes / totalBytes) * 100, 100) : 0;
+
   return (
     <div className="space-y-3">
-      <Button variant="secondary" onClick={handleExport} disabled={exporting}>
-        <Download size={16} />
-        {exporting ? "Preparing export\u2026" : "Export My Data"}
-      </Button>
-      {exporting && downloadedMB > 0 && (
-        <p className="text-xs text-muted">
-          {downloadedMB < 1
-            ? `${Math.round(downloadedMB * 1024)} KB downloaded`
-            : `${downloadedMB.toFixed(1)} MB downloaded`}
-        </p>
+      {!estimate ? (
+        <Button variant="secondary" onClick={handleEstimate} disabled={loading}>
+          <Download size={16} />
+          {loading ? "Calculating\u2026" : "Export My Data"}
+        </Button>
+      ) : (
+        <div className="space-y-3">
+          <div className="rounded-lg bg-panel-2 border border-border p-4">
+            <p className="text-sm text-text">
+              Your export is approximately{" "}
+              <span className="font-semibold">{formatBytes(totalBytes)}</span>
+            </p>
+            <p className="text-xs text-muted mt-1">
+              {estimate.releaseCount} {estimate.releaseCount === 1 ? "release" : "releases"},{" "}
+              {estimate.trackCount} {estimate.trackCount === 1 ? "track" : "tracks"},{" "}
+              {estimate.audioFileCount} audio {estimate.audioFileCount === 1 ? "file" : "files"}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="primary" onClick={handleDownload} disabled={exporting}>
+              <Download size={16} />
+              {exporting ? "Downloading\u2026" : "Download"}
+            </Button>
+            {!exporting && (
+              <Button variant="secondary" onClick={() => setEstimate(null)}>
+                Cancel
+              </Button>
+            )}
+          </div>
+          {exporting && (
+            <div className="space-y-1.5">
+              <div className="h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-signal transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted">
+                {formatBytes(downloadedBytes)} / {formatBytes(totalBytes)}
+              </p>
+            </div>
+          )}
+        </div>
       )}
       {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
