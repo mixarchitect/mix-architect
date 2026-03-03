@@ -23,6 +23,7 @@ import { ArrowLeft, Bookmark, Check, Disc3, Plus, StickyNote, Users, X } from "l
 import { EmptyState } from "@/components/ui/empty-state";
 import { EditableTitle } from "@/components/ui/editable-title";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
+import { sendNotification } from "@/lib/notifications/client";
 import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
 import { PortalTrackEditor } from "./portal-track-editor";
 
@@ -340,6 +341,14 @@ export function TrackDetailClient({
     try {
       const { error } = await supabase.from("tracks").update({ status: next }).eq("id", track.id);
       if (error) throw error;
+      const label = next === "complete" ? "Complete" : next === "in_progress" ? "In Progress" : "Not Started";
+      sendNotification({
+        type: "status_change",
+        title: `Track "${track.title}" marked ${label}`,
+        body: releaseTitle,
+        releaseId,
+        trackId: track.id,
+      });
     } catch {
       setTrackStatus(prev);
     }
@@ -367,6 +376,13 @@ export function TrackDetailClient({
       setLocalNotes([data, ...localNotes]);
       setNewNote("");
       autoPromoteTrack();
+      sendNotification({
+        type: "comment",
+        title: `New note on "${track.title}"`,
+        body: newNote.trim().slice(0, 120),
+        releaseId,
+        trackId: track.id,
+      });
     }
   }
 

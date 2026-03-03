@@ -8,6 +8,7 @@ import { Home, Settings, Search, LogOut, DollarSign, Sun, Moon, Monitor, LayoutT
 import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { usePaymentsEnabled } from "@/lib/payments-context";
+import { NotificationBell } from "@/components/ui/notification-bell";
 
 const NAV_ITEMS = [
   { href: "/app", icon: Home, label: "Home", exact: true },
@@ -16,10 +17,11 @@ const NAV_ITEMS = [
 ];
 
 type Props = {
+  userId?: string;
   onSearchClick?: () => void;
 };
 
-export function MobileNav({ onSearchClick }: Props) {
+export function MobileNav({ userId, onSearchClick }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const paymentsEnabled = usePaymentsEnabled();
@@ -91,6 +93,7 @@ export function MobileNav({ onSearchClick }: Props) {
         <Search size={20} strokeWidth={1.5} />
         <span className="text-[10px] font-medium">Search</span>
       </button>
+      {userId && <NotificationBell userId={userId} variant="mobile" />}
       <button
         type="button"
         onClick={cycleTheme}

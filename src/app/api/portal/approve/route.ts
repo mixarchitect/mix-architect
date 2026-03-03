@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
+import { notifyReleaseMembers } from "@/lib/notifications/service";
 
 /**
  * POST /api/portal/approve
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     // Verify the track belongs to this release
     const { data: track, error: trackErr } = await supabase
       .from("tracks")
-      .select("id")
+      .select("id, title")
       .eq("id", track_id)
       .eq("release_id", share.release_id)
       .maybeSingle();
@@ -162,6 +163,23 @@ export async function POST(req: NextRequest) {
     }
 
     console.log("[portal/approve] success:", { action, newStatus, portalStatus });
+
+    // Fire-and-forget notification to release members
+    const actor = actor_name?.trim() || "Client";
+    const actionLabels: Record<string, string> = {
+      approve: "approved",
+      request_changes: "requested changes on",
+      deliver: "delivered",
+      reopen: "reopened",
+    };
+    notifyReleaseMembers({
+      releaseId: share.release_id,
+      type: "approval",
+      title: `${actor} ${actionLabels[action] ?? action} "${track.title}"`,
+      body: note?.trim()?.slice(0, 120),
+      trackId: track_id,
+      actorName: actor,
+    });
 
     return NextResponse.json({
       approval_status: newStatus,

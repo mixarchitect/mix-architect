@@ -8,12 +8,14 @@ import { Home, Search, Settings, LogOut, DollarSign, Sun, Moon, Monitor, LayoutT
 import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { usePaymentsEnabled } from "@/lib/payments-context";
+import { NotificationBell } from "@/components/ui/notification-bell";
 
 type Props = {
+  userId?: string;
   onSearchClick?: () => void;
 };
 
-export function Rail({ onSearchClick }: Props) {
+export function Rail({ userId, onSearchClick }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const paymentsEnabled = usePaymentsEnabled();
@@ -136,8 +138,15 @@ export function Rail({ onSearchClick }: Props) {
         <span className={labelClass}>Settings</span>
       </Link>
 
+      {/* Notifications */}
+      {userId && (
+        <div className="mt-auto">
+          <NotificationBell userId={userId} variant="rail" />
+        </div>
+      )}
+
       {/* Theme toggle */}
-      <button type="button" onClick={cycleTheme} className={cn(itemClass(), "mt-auto")}>
+      <button type="button" onClick={cycleTheme} className={cn(itemClass(), !userId ? "mt-auto" : "")}>
         <span className="w-10 h-10 grid place-items-center shrink-0">
           <ThemeIcon size={18} strokeWidth={1.5} />
         </span>

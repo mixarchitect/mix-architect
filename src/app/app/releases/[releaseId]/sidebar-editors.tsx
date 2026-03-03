@@ -10,6 +10,7 @@ import { ReferenceCard } from "@/components/ui/reference-card";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { Pencil, Check, X, ImageIcon, Upload } from "lucide-react";
 import { canEdit, canEditCreative, canEditPayment, type ReleaseRole } from "@/lib/permissions";
+import { sendNotification } from "@/lib/notifications/client";
 
 // ── Status Editor ──
 
@@ -53,6 +54,11 @@ export function StatusEditor({ releaseId, initialStatus, role }: StatusEditorPro
         .eq("id", releaseId);
       if (error) throw error;
       router.refresh();
+      sendNotification({
+        type: "status_change",
+        title: `Release marked ${releaseStatusLabel(next)}`,
+        releaseId,
+      });
     } catch {
       setStatus(prev);
     }
@@ -712,6 +718,11 @@ export function PaymentEditor({
         .eq("id", releaseId);
       if (error) throw error;
       router.refresh();
+      sendNotification({
+        type: "payment_update",
+        title: `Payment status changed to ${paymentStatusLabel(next)}`,
+        releaseId,
+      });
     } catch {
       setPaymentStatus(prev);
     }

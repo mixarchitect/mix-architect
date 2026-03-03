@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
+import { notifyReleaseMembers } from "@/lib/notifications/service";
 
 /**
  * POST /api/portal/comment
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
     // Verify the track belongs to this release
     const { data: track } = await supabase
       .from("tracks")
-      .select("id")
+      .select("id, title")
       .eq("id", track_id)
       .eq("release_id", share.release_id)
       .maybeSingle();
@@ -73,6 +74,17 @@ export async function POST(req: NextRequest) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // Fire-and-forget notification to release members
+    const actor = author_name?.trim() || "Client";
+    notifyReleaseMembers({
+      releaseId: share.release_id,
+      type: "portal_comment",
+      title: `${actor} commented on "${track.title}"`,
+      body: content.trim().slice(0, 120),
+      trackId: track_id,
+      actorName: actor,
+    });
 
     return NextResponse.json(comment);
   } catch {

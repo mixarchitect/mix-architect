@@ -15,6 +15,7 @@ import { useCommandPalette } from "@/hooks/use-command-palette";
 import { ToastProvider } from "@/components/ui/toast";
 
 type ShellProps = {
+  userId?: string;
   userEmail?: string | null;
   paymentsEnabled?: boolean;
   theme?: string;
@@ -30,7 +31,7 @@ const DEFAULT_SUB: SubscriptionState = {
   grantedByAdmin: false,
 };
 
-export function Shell({ paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, children }: ShellProps) {
+export function Shell({ userId, paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, children }: ShellProps) {
   const { isOpen, open, close } = useCommandPalette();
   const { setTheme } = useTheme();
 
@@ -59,8 +60,8 @@ export function Shell({ paymentsEnabled = false, theme = "system", subscription 
         <div className="flex h-dvh overflow-hidden">
           {/* Spacer for fixed-position Rail */}
           <div className="hidden md:block w-16 shrink-0" />
-          <Rail onSearchClick={open} />
-          <MobileNav onSearchClick={open} />
+          <Rail userId={userId} onSearchClick={open} />
+          <MobileNav userId={userId} onSearchClick={open} />
           <MainContent>{children}</MainContent>
         </div>
         <MiniPlayer />

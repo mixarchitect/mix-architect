@@ -41,7 +41,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   };
 
   return (
-    <Shell userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription}>
+    <Shell userId={user.id} userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription}>
       {children}
     </Shell>
   );
