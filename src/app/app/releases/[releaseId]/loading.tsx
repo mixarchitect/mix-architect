@@ -4,9 +4,11 @@ export default function Loading() {
   return (
     <div className="animate-pulse">
       {/* Loading indicator */}
-      <div className="flex items-center justify-center gap-2 mb-8 text-muted text-sm">
-        <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-        Loading...
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-10">
+        <div className="flex items-center gap-2 text-muted text-sm">
+          <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+          Loading...
+        </div>
       </div>
 
       {/* Back link + title */}
