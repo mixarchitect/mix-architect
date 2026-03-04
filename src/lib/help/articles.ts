@@ -37,12 +37,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Key Concepts",
         body: "Releases are your top-level projects. Each release contains one or more tracks, a brief document, a task board, and a collaborator list. Tracks hold audio versions, comments, and export settings. Everything is organized around this release-first structure so your team always has full context.",
-        workflow: [
-          { label: "Dashboard", icon: "LayoutDashboard" },
-          { label: "Releases", icon: "Disc3" },
-          { label: "Tracks", icon: "Music" },
-          { label: "Collaborate", icon: "Users" },
-        ],
+        mockup: "dashboard",
       },
     ],
   },
@@ -58,12 +53,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Create a New Release",
         body: "From the dashboard, click the \"New Release\" button in the top right. Enter a title for your release. You can also set optional metadata like artist name, label, genre, and target release date. Click \"Create\" to generate your release.",
-        workflow: [
-          { label: "Create", icon: "Disc3" },
-          { label: "Upload Art", icon: "Image" },
-          { label: "Add Tracks", icon: "Music" },
-          { label: "Set Status", icon: "CheckCircle2" },
-        ],
+        mockup: "release-detail",
       },
       {
         heading: "Add Cover Art",
@@ -92,12 +82,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Sending Invitations",
         body: "Open a release and click the \"Collaborators\" section. Enter the email address of the person you want to invite and select their role (e.g., Artist, Engineer, Producer, Label). Click \"Invite\" to send them an email with a link to join the release.",
-        workflow: [
-          { label: "Invite", icon: "Send" },
-          { label: "Accept", icon: "UserPlus" },
-          { label: "Collaborate", icon: "Users" },
-          { label: "Review", icon: "Eye" },
-        ],
+        mockup: "collaborator-panel",
       },
       {
         heading: "Collaborator Roles",
@@ -130,12 +115,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Uploading Audio",
         body: "Inside any release, click \"Add Track\" to upload audio files. Supported formats: WAV, AIFF, FLAC, and MP3. Files are uploaded to secure cloud storage and processed to generate a waveform visualization. Large files (up to 500 MB) are supported.",
-        workflow: [
-          { label: "Upload", icon: "Upload" },
-          { label: "Process", icon: "Settings" },
-          { label: "Waveform", icon: "AudioWaveform" },
-          { label: "Version", icon: "GitBranch" },
-        ],
+        mockup: "audio-player",
       },
       {
         heading: "Track Versions",
@@ -160,11 +140,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Starting a Conversion",
         body: "Open any track and navigate to the Export tab. Select your target format (WAV, AIFF, FLAC, or MP3), sample rate, and bit depth. Click \"Convert\" to start the job. Conversions run in the background so you can continue working.",
-        workflow: [
-          { label: "Select Format", icon: "Settings" },
-          { label: "Convert", icon: "RefreshCw" },
-          { label: "Download", icon: "Download" },
-        ],
+        mockup: "format-converter",
       },
       {
         heading: "Download Your Export",
@@ -190,12 +166,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Adding a Comment",
         body: "While playing or paused, click on the waveform at the point you want to reference, then type your comment in the text field below. The comment is anchored to that timecode. Collaborators can click the timestamp to jump directly to that moment in the track.",
-        workflow: [
-          { label: "Play", icon: "Play" },
-          { label: "Click", icon: "MousePointerClick" },
-          { label: "Comment", icon: "MessageSquare" },
-          { label: "Resolve", icon: "CheckCircle2" },
-        ],
+        mockup: "timestamped-comments",
       },
       {
         heading: "Portal Comments",
@@ -224,12 +195,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Creating a Task",
         body: "Open a release and navigate to the Tasks tab. Click \"Add Task\" and enter a title. You can optionally add a description, set a due date, and assign the task to a specific collaborator. Tasks appear in a list view ordered by status and due date.",
-        workflow: [
-          { label: "Add Task", icon: "ClipboardList" },
-          { label: "Assign", icon: "UserCheck" },
-          { label: "Track", icon: "BarChart3" },
-          { label: "Complete", icon: "CheckCircle2" },
-        ],
+        mockup: "task-list",
       },
       {
         heading: "Assigning Tasks",
@@ -254,11 +220,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Available Statuses",
         body: "Each task has one of three statuses: To Do (not started), In Progress (actively being worked on), and Done (complete). Update the status by clicking the status badge on the task card.",
-        workflow: [
-          { label: "To Do", icon: "ClipboardList" },
-          { label: "In Progress", icon: "RefreshCw" },
-          { label: "Done", icon: "CheckCircle2" },
-        ],
+        mockup: "task-status-flow",
       },
       {
         heading: "Tracking Progress",
@@ -287,12 +249,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Opening the Timeline",
         body: "The Timeline view is available from the release detail page. It displays all your active releases as horizontal bars on a scrollable calendar. Each bar spans from the release creation date to the target release date, color-coded by status.",
-        workflow: [
-          { label: "Create", icon: "Disc3" },
-          { label: "Set Dates", icon: "Calendar" },
-          { label: "View", icon: "Eye" },
-          { label: "Track", icon: "BarChart3" },
-        ],
+        mockup: "multi-release-timeline",
       },
       {
         heading: "Navigating the Timeline",
@@ -321,11 +278,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Adding Milestones",
         body: "Open the release settings and scroll to the Milestones section. Click \"Add Milestone\", enter a name and date, then save. The milestone appears on the timeline and is visible to all collaborators.",
-        workflow: [
-          { label: "Add", icon: "MapPin" },
-          { label: "Set Date", icon: "Calendar" },
-          { label: "Remind", icon: "Bell" },
-        ],
+        mockup: "timeline-milestones",
       },
       {
         heading: "Milestone Notifications",
@@ -354,11 +307,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Creating a Template",
         body: "Navigate to the Templates page from the sidebar. Click \"New Template\" and fill in the defaults you want to reuse: audio format, sample rate, bit depth, default elements, and tasks. Give the template a descriptive name so you can find it later.",
-        workflow: [
-          { label: "Create", icon: "LayoutTemplate" },
-          { label: "Configure", icon: "Wrench" },
-          { label: "Use", icon: "Disc3" },
-        ],
+        mockup: "template-selection",
       },
       {
         heading: "Using a Template",
@@ -387,11 +336,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Starting an Export",
         body: "Go to Settings and scroll to the \"Your Data\" section. Click \"Export All Data\". The export is generated as a JSON file and downloaded to your browser automatically. For large accounts this may take a few seconds.",
-        workflow: [
-          { label: "Settings", icon: "Settings" },
-          { label: "Export", icon: "FileDown" },
-          { label: "Download", icon: "Download" },
-        ],
+        mockup: "export-data",
       },
       {
         heading: "Data Privacy",
@@ -420,11 +365,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Upgrading to Pro",
         body: "Click \"Upgrade to Pro\" from the Settings page or from any feature that requires Pro access. You will be taken to a secure Stripe checkout page. Once payment is confirmed, your account is upgraded immediately and you gain access to all Pro features.",
-        workflow: [
-          { label: "View Plan", icon: "Eye" },
-          { label: "Upgrade", icon: "ArrowUpCircle" },
-          { label: "Manage", icon: "Receipt" },
-        ],
+        mockup: "subscription-page",
       },
       {
         heading: "Managing Payment",
@@ -445,11 +386,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Cancelling Your Subscription",
         body: "Click \"Manage Subscription\" in Settings to open the Stripe portal, then click \"Cancel plan\". Your Pro access continues until the end of your current billing period. After that, your account reverts to the Free plan.",
-        workflow: [
-          { label: "Cancel", icon: "XCircle" },
-          { label: "Use Until End", icon: "Clock" },
-          { label: "Resubscribe", icon: "RefreshCw" },
-        ],
+        mockup: "cancellation-flow",
       },
       {
         heading: "What Happens to Your Data",

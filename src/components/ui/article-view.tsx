@@ -2,7 +2,7 @@
 
 import { ChevronLeft } from "lucide-react";
 import type { HelpArticle } from "@/lib/help/types";
-import { WorkflowSteps } from "@/components/ui/workflow-steps";
+import { ScreenMockup } from "@/components/ui/screen-mockup";
 
 type Props = {
   article: HelpArticle;
@@ -34,7 +34,7 @@ export function ArticleView({ article, onBack }: Props) {
             )}
             <p className="text-sm text-muted leading-relaxed">{section.body}</p>
 
-            {section.workflow && <WorkflowSteps steps={section.workflow} />}
+            {section.mockup && <ScreenMockup mockupId={section.mockup} />}
 
             {section.tip && (
               <div className="mt-3 bg-signal-muted border border-signal/20 text-text rounded-lg px-4 py-3 text-sm leading-relaxed">

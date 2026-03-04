@@ -17,17 +17,12 @@ export interface HelpArticle {
   updatedAt: string;
 }
 
-export interface WorkflowStep {
-  label: string;
-  icon: string;
-}
-
 export interface ArticleSection {
   heading?: string;
   body: string;
   tip?: string;
   warning?: string;
-  workflow?: WorkflowStep[];
+  mockup?: string;
 }
 
 export type BugSeverity = "low" | "medium" | "high" | "critical";
