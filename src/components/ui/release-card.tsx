@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, useTransition } from "react";
+import { useState, useRef, useEffect } from "react";
+import { flushSync } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MoreVertical, Pencil, Trash2, Music, Pin } from "lucide-react";
@@ -61,15 +62,16 @@ export function ReleaseCard({
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [pinning, setPinning] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const [navigating, setNavigating] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   function navigateToRelease(e: React.MouseEvent) {
     e.preventDefault();
-    startTransition(() => {
-      router.push(`/app/releases/${id}`);
-    });
+    // flushSync forces React to paint the loading state synchronously
+    // before the Link navigation begins
+    flushSync(() => setNavigating(true));
+    router.push(`/app/releases/${id}`);
   }
 
   useEffect(() => {
@@ -113,7 +115,7 @@ export function ReleaseCard({
   }
 
   return (
-    <div className={cn("relative card px-5 py-4 transition-opacity duration-150", isPending && "opacity-60 pointer-events-none", className)}>
+    <div className={cn("relative card px-5 py-4 transition-opacity duration-150", navigating && "opacity-60 pointer-events-none", className)}>
       <div className="flex items-start justify-between gap-2">
         <Link
           href={`/app/releases/${id}`}
@@ -124,7 +126,7 @@ export function ReleaseCard({
             className="w-10 h-10 rounded-md flex-shrink-0 overflow-hidden flex items-center justify-center"
             style={{ background: "var(--panel2)" }}
           >
-            {isPending ? (
+            {navigating ? (
               <span className="w-4 h-4 border-2 border-muted/40 border-t-muted rounded-full animate-spin" />
             ) : coverArtUrl ? (
               <img src={coverArtUrl} alt="" className="w-full h-full object-cover" />
