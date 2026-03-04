@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import Image from "next/image";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
@@ -39,14 +40,14 @@ export default function SignInPage() {
       }
 
       router.push("/app");
+      // Don't reset loading — let the button stay disabled through navigation
     } catch (err: unknown) {
+      setLoading(false);
       if (err instanceof Error) {
         setErrorMsg(err.message);
       } else {
         setErrorMsg("Something went wrong");
       }
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -55,11 +56,18 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         <Panel>
           <PanelHeader className="text-center">
-            <div className="label text-[11px] text-faint">ACCESS</div>
+            <Image
+              src="/mix-architect-logo-white.svg"
+              alt="Mix Architect"
+              width={180}
+              height={36}
+              priority
+              className="h-7 w-auto mx-auto mb-5"
+            />
             <h1 className="mt-3 text-2xl font-semibold h1 text-text">
               {mode === "signin"
-                ? "Sign in to Mix Architect"
-                : "Create a Mix Architect account"}
+                ? "Sign In"
+                : "Create Account"}
             </h1>
           </PanelHeader>
           <Rule />
@@ -101,11 +109,16 @@ export default function SignInPage() {
                 disabled={loading}
                 className="w-full"
               >
-                {loading
-                  ? "Working..."
-                  : mode === "signin"
-                  ? "Sign in"
-                  : "Sign up"}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                    {mode === "signin" ? "Signing in..." : "Creating account..."}
+                  </span>
+                ) : mode === "signin" ? (
+                  "Sign in"
+                ) : (
+                  "Sign up"
+                )}
               </Button>
             </form>
 
