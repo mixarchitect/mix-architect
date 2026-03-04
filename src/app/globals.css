@@ -860,3 +860,30 @@ select.input {
 .timeline-today-line {
   animation: timeline-today-pulse 2s ease-out;
 }
+
+/* ─────────────────────────────────────────────────────
+   WORKFLOW STEP ANIMATIONS (Help articles)
+───────────────────────────────────────────────────── */
+@keyframes workflow-step-activate {
+  0%, 100% { opacity: 0.35; transform: scale(1); color: var(--faint); }
+  12%, 30% { opacity: 1; transform: scale(1.1); color: var(--signal); }
+}
+
+@keyframes workflow-connector-fill {
+  0%, 100% { transform: scaleX(0); }
+  15%, 35% { transform: scaleX(1); }
+}
+
+.workflow-step {
+  animation: workflow-step-activate calc(var(--step-count) * 1.5s + 1s) ease-in-out infinite;
+  animation-delay: calc(var(--step-index) * 1.5s);
+  opacity: 0.35;
+  color: var(--faint);
+}
+
+.workflow-connector {
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: workflow-connector-fill calc(var(--step-count) * 1.5s + 1s) ease-in-out infinite;
+  animation-delay: calc((var(--step-index) + 0.5) * 1.5s);
+}

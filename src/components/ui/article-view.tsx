@@ -2,6 +2,7 @@
 
 import { ChevronLeft } from "lucide-react";
 import type { HelpArticle } from "@/lib/help/types";
+import { WorkflowSteps } from "@/components/ui/workflow-steps";
 
 type Props = {
   article: HelpArticle;
@@ -32,6 +33,8 @@ export function ArticleView({ article, onBack }: Props) {
               <h3 className="text-sm font-semibold mb-2">{section.heading}</h3>
             )}
             <p className="text-sm text-muted leading-relaxed">{section.body}</p>
+
+            {section.workflow && <WorkflowSteps steps={section.workflow} />}
 
             {section.tip && (
               <div className="mt-3 bg-signal-muted border border-signal/20 text-text rounded-lg px-4 py-3 text-sm leading-relaxed">
