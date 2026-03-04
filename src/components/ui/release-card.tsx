@@ -61,6 +61,7 @@ export function ReleaseCard({
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [pinning, setPinning] = useState(false);
+  const [navigating, setNavigating] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -105,17 +106,20 @@ export function ReleaseCard({
   }
 
   return (
-    <div className={cn("relative card px-5 py-4", className)}>
+    <div className={cn("relative card px-5 py-4 transition-opacity duration-150", navigating && "opacity-60 pointer-events-none", className)}>
       <div className="flex items-start justify-between gap-2">
         <Link
           href={`/app/releases/${id}`}
+          onClick={() => setNavigating(true)}
           className="group min-w-0 flex-1 focus-visible:outline-none flex items-start gap-3"
         >
           <div
             className="w-10 h-10 rounded-md flex-shrink-0 overflow-hidden flex items-center justify-center"
             style={{ background: "var(--panel2)" }}
           >
-            {coverArtUrl ? (
+            {navigating ? (
+              <span className="w-4 h-4 border-2 border-muted/40 border-t-muted rounded-full animate-spin" />
+            ) : coverArtUrl ? (
               <img src={coverArtUrl} alt="" className="w-full h-full object-cover" />
             ) : (
               <Music size={18} className="text-muted opacity-30" />
@@ -265,6 +269,7 @@ export function ReleaseCard({
 
       <Link
         href={`/app/releases/${id}`}
+        onClick={() => setNavigating(true)}
         className="group block focus-visible:outline-none"
       >
         <div className="mt-3 flex flex-wrap gap-1.5">
