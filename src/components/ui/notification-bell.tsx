@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Bell, Check, MessageSquare, GitCommitHorizontal, DollarSign, ShieldCheck, X } from "lucide-react";
+import { Bell, Check, MessageSquare, GitCommitHorizontal, DollarSign, ShieldCheck, X, Upload, UserPlus, Download } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useNotifications, type Notification } from "@/lib/notifications/use-notifications";
 import { relativeTime } from "@/lib/relative-time";
@@ -148,6 +148,12 @@ function NotificationIcon({ type }: { type: string }) {
       return <DollarSign size={16} strokeWidth={1.5} className={cls} />;
     case "approval":
       return <ShieldCheck size={16} strokeWidth={1.5} className={cls} />;
+    case "audio_upload":
+      return <Upload size={16} strokeWidth={1.5} className={cls} />;
+    case "collaborator_joined":
+      return <UserPlus size={16} strokeWidth={1.5} className={cls} />;
+    case "export_complete":
+      return <Download size={16} strokeWidth={1.5} className={cls} />;
     default:
       return <Bell size={16} strokeWidth={1.5} className={cls} />;
   }

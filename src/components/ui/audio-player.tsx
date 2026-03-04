@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
 import { useTheme } from "next-themes";
+import { sendNotification } from "@/lib/notifications/client";
 import {
   SkipBack,
   SkipForward,
@@ -554,6 +555,14 @@ export function AudioPlayer({
         const updated = [...versions, data];
         onVersionsChange(updated);
         setActiveVersionId(data.id);
+
+        sendNotification({
+          type: "audio_upload",
+          title: `New version uploaded: ${trackTitle}`,
+          body: `${currentUserName} uploaded v${nextVersion}`,
+          releaseId,
+          trackId,
+        });
       }
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed");

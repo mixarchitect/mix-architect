@@ -157,6 +157,24 @@ async function processNextJob() {
       })
       .eq("id", job.id);
 
+    // Notify the requesting user that their export is ready
+    const { data: track } = await supabase
+      .from("tracks")
+      .select("release_id, title")
+      .eq("id", job.track_id)
+      .single();
+
+    if (track?.release_id) {
+      await supabase.from("notifications").insert({
+        user_id: job.requested_by,
+        type: "export_complete",
+        title: `Export ready: ${track.title ?? "Untitled"}`,
+        body: `Your ${job.target_format.toUpperCase()} conversion is ready for download`,
+        release_id: track.release_id,
+        track_id: job.track_id,
+      });
+    }
+
     console.log(`✅ Job ${job.id} complete`);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

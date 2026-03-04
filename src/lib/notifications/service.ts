@@ -11,7 +11,10 @@ export type NotificationType =
   | "portal_comment"
   | "status_change"
   | "payment_update"
-  | "approval";
+  | "approval"
+  | "audio_upload"
+  | "collaborator_joined"
+  | "export_complete";
 
 type CreateNotificationParams = {
   userId: string;

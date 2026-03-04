@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { Shell } from "@/components/ui/shell";
+import { createNotification } from "@/lib/notifications/service";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const supabase = await createSupabaseServerClient();
@@ -31,6 +32,32 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   ]);
   const paymentsEnabled = defaultsRes.data?.payments_enabled ?? false;
   const theme = (defaultsRes.data?.theme as string) ?? "system";
+
+  // Notify release owners when this user just accepted a collaboration invite
+  // (accepted_at within last 60s means it was claimed by the RPC above)
+  const cutoff = new Date(Date.now() - 60_000).toISOString();
+  const { data: recentJoins } = await supabase
+    .from("release_members")
+    .select("release_id, role, releases!inner(user_id, title)")
+    .eq("user_id", user.id)
+    .gte("accepted_at", cutoff);
+
+  if (recentJoins?.length) {
+    const displayName = user.user_metadata?.display_name || user.email || "Someone";
+    for (const join of recentJoins) {
+      const release = join.releases as unknown as { user_id: string; title: string };
+      if (release?.user_id && release.user_id !== user.id) {
+        createNotification({
+          userId: release.user_id,
+          type: "collaborator_joined",
+          title: `${displayName} joined "${release.title}"`,
+          body: `Accepted their invite as ${join.role ?? "collaborator"}`,
+          releaseId: join.release_id,
+          actorName: displayName,
+        });
+      }
+    }
+  }
 
   const subscription = {
     plan: (subRes.data?.plan as "free" | "pro") ?? "free",
