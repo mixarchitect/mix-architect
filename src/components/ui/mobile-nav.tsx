@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Settings, Search, LogOut, DollarSign, Sun, Moon, Monitor, LayoutTemplate } from "lucide-react";
+import { Home, Settings, Search, LogOut, DollarSign, Sun, Moon, Monitor, LayoutTemplate, HelpCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { usePaymentsEnabled } from "@/lib/payments-context";
@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: "/app", icon: Home, label: "Home", exact: true },
   { href: "/app/templates", icon: LayoutTemplate, label: "Templates", exact: false },
   { href: "/app/settings", icon: Settings, label: "Settings", exact: false },
+  { href: "/app/help", icon: HelpCircle, label: "Help", exact: false },
 ];
 
 type Props = {

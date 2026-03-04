@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Home, Search, Settings, LogOut, DollarSign, Sun, Moon, Monitor, LayoutTemplate } from "lucide-react";
+import { Home, Search, Settings, LogOut, DollarSign, Sun, Moon, Monitor, LayoutTemplate, HelpCircle } from "lucide-react";
 import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { usePaymentsEnabled } from "@/lib/payments-context";
@@ -51,6 +51,7 @@ export function Rail({ userId, onSearchClick }: Props) {
   const isTemplates = pathname?.startsWith("/app/templates");
   const isPayments = pathname?.startsWith("/app/payments");
   const isSettings = pathname?.startsWith("/app/settings");
+  const isHelp = pathname?.startsWith("/app/help");
 
   const itemClass = (active?: boolean) =>
     cn(
@@ -136,6 +137,14 @@ export function Rail({ userId, onSearchClick }: Props) {
           <Settings size={20} strokeWidth={1.5} />
         </span>
         <span className={labelClass}>Settings</span>
+      </Link>
+
+      {/* Help */}
+      <Link href="/app/help" className={itemClass(isHelp)}>
+        <span className="w-10 h-10 grid place-items-center shrink-0">
+          <HelpCircle size={20} strokeWidth={1.5} />
+        </span>
+        <span className={labelClass}>Help</span>
       </Link>
 
       {/* Notifications */}
