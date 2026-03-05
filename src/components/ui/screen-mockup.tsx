@@ -2,7 +2,7 @@
 
 /* ═══════════════════════════════════════════════════════════
    SCREEN MOCKUP — Help article visual aids using real components
-   44 mockups (14 articles x ~3 each)
+   47 mockups (14 articles, ~3 each; Article 4 has 6)
    ═══════════════════════════════════════════════════════════ */
 
 import {
@@ -12,7 +12,7 @@ import {
   Disc3, Download, ArrowUpCircle, Globe, Share2,
   Calendar, Upload, GripVertical, Copy, Link2,
   Shield, CreditCard, CheckCircle2, Clock,
-  ClipboardList, FileText, Users, Sparkles,
+  ClipboardList, FileText, Users, Sparkles, Eye,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -297,8 +297,7 @@ function ReleaseStatusMockup() {
           {[
             { color: "blue" as const, label: "Draft" },
             { color: "orange" as const, label: "In Progress", active: true },
-            { color: "orange" as const, label: "Review" },
-            { color: "green" as const, label: "Complete" },
+            { color: "green" as const, label: "Ready" },
           ].map((s) => (
             <div
               key={s.label}
@@ -418,35 +417,89 @@ function PortalSharingMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ARTICLE 4: TRACK DETAIL TABS (3 mockups)
+   ARTICLE 4: TRACK DETAIL TABS (6 mockups, one per tab)
    ═══════════════════════════════════════════════════════════ */
 
-function TrackTabsOverviewMockup() {
-  const tabs = ["Intent", "Specs", "Audio", "Distribution", "Portal", "Notes"];
+const TRACK_TABS = ["Intent", "Specs", "Audio", "Distribution", "Portal", "Notes"] as const;
+
+function TrackTabBar({ active }: { active: typeof TRACK_TABS[number] }) {
+  return (
+    <div className="flex items-center gap-4 border-b border-border pb-3">
+      {TRACK_TABS.map((tab) => (
+        <span
+          key={tab}
+          className={cn(
+            "text-sm font-medium pb-2 -mb-3",
+            tab === active ? "text-signal border-b-2 border-signal" : "text-muted",
+          )}
+        >
+          {tab}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function TrackTabIntentMockup() {
   return (
     <>
       <div className="p-4 space-y-4">
-        <div className="flex items-center gap-4 border-b border-border pb-3">
-          {tabs.map((tab, i) => (
-            <span
-              key={tab}
-              className={cn(
-                "text-sm font-medium pb-2 -mb-3",
-                i === 0 ? "text-signal border-b-2 border-signal" : "text-muted",
-              )}
-            >
-              {tab}
-            </span>
-          ))}
-        </div>
+        <TrackTabBar active="Intent" />
         <Panel>
           <PanelBody className="space-y-3">
             <span className="label text-xs text-faint">MIX VISION</span>
             <p className="text-sm text-text leading-relaxed">Warm, spacious vocal mix with tight low end. Think Bon Iver meets James Blake.</p>
+            <Rule />
             <span className="label text-xs text-faint">EMOTIONAL QUALITIES</span>
             <div className="flex flex-wrap gap-1.5 mt-1">
-              {["Warm", "Spacious", "Intimate"].map((q) => (
+              {["Warm", "Spacious", "Intimate", "Dreamy"].map((q) => (
                 <Pill key={q} active>{q}</Pill>
+              ))}
+            </div>
+            <Rule />
+            <span className="label text-xs text-faint">ANTI-REFERENCES</span>
+            <p className="text-sm text-muted">No harsh sibilance. Avoid overly compressed vocal sound.</p>
+          </PanelBody>
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+function TrackTabSpecsMockup() {
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <TrackTabBar active="Specs" />
+        <Panel>
+          <PanelBody className="space-y-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="label text-xs text-faint mb-1.5 block">FORMAT</label>
+                <MockSelect text="WAV" />
+              </div>
+              <div>
+                <label className="label text-xs text-faint mb-1.5 block">SAMPLE RATE</label>
+                <MockSelect text="48 kHz" />
+              </div>
+              <div>
+                <label className="label text-xs text-faint mb-1.5 block">BIT DEPTH</label>
+                <MockSelect text="24-bit" />
+              </div>
+            </div>
+            <Rule />
+            <span className="label text-xs text-faint">DELIVERY FORMATS</span>
+            <div className="flex flex-wrap gap-2 mt-1">
+              {["WAV", "FLAC", "MP3"].map((f) => (
+                <div key={f} className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-signal/30 bg-signal-muted">
+                  <Check size={12} className="text-signal" />
+                  <span className="text-sm font-medium text-text">{f}</span>
+                </div>
+              ))}
+              {["AIFF", "AAC"].map((f) => (
+                <div key={f} className="px-3 py-1.5 rounded-md border border-border">
+                  <span className="text-sm text-muted">{f}</span>
+                </div>
               ))}
             </div>
           </PanelBody>
@@ -456,30 +509,42 @@ function TrackTabsOverviewMockup() {
   );
 }
 
-function TrackAudioNotesMockup() {
+function TrackTabAudioMockup() {
   return (
     <>
-      <Panel className="m-4">
-        <PanelBody className="space-y-1">
-          <span className="label text-xs text-faint">NOTES</span>
-          <MockNoteEntry author="Sarah Kim" time="2h ago" content="Rev3 sounds great. The low end is tighter now." />
-          <Rule />
-          <MockNoteEntry author="Jordan Blake" time="1h ago" content="Can we try a version with more reverb on the vocals?" isClient />
-          <Rule />
-          <div className="flex items-center gap-2 pt-2">
-            <MockInput text="Add a note..." className="flex-1" placeholder />
-            <Button variant="primary"><Send size={14} /></Button>
-          </div>
-        </PanelBody>
-      </Panel>
+      <div className="p-4 space-y-4">
+        <TrackTabBar active="Audio" />
+        <Panel>
+          <PanelBody className="space-y-4">
+            <MockSelect text="v3 - mix-v3-final.wav (latest)" />
+            <div className="bg-panel2 rounded-md p-3">
+              <WaveformBars highlight={14} />
+            </div>
+            <div className="flex items-center gap-3">
+              <button type="button" className="w-9 h-9 rounded-full bg-signal text-signal-on flex items-center justify-center">
+                <Play size={16} fill="currentColor" />
+              </button>
+              <span className="text-sm text-muted">1:24 / 3:42</span>
+              <span className="flex-1" />
+              <span className="text-xs text-faint font-medium">-14.2 LUFS</span>
+            </div>
+            <Rule />
+            <div className="flex items-center gap-2">
+              <MockInput text="Add comment at 1:24..." className="flex-1" placeholder />
+              <Button variant="primary"><Send size={14} /></Button>
+            </div>
+          </PanelBody>
+        </Panel>
+      </div>
     </>
   );
 }
 
-function TrackDistributionPortalMockup() {
+function TrackTabDistributionMockup() {
   return (
     <>
       <div className="p-4 space-y-4">
+        <TrackTabBar active="Distribution" />
         <Panel>
           <PanelBody className="space-y-3">
             <span className="label text-xs text-faint">WRITING SPLIT</span>
@@ -505,6 +570,81 @@ function TrackDistributionPortalMockup() {
                 <label className="label text-xs text-faint mb-1.5 block">ISWC</label>
                 <MockInput text="T-345246800-1" />
               </div>
+            </div>
+            <Rule />
+            <span className="label text-xs text-faint">TRACK PROPERTIES</span>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label text-xs text-faint mb-1.5 block">Language</label>
+                <MockSelect text="English" />
+              </div>
+              <div>
+                <label className="label text-xs text-faint mb-1.5 block">Content</label>
+                <MockSelect text="Explicit" />
+              </div>
+            </div>
+          </PanelBody>
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+function TrackTabPortalMockup() {
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <TrackTabBar active="Portal" />
+        <Panel>
+          <PanelBody className="space-y-3">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 size={16} className="text-signal" />
+              <span className="text-sm font-semibold text-text">Approved by client</span>
+              <span className="text-xs text-faint ml-auto">Mar 3, 2026</span>
+            </div>
+            <Rule />
+            <span className="label text-xs text-faint">PORTAL VISIBILITY</span>
+            {[
+              { label: "Show on portal", on: true },
+              { label: "Allow download", on: true },
+              { label: "Show specs", on: false },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center justify-between py-1">
+                <span className="text-sm text-text">{item.label}</span>
+                <div className={cn("w-9 h-5 rounded-full flex items-center px-0.5", item.on ? "bg-signal justify-end" : "bg-panel2 border border-border")}>
+                  <div className={cn("w-4 h-4 rounded-full", item.on ? "bg-white" : "bg-muted")} />
+                </div>
+              </div>
+            ))}
+            <Rule />
+            <span className="label text-xs text-faint">VERSION VISIBILITY</span>
+            {["v3 (latest)", "v2", "v1"].map((v, i) => (
+              <div key={v} className="flex items-center justify-between py-1">
+                <span className="text-sm text-text">{v}</span>
+                <Eye size={14} className={i < 2 ? "text-signal" : "text-faint"} />
+              </div>
+            ))}
+          </PanelBody>
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+function TrackTabNotesMockup() {
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <TrackTabBar active="Notes" />
+        <Panel>
+          <PanelBody className="space-y-1">
+            <MockNoteEntry author="Sarah Kim" time="2h ago" content="Rev3 sounds great. The low end is tighter now." />
+            <Rule />
+            <MockNoteEntry author="Jordan Blake" time="1h ago" content="Can we try a version with more reverb on the vocals?" isClient />
+            <Rule />
+            <div className="flex items-center gap-2 pt-2">
+              <MockInput text="Add a note..." className="flex-1" placeholder />
+              <Button variant="primary"><Send size={14} /></Button>
             </div>
           </PanelBody>
         </Panel>
@@ -1458,10 +1598,13 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "collaborator-roles": CollaboratorRolesMockup,
   "accept-invitation": AcceptInvitationMockup,
   "portal-sharing": PortalSharingMockup,
-  /* Article 4: Track Tabs */
-  "track-tabs-overview": TrackTabsOverviewMockup,
-  "track-audio-notes": TrackAudioNotesMockup,
-  "track-distribution-portal": TrackDistributionPortalMockup,
+  /* Article 4: Track Tabs (one per tab) */
+  "track-tab-intent": TrackTabIntentMockup,
+  "track-tab-specs": TrackTabSpecsMockup,
+  "track-tab-audio": TrackTabAudioMockup,
+  "track-tab-distribution": TrackTabDistributionMockup,
+  "track-tab-portal": TrackTabPortalMockup,
+  "track-tab-notes": TrackTabNotesMockup,
   /* Article 5: Audio Upload */
   "audio-upload": AudioUploadMockup,
   "track-versions": TrackVersionsMockup,

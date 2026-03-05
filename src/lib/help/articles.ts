@@ -120,19 +120,34 @@ export const articles: HelpArticle[] = [
     updatedAt: "2026-03-04",
     content: [
       {
-        heading: "Intent and Specs",
-        body: "The Intent tab is where you describe the creative vision for a track: mix direction, emotional tags, anti-references, and reference tracks with notes. The Specs tab holds technical settings: format override (or inherit from release), sample rate, bit depth, delivery formats for conversion, and any special requirements like \"radio edit needed\" or \"stems for remix.\"",
-        mockup: "track-tabs-overview",
+        heading: "Intent",
+        body: "The Intent tab is where you describe the creative vision for a track. Write a free-form mix direction in the Mix Vision field, tag the track with Emotional Qualities (choose from 31 suggestions or add your own), and note any anti-references to describe sounds you want to avoid.",
+        mockup: "track-tab-intent",
       },
       {
-        heading: "Audio and Notes",
-        body: "The Audio tab is where you upload files, manage versions, play back the waveform, and leave timestamped comments tied to specific moments in the audio. The Notes tab is a general-purpose space for revision notes and discussion that is not tied to a specific timecode.",
-        mockup: "track-audio-notes",
+        heading: "Specs",
+        body: "The Specs tab holds technical settings for the track: format (WAV, AIFF, etc.), sample rate, and bit depth. Below the format settings, select which Delivery Formats should be available for conversion. Selected formats appear highlighted; click a format chip to toggle it on or off.",
+        mockup: "track-tab-specs",
       },
       {
-        heading: "Distribution and Portal",
-        body: "The Distribution tab captures metadata needed for digital distribution: ISRC, ISWC, featured artist, explicit content flag, language, copyright info, producer, composers, and lyrics. The Portal tab controls per-track visibility for client portal users, including which audio versions are accessible, whether downloads are enabled, and the track's approval status.",
-        mockup: "track-distribution-portal",
+        heading: "Audio",
+        body: "The Audio tab is where you upload files, manage versions, and play back the waveform. Use the version selector to switch between revisions. The player shows the waveform, playback controls, LUFS measurement, and file metadata. You can leave timestamped comments tied to specific moments in the audio directly below the player.",
+        mockup: "track-tab-audio",
+      },
+      {
+        heading: "Distribution",
+        body: "The Distribution tab captures metadata needed for digital distribution: writing and publishing splits with percentages, ISRC and ISWC codes, track properties (language, explicit content flag), credits, copyright, and lyrics.",
+        mockup: "track-tab-distribution",
+      },
+      {
+        heading: "Portal",
+        body: "The Portal tab controls per-track visibility for client portal users. Toggle whether this track appears on the portal, whether downloads are enabled, and which specs are shown. You can also control which audio versions the client can access. The approval status and date are displayed at the top.",
+        mockup: "track-tab-portal",
+      },
+      {
+        heading: "Notes",
+        body: "The Notes tab is a general-purpose space for revision notes and discussion that is not tied to a specific timecode. Team members and clients can leave notes, and client notes are visually distinguished with a badge. Use this tab for general feedback, to-dos, and discussion that does not need to reference a specific moment in the audio.",
+        mockup: "track-tab-notes",
       },
     ],
   },
