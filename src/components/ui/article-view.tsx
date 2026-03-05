@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
-import type { HelpArticle } from "@/lib/help/types";
+import type { HelpArticle, ArticleCategory } from "@/lib/help/types";
+import { CATEGORY_LABELS } from "@/lib/help/articles";
 import { ScreenMockup } from "@/components/ui/screen-mockup";
 
 /** Parse `[text](/path)` links in plain-text strings.
@@ -35,21 +35,34 @@ function RichText({ text }: { text: string }) {
 
 type Props = {
   article: HelpArticle;
-  onBack: () => void;
+  onBack: (category?: ArticleCategory) => void;
 };
 
 export function ArticleView({ article, onBack }: Props) {
+  const categoryLabel = CATEGORY_LABELS[article.category];
+
   return (
     <div className="max-w-2xl">
-      {/* Back link */}
-      <button
-        type="button"
-        onClick={onBack}
-        className="flex items-center gap-1 text-muted hover:text-text text-sm mb-6 transition-colors"
-      >
-        <ChevronLeft size={16} strokeWidth={1.5} />
-        Back to articles
-      </button>
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1.5 text-sm mb-6 flex-wrap">
+        <button
+          type="button"
+          onClick={() => onBack()}
+          className="text-muted hover:text-text transition-colors"
+        >
+          Help Articles
+        </button>
+        <span className="text-faint">/</span>
+        <button
+          type="button"
+          onClick={() => onBack(article.category)}
+          className="text-muted hover:text-text transition-colors"
+        >
+          {categoryLabel}
+        </button>
+        <span className="text-faint">/</span>
+        <span className="text-text truncate">{article.title}</span>
+      </nav>
 
       {/* Title */}
       <h2 className="text-lg font-semibold h3 mb-6">{article.title}</h2>

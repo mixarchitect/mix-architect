@@ -69,13 +69,16 @@ export function KnowledgeBase() {
     return map;
   }, [results, displayedArticles]);
 
+  const handleBack = useCallback(
+    (category?: ArticleCategory) => {
+      setSelectedCategory(category ?? null);
+      setActiveArticle(null);
+    },
+    [setActiveArticle],
+  );
+
   if (activeArticle) {
-    return (
-      <ArticleView
-        article={activeArticle}
-        onBack={() => setActiveArticle(null)}
-      />
-    );
+    return <ArticleView article={activeArticle} onBack={handleBack} />;
   }
 
   return (
