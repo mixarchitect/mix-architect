@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Fuse from "fuse.js";
 import { cn } from "@/lib/cn";
 import { Search, ChevronLeft } from "lucide-react";
@@ -17,10 +18,32 @@ const fuse = new Fuse(articles, {
 });
 
 export function KnowledgeBase() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] =
     useState<ArticleCategory | null>(null);
-  const [activeArticle, setActiveArticle] = useState<HelpArticle | null>(null);
+
+  const articleParam = searchParams.get("article");
+  const activeArticle = useMemo(() => {
+    if (!articleParam) return null;
+    return articles.find((a) => a.id === articleParam) ?? null;
+  }, [articleParam]);
+
+  const setActiveArticle = useCallback(
+    (article: HelpArticle | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (article) {
+        params.set("article", article.id);
+      } else {
+        params.delete("article");
+      }
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [searchParams, router, pathname],
+  );
 
   const results = useMemo(() => {
     if (!query.trim()) return null;

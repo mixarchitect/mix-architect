@@ -5,7 +5,8 @@ import { ChevronLeft } from "lucide-react";
 import type { HelpArticle } from "@/lib/help/types";
 import { ScreenMockup } from "@/components/ui/screen-mockup";
 
-/** Parse `[text](/path)` links in plain-text strings. Opens in new tab. */
+/** Parse `[text](/path)` links in plain-text strings.
+ *  Help article links (?article=) navigate in-place; others open in a new tab. */
 function RichText({ text }: { text: string }) {
   const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
   return (
@@ -13,11 +14,13 @@ function RichText({ text }: { text: string }) {
       {parts.map((part, i) => {
         const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
         if (match) {
+          const href = match[2];
+          const isHelpArticle = href.startsWith("/app/help?article=");
           return (
             <Link
               key={i}
-              href={match[2]}
-              target="_blank"
+              href={href}
+              {...(!isHelpArticle && { target: "_blank" })}
               className="text-signal underline underline-offset-2 hover:text-text transition-colors"
             >
               {match[1]}

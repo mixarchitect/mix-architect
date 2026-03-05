@@ -31,7 +31,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Grid vs Timeline View",
-        body: "The dashboard header has two view toggle buttons: Grid and Timeline. Grid view (the default) displays your releases as cards in a responsive grid. Timeline view arranges releases chronologically based on their target release dates, showing countdowns and scheduling information. Your view preference is saved automatically. Learn more in the \"Using the Timeline View\" article in this Help Center.",
+        body: "The dashboard header has two view toggle buttons: Grid and Timeline. Grid view (the default) displays your releases as cards in a responsive grid. Timeline view arranges releases chronologically based on their target release dates, showing countdowns and scheduling information. Your view preference is saved automatically. Learn more in [Using the Timeline View](/app/help?article=timeline-overview).",
       },
       {
         heading: "Navigating the App",

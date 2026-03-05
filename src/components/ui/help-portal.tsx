@@ -21,15 +21,22 @@ const TABS: { key: Tab; label: string }[] = [
 export function HelpPortal() {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as Tab | null;
+  const articleParam = searchParams.get("article");
   const [activeTab, setActiveTab] = useState<Tab>(
-    tabParam && TABS.some((t) => t.key === tabParam) ? tabParam : "articles",
+    articleParam
+      ? "articles"
+      : tabParam && TABS.some((t) => t.key === tabParam)
+        ? tabParam
+        : "articles",
   );
 
   useEffect(() => {
-    if (tabParam && TABS.some((t) => t.key === tabParam)) {
+    if (articleParam) {
+      setActiveTab("articles");
+    } else if (tabParam && TABS.some((t) => t.key === tabParam)) {
       setActiveTab(tabParam);
     }
-  }, [tabParam]);
+  }, [tabParam, articleParam]);
 
   return (
     <div>
