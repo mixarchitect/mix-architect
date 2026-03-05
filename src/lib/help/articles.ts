@@ -31,13 +31,13 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Navigating the App",
-        body: "The sidebar (or bottom bar on mobile) gives you quick access to the Dashboard, Templates, Payments (if enabled), Settings, and Help. Click any release card to open the release detail view. You can also use the search icon or Cmd+K to jump to any release or track instantly. The sidebar includes a notification bell for activity updates and a theme toggle for light, dark, or system appearance.",
+        body: "The sidebar (or bottom bar on mobile) gives you quick access to the Dashboard, Search, Templates, Payments (if enabled), Settings, and Help. Use the search button or Cmd+K to jump to any release or track instantly. The sidebar also includes Notifications for activity updates, Auto for automation, and Sign Out. Theme switching (light, dark, or system) is available in Settings under Appearance.",
         tip: "Pin your most important releases so they always appear at the top of the dashboard.",
         mockup: "nav-rail",
       },
       {
         heading: "Key Concepts",
-        body: "Releases are your top-level projects. Each release contains one or more tracks. Tracks are where the real work happens: each track has six tabs for Intent, Specs, Audio, Distribution, Portal, and Notes. The release detail page shows your track list on the left and an inspector sidebar on the right with cover art, release info, mix direction, references, and collaborator access.",
+        body: "Releases are your top-level projects. Each release contains one or more tracks. Tracks are where the real work happens: each track has six tabs for Intent, Specs, Audio, Distribution, Portal, and Notes. The release detail page shows your track list with status dots, intent previews, and approval badges. Click the settings gear to access Release Settings where you can edit metadata, manage your team, and configure payment.",
         mockup: "key-concepts",
       },
     ],
@@ -59,7 +59,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Add Cover Art",
-        body: "In the release detail view, the inspector sidebar on the right shows a cover art area. Click it to upload an image (PNG, JPG, WebP, or GIF, max 5 MB). You can also paste a URL instead. The image is displayed on the release card, in the brief, and on the client portal.",
+        body: "Open Release Settings (gear icon on the release page) to find the Cover Art section at the top. Upload an image (PNG, JPG, WebP, or GIF) or paste a URL. The image is displayed on the release card, in the brief, and on the client portal.",
         mockup: "cover-art-upload",
       },
       {
@@ -85,7 +85,7 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Sending Invitations",
-        body: "Open a release, go to Settings, and scroll to the Team section. Enter the email address of the person you want to invite and select their role: Collaborator (full access to edit) or Client (view-only with approval capabilities). Click \"Invite\" to send them an email with a link to join the release.",
+        body: "Open a release, click the settings gear icon, and scroll down to the Team section below the release settings. Enter the email address of the person you want to invite and select their role: Collaborator (full access to edit) or Client (view-only with approval capabilities). Click \"Invite\" to send them an email with a link to join the release.",
         mockup: "invite-collaborator",
       },
       {
@@ -121,27 +121,27 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Intent",
-        body: "The Intent tab is where you describe the creative vision for a track. Write a free-form mix direction in the Mix Vision field, tag the track with Emotional Qualities (choose from 31 suggestions or add your own), and note any anti-references to describe sounds you want to avoid.",
+        body: "The Intent tab is where you describe the creative vision for a track. Write a free-form mix direction under \"What should this track feel like?\", tag the track with Emotional Qualities (choose from suggestions or add your own), and note any anti-references to describe sounds you want to avoid. A Quick View sidebar shows the track status, quality, and format at a glance, plus your reference tracks.",
         mockup: "track-tab-intent",
       },
       {
         heading: "Specs",
-        body: "The Specs tab holds technical settings for the track: format (WAV, AIFF, etc.), sample rate, and bit depth. Below the format settings, select which Delivery Formats should be available for conversion. Selected formats appear highlighted; click a format chip to toggle it on or off.",
+        body: "The Specs tab holds Technical Settings for the track: format (Stereo, Dolby Atmos, or Stereo + Atmos), sample rate, and bit depth. Below the format settings, the Delivery section lets you select which formats should be available for conversion. Selected formats appear highlighted; click a format chip to toggle it on or off. You can also add delivery notes.",
         mockup: "track-tab-specs",
       },
       {
         heading: "Audio",
-        body: "The Audio tab is where you upload files, manage versions, and play back the waveform. Use the version selector to switch between revisions. The player shows the waveform, playback controls, LUFS measurement, and file metadata. You can leave timestamped comments tied to specific moments in the audio directly below the player.",
+        body: "The Audio tab is where you upload files, manage versions, and play back the waveform. Use the version selector (v1, v2, v3, etc.) to switch between revisions. The player shows the waveform, playback controls, LUFS loudness measurement, and file metadata. Double-click the waveform to leave a timestamped comment tied to that specific moment in the audio.",
         mockup: "track-tab-audio",
       },
       {
         heading: "Distribution",
-        body: "The Distribution tab captures metadata needed for digital distribution: writing and publishing splits with percentages, ISRC and ISWC codes, track properties (language, explicit content flag), credits, copyright, and lyrics.",
+        body: "The Distribution tab captures metadata needed for digital distribution. It includes three split sections (Writing, Publishing, and Master Recording) with per-person percentages, PRO info, and IPI numbers. Below the splits: Codes and Identifiers (ISRC, ISWC), Credits (producer, composer/songwriter), Track Properties (featured artist, language, explicit lyrics, instrumental, cover song toggles), Copyright (registration number and date), and Lyrics.",
         mockup: "track-tab-distribution",
       },
       {
         heading: "Portal",
-        body: "The Portal tab controls per-track visibility for client portal users. Toggle whether this track appears on the portal, whether downloads are enabled, and which specs are shown. You can also control which audio versions the client can access. The approval status and date are displayed at the top.",
+        body: "The Portal tab has two sections. Client Approval at the top shows the current approval status with a timestamped history of all approval events (approved, requested changes, reopened for review). Below that, Track Portal Visibility lets you toggle whether this track appears on the portal, whether downloads are enabled, and which audio versions the client can access.",
         mockup: "track-tab-portal",
       },
       {

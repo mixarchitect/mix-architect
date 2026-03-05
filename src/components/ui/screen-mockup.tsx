@@ -8,7 +8,7 @@
 import {
   Home, Search, LayoutTemplate, Settings, HelpCircle,
   Image, Music, Play, ChevronDown, Send, ArrowRight,
-  MessageSquare, Plus, Check, X,
+  MessageSquare, MessageCircle, Plus, Check, X,
   Disc3, Download, ArrowUpCircle, Globe, Share2,
   Calendar, Upload, GripVertical, Copy, Link2,
   Shield, CreditCard, CheckCircle2, Clock,
@@ -447,7 +447,7 @@ function TrackTabIntentMockup() {
         <TrackTabBar active="Intent" />
         <Panel>
           <PanelBody className="space-y-3">
-            <span className="label text-xs text-faint">MIX VISION</span>
+            <span className="label text-xs text-faint">WHAT SHOULD THIS TRACK FEEL LIKE?</span>
             <p className="text-sm text-text leading-relaxed">Warm, spacious vocal mix with tight low end. Think Bon Iver meets James Blake.</p>
             <Rule />
             <span className="label text-xs text-faint">EMOTIONAL QUALITIES</span>
@@ -473,10 +473,11 @@ function TrackTabSpecsMockup() {
         <TrackTabBar active="Specs" />
         <Panel>
           <PanelBody className="space-y-3">
+            <span className="label text-xs text-faint">TECHNICAL SETTINGS</span>
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="label text-xs text-faint mb-1.5 block">FORMAT</label>
-                <MockSelect text="WAV" />
+                <MockSelect text="Stereo + Atmos" />
               </div>
               <div>
                 <label className="label text-xs text-faint mb-1.5 block">SAMPLE RATE</label>
@@ -488,7 +489,7 @@ function TrackTabSpecsMockup() {
               </div>
             </div>
             <Rule />
-            <span className="label text-xs text-faint">DELIVERY FORMATS</span>
+            <span className="label text-xs text-faint">DELIVERY</span>
             <div className="flex flex-wrap gap-2 mt-1">
               {["WAV", "FLAC", "MP3"].map((f) => (
                 <div key={f} className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-signal/30 bg-signal-muted">
@@ -560,6 +561,14 @@ function TrackTabDistributionMockup() {
               ))}
             </div>
             <Rule />
+            <span className="label text-xs text-faint">PUBLISHING SPLIT</span>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-text flex-1">Alex Rivera</span>
+                <span className="text-sm font-medium text-text">50%</span>
+              </div>
+            </div>
+            <Rule />
             <span className="label text-xs text-faint">CODES & IDENTIFIERS</span>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -572,15 +581,27 @@ function TrackTabDistributionMockup() {
               </div>
             </div>
             <Rule />
+            <span className="label text-xs text-faint">CREDITS</span>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label text-xs text-faint mb-1.5 block">PRODUCER</label>
+                <MockInput text="Alex Rivera" />
+              </div>
+              <div>
+                <label className="label text-xs text-faint mb-1.5 block">COMPOSER</label>
+                <MockInput text="Alex Rivera, Jordan Blake" />
+              </div>
+            </div>
+            <Rule />
             <span className="label text-xs text-faint">TRACK PROPERTIES</span>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="label text-xs text-faint mb-1.5 block">Language</label>
+                <label className="label text-xs text-faint mb-1.5 block">LANGUAGE</label>
                 <MockSelect text="English" />
               </div>
-              <div>
-                <label className="label text-xs text-faint mb-1.5 block">Content</label>
-                <MockSelect text="Explicit" />
+              <div className="flex items-center gap-2 pt-5">
+                <span className="text-sm text-muted">Explicit Lyrics</span>
+                <div className="w-8 h-4 rounded-full bg-signal relative"><div className="absolute right-0.5 top-0.5 w-3 h-3 rounded-full bg-white" /></div>
               </div>
             </div>
           </PanelBody>
@@ -597,17 +618,20 @@ function TrackTabPortalMockup() {
         <TrackTabBar active="Portal" />
         <Panel>
           <PanelBody className="space-y-3">
+            <span className="label text-xs text-faint">CLIENT APPROVAL</span>
             <div className="flex items-center gap-3">
               <CheckCircle2 size={16} className="text-signal" />
-              <span className="text-sm font-semibold text-text">Approved by client</span>
-              <span className="text-xs text-faint ml-auto">Mar 3, 2026</span>
+              <span className="text-sm font-semibold text-signal">Approved</span>
+            </div>
+            <div className="space-y-1.5 text-xs text-muted">
+              <div className="flex items-center gap-2"><CheckCircle2 size={10} className="text-signal" /><span className="font-semibold text-text">Client</span> approved<span className="ml-auto text-faint">Feb 28</span></div>
+              <div className="flex items-center gap-2"><MessageCircle size={10} className="text-orange-400" /><span className="font-semibold text-text">Client</span> requested changes<span className="ml-auto text-faint">Feb 28</span></div>
             </div>
             <Rule />
-            <span className="label text-xs text-faint">PORTAL VISIBILITY</span>
+            <span className="label text-xs text-faint">TRACK PORTAL VISIBILITY</span>
             {[
-              { label: "Show on portal", on: true },
-              { label: "Allow download", on: true },
-              { label: "Show specs", on: false },
+              { label: "Visible on portal", on: true },
+              { label: "Enable download", on: true },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between py-1">
                 <span className="text-sm text-text">{item.label}</span>
@@ -617,11 +641,13 @@ function TrackTabPortalMockup() {
               </div>
             ))}
             <Rule />
-            <span className="label text-xs text-faint">VERSION VISIBILITY</span>
-            {["v3 (latest)", "v2", "v1"].map((v, i) => (
+            <span className="label text-xs text-faint">TRACK VERSION VISIBILITY</span>
+            {["Version 3", "Version 2", "Version 1"].map((v, i) => (
               <div key={v} className="flex items-center justify-between py-1">
                 <span className="text-sm text-text">{v}</span>
-                <Eye size={14} className={i < 2 ? "text-signal" : "text-faint"} />
+                <div className={cn("w-9 h-5 rounded-full flex items-center px-0.5", i < 2 ? "bg-signal justify-end" : "bg-panel2 border border-border")}>
+                  <div className={cn("w-4 h-4 rounded-full", i < 2 ? "bg-white" : "bg-muted")} />
+                </div>
               </div>
             ))}
           </PanelBody>
