@@ -823,15 +823,41 @@ function ExportDownloadMockup() {
 }
 
 function SupportedFormatsMockup() {
+  const lossless = [
+    { name: "WAV", spec: "Source rate / depth" },
+    { name: "AIFF", spec: "Source rate / depth" },
+    { name: "FLAC", spec: "Source rate" },
+    { name: "ALAC", spec: "Source rate" },
+  ];
+  const lossy = [
+    { name: "MP3", spec: "44.1 kHz / 320 kbps" },
+    { name: "AAC", spec: "44.1 kHz / 256 kbps" },
+    { name: "OGG", spec: "44.1 kHz / Quality 8" },
+  ];
   return (
     <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div>
-            <span className="label text-xs text-faint">CONVERTIBLE FORMATS</span>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {["WAV", "AIFF", "FLAC", "MP3", "AAC", "OGG", "ALAC"].map((f) => (
-                <Pill key={f} active>{f}</Pill>
+            <span className="label text-xs text-faint">LOSSLESS (PRESERVES SOURCE QUALITY)</span>
+            <div className="space-y-1.5 mt-2">
+              {lossless.map((f) => (
+                <div key={f.name} className="flex items-center justify-between px-3 py-1.5 rounded-md border border-signal/30 bg-signal-muted">
+                  <span className="text-sm font-medium text-text">{f.name}</span>
+                  <span className="text-xs text-muted">{f.spec}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <Rule />
+          <div>
+            <span className="label text-xs text-faint">LOSSY (FIXED OUTPUT PRESETS)</span>
+            <div className="space-y-1.5 mt-2">
+              {lossy.map((f) => (
+                <div key={f.name} className="flex items-center justify-between px-3 py-1.5 rounded-md border border-border">
+                  <span className="text-sm font-medium text-text">{f.name}</span>
+                  <span className="text-xs text-muted">{f.spec}</span>
+                </div>
               ))}
             </div>
           </div>
