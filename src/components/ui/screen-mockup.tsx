@@ -27,18 +27,6 @@ import { AccentPanel } from "@/components/ui/accent-panel";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 
 /* ───────────────────────────────────────────────────────
-   SHARED: Scale wrapper
-   ─────────────────────────────────────────────────────── */
-
-function MockupScale({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="origin-top-left scale-75" style={{ width: "133.33%" }}>
-      {children}
-    </div>
-  );
-}
-
-/* ───────────────────────────────────────────────────────
    SHARED: Visual-only clones (for components with side effects)
    ─────────────────────────────────────────────────────── */
 
@@ -87,28 +75,31 @@ function MockTrackRow({ num, title, status, intent }: {
   );
 }
 
-function MockAvatar({ initials, className }: { initials: string; className?: string }) {
+function MockAvatar({ initials, size = "md" }: { initials: string; size?: "sm" | "md" }) {
   return (
-    <span className={cn("w-6 h-6 rounded-full bg-signal text-signal-on text-[10px] font-bold flex items-center justify-center shrink-0", className)}>
+    <span className={cn(
+      "rounded-full bg-signal text-signal-on font-bold flex items-center justify-center shrink-0",
+      size === "sm" ? "w-5 h-5 text-[8px]" : "w-6 h-6 text-[10px]",
+    )}>
       {initials}
     </span>
   );
 }
 
-function MockInput({ text, className }: { text: string; className?: string }) {
+function MockInput({ text, className, placeholder }: { text: string; className?: string; placeholder?: boolean }) {
   return (
-    <span className={cn("inline-flex items-center px-4 py-2.5 rounded-sm border border-border bg-panel text-sm text-faint flex-1 min-w-0 truncate", className)}>
-      {text}
-    </span>
+    <div className={cn("input min-w-0", className)} style={{ pointerEvents: "none" }}>
+      {placeholder ? <span className="text-faint">{text}</span> : text}
+    </div>
   );
 }
 
-function MockSelect({ text }: { text: string }) {
+function MockSelect({ text, className }: { text: string; className?: string }) {
   return (
-    <span className="inline-flex items-center gap-2 px-4 py-2.5 rounded-sm border border-border bg-panel text-sm text-text whitespace-nowrap">
+    <div className={cn("input relative min-w-0", className)} style={{ pointerEvents: "none", paddingRight: 40 }}>
       {text}
-      <ChevronDown size={14} className="text-faint" />
-    </span>
+      <ChevronDown size={14} className="text-faint absolute right-3.5 top-1/2 -translate-y-1/2" />
+    </div>
   );
 }
 
@@ -131,18 +122,18 @@ function WaveformBars({ highlight, className }: { highlight?: number; className?
   );
 }
 
-function MockNoteEntry({ author, initials, time, content, isClient }: {
-  author: string; initials: string; time: string; content: string; isClient?: boolean;
+function MockNoteEntry({ author, time, content, isClient }: {
+  author: string; time: string; content: string; isClient?: boolean;
 }) {
   return (
-    <div className={cn("py-4", isClient && "pl-4 border-l-2 border-signal/40")}>
+    <div className={cn("py-4", isClient && "pl-3 border-l-2 border-signal/40")}>
       <div className="flex items-center gap-2 text-xs text-muted mb-2">
-        <MockAvatar initials={initials} className="w-5 h-5 text-[8px]" />
-        <span className="font-medium text-text">{author}</span>
-        {isClient && <span className="text-[10px] font-medium text-signal bg-signal-muted px-1.5 py-0.5 rounded-full">Client</span>}
+        <span className="font-medium">{author}</span>
+        {isClient && <span className="text-[9px] font-medium text-signal bg-signal-muted px-1.5 py-0.5 rounded-full">Client</span>}
+        <span>&middot;</span>
         <span className="text-faint">{time}</span>
       </div>
-      <p className="text-sm text-muted leading-relaxed">{content}</p>
+      <p className="text-sm text-text leading-relaxed whitespace-pre-wrap">{content}</p>
     </div>
   );
 }
@@ -153,7 +144,7 @@ function MockNoteEntry({ author, initials, time, content, isClient }: {
 
 function DashboardMockup() {
   return (
-    <MockupScale>
+    <>
       <div className="space-y-4 p-4">
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold text-text">Your Releases</span>
@@ -165,7 +156,7 @@ function DashboardMockup() {
           <MockReleaseCard title="Demo Reel" artist="Jay Park" type="Album" status="blue" tracks={8} completed={3} time="3d ago" />
         </div>
       </div>
-    </MockupScale>
+    </>
   );
 }
 
@@ -178,7 +169,7 @@ function NavRailMockup() {
     { icon: HelpCircle, label: "Help", active: false },
   ];
   return (
-    <MockupScale>
+    <>
       <div className="flex">
         <div className="w-48 border-r border-border bg-panel py-4 px-3 space-y-1">
           {items.map((item) => (
@@ -199,13 +190,13 @@ function NavRailMockup() {
           <p className="text-sm text-muted mt-1">Click any release to open it</p>
         </div>
       </div>
-    </MockupScale>
+    </>
   );
 }
 
 function KeyConceptsMockup() {
   return (
-    <MockupScale>
+    <>
       <div className="p-4 space-y-3">
         <Panel variant="flat" className="px-5 py-4 border-border border">
           <div className="flex items-center gap-3 mb-4">
@@ -231,7 +222,7 @@ function KeyConceptsMockup() {
           </div>
         </Panel>
       </div>
-    </MockupScale>
+    </>
   );
 }
 
@@ -241,17 +232,17 @@ function KeyConceptsMockup() {
 
 function CreateReleaseMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelHeader><span className="text-base font-semibold text-text">New Release</span></PanelHeader>
         <PanelBody className="space-y-4">
           <div>
             <label className="label text-xs text-faint mb-1.5 block">TITLE</label>
-            <MockInput text="Midnight Sessions" className="w-full text-text" />
+            <MockInput text="Midnight Sessions" className="w-full" />
           </div>
           <div>
             <label className="label text-xs text-faint mb-1.5 block">ARTIST</label>
-            <MockInput text="Alex Rivera" className="w-full text-text" />
+            <MockInput text="Alex Rivera" className="w-full" />
           </div>
           <div className="flex gap-3">
             <div className="flex-1">
@@ -266,13 +257,13 @@ function CreateReleaseMockup() {
           <Button variant="primary" className="w-full">Create Release</Button>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function CoverArtUploadMockup() {
   return (
-    <MockupScale>
+    <>
       <div className="p-4">
         <div className="w-48 mx-auto aspect-square rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-3 bg-panel2">
           <Image size={32} className="text-muted" />
@@ -280,13 +271,13 @@ function CoverArtUploadMockup() {
           <span className="text-xs text-faint">JPEG or PNG, min 1400x1400</span>
         </div>
       </div>
-    </MockupScale>
+    </>
   );
 }
 
 function TrackUploadMockup() {
   return (
-    <MockupScale>
+    <>
       <div className="p-4">
         <EmptyState
           icon={Upload}
@@ -295,13 +286,13 @@ function TrackUploadMockup() {
           action={{ label: "Browse Files", onClick: () => {} }}
         />
       </div>
-    </MockupScale>
+    </>
   );
 }
 
 function ReleaseStatusMockup() {
   return (
-    <MockupScale>
+    <>
       <div className="p-4 space-y-4">
         <div className="flex flex-wrap gap-2">
           {[
@@ -324,7 +315,7 @@ function ReleaseStatusMockup() {
         </div>
         <StatusIndicator color="orange" label="In Progress" />
       </div>
-    </MockupScale>
+    </>
   );
 }
 
@@ -334,11 +325,11 @@ function ReleaseStatusMockup() {
 
 function InviteCollaboratorMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div className="flex items-center gap-3">
-            <MockInput text="engineer@studio.com" />
+            <MockInput text="engineer@studio.com" placeholder />
             <MockSelect text="Engineer" />
             <Button variant="primary"><Send size={14} /> Invite</Button>
           </div>
@@ -355,13 +346,13 @@ function InviteCollaboratorMockup() {
           ))}
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function CollaboratorRolesMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-3">
           {[
@@ -380,13 +371,13 @@ function CollaboratorRolesMockup() {
           ))}
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function AcceptInvitationMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody>
           <div className="flex items-center gap-3">
@@ -401,13 +392,13 @@ function AcceptInvitationMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function PortalSharingMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div className="flex items-center justify-between">
@@ -425,7 +416,7 @@ function PortalSharingMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -435,7 +426,7 @@ function PortalSharingMockup() {
 
 function AudioUploadMockup() {
   return (
-    <MockupScale>
+    <>
       <div className="p-4 space-y-4">
         <EmptyState
           icon={Upload}
@@ -457,13 +448,13 @@ function AudioUploadMockup() {
           </div>
         </Panel>
       </div>
-    </MockupScale>
+    </>
   );
 }
 
 function TrackVersionsMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-3">
           <MockSelect text="v3 (latest)" />
@@ -484,13 +475,13 @@ function TrackVersionsMockup() {
           ))}
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function WaveformPlayerMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div className="bg-panel2 rounded-md p-4">
@@ -513,7 +504,7 @@ function WaveformPlayerMockup() {
           </DataGrid>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -523,7 +514,7 @@ function WaveformPlayerMockup() {
 
 function FormatConvertMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div className="flex items-center gap-3">
@@ -544,13 +535,13 @@ function FormatConvertMockup() {
           <Button variant="primary"><RefreshCw size={14} /> Convert</Button>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function ExportDownloadMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody>
           <div className="flex items-center gap-3 mb-3">
@@ -565,13 +556,13 @@ function ExportDownloadMockup() {
           <Button variant="primary"><Download size={14} /> Download</Button>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function SupportedFormatsMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div>
@@ -599,7 +590,7 @@ function SupportedFormatsMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -609,7 +600,7 @@ function SupportedFormatsMockup() {
 
 function CommentWaveformMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-3">
           <div className="bg-panel2 rounded-md p-4 relative">
@@ -629,32 +620,32 @@ function CommentWaveformMockup() {
             </div>
           ))}
           <div className="flex items-center gap-2 pt-2">
-            <MockInput text="Add a comment at 2:05..." className="flex-1" />
+            <MockInput text="Add a comment at 2:05..." className="flex-1" placeholder />
             <Button variant="primary"><Send size={14} /></Button>
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function PortalCommentsMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody>
-          <MockNoteEntry author="Sarah Kim" initials="SK" time="2h ago" content="The vocal balance sounds great in the chorus. Can we bring up the backing vocals slightly in verse 2?" />
+          <MockNoteEntry author="Sarah Kim" time="2h ago" content="The vocal balance sounds great in the chorus. Can we bring up the backing vocals slightly in verse 2?" />
           <Rule />
-          <MockNoteEntry author="Jordan Blake" initials="JB" time="1h ago" content="Love the overall direction. The guitar tone in the bridge needs a bit more warmth." isClient />
+          <MockNoteEntry author="Jordan Blake" time="1h ago" content="Love the overall direction. The guitar tone in the bridge needs a bit more warmth." isClient />
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function ResolveFeedbackMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-3">
           <div className="flex items-start gap-3 opacity-50">
@@ -682,7 +673,7 @@ function ResolveFeedbackMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -697,7 +688,7 @@ function TaskCreateMockup() {
     { title: "Export stems", assignee: "AR", status: "Done", color: "green" as const, done: true },
   ];
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelHeader>
           <div className="flex items-center justify-between">
@@ -722,13 +713,13 @@ function TaskCreateMockup() {
           ))}
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function TaskAssignMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-3">
           <div className="flex items-center gap-3 px-4 py-3 rounded-md border border-border bg-panel">
@@ -751,13 +742,13 @@ function TaskAssignMockup() {
           </Panel>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function TaskTemplatesMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-3">
           <div className="flex items-center gap-2">
@@ -775,7 +766,7 @@ function TaskTemplatesMockup() {
           ))}
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -790,7 +781,7 @@ function TaskKanbanMockup() {
     { title: "Done", color: "green" as const, tasks: ["Record vocals", "Export stems"] },
   ];
   return (
-    <MockupScale>
+    <>
       <div className="p-4 grid grid-cols-3 gap-3">
         {cols.map((col) => (
           <div key={col.title}>
@@ -809,13 +800,13 @@ function TaskKanbanMockup() {
           </div>
         ))}
       </div>
-    </MockupScale>
+    </>
   );
 }
 
 function TaskProgressMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div>
@@ -834,13 +825,13 @@ function TaskProgressMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function TaskFiltersMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
@@ -863,7 +854,7 @@ function TaskFiltersMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -883,7 +874,7 @@ function TimelineBar({ title, left, width, color }: { title: string; left: strin
 
 function TimelineFullMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody>
           <div className="flex mb-2">
@@ -906,13 +897,13 @@ function TimelineFullMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function TimelineNavigateMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody>
           <div className="flex mb-2">
@@ -935,13 +926,13 @@ function TimelineNavigateMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function TimelineDatesMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody>
           <div className="flex mb-2">
@@ -964,7 +955,7 @@ function TimelineDatesMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -979,7 +970,7 @@ function MilestoneExamplesMockup() {
     { label: "Release Date", pos: "85%" },
   ];
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="pt-2">
           <div className="flex mb-2">
@@ -1004,13 +995,13 @@ function MilestoneExamplesMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function MilestoneAddMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelHeader><span className="text-base font-semibold text-text">Add Milestone</span></PanelHeader>
         <PanelBody className="space-y-4">
@@ -1039,13 +1030,13 @@ function MilestoneAddMockup() {
           ))}
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function MilestoneNotificationMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody>
           <div className="flex items-start gap-3">
@@ -1060,7 +1051,7 @@ function MilestoneNotificationMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -1070,7 +1061,7 @@ function MilestoneNotificationMockup() {
 
 function TemplateContentsMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelHeader>
           <div className="flex items-center gap-2">
@@ -1108,13 +1099,13 @@ function TemplateContentsMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function TemplateCreateMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelHeader><span className="text-base font-semibold text-text">New Template</span></PanelHeader>
         <PanelBody className="space-y-4">
@@ -1139,13 +1130,13 @@ function TemplateCreateMockup() {
           <Button variant="primary" className="w-full">Save Template</Button>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function TemplateUseMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelHeader><span className="text-base font-semibold text-text">New Release</span></PanelHeader>
         <PanelBody className="space-y-4">
@@ -1169,7 +1160,7 @@ function TemplateUseMockup() {
           <Button variant="primary" className="w-full">Create Release</Button>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -1179,7 +1170,7 @@ function TemplateUseMockup() {
 
 function ExportContentsMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-2">
           <span className="text-sm font-semibold text-text">Export includes:</span>
@@ -1202,13 +1193,13 @@ function ExportContentsMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function ExportProgressMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div className="grid grid-cols-3 gap-3">
@@ -1227,13 +1218,13 @@ function ExportProgressMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function ExportPrivacyMockup() {
   return (
-    <MockupScale>
+    <>
       <div className="p-4">
         <AccentPanel>
           <div className="flex items-center gap-3 mb-4">
@@ -1254,7 +1245,7 @@ function ExportPrivacyMockup() {
           </div>
         </AccentPanel>
       </div>
-    </MockupScale>
+    </>
   );
 }
 
@@ -1264,7 +1255,7 @@ function ExportPrivacyMockup() {
 
 function PlanCurrentMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelHeader>
           <div className="flex items-center gap-3">
@@ -1281,13 +1272,13 @@ function PlanCurrentMockup() {
           <Button variant="secondary">Manage Subscription</Button>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function UpgradeProMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div className="flex items-center gap-3">
@@ -1309,13 +1300,13 @@ function UpgradeProMockup() {
           <Button variant="primary"><ArrowUpCircle size={14} /> Upgrade to Pro</Button>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function ManagePaymentMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div className="flex items-center gap-3">
@@ -1334,7 +1325,7 @@ function ManagePaymentMockup() {
           <Button variant="secondary"><Link2 size={14} /> Open Billing Portal</Button>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
@@ -1344,7 +1335,7 @@ function ManagePaymentMockup() {
 
 function CancelSubscriptionMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4 border-status-orange/30">
         <PanelBody className="space-y-3">
           <StatusIndicator color="orange" label="Subscription Cancelled" />
@@ -1355,13 +1346,13 @@ function CancelSubscriptionMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function DataAfterCancelMockup() {
   return (
-    <MockupScale>
+    <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div>
@@ -1385,13 +1376,13 @@ function DataAfterCancelMockup() {
           </div>
         </PanelBody>
       </Panel>
-    </MockupScale>
+    </>
   );
 }
 
 function ResubscribeMockup() {
   return (
-    <MockupScale>
+    <>
       <div className="p-4">
         <AccentPanel>
           <div className="flex items-center gap-3 mb-3">
@@ -1406,7 +1397,7 @@ function ResubscribeMockup() {
           <Button variant="secondary"><ArrowUpCircle size={14} /> Resubscribe to Pro</Button>
         </AccentPanel>
       </div>
-    </MockupScale>
+    </>
   );
 }
 
