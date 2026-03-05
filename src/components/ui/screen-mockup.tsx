@@ -2,16 +2,16 @@
 
 /* ═══════════════════════════════════════════════════════════
    SCREEN MOCKUP — Help article visual aids using real components
-   44 mockups, one per article section
+   44 mockups (14 articles x ~3 each)
    ═══════════════════════════════════════════════════════════ */
 
 import {
   Home, Search, LayoutTemplate, Settings, HelpCircle,
   Image, Music, Play, ChevronDown, Send, ArrowRight,
-  RefreshCw, MessageSquare, Plus, Check, X,
-  Disc3, Download, ArrowUpCircle, Bell, MapPin,
+  MessageSquare, Plus, Check, X,
+  Disc3, Download, ArrowUpCircle, Globe, Share2,
   Calendar, Upload, GripVertical, Copy, Link2,
-  Shield, CreditCard, CheckCircle2, Clock, Eye,
+  Shield, CreditCard, CheckCircle2, Clock,
   ClipboardList, FileText, Users, Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -24,7 +24,6 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { DataGrid, DataCell } from "@/components/ui/data-grid";
 import { Rule } from "@/components/ui/rule";
 import { AccentPanel } from "@/components/ui/accent-panel";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 
 /* ───────────────────────────────────────────────────────
    SHARED: Visual-only clones (for components with side effects)
@@ -208,7 +207,7 @@ function KeyConceptsMockup() {
             {[
               { icon: Music, label: "Tracks", desc: "Audio versions, comments, exports" },
               { icon: FileText, label: "Brief", desc: "Mix direction and references" },
-              { icon: ClipboardList, label: "Tasks", desc: "Assignments and checklists" },
+              { icon: ClipboardList, label: "Specs", desc: "Technical settings and delivery" },
               { icon: Users, label: "Collaborators", desc: "Team members and roles" },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-3 py-2 px-3 rounded-md border border-border bg-panel">
@@ -329,14 +328,14 @@ function InviteCollaboratorMockup() {
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div className="flex items-center gap-3">
-            <MockInput text="engineer@studio.com" placeholder />
-            <MockSelect text="Engineer" />
+            <MockInput text="client@example.com" placeholder />
+            <MockSelect text="Collaborator" />
             <Button variant="primary"><Send size={14} /> Invite</Button>
           </div>
           <Rule />
           {[
-            { name: "Sarah Kim", role: "Producer", initials: "SK" },
-            { name: "Marcus Lee", role: "Engineer", initials: "ML" },
+            { name: "Sarah Kim", role: "Collaborator", initials: "SK" },
+            { name: "Jordan Blake", role: "Client", initials: "JB" },
           ].map((m) => (
             <div key={m.name} className="flex items-center gap-3 py-2">
               <MockAvatar initials={m.initials} />
@@ -356,10 +355,8 @@ function CollaboratorRolesMockup() {
       <Panel className="m-4">
         <PanelBody className="space-y-3">
           {[
-            { role: "Artist", desc: "The performing artist or band on this release" },
-            { role: "Engineer", desc: "Mixing or mastering engineer working on audio" },
-            { role: "Producer", desc: "Oversees the creative direction of the project" },
-            { role: "Label", desc: "Label representative reviewing for distribution" },
+            { role: "Collaborator", desc: "Full access to all release and track details" },
+            { role: "Client", desc: "Read-only portal access with approval capabilities" },
           ].map((r, i) => (
             <div key={r.role}>
               {i > 0 && <Rule className="mb-3" />}
@@ -385,7 +382,7 @@ function AcceptInvitationMockup() {
             <div className="flex-1">
               <span className="text-sm font-semibold text-text">Sarah Kim</span>
               <span className="text-sm text-muted"> joined as </span>
-              <Pill>Engineer</Pill>
+              <Pill>Collaborator</Pill>
             </div>
             <StatusDot color="green" />
             <span className="text-xs text-faint">Just now</span>
@@ -421,7 +418,103 @@ function PortalSharingMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ARTICLE 4: UPLOADING AUDIO TRACKS (3 mockups)
+   ARTICLE 4: TRACK DETAIL TABS (3 mockups)
+   ═══════════════════════════════════════════════════════════ */
+
+function TrackTabsOverviewMockup() {
+  const tabs = ["Intent", "Specs", "Audio", "Distribution", "Portal", "Notes"];
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <div className="flex items-center gap-4 border-b border-border pb-3">
+          {tabs.map((tab, i) => (
+            <span
+              key={tab}
+              className={cn(
+                "text-sm font-medium pb-2 -mb-3",
+                i === 0 ? "text-signal border-b-2 border-signal" : "text-muted",
+              )}
+            >
+              {tab}
+            </span>
+          ))}
+        </div>
+        <Panel>
+          <PanelBody className="space-y-3">
+            <span className="label text-xs text-faint">MIX VISION</span>
+            <p className="text-sm text-text leading-relaxed">Warm, spacious vocal mix with tight low end. Think Bon Iver meets James Blake.</p>
+            <span className="label text-xs text-faint">EMOTIONAL QUALITIES</span>
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {["Warm", "Spacious", "Intimate"].map((q) => (
+                <Pill key={q} active>{q}</Pill>
+              ))}
+            </div>
+          </PanelBody>
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+function TrackAudioNotesMockup() {
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelBody className="space-y-1">
+          <span className="label text-xs text-faint">NOTES</span>
+          <MockNoteEntry author="Sarah Kim" time="2h ago" content="Rev3 sounds great. The low end is tighter now." />
+          <Rule />
+          <MockNoteEntry author="Jordan Blake" time="1h ago" content="Can we try a version with more reverb on the vocals?" isClient />
+          <Rule />
+          <div className="flex items-center gap-2 pt-2">
+            <MockInput text="Add a note..." className="flex-1" placeholder />
+            <Button variant="primary"><Send size={14} /></Button>
+          </div>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function TrackDistributionPortalMockup() {
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <Panel>
+          <PanelBody className="space-y-3">
+            <span className="label text-xs text-faint">WRITING SPLIT</span>
+            <div className="space-y-2">
+              {[
+                { name: "Alex Rivera", pct: "50%" },
+                { name: "Jordan Blake", pct: "50%" },
+              ].map((s) => (
+                <div key={s.name} className="flex items-center gap-3">
+                  <span className="text-sm text-text flex-1">{s.name}</span>
+                  <span className="text-sm font-medium text-text">{s.pct}</span>
+                </div>
+              ))}
+            </div>
+            <Rule />
+            <span className="label text-xs text-faint">CODES & IDENTIFIERS</span>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label text-xs text-faint mb-1.5 block">ISRC</label>
+                <MockInput text="USRC17607839" />
+              </div>
+              <div>
+                <label className="label text-xs text-faint mb-1.5 block">ISWC</label>
+                <MockInput text="T-345246800-1" />
+              </div>
+            </div>
+          </PanelBody>
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ARTICLE 5: UPLOADING AND MANAGING AUDIO (3 mockups)
    ═══════════════════════════════════════════════════════════ */
 
 function AudioUploadMockup() {
@@ -509,7 +602,7 @@ function WaveformPlayerMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ARTICLE 5: CONVERTING AUDIO FORMATS (3 mockups)
+   ARTICLE 6: DELIVERY FORMATS AND CONVERSION (3 mockups)
    ═══════════════════════════════════════════════════════════ */
 
 function FormatConvertMockup() {
@@ -517,22 +610,25 @@ function FormatConvertMockup() {
     <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
+          <span className="label text-xs text-faint">DELIVERY FORMATS</span>
+          <div className="flex flex-wrap gap-2">
+            {["WAV", "FLAC", "MP3"].map((f) => (
+              <div key={f} className="flex items-center gap-2 px-3 py-2 rounded-md border border-signal/30 bg-signal-muted">
+                <Check size={14} className="text-signal" />
+                <span className="text-sm font-medium text-text">{f}</span>
+              </div>
+            ))}
+            {["AIFF", "AAC", "OGG"].map((f) => (
+              <div key={f} className="flex items-center gap-2 px-3 py-2 rounded-md border border-border">
+                <span className="text-sm text-muted">{f}</span>
+              </div>
+            ))}
+          </div>
+          <Rule />
           <div className="flex items-center gap-3">
-            <Pill active>WAV 48kHz / 24-bit</Pill>
-            <ArrowRight size={16} className="text-faint" />
-            <MockSelect text="FLAC" />
+            <MockSelect text="Export from: v3 - mix-final.wav (latest)" className="flex-1" />
+            <Button variant="primary"><Download size={14} /> Convert</Button>
           </div>
-          <div className="flex gap-3">
-            <div>
-              <label className="label text-xs text-faint mb-1.5 block">SAMPLE RATE</label>
-              <MockSelect text="44.1 kHz" />
-            </div>
-            <div>
-              <label className="label text-xs text-faint mb-1.5 block">BIT DEPTH</label>
-              <MockSelect text="16-bit" />
-            </div>
-          </div>
-          <Button variant="primary"><RefreshCw size={14} /> Convert</Button>
         </PanelBody>
       </Panel>
     </>
@@ -566,27 +662,22 @@ function SupportedFormatsMockup() {
       <Panel className="m-4">
         <PanelBody className="space-y-4">
           <div>
-            <span className="label text-xs text-faint">INPUT FORMATS</span>
-            <div className="flex gap-2 mt-2">
-              {["WAV", "AIFF", "FLAC", "MP3"].map((f) => <Pill key={f}>{f}</Pill>)}
+            <span className="label text-xs text-faint">CONVERTIBLE FORMATS</span>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {["WAV", "AIFF", "FLAC", "MP3", "AAC", "OGG", "ALAC"].map((f) => (
+                <Pill key={f} active>{f}</Pill>
+              ))}
             </div>
           </div>
           <Rule />
           <div>
-            <span className="label text-xs text-faint">OUTPUT FORMATS</span>
-            <div className="mt-2 space-y-2">
-              {[
-                { fmt: "WAV", spec: "16/24/32-bit, 44.1-192 kHz" },
-                { fmt: "AIFF", spec: "16/24-bit" },
-                { fmt: "FLAC", spec: "16/24-bit" },
-                { fmt: "MP3", spec: "128-320 kbps" },
-              ].map((f) => (
-                <div key={f.fmt} className="flex items-center gap-3">
-                  <Pill active>{f.fmt}</Pill>
-                  <span className="text-sm text-muted">{f.spec}</span>
-                </div>
+            <span className="label text-xs text-faint">NON-CONVERTIBLE (DISPLAY ONLY)</span>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {["DDP", "ADM BWF/Atmos", "MQA"].map((f) => (
+                <Pill key={f}>{f}</Pill>
               ))}
             </div>
+            <p className="text-xs text-muted mt-2">These formats require specialized tools and cannot be converted in-app.</p>
           </div>
         </PanelBody>
       </Panel>
@@ -595,7 +686,7 @@ function SupportedFormatsMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ARTICLE 6: TIMESTAMPED COMMENTS (3 mockups)
+   ARTICLE 7: TIMESTAMPED COMMENTS (3 mockups)
    ═══════════════════════════════════════════════════════════ */
 
 function CommentWaveformMockup() {
@@ -678,150 +769,86 @@ function ResolveFeedbackMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ARTICLE 7: CREATING TASKS (3 mockups)
+   ARTICLE 8: CLIENT PORTAL AND APPROVALS (3 mockups)
    ═══════════════════════════════════════════════════════════ */
 
-function TaskCreateMockup() {
-  const tasks = [
-    { title: "Record final vocal take", assignee: "SK", status: "To Do", color: "blue" as const },
-    { title: "Mix bass and drums", assignee: "ML", status: "In Progress", color: "orange" as const },
-    { title: "Export stems", assignee: "AR", status: "Done", color: "green" as const, done: true },
-  ];
+function PortalSettingsMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelHeader>
+        <PanelBody className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-base font-semibold text-text">Tasks</span>
-            <Button variant="primary"><Plus size={14} /> Add Task</Button>
-          </div>
-        </PanelHeader>
-        <PanelBody className="space-y-2">
-          {tasks.map((t) => (
-            <div key={t.title} className="flex items-center gap-3 px-4 py-3 rounded-md border border-border bg-panel">
-              <span className={cn("w-5 h-5 rounded-sm border-2 flex items-center justify-center shrink-0", t.done ? "bg-signal border-signal" : "border-border")}>
-                {t.done && <Check size={12} className="text-signal-on" />}
-              </span>
-              <span className={cn("text-sm flex-1 truncate", t.done ? "text-faint line-through" : "text-text")}>{t.title}</span>
-              <MockAvatar initials={t.assignee} />
-              <Pill className={cn(
-                t.color === "blue" && "bg-status-blue/10 text-status-blue border-status-blue/20",
-                t.color === "orange" && "bg-status-orange/10 text-status-orange border-status-orange/20",
-                t.color === "green" && "bg-status-green/10 text-status-green border-status-green/20",
-              )}>{t.status}</Pill>
+            <div className="flex items-center gap-2">
+              <Globe size={16} className="text-signal" />
+              <span className="text-sm font-semibold text-text">Client Portal</span>
             </div>
-          ))}
-        </PanelBody>
-      </Panel>
-    </>
-  );
-}
-
-function TaskAssignMockup() {
-  return (
-    <>
-      <Panel className="m-4">
-        <PanelBody className="space-y-3">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-md border border-border bg-panel">
-            <span className="w-5 h-5 rounded-sm border-2 border-border shrink-0" />
-            <span className="text-sm text-text flex-1">Mix bass and drums</span>
-            <span className="text-xs text-signal font-medium">Assign</span>
+            <div className="w-10 h-6 rounded-full bg-signal flex items-center justify-end px-0.5">
+              <div className="w-5 h-5 rounded-full bg-white" />
+            </div>
           </div>
-          <Panel variant="flat" className="border border-signal/30 shadow-lg p-2 space-y-1">
+          <div className="flex items-center gap-2">
+            <MockInput text="mixarchitect.com/portal/abc123" className="flex-1" />
+            <Button variant="secondary"><Share2 size={14} /> Share</Button>
+          </div>
+          <Rule />
+          <span className="label text-xs text-faint">VISIBLE SECTIONS</span>
+          <div className="space-y-3">
             {[
-              { name: "Sarah Kim", initials: "SK", role: "Producer" },
-              { name: "Marcus Lee", initials: "ML", role: "Engineer" },
-              { name: "Alex Rivera", initials: "AR", role: "Artist" },
-            ].map((c) => (
-              <div key={c.name} className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-panel2">
-                <MockAvatar initials={c.initials} />
-                <span className="text-sm text-text flex-1">{c.name}</span>
-                <span className="text-xs text-faint">{c.role}</span>
+              { label: "Mix direction", on: true },
+              { label: "Specs", on: true },
+              { label: "References", on: false },
+              { label: "Lyrics", on: false },
+              { label: "Require payment for download", on: true },
+            ].map((t) => (
+              <div key={t.label} className="flex items-center justify-between">
+                <span className="text-sm text-text">{t.label}</span>
+                <div className={cn("w-9 h-5 rounded-full flex items-center px-0.5", t.on ? "bg-signal justify-end" : "bg-border justify-start")}>
+                  <div className="w-4 h-4 rounded-full bg-white" />
+                </div>
               </div>
             ))}
-          </Panel>
+          </div>
         </PanelBody>
       </Panel>
     </>
   );
 }
 
-function TaskTemplatesMockup() {
-  return (
-    <>
-      <Panel className="m-4">
-        <PanelBody className="space-y-3">
-          <div className="flex items-center gap-2">
-            <LayoutTemplate size={16} className="text-signal" />
-            <span className="text-sm font-semibold text-text">Album Master</span>
-            <Pill>Template</Pill>
-          </div>
-          <Rule />
-          <span className="text-xs text-faint label">PRE-BUILT TASKS</span>
-          {["Record vocals", "Mix and balance", "Master final", "Export stems", "Submit for distribution"].map((t) => (
-            <div key={t} className="flex items-center gap-3 px-4 py-2.5 rounded-md border border-border bg-panel">
-              <span className="w-5 h-5 rounded-sm border-2 border-border shrink-0" />
-              <span className="text-sm text-text">{t}</span>
-            </div>
-          ))}
-        </PanelBody>
-      </Panel>
-    </>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════
-   ARTICLE 8: TASK STATUSES (3 mockups)
-   ═══════════════════════════════════════════════════════════ */
-
-function TaskKanbanMockup() {
-  const cols = [
-    { title: "To Do", color: "blue" as const, tasks: ["Update liner notes", "Finalize tracklist"] },
-    { title: "In Progress", color: "orange" as const, tasks: ["Mix revisions"] },
-    { title: "Done", color: "green" as const, tasks: ["Record vocals", "Export stems"] },
-  ];
-  return (
-    <>
-      <div className="p-4 grid grid-cols-3 gap-3">
-        {cols.map((col) => (
-          <div key={col.title}>
-            <div className="flex items-center gap-2 mb-3">
-              <StatusDot color={col.color} />
-              <span className="text-sm font-semibold text-text">{col.title}</span>
-              <span className="text-xs text-faint">{col.tasks.length}</span>
-            </div>
-            <div className="space-y-2">
-              {col.tasks.map((task) => (
-                <Panel key={task} variant="flat" className="px-4 py-3 border border-border">
-                  <span className="text-sm text-text">{task}</span>
-                </Panel>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function TaskProgressMockup() {
+function PortalTrackVisibilityMockup() {
   return (
     <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-text">Task Progress</span>
-              <span className="text-sm font-semibold text-signal">67%</span>
-            </div>
-            <div className="h-2 bg-panel2 rounded-full overflow-hidden">
-              <div className="h-full w-[67%] bg-signal rounded-full" />
-            </div>
+          <span className="label text-xs text-faint">TRACK PORTAL VISIBILITY</span>
+          <p className="text-xs text-muted">Control what your client sees for this track on the portal.</p>
+          <div className="space-y-3">
+            {[
+              { label: "Visible on portal", on: true },
+              { label: "Enable download", on: true },
+            ].map((t) => (
+              <div key={t.label} className="flex items-center justify-between">
+                <span className="text-sm text-text">{t.label}</span>
+                <div className={cn("w-9 h-5 rounded-full flex items-center px-0.5", t.on ? "bg-signal justify-end" : "bg-border justify-start")}>
+                  <div className="w-4 h-4 rounded-full bg-white" />
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="flex gap-4">
-            <div className="flex items-center gap-2"><StatusDot color="blue" /><span className="text-sm text-muted">3 To Do</span></div>
-            <div className="flex items-center gap-2"><StatusDot color="orange" /><span className="text-sm text-muted">2 In Progress</span></div>
-            <div className="flex items-center gap-2"><StatusDot color="green" /><span className="text-sm text-muted">5 Done</span></div>
+          <Rule />
+          <span className="label text-xs text-faint">TRACK VERSION VISIBILITY</span>
+          <div className="space-y-3">
+            {[
+              { label: "v3 - mix-final.wav (latest)", on: true },
+              { label: "v2 - mix-rev2.wav", on: false },
+              { label: "v1 - mix-rough.wav", on: false },
+            ].map((t) => (
+              <div key={t.label} className="flex items-center justify-between">
+                <span className="text-sm text-text">{t.label}</span>
+                <div className={cn("w-9 h-5 rounded-full flex items-center px-0.5", t.on ? "bg-signal justify-end" : "bg-border justify-start")}>
+                  <div className="w-4 h-4 rounded-full bg-white" />
+                </div>
+              </div>
+            ))}
           </div>
         </PanelBody>
       </Panel>
@@ -829,26 +856,35 @@ function TaskProgressMockup() {
   );
 }
 
-function TaskFiltersMockup() {
+function PortalApprovalMockup() {
   return (
     <>
       <Panel className="m-4">
         <PanelBody className="space-y-4">
-          <div className="flex items-center gap-3 flex-wrap">
-            <SegmentedControl
-              options={[{ value: "all", label: "All" }, { value: "todo", label: "To Do" }, { value: "progress", label: "In Progress" }, { value: "done", label: "Done" }]}
-              value="progress"
-              onChange={() => {}}
-            />
-            <MockSelect text="All Members" />
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-status-green/10 flex items-center justify-center shrink-0">
+              <Check size={16} className="text-status-green" />
+            </div>
+            <div className="flex-1">
+              <span className="text-sm font-semibold text-text">Approved</span>
+              <p className="text-xs text-muted mt-0.5">Jordan Blake approved on Mar 2, 2026</p>
+            </div>
           </div>
           <Rule />
+          <span className="label text-xs text-faint">APPROVAL HISTORY</span>
           <div className="space-y-2">
-            {["Mix bass and drums", "Balance synth levels"].map((t) => (
-              <div key={t} className="flex items-center gap-3 px-4 py-3 rounded-md border border-border bg-panel">
-                <span className="w-5 h-5 rounded-sm border-2 border-border shrink-0" />
-                <span className="text-sm text-text flex-1">{t}</span>
-                <Pill className="bg-status-orange/10 text-status-orange border-status-orange/20">In Progress</Pill>
+            {[
+              { action: "Approved", actor: "Jordan Blake", date: "Mar 2", color: "green" as const },
+              { action: "Changes requested", actor: "Jordan Blake", date: "Feb 28", color: "orange" as const, note: "Vocals need more presence in the chorus" },
+              { action: "Delivered", actor: "Sarah Kim", date: "Feb 25", color: "blue" as const },
+            ].map((e) => (
+              <div key={e.date} className="flex items-start gap-3">
+                <StatusDot color={e.color} />
+                <div className="flex-1 min-w-0">
+                  <span className="text-xs text-text">{e.actor} {e.action.toLowerCase()}</span>
+                  <span className="text-xs text-faint ml-2">{e.date}</span>
+                  {e.note && <p className="text-xs text-muted mt-0.5 italic">{e.note}</p>}
+                </div>
               </div>
             ))}
           </div>
@@ -960,103 +996,7 @@ function TimelineDatesMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ARTICLE 10: MILESTONES (3 mockups)
-   ═══════════════════════════════════════════════════════════ */
-
-function MilestoneExamplesMockup() {
-  const milestones = [
-    { label: "Mix Due", pos: "20%" },
-    { label: "Master Due", pos: "55%" },
-    { label: "Release Date", pos: "85%" },
-  ];
-  return (
-    <>
-      <Panel className="m-4">
-        <PanelBody className="pt-2">
-          <div className="flex mb-2">
-            {["Jan", "Feb", "Mar", "Apr"].map((m) => (
-              <span key={m} className="flex-1 text-xs text-faint text-center">{m}</span>
-            ))}
-          </div>
-          <div className="relative h-4 bg-status-blue/20 rounded-full mx-4">
-            <div className="absolute inset-y-0 left-0 w-[45%] bg-status-blue rounded-full" />
-            {milestones.map((ms) => (
-              <div key={ms.label} className="absolute top-1/2 -translate-y-1/2" style={{ left: ms.pos }}>
-                <div className="w-4 h-4 rotate-45 rounded-sm bg-signal border-2 border-panel -translate-x-1/2" />
-              </div>
-            ))}
-          </div>
-          <div className="relative h-6 mx-4 mt-2">
-            {milestones.map((ms) => (
-              <span key={ms.label} className="absolute text-xs text-muted -translate-x-1/2 whitespace-nowrap" style={{ left: ms.pos }}>
-                {ms.label}
-              </span>
-            ))}
-          </div>
-        </PanelBody>
-      </Panel>
-    </>
-  );
-}
-
-function MilestoneAddMockup() {
-  return (
-    <>
-      <Panel className="m-4">
-        <PanelHeader><span className="text-base font-semibold text-text">Add Milestone</span></PanelHeader>
-        <PanelBody className="space-y-4">
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="label text-xs text-faint mb-1.5 block">NAME</label>
-              <MockInput text="Master Due" className="w-full" />
-            </div>
-            <div className="flex-1">
-              <label className="label text-xs text-faint mb-1.5 block">DATE</label>
-              <MockSelect text="Mar 10, 2026" />
-            </div>
-          </div>
-          <Button variant="primary">Save Milestone</Button>
-          <Rule />
-          <span className="label text-xs text-faint">EXISTING MILESTONES</span>
-          {[
-            { name: "Mix Due", date: "Feb 15" },
-            { name: "Artwork Due", date: "Feb 28" },
-          ].map((m) => (
-            <div key={m.name} className="flex items-center gap-3 py-2">
-              <MapPin size={14} className="text-signal" />
-              <span className="text-sm text-text flex-1">{m.name}</span>
-              <span className="text-sm text-muted">{m.date}</span>
-            </div>
-          ))}
-        </PanelBody>
-      </Panel>
-    </>
-  );
-}
-
-function MilestoneNotificationMockup() {
-  return (
-    <>
-      <Panel className="m-4">
-        <PanelBody>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-status-orange/10 flex items-center justify-center shrink-0">
-              <Bell size={16} className="text-status-orange" />
-            </div>
-            <div className="flex-1">
-              <span className="text-sm font-semibold text-text">Master Due in 3 days</span>
-              <p className="text-sm text-muted mt-0.5">Late Night EP - March 10, 2026</p>
-            </div>
-            <span className="text-xs text-faint shrink-0">Just now</span>
-          </div>
-        </PanelBody>
-      </Panel>
-    </>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════
-   ARTICLE 11: TEMPLATES (3 mockups)
+   ARTICLE 10: TEMPLATES (3 mockups)
    ═══════════════════════════════════════════════════════════ */
 
 function TemplateContentsMockup() {
@@ -1087,11 +1027,11 @@ function TemplateContentsMockup() {
           </div>
           <Rule />
           <div>
-            <span className="label text-xs text-faint">PRE-BUILT TASKS</span>
+            <span className="label text-xs text-faint">INCLUDED SETTINGS</span>
             <div className="mt-2 space-y-1 text-sm text-muted">
-              {["Record vocals", "Mix and balance", "Master final"].map((t) => (
+              {["Stereo format", "48 kHz / 24-bit", "WAV + FLAC delivery"].map((t) => (
                 <div key={t} className="flex items-center gap-2">
-                  <ClipboardList size={14} className="text-faint" />
+                  <Check size={14} className="text-signal" />
                   {t}
                 </div>
               ))}
@@ -1150,7 +1090,7 @@ function TemplateUseMockup() {
               <Pill>Stereo</Pill>
               <Pill>48 kHz</Pill>
               <Pill>24-bit</Pill>
-              <Pill>5 tasks</Pill>
+              <Pill>WAV + FLAC</Pill>
             </div>
           </div>
           <div>
@@ -1158,6 +1098,104 @@ function TemplateUseMockup() {
             <MockInput text="My New Album" className="w-full" />
           </div>
           <Button variant="primary" className="w-full">Create Release</Button>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ARTICLE 11: PAYMENT TRACKING (3 mockups)
+   ═══════════════════════════════════════════════════════════ */
+
+function PaymentDashboardMockup() {
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <span className="text-lg font-semibold text-text">Payments</span>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: "OUTSTANDING", value: "$2,400", highlight: true, count: "3 releases" },
+            { label: "EARNED", value: "$8,600", highlight: false, count: "5 paid" },
+            { label: "TOTAL FEES", value: "$11,000", highlight: false, count: "8 releases" },
+          ].map((s) => (
+            <Panel key={s.label} variant="flat" className="px-4 py-3 border border-border">
+              <span className="text-[10px] uppercase tracking-wide text-faint font-medium">{s.label}</span>
+              <div className={cn("text-lg font-semibold mt-1", s.highlight ? "text-signal" : "text-text")}>{s.value}</div>
+              <span className="text-xs text-muted">{s.count}</span>
+            </Panel>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function PaymentReleaseFeesMockup() {
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelBody>
+          <div className="space-y-1 text-sm">
+            <div className="flex items-center gap-3 py-2 font-medium text-faint text-xs">
+              <span className="flex-1">Release</span>
+              <span className="w-20 text-right">Fee</span>
+              <span className="w-20 text-right">Paid</span>
+              <span className="w-16 text-right">Status</span>
+            </div>
+            <Rule />
+            {[
+              { title: "Late Night EP", fee: "$3,000", paid: "$3,000", status: "paid" as const },
+              { title: "Summer Single", fee: "$1,200", paid: "$600", status: "partial" as const },
+              { title: "Demo Reel", fee: "$2,400", paid: "$0", status: "unpaid" as const },
+            ].map((r) => (
+              <div key={r.title} className="flex items-center gap-3 py-2.5">
+                <span className="text-sm font-medium text-text flex-1 truncate">{r.title}</span>
+                <span className="w-20 text-right text-sm text-text">{r.fee}</span>
+                <span className="w-20 text-right text-sm text-text">{r.paid}</span>
+                <span className={cn(
+                  "w-16 text-right text-[10px] font-medium uppercase tracking-wide",
+                  r.status === "paid" && "text-status-green",
+                  r.status === "partial" && "text-status-orange",
+                  r.status === "unpaid" && "text-faint",
+                )}>{r.status}</span>
+              </div>
+            ))}
+          </div>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function PaymentTrackFeesMockup() {
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelBody className="space-y-0">
+          <div className="flex items-center gap-3 py-2.5">
+            <ChevronDown size={14} className="text-muted" />
+            <span className="text-sm font-medium text-text flex-1">Summer Single</span>
+            <span className="text-sm text-text w-20 text-right">$1,200</span>
+            <span className="text-sm text-text w-20 text-right">$600</span>
+            <Pill className="bg-status-orange/10 text-status-orange border-status-orange/20">Partial</Pill>
+          </div>
+          <div className="ml-7 border-l border-border pl-4 space-y-0">
+            {[
+              { num: "01", title: "Midnight Drive", fee: "$600", paid: true },
+              { num: "02", title: "Golden Hour", fee: "$600", paid: false },
+            ].map((t) => (
+              <div key={t.num} className="flex items-center gap-3 py-2 text-xs">
+                <span className="text-faint">{t.num}</span>
+                <span className="text-muted flex-1">{t.title}</span>
+                <span className="text-muted w-20 text-right">{t.fee}</span>
+                <span className={cn("w-20 text-right", t.paid ? "text-status-green" : "text-faint")}>
+                  {t.paid ? t.fee : "$0"}
+                </span>
+                <StatusDot color={t.paid ? "green" : "blue"} />
+              </div>
+            ))}
+          </div>
         </PanelBody>
       </Panel>
     </>
@@ -1178,7 +1216,7 @@ function ExportContentsMockup() {
             "Profile information",
             "All releases and metadata",
             "Track details (names, versions, notes)",
-            "Tasks and assignments",
+            "Audio files and versions",
             "Collaborator lists",
             "Comments and feedback",
           ].map((item) => (
@@ -1357,7 +1395,7 @@ function DataAfterCancelMockup() {
         <PanelBody className="space-y-4">
           <div>
             <span className="label text-xs text-faint mb-2 block">PRESERVED</span>
-            {["All releases and tracks", "Audio files and versions", "Tasks and comments", "Collaborator lists"].map((item) => (
+            {["All releases and tracks", "Audio files and versions", "Notes and comments", "Collaborator lists"].map((item) => (
               <div key={item} className="flex items-center gap-3 py-1.5">
                 <Check size={16} className="text-signal shrink-0" />
                 <span className="text-sm text-text">{item}</span>
@@ -1420,38 +1458,38 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "collaborator-roles": CollaboratorRolesMockup,
   "accept-invitation": AcceptInvitationMockup,
   "portal-sharing": PortalSharingMockup,
-  /* Article 4: Audio Tracks */
+  /* Article 4: Track Tabs */
+  "track-tabs-overview": TrackTabsOverviewMockup,
+  "track-audio-notes": TrackAudioNotesMockup,
+  "track-distribution-portal": TrackDistributionPortalMockup,
+  /* Article 5: Audio Upload */
   "audio-upload": AudioUploadMockup,
   "track-versions": TrackVersionsMockup,
   "waveform-player": WaveformPlayerMockup,
-  /* Article 5: Audio Converter */
+  /* Article 6: Delivery Formats */
   "format-convert": FormatConvertMockup,
   "export-download": ExportDownloadMockup,
   "supported-formats": SupportedFormatsMockup,
-  /* Article 6: Timestamped Comments */
+  /* Article 7: Timestamped Comments */
   "comment-waveform": CommentWaveformMockup,
   "portal-comments": PortalCommentsMockup,
   "resolve-feedback": ResolveFeedbackMockup,
-  /* Article 7: Tasks */
-  "task-create": TaskCreateMockup,
-  "task-assign": TaskAssignMockup,
-  "task-templates": TaskTemplatesMockup,
-  /* Article 8: Task Statuses */
-  "task-kanban": TaskKanbanMockup,
-  "task-progress": TaskProgressMockup,
-  "task-filters": TaskFiltersMockup,
+  /* Article 8: Client Portal */
+  "portal-settings": PortalSettingsMockup,
+  "portal-track-visibility": PortalTrackVisibilityMockup,
+  "portal-approval": PortalApprovalMockup,
   /* Article 9: Timeline */
   "timeline-full": TimelineFullMockup,
   "timeline-navigate": TimelineNavigateMockup,
   "timeline-dates": TimelineDatesMockup,
-  /* Article 10: Milestones */
-  "milestone-examples": MilestoneExamplesMockup,
-  "milestone-add": MilestoneAddMockup,
-  "milestone-notification": MilestoneNotificationMockup,
-  /* Article 11: Templates */
+  /* Article 10: Templates */
   "template-contents": TemplateContentsMockup,
   "template-create": TemplateCreateMockup,
   "template-use": TemplateUseMockup,
+  /* Article 11: Payment Tracking */
+  "payment-dashboard": PaymentDashboardMockup,
+  "payment-release-fees": PaymentReleaseFeesMockup,
+  "payment-track-fees": PaymentTrackFeesMockup,
   /* Article 12: Export */
   "export-contents": ExportContentsMockup,
   "export-progress": ExportProgressMockup,

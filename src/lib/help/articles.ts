@@ -4,7 +4,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   "getting-started": "Getting Started",
   releases: "Releases",
   audio: "Audio",
-  tasks: "Tasks",
   timeline: "Timeline",
   account: "Account",
   billing: "Billing",
@@ -23,22 +22,22 @@ export const articles: HelpArticle[] = [
     summary:
       "A quick tour of the platform, from your dashboard to releases, tracks, and collaboration tools.",
     tags: ["overview", "intro", "dashboard", "getting started"],
-    updatedAt: "2026-02-15",
+    updatedAt: "2026-03-04",
     content: [
       {
         heading: "Your Dashboard",
-        body: "After signing in you land on the dashboard. It shows all your releases sorted by most recent activity, along with key stats like total tracks, active collaborators, and pending tasks. Each release card shows its cover art, status badge, and track count.",
+        body: "After signing in you land on the dashboard. It shows all your releases in a responsive grid, sorted by most recent activity. Each release card displays its cover art, title, artist, status badge, format, and track completion count. If payment tracking is enabled, you will also see payment stats at the top: Outstanding, Earned, and Total fees across all releases.",
         mockup: "dashboard",
       },
       {
         heading: "Navigating the App",
-        body: "The sidebar (or bottom bar on mobile) gives you quick access to the Dashboard, Templates, Payments, Settings, and Help. Click any release card to open the release detail view where you manage tracks, tasks, the brief, and collaborator access.",
-        tip: "Use the Search shortcut (click the magnifying glass or press Cmd+K) to jump to any release or track instantly.",
+        body: "The sidebar (or bottom bar on mobile) gives you quick access to the Dashboard, Templates, Payments (if enabled), Settings, and Help. Click any release card to open the release detail view. You can also use the search icon or Cmd+K to jump to any release or track instantly. The sidebar includes a notification bell for activity updates and a theme toggle for light, dark, or system appearance.",
+        tip: "Pin your most important releases so they always appear at the top of the dashboard.",
         mockup: "nav-rail",
       },
       {
         heading: "Key Concepts",
-        body: "Releases are your top-level projects. Each release contains one or more tracks, a brief document, a task board, and a collaborator list. Tracks hold audio versions, comments, and export settings. Everything is organized around this release-first structure so your team always has full context.",
+        body: "Releases are your top-level projects. Each release contains one or more tracks. Tracks are where the real work happens: each track has six tabs for Intent, Specs, Audio, Distribution, Portal, and Notes. The release detail page shows your track list on the left and an inspector sidebar on the right with cover art, release info, mix direction, references, and collaborator access.",
         mockup: "key-concepts",
       },
     ],
@@ -50,27 +49,27 @@ export const articles: HelpArticle[] = [
     summary:
       "Step-by-step guide to creating a release, adding metadata, and uploading your first track.",
     tags: ["create", "release", "new project", "setup"],
-    updatedAt: "2026-02-15",
+    updatedAt: "2026-03-04",
     content: [
       {
         heading: "Create a New Release",
-        body: "From the dashboard, click the \"New Release\" button in the top right. Enter a title for your release. You can also set optional metadata like artist name, label, genre, and target release date. Click \"Create\" to generate your release.",
+        body: "From the dashboard, click the \"New Release\" button in the top right. If you have saved templates, you will be shown a template picker first. Otherwise, you go straight to the form. Enter a title, optionally add an artist name, choose the release type (Single, EP, or Album), format (Stereo, Dolby Atmos, or Stereo + Atmos), genre tags, and a target release date. Click \"Create\" to generate your release.",
+        tip: "When you create a Single, a track is automatically created with the release title and your default specs applied.",
         mockup: "create-release",
       },
       {
         heading: "Add Cover Art",
-        body: "In the release detail view, the sidebar shows a cover art placeholder. Click it to upload an image. Supported formats are JPEG and PNG, minimum 1400x1400 pixels for distribution compatibility. The image is stored securely and displayed across all views.",
+        body: "In the release detail view, the inspector sidebar on the right shows a cover art area. Click it to upload an image (PNG, JPG, WebP, or GIF, max 5 MB). You can also paste a URL instead. The image is displayed on the release card, in the brief, and on the client portal.",
         mockup: "cover-art-upload",
       },
       {
         heading: "Upload Your First Track",
-        body: "Navigate to the track list in your release and click \"Add Track\". Drag and drop an audio file or click to browse. Supported formats include WAV, AIFF, FLAC, and MP3. The track will be processed and a waveform visualization will appear once the upload completes.",
-        tip: "You can upload multiple tracks at once by selecting several files in the file picker.",
+        body: "In the release detail view, click \"Add Track\" below the track list on the left. Give your track a title and it will be created. Then open the track and go to the Audio tab to upload your audio file. Supported formats: WAV, AIFF, FLAC, MP3, AAC, and M4A, up to 500 MB per file. A waveform visualization will appear once processing completes.",
         mockup: "track-upload",
       },
       {
         heading: "Set Release Status",
-        body: "Each release has a status: Draft, In Progress, Review, or Complete. Update the status from the toolbar at the top of the release page. Status changes are visible to all collaborators and appear in the timeline view.",
+        body: "Each release has a status: Draft, In Progress, or Ready. Update the status from the release settings page. The status badge appears on your dashboard release cards and is visible to all collaborators.",
         mockup: "release-status",
       },
     ],
@@ -80,30 +79,140 @@ export const articles: HelpArticle[] = [
     title: "Inviting Collaborators to a Release",
     category: "getting-started",
     summary:
-      "Share your release with mix engineers, producers, artists, and label contacts.",
+      "Share your release with team members and external clients.",
     tags: ["collaborators", "invite", "share", "team", "permissions"],
-    updatedAt: "2026-02-15",
+    updatedAt: "2026-03-04",
     content: [
       {
         heading: "Sending Invitations",
-        body: "Open a release and click the \"Collaborators\" section. Enter the email address of the person you want to invite and select their role (e.g., Artist, Engineer, Producer, Label). Click \"Invite\" to send them an email with a link to join the release.",
+        body: "Open a release, go to Settings, and scroll to the Team section. Enter the email address of the person you want to invite and select their role: Collaborator (full access to edit) or Client (view-only with approval capabilities). Click \"Invite\" to send them an email with a link to join the release.",
         mockup: "invite-collaborator",
       },
       {
-        heading: "Collaborator Roles",
-        body: "Roles help organize who does what, but all collaborators have access to the same release content: tracks, tasks, comments, and the brief. The role is displayed next to each collaborator's name for clarity.",
+        heading: "Collaborator vs Client Roles",
+        body: "There are two roles. Collaborators can view and edit all release content: tracks, specs, audio, notes, and distribution metadata. Clients have view-only access and can provide feedback through the portal, approve tracks, and download audio if permitted. The role badge is displayed next to each team member's name.",
         mockup: "collaborator-roles",
       },
       {
         heading: "Accepting Invitations",
-        body: "When someone accepts their invitation, they will appear in the collaborator list with their role badge. You will receive a notification in-app letting you know they have joined.",
-        tip: "Collaborators who do not have a Mix Architect account will be prompted to create one when they click the invite link.",
+        body: "When someone accepts their invitation, they appear in the team list with their role badge and the date they joined. You will receive an in-app notification letting you know they have joined.",
+        tip: "Invitees who do not have a Mix Architect account will be prompted to create one when they click the invite link.",
         mockup: "accept-invitation",
       },
       {
         heading: "Client Portal Sharing",
-        body: "For external stakeholders who only need to review a release (not collaborate on it), use the Portal share link instead. This gives them read-only access to the brief, track list, and comments without requiring an account.",
+        body: "For external stakeholders who need to review without logging in, activate the client portal from the release detail page. This generates a unique share link that provides read-only access to the brief, track list, audio, and comments. You can configure exactly what is visible: mix direction, specs, references, payment status, distribution info, and lyrics.",
         mockup: "portal-sharing",
+      },
+    ],
+  },
+
+  /* ──────────────────────────────────────────────────────
+     RELEASES
+     ────────────────────────────────────────────────────── */
+  {
+    id: "track-tabs",
+    title: "Track Detail: Understanding the Tabs",
+    category: "releases",
+    summary:
+      "Each track has six tabs for managing every aspect of your mix, from creative intent to delivery specs.",
+    tags: ["tracks", "tabs", "intent", "specs", "audio", "distribution", "portal", "notes"],
+    updatedAt: "2026-03-04",
+    content: [
+      {
+        heading: "Intent and Specs",
+        body: "The Intent tab is where you describe the creative vision for a track: mix direction, emotional tags, anti-references, and reference tracks with notes. The Specs tab holds technical settings: format override (or inherit from release), sample rate, bit depth, delivery formats for conversion, and any special requirements like \"radio edit needed\" or \"stems for remix.\"",
+        mockup: "track-tabs-overview",
+      },
+      {
+        heading: "Audio and Notes",
+        body: "The Audio tab is where you upload files, manage versions, play back the waveform, and leave timestamped comments tied to specific moments in the audio. The Notes tab is a general-purpose space for revision notes and discussion that is not tied to a specific timecode.",
+        mockup: "track-audio-notes",
+      },
+      {
+        heading: "Distribution and Portal",
+        body: "The Distribution tab captures metadata needed for digital distribution: ISRC, ISWC, featured artist, explicit content flag, language, copyright info, producer, composers, and lyrics. The Portal tab controls per-track visibility for client portal users, including which audio versions are accessible, whether downloads are enabled, and the track's approval status.",
+        mockup: "track-distribution-portal",
+      },
+    ],
+  },
+  {
+    id: "client-portal",
+    title: "Client Portal and Approvals",
+    category: "releases",
+    summary:
+      "Share your release with clients via a unique link, control what they can see, and track approvals.",
+    tags: ["portal", "client", "approval", "sharing", "review"],
+    updatedAt: "2026-03-04",
+    content: [
+      {
+        heading: "Activating the Portal",
+        body: "On the release detail page, click the Portal toggle in the header area. Once active, you get a unique share link you can copy and send to your client. The portal provides read-only access without requiring an account. Use the portal settings menu to control what sections are visible: mix direction, specs, references, payment status, distribution, and lyrics.",
+        mockup: "portal-settings",
+      },
+      {
+        heading: "Per-Track Visibility",
+        body: "For each track, go to the Portal tab to control what your client can see. Toggle track visibility on or off, enable or disable downloads, and choose which audio versions are accessible. This gives you fine-grained control so you can hide works in progress and only share finished mixes.",
+        mockup: "portal-track-visibility",
+      },
+      {
+        heading: "Track Approvals",
+        body: "Clients can approve or request revisions on individual tracks through the portal. The approval status (Pending, Approved, Rejected, or Revisions Requested) is tracked with a timestamped history so you have a clear record of all decisions. Approval events appear in the Portal tab of each track.",
+        mockup: "portal-approval",
+      },
+    ],
+  },
+  {
+    id: "templates",
+    title: "Using Release Templates",
+    category: "releases",
+    summary:
+      "Save time by creating releases from reusable templates with pre-configured specs and delivery formats.",
+    tags: ["templates", "reuse", "workflow", "presets"],
+    updatedAt: "2026-03-04",
+    content: [
+      {
+        heading: "What Templates Include",
+        body: "A template captures a release's specs (format, sample rate, bit depth), delivery formats, and client info. When you create a release from a template, these defaults are automatically applied to new tracks, saving you from configuring the same settings repeatedly.",
+        mockup: "template-contents",
+      },
+      {
+        heading: "Creating a Template",
+        body: "Navigate to the Templates page from the sidebar. Click \"New Template\" and fill in the defaults you want to reuse: audio format, sample rate, bit depth, and delivery formats. Give the template a descriptive name. You can also set one template as your default, which will be pre-selected when creating new releases.",
+        mockup: "template-create",
+      },
+      {
+        heading: "Using a Template",
+        body: "When creating a new release, if you have saved templates, a template picker is shown as the first step. Select a template and click \"Use Template\" to pre-fill the release with those settings. You can also click \"Start from scratch\" to skip templates entirely. Any template settings can be customized after the release is created.",
+        tip: "Create templates for your most common project types: singles, EPs, albums, Dolby Atmos projects, etc. This ensures consistency and saves setup time.",
+        mockup: "template-use",
+      },
+    ],
+  },
+  {
+    id: "payment-tracking",
+    title: "Payment Tracking",
+    category: "releases",
+    summary:
+      "Track fees, payments, and outstanding balances across your releases and individual tracks.",
+    tags: ["payments", "fees", "billing", "tracking", "invoicing"],
+    updatedAt: "2026-03-04",
+    content: [
+      {
+        heading: "Enabling Payment Tracking",
+        body: "Go to Settings and toggle \"Enable payment tracking\" in the Payment Tracking section. Once enabled, you can set fees on releases and individual tracks. Payment stats will appear at the top of your dashboard showing Outstanding, Earned, and Total amounts across all releases.",
+        mockup: "payment-dashboard",
+      },
+      {
+        heading: "Setting Release Fees",
+        body: "In the release settings, scroll to the Payment section. Set the total fee amount, choose a currency (USD, EUR, GBP, CAD, or AUD), and update the payment status: No Fee, Unpaid, Partial, or Paid. You can also record the amount paid so far and add payment notes for your records.",
+        mockup: "payment-release-fees",
+      },
+      {
+        heading: "Payments Dashboard",
+        body: "Access the Payments page from the sidebar to see all releases with their payment status in one view. The page shows three summary cards (Outstanding, Earned, Total) and a table of all releases with fee details. Click any release to expand and see per-track fee breakdowns. The page is print-friendly for generating payment summaries.",
+        tip: "Click the Outstanding or Earned stat cards on the dashboard to quickly filter to releases matching that payment status.",
+        mockup: "payment-track-fees",
       },
     ],
   },
@@ -113,141 +222,83 @@ export const articles: HelpArticle[] = [
      ────────────────────────────────────────────────────── */
   {
     id: "upload-audio-tracks",
-    title: "Uploading and Managing Audio Tracks",
+    title: "Uploading and Managing Audio",
     category: "audio",
     summary:
-      "How to upload, version, and organize audio tracks within a release.",
+      "How to upload audio, manage versions, and use the waveform player.",
     tags: ["upload", "tracks", "audio", "versions", "waveform"],
-    updatedAt: "2026-02-15",
+    updatedAt: "2026-03-04",
     content: [
       {
         heading: "Uploading Audio",
-        body: "Inside any release, click \"Add Track\" to upload audio files. Supported formats: WAV, AIFF, FLAC, and MP3. Files are uploaded to secure cloud storage and processed to generate a waveform visualization. Large files (up to 500 MB) are supported.",
+        body: "Open any track and go to the Audio tab. Click \"Upload audio\" and select a file, or drag and drop directly. Supported formats: WAV, AIFF, FLAC, MP3, AAC, and M4A, up to 500 MB per file. The file is uploaded to secure cloud storage, and a waveform visualization is generated automatically. File metadata (sample rate, bit depth, duration, format) is captured and displayed.",
         mockup: "audio-upload",
       },
       {
         heading: "Track Versions",
-        body: "Each track supports multiple versions. When you upload a new file to an existing track, it becomes the latest version. Previous versions are preserved and accessible from the version dropdown. This lets you compare mixes over time without losing any work.",
-        tip: "Version numbers auto-increment. Upload your revised mix to the same track rather than creating a new track to keep your version history clean.",
+        body: "Each time you upload a new file to the same track, it becomes the latest version. Previous versions are preserved and accessible from the version dropdown above the waveform. Each version shows its version number, upload date, and uploader. You can delete old versions if needed.",
+        tip: "Upload revised mixes to the same track rather than creating a new track. This keeps your version history clean and lets you compare mixes over time.",
         mockup: "track-versions",
       },
       {
         heading: "Waveform Player",
-        body: "Every uploaded track displays an interactive waveform. Click anywhere on the waveform to seek, drag to scrub, and use the play/pause button to control playback. The waveform also shows LUFS loudness measurements so you can evaluate levels at a glance.",
+        body: "Every uploaded version displays an interactive waveform. Click anywhere to seek, drag to scrub, and use the play/pause button to control playback. The player also shows LUFS loudness measurements, color-coded against loudness targets, so you can evaluate levels at a glance.",
         mockup: "waveform-player",
       },
     ],
   },
   {
     id: "audio-converter",
-    title: "Converting Audio Formats",
+    title: "Delivery Formats and Conversion",
     category: "audio",
     summary:
-      "Use the built-in audio converter to export tracks in different formats and sample rates.",
-    tags: ["convert", "export", "format", "wav", "mp3", "flac", "aiff"],
-    updatedAt: "2026-02-15",
+      "Set up delivery formats in the Specs tab and convert audio to the formats your project needs.",
+    tags: ["convert", "export", "format", "delivery", "wav", "mp3", "flac", "aiff", "specs"],
+    updatedAt: "2026-03-04",
     content: [
       {
-        heading: "Starting a Conversion",
-        body: "Open any track and navigate to the Export tab. Select your target format (WAV, AIFF, FLAC, or MP3), sample rate, and bit depth. Click \"Convert\" to start the job. Conversions run in the background so you can continue working.",
+        heading: "Setting Delivery Formats",
+        body: "Open any track and go to the Specs tab. In the Delivery section, select the formats your project needs. Available convertible formats: WAV, AIFF, FLAC, MP3, AAC, OGG, and ALAC. Additional non-convertible formats (DDP, ADM BWF/Atmos, MQA) can be tagged for reference. You can also type a custom format name if your project requires something specific. Use the \"Export from\" dropdown to choose which audio version to convert from.",
         mockup: "format-convert",
       },
       {
-        heading: "Download Your Export",
-        body: "When the conversion finishes, you will receive an in-app notification. Navigate back to the Export tab to download the converted file. The download link remains available until you start a new conversion for the same track.",
+        heading: "Converting and Downloading",
+        body: "Once delivery formats are selected, click the download icon next to any format to start a conversion. The conversion runs in the background, and the icon shows a spinner while processing. When complete, the converted file downloads automatically. You will also receive an in-app notification when the conversion finishes.",
         tip: "For distribution, most platforms accept 16-bit/44.1kHz WAV or FLAC. Check your distributor's requirements before converting.",
         mockup: "export-download",
       },
       {
         heading: "Supported Formats",
-        body: "Input: WAV, AIFF, FLAC, MP3. Output: WAV (16/24/32-bit, 44.1-192kHz), AIFF (16/24-bit), FLAC (16/24-bit), MP3 (128-320kbps). The converter preserves audio quality by working from the original uploaded file, not a compressed intermediate.",
-        warning: "Converting from MP3 to WAV does not improve audio quality. The conversion is lossless in format only; the original MP3 compression artifacts remain.",
+        body: "Convertible: WAV, AIFF, FLAC, MP3, AAC, OGG, ALAC. Non-convertible (tag only): DDP, ADM BWF (Atmos), MQA. The converter works from the original uploaded file to preserve audio quality. You can set sample rate and bit depth overrides per track in the Specs tab.",
+        warning: "Converting from a lossy format (MP3, AAC, OGG) to a lossless format (WAV, FLAC) does not improve audio quality. The original compression artifacts remain.",
         mockup: "supported-formats",
       },
     ],
   },
   {
     id: "audio-review-comments",
-    title: "Leaving Timestamped Comments on a Mix",
+    title: "Leaving Timestamped Comments",
     category: "audio",
     summary:
       "Add time-coded feedback directly on the waveform so collaborators know exactly where to listen.",
-    tags: ["comments", "feedback", "review", "timestamp", "waveform"],
-    updatedAt: "2026-02-15",
+    tags: ["comments", "feedback", "review", "timestamp", "waveform", "notes"],
+    updatedAt: "2026-03-04",
     content: [
       {
         heading: "Adding a Comment",
-        body: "While playing or paused, click on the waveform at the point you want to reference, then type your comment in the text field below. The comment is anchored to that timecode. Collaborators can click the timestamp to jump directly to that moment in the track.",
+        body: "Open a track and go to the Audio tab. While playing or paused, click on the waveform at the point you want to reference, then type your comment in the text field below and click \"Post\". The comment is anchored to that timecode. Collaborators can click the timestamp to jump directly to that moment in the audio. Comments are tied to the specific audio version you are viewing.",
         mockup: "comment-waveform",
       },
       {
         heading: "Portal Comments",
-        body: "External reviewers using the client portal can also leave timestamped comments. Their comments appear alongside team comments but are visually distinguished so you can tell internal from external feedback at a glance.",
+        body: "Client portal users can also leave timestamped comments on the waveform. Their comments appear alongside team comments but are visually distinguished with a \"Client\" badge so you can tell internal from external feedback at a glance.",
         mockup: "portal-comments",
       },
       {
-        heading: "Resolving Feedback",
-        body: "As you address feedback, you can resolve individual comments. Resolved comments are dimmed but still visible for reference. This helps the team track what has been addressed and what still needs attention.",
-        tip: "Use comments for specific, actionable feedback. For general notes about the release, use the Brief document instead.",
+        heading: "Notes vs Audio Comments",
+        body: "The Audio tab is for timestamped feedback tied to specific moments in the waveform. The Notes tab is for general discussion and revision notes that are not tied to a timecode. Use audio comments for specific, actionable feedback like \"bring up the vocals here\" and notes for broader direction like \"overall the mix needs more low end.\"",
+        tip: "For a complete overview of a track's creative direction, use the Intent tab to document the mix vision, emotional tags, and reference tracks.",
         mockup: "resolve-feedback",
-      },
-    ],
-  },
-
-  /* ──────────────────────────────────────────────────────
-     TASKS
-     ────────────────────────────────────────────────────── */
-  {
-    id: "create-release-tasks",
-    title: "Creating and Assigning Tasks",
-    category: "tasks",
-    summary:
-      "Keep your release on track with tasks you can assign to any collaborator.",
-    tags: ["tasks", "assign", "todo", "checklist", "workflow"],
-    updatedAt: "2026-02-15",
-    content: [
-      {
-        heading: "Creating a Task",
-        body: "Open a release and navigate to the Tasks tab. Click \"Add Task\" and enter a title. You can optionally add a description, set a due date, and assign the task to a specific collaborator. Tasks appear in a list view ordered by status and due date.",
-        mockup: "task-create",
-      },
-      {
-        heading: "Assigning Tasks",
-        body: "Click the assignee field on any task to pick from the list of release collaborators. The assigned person will see the task in their view and receive relevant notifications when the task is updated.",
-        mockup: "task-assign",
-      },
-      {
-        heading: "Task Templates",
-        body: "When you create a release from a template, any tasks defined in the template are automatically created. This is useful for standard workflows like mastering checklists, approval chains, or distribution prep steps.",
-        tip: "Build a template with your most common tasks so every new release starts with a ready-made checklist.",
-        mockup: "task-templates",
-      },
-    ],
-  },
-  {
-    id: "task-statuses",
-    title: "Understanding Task Statuses",
-    category: "tasks",
-    summary:
-      "How task statuses work and how to move tasks through your workflow.",
-    tags: ["tasks", "status", "workflow", "progress", "done"],
-    updatedAt: "2026-02-15",
-    content: [
-      {
-        heading: "Available Statuses",
-        body: "Each task has one of three statuses: To Do (not started), In Progress (actively being worked on), and Done (complete). Update the status by clicking the status badge on the task card.",
-        mockup: "task-kanban",
-      },
-      {
-        heading: "Tracking Progress",
-        body: "The release detail view shows a progress bar indicating what percentage of tasks are complete. This gives you a quick visual indicator of how close the release is to being finished without opening the Tasks tab.",
-        mockup: "task-progress",
-      },
-      {
-        heading: "Filtering and Sorting",
-        body: "Use the filter controls at the top of the task list to show only tasks with a specific status or assigned to a specific person. This helps you focus on what needs your attention right now.",
-        tip: "Filter to \"My Tasks\" + \"To Do\" for a quick view of your outstanding work across a release.",
-        mockup: "task-filters",
       },
     ],
   },
@@ -257,86 +308,28 @@ export const articles: HelpArticle[] = [
      ────────────────────────────────────────────────────── */
   {
     id: "timeline-overview",
-    title: "Using the Multi-Release Timeline View",
+    title: "Using the Timeline View",
     category: "timeline",
     summary:
-      "Visualize all your releases on a single timeline to manage schedules and avoid conflicts.",
-    tags: ["timeline", "schedule", "calendar", "gantt", "planning"],
-    updatedAt: "2026-02-15",
+      "Switch to timeline view on your dashboard to visualize release schedules and countdown to release dates.",
+    tags: ["timeline", "schedule", "calendar", "planning", "release date"],
+    updatedAt: "2026-03-04",
     content: [
       {
-        heading: "Opening the Timeline",
-        body: "The Timeline view is available from the release detail page. It displays all your active releases as horizontal bars on a scrollable calendar. Each bar spans from the release creation date to the target release date, color-coded by status.",
+        heading: "Switching to Timeline View",
+        body: "On the dashboard, click the timeline toggle in the header to switch from grid view to timeline view. The timeline displays your releases chronologically based on their target release dates. Releases without a target date appear in a separate \"Unscheduled\" section. Your view preference is saved automatically.",
         mockup: "timeline-full",
       },
       {
-        heading: "Navigating the Timeline",
-        body: "Scroll horizontally to move through time. The \"Today\" line is highlighted so you can see where you are relative to your deadlines. Click any release bar to jump to that release's detail page.",
+        heading: "Reading the Timeline",
+        body: "Each release appears as a card positioned by its target release date. The timeline shows a countdown: \"X days until release\" for upcoming dates or \"Released X days ago\" for past dates. Release cards are color-coded by status (Draft, In Progress, Ready) and pinned releases appear at the top.",
         mockup: "timeline-navigate",
       },
       {
-        heading: "Adjusting Dates",
-        body: "To change a release's schedule, update the target release date from the release settings. The timeline updates automatically. This makes it easy to spot overlapping releases or tight turnarounds.",
-        tip: "Use the timeline during planning to space out your releases and avoid bottlenecks in your mastering or distribution workflow.",
+        heading: "Setting Target Dates",
+        body: "To add a release to the timeline, set a target release date in the release settings or when creating the release. The timeline updates automatically as you adjust dates. This helps you visualize your schedule and avoid overlapping release windows.",
+        tip: "Use the timeline during planning to space out your releases. Having clear visibility of upcoming deadlines helps prevent bottlenecks in your mastering or distribution workflow.",
         mockup: "timeline-dates",
-      },
-    ],
-  },
-  {
-    id: "timeline-milestones",
-    title: "Setting Release Milestones",
-    category: "timeline",
-    summary:
-      "Mark key dates like mix delivery, mastering, and distribution deadlines on your timeline.",
-    tags: ["milestones", "deadlines", "dates", "timeline", "planning"],
-    updatedAt: "2026-02-15",
-    content: [
-      {
-        heading: "What Are Milestones",
-        body: "Milestones are key dates within a release's lifecycle. Common examples include mix delivery, mastering deadline, artwork due, and distribution submission date. They appear as markers on the timeline bar for that release.",
-        mockup: "milestone-examples",
-      },
-      {
-        heading: "Adding Milestones",
-        body: "Open the release settings and scroll to the Milestones section. Click \"Add Milestone\", enter a name and date, then save. The milestone appears on the timeline and is visible to all collaborators.",
-        mockup: "milestone-add",
-      },
-      {
-        heading: "Milestone Notifications",
-        body: "You can set reminders for milestones. When a milestone date approaches, collaborators receive a notification so nothing slips through the cracks.",
-        warning: "Milestones are informational markers. They do not block any actions. If a milestone date passes, the release continues as normal.",
-        mockup: "milestone-notification",
-      },
-    ],
-  },
-
-  /* ──────────────────────────────────────────────────────
-     RELEASES
-     ────────────────────────────────────────────────────── */
-  {
-    id: "templates",
-    title: "Using Release Templates",
-    category: "releases",
-    summary:
-      "Save time by creating releases from reusable templates with pre-configured settings and tasks.",
-    tags: ["templates", "reuse", "workflow", "presets"],
-    updatedAt: "2026-02-15",
-    content: [
-      {
-        heading: "What Templates Include",
-        body: "A template captures a release's mix defaults (format, sample rate, bit depth), default elements (like instrument stems or reference tracks), and a set of pre-built tasks. When you create a release from a template, all of these are copied into the new release.",
-        mockup: "template-contents",
-      },
-      {
-        heading: "Creating a Template",
-        body: "Navigate to the Templates page from the sidebar. Click \"New Template\" and fill in the defaults you want to reuse: audio format, sample rate, bit depth, default elements, and tasks. Give the template a descriptive name so you can find it later.",
-        mockup: "template-create",
-      },
-      {
-        heading: "Using a Template",
-        body: "When creating a new release, select a template from the dropdown. The release will be pre-populated with the template's settings and tasks. You can then customize anything for that specific release.",
-        tip: "Create templates for your most common project types: singles, EPs, albums, podcast episodes, etc. This ensures consistency and saves setup time.",
-        mockup: "template-use",
       },
     ],
   },
@@ -349,24 +342,24 @@ export const articles: HelpArticle[] = [
     title: "Exporting Your Account Data",
     category: "account",
     summary:
-      "Download a complete export of your releases, tracks, tasks, and account data.",
-    tags: ["export", "data", "download", "backup", "privacy"],
-    updatedAt: "2026-02-15",
+      "Download a complete ZIP export of your releases, tracks, audio files, and payment records.",
+    tags: ["export", "data", "download", "backup", "privacy", "zip"],
+    updatedAt: "2026-03-04",
     content: [
       {
         heading: "What's Included",
-        body: "The data export includes your profile information, all releases and their metadata, track details (names, versions, notes), tasks, collaborator lists, and comments. Audio files are not included in the export; they can be downloaded individually from each track.",
+        body: "The data export is a ZIP file containing all your release metadata, track details, audio files, and payment records. Before downloading, the app shows an estimate of the export size along with counts: number of releases, tracks, and audio files included.",
         mockup: "export-contents",
       },
       {
         heading: "Starting an Export",
-        body: "Go to Settings and scroll to the \"Your Data\" section. Click \"Export All Data\". The export is generated as a JSON file and downloaded to your browser automatically. For large accounts this may take a few seconds.",
+        body: "Go to Settings and scroll to the \"Your Data\" section. Click \"Export My Data\" to begin. A progress bar shows the download status. For large accounts with many audio files, the export may take a while. The ZIP file downloads to your browser automatically when complete.",
         mockup: "export-progress",
       },
       {
         heading: "Data Privacy",
-        body: "Your export contains only data you own or have created. Collaborator comments on your releases are included, but other users' private data is not. The export is generated on-demand and is not stored on our servers.",
-        tip: "Run a data export periodically as a lightweight backup of your project metadata.",
+        body: "Your export contains only data you own or have created. Collaborator contributions (like comments on your releases) are included, but other users' private data is not. The export is generated on-demand and is not stored on our servers.",
+        tip: "Run a data export periodically as a backup of your projects and audio files.",
         mockup: "export-privacy",
       },
     ],
@@ -382,21 +375,21 @@ export const articles: HelpArticle[] = [
     summary:
       "View your plan, update payment details, and manage your Pro subscription.",
     tags: ["subscription", "pro", "billing", "payment", "plan"],
-    updatedAt: "2026-02-15",
+    updatedAt: "2026-03-04",
     content: [
       {
         heading: "Viewing Your Plan",
-        body: "Go to Settings and scroll to the Subscription section. You will see your current plan (Free or Pro), billing cycle, and next payment date. Pro users also see a link to manage their subscription through the Stripe billing portal.",
+        body: "Go to Settings and scroll to the Subscription section. You will see your current plan (Free or Pro) with a badge, your billing details, and links to manage your subscription. Pro users see a \"Manage Billing\" button that opens the Stripe billing portal.",
         mockup: "plan-current",
       },
       {
         heading: "Upgrading to Pro",
-        body: "Click \"Upgrade to Pro\" from the Settings page or from any feature that requires Pro access. You will be taken to a secure Stripe checkout page. Once payment is confirmed, your account is upgraded immediately and you gain access to all Pro features.",
+        body: "Click \"Upgrade to Pro\" from the Settings page. You will be taken to a secure Stripe checkout page. Once payment is confirmed, your account is upgraded immediately and you gain access to all Pro features, including unlimited releases.",
         mockup: "upgrade-pro",
       },
       {
         heading: "Managing Payment",
-        body: "Click \"Manage Subscription\" to open the Stripe billing portal. From there you can update your payment method, view invoices, and change your billing cycle. All payment processing is handled securely by Stripe.",
+        body: "Click \"Manage Billing\" to open the Stripe billing portal. From there you can update your payment method, view invoices, and change your billing cycle. All payment processing is handled securely by Stripe.",
         tip: "Annual billing saves 20% compared to monthly. You can switch at any time from the Stripe portal.",
         mockup: "manage-payment",
       },
@@ -409,22 +402,22 @@ export const articles: HelpArticle[] = [
     summary:
       "How to cancel your Pro subscription and what happens to your data.",
     tags: ["cancel", "resubscribe", "downgrade", "billing"],
-    updatedAt: "2026-02-15",
+    updatedAt: "2026-03-04",
     content: [
       {
         heading: "Cancelling Your Subscription",
-        body: "Click \"Manage Subscription\" in Settings to open the Stripe portal, then click \"Cancel plan\". Your Pro access continues until the end of your current billing period. After that, your account reverts to the Free plan.",
+        body: "Click \"Manage Billing\" in Settings to open the Stripe portal, then click \"Cancel plan\". Your Pro access continues until the end of your current billing period. A notice in Settings will show when your Pro plan expires.",
         mockup: "cancel-subscription",
       },
       {
         heading: "What Happens to Your Data",
-        body: "All your releases, tracks, and data are preserved. You do not lose anything when downgrading. However, some Pro features (like audio conversion and advanced export options) will become unavailable until you resubscribe.",
-        warning: "If you are over the Free plan's release limit, you will not be able to create new releases until you are under the limit or resubscribe to Pro.",
+        body: "All your releases, tracks, and data are preserved. You do not lose anything when downgrading. However, Pro features (like unlimited releases and audio conversion) will become unavailable until you resubscribe.",
+        warning: "Free accounts are limited to one release. If you have more than one release when your Pro plan expires, you will not be able to create new releases until you resubscribe.",
         mockup: "data-after-cancel",
       },
       {
         heading: "Resubscribing",
-        body: "To reactivate Pro, simply click \"Upgrade to Pro\" again from Settings. Your previous data and settings are intact. If you resubscribe within the same billing cycle, you will not be charged twice.",
+        body: "To reactivate Pro, click \"Upgrade to Pro\" again from Settings, or use \"Manage Billing\" to resubscribe through the Stripe portal. Your previous data and settings are intact.",
         mockup: "resubscribe",
       },
     ],
