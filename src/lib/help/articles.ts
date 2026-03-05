@@ -63,12 +63,12 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "The Release Detail Page",
-        body: "After creation, you land on the release detail page. On desktop this has a two-column layout: the track list on the left with a \"Flow\" button and \"+ Add Track\" button, and an inspector sidebar on the right. The inspector sidebar shows the cover art (click to change), Release Info (Artist, Type, Format, Status, Target Date, Genre), Global Mix Direction (click the edit icon to update), and Global References (click \"+ Add\" to search and add reference tracks). If payment tracking is enabled, the Payment section is at the bottom of the sidebar.",
+        body: "After creation, you land on the release detail page. On desktop this has a two-column layout: the track list on the left with a \"Flow\" button and \"+ Add Track\" button, and an inspector sidebar on the right. The inspector sidebar shows the cover art, Release Info (Artist, Type, Format, Status, Target Date, Genre), Global Mix Direction (click the pencil icon to update), and Global References (click \"+ Add\" to search and add reference tracks). If payment tracking is enabled, the Payment section appears at the bottom of the sidebar. To change the cover art or edit release metadata, click the settings gear icon in the header to open Release Settings.",
         mockup: "cover-art-upload",
       },
       {
         heading: "Add Tracks",
-        body: "In the release detail view, click \"+ Add Track\" in the header next to the Flow button. Give your track a title and it will be created with your default specs from [Settings](/app/settings) applied. Each track appears in the list with a number, title, intent preview, status dot, and approval badge. You can drag tracks to reorder them using the grip handle on the left, and delete tracks with the trash icon on the right. Click any track to open it and start working in its six tabs.",
+        body: "In the release detail view, click \"+ Add Track\" in the header next to the Flow button. Give your track a title and it will be created with your default specs from [Settings](/app/settings) applied. Each track appears in the list with a number, title, intent preview, status dot, and approval badge. You can drag tracks to reorder them using the grip handle on the left, or use the move up/down buttons. Delete tracks with the trash icon on the right. Click any track to open it and start working in its six tabs.",
         mockup: "track-upload",
       },
       {
@@ -192,18 +192,18 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "What Templates Include",
-        body: "A template captures a release's configuration so you can reuse it: audio format (Stereo, Dolby Atmos, or Stereo + Atmos), sample rate, bit depth, delivery format selections, and client info. When you create a release from a template, these defaults are automatically applied to new tracks, saving you from configuring the same settings repeatedly across similar projects.",
+        body: "A template captures a comprehensive set of release defaults across six collapsible sections. Basics: template name, description, a \"Set as default template\" checkbox (auto-selected for new releases), and artist/client name and email. Release Settings: release type (Single, EP, or Album), format (Stereo, Dolby Atmos, or Stereo + Atmos), and genre tags. Technical Specs: sample rate, bit depth, delivery format selections (WAV, AIFF, FLAC, MP3, AAC, OGG, DDP, ADM BWF/Atmos, MQA, ALAC), and special requirements. Intent Defaults: pre-selected emotional quality tags for new tracks. Distribution Metadata: distributor, record label, copyright holder, language, primary genre, and rights and publishing contacts. Payment Defaults: payment status, currency, and payment notes. When you create a release from a template, all of these defaults are applied automatically.",
         mockup: "template-contents",
       },
       {
-        heading: "Saving a Release as a Template",
-        body: "On any release detail page, click the \"Save as Template\" button in the header (the bookmark/save icon next to the settings gear). This captures the current release's specs and settings as a reusable template. You can also create templates directly from the [Templates](/app/templates) page by clicking \"New Template\" and filling in the defaults manually: audio format, sample rate, bit depth, and delivery formats. Give each template a descriptive name like \"Stereo Master\" or \"Atmos EP\".",
+        heading: "Creating and Managing Templates",
+        body: "There are two ways to create a template. From any release detail page, click the \"Save as Template\" button in the header (next to the settings gear) to capture that release's current configuration. Or go to the [Templates](/app/templates) page and click \"+ New Template\" to build one from scratch using the full template form. Each template card on the [Templates](/app/templates) page shows its name, description, and a summary line like \"Single, Stereo + Atmos, 96 kHz / 24-bit, 4 delivery formats\". Use the three-dot menu on any template card for options like editing or deleting. Give templates descriptive names like \"Stereo Master\" or \"Atmos EP\" to keep them organized.",
         mockup: "template-create",
       },
       {
         heading: "Creating a Release from a Template",
-        body: "When creating a new release from the [Dashboard](/app), if you have saved templates, a template picker is shown as the first step. Select a template card and click \"Use Template\" to pre-fill the new release with those settings. You can also click \"Start from scratch\" to skip templates entirely. Any template settings can be customized after the release is created. Manage all your templates on the [Templates](/app/templates) page, accessible from the sidebar.",
-        tip: "Create templates for your most common project types: stereo singles, Dolby Atmos albums, mastering-only projects, etc. This ensures consistency across similar projects and saves setup time.",
+        body: "When creating a new release from the [Dashboard](/app), if you have saved templates, a \"Start from a template\" picker is shown as the first step. It reads \"Pre-fill your release settings, or start from scratch.\" Select a template card and click \"Use Template\" to pre-fill the new release form with those settings, or click \"Start from scratch\" to skip. The create release form also has a \"Change template\" link at the bottom if you want to switch. Any template settings can be customized after the release is created.",
+        tip: "Mark your most-used template as the default (\"Set as default template\" checkbox) so it is auto-selected whenever you create a new release.",
         mockup: "template-use",
       },
     ],
@@ -219,7 +219,7 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Enabling Payment Tracking",
-        body: "Go to [Settings](/app/settings) and find the Payment Tracking section. Toggle \"Enable payment tracking\" on. The description reads: \"Shows fee and paid/unpaid status on releases and tracks.\" Once enabled, payment-related features appear throughout the app: fee stats on the [Dashboard](/app) (Outstanding, Earned, Total), a Payment section in the inspector sidebar on each release, and the [Payments](/app/payments) page in the sidebar navigation. Turn this off if you are mixing your own projects and do not need to track client fees.",
+        body: "Go to [Settings](/app/settings) and find the Payment Tracking section. The section reads: \"Track fees and payment status on releases and tracks. Turn this off if you're mixing your own projects.\" Toggle \"Enable payment tracking\" on. Once enabled, payment-related features appear throughout the app: fee stats on the [Dashboard](/app) (Outstanding, Earned, Total Fees), a Payment section in the inspector sidebar on each release, and the [Payments](/app/payments) page in the sidebar navigation.",
         mockup: "payment-dashboard",
       },
       {
@@ -372,7 +372,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Starting an Export",
-        body: "Go to [Settings](/app/settings) and scroll to the \"Your Data\" section. The description reads: \"Download a complete copy of your Mix Architect data, including all release metadata, payment records, and audio files.\" Click \"Export My Data\" to begin. A progress indicator shows the download status. For large accounts with many audio files, the export may take a while. The ZIP file downloads to your browser automatically when complete.",
+        body: "Go to [Settings](/app/settings) and scroll to the \"Your Data\" section. Click \"Export My Data\" to begin. The app first calculates an estimate showing the approximate file size and counts (e.g. \"3 releases, 12 tracks, 8 audio files\"). Review the estimate, then click \"Download\" to start the export. A progress bar shows the download status. For large accounts with many audio files, the export may take a while. The ZIP file downloads to your browser automatically when complete. You can click \"Cancel\" to go back without downloading.",
         mockup: "export-progress",
       },
       {
@@ -398,7 +398,7 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Viewing Your Plan",
-        body: "Go to [Settings](/app/settings) and scroll to the Subscription section at the bottom. You will see your current plan with a badge: Free accounts show basic limits, while Pro accounts display \"$9/month, Unlimited releases\" with a green \"PRO\" badge. Pro users see a \"Manage Billing\" button that opens the Stripe billing portal for payment management.",
+        body: "Go to [Settings](/app/settings) and scroll to the Subscription section at the bottom. The section reads \"Manage your Mix Architect plan.\" You will see your current plan: Pro accounts display \"$9/month, Unlimited releases\" with a green \"PRO\" badge and a \"Manage Billing\" button. Free accounts show an \"Upgrade to Pro\" button instead.",
         mockup: "plan-current",
       },
       {
@@ -408,8 +408,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Managing Payment",
-        body: "Click \"Manage Billing\" in the Subscription section of [Settings](/app/settings) to open the Stripe billing portal. From there you can update your payment method, view invoices, download receipts, and change your billing cycle. All payment processing is handled securely by Stripe.",
-        tip: "Annual billing saves compared to monthly. You can switch billing cycles at any time from the Stripe portal.",
+        body: "Click \"Manage Billing\" in the Subscription section of [Settings](/app/settings) to open the Stripe billing portal. From there you can update your payment method, view invoices, and download receipts. All payment processing is handled securely by Stripe.",
         mockup: "manage-payment",
       },
     ],

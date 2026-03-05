@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Fuse from "fuse.js";
 import { cn } from "@/lib/cn";
-import { Search, ChevronLeft } from "lucide-react";
+import { Search } from "lucide-react";
 import { articles, CATEGORY_LABELS } from "@/lib/help/articles";
 import type { HelpArticle, ArticleCategory } from "@/lib/help/types";
 import { ArticleView } from "@/components/ui/article-view";

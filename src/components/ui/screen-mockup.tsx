@@ -1192,43 +1192,34 @@ function TimelineDatesMockup() {
    ═══════════════════════════════════════════════════════════ */
 
 function TemplateContentsMockup() {
+  const sections = [
+    { name: "Basics", items: ["Template name", "Description", "Default template", "Artist / Client"] },
+    { name: "Release Settings", items: ["Release type", "Format", "Genre tags"] },
+    { name: "Technical Specs", items: ["Sample rate", "Bit depth", "Delivery formats", "Special requirements"] },
+    { name: "Intent Defaults", items: ["Emotional quality tags"] },
+    { name: "Distribution Metadata", items: ["Distributor", "Record label", "Copyright", "Rights & publishing"] },
+    { name: "Payment Defaults", items: ["Payment status", "Currency", "Payment notes"] },
+  ];
   return (
     <>
       <Panel className="m-4">
         <PanelHeader>
           <div className="flex items-center gap-2">
             <LayoutTemplate size={18} className="text-signal" />
-            <span className="text-base font-semibold text-text">Album Master</span>
+            <span className="text-base font-semibold text-text">Template Sections</span>
           </div>
         </PanelHeader>
-        <PanelBody className="space-y-4">
-          <div>
-            <span className="label text-xs text-faint">MIX DEFAULTS</span>
-            <DataGrid className="mt-2">
-              <DataCell label="Format" value="Stereo" size="small" />
-              <DataCell label="Sample Rate" value="48" unit="kHz" size="small" />
-              <DataCell label="Bit Depth" value="24" unit="bit" size="small" />
-            </DataGrid>
-          </div>
-          <Rule />
-          <div>
-            <span className="label text-xs text-faint">DEFAULT ELEMENTS</span>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {["Vocal stems", "Instrument bus", "Reference mix"].map((e) => <Pill key={e}>{e}</Pill>)}
+        <PanelBody className="space-y-3">
+          {sections.map((s) => (
+            <div key={s.name} className="rounded-md bg-panel-2 px-3 py-2.5">
+              <div className="text-sm font-medium text-text">{s.name}</div>
+              <div className="flex flex-wrap gap-1.5 mt-1.5">
+                {s.items.map((item) => (
+                  <span key={item} className="text-xs text-muted bg-panel rounded px-2 py-0.5">{item}</span>
+                ))}
+              </div>
             </div>
-          </div>
-          <Rule />
-          <div>
-            <span className="label text-xs text-faint">INCLUDED SETTINGS</span>
-            <div className="mt-2 space-y-1 text-sm text-muted">
-              {["Stereo format", "48 kHz / 24-bit", "WAV + FLAC delivery"].map((t) => (
-                <div key={t} className="flex items-center gap-2">
-                  <Check size={14} className="text-signal" />
-                  {t}
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </PanelBody>
       </Panel>
     </>
@@ -1243,8 +1234,19 @@ function TemplateCreateMockup() {
         <PanelBody className="space-y-4">
           <div>
             <label className="label text-xs text-faint mb-1.5 block">TEMPLATE NAME</label>
-            <MockInput text="Single Release" className="w-full" />
+            <MockInput text="Stereo Master" className="w-full" />
           </div>
+          <div>
+            <label className="label text-xs text-faint mb-1.5 block">DESCRIPTION</label>
+            <MockInput text="Standard stereo single release" className="w-full" />
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted">
+            <div className="w-4 h-4 rounded border border-border bg-signal flex items-center justify-center">
+              <Check size={12} className="text-white" />
+            </div>
+            Set as default template
+          </div>
+          <Rule />
           <div className="flex gap-3">
             <div className="flex-1">
               <label className="label text-xs text-faint mb-1.5 block">FORMAT</label>
@@ -1259,7 +1261,16 @@ function TemplateCreateMockup() {
               <MockSelect text="16-bit" />
             </div>
           </div>
-          <Button variant="primary" className="w-full">Save Template</Button>
+          <div>
+            <label className="label text-xs text-faint mb-1.5 block">DELIVERY FORMATS</label>
+            <div className="flex flex-wrap gap-2">
+              <Pill active>WAV</Pill>
+              <Pill active>FLAC</Pill>
+              <Pill>MP3</Pill>
+              <Pill>AAC</Pill>
+            </div>
+          </div>
+          <Button variant="primary" className="w-full">Create Template</Button>
         </PanelBody>
       </Panel>
     </>
@@ -1270,26 +1281,26 @@ function TemplateUseMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelHeader><span className="text-base font-semibold text-text">New Release</span></PanelHeader>
+        <PanelHeader>
+          <div className="flex items-center gap-2">
+            <LayoutTemplate size={18} className="text-signal" />
+            <span className="text-base font-semibold text-text">Start from a template</span>
+          </div>
+          <p className="text-xs text-muted mt-1">Pre-fill your release settings, or start from scratch.</p>
+        </PanelHeader>
         <PanelBody className="space-y-4">
-          <div>
-            <label className="label text-xs text-faint mb-1.5 block">TEMPLATE</label>
-            <MockSelect text="Album Master" />
+          <div className="rounded-md border border-signal bg-signal-muted px-4 py-3">
+            <div className="text-sm font-medium text-text">Stereo Master</div>
+            <div className="text-xs text-muted mt-1">Single, Stereo, 44.1 kHz / 16-bit, 2 delivery formats</div>
           </div>
-          <div className="bg-signal-muted rounded-md px-4 py-3">
-            <span className="text-xs text-signal font-medium">Pre-filled from template:</span>
-            <div className="flex flex-wrap gap-2 mt-2">
-              <Pill>Stereo</Pill>
-              <Pill>48 kHz</Pill>
-              <Pill>24-bit</Pill>
-              <Pill>WAV + FLAC</Pill>
-            </div>
+          <div className="rounded-md border border-border px-4 py-3">
+            <div className="text-sm font-medium text-text">Atmos EP</div>
+            <div className="text-xs text-muted mt-1">EP, Stereo + Atmos, 48 kHz / 24-bit, 4 delivery formats</div>
           </div>
-          <div>
-            <label className="label text-xs text-faint mb-1.5 block">TITLE</label>
-            <MockInput text="My New Album" className="w-full" />
+          <div className="flex items-center gap-3">
+            <Button variant="primary">Use Template</Button>
+            <span className="text-sm text-muted">Start from scratch</span>
           </div>
-          <Button variant="primary" className="w-full">Create Release</Button>
         </PanelBody>
       </Panel>
     </>
