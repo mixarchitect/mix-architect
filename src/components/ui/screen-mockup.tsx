@@ -234,7 +234,7 @@ function CreateReleaseMockup() {
     <>
       <Panel className="m-4">
         <PanelHeader><span className="text-base font-semibold text-text">New Release</span></PanelHeader>
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div>
             <label className="label text-xs text-faint mb-1.5 block">TITLE</label>
             <MockInput text="Midnight Sessions" className="w-full" />
@@ -356,7 +356,7 @@ function InviteCollaboratorMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div className="flex items-center gap-3">
             <MockInput text="client@example.com" placeholder />
             <MockSelect text="Collaborator" />
@@ -383,7 +383,7 @@ function CollaboratorRolesMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-3">
+        <PanelBody className="pt-6 space-y-3">
           {[
             { role: "Collaborator", desc: "Full access to all release and track details" },
             { role: "Client", desc: "Read-only portal access with approval capabilities" },
@@ -406,7 +406,7 @@ function AcceptInvitationMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody>
+        <PanelBody className="pt-6">
           <div className="flex items-center gap-3">
             <MockAvatar initials="SK" />
             <div className="flex-1">
@@ -427,7 +427,7 @@ function PortalSharingMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-sm font-semibold text-text">Client Portal Link</span>
@@ -477,7 +477,7 @@ function TrackTabIntentMockup() {
       <div className="p-4 space-y-4">
         <TrackTabBar active="Intent" />
         <Panel>
-          <PanelBody className="space-y-3">
+          <PanelBody className="pt-6 space-y-3">
             <span className="label text-xs text-faint">WHAT SHOULD THIS TRACK FEEL LIKE?</span>
             <p className="text-sm text-text leading-relaxed">Warm, spacious vocal mix with tight low end. Think Bon Iver meets James Blake.</p>
             <Rule />
@@ -503,7 +503,7 @@ function TrackTabSpecsMockup() {
       <div className="p-4 space-y-4">
         <TrackTabBar active="Specs" />
         <Panel>
-          <PanelBody className="space-y-3">
+          <PanelBody className="pt-6 space-y-3">
             <span className="label text-xs text-faint">TECHNICAL SETTINGS</span>
             <div className="grid grid-cols-3 gap-3">
               <div>
@@ -547,7 +547,7 @@ function TrackTabAudioMockup() {
       <div className="p-4 space-y-4">
         <TrackTabBar active="Audio" />
         <Panel>
-          <PanelBody className="space-y-4">
+          <PanelBody className="pt-6 space-y-4">
             <MockSelect text="v3 - mix-v3-final.wav (latest)" />
             <div className="bg-panel2 rounded-md p-3">
               <WaveformBars highlight={14} />
@@ -578,7 +578,7 @@ function TrackTabDistributionMockup() {
       <div className="p-4 space-y-4">
         <TrackTabBar active="Distribution" />
         <Panel>
-          <PanelBody className="space-y-3">
+          <PanelBody className="pt-6 space-y-3">
             <span className="label text-xs text-faint">WRITING SPLIT</span>
             <div className="space-y-2">
               {[
@@ -648,7 +648,7 @@ function TrackTabPortalMockup() {
       <div className="p-4 space-y-4">
         <TrackTabBar active="Portal" />
         <Panel>
-          <PanelBody className="space-y-3">
+          <PanelBody className="pt-6 space-y-3">
             <span className="label text-xs text-faint">CLIENT APPROVAL</span>
             <div className="flex items-center gap-3">
               <CheckCircle2 size={16} className="text-signal" />
@@ -694,7 +694,7 @@ function TrackTabNotesMockup() {
       <div className="p-4 space-y-4">
         <TrackTabBar active="Notes" />
         <Panel>
-          <PanelBody className="space-y-1">
+          <PanelBody className="pt-6 space-y-1">
             <MockNoteEntry author="Sarah Kim" time="2h ago" content="Rev3 sounds great. The low end is tighter now." />
             <Rule />
             <MockNoteEntry author="Jordan Blake" time="1h ago" content="Can we try a version with more reverb on the vocals?" isClient />
@@ -746,7 +746,7 @@ function TrackVersionsMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-3">
+        <PanelBody className="pt-6 space-y-3">
           <MockSelect text="v3 (latest)" />
           <Rule />
           {[
@@ -773,7 +773,7 @@ function WaveformPlayerMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div className="bg-panel2 rounded-md p-4">
             <WaveformBars highlight={14} />
           </div>
@@ -806,7 +806,7 @@ function FormatConvertMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <span className="label text-xs text-faint">DELIVERY FORMATS</span>
           <div className="flex flex-wrap gap-2">
             {["WAV", "FLAC", "MP3"].map((f) => (
@@ -836,7 +836,7 @@ function ExportDownloadMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody>
+        <PanelBody className="pt-6">
           <div className="flex items-center gap-3 mb-3">
             <StatusDot color="green" />
             <span className="text-base font-semibold text-text">Conversion Complete</span>
@@ -868,7 +868,7 @@ function SupportedFormatsMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div>
             <span className="label text-xs text-faint">LOSSLESS (PRESERVES SOURCE QUALITY)</span>
             <div className="space-y-1.5 mt-2">
@@ -916,7 +916,7 @@ function CommentWaveformMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-3">
+        <PanelBody className="pt-6 space-y-3">
           <div className="bg-panel2 rounded-md p-4 relative">
             <WaveformBars />
             <div className="absolute top-2 left-[22%] w-2.5 h-2.5 rounded-full bg-signal border-2 border-panel" />
@@ -947,7 +947,7 @@ function PortalCommentsMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody>
+        <PanelBody className="pt-6">
           <MockNoteEntry author="Sarah Kim" time="2h ago" content="The vocal balance sounds great in the chorus. Can we bring up the backing vocals slightly in verse 2?" />
           <Rule />
           <MockNoteEntry author="Jordan Blake" time="1h ago" content="Love the overall direction. The guitar tone in the bridge needs a bit more warmth." isClient />
@@ -961,7 +961,7 @@ function ResolveFeedbackMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-3">
+        <PanelBody className="pt-6 space-y-3">
           <div className="flex items-start gap-3 opacity-50">
             <MockAvatar initials="SK" />
             <div className="flex-1">
@@ -999,7 +999,7 @@ function PortalSettingsMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Globe size={16} className="text-signal" />
@@ -1041,7 +1041,7 @@ function PortalTrackVisibilityMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <span className="label text-xs text-faint">TRACK PORTAL VISIBILITY</span>
           <p className="text-xs text-muted">Control what your client sees for this track on the portal.</p>
           <div className="space-y-3">
@@ -1083,7 +1083,7 @@ function PortalApprovalMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-status-green/10 flex items-center justify-center shrink-0">
               <Check size={16} className="text-status-green" />
@@ -1135,7 +1135,7 @@ function TimelineFullMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody>
+        <PanelBody className="pt-6">
           <div className="flex mb-2">
             {["Jan", "Feb", "Mar", "Apr"].map((m) => (
               <span key={m} className="flex-1 text-xs text-faint text-center">{m}</span>
@@ -1164,7 +1164,7 @@ function TimelineNavigateMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody>
+        <PanelBody className="pt-6">
           <div className="flex mb-2">
             {["Jan", "Feb", "Mar", "Apr"].map((m) => (
               <span key={m} className="flex-1 text-xs text-faint text-center">{m}</span>
@@ -1193,7 +1193,7 @@ function TimelineDatesMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody>
+        <PanelBody className="pt-6">
           <div className="flex mb-2">
             {["Jan", "Feb", "Mar", "Apr"].map((m) => (
               <span key={m} className="flex-1 text-xs text-faint text-center">{m}</span>
@@ -1240,7 +1240,7 @@ function TemplateContentsMockup() {
             <span className="text-base font-semibold text-text">Template Sections</span>
           </div>
         </PanelHeader>
-        <PanelBody className="space-y-3">
+        <PanelBody className="pt-6 space-y-3">
           {sections.map((s) => (
             <div key={s.name} className="rounded-md bg-panel-2 px-3 py-2.5">
               <div className="text-sm font-medium text-text">{s.name}</div>
@@ -1262,7 +1262,7 @@ function TemplateCreateMockup() {
     <>
       <Panel className="m-4">
         <PanelHeader><span className="text-base font-semibold text-text">New Template</span></PanelHeader>
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div>
             <label className="label text-xs text-faint mb-1.5 block">TEMPLATE NAME</label>
             <MockInput text="Stereo Master" className="w-full" />
@@ -1319,7 +1319,7 @@ function TemplateUseMockup() {
           </div>
           <p className="text-xs text-muted mt-1">Pre-fill your release settings, or start from scratch.</p>
         </PanelHeader>
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div className="rounded-md border border-signal bg-signal-muted px-4 py-3">
             <div className="text-sm font-medium text-text">Stereo Master</div>
             <div className="text-xs text-muted mt-1">Single, Stereo, 44.1 kHz / 16-bit, 2 delivery formats</div>
@@ -1369,7 +1369,7 @@ function PaymentReleaseFeesMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody>
+        <PanelBody className="pt-6">
           <div className="space-y-1 text-sm">
             <div className="flex items-center gap-3 py-2 font-medium text-faint text-xs">
               <span className="flex-1">Release</span>
@@ -1406,7 +1406,7 @@ function PaymentTrackFeesMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-0">
+        <PanelBody className="pt-6 space-y-0">
           <div className="flex items-center gap-3 py-2.5">
             <ChevronDown size={14} className="text-muted" />
             <span className="text-sm font-medium text-text flex-1">Summer Single</span>
@@ -1444,7 +1444,7 @@ function ExportContentsMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-2">
+        <PanelBody className="pt-6 space-y-2">
           <span className="text-sm font-semibold text-text">Export includes:</span>
           {[
             "Profile information",
@@ -1473,7 +1473,7 @@ function ExportProgressMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div className="grid grid-cols-3 gap-3">
             <StatTile label="Releases" value="12" />
             <StatTile label="Tracks" value="47" />
@@ -1535,7 +1535,7 @@ function PlanCurrentMockup() {
             <span className="text-sm text-muted">Current Plan</span>
           </div>
         </PanelHeader>
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <DataGrid>
             <DataCell label="Billing Cycle" value="Monthly" size="small" />
             <DataCell label="Next Payment" value="Mar 15" size="small" />
@@ -1552,7 +1552,7 @@ function UpgradeProMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div className="flex items-center gap-3">
             <Pill>Free</Pill>
             <ArrowRight size={16} className="text-faint" />
@@ -1580,7 +1580,7 @@ function ManagePaymentMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div className="flex items-center gap-3">
             <CreditCard size={18} className="text-muted" />
             <div className="flex-1">
@@ -1609,7 +1609,7 @@ function CancelSubscriptionMockup() {
   return (
     <>
       <Panel className="m-4 border-status-orange/30">
-        <PanelBody className="space-y-3">
+        <PanelBody className="pt-6 space-y-3">
           <StatusIndicator color="orange" label="Subscription Cancelled" />
           <p className="text-sm text-muted">Your Pro access continues until March 15, 2026. After that, your account reverts to the Free plan.</p>
           <div className="flex items-center gap-2">
@@ -1626,7 +1626,7 @@ function DataAfterCancelMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="space-y-4">
+        <PanelBody className="pt-6 space-y-4">
           <div>
             <span className="label text-xs text-faint mb-2 block">PRESERVED</span>
             {["All releases and tracks", "Audio files and versions", "Notes and comments", "Collaborator lists"].map((item) => (
