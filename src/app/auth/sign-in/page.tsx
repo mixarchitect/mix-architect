@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
-import Image from "next/image";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
@@ -15,9 +15,13 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => setMounted(true), []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,12 +60,9 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         <Panel>
           <PanelHeader className="text-center">
-            <Image
-              src="/mix-architect-logo-white.svg"
+            <img
+              src={mounted && resolvedTheme === "dark" ? "/mix-architect-logo-white.svg" : "/mix-architect-logo.svg"}
               alt="Mix Architect"
-              width={180}
-              height={36}
-              priority
               className="h-7 w-auto mx-auto mb-5"
             />
             <h1 className="mt-3 text-2xl font-semibold h1 text-text">
