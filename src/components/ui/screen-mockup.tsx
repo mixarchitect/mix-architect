@@ -7,7 +7,7 @@
 
 import {
   Home, Search, LayoutTemplate, Settings, HelpCircle,
-  Image, Music, Play, ChevronDown, Send, ArrowRight,
+  Image, Music, Play, ChevronDown, Send, ArrowRight, Pencil,
   MessageSquare, MessageCircle, Plus, Check, X,
   Disc3, Download, ArrowUpCircle, Globe, Share2,
   Calendar, Upload, GripVertical, Copy, Link2,
@@ -263,11 +263,42 @@ function CreateReleaseMockup() {
 function CoverArtUploadMockup() {
   return (
     <>
-      <div className="p-4">
-        <div className="w-48 mx-auto aspect-square rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center gap-3 bg-panel2">
-          <Image size={32} className="text-muted" />
-          <span className="text-sm font-medium text-muted">Click to upload</span>
-          <span className="text-xs text-faint">JPEG or PNG, min 1400x1400</span>
+      <div className="p-4 space-y-4">
+        {/* Cover art with pencil overlay */}
+        <div className="w-48 mx-auto aspect-square rounded-lg bg-panel2 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-black/50 flex items-center justify-center">
+              <Pencil size={16} className="text-white" />
+            </div>
+          </div>
+          <div className="absolute bottom-2 left-2.5 right-2.5">
+            <div className="text-[10px] font-medium text-white/80 truncate">Artist Name</div>
+            <div className="text-[10px] text-white/60 truncate">Release Title</div>
+          </div>
+        </div>
+
+        {/* Upload / Remove actions */}
+        <div className="flex items-center gap-4 justify-center">
+          <span className="flex items-center gap-1.5 text-sm font-medium text-text">
+            <Upload size={14} /> Upload
+          </span>
+          <span className="flex items-center gap-1.5 text-sm font-medium text-red-500">
+            <X size={14} /> Remove
+          </span>
+        </div>
+
+        {/* Paste URL field */}
+        <div className="space-y-1.5">
+          <span className="label text-faint text-[10px]">OR PASTE URL</span>
+          <div className="flex gap-2">
+            <div className="flex-1 h-9 rounded-md border border-border bg-panel px-3 flex items-center">
+              <span className="text-xs text-faint">https://...</span>
+            </div>
+            <div className="h-9 w-9 rounded-md bg-signal flex items-center justify-center">
+              <Check size={14} className="text-white" />
+            </div>
+          </div>
         </div>
       </div>
     </>

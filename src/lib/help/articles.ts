@@ -63,7 +63,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "The Release Detail Page",
-        body: "After creation, you land on the release detail page. On desktop this has a two-column layout: the track list on the left with a \"Flow\" button and \"+ Add Track\" button, and an inspector sidebar on the right. The inspector sidebar shows the cover art, Release Info (Artist, Type, Format, Status, Target Date, Genre), Global Mix Direction (click the pencil icon to update), and Global References (click \"+ Add\" to search and add reference tracks). If payment tracking is enabled, the Payment section appears at the bottom of the sidebar. To change the cover art or edit release metadata, click the settings gear icon in the header to open Release Settings.",
+        body: "After creation, you land on the release detail page. On desktop this has a two-column layout: the track list on the left with a \"Flow\" button and \"+ Add Track\" button, and an inspector sidebar on the right. The inspector sidebar shows the cover art, Release Info (Artist, Type, Format, Status, Target Date, Genre), Global Mix Direction (click the pencil icon to update), and Global References (click \"+ Add\" to search and add reference tracks). If payment tracking is enabled, the Payment section appears at the bottom of the sidebar. To add or change the cover art, click the pencil icon on the artwork in the sidebar. This reveals options below the image: an Upload button to choose a file, a Remove button (if art already exists), and an \"Or paste URL\" field to link an image directly. New releases show a dashed upload area with \"Click to upload\" (JPEG or PNG, min 1400x1400). To edit other release metadata, click the settings gear icon in the header to open Release Settings.",
         mockup: "cover-art-upload",
       },
       {
@@ -73,7 +73,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Set Release Status",
-        body: "Each release has a status: Draft, In Progress, or Ready. You can change the status from the inspector sidebar by clicking the status badge next to \"Status\" in the Release Info section, or from Release Settings (gear icon). The status badge color appears on your [Dashboard](/app) release cards (orange for Draft, blue for In Progress, green for Ready) and is visible to all collaborators and in the client portal.",
+        body: "Each release has a status: Draft, In Progress, or Ready. You can change the status from the inspector sidebar by clicking the status badge next to \"Status\" in the Release Info section, or from Release Settings (gear icon). A release automatically changes to In Progress once work has started on it (for example, uploading audio or adding tracks). The status badge color appears on your [Dashboard](/app) release cards (orange for Draft, blue for In Progress, green for Ready) and is visible to all collaborators and in the client portal.",
         mockup: "release-status",
       },
     ],
