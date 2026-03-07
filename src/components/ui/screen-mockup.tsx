@@ -74,12 +74,16 @@ function MockTrackRow({ num, title, status, intent }: {
   );
 }
 
-function MockAvatar({ initials, size = "md" }: { initials: string; size?: "sm" | "md" }) {
+function MockAvatar({ initials, size = "md", color }: { initials: string; size?: "sm" | "md"; color?: string }) {
   return (
-    <span className={cn(
-      "rounded-full bg-signal text-signal-on font-bold flex items-center justify-center shrink-0",
-      size === "sm" ? "w-5 h-5 text-[8px]" : "w-6 h-6 text-[10px]",
-    )}>
+    <span
+      className={cn(
+        "rounded-full font-bold flex items-center justify-center shrink-0",
+        !color && "bg-signal text-signal-on",
+        size === "sm" ? "w-5 h-5 text-[8px]" : "w-6 h-6 text-[10px]",
+      )}
+      style={color ? { backgroundColor: color, color: "#fff" } : undefined}
+    >
       {initials}
     </span>
   );
@@ -104,10 +108,37 @@ function MockSelect({ text, className }: { text: string; className?: string }) {
 
 const BAR_HEIGHTS = [4, 8, 14, 20, 16, 8, 12, 18, 24, 16, 10, 14, 20, 12, 8, 16, 18, 10, 14, 12, 9, 17, 13, 11];
 
-function WaveformBars({ highlight, className }: { highlight?: number; className?: string }) {
+/* Dense waveform data: ~80 bars simulating a real audio waveform with quiet intro, loud middle, and fade-out */
+const DENSE_BARS = [
+  3, 5, 4, 6, 8, 5, 7, 10, 8, 6, 9, 12, 10, 8, 11, 14, 12, 9, 13, 16,
+  14, 11, 15, 18, 16, 13, 10, 14, 17, 20, 18, 15, 19, 22, 20, 17, 21, 24, 22, 19,
+  16, 20, 23, 18, 21, 24, 22, 19, 23, 20, 17, 22, 24, 21, 18, 23, 20, 16, 19, 22,
+  18, 14, 17, 20, 16, 12, 15, 18, 14, 10, 13, 16, 12, 8, 11, 9, 6, 8, 5, 4,
+];
+
+function WaveformBars({ highlight, className, mirrored }: { highlight?: number; className?: string; mirrored?: boolean }) {
+  const bars = mirrored ? DENSE_BARS : BAR_HEIGHTS;
+  if (mirrored) {
+    return (
+      <div className={cn("flex items-center gap-[1px] h-12", className)}>
+        {bars.map((h, i) => {
+          const active = highlight !== undefined && i <= highlight;
+          const color = active ? "bg-signal" : "bg-signal/30";
+          const top = h * 0.85;
+          const bot = h * 0.55;
+          return (
+            <div key={i} className="flex flex-col items-center gap-[1px] flex-1">
+              <div className={cn("w-full max-w-[3px] rounded-sm", color)} style={{ height: `${top}px` }} />
+              <div className={cn("w-full max-w-[3px] rounded-sm", color)} style={{ height: `${bot}px` }} />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
   return (
     <div className={cn("flex items-end gap-[2px] h-8", className)}>
-      {BAR_HEIGHTS.map((h, i) => (
+      {bars.map((h, i) => (
         <div
           key={i}
           className={cn(
@@ -523,9 +554,12 @@ function TrackTabSpecsMockup() {
             <span className="label text-xs text-faint">DELIVERY</span>
             <div className="flex flex-wrap gap-2 mt-1">
               {["WAV", "FLAC", "MP3"].map((f) => (
-                <div key={f} className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-signal/30 bg-signal-muted">
-                  <Check size={12} className="text-signal" />
-                  <span className="text-sm font-medium text-text">{f}</span>
+                <div key={f} className="flex items-center gap-1">
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-signal/30 bg-signal-muted">
+                    <Check size={12} className="text-signal" />
+                    <span className="text-sm font-medium text-text">{f}</span>
+                  </div>
+                  <Download size={14} className="text-signal ml-0.5" />
                 </div>
               ))}
               {["AIFF", "AAC"].map((f) => (
@@ -542,29 +576,95 @@ function TrackTabSpecsMockup() {
 }
 
 function TrackTabAudioMockup() {
+  const commentMarkers = [
+    { pos: 6, color: "#6366f1" },   // Alex - purple
+    { pos: 18, color: "#f59e0b" },  // Jordan - gold
+    { pos: 45, color: "#6366f1" },  // Alex
+    { pos: 68, color: "#f59e0b" },  // Jordan
+    { pos: 82, color: "#6366f1" },  // Alex
+  ];
   return (
     <>
       <div className="p-4 space-y-4">
         <TrackTabBar active="Audio" />
         <Panel>
           <PanelBody className="pt-6 space-y-4">
-            <MockSelect text="v3 - mix-v3-final.wav (latest)" />
-            <div className="bg-panel2 rounded-md p-3">
-              <WaveformBars highlight={14} />
+            {/* Header: track info + version tabs */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded bg-panel2" />
+                <div>
+                  <span className="text-sm font-semibold text-text block">Morning Light</span>
+                  <span className="text-xs text-muted">Neon Waves</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 bg-panel2 rounded-md p-0.5">
+                <span className="px-2.5 py-1 text-xs font-medium rounded bg-signal text-signal-on">v1</span>
+                <span className="px-2.5 py-1 text-xs font-medium text-muted">v2</span>
+                <span className="px-2.5 py-1 text-xs font-medium text-muted">v3</span>
+                <span className="px-2 py-1 text-xs text-muted">+</span>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
-              <button type="button" className="w-9 h-9 rounded-full bg-signal text-signal-on flex items-center justify-center">
-                <Play size={16} fill="currentColor" />
-              </button>
-              <span className="text-sm text-muted">1:24 / 3:42</span>
+
+            {/* Version metadata */}
+            <div className="flex items-center gap-2 text-xs text-faint">
+              <span>V1 &middot; MAR 4 &middot; 5 comments</span>
+              <Download size={12} />
               <span className="flex-1" />
-              <span className="text-xs text-faint font-medium">-14.2 LUFS</span>
+              <span>-14.2 LUFS</span>
+              <span className="px-1.5 py-0.5 rounded bg-status-orange/20 text-status-orange text-[10px] font-medium">-0.8 dB</span>
             </div>
+
+            {/* Waveform with comment markers */}
+            <div className="relative">
+              {/* Comment markers */}
+              <div className="relative h-5 mb-1">
+                {commentMarkers.map((m, i) => (
+                  <div key={i} className="absolute -translate-x-1/2" style={{ left: `${m.pos}%` }}>
+                    <MessageCircle size={14} style={{ color: m.color }} />
+                  </div>
+                ))}
+              </div>
+              <div className="bg-panel2 rounded-md p-3">
+                <WaveformBars highlight={14} mirrored />
+              </div>
+              <p className="text-center text-[10px] text-faint mt-1">double-click waveform to add comment</p>
+            </div>
+
+            {/* Playback controls */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted">0:00</span>
+              <div className="flex items-center gap-3">
+                <button type="button" className="w-9 h-9 rounded-full bg-signal text-signal-on flex items-center justify-center">
+                  <Play size={16} fill="currentColor" />
+                </button>
+              </div>
+              <span className="text-xs text-muted">4:12</span>
+            </div>
+
             <Rule />
-            <div className="flex items-center gap-2">
-              <MockInput text="Add comment at 1:24..." className="flex-1" placeholder />
-              <Button variant="primary"><Send size={14} /></Button>
+
+            {/* Feedback section */}
+            <div className="flex items-center justify-between">
+              <span className="label text-xs text-faint">FEEDBACK</span>
+              <span className="text-xs text-faint">3 notes</span>
             </div>
+            {[
+              { author: "Alex Rivera", initials: "AR", color: "#6366f1", time: "0:15", comment: "Bring up the vocal a touch here" },
+              { author: "Jordan Blake", initials: "JB", color: "#f59e0b", time: "1:08", comment: "Love the reverb on the snare" },
+              { author: "Alex Rivera", initials: "AR", color: "#6366f1", time: "2:34", comment: "Can we try a wider stereo spread on the pads?" },
+            ].map((c, i) => (
+              <div key={i} className="flex items-start gap-3 py-1">
+                <MockAvatar initials={c.initials} color={c.color} />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="font-medium text-text">{c.author}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-signal/15 text-signal text-[10px] font-medium">{c.time}</span>
+                  </div>
+                  <p className="text-sm text-muted mt-0.5">{c.comment}</p>
+                </div>
+              </div>
+            ))}
           </PanelBody>
         </Panel>
       </div>
