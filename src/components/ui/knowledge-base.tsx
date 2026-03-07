@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import Fuse from "fuse.js";
+import Fuse, { type FuseResultMatch } from "fuse.js";
 import { cn } from "@/lib/cn";
 import { Search } from "lucide-react";
 import { articles, CATEGORY_LABELS } from "@/lib/help/articles";
@@ -12,10 +12,14 @@ import { ArticleView } from "@/components/ui/article-view";
 const CATEGORIES = Object.keys(CATEGORY_LABELS) as ArticleCategory[];
 
 const fuse = new Fuse(articles, {
-  keys: ["title", "summary", "tags", "content.body"],
+  keys: ["title", "summary", "tags", "content.heading", "content.body"],
   threshold: 0.35,
+  ignoreLocation: true,
   includeScore: true,
+  includeMatches: true,
 });
+
+type SearchResult = { article: HelpArticle; matches: readonly FuseResultMatch[] };
 
 export function KnowledgeBase() {
   const searchParams = useSearchParams();
@@ -45,29 +49,35 @@ export function KnowledgeBase() {
     [searchParams, router, pathname],
   );
 
-  const results = useMemo(() => {
+  const results = useMemo((): SearchResult[] | null => {
     if (!query.trim()) return null;
-    return fuse.search(query).map((r) => r.item);
+    return fuse.search(query).map((r) => ({ article: r.item, matches: r.matches ?? [] }));
   }, [query]);
 
-  const displayedArticles = useMemo(() => {
-    const source = results ?? articles;
+  const displayedResults = useMemo(() => {
+    if (!results) return null;
     if (selectedCategory) {
-      return source.filter((a) => a.category === selectedCategory);
+      return results.filter((r) => r.article.category === selectedCategory);
     }
-    return source;
+    return results;
   }, [results, selectedCategory]);
+
+  const displayedArticles = useMemo(() => {
+    if (displayedResults) return displayedResults.map((r) => r.article);
+    if (selectedCategory) return articles.filter((a) => a.category === selectedCategory);
+    return articles;
+  }, [displayedResults, selectedCategory]);
 
   // Grouped view (no search query)
   const grouped = useMemo(() => {
-    if (results) return null;
+    if (displayedResults) return null;
     const map: Record<string, HelpArticle[]> = {};
     for (const article of displayedArticles) {
       if (!map[article.category]) map[article.category] = [];
       map[article.category].push(article);
     }
     return map;
-  }, [results, displayedArticles]);
+  }, [displayedResults, displayedArticles]);
 
   const handleBack = useCallback(
     (category?: ArticleCategory) => {
@@ -92,7 +102,8 @@ export function KnowledgeBase() {
         />
         <input
           type="text"
-          className="input pl-10"
+          className="input"
+          style={{ paddingLeft: 40 }}
           placeholder="Search articles..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -162,19 +173,21 @@ export function KnowledgeBase() {
 
         {/* Article list */}
         <div>
-          {results ? (
+          {displayedResults ? (
             /* Flat search results */
             <div className="space-y-2">
-              {displayedArticles.length === 0 ? (
+              {displayedResults.length === 0 ? (
                 <p className="text-muted text-sm py-8 text-center">
                   No articles found for &ldquo;{query}&rdquo;
                 </p>
               ) : (
-                displayedArticles.map((article) => (
+                displayedResults.map((r) => (
                   <ArticleCard
-                    key={article.id}
-                    article={article}
-                    onClick={() => setActiveArticle(article)}
+                    key={r.article.id}
+                    article={r.article}
+                    matches={r.matches}
+                    query={query}
+                    onClick={() => setActiveArticle(r.article)}
                   />
                 ))
               )}
@@ -206,13 +219,49 @@ export function KnowledgeBase() {
   );
 }
 
+/* ── Highlight helper ── */
+
+/** Find the query in matched text and show a highlighted snippet around it. */
+function MatchSnippet({ matches, query }: { matches: readonly FuseResultMatch[]; query: string }) {
+  if (!query) return null;
+  // Prefer body matches for context, fall back to heading, then summary
+  const best = matches.find((m) => m.key === "content.body")
+    ?? matches.find((m) => m.key === "content.heading")
+    ?? matches.find((m) => m.key === "summary");
+  if (!best?.value) return null;
+
+  const text = best.value;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return null;
+
+  const matchEnd = idx + query.length;
+  // Show ~40 chars before and after
+  const snippetStart = Math.max(0, idx - 40);
+  const snippetEnd = Math.min(text.length, matchEnd + 40);
+  const before = (snippetStart > 0 ? "..." : "") + text.slice(snippetStart, idx);
+  const matched = text.slice(idx, matchEnd);
+  const after = text.slice(matchEnd, snippetEnd) + (snippetEnd < text.length ? "..." : "");
+
+  return (
+    <p className="text-xs text-muted mt-1 line-clamp-2">
+      {before}
+      <mark className="bg-signal/20 text-text rounded-sm px-0.5">{matched}</mark>
+      {after}
+    </p>
+  );
+}
+
 /* ── Article Card ── */
 
 function ArticleCard({
   article,
+  matches,
+  query,
   onClick,
 }: {
   article: HelpArticle;
+  matches?: readonly FuseResultMatch[];
+  query?: string;
   onClick: () => void;
 }) {
   return (
@@ -222,7 +271,11 @@ function ArticleCard({
       className="w-full text-left bg-panel border border-border hover:border-border-strong rounded-lg p-4 transition-all cursor-pointer"
     >
       <div className="font-medium text-sm text-text">{article.title}</div>
-      <p className="text-muted text-xs mt-1 line-clamp-2">{article.summary}</p>
+      {matches?.length && query ? (
+        <MatchSnippet matches={matches} query={query} />
+      ) : (
+        <p className="text-muted text-xs mt-1 line-clamp-2">{article.summary}</p>
+      )}
     </button>
   );
 }
