@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Fuse, { type FuseResultMatch } from "fuse.js";
 import { cn } from "@/lib/cn";
@@ -26,6 +26,21 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
   const pathname = usePathname();
   const [selectedCategory, setSelectedCategory] =
     useState<ArticleCategory | null>(null);
+
+  // When the search query changes, close any open article so results are visible
+  const prevQueryRef = useRef(query);
+  useEffect(() => {
+    if (query !== prevQueryRef.current) {
+      prevQueryRef.current = query;
+      const ap = searchParams.get("article");
+      if (ap) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("article");
+        params.delete("q");
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+      }
+    }
+  }, [query, searchParams, router, pathname]);
 
   const articleParam = searchParams.get("article");
   const activeArticle = useMemo(() => {
