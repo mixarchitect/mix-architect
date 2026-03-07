@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Mail } from "lucide-react";
+import { Mail, Search } from "lucide-react";
 import { KnowledgeBase } from "@/components/ui/knowledge-base";
 import { BugReportForm } from "@/components/ui/bug-report-form";
 import { FeatureBoard } from "@/components/ui/feature-board";
@@ -29,6 +29,7 @@ export function HelpPortal() {
         ? tabParam
         : "articles",
   );
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     if (articleParam) {
@@ -37,6 +38,8 @@ export function HelpPortal() {
       setActiveTab(tabParam);
     }
   }, [tabParam, articleParam]);
+
+  const hasSearch = query.trim().length > 0;
 
   return (
     <div>
@@ -57,7 +60,7 @@ export function HelpPortal() {
             onClick={() => setActiveTab(tab.key)}
             className={cn(
               "pb-3 text-sm font-medium whitespace-nowrap transition-colors",
-              activeTab === tab.key
+              activeTab === tab.key && !hasSearch
                 ? "text-signal border-b-2 border-signal"
                 : "text-muted hover:text-text",
             )}
@@ -67,11 +70,33 @@ export function HelpPortal() {
         ))}
       </div>
 
-      {/* Tab content */}
-      {activeTab === "articles" && <KnowledgeBase />}
-      {activeTab === "bug" && <BugReportForm />}
-      {activeTab === "feature" && <FeatureBoard />}
-      {activeTab === "contact" && <ContactSection />}
+      {/* Persistent search bar */}
+      <div className="relative mb-6">
+        <Search
+          size={16}
+          strokeWidth={1.5}
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-faint pointer-events-none"
+        />
+        <input
+          type="text"
+          className="input"
+          style={{ paddingLeft: 40 }}
+          placeholder="Search articles..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      {/* Tab content — search overrides to show articles */}
+      {hasSearch || activeTab === "articles" ? (
+        <KnowledgeBase query={query} />
+      ) : (
+        <>
+          {activeTab === "bug" && <BugReportForm />}
+          {activeTab === "feature" && <FeatureBoard />}
+          {activeTab === "contact" && <ContactSection />}
+        </>
+      )}
     </div>
   );
 }

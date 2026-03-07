@@ -4,7 +4,6 @@ import { useState, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Fuse, { type FuseResultMatch } from "fuse.js";
 import { cn } from "@/lib/cn";
-import { Search } from "lucide-react";
 import { articles, CATEGORY_LABELS } from "@/lib/help/articles";
 import type { HelpArticle, ArticleCategory } from "@/lib/help/types";
 import { ArticleView } from "@/components/ui/article-view";
@@ -21,12 +20,10 @@ const fuse = new Fuse(articles, {
 
 type SearchResult = { article: HelpArticle; matches: readonly FuseResultMatch[] };
 
-export function KnowledgeBase() {
+export function KnowledgeBase({ query = "" }: { query?: string }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-
-  const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] =
     useState<ArticleCategory | null>(null);
 
@@ -93,23 +90,6 @@ export function KnowledgeBase() {
 
   return (
     <div>
-      {/* Search */}
-      <div className="relative mb-6">
-        <Search
-          size={16}
-          strokeWidth={1.5}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-faint pointer-events-none"
-        />
-        <input
-          type="text"
-          className="input"
-          style={{ paddingLeft: 40 }}
-          placeholder="Search articles..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6">
         {/* Category sidebar (desktop) */}
         <aside className="hidden md:block">
