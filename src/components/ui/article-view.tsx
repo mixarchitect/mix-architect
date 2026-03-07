@@ -1,13 +1,28 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import type { HelpArticle, ArticleCategory } from "@/lib/help/types";
 import { CATEGORY_LABELS } from "@/lib/help/articles";
 import { ScreenMockup } from "@/components/ui/screen-mockup";
 
+/** Wrap occurrences of `highlight` in <mark> tags within a plain string. */
+function HighlightText({ text, highlight }: { text: string; highlight?: string }) {
+  if (!highlight) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(highlight.toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="bg-signal/20 text-text rounded-sm px-0.5">{text.slice(idx, idx + highlight.length)}</mark>
+      <HighlightText text={text.slice(idx + highlight.length)} highlight={highlight} />
+    </>
+  );
+}
+
 /** Parse `[text](/path)` links in plain-text strings.
  *  Help article links (?article=) navigate in-place; others open in a new tab. */
-function RichText({ text }: { text: string }) {
+function RichText({ text, highlight }: { text: string; highlight?: string }) {
   const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
   return (
     <>
@@ -27,7 +42,7 @@ function RichText({ text }: { text: string }) {
             </Link>
           );
         }
-        return <span key={i}>{part}</span>;
+        return <span key={i}><HighlightText text={part} highlight={highlight} /></span>;
       })}
     </>
   );
@@ -36,13 +51,24 @@ function RichText({ text }: { text: string }) {
 type Props = {
   article: HelpArticle;
   onBack: (category?: ArticleCategory) => void;
+  highlight?: string;
 };
 
-export function ArticleView({ article, onBack }: Props) {
+export function ArticleView({ article, onBack, highlight }: Props) {
   const categoryLabel = CATEGORY_LABELS[article.category];
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to the first highlighted <mark> on mount
+  useEffect(() => {
+    if (!highlight || !containerRef.current) return;
+    requestAnimationFrame(() => {
+      const mark = containerRef.current?.querySelector("mark");
+      mark?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }, [highlight]);
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl" ref={containerRef}>
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-sm mb-6 flex-wrap">
         <button
@@ -72,23 +98,25 @@ export function ArticleView({ article, onBack }: Props) {
         {article.content.map((section, i) => (
           <div key={i}>
             {section.heading && (
-              <h3 className="text-sm font-semibold mb-2">{section.heading}</h3>
+              <h3 className="text-sm font-semibold mb-2">
+                <HighlightText text={section.heading} highlight={highlight} />
+              </h3>
             )}
             <p className="text-sm text-muted leading-relaxed">
-              <RichText text={section.body} />
+              <RichText text={section.body} highlight={highlight} />
             </p>
 
             {section.mockup && <ScreenMockup mockupId={section.mockup} />}
 
             {section.tip && (
               <div className="mt-3 bg-signal-muted border border-signal/20 text-text rounded-lg px-4 py-3 text-sm leading-relaxed">
-                <RichText text={section.tip} />
+                <RichText text={section.tip} highlight={highlight} />
               </div>
             )}
 
             {section.warning && (
               <div className="mt-3 bg-status-orange/10 border border-status-orange/20 text-text rounded-lg px-4 py-3 text-sm leading-relaxed">
-                <RichText text={section.warning} />
+                <RichText text={section.warning} highlight={highlight} />
               </div>
             )}
           </div>

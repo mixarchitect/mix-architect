@@ -37,12 +37,15 @@ export function KnowledgeBase() {
   }, [articleParam]);
 
   const setActiveArticle = useCallback(
-    (article: HelpArticle | null) => {
+    (article: HelpArticle | null, searchQuery?: string) => {
       const params = new URLSearchParams(searchParams.toString());
       if (article) {
         params.set("article", article.id);
+        if (searchQuery) params.set("q", searchQuery);
+        else params.delete("q");
       } else {
         params.delete("article");
+        params.delete("q");
       }
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     },
@@ -54,13 +57,8 @@ export function KnowledgeBase() {
     return fuse.search(query).map((r) => ({ article: r.item, matches: r.matches ?? [] }));
   }, [query]);
 
-  const displayedResults = useMemo(() => {
-    if (!results) return null;
-    if (selectedCategory) {
-      return results.filter((r) => r.article.category === selectedCategory);
-    }
-    return results;
-  }, [results, selectedCategory]);
+  // Search always returns all articles regardless of category filter
+  const displayedResults = results;
 
   const displayedArticles = useMemo(() => {
     if (displayedResults) return displayedResults.map((r) => r.article);
@@ -87,8 +85,10 @@ export function KnowledgeBase() {
     [setActiveArticle],
   );
 
+  const highlightQuery = searchParams.get("q") ?? undefined;
+
   if (activeArticle) {
-    return <ArticleView article={activeArticle} onBack={handleBack} />;
+    return <ArticleView article={activeArticle} onBack={handleBack} highlight={highlightQuery} />;
   }
 
   return (
@@ -187,7 +187,7 @@ export function KnowledgeBase() {
                     article={r.article}
                     matches={r.matches}
                     query={query}
-                    onClick={() => setActiveArticle(r.article)}
+                    onClick={() => setActiveArticle(r.article, query)}
                   />
                 ))
               )}
