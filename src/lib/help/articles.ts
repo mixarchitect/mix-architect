@@ -139,6 +139,11 @@ export const articles: HelpArticle[] = [
         mockup: "track-tab-audio",
       },
       {
+        heading: "Loudness Analysis (LUFS)",
+        body: "When you upload audio, Mix Architect automatically measures the integrated loudness in LUFS (Loudness Units Full Scale). Click the LUFS reading next to the version metadata to expand the Loudness Analysis panel. This shows how every major streaming service, broadcast standard, and social platform will adjust your track during playback. Each row displays the platform name, its target loudness (e.g. Spotify targets -14 LUFS), and the gain change that would be applied to your file. A positive value means the service will turn your track up; a negative value (shown in orange) means it will be turned down. For example, if your mix measures -14.9 LUFS, Spotify would apply +0.9 dB while Apple Music (target -16) would apply -1.1 dB. The panel is grouped into Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Broadcast (EBU R128, ATSC A/85, ITU-R BS.1770), and Social (Instagram/Reels, TikTok, Facebook). Use this to check whether your master will be significantly altered on any platform before delivery.",
+        mockup: "track-tab-lufs",
+      },
+      {
         heading: "Distribution",
         body: "The Distribution tab captures all metadata needed for digital distribution. It includes three split sections, each with \"+ Add Person\" buttons: Writing Split (person name, percentage, PRO affiliation like ASCAP/BMI, Member Account number, and Writer IPI number), Publishing Split (publisher name, percentage, Publisher Member ID, and Publisher IPI), and Master Recording Split (entity name and percentage). The running total for each split section is shown in green when it equals 100% or orange when it does not. Below the splits: Codes and Identifiers (ISRC and ISWC fields), Credits (producer and composer/songwriter names), Track Properties (featured artist, language selector, toggles for explicit lyrics, instrumental, and cover song), Copyright (registration number and copyright date), and Lyrics (full lyrics text area).",
         mockup: "track-tab-distribution",

@@ -575,6 +575,77 @@ function TrackTabSpecsMockup() {
   );
 }
 
+function TrackTabLufsMockup() {
+  const measured = -14.9;
+  const services = [
+    { label: "STREAMING", items: [
+      { name: "Spotify", target: -14 },
+      { name: "Apple Music", target: -16 },
+      { name: "YouTube", target: -14 },
+      { name: "Tidal", target: -14 },
+      { name: "Amazon Music", target: -14 },
+      { name: "Deezer", target: -15 },
+      { name: "Qobuz", target: -14 },
+      { name: "Pandora", target: -14 },
+    ]},
+    { label: "BROADCAST", items: [
+      { name: "EBU R128", target: -23 },
+      { name: "ATSC A/85", target: -24 },
+      { name: "ITU-R BS.1770", target: -24 },
+    ]},
+    { label: "SOCIAL", items: [
+      { name: "Instagram/Reels", target: -14 },
+      { name: "TikTok", target: -14 },
+      { name: "Facebook", target: -16 },
+    ]},
+  ];
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <TrackTabBar active="Audio" />
+        <Panel>
+          <PanelBody className="pt-6 space-y-4">
+            {/* LUFS header */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-text">Loudness Analysis</span>
+              <div className="flex items-center gap-2 text-xs text-faint">
+                <span>{measured} LUFS</span>
+                <span className="px-1.5 py-0.5 rounded bg-status-orange/20 text-status-orange text-[10px] font-medium">-0.9 dB</span>
+              </div>
+            </div>
+
+            {/* Service table */}
+            <div className="border border-border rounded-lg overflow-hidden">
+              {services.map((group, gi) => (
+                <div key={gi}>
+                  <div className="px-3 py-2 bg-panel2">
+                    <span className="label text-[10px] text-faint tracking-wider">{group.label}</span>
+                  </div>
+                  {group.items.map((s, si) => {
+                    const adj = +(s.target - measured).toFixed(1);
+                    const isNeg = adj < 0;
+                    return (
+                      <div key={si} className="flex items-center justify-between px-3 py-1.5 border-t border-border">
+                        <span className="text-xs text-text">{s.name}</span>
+                        <div className="flex items-center gap-4 text-xs">
+                          <span className="text-faint w-8 text-right">{s.target}</span>
+                          <span className={cn("w-14 text-right font-medium", isNeg ? "text-status-orange" : "text-text")}>
+                            {adj > 0 ? "+" : ""}{adj} dB
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </PanelBody>
+        </Panel>
+      </div>
+    </>
+  );
+}
+
 function TrackTabAudioMockup() {
   const commentMarkers = [
     { pos: 6, color: "#6366f1" },   // Alex - purple
@@ -1796,6 +1867,7 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "track-tab-intent": TrackTabIntentMockup,
   "track-tab-specs": TrackTabSpecsMockup,
   "track-tab-audio": TrackTabAudioMockup,
+  "track-tab-lufs": TrackTabLufsMockup,
   "track-tab-distribution": TrackTabDistributionMockup,
   "track-tab-portal": TrackTabPortalMockup,
   "track-tab-notes": TrackTabNotesMockup,
