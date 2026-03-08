@@ -288,7 +288,6 @@ export const articles: HelpArticle[] = [
       {
         heading: "Converting and Downloading",
         body: "Select which formats should be available by clicking the format chips in the Delivery section: convertible formats include WAV, AIFF, FLAC, MP3, AAC, OGG, and ALAC. Selected formats appear highlighted in green with a checkmark. Click the download arrow icon next to any selected convertible format to start a conversion. The icon shows a spinner while the conversion is processing in the background. When the conversion completes, the file downloads automatically to your browser. Each conversion uses the audio version you selected in the \"Export from\" dropdown, converting from the original uploaded file to preserve maximum audio quality. Lossless formats (WAV, AIFF, FLAC, ALAC) preserve the source file's sample rate and bit depth. Lossy formats use optimized presets: MP3 exports at 44.1 kHz / 320 kbps, AAC at 44.1 kHz / 256 kbps, and OGG at 44.1 kHz / Quality 8.",
-        tip: "For distribution, most platforms accept 16-bit/44.1kHz WAV or FLAC. Check your distributor's requirements before converting.",
         mockup: "track-tab-specs",
       },
       {
