@@ -198,6 +198,33 @@ export function AudioPlayer({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Drag-and-drop state
+  const [dragging, setDragging] = useState(false);
+  const dragCounterRef = useRef(0);
+
+  function onDragEnter(e: React.DragEvent) {
+    e.preventDefault();
+    if (!canUpload) return;
+    dragCounterRef.current++;
+    setDragging(true);
+  }
+  function onDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    dragCounterRef.current--;
+    if (dragCounterRef.current === 0) setDragging(false);
+  }
+  function onDragOver(e: React.DragEvent) {
+    e.preventDefault();
+  }
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault();
+    dragCounterRef.current = 0;
+    setDragging(false);
+    if (!canUpload) return;
+    const file = e.dataTransfer.files[0];
+    if (file) handleUpload(file);
+  }
+
   // Delete state
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -683,13 +710,26 @@ export function AudioPlayer({
 
   if (versions.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border bg-panel px-6 py-10 text-center">
+      <div
+        className={cn(
+          "rounded-lg border border-dashed bg-panel px-6 py-10 text-center transition-colors",
+          dragging ? "border-signal bg-signal-muted/30" : "border-border",
+        )}
+        onDragEnter={onDragEnter}
+        onDragLeave={onDragLeave}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+      >
         <div className="mx-auto flex items-center justify-center text-muted mb-4">
           <Upload size={32} strokeWidth={1.5} />
         </div>
-        <div className="text-sm font-semibold text-text">No audio files yet</div>
+        <div className="text-sm font-semibold text-text">
+          {dragging ? "Drop audio file here" : "No audio files yet"}
+        </div>
         <p className="text-sm text-muted mt-1.5 mx-auto max-w-sm">
-          Upload a mix to start the review process with waveform playback, versioning, and timestamped comments.
+          {dragging
+            ? "Release to upload"
+            : "Drag and drop a file, or click below to browse. Supports WAV, AIFF, FLAC, MP3, and AAC."}
         </p>
         {canUpload && (
           <div className="mt-5">
@@ -725,9 +765,24 @@ export function AudioPlayer({
   /* ---------------------------------------------------------------- */
 
   return (
-    <div className="space-y-2">
+    <div
+      className="space-y-2"
+      onDragEnter={onDragEnter}
+      onDragLeave={onDragLeave}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
       {/* Main player card */}
       <div className="relative rounded-lg border border-border bg-panel overflow-hidden">
+        {/* Drag-and-drop overlay */}
+        {dragging && canUpload && (
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-panel/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-signal">
+            <div className="flex items-center gap-2 text-sm text-signal font-medium">
+              <Upload size={16} />
+              Drop to upload new version
+            </div>
+          </div>
+        )}
         {/* Upload overlay */}
         {uploading && (
           <div className="absolute inset-0 z-20 flex items-center justify-center bg-panel/80 backdrop-blur-sm rounded-lg">
