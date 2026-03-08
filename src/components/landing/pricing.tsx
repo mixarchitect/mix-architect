@@ -18,36 +18,38 @@ function BillingToggle({
   onChange: (i: BillingInterval) => void;
 }) {
   return (
-    <div className="flex items-center justify-center gap-2 mb-12">
-      <div className="inline-flex rounded-full bg-white/6 p-1">
-        <button
-          type="button"
-          onClick={() => onChange("monthly")}
-          className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors ${
-            interval === "monthly"
-              ? "bg-[#0D9488] text-[#1a1a1a]"
-              : "text-white/50 hover:text-white/70"
-          }`}
-        >
-          Monthly
-        </button>
-        <button
-          type="button"
-          onClick={() => onChange("annual")}
-          className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors ${
-            interval === "annual"
-              ? "bg-[#0D9488] text-[#1a1a1a]"
-              : "text-white/50 hover:text-white/70"
-          }`}
-        >
-          Annual
-        </button>
+    <div className="flex justify-center mb-12">
+      <div className="relative inline-flex items-center">
+        <div className="inline-flex rounded-full bg-white/6 p-1">
+          <button
+            type="button"
+            onClick={() => onChange("monthly")}
+            className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors ${
+              interval === "monthly"
+                ? "bg-[#0D9488] text-[#1a1a1a]"
+                : "text-white/50 hover:text-white/70"
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            type="button"
+            onClick={() => onChange("annual")}
+            className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors ${
+              interval === "annual"
+                ? "bg-[#0D9488] text-[#1a1a1a]"
+                : "text-white/50 hover:text-white/70"
+            }`}
+          >
+            Annual
+          </button>
+        </div>
+        {interval === "annual" && (
+          <span className="absolute left-full ml-2 text-xs font-semibold text-[#0D9488] bg-[#0D9488]/10 border border-[#0D9488]/20 px-2.5 py-0.5 rounded-full whitespace-nowrap">
+            Save {PRICING.PRO.annualSavingsPercent}%
+          </span>
+        )}
       </div>
-      {interval === "annual" && (
-        <span className="text-xs font-semibold text-[#0D9488] bg-[#0D9488]/10 border border-[#0D9488]/20 px-2.5 py-0.5 rounded-full">
-          Save {PRICING.PRO.annualSavingsPercent}%
-        </span>
-      )}
     </div>
   );
 }
