@@ -1796,20 +1796,10 @@ function DataAfterCancelMockup() {
         <PanelBody className="pt-6 space-y-4">
           <div>
             <span className="label text-xs text-faint mb-2 block">PRESERVED</span>
-            {["All releases and tracks", "Audio files and versions", "Notes and comments", "Collaborator lists"].map((item) => (
+            {["All releases and tracks", "Audio files and versions", "Notes and comments", "Collaborator lists", "Audio format conversion", "Advanced export options"].map((item) => (
               <div key={item} className="flex items-center gap-3 py-1.5">
                 <Check size={16} className="text-signal shrink-0" />
                 <span className="text-sm text-text">{item}</span>
-              </div>
-            ))}
-          </div>
-          <Rule />
-          <div>
-            <span className="label text-xs text-faint mb-2 block">UNAVAILABLE ON FREE</span>
-            {["Audio format conversion", "Advanced export options"].map((item) => (
-              <div key={item} className="flex items-center gap-3 py-1.5">
-                <X size={16} className="text-status-orange shrink-0" />
-                <span className="text-sm text-muted">{item}</span>
               </div>
             ))}
           </div>
