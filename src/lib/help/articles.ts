@@ -267,7 +267,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Waveform Player",
         body: "Every uploaded version displays an interactive waveform. Click anywhere on the waveform to seek to that position. The transport controls below the waveform include: current time, loop toggle, skip backward, play/pause, skip forward, repeat toggle, and total duration. The player also shows an integrated LUFS loudness measurement (e.g. \"-14.8 LUFS\") next to the file metadata, color-coded against loudness targets so you can evaluate levels at a glance. If there are timestamped comments on the current version, small marker icons appear on the waveform at their positions.",
-        mockup: "waveform-player",
+        mockup: "track-tab-audio",
       },
     ],
   },
