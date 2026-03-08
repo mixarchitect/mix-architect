@@ -195,6 +195,8 @@ export function AudioPlayer({
 
   // Upload state
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadFileName, setUploadFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -543,22 +545,39 @@ export function AudioPlayer({
     }
 
     setUploading(true);
+    setUploadProgress(0);
+    setUploadFileName(file.name);
     setUploadError(null);
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!user || !session) throw new Error("Not authenticated");
 
       const nextVersion = versions.length + 1;
       const ext = file.name.split(".").pop() ?? "wav";
       const path = `${user.id}/${trackId}/v${nextVersion}.${ext}`;
 
-      const { error: uploadErr } = await supabase.storage
-        .from("track-audio")
-        .upload(path, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
+      // Upload via XHR for progress tracking
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `${supabaseUrl}/storage/v1/object/track-audio/${path}`);
+        xhr.setRequestHeader("Authorization", `Bearer ${session.access_token}`);
+        xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+        xhr.setRequestHeader("x-upsert", "true");
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            setUploadProgress(Math.round((e.loaded / e.total) * 100));
+          }
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) resolve();
+          else reject(new Error(`Upload failed (${xhr.status})`));
+        };
+        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.send(file);
+      });
 
       const { data: urlData } = supabase.storage
         .from("track-audio")
@@ -595,6 +614,8 @@ export function AudioPlayer({
       setUploadError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
+      setUploadProgress(0);
+      setUploadFileName(null);
     }
   }
 
@@ -710,52 +731,55 @@ export function AudioPlayer({
 
   if (versions.length === 0) {
     return (
-      <div
-        className={cn(
-          "rounded-lg border border-dashed bg-panel px-6 py-10 text-center transition-colors",
-          dragging ? "border-signal bg-signal-muted/30" : "border-border",
-        )}
-        onDragEnter={onDragEnter}
-        onDragLeave={onDragLeave}
-        onDragOver={onDragOver}
-        onDrop={onDrop}
-      >
-        <div className="mx-auto flex items-center justify-center text-muted mb-4">
-          <Upload size={32} strokeWidth={1.5} />
-        </div>
-        <div className="text-sm font-semibold text-text">
-          {dragging ? "Drop audio file here" : "No audio files yet"}
-        </div>
-        <p className="text-sm text-muted mt-1.5 mx-auto max-w-sm">
-          {dragging
-            ? "Release to upload"
-            : "Drag and drop a file, or click below to browse. Supports WAV, AIFF, FLAC, MP3, and AAC."}
-        </p>
-        {canUpload && (
-          <div className="mt-5">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept={ACCEPTED_AUDIO_TYPES.join(",")}
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) handleUpload(f);
-              }}
-            />
-            <Button
-              variant="primary"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-            >
-              <FilledUpload size={16} />
-              {uploading ? "Uploading..." : "Upload audio"}
-            </Button>
-            {uploadError && (
-              <p className="text-xs text-signal mt-2">{uploadError}</p>
-            )}
+      <div className="space-y-3">
+        <div
+          className={cn(
+            "rounded-lg border border-dashed bg-panel px-6 py-10 text-center transition-colors",
+            dragging ? "border-signal bg-signal-muted/30" : "border-border",
+          )}
+          onDragEnter={onDragEnter}
+          onDragLeave={onDragLeave}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+        >
+          <div className="mx-auto flex items-center justify-center text-muted mb-4">
+            <Upload size={32} strokeWidth={1.5} />
           </div>
-        )}
+          <div className="text-sm font-semibold text-text">
+            {dragging ? "Drop audio file here" : "No audio files yet"}
+          </div>
+          <p className="text-sm text-muted mt-1.5 mx-auto max-w-sm">
+            {dragging
+              ? "Release to upload"
+              : "Drag and drop a file, or click below to browse. Supports WAV, AIFF, FLAC, MP3, and AAC."}
+          </p>
+          {canUpload && (
+            <div className="mt-5">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ACCEPTED_AUDIO_TYPES.join(",")}
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleUpload(f);
+                }}
+              />
+              <Button
+                variant="primary"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                <FilledUpload size={16} />
+                {uploading ? "Uploading..." : "Upload audio"}
+              </Button>
+              {uploadError && (
+                <p className="text-xs text-signal mt-2">{uploadError}</p>
+              )}
+            </div>
+          )}
+        </div>
+        {uploading && <UploadProgressBar fileName={uploadFileName} progress={uploadProgress} />}
       </div>
     );
   }
@@ -783,14 +807,9 @@ export function AudioPlayer({
             </div>
           </div>
         )}
-        {/* Upload overlay */}
+        {/* Upload dim overlay (no text — progress bar is below) */}
         {uploading && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-panel/80 backdrop-blur-sm rounded-lg">
-            <div className="flex items-center gap-2 text-sm text-muted">
-              <Upload size={16} className="animate-pulse" />
-              Uploading…
-            </div>
-          </div>
+          <div className="absolute inset-0 z-20 bg-panel/60 backdrop-blur-[2px] rounded-lg pointer-events-none" />
         )}
         {/* Header: track info + version switcher */}
         <div className="flex items-center justify-between px-5 pt-4">
@@ -1238,6 +1257,44 @@ export function AudioPlayer({
       {uploadError && (
         <p className="text-xs text-red-500 text-center">{uploadError}</p>
       )}
+
+      {uploading && <UploadProgressBar fileName={uploadFileName} progress={uploadProgress} />}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  UploadProgressBar                                                  */
+/* ------------------------------------------------------------------ */
+
+function UploadProgressBar({
+  fileName,
+  progress,
+}: {
+  fileName: string | null;
+  progress: number;
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-panel px-4 py-3">
+      <div className="flex items-center gap-3">
+        <div className="shrink-0 text-muted animate-spin">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="7.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="32 16" />
+          </svg>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-sm text-text truncate">{fileName ?? "Uploading..."}</span>
+            <span className="text-sm text-muted tabular-nums shrink-0 ml-3">{progress}%</span>
+          </div>
+          <div className="h-1 rounded-full bg-border overflow-hidden">
+            <div
+              className="h-full rounded-full bg-signal transition-[width] duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
