@@ -402,7 +402,7 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Viewing Your Plan",
-        body: "Go to [Settings](/app/settings) and scroll to the Subscription section at the bottom. The section reads \"Manage your Mix Architect plan.\" You will see your current plan: Pro accounts display \"$9/month, Unlimited releases\" with a green \"PRO\" badge and a \"Manage Billing\" button. Free accounts show an \"Upgrade to Pro\" button instead.",
+        body: "Go to [Settings](/app/settings) and scroll to the Subscription section at the bottom. The section reads \"Manage your Mix Architect plan.\" You will see your current plan: Pro accounts display \"$14/month, Unlimited releases\" with a green \"PRO\" badge and a \"Manage Billing\" button. Free accounts show an \"Upgrade to Pro\" button instead.",
         mockup: "plan-current",
       },
       {

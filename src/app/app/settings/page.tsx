@@ -448,7 +448,7 @@ function SubscriptionPanel() {
                 {isPro
                   ? isAdminGranted
                     ? "Unlimited releases"
-                    : "$9/month \u00b7 Unlimited releases"
+                    : "$14/month \u00b7 Unlimited releases"
                   : "1 release included"}
               </div>
             </div>
@@ -488,7 +488,7 @@ function SubscriptionPanel() {
         {!isPro && (
           <Button variant="primary" onClick={handleUpgrade} disabled={upgrading}>
             <Sparkles size={16} />
-            {upgrading ? "Redirecting\u2026" : "Upgrade to Pro \u2014 $9/mo"}
+            {upgrading ? "Redirecting\u2026" : "Upgrade to Pro"}
           </Button>
         )}
 

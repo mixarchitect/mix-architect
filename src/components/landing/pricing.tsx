@@ -1,6 +1,60 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { FilledArrowRight } from "@/components/ui/filled-icon";
+import { PRICING, type BillingInterval } from "@/lib/pricing";
+
+/* ------------------------------------------------------------------ */
+/*  Billing toggle                                                     */
+/* ------------------------------------------------------------------ */
+
+function BillingToggle({
+  interval,
+  onChange,
+}: {
+  interval: BillingInterval;
+  onChange: (i: BillingInterval) => void;
+}) {
+  return (
+    <div className="flex items-center justify-center gap-2 mb-12">
+      <div className="inline-flex rounded-full bg-white/6 p-1">
+        <button
+          type="button"
+          onClick={() => onChange("monthly")}
+          className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors ${
+            interval === "monthly"
+              ? "bg-[#0D9488] text-[#1a1a1a]"
+              : "text-white/50 hover:text-white/70"
+          }`}
+        >
+          Monthly
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange("annual")}
+          className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors ${
+            interval === "annual"
+              ? "bg-[#0D9488] text-[#1a1a1a]"
+              : "text-white/50 hover:text-white/70"
+          }`}
+        >
+          Annual
+        </button>
+      </div>
+      {interval === "annual" && (
+        <span className="text-xs font-semibold text-[#0D9488] bg-[#0D9488]/10 border border-[#0D9488]/20 px-2.5 py-0.5 rounded-full">
+          Save {PRICING.PRO.annualSavingsPercent}%
+        </span>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Price card                                                         */
+/* ------------------------------------------------------------------ */
 
 function PriceCard({
   title,
@@ -10,6 +64,7 @@ function PriceCard({
   features,
   ctaLabel,
   highlighted = false,
+  annualNote,
 }: {
   title: string;
   price: string;
@@ -18,6 +73,7 @@ function PriceCard({
   features: string[];
   ctaLabel: string;
   highlighted?: boolean;
+  annualNote?: string;
 }) {
   return (
     <div
@@ -35,6 +91,9 @@ function PriceCard({
             <span className="text-base text-white/40">{period}</span>
           )}
         </div>
+        {annualNote && (
+          <p className="mt-1 text-xs text-white/40">{annualNote}</p>
+        )}
         <p className="mt-2 text-sm text-white/50">{subtitle}</p>
       </div>
 
@@ -67,7 +126,23 @@ function PriceCard({
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Pricing section                                                    */
+/* ------------------------------------------------------------------ */
+
 export function Pricing() {
+  const [interval, setInterval] = useState<BillingInterval>("monthly");
+
+  const proPrice =
+    interval === "annual"
+      ? `$${PRICING.PRO.annualMonthlyEquivalent}`
+      : `$${PRICING.PRO.monthlyPrice}`;
+
+  const annualNote =
+    interval === "annual"
+      ? `Billed annually at $${PRICING.PRO.annualPrice}/year`
+      : undefined;
+
   return (
     <section id="pricing" className="px-6 py-20 md:py-28">
       <div className="mx-auto max-w-4xl">
@@ -80,38 +155,25 @@ export function Pricing() {
           </p>
         </div>
 
+        <BillingToggle interval={interval} onChange={setInterval} />
+
         <div className="grid gap-6 md:grid-cols-2">
           <PriceCard
             title="FREE"
-            price="$0"
-            subtitle="Perfect for independent artists getting started"
-            features={[
-              "1 release",
-              "Mix brief builder with intent & references",
-              "Release planning & timeline",
-              "Audio review with waveform & comments",
-              "Technical specs (LUFS, format, sample rate)",
-              "Audio format conversion",
-            ]}
+            price={`$${PRICING.FREE.monthlyPrice}`}
+            subtitle={PRICING.FREE.description}
+            features={[...PRICING.FREE.features]}
             ctaLabel="Start Free"
           />
           <PriceCard
             title="PRO"
-            price="$9"
+            price={proPrice}
             period="/month"
-            subtitle="Everything you need to run a professional operation"
-            features={[
-              "Unlimited releases",
-              "Everything in Free, plus:",
-              "Audio file storage",
-              "Web-based client delivery portal",
-              "Release templates",
-              "Payment tracking with export",
-              "Multi-project dashboard",
-              "Priority support",
-            ]}
+            subtitle={PRICING.PRO.description}
+            features={[...PRICING.PRO.features]}
             ctaLabel="Start Pro"
             highlighted
+            annualNote={annualNote}
           />
         </div>
 

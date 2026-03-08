@@ -1706,7 +1706,7 @@ function PlanCurrentMockup() {
           <DataGrid>
             <DataCell label="Billing Cycle" value="Monthly" size="small" />
             <DataCell label="Next Payment" value="Mar 15" size="small" />
-            <DataCell label="Price" value="$12" unit="/mo" size="small" />
+            <DataCell label="Price" value="$14" unit="/mo" size="small" />
           </DataGrid>
           <Button variant="secondary">Manage Subscription</Button>
         </PanelBody>
@@ -1726,7 +1726,7 @@ function UpgradeProMockup() {
             <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-signal text-signal-on">
               <Sparkles size={12} /> Pro
             </span>
-            <span className="text-sm text-muted">$12/month</span>
+            <span className="text-sm text-muted">$14/month</span>
           </div>
           <div className="space-y-2">
             {["Unlimited releases", "Audio format conversion", "Priority support", "Advanced export options"].map((f) => (
@@ -1758,7 +1758,7 @@ function ManagePaymentMockup() {
           <Rule />
           <DataGrid>
             <DataCell label="Last Payment" value="Feb 15" size="small" />
-            <DataCell label="Amount" value="$12.00" size="small" />
+            <DataCell label="Amount" value="$14.00" size="small" />
             <DataCell label="Next Billing" value="Mar 15" size="small" />
           </DataGrid>
           <Button variant="secondary"><Link2 size={14} /> Open Billing Portal</Button>

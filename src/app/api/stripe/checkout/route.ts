@@ -1,13 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { stripe } from "@/lib/stripe-server";
+import { getStripePriceId, type BillingInterval } from "@/lib/pricing";
 
 /**
  * POST /api/stripe/checkout
  * Creates a Stripe Checkout session for upgrading to Pro.
+ * Accepts an optional `interval` body param: "monthly" | "annual" (default: "monthly").
  */
 export async function POST(req: NextRequest) {
   try {
+    const body = await req.json().catch(() => ({}));
+    const interval: BillingInterval =
+      body.interval === "annual" ? "annual" : "monthly";
+
     const supabase = await createSupabaseServerClient({ allowCookieWrite: true });
     const {
       data: { user },
@@ -43,7 +49,7 @@ export async function POST(req: NextRequest) {
       mode: "subscription",
       line_items: [
         {
-          price: process.env.STRIPE_PRO_PRICE_ID!,
+          price: getStripePriceId(interval),
           quantity: 1,
         },
       ],
