@@ -310,7 +310,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "Adding a Comment",
         body: "Open a track and go to the Audio tab. Double-click on the waveform at the exact point you want to reference. A text input appears in the Feedback section below the waveform where you can type your comment. The comment is anchored to that timecode and version. In the Feedback section, each comment shows the author's name, a colored timestamp badge (e.g. \"0:07\" or \"1:22\"), the relative date, and the message text. Comment markers also appear as small icons directly on the waveform at their positions. Click any timestamp to jump the playback head to that moment.",
-        mockup: "comment-waveform",
+        mockup: "track-tab-audio",
       },
       {
         heading: "Portal Comments",
