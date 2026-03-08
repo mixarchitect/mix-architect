@@ -1630,10 +1630,6 @@ function ExportContentsMockup() {
               <span className="text-sm text-text">{item}</span>
             </div>
           ))}
-          <div className="flex items-center gap-3 py-1.5 opacity-50">
-            <X size={16} className="text-faint shrink-0" />
-            <span className="text-sm text-muted">Audio files (download individually)</span>
-          </div>
         </PanelBody>
       </Panel>
     </>
