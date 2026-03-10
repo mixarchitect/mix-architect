@@ -255,16 +255,21 @@ export function AudioPlayer({
   }, [versions.map((v) => `${v.id}:${v.spec_analysis_status}`).join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Spec mismatch computation ──
+  // Compare whenever we have any detected specs (from client-side parsing or worker analysis)
+  const hasDetectedSpecs = activeVersion != null && (
+    activeVersion.sample_rate != null || activeVersion.bit_depth != null ||
+    activeVersion.channels != null || activeVersion.file_format != null
+  );
   const specMismatches = useMemo(() => {
     if (!activeVersion || !targetSpecs || !hasTargetSpecs(targetSpecs)) return [];
-    if (activeVersion.spec_analysis_status !== "complete") return [];
+    if (!hasDetectedSpecs) return [];
     return compareSpecs(targetSpecs, {
       sample_rate: activeVersion.sample_rate,
       bit_depth: activeVersion.bit_depth,
       channels: activeVersion.channels,
       file_format: activeVersion.file_format,
     });
-  }, [activeVersion, targetSpecs]);
+  }, [activeVersion, targetSpecs, hasDetectedSpecs]);
 
   // Drag-and-drop state
   const [dragging, setDragging] = useState(false);
@@ -1087,8 +1092,8 @@ export function AudioPlayer({
                   <span>{formatChannels(activeVersion.channels)}</span>
                 </>
               )}
-              {/* Analysis status indicator */}
-              {activeVersion.spec_analysis_status === "pending" || activeVersion.spec_analysis_status === "analyzing" ? (
+              {/* Analysis status indicator — only show when specs not yet populated */}
+              {!hasDetectedSpecs && (activeVersion.spec_analysis_status === "pending" || activeVersion.spec_analysis_status === "analyzing") ? (
                 <>
                   <span>·</span>
                   <span className="inline-flex items-center gap-1 text-muted">
@@ -1100,7 +1105,7 @@ export function AudioPlayer({
             </div>
 
             {/* Spec match / mismatch indicator */}
-            {activeVersion.spec_analysis_status === "complete" && targetSpecs && hasTargetSpecs(targetSpecs) && (
+            {hasDetectedSpecs && targetSpecs && hasTargetSpecs(targetSpecs) && (
               specMismatches.length === 0 ? (
                 <div className="flex items-center gap-1 text-[10px] text-status-green">
                   <CheckCircle2 size={10} />
@@ -1116,7 +1121,7 @@ export function AudioPlayer({
               )
             )}
 
-            {activeVersion.spec_analysis_status === "failed" && (
+            {activeVersion.spec_analysis_status === "failed" && !hasDetectedSpecs && (
               <div className="flex items-center gap-1 text-[10px] text-faint">
                 <AlertTriangle size={10} />
                 <span>Could not analyze audio specs</span>

@@ -44,6 +44,22 @@ const EMOTIONAL_SUGGESTIONS = [
   "haunting", "playful", "anthemic", "delicate", "heavy", "airy",
 ];
 
+/** Parse a human-readable sample rate string to Hz integer. */
+function parseSampleRateInt(label: string): number | null {
+  const map: Record<string, number> = {
+    "44.1 kHz": 44100, "48 kHz": 48000, "88.2 kHz": 88200,
+    "96 kHz": 96000, "176.4 kHz": 176400, "192 kHz": 192000,
+  };
+  return map[label] ?? null;
+}
+
+/** Parse a human-readable bit depth string to integer. */
+function parseBitDepthInt(label: string): number | null {
+  const map: Record<string, number> = {
+    "16-bit": 16, "24-bit": 24, "32-bit float": 32,
+  };
+  return map[label] ?? null;
+}
 
 type TrackData = {
   id: string;
@@ -662,10 +678,13 @@ export function TrackDetailClient({
             <div className="space-y-4">
               <Panel>
                 <PanelBody className="py-5">
-                  <div className="label-sm text-muted mb-4">Technical settings</div>
+                  <div className="label-sm text-muted mb-1">Technical settings</div>
+                  <p className="text-[11px] text-faint mb-4">
+                    Uploaded audio will be validated against these specs.
+                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-1.5">
-                      <label className="label text-muted">Format</label>
+                      <label className="label text-muted">Mix format</label>
                       <select
                         value={formatOverride || releaseFormat}
                         onChange={(e) => {
@@ -683,12 +702,35 @@ export function TrackDetailClient({
                       </select>
                     </div>
                     <div className="space-y-1.5">
+                      <label className="label text-muted">File format</label>
+                      <select
+                        value={targetFormat ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value || null;
+                          setTargetFormat(val);
+                          saveTargetSpecs({ target_format: val });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="">Any</option>
+                        <option value="WAV">WAV</option>
+                        <option value="FLAC">FLAC</option>
+                        <option value="AIFF">AIFF</option>
+                        <option value="MP3">MP3</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
                       <label className="label text-muted">Sample rate</label>
                       <select
                         value={sampleRate}
                         onChange={(e) => {
                           setSampleRate(e.target.value);
                           saveSpecs({ sample_rate: e.target.value });
+                          // Also save integer for upload validation
+                          const intVal = parseSampleRateInt(e.target.value);
+                          setTargetSampleRate(intVal);
+                          saveTargetSpecs({ target_sample_rate: intVal });
                         }}
                         disabled={!canEdit(role)}
                         className="input"
@@ -697,7 +739,8 @@ export function TrackDetailClient({
                         <option value="48 kHz">48 kHz</option>
                         <option value="88.2 kHz">88.2 kHz</option>
                         <option value="96 kHz">96 kHz</option>
-                        <option value="Other">Other</option>
+                        <option value="176.4 kHz">176.4 kHz</option>
+                        <option value="192 kHz">192 kHz</option>
                       </select>
                     </div>
                     <div className="space-y-1.5">
@@ -707,6 +750,10 @@ export function TrackDetailClient({
                         onChange={(e) => {
                           setBitDepth(e.target.value);
                           saveSpecs({ bit_depth: e.target.value });
+                          // Also save integer for upload validation
+                          const intVal = parseBitDepthInt(e.target.value);
+                          setTargetBitDepth(intVal);
+                          saveTargetSpecs({ target_bit_depth: intVal });
                         }}
                         disabled={!canEdit(role)}
                         className="input"
@@ -714,56 +761,6 @@ export function TrackDetailClient({
                         <option value="16-bit">16-bit</option>
                         <option value="24-bit">24-bit</option>
                         <option value="32-bit float">32-bit float</option>
-                        <option value="Other">Other</option>
-                      </select>
-                    </div>
-                  </div>
-                </PanelBody>
-              </Panel>
-              <Panel>
-                <PanelBody className="py-5">
-                  <div className="label-sm text-muted mb-1">Target specs</div>
-                  <p className="text-[11px] text-faint mb-4">
-                    Uploaded audio will be validated against these specs.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">Sample rate</label>
-                      <select
-                        value={targetSampleRate ?? ""}
-                        onChange={(e) => {
-                          const val = e.target.value ? parseInt(e.target.value, 10) : null;
-                          setTargetSampleRate(val);
-                          saveTargetSpecs({ target_sample_rate: val });
-                        }}
-                        disabled={!canEdit(role)}
-                        className="input"
-                      >
-                        <option value="">Any</option>
-                        <option value="44100">44.1 kHz</option>
-                        <option value="48000">48 kHz</option>
-                        <option value="88200">88.2 kHz</option>
-                        <option value="96000">96 kHz</option>
-                        <option value="176400">176.4 kHz</option>
-                        <option value="192000">192 kHz</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">Bit depth</label>
-                      <select
-                        value={targetBitDepth ?? ""}
-                        onChange={(e) => {
-                          const val = e.target.value ? parseInt(e.target.value, 10) : null;
-                          setTargetBitDepth(val);
-                          saveTargetSpecs({ target_bit_depth: val });
-                        }}
-                        disabled={!canEdit(role)}
-                        className="input"
-                      >
-                        <option value="">Any</option>
-                        <option value="16">16-bit</option>
-                        <option value="24">24-bit</option>
-                        <option value="32">32-bit float</option>
                       </select>
                     </div>
                     <div className="space-y-1.5">
@@ -781,25 +778,6 @@ export function TrackDetailClient({
                         <option value="">Any</option>
                         <option value="1">Mono</option>
                         <option value="2">Stereo</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">Format</label>
-                      <select
-                        value={targetFormat ?? ""}
-                        onChange={(e) => {
-                          const val = e.target.value || null;
-                          setTargetFormat(val);
-                          saveTargetSpecs({ target_format: val });
-                        }}
-                        disabled={!canEdit(role)}
-                        className="input"
-                      >
-                        <option value="">Any</option>
-                        <option value="WAV">WAV</option>
-                        <option value="FLAC">FLAC</option>
-                        <option value="AIFF">AIFF</option>
-                        <option value="MP3">MP3</option>
                       </select>
                     </div>
                   </div>
