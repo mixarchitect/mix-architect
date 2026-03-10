@@ -13,6 +13,7 @@ export type SourceInfo = {
   bitDepth: number;
   channels: number;
   duration: number;
+  formatName: string | null;
 };
 
 /* ------------------------------------------------------------------ */
@@ -44,7 +45,40 @@ export async function probeSource(filePath: string): Promise<SourceInfo> {
     ),
     channels: audio.channels ?? 2,
     duration: parseFloat(data.format?.duration ?? "0"),
+    formatName: data.format?.format_name ?? null,
   };
+}
+
+/* ------------------------------------------------------------------ */
+/*  Lossy codec detection                                              */
+/* ------------------------------------------------------------------ */
+
+const LOSSY_CODECS = new Set(["mp3", "aac", "vorbis", "opus"]);
+
+export function isLossyCodec(codecName: string): boolean {
+  return LOSSY_CODECS.has(codecName.toLowerCase());
+}
+
+/* ------------------------------------------------------------------ */
+/*  Normalize ffprobe format_name to clean user-facing format          */
+/* ------------------------------------------------------------------ */
+
+export function normalizeFormat(
+  formatName: string | null,
+  codecName: string | null,
+): string | null {
+  if (!formatName) return null;
+  const f = formatName.toLowerCase();
+  if (f.includes("wav") || f.includes("w64")) return "WAV";
+  if (f.includes("flac")) return "FLAC";
+  if (f.includes("mp3") || f === "mp2/3") return "MP3";
+  if (f.includes("aiff") || f.includes("aif")) return "AIFF";
+  if (f.includes("ogg")) return "OGG";
+  if (f.includes("m4a") || f.includes("mp4") || f.includes("mov")) {
+    return codecName?.toLowerCase() === "alac" ? "ALAC" : "M4A";
+  }
+  if (f.includes("aac")) return "AAC";
+  return f.toUpperCase();
 }
 
 /* ------------------------------------------------------------------ */

@@ -14,6 +14,8 @@ import {
 import {
   probeSource,
   isSourceFormat,
+  isLossyCodec,
+  normalizeFormat,
   convertAudio,
   getExtension,
 } from "./converter.js";
@@ -53,6 +55,7 @@ async function main() {
   while (true) {
     try {
       await processNextJob();
+      await processNextAnalysis();
     } catch (err) {
       console.error("Worker loop error:", err);
     }
@@ -191,6 +194,87 @@ async function processNextJob() {
   } finally {
     // Cleanup temp files
     await fs.rm(jobDir, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Process a single spec analysis                                     */
+/* ------------------------------------------------------------------ */
+
+async function processNextAnalysis() {
+  // Grab the oldest pending analysis
+  const { data: rows } = await supabase
+    .from("track_audio_versions")
+    .select("id, audio_url, file_name")
+    .eq("spec_analysis_status", "pending")
+    .order("created_at", { ascending: true })
+    .limit(1);
+
+  if (!rows?.length) return;
+  const row = rows[0];
+
+  // Claim the analysis (optimistic lock)
+  const { error: claimError } = await supabase
+    .from("track_audio_versions")
+    .update({ spec_analysis_status: "analyzing" })
+    .eq("id", row.id)
+    .eq("spec_analysis_status", "pending");
+
+  if (claimError) {
+    console.warn(`Failed to claim analysis ${row.id}:`, claimError.message);
+    return;
+  }
+
+  console.log(`Analyzing specs for ${row.id} (${row.file_name ?? "unknown"})`);
+
+  const analysisDir = path.join(TEMP_DIR, `analyze-${row.id}`);
+  await fs.mkdir(analysisDir, { recursive: true });
+
+  try {
+    // Download source audio
+    const ext = row.file_name?.split(".").pop() ?? "wav";
+    const sourcePath = path.join(analysisDir, `source.${ext}`);
+    await downloadSourceAudio(row.audio_url, sourcePath);
+
+    // Run ffprobe
+    const info = await probeSource(sourcePath);
+    const format = normalizeFormat(info.formatName, info.codecName);
+    const lossy = isLossyCodec(info.codecName);
+
+    // Write results back
+    const { error } = await supabase
+      .from("track_audio_versions")
+      .update({
+        sample_rate: info.sampleRate,
+        bit_depth: lossy ? null : info.bitDepth,
+        channels: info.channels,
+        codec: info.codecName,
+        file_format: format,
+        duration_seconds: info.duration > 0 ? info.duration : null,
+        spec_analysis_status: "complete",
+      })
+      .eq("id", row.id);
+
+    if (error) throw error;
+
+    console.log(
+      `  Detected: ${format}, ${info.sampleRate}Hz, ${lossy ? "lossy" : `${info.bitDepth}-bit`}, ${info.channels}ch`,
+    );
+    console.log(`✅ Analysis ${row.id} complete`);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`❌ Analysis ${row.id} failed:`, message);
+
+    try {
+      await supabase
+        .from("track_audio_versions")
+        .update({ spec_analysis_status: "failed" })
+        .eq("id", row.id);
+    } catch {
+      // Ignore cleanup errors
+    }
+  } finally {
+    await fs.rm(analysisDir, { recursive: true, force: true }).catch(() => {});
   }
 }
 

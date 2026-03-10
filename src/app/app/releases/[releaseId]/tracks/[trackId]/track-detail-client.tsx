@@ -50,6 +50,10 @@ type TrackData = {
   title: string;
   status: string;
   track_number: number;
+  target_sample_rate: number | null;
+  target_bit_depth: number | null;
+  target_channels: number | null;
+  target_format: string | null;
 };
 type IntentData = {
   mix_vision?: string;
@@ -164,6 +168,16 @@ export function TrackDetailClient({
   const [bitDepth, setBitDepth] = useState(specs?.bit_depth ?? "24-bit");
   const [deliveryFormats, setDeliveryFormats] = useState<string[]>(specs?.delivery_formats ?? []);
   const [specialReqs, setSpecialReqs] = useState(specs?.special_reqs ?? "");
+
+  // ── Target delivery specs (validated against uploads) ──
+  const [targetSampleRate, setTargetSampleRate] = useState<number | null>(track.target_sample_rate);
+  const [targetBitDepth, setTargetBitDepth] = useState<number | null>(track.target_bit_depth);
+  const [targetChannels, setTargetChannels] = useState<number | null>(track.target_channels);
+  const [targetFormat, setTargetFormat] = useState<string | null>(track.target_format);
+
+  function saveTargetSpecs(data: Record<string, unknown>) {
+    autoSave("tracks", data, "id", track.id);
+  }
 
   // ── Audio conversion ──
   const { requestConversion, getJobStatus } = useConversion();
@@ -708,6 +722,91 @@ export function TrackDetailClient({
               </Panel>
               <Panel>
                 <PanelBody className="py-5">
+                  <div className="label-sm text-muted mb-1">Target specs</div>
+                  <p className="text-[11px] text-faint mb-4">
+                    Uploaded audio will be validated against these specs.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Sample rate</label>
+                      <select
+                        value={targetSampleRate ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value ? parseInt(e.target.value, 10) : null;
+                          setTargetSampleRate(val);
+                          saveTargetSpecs({ target_sample_rate: val });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="">Any</option>
+                        <option value="44100">44.1 kHz</option>
+                        <option value="48000">48 kHz</option>
+                        <option value="88200">88.2 kHz</option>
+                        <option value="96000">96 kHz</option>
+                        <option value="176400">176.4 kHz</option>
+                        <option value="192000">192 kHz</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Bit depth</label>
+                      <select
+                        value={targetBitDepth ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value ? parseInt(e.target.value, 10) : null;
+                          setTargetBitDepth(val);
+                          saveTargetSpecs({ target_bit_depth: val });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="">Any</option>
+                        <option value="16">16-bit</option>
+                        <option value="24">24-bit</option>
+                        <option value="32">32-bit float</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Channels</label>
+                      <select
+                        value={targetChannels ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value ? parseInt(e.target.value, 10) : null;
+                          setTargetChannels(val);
+                          saveTargetSpecs({ target_channels: val });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="">Any</option>
+                        <option value="1">Mono</option>
+                        <option value="2">Stereo</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Format</label>
+                      <select
+                        value={targetFormat ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value || null;
+                          setTargetFormat(val);
+                          saveTargetSpecs({ target_format: val });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="">Any</option>
+                        <option value="WAV">WAV</option>
+                        <option value="FLAC">FLAC</option>
+                        <option value="AIFF">AIFF</option>
+                        <option value="MP3">MP3</option>
+                      </select>
+                    </div>
+                  </div>
+                </PanelBody>
+              </Panel>
+              <Panel>
+                <PanelBody className="py-5">
                   <div className="label-sm text-muted mb-4">Delivery</div>
                   <div className="space-y-5">
                     <div className="space-y-1.5">
@@ -798,6 +897,12 @@ export function TrackDetailClient({
                   );
                   return [...updated, ...nonTimecoded];
                 });
+              }}
+              targetSpecs={{
+                target_sample_rate: targetSampleRate,
+                target_bit_depth: targetBitDepth,
+                target_channels: targetChannels,
+                target_format: targetFormat,
               }}
             />
           )}

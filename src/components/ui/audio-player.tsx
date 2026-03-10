@@ -31,6 +31,13 @@ import {
   LOUDNESS_GROUPS,
   AUTHOR_COLORS,
 } from "@/components/ui/audio-player-shared";
+import {
+  compareSpecs,
+  hasTargetSpecs,
+  formatChannels,
+  type TrackTargetSpecs,
+} from "@/lib/spec-validation";
+import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { FilledPlay, FilledPause, FilledUpload } from "@/components/ui/filled-icon";
 
 /* ------------------------------------------------------------------ */
@@ -50,6 +57,9 @@ export type AudioVersionData = {
   sample_rate: number | null;
   bit_depth: number | null;
   file_format: string | null;
+  channels: number | null;
+  codec: string | null;
+  spec_analysis_status: "pending" | "analyzing" | "complete" | "failed" | null;
   uploaded_by: string;
   created_at: string;
 };
@@ -77,6 +87,12 @@ type AudioPlayerProps = {
   currentUserName: string;
   onVersionsChange: (v: AudioVersionData[]) => void;
   onCommentsChange: (c: TimelineComment[]) => void;
+  targetSpecs?: {
+    target_sample_rate: number | null;
+    target_bit_depth: number | null;
+    target_channels: number | null;
+    target_format: string | null;
+  } | null;
 };
 
 /* ------------------------------------------------------------------ */
@@ -124,6 +140,7 @@ export function AudioPlayer({
   currentUserName,
   onVersionsChange,
   onCommentsChange,
+  targetSpecs,
 }: AudioPlayerProps) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const { resolvedTheme } = useTheme();
@@ -199,6 +216,55 @@ export function AudioPlayer({
   const [uploadFileName, setUploadFileName] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Spec analysis Realtime subscription ──
+  useEffect(() => {
+    // Subscribe to analysis status changes for all versions that aren't complete
+    const pending = versions.filter(
+      (v) => v.spec_analysis_status && v.spec_analysis_status !== "complete" && v.spec_analysis_status !== "failed",
+    );
+    if (pending.length === 0) return;
+
+    const channels = pending.map((v) => {
+      const ch = supabase
+        .channel(`spec-analysis-${v.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "track_audio_versions",
+            filter: `id=eq.${v.id}`,
+          },
+          (payload: { new: Record<string, unknown> }) => {
+            const updated = payload.new as unknown as AudioVersionData;
+            if (updated.spec_analysis_status === "complete" || updated.spec_analysis_status === "failed") {
+              onVersionsChange(
+                versions.map((ver) => (ver.id === updated.id ? { ...ver, ...updated } : ver)),
+              );
+            }
+          },
+        )
+        .subscribe();
+      return ch;
+    });
+
+    return () => {
+      channels.forEach((ch) => supabase.removeChannel(ch));
+    };
+  }, [versions.map((v) => `${v.id}:${v.spec_analysis_status}`).join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Spec mismatch computation ──
+  const specMismatches = useMemo(() => {
+    if (!activeVersion || !targetSpecs || !hasTargetSpecs(targetSpecs)) return [];
+    if (activeVersion.spec_analysis_status !== "complete") return [];
+    return compareSpecs(targetSpecs, {
+      sample_rate: activeVersion.sample_rate,
+      bit_depth: activeVersion.bit_depth,
+      channels: activeVersion.channels,
+      file_format: activeVersion.file_format,
+    });
+  }, [activeVersion, targetSpecs]);
 
   // Drag-and-drop state
   const [dragging, setDragging] = useState(false);
@@ -592,6 +658,7 @@ export function AudioPlayer({
           file_name: file.name,
           file_size: file.size,
           uploaded_by: currentUserName,
+          spec_analysis_status: "pending",
         })
         .select()
         .single();
@@ -991,27 +1058,69 @@ export function AudioPlayer({
 
         {/* File info line */}
         {activeVersion && (
-          <div className="px-5 pt-1 flex items-center gap-1 text-[10px] text-faint">
-            {activeVersion.file_name && (
-              <span className="truncate max-w-[360px]">{activeVersion.file_name}</span>
+          <div className="px-5 pt-1 flex flex-col gap-1">
+            <div className="flex items-center gap-1 text-[10px] text-faint">
+              {activeVersion.file_name && (
+                <span className="truncate max-w-[360px]">{activeVersion.file_name}</span>
+              )}
+              {activeVersion.file_format && (
+                <>
+                  {activeVersion.file_name && <span>·</span>}
+                  <span>{activeVersion.file_format}</span>
+                </>
+              )}
+              {activeVersion.sample_rate != null && (
+                <>
+                  <span>·</span>
+                  <span>{formatSampleRate(activeVersion.sample_rate)}</span>
+                </>
+              )}
+              {activeVersion.bit_depth != null && (
+                <>
+                  <span>·</span>
+                  <span>{formatBitDepth(activeVersion.bit_depth, activeVersion.file_format)}</span>
+                </>
+              )}
+              {activeVersion.channels != null && (
+                <>
+                  <span>·</span>
+                  <span>{formatChannels(activeVersion.channels)}</span>
+                </>
+              )}
+              {/* Analysis status indicator */}
+              {activeVersion.spec_analysis_status === "pending" || activeVersion.spec_analysis_status === "analyzing" ? (
+                <>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-1 text-muted">
+                    <Loader2 size={9} className="animate-spin" />
+                    Analyzing
+                  </span>
+                </>
+              ) : null}
+            </div>
+
+            {/* Spec match / mismatch indicator */}
+            {activeVersion.spec_analysis_status === "complete" && targetSpecs && hasTargetSpecs(targetSpecs) && (
+              specMismatches.length === 0 ? (
+                <div className="flex items-center gap-1 text-[10px] text-status-green">
+                  <CheckCircle2 size={10} />
+                  <span>Specs match target</span>
+                </div>
+              ) : (
+                <div className="flex items-start gap-1.5 text-[10px] text-amber-500">
+                  <AlertTriangle size={10} className="mt-px shrink-0" />
+                  <span>
+                    Mismatch: {specMismatches.map((m) => `${m.label} (${m.actual}, target ${m.expected})`).join(", ")}
+                  </span>
+                </div>
+              )
             )}
-            {activeVersion.file_format && (
-              <>
-                {activeVersion.file_name && <span>·</span>}
-                <span>{activeVersion.file_format}</span>
-              </>
-            )}
-            {activeVersion.sample_rate != null && (
-              <>
-                <span>·</span>
-                <span>{formatSampleRate(activeVersion.sample_rate)}</span>
-              </>
-            )}
-            {activeVersion.bit_depth != null && (
-              <>
-                <span>·</span>
-                <span>{formatBitDepth(activeVersion.bit_depth, activeVersion.file_format)}</span>
-              </>
+
+            {activeVersion.spec_analysis_status === "failed" && (
+              <div className="flex items-center gap-1 text-[10px] text-faint">
+                <AlertTriangle size={10} />
+                <span>Could not analyze audio specs</span>
+              </div>
             )}
           </div>
         )}
