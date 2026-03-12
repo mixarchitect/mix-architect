@@ -31,6 +31,7 @@ type Props = {
   coverArtUrl?: string | null;
   pinned?: boolean;
   role?: ReleaseRole;
+  hasNotes?: boolean;
   className?: string;
 };
 
@@ -56,7 +57,7 @@ export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt,
   paymentStatus, feeTotal, feeCurrency, paymentsEnabled,
-  coverArtUrl, pinned, role, className,
+  coverArtUrl, pinned, role, hasNotes, className,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -135,8 +136,9 @@ export function ReleaseCard({
             )}
           </div>
           <div className="min-w-0">
-            <div className="text-base font-semibold text-text truncate group-hover:text-signal transition-colors duration-150">
+            <div className="text-base font-semibold text-text truncate group-hover:text-signal transition-colors duration-150 flex items-center gap-1.5">
               {title}
+              {hasNotes && <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />}
             </div>
             <div className="mt-0.5 text-sm text-muted truncate">{artist || "\u2014"}</div>
           </div>

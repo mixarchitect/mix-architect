@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
 import { Plus, Settings, ArrowLeft, ListMusic } from "lucide-react";
 import { PortalToggle } from "./portal-toggle";
-import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor } from "./sidebar-editors";
+import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor, ReleaseNotesEditor, ClientNotesEditor } from "./sidebar-editors";
 import { FlowSimulatorButton } from "@/components/flow-simulator/flow-simulator-button";
 import { FlowProvider, ReleaseFlowContent } from "@/components/flow-simulator/release-flow-context";
 import { FlowBreadcrumbTitle } from "@/components/flow-simulator/flow-breadcrumb-title";
@@ -70,6 +70,18 @@ export default async function ReleasePage({ params }: Props) {
       .maybeSingle(),
   ]);
   const paymentsEnabled = defaultsRes2.data?.payments_enabled ?? false;
+
+  // Fetch client notes if client email is present
+  let clientNotes = "";
+  if (release.client_email) {
+    const { data: cnData } = await supabase
+      .from("client_notes")
+      .select("notes")
+      .eq("engineer_id", user.id)
+      .eq("client_email", release.client_email)
+      .maybeSingle();
+    clientNotes = cnData?.notes ?? "";
+  }
 
   const tracks = tracksRes.data;
   const globalRefs = globalRefsRes.data;
@@ -355,6 +367,19 @@ export default async function ReleasePage({ params }: Props) {
               initialFeeCurrency={release.fee_currency ?? "USD"}
               initialPaymentNotes={release.payment_notes}
               role={role}
+            />
+          )}
+
+          {/* Internal Notes (engineer-only) */}
+          <ReleaseNotesEditor
+            releaseId={releaseId}
+            initialValue={release.internal_notes ?? ""}
+          />
+
+          {release.client_email && (
+            <ClientNotesEditor
+              clientEmail={release.client_email}
+              initialNotes={clientNotes}
             />
           )}
 

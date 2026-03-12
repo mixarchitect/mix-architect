@@ -11,6 +11,7 @@ import { StatusIndicator } from "@/components/ui/status-dot";
 import { Pencil, Check, X, ImageIcon, Upload } from "lucide-react";
 import { canEdit, canEditCreative, canEditPayment, type ReleaseRole } from "@/lib/permissions";
 import { sendNotification } from "@/lib/notifications/client";
+import { InternalNotesEditor } from "@/components/ui/internal-notes-editor";
 
 // ── Status Editor ──
 
@@ -929,5 +930,63 @@ export function PaymentEditor({
         </div>
       </PanelBody>
     </Panel>
+  );
+}
+
+// ── Release Internal Notes Editor ──
+
+type ReleaseNotesEditorProps = {
+  releaseId: string;
+  initialValue: string;
+};
+
+export function ReleaseNotesEditor({ releaseId, initialValue }: ReleaseNotesEditorProps) {
+  const handleSave = async (value: string) => {
+    const supabase = createSupabaseBrowserClient();
+    const { error } = await supabase
+      .from("releases")
+      .update({ internal_notes: value || null })
+      .eq("id", releaseId);
+    if (error) throw error;
+  };
+
+  return (
+    <InternalNotesEditor
+      label="RELEASE NOTES"
+      initialValue={initialValue}
+      onSave={handleSave}
+      placeholder="Private notes about this release..."
+    />
+  );
+}
+
+// ── Client Notes Editor ──
+
+type ClientNotesEditorProps = {
+  clientEmail: string;
+  initialNotes: string;
+};
+
+export function ClientNotesEditor({ clientEmail, initialNotes }: ClientNotesEditorProps) {
+  const handleSave = async (value: string) => {
+    const supabase = createSupabaseBrowserClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
+    const { error } = await supabase
+      .from("client_notes")
+      .upsert(
+        { engineer_id: user.id, client_email: clientEmail, notes: value },
+        { onConflict: "engineer_id,client_email" },
+      );
+    if (error) throw error;
+  };
+
+  return (
+    <InternalNotesEditor
+      label="CLIENT NOTES"
+      initialValue={initialNotes}
+      onSave={handleSave}
+      placeholder="Private notes about this client..."
+    />
   );
 }

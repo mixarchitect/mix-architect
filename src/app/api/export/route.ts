@@ -97,6 +97,7 @@ export async function GET(req: NextRequest) {
       briefSharesRes,
       templatesRes,
       defaultsRes,
+      clientNotesRes,
     ] = await Promise.all([
       trackIds.length > 0
         ? supabase.from("track_intent").select("*").in("track_id", trackIds)
@@ -164,6 +165,10 @@ export async function GET(req: NextRequest) {
         .select("*")
         .eq("user_id", user.id)
         .maybeSingle(),
+      supabase
+        .from("client_notes")
+        .select("*")
+        .eq("engineer_id", user.id),
     ]);
 
     /* -------------------------------------------------------------- */
@@ -205,6 +210,7 @@ export async function GET(req: NextRequest) {
       },
       defaults: defaultsRes.data ?? null,
       templates: templatesRes.data ?? [],
+      clientNotes: clientNotesRes.data ?? [],
       releases: (releases ?? []).map((release) => {
         const relTracks = (tracks ?? []).filter(
           (t) => t.release_id === release.id

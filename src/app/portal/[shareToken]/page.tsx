@@ -80,7 +80,7 @@ export default async function PortalPage({ params }: Props) {
 
   const { data: release, error: releaseErr } = await supabase
     .from("releases")
-    .select("*")
+    .select("id, user_id, title, artist, release_type, format, cover_art_url, global_direction, payment_status, fee_total, fee_currency, paid_amount, client_name, client_email, delivery_notes, status, target_date, genre_tags, payment_notes, pinned, distributor, record_label, upc, copyright_holder, copyright_year, phonogram_copyright, catalog_number, created_at, updated_at")
     .eq("id", portalShare.release_id)
     .maybeSingle();
 

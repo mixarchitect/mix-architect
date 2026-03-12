@@ -191,6 +191,7 @@ export default async function DashboardPage({ searchParams }: Props) {
               coverArtUrl={r.cover_art_url as string | null}
               pinned={r.pinned as boolean}
               role="owner"
+              hasNotes={!!r.internal_notes}
             />
           );
         })}
