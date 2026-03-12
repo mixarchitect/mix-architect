@@ -8,6 +8,8 @@ import {
   getFileSize,
   getTrackTitle,
   getAudioVersionUrl,
+  getTrackMetadata,
+  downloadArtwork,
   sanitizeFilename,
   getContentType,
 } from "./storage.js";
@@ -114,7 +116,23 @@ async function processNextJob() {
       `  Source: ${sourceInfo.codecName}, ${sourceInfo.sampleRate}Hz, ${sourceInfo.bitDepth}-bit, ${sourceInfo.channels}ch`,
     );
 
-    // 4. Convert (or use source directly if already in target format)
+    // 4. Fetch metadata for embedding in tagged formats
+    const { metadata, artworkUrl } = await getTrackMetadata(
+      job.track_id,
+      job.audio_version_id,
+    );
+    console.log(
+      `  Metadata: ${Object.keys(metadata).length} tags, artwork: ${artworkUrl ? "yes" : "no"}`,
+    );
+
+    // 5. Download artwork if available
+    let artworkPath: string | null = null;
+    if (artworkUrl) {
+      artworkPath = await downloadArtwork(artworkUrl, jobDir);
+      if (artworkPath) console.log(`  Downloaded cover art`);
+    }
+
+    // 6. Convert (or use source directly if already in target format)
     let outputPath: string;
 
     if (isSourceFormat(job.target_format, sourceInfo)) {
@@ -123,11 +141,18 @@ async function processNextJob() {
     } else {
       const ext = getExtension(job.target_format);
       outputPath = path.join(jobDir, `output.${ext}`);
-      await convertAudio(sourcePath, outputPath, job.target_format, sourceInfo);
+      await convertAudio(
+        sourcePath,
+        outputPath,
+        job.target_format,
+        sourceInfo,
+        metadata,
+        artworkPath,
+      );
       console.log(`  Converted to ${job.target_format}`);
     }
 
-    // 5. Upload to Supabase Storage
+    // 7. Upload to Supabase Storage
     const trackTitle = await getTrackTitle(job.track_id);
     const ext = getExtension(job.target_format);
     const safeName = sanitizeFilename(trackTitle);
@@ -141,13 +166,26 @@ async function processNextJob() {
     );
     console.log(`  Uploaded to storage`);
 
-    // 6. Get output file size
+    // 8. Get output file size
     const fileSize = await getFileSize(outputPath);
 
-    // 7. Mark job complete
+    // 9. Mark job complete
     const expiresAt = new Date(
       Date.now() + 7 * 24 * 60 * 60 * 1000,
     ).toISOString();
+
+    // Build a summary of what was embedded (for UI display)
+    const embeddedSummary: Record<string, string | boolean> = {};
+    for (const [key, val] of Object.entries(metadata)) {
+      if (key === "lyrics") {
+        // Show word count instead of full text
+        const words = val.trim().split(/\s+/).length;
+        embeddedSummary.lyrics = `${words} words`;
+      } else {
+        embeddedSummary[key] = val;
+      }
+    }
+    if (artworkPath) embeddedSummary.artwork = true;
 
     await supabase
       .from("conversion_jobs")
@@ -157,6 +195,7 @@ async function processNextJob() {
         output_file_size: fileSize,
         completed_at: new Date().toISOString(),
         expires_at: expiresAt,
+        embedded_metadata: embeddedSummary,
       })
       .eq("id", job.id);
 

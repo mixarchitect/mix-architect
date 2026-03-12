@@ -16,12 +16,15 @@ export type ConversionStatus =
   | "completed"
   | "failed";
 
+export type EmbeddedMetadata = Record<string, string | boolean>;
+
 export type ConversionJob = {
   jobId: string;
   status: ConversionStatus;
   outputUrl: string | null;
   errorMessage: string | null;
   targetFormat: string;
+  embeddedMetadata: EmbeddedMetadata | null;
 };
 
 /* ------------------------------------------------------------------ */
@@ -107,6 +110,7 @@ export function useConversion() {
               outputUrl: data.output_url ?? null,
               errorMessage: data.error_message ?? null,
               targetFormat,
+              embeddedMetadata: data.embedded_metadata ?? null,
             });
             return next;
           });
@@ -171,6 +175,7 @@ export function useConversion() {
           outputUrl: null,
           errorMessage: null,
           targetFormat: targetFormat.toLowerCase(),
+          embeddedMetadata: null,
         });
         return next;
       });
@@ -200,6 +205,7 @@ export function useConversion() {
               outputUrl: data.outputUrl,
               errorMessage: null,
               targetFormat: targetFormat.toLowerCase(),
+              embeddedMetadata: null,
             });
             return next;
           });
@@ -220,6 +226,7 @@ export function useConversion() {
             outputUrl: null,
             errorMessage: null,
             targetFormat: targetFormat.toLowerCase(),
+            embeddedMetadata: null,
           });
           return next;
         });
@@ -237,6 +244,7 @@ export function useConversion() {
             outputUrl: null,
             errorMessage: msg,
             targetFormat: targetFormat.toLowerCase(),
+            embeddedMetadata: null,
           });
           return next;
         });

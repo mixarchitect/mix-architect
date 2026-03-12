@@ -9,7 +9,9 @@ import {
   Plus,
   ChevronDown,
   AlertCircle,
+  Tag,
 } from "lucide-react";
+import type { EmbeddedMetadata } from "@/hooks/use-conversion";
 import { Button } from "@/components/ui/button";
 import type { AudioVersionData } from "@/components/ui/audio-player";
 import type { ConversionJob } from "@/hooks/use-conversion";
@@ -37,6 +39,35 @@ type Props = {
     format: string,
   ) => ConversionJob | null;
 };
+
+/* ------------------------------------------------------------------ */
+/*  Metadata tooltip labels                                            */
+/* ------------------------------------------------------------------ */
+
+const META_LABELS: Record<string, string> = {
+  title: "Title",
+  artist: "Artist",
+  album: "Album",
+  track: "Track",
+  genre: "Genre",
+  isrc: "ISRC",
+  barcode: "UPC",
+  date: "Year",
+  copyright: "\u00A9",
+  lyrics: "Lyrics",
+  replaygain_track_gain: "Gain",
+  encoded_by: "Encoder",
+  comment: "Comment",
+  artwork: "Art",
+};
+
+function formatMetaValue(key: string, val: string | boolean): string {
+  if (key === "artwork") return "Cover embedded";
+  if (typeof val === "boolean") return val ? "Yes" : "No";
+  // Truncate long values for tooltip
+  if (val.length > 40) return val.slice(0, 37) + "...";
+  return val;
+}
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -195,6 +226,30 @@ export function DeliveryFormatSelector({
                 >
                   <Download size={12} />
                 </button>
+              )}
+
+              {/* ── Metadata indicator (on completed conversions) ── */}
+              {isComplete && job?.embeddedMetadata && (
+                <span className="relative ml-0.5">
+                  <Tag size={10} className="text-signal/60" />
+                  <span className="absolute bottom-full right-0 mb-2 w-52 px-3 py-2 text-[11px] text-text bg-panel border border-border rounded-md shadow-float opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-50 leading-snug">
+                    <span className="font-medium text-signal block mb-1">Embedded metadata</span>
+                    {Object.entries(job.embeddedMetadata as EmbeddedMetadata)
+                      .filter(([key]) => key !== "encoded_by" && key !== "comment")
+                      .map(([key, val]) => (
+                        <span key={key} className="flex justify-between gap-2">
+                          <span className="text-muted">{META_LABELS[key] ?? key}</span>
+                          <span className="text-text truncate text-right max-w-[120px]">
+                            {key === "artwork" ? (
+                              <span className="text-signal">Cover embedded</span>
+                            ) : (
+                              formatMetaValue(key, val)
+                            )}
+                          </span>
+                        </span>
+                      ))}
+                  </span>
+                </span>
               )}
 
               {/* ── Error tooltip ── */}

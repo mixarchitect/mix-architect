@@ -24,7 +24,7 @@ export async function GET(
     const { data: job } = await supabase
       .from("conversion_jobs")
       .select(
-        "id, status, target_format, output_url, output_file_size, error_message, created_at, completed_at",
+        "id, status, target_format, output_url, output_file_size, error_message, created_at, completed_at, embedded_metadata",
       )
       .eq("id", jobId)
       .maybeSingle();

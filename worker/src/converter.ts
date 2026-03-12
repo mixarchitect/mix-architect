@@ -127,102 +127,132 @@ function pcmCodec(bitDepth: number, endian: "le" | "be"): string {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Metadata tag mapping                                               */
+/* ------------------------------------------------------------------ */
+
+const TAGGABLE_FORMATS = new Set(["mp3", "flac", "aac", "ogg", "alac"]);
+
+// Formats that support embedded cover art reliably
+const ARTWORK_FORMATS = new Set(["mp3", "flac", "aac", "alac"]);
+
+const TAG_MAP: Record<string, string> = {
+  title: "title",
+  artist: "artist",
+  album: "album",
+  track: "track",
+  genre: "genre",
+  isrc: "TSRC",
+  barcode: "barcode",
+  date: "date",
+  copyright: "copyright",
+  lyrics: "lyrics",
+  encoded_by: "encoded_by",
+  comment: "comment",
+  replaygain_track_gain: "replaygain_track_gain",
+};
+
+function buildMetadataFlags(
+  metadata: Record<string, string>,
+  targetFormat: string,
+): string[] {
+  const flags: string[] = [];
+
+  for (const [key, ffmpegTag] of Object.entries(TAG_MAP)) {
+    if (!metadata[key]) continue;
+
+    // ISRC tag name varies by container
+    let tag = ffmpegTag;
+    if (key === "isrc" && (targetFormat === "flac" || targetFormat === "ogg")) {
+      tag = "ISRC";
+    }
+
+    flags.push("-metadata", `${tag}=${metadata[key]}`);
+  }
+
+  // album_artist (some players use both)
+  if (metadata.artist) {
+    flags.push("-metadata", `album_artist=${metadata.artist}`);
+  }
+
+  return flags;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Build FFmpeg arguments for a specific format                       */
 /* ------------------------------------------------------------------ */
 
-function getFFmpegArgs(
-  input: string,
-  output: string,
+function getCodecArgs(
   format: string,
   info: SourceInfo,
 ): string[] {
   const { sampleRate, bitDepth, channels } = info;
 
-  const common = ["-i", input, "-v", "error", "-y"];
-
   switch (format) {
     case "wav":
       return [
-        ...common,
         "-c:a", pcmCodec(bitDepth, "le"),
         "-ar", String(sampleRate),
         "-ac", String(channels),
-        output,
       ];
 
     case "aiff":
       return [
-        ...common,
         "-c:a", pcmCodec(bitDepth, "be"),
         "-ar", String(sampleRate),
         "-ac", String(channels),
-        output,
       ];
 
     case "flac":
       return [
-        ...common,
         "-c:a", "flac",
         "-compression_level", "8",
         "-ar", String(sampleRate),
-        output,
       ];
 
     case "mp3":
       return [
-        ...common,
         "-c:a", "libmp3lame",
         "-b:a", "320k",
         "-ar", "44100",
         "-ac", String(Math.min(channels, 2)),
-        output,
       ];
 
     case "aac":
       return [
-        ...common,
         "-c:a", "aac",
         "-b:a", "256k",
         "-ar", "44100",
         "-ac", String(Math.min(channels, 2)),
         "-movflags", "+faststart",
-        output,
       ];
 
     case "ogg":
       return [
-        ...common,
         "-c:a", "libvorbis",
         "-q:a", "8",
         "-ar", "44100",
         "-ac", String(Math.min(channels, 2)),
-        output,
       ];
 
     case "alac":
       return [
-        ...common,
         "-c:a", "alac",
         "-ar", String(sampleRate),
         "-ac", String(channels),
         "-movflags", "+faststart",
-        output,
       ];
 
     default:
-      // Fallback to WAV
       return [
-        ...common,
         "-c:a", pcmCodec(bitDepth, "le"),
         "-ar", String(sampleRate),
         "-ac", String(channels),
-        output,
       ];
   }
 }
 
 /* ------------------------------------------------------------------ */
-/*  Run FFmpeg conversion                                              */
+/*  Run FFmpeg conversion with optional metadata + artwork embedding   */
 /* ------------------------------------------------------------------ */
 
 export async function convertAudio(
@@ -230,12 +260,58 @@ export async function convertAudio(
   outputPath: string,
   targetFormat: string,
   sourceInfo: SourceInfo,
+  metadata?: Record<string, string> | null,
+  artworkPath?: string | null,
 ): Promise<void> {
-  const args = getFFmpegArgs(inputPath, outputPath, targetFormat, sourceInfo);
+  const args: string[] = ["-i", inputPath];
+
+  const shouldTag = TAGGABLE_FORMATS.has(targetFormat);
+  const shouldEmbed = shouldTag && ARTWORK_FORMATS.has(targetFormat) && artworkPath;
+
+  // Add artwork as second input if available
+  if (shouldEmbed) {
+    args.push("-i", artworkPath);
+  }
+
+  // Common flags
+  args.push("-v", "error", "-y");
+
+  // Codec args
+  args.push(...getCodecArgs(targetFormat, sourceInfo));
+
+  // Stream mapping when artwork is present
+  if (shouldEmbed) {
+    args.push(
+      "-map", "0:a",
+      "-map", "1:v",
+      "-c:v", "copy",
+      "-disposition:v:0", "attached_pic",
+    );
+
+    // MP3 needs ID3v2 version 3 for proper artwork support
+    if (targetFormat === "mp3") {
+      args.push("-id3v2_version", "3");
+    }
+
+    // Image stream metadata
+    args.push(
+      "-metadata:s:v", "title=Album cover",
+      "-metadata:s:v", "comment=Cover (front)",
+    );
+  }
+
+  // Text metadata flags
+  if (shouldTag && metadata && Object.keys(metadata).length > 0) {
+    args.push(...buildMetadataFlags(metadata, targetFormat));
+  }
+
+  // Output
+  args.push(outputPath);
 
   try {
     await execFileAsync("ffmpeg", args, {
-      timeout: 5 * 60 * 1000, // 5-minute timeout
+      timeout: 5 * 60 * 1000,
+      maxBuffer: 10 * 1024 * 1024,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
