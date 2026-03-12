@@ -13,6 +13,7 @@ type Props = {
   userId: string;
   initialClientName: string;
   initialClientEmail: string;
+  initialClientPhone: string;
   initialNotes: string;
   customPhotoUrl?: string | null;
   fallbackCoverUrl?: string | null;
@@ -23,6 +24,7 @@ export function ArtistInfoBar({
   userId,
   initialClientName,
   initialClientEmail,
+  initialClientPhone,
   initialNotes,
   customPhotoUrl = null,
   fallbackCoverUrl = null,
@@ -47,6 +49,7 @@ export function ArtistInfoBar({
           userId={userId}
           initialName={initialClientName}
           initialEmail={initialClientEmail}
+          initialPhone={initialClientPhone}
         />
         <ClientNotesEditor
           clientEmail={initialClientEmail || undefined}
@@ -196,15 +199,18 @@ function ContactInfoEditor({
   userId,
   initialName,
   initialEmail,
+  initialPhone,
 }: {
   artistName: string;
   userId: string;
   initialName: string;
   initialEmail: string;
+  initialPhone: string;
 }) {
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
+  const [phone, setPhone] = useState(initialPhone);
   const [saving, setSaving] = useState(false);
   const router = useRouter();
 
@@ -217,6 +223,7 @@ function ContactInfoEditor({
         .update({
           client_name: name || null,
           client_email: email || null,
+          client_phone: phone || null,
         })
         .eq("user_id", userId)
         .ilike("artist", artistName);
@@ -228,7 +235,7 @@ function ContactInfoEditor({
     } finally {
       setSaving(false);
     }
-  }, [name, email, userId, artistName, router]);
+  }, [name, email, phone, userId, artistName, router]);
 
   return (
     <Panel>
@@ -261,6 +268,13 @@ function ContactInfoEditor({
               placeholder="Client email"
               type="email"
             />
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="input text-sm w-full"
+              placeholder="Client phone"
+              type="tel"
+            />
             <p className="text-[10px] text-muted">
               Saves to all releases by {artistName}
             </p>
@@ -280,6 +294,7 @@ function ContactInfoEditor({
                 onClick={() => {
                   setName(initialName);
                   setEmail(initialEmail);
+                  setPhone(initialPhone);
                   setEditing(false);
                 }}
                 className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md text-muted hover:text-text transition-colors"
@@ -304,7 +319,13 @@ function ContactInfoEditor({
                 <a href={`mailto:${email}`} className="text-signal text-xs hover:underline">{email}</a>
               </div>
             ) : null}
-            {!name && !email && (
+            {phone ? (
+              <div className="flex justify-between">
+                <span className="text-muted">Phone</span>
+                <a href={`tel:${phone}`} className="text-signal text-xs hover:underline">{phone}</a>
+              </div>
+            ) : null}
+            {!name && !email && !phone && (
               <p className="text-sm text-muted italic">No contact info set.</p>
             )}
           </div>

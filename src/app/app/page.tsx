@@ -146,6 +146,7 @@ export default async function DashboardPage({ searchParams }: Props) {
   // ── Fetch client info + artist photo for artist sidebar ──
   let artistClientName = "";
   let artistClientEmail = "";
+  let artistClientPhone = "";
   let artistClientNotes = "";
   let artistCustomPhotoUrl: string | null = null;
   let artistFallbackCoverUrl: string | null = null;
@@ -154,6 +155,7 @@ export default async function DashboardPage({ searchParams }: Props) {
     const match = displayReleases.find((r) => r.client_email);
     artistClientName = (match?.client_name as string) ?? "";
     artistClientEmail = (match?.client_email as string) ?? "";
+    artistClientPhone = (match?.client_phone as string) ?? "";
 
     // Get latest cover art as fallback photo
     const coverMatch = displayReleases.find((r) => r.cover_art_url);
@@ -281,6 +283,7 @@ export default async function DashboardPage({ searchParams }: Props) {
             userId={user.id}
             initialClientName={artistClientName}
             initialClientEmail={artistClientEmail}
+            initialClientPhone={artistClientPhone}
             initialNotes={artistClientNotes}
             customPhotoUrl={artistCustomPhotoUrl}
             fallbackCoverUrl={artistFallbackCoverUrl}

@@ -130,7 +130,7 @@ export function ArtistPhotoUploader({
 
   if (editing) {
     return (
-      <div className="rounded-lg border border-border overflow-hidden" style={{ width: 200 }}>
+      <div className="rounded-lg border border-border overflow-hidden" style={{ width: 340 }}>
         {/* Preview */}
         <div
           className="w-full aspect-square flex items-center justify-center"

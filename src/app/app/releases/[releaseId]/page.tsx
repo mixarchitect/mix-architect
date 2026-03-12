@@ -342,7 +342,7 @@ export default async function ReleasePage({ params }: Props) {
           />
 
           {/* Client Info */}
-          {(release.client_name || release.client_email) && (
+          {(release.client_name || release.client_email || release.client_phone) && (
             <Panel>
               <PanelBody className="py-5">
                 <div className="label-sm text-muted mb-2">CLIENT INFO</div>
@@ -358,6 +358,14 @@ export default async function ReleasePage({ params }: Props) {
                       <span className="text-muted">Email</span>
                       <a href={`mailto:${release.client_email}`} className="text-signal text-xs hover:underline">
                         {release.client_email}
+                      </a>
+                    </div>
+                  )}
+                  {release.client_phone && (
+                    <div className="flex justify-between">
+                      <span className="text-muted">Phone</span>
+                      <a href={`tel:${release.client_phone}`} className="text-signal text-xs hover:underline">
+                        {release.client_phone}
                       </a>
                     </div>
                   )}
