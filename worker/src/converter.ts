@@ -328,7 +328,7 @@ export async function convertAudio(
   // Write lyrics via node-id3 for MP3 (FFmpeg can't write proper USLT frames)
   if (targetFormat === "mp3" && metadata?.lyrics) {
     try {
-      const NodeID3 = await import("node-id3");
+      const { default: NodeID3 } = await import("node-id3");
       const tags = {
         unsynchronisedLyrics: {
           language: "eng",
