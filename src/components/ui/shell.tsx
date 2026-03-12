@@ -53,15 +53,16 @@ export function Shell({ userId, userEmail, paymentsEnabled = false, theme = "sys
     <ToastProvider>
       <PaymentsProvider enabled={paymentsEnabled}>
       <SubscriptionProvider initial={subscription}>
-        <div className="flex h-dvh overflow-hidden">
-          {/* Spacer for fixed-position Rail (desktop) */}
-          <div className="hidden md:block w-[200px] shrink-0" />
-          <Rail />
-          <MobileNav userId={userId} userEmail={userEmail} onSearchClick={open} />
+        <div className="flex flex-col h-dvh overflow-hidden">
+          {/* Full-width top bar (desktop) */}
+          <TopBar userId={userId} userEmail={userEmail ?? null} onSearchClick={open} />
 
-          {/* Right side: top bar + scrollable content */}
-          <div className="flex flex-col flex-1 min-w-0">
-            <TopBar userId={userId} userEmail={userEmail ?? null} onSearchClick={open} />
+          {/* Below top bar: sidebar + content */}
+          <div className="flex flex-1 min-h-0">
+            {/* Spacer for fixed-position Rail (desktop) */}
+            <div className="hidden md:block w-14 shrink-0" />
+            <Rail />
+            <MobileNav userId={userId} userEmail={userEmail} onSearchClick={open} />
             <MainContent>{children}</MainContent>
           </div>
         </div>

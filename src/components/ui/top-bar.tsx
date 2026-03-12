@@ -8,6 +8,7 @@ import { useTheme } from "next-themes";
 import { cn } from "@/lib/cn";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { NotificationBell } from "@/components/ui/notification-bell";
+import { Tooltip } from "@/components/ui/tooltip";
 
 type Props = {
   userId?: string;
@@ -39,8 +40,17 @@ export function TopBar({ userId, userEmail, onSearchClick }: Props) {
 
   return (
     <header className="hidden md:flex h-14 shrink-0 items-center justify-between px-6 border-b border-border bg-panel">
-      {/* Left: spacer for breadcrumbs (future) */}
-      <div />
+      {/* Left: logo */}
+      <Link
+        href="/app"
+        className="flex items-center hover:opacity-90 transition-opacity"
+      >
+        <img
+          src={mounted && resolvedTheme === "dark" ? "/mix-architect-logo-white.svg" : "/mix-architect-logo.svg"}
+          alt="Mix Architect"
+          className="h-6 w-auto"
+        />
+      </Link>
 
       {/* Right: utility items */}
       <div className="flex items-center gap-1">
@@ -62,32 +72,42 @@ export function TopBar({ userId, userEmail, onSearchClick }: Props) {
         </button>
 
         {/* Notification bell */}
-        {userId && <NotificationBell userId={userId} variant="topbar" />}
+        {userId && (
+          <Tooltip label="Notifications" align="right">
+            <NotificationBell userId={userId} variant="topbar" />
+          </Tooltip>
+        )}
 
         {/* Help */}
-        <Link
-          href="/app/help"
-          aria-label="Help Center"
-          title="Help Center"
-          className="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
-        >
-          <HelpCircle size={18} strokeWidth={1.5} />
-        </Link>
+        <Tooltip label="Help Center" align="right">
+          <Link
+            href="/app/help"
+            aria-label="Help Center"
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
+          >
+            <HelpCircle size={18} strokeWidth={1.5} />
+          </Link>
+        </Tooltip>
 
         {/* Theme toggle */}
-        <button
-          type="button"
-          onClick={cycleTheme}
-          aria-label={themeLabel}
-          title={themeLabel}
-          className="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
-        >
-          <ThemeIcon size={18} strokeWidth={1.5} />
-        </button>
+        <Tooltip label={themeLabel} align="right">
+          <button
+            type="button"
+            onClick={cycleTheme}
+            aria-label={themeLabel}
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
+          >
+            <ThemeIcon size={18} strokeWidth={1.5} />
+          </button>
+        </Tooltip>
 
         {/* Account avatar */}
         {userId && (
-          <AccountMenu userEmail={userEmail ?? null} />
+          <Tooltip label="Account" align="right">
+            <span className="ml-1">
+              <AccountMenu userEmail={userEmail ?? null} />
+            </span>
+          </Tooltip>
         )}
       </div>
     </header>
@@ -140,8 +160,7 @@ function AccountMenu({ userEmail }: { userEmail: string | null }) {
         aria-label="Account menu"
         aria-haspopup="true"
         aria-expanded={open}
-        title="Account"
-        className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold text-white transition-opacity hover:opacity-80"
+        className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold text-white transition-opacity hover:opacity-80"
         style={{ background: "var(--signal)" }}
       >
         {initial}
