@@ -143,25 +143,40 @@ export default async function DashboardPage({ searchParams }: Props) {
     );
   }
 
-  // ── Fetch client info for artist sidebar ──
+  // ── Fetch client info + artist photo for artist sidebar ──
   let artistClientName = "";
   let artistClientEmail = "";
   let artistClientNotes = "";
+  let artistCustomPhotoUrl: string | null = null;
+  let artistFallbackCoverUrl: string | null = null;
 
   if (artistFilter && displayReleases && user) {
     const match = displayReleases.find((r) => r.client_email);
     artistClientName = (match?.client_name as string) ?? "";
     artistClientEmail = (match?.client_email as string) ?? "";
 
-    // Look up notes by email if available, otherwise by artist name convention
+    // Get latest cover art as fallback photo
+    const coverMatch = displayReleases.find((r) => r.cover_art_url);
+    artistFallbackCoverUrl = (coverMatch?.cover_art_url as string | null) ?? null;
+
+    // Look up notes and custom photo in parallel
     const noteKey = artistClientEmail || `artist:${artistFilter.toLowerCase()}`;
-    const { data: cnData } = await supabase
-      .from("client_notes")
-      .select("notes")
-      .eq("engineer_id", user.id)
-      .eq("client_email", noteKey)
-      .maybeSingle();
-    artistClientNotes = cnData?.notes ?? "";
+    const [cnRes, photoRes] = await Promise.all([
+      supabase
+        .from("client_notes")
+        .select("notes")
+        .eq("engineer_id", user.id)
+        .eq("client_email", noteKey)
+        .maybeSingle(),
+      supabase
+        .from("artist_photos")
+        .select("photo_url")
+        .eq("user_id", user.id)
+        .eq("artist_name_key", artistFilter.toLowerCase())
+        .maybeSingle(),
+    ]);
+    artistClientNotes = cnRes.data?.notes ?? "";
+    artistCustomPhotoUrl = (photoRes.data?.photo_url as string | null) ?? null;
   }
 
   // ── Build DashboardRelease[] for the timeline ──
@@ -267,6 +282,8 @@ export default async function DashboardPage({ searchParams }: Props) {
             initialClientName={artistClientName}
             initialClientEmail={artistClientEmail}
             initialNotes={artistClientNotes}
+            customPhotoUrl={artistCustomPhotoUrl}
+            fallbackCoverUrl={artistFallbackCoverUrl}
           />
         )}
         </>

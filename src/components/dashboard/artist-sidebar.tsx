@@ -6,6 +6,7 @@ import { Check, Pencil, X } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { ClientNotesEditor } from "@/app/app/releases/[releaseId]/sidebar-editors";
+import { ArtistPhotoUploader } from "@/components/ui/artist-photo-uploader";
 
 type Props = {
   artistName: string;
@@ -13,6 +14,8 @@ type Props = {
   initialClientName: string;
   initialClientEmail: string;
   initialNotes: string;
+  customPhotoUrl?: string | null;
+  fallbackCoverUrl?: string | null;
 };
 
 export function ArtistInfoBar({
@@ -21,24 +24,173 @@ export function ArtistInfoBar({
   initialClientName,
   initialClientEmail,
   initialNotes,
+  customPhotoUrl = null,
+  fallbackCoverUrl = null,
 }: Props) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-      <ContactInfoEditor
-        artistName={artistName}
-        userId={userId}
-        initialName={initialClientName}
-        initialEmail={initialClientEmail}
-      />
-      <ClientNotesEditor
-        clientEmail={initialClientEmail || undefined}
-        artistName={artistName}
-        initialNotes={initialNotes}
-      />
+    <div className="space-y-4 mb-6">
+      {/* Artist identity row: photo + name */}
+      <div className="flex items-center gap-4">
+        <ArtistPhotoUploader
+          artistName={artistName}
+          currentPhotoUrl={customPhotoUrl}
+          fallbackCoverUrl={fallbackCoverUrl}
+          size="lg"
+        />
+        <ArtistNameEditor artistName={artistName} userId={userId} />
+      </div>
+
+      {/* Contact + notes grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ContactInfoEditor
+          artistName={artistName}
+          userId={userId}
+          initialName={initialClientName}
+          initialEmail={initialClientEmail}
+        />
+        <ClientNotesEditor
+          clientEmail={initialClientEmail || undefined}
+          artistName={artistName}
+          initialNotes={initialNotes}
+        />
+      </div>
     </div>
   );
 }
 
+/* ── Artist Name Editor ── */
+function ArtistNameEditor({
+  artistName,
+  userId,
+}: {
+  artistName: string;
+  userId: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(artistName);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  async function handleSave() {
+    const trimmed = name.trim();
+    if (!trimmed || trimmed === artistName) {
+      setName(artistName);
+      setEditing(false);
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `This will rename "${artistName}" to "${trimmed}" across all releases. Continue?`,
+    );
+    if (!confirmed) return;
+
+    setSaving(true);
+    setError("");
+    const supabase = createSupabaseBrowserClient();
+    try {
+      // Update all releases with this artist name
+      const { error: relErr } = await supabase
+        .from("releases")
+        .update({ artist: trimmed })
+        .eq("user_id", userId)
+        .ilike("artist", artistName);
+      if (relErr) throw relErr;
+
+      // Update artist_photos key if exists
+      const oldKey = artistName.toLowerCase().trim();
+      const newKey = trimmed.toLowerCase();
+      if (oldKey !== newKey) {
+        await supabase
+          .from("artist_photos")
+          .update({ artist_name_key: newKey })
+          .eq("user_id", userId)
+          .eq("artist_name_key", oldKey);
+
+        // Update client_notes key if using artist: prefix
+        await supabase
+          .from("client_notes")
+          .update({ client_email: `artist:${newKey}` })
+          .eq("engineer_id", userId)
+          .eq("client_email", `artist:${oldKey}`);
+      }
+
+      setEditing(false);
+      router.push(`/app?artist=${encodeURIComponent(trimmed)}`);
+      router.refresh();
+    } catch {
+      setError("Failed to rename artist");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (editing) {
+    return (
+      <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex items-center gap-2">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="input text-lg font-semibold flex-1 min-w-0"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave();
+              if (e.key === "Escape") {
+                setName(artistName);
+                setEditing(false);
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors shrink-0"
+            style={{ background: "var(--signal)", color: "var(--signal-on)" }}
+          >
+            <Check size={12} />
+            {saving ? "Saving..." : "Save"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setName(artistName);
+              setEditing(false);
+              setError("");
+            }}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md text-muted hover:text-text transition-colors shrink-0"
+            style={{ background: "var(--panel2)" }}
+          >
+            <X size={12} />
+          </button>
+        </div>
+        <p className="text-[10px] text-muted">
+          Renaming updates all releases by this artist
+        </p>
+        {error && <p className="text-xs text-red-500">{error}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className="group flex items-center gap-2 min-w-0"
+    >
+      <span className="text-lg font-semibold text-text truncate">
+        {artistName}
+      </span>
+      <Pencil
+        size={14}
+        className="text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+      />
+    </button>
+  );
+}
+
+/* ── Contact Info Editor ── */
 function ContactInfoEditor({
   artistName,
   userId,
