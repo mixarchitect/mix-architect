@@ -160,10 +160,17 @@ function buildMetadataFlags(
   for (const [key, ffmpegTag] of Object.entries(TAG_MAP)) {
     if (!metadata[key]) continue;
 
-    // ISRC tag name varies by container
+    // Some tag names vary by container
     let tag = ffmpegTag;
     if (key === "isrc" && (targetFormat === "flac" || targetFormat === "ogg")) {
       tag = "ISRC";
+    }
+    if (key === "lyrics") {
+      if (targetFormat === "mp3") {
+        tag = "lyrics-eng";
+      } else {
+        tag = "LYRICS";
+      }
     }
 
     flags.push("-metadata", `${tag}=${metadata[key]}`);
