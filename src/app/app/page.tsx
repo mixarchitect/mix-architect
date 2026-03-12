@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
+import { ArtistSidebar } from "@/components/dashboard/artist-sidebar";
 import { Plus, Sparkles, Music, Search } from "lucide-react";
 import { formatMoney } from "@/lib/format-money";
 import type { DashboardRelease } from "@/types/release";
@@ -142,6 +143,27 @@ export default async function DashboardPage({ searchParams }: Props) {
     );
   }
 
+  // ── Fetch client info for artist sidebar ──
+  let artistClientName = "";
+  let artistClientEmail = "";
+  let artistClientNotes = "";
+
+  if (artistFilter && displayReleases && user) {
+    const match = displayReleases.find((r) => r.client_email);
+    artistClientName = (match?.client_name as string) ?? "";
+    artistClientEmail = (match?.client_email as string) ?? "";
+
+    if (artistClientEmail) {
+      const { data: cnData } = await supabase
+        .from("client_notes")
+        .select("notes")
+        .eq("engineer_id", user.id)
+        .eq("client_email", artistClientEmail)
+        .maybeSingle();
+      artistClientNotes = cnData?.notes ?? "";
+    }
+  }
+
   // ── Build DashboardRelease[] for the timeline ──
   const dashboardReleases: DashboardRelease[] = (displayReleases ?? []).map(
     (r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => ({
@@ -227,6 +249,9 @@ export default async function DashboardPage({ searchParams }: Props) {
           </Link>
         </div>
       </div>
+
+      <div className={artistFilter ? "grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6" : ""}>
+      <div>
 
       {artistFilter && (
         <div className="flex items-center gap-2 text-sm text-muted mb-6">
@@ -350,6 +375,18 @@ export default async function DashboardPage({ searchParams }: Props) {
           </div>
         </>
       )}
+
+      </div>
+      {artistFilter && user && (
+        <ArtistSidebar
+          artistName={artistFilter}
+          userId={user.id}
+          initialClientName={artistClientName}
+          initialClientEmail={artistClientEmail}
+          initialNotes={artistClientNotes}
+        />
+      )}
+      </div>
     </div>
   );
 }
