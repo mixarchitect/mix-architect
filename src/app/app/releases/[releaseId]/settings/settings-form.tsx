@@ -114,6 +114,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
   const [targetDate, setTargetDate] = useState("");
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
   const [deliveryNotes, setDeliveryNotes] = useState("");
   const [paymentsEnabled, setPaymentsEnabled] = useState(false);
   const [feeTotal, setFeeTotal] = useState("");
@@ -148,7 +149,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
   const initialSnapshot = useRef("");
   const currentSnapshot = JSON.stringify({
     title, artist, releaseType, format, status, globalDirection, genreTags,
-    targetDate, clientName, clientEmail, deliveryNotes, feeTotal, feeCurrency,
+    targetDate, clientName, clientEmail, clientPhone, deliveryNotes, feeTotal, feeCurrency,
     paymentStatus, paidAmount, paymentNotes, distributor, recordLabel, upc,
     copyrightHolder, copyrightYear, phonogramCopyright, catalogNumber,
   });
@@ -173,6 +174,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
         setTargetDate(data.target_date ?? "");
         setClientName(data.client_name ?? "");
         setClientEmail(data.client_email ?? "");
+        setClientPhone(data.client_phone ?? "");
         setDeliveryNotes(data.delivery_notes ?? "");
         setFeeTotal(data.fee_total != null ? String(data.fee_total) : "");
         setFeeCurrency(data.fee_currency ?? "USD");
@@ -217,6 +219,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
             targetDate: data.target_date ?? "",
             clientName: data.client_name ?? "",
             clientEmail: data.client_email ?? "",
+            clientPhone: data.client_phone ?? "",
             deliveryNotes: data.delivery_notes ?? "",
             feeTotal: data.fee_total != null ? String(data.fee_total) : "",
             feeCurrency: data.fee_currency ?? "USD",
@@ -252,6 +255,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
         target_date: targetDate || null,
         client_name: clientName || null,
         client_email: clientEmail || null,
+        client_phone: clientPhone || null,
         delivery_notes: deliveryNotes || null,
         cover_art_url: coverArtUrl || null,
         distributor: distributor || null,
@@ -613,6 +617,18 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
               disabled={!editable}
               className="input"
               placeholder="client@example.com"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="label text-muted">Client phone</label>
+            <input
+              type="tel"
+              value={clientPhone}
+              onChange={(e) => setClientPhone(e.target.value)}
+              disabled={!editable}
+              className="input"
+              placeholder="+1 (555) 000-0000"
             />
           </div>
 
