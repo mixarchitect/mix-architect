@@ -356,9 +356,9 @@ export default async function ReleasePage({ params }: Props) {
                   {release.client_email && (
                     <div className="flex justify-between">
                       <span className="text-muted">Email</span>
-                      <span className="text-text text-xs">
+                      <a href={`mailto:${release.client_email}`} className="text-signal text-xs hover:underline">
                         {release.client_email}
-                      </span>
+                      </a>
                     </div>
                   )}
                 </div>

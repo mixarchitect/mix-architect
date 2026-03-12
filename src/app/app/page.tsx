@@ -153,15 +153,15 @@ export default async function DashboardPage({ searchParams }: Props) {
     artistClientName = (match?.client_name as string) ?? "";
     artistClientEmail = (match?.client_email as string) ?? "";
 
-    if (artistClientEmail) {
-      const { data: cnData } = await supabase
-        .from("client_notes")
-        .select("notes")
-        .eq("engineer_id", user.id)
-        .eq("client_email", artistClientEmail)
-        .maybeSingle();
-      artistClientNotes = cnData?.notes ?? "";
-    }
+    // Look up notes by email if available, otherwise by artist name convention
+    const noteKey = artistClientEmail || `artist:${artistFilter.toLowerCase()}`;
+    const { data: cnData } = await supabase
+      .from("client_notes")
+      .select("notes")
+      .eq("engineer_id", user.id)
+      .eq("client_email", noteKey)
+      .maybeSingle();
+    artistClientNotes = cnData?.notes ?? "";
   }
 
   // ── Build DashboardRelease[] for the timeline ──

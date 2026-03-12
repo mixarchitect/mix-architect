@@ -30,12 +30,11 @@ export function ArtistInfoBar({
         initialName={initialClientName}
         initialEmail={initialClientEmail}
       />
-      {initialClientEmail && (
-        <ClientNotesEditor
-          clientEmail={initialClientEmail}
-          initialNotes={initialNotes}
-        />
-      )}
+      <ClientNotesEditor
+        clientEmail={initialClientEmail || undefined}
+        artistName={artistName}
+        initialNotes={initialNotes}
+      />
     </div>
   );
 }
@@ -150,7 +149,7 @@ function ContactInfoEditor({
             {email ? (
               <div className="flex justify-between">
                 <span className="text-muted">Email</span>
-                <span className="text-text text-xs">{email}</span>
+                <a href={`mailto:${email}`} className="text-signal text-xs hover:underline">{email}</a>
               </div>
             ) : null}
             {!name && !email && (

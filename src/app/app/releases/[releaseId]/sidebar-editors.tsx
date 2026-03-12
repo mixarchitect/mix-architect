@@ -963,23 +963,29 @@ export function ReleaseNotesEditor({ releaseId, initialValue }: ReleaseNotesEdit
 // ── Client Notes Editor ──
 
 type ClientNotesEditorProps = {
-  clientEmail: string;
+  clientEmail?: string;
+  artistName?: string;
   initialNotes: string;
 };
 
-export function ClientNotesEditor({ clientEmail, initialNotes }: ClientNotesEditorProps) {
+export function ClientNotesEditor({ clientEmail, artistName, initialNotes }: ClientNotesEditorProps) {
+  const noteKey = clientEmail || (artistName ? `artist:${artistName.toLowerCase()}` : null);
+
   const handleSave = async (value: string) => {
+    if (!noteKey) return;
     const supabase = createSupabaseBrowserClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
     const { error } = await supabase
       .from("client_notes")
       .upsert(
-        { engineer_id: user.id, client_email: clientEmail, notes: value },
+        { engineer_id: user.id, client_email: noteKey, notes: value },
         { onConflict: "engineer_id,client_email" },
       );
     if (error) throw error;
   };
+
+  if (!noteKey) return null;
 
   return (
     <InternalNotesEditor
