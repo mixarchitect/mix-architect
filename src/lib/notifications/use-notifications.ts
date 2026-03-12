@@ -81,6 +81,30 @@ export function useNotifications(userId: string | undefined) {
     };
   }, [userId]);
 
+  // Fallback poll every 30s in case realtime misses events (e.g. service-role inserts)
+  useEffect(() => {
+    if (!userId) return;
+
+    const supabase = createSupabaseBrowserClient();
+
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from("notifications")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(PAGE_SIZE);
+
+      if (data) {
+        const rows = data as Notification[];
+        setNotifications(rows);
+        setUnreadCount(rows.filter((n) => !n.read).length);
+      }
+    }, 30_000);
+
+    return () => clearInterval(interval);
+  }, [userId]);
+
   // Mark a single notification as read
   const markRead = useCallback(
     async (notificationId: string) => {
