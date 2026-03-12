@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { cn } from "@/lib/cn";
 import { Rail } from "@/components/ui/rail";
 import { MobileNav } from "@/components/ui/mobile-nav";
+import { TopBar } from "@/components/ui/top-bar";
 import { CommandPalette } from "@/components/ui/command-palette";
 import { PaymentsProvider } from "@/lib/payments-context";
 import { SubscriptionProvider, type SubscriptionState } from "@/lib/subscription-context";
@@ -31,16 +32,11 @@ const DEFAULT_SUB: SubscriptionState = {
   grantedByAdmin: false,
 };
 
-export function Shell({ userId, paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, children }: ShellProps) {
+export function Shell({ userId, userEmail, paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, children }: ShellProps) {
   const { isOpen, open, close } = useCommandPalette();
   const { setTheme } = useTheme();
 
   // Sync the user's DB preference with next-themes once on mount.
-  // Only apply when the DB holds an explicit choice (light/dark).
-  // When the server prop is "system" (the default), let next-themes'
-  // own localStorage persistence take precedence — this prevents
-  // resetting user toggles when the fire-and-forget DB upsert
-  // hasn't completed before a page refresh.
   const syncedRef = React.useRef(false);
   React.useEffect(() => {
     if (!syncedRef.current) {
@@ -58,11 +54,16 @@ export function Shell({ userId, paymentsEnabled = false, theme = "system", subsc
       <PaymentsProvider enabled={paymentsEnabled}>
       <SubscriptionProvider initial={subscription}>
         <div className="flex h-dvh overflow-hidden">
-          {/* Spacer for fixed-position Rail */}
-          <div className="hidden md:block w-16 shrink-0" />
-          <Rail userId={userId} onSearchClick={open} />
-          <MobileNav userId={userId} onSearchClick={open} />
-          <MainContent>{children}</MainContent>
+          {/* Spacer for fixed-position Rail (desktop) */}
+          <div className="hidden md:block w-[200px] shrink-0" />
+          <Rail />
+          <MobileNav userId={userId} userEmail={userEmail} onSearchClick={open} />
+
+          {/* Right side: top bar + scrollable content */}
+          <div className="flex flex-col flex-1 min-w-0">
+            <TopBar userId={userId} userEmail={userEmail ?? null} onSearchClick={open} />
+            <MainContent>{children}</MainContent>
+          </div>
         </div>
         <MiniPlayer />
         <CommandPalette isOpen={isOpen} onClose={close} />

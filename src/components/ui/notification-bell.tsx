@@ -9,8 +9,8 @@ import { useRouter } from "next/navigation";
 
 type Props = {
   userId: string;
-  /** Render variant: rail (desktop sidebar) or mobile (bottom nav) */
-  variant: "rail" | "mobile";
+  /** Render variant: rail (desktop sidebar), topbar (top bar), or mobile (bottom nav) */
+  variant: "rail" | "topbar" | "mobile";
 };
 
 export function NotificationBell({ userId, variant }: Props) {
@@ -87,6 +87,37 @@ export function NotificationBell({ userId, variant }: Props) {
           />
         )}
       </>
+    );
+  }
+
+  // Topbar variant
+  if (variant === "topbar") {
+    return (
+      <div className="relative">
+        <button
+          ref={buttonRef}
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Notifications"
+          title="Notifications"
+          className="relative w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
+        >
+          <Bell size={18} strokeWidth={1.5} />
+          {unreadCount > 0 && <Badge count={unreadCount} />}
+        </button>
+        {open && (
+          <NotificationPanel
+            ref={panelRef}
+            notifications={notifications}
+            onItemClick={handleItemClick}
+            onMarkAllRead={markAllRead}
+            onDismiss={dismiss}
+            onClearAll={clearAll}
+            onClose={() => setOpen(false)}
+            position="topbar"
+          />
+        )}
+      </div>
     );
   }
 
@@ -176,7 +207,7 @@ type PanelProps = {
   onDismiss: (id: string) => void;
   onClearAll: () => void;
   onClose: () => void;
-  position: "rail" | "mobile";
+  position: "rail" | "topbar" | "mobile";
 };
 
 const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
@@ -186,11 +217,13 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
         ref={ref}
         style={{ background: "var(--panel)" }}
         className={cn(
-          "fixed z-50 border border-border rounded-xl shadow-xl overflow-hidden",
+          "z-50 border border-border rounded-xl shadow-xl overflow-hidden",
           "flex flex-col",
           position === "rail"
-            ? "left-16 bottom-16 w-80 max-h-[min(480px,70dvh)]"
-            : "left-2 right-2 bottom-[72px] max-h-[min(480px,60dvh)]",
+            ? "fixed left-16 bottom-16 w-80 max-h-[min(480px,70dvh)]"
+            : position === "topbar"
+              ? "absolute right-0 top-full mt-2 w-80 max-h-[min(480px,70dvh)]"
+              : "fixed left-2 right-2 bottom-[72px] max-h-[min(480px,60dvh)]",
         )}
       >
         {/* Header */}
