@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
-import { ArtistSidebar } from "@/components/dashboard/artist-sidebar";
+import { ArtistInfoBar } from "@/components/dashboard/artist-sidebar";
 import { Plus, Sparkles, Music, Search } from "lucide-react";
 import { formatMoney } from "@/lib/format-money";
 import type { DashboardRelease } from "@/types/release";
@@ -250,16 +250,26 @@ export default async function DashboardPage({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className={artistFilter ? "grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6" : ""}>
       <div>
 
       {artistFilter && (
-        <div className="flex items-center gap-2 text-sm text-muted mb-6">
+        <>
+        <div className="flex items-center gap-2 text-sm text-muted mb-4">
           Showing releases by <span className="font-semibold text-text">{artistFilter}</span>
           <Link href="/app" className="text-signal hover:underline text-xs">
             Show all
           </Link>
         </div>
+        {user && (
+          <ArtistInfoBar
+            artistName={artistFilter}
+            userId={user.id}
+            initialClientName={artistClientName}
+            initialClientEmail={artistClientEmail}
+            initialNotes={artistClientNotes}
+          />
+        )}
+        </>
       )}
 
       {paymentsEnabled && hasAnyFees && (
@@ -376,16 +386,6 @@ export default async function DashboardPage({ searchParams }: Props) {
         </>
       )}
 
-      </div>
-      {artistFilter && user && (
-        <ArtistSidebar
-          artistName={artistFilter}
-          userId={user.id}
-          initialClientName={artistClientName}
-          initialClientEmail={artistClientEmail}
-          initialNotes={artistClientNotes}
-        />
-      )}
       </div>
     </div>
   );

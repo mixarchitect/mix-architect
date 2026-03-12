@@ -15,7 +15,7 @@ type Props = {
   initialNotes: string;
 };
 
-export function ArtistSidebar({
+export function ArtistInfoBar({
   artistName,
   userId,
   initialClientName,
@@ -23,7 +23,7 @@ export function ArtistSidebar({
   initialNotes,
 }: Props) {
   return (
-    <aside className="space-y-4">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
       <ContactInfoEditor
         artistName={artistName}
         userId={userId}
@@ -36,7 +36,7 @@ export function ArtistSidebar({
           initialNotes={initialNotes}
         />
       )}
-    </aside>
+    </div>
   );
 }
 
