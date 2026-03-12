@@ -276,8 +276,8 @@ export const articles: HelpArticle[] = [
     title: "Delivery Formats and Conversion",
     category: "audio",
     summary:
-      "Set up delivery formats in the Specs tab and convert audio to the formats your project needs.",
-    tags: ["convert", "export", "format", "delivery", "wav", "mp3", "flac", "aiff", "specs"],
+      "Set up delivery formats, convert audio, and automatically embed metadata tags like artist, cover art, ISRC, and lyrics.",
+    tags: ["convert", "export", "format", "delivery", "wav", "mp3", "flac", "aiff", "specs", "metadata", "tags", "isrc", "lyrics", "cover art", "replaygain"],
     updatedAt: "2026-03-04",
     content: [
       {
@@ -289,6 +289,11 @@ export const articles: HelpArticle[] = [
         heading: "Converting and Downloading",
         body: "Select which formats should be available by clicking the format chips in the Delivery section: convertible formats include WAV, AIFF, FLAC, MP3, AAC, OGG, and ALAC. Selected formats appear highlighted in green with a checkmark. Click the download arrow icon next to any selected convertible format to start a conversion. The icon shows a spinner while the conversion is processing in the background. When the conversion completes, the file downloads automatically to your browser. Each conversion uses the audio version you selected in the \"Export from\" dropdown, converting from the original uploaded file to preserve maximum audio quality. Lossless formats (WAV, AIFF, FLAC, ALAC) preserve the source file's sample rate and bit depth. Lossy formats use optimized presets: MP3 exports at 44.1 kHz / 320 kbps, AAC at 44.1 kHz / 256 kbps, and OGG at 44.1 kHz / Quality 8.",
         mockup: "track-tab-specs",
+      },
+      {
+        heading: "Automatic Metadata Embedding",
+        body: "When you convert to MP3, FLAC, AAC, OGG, or ALAC, Mix Architect automatically writes industry-standard metadata tags into the output file. This includes: artist, title, album, track number, genre, release year, copyright, ISRC, UPC/barcode, lyrics, cover art, and ReplayGain loudness normalization. MP3 files get ID3v2 tags, FLAC and OGG use Vorbis comments, and AAC/ALAC use iTunes-style MP4 atoms. All metadata is pulled from your release and track details (including the Distribution tab for ISRC and lyrics, and the release cover art). WAV and AIFF exports do not include metadata tags. After a conversion completes, hover over the tag icon next to the format chip to see exactly which tags were embedded.",
+        tip: "Fill out your Distribution tab (ISRC, lyrics) and upload cover art before exporting. The more metadata you provide, the more complete your exported files will be for distribution.",
       },
       {
         heading: "Supported Formats Reference",

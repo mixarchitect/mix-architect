@@ -166,7 +166,7 @@ const tools: {
     icon: <RefreshCw size={22} />,
     title: "Audio Format Conversion",
     description:
-      "Convert between WAV, AIFF, FLAC, and MP3, right inside the app. No external tools needed.",
+      "Convert between WAV, AIFF, FLAC, and MP3 with full metadata embedding: artist, title, cover art, ISRC, lyrics, and ReplayGain, all written into the file.",
     visual: <FormatConversion />,
   },
   {
