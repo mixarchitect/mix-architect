@@ -14,7 +14,7 @@ type Props = {
 };
 
 export function NotificationBell({ userId, variant }: Props) {
-  const { notifications, unreadCount, markRead, markAllRead } = useNotifications(userId);
+  const { notifications, unreadCount, markRead, markAllRead, dismiss, clearAll } = useNotifications(userId);
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -80,6 +80,8 @@ export function NotificationBell({ userId, variant }: Props) {
             notifications={notifications}
             onItemClick={handleItemClick}
             onMarkAllRead={markAllRead}
+            onDismiss={dismiss}
+            onClearAll={clearAll}
             onClose={() => setOpen(false)}
             position="mobile"
           />
@@ -116,6 +118,8 @@ export function NotificationBell({ userId, variant }: Props) {
           notifications={notifications}
           onItemClick={handleItemClick}
           onMarkAllRead={markAllRead}
+          onDismiss={dismiss}
+          onClearAll={clearAll}
           onClose={() => setOpen(false)}
           position="rail"
         />
@@ -169,12 +173,14 @@ type PanelProps = {
   notifications: Notification[];
   onItemClick: (n: Notification) => void;
   onMarkAllRead: () => void;
+  onDismiss: (id: string) => void;
+  onClearAll: () => void;
   onClose: () => void;
   position: "rail" | "mobile";
 };
 
 const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
-  function NotificationPanel({ notifications, onItemClick, onMarkAllRead, onClose, position }, ref) {
+  function NotificationPanel({ notifications, onItemClick, onMarkAllRead, onDismiss, onClearAll, onClose, position }, ref) {
     return (
       <div
         ref={ref}
@@ -199,6 +205,15 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
               <Check size={12} strokeWidth={2} />
               Mark all read
             </button>
+            {notifications.length > 0 && (
+              <button
+                type="button"
+                onClick={onClearAll}
+                className="text-xs text-muted hover:text-text transition-colors"
+              >
+                Clear all
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}
@@ -217,20 +232,26 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
             </div>
           ) : (
             notifications.map((n) => (
-              <button
+              <div
                 key={n.id}
-                type="button"
-                onClick={() => onItemClick(n)}
                 className={cn(
                   "w-full text-left px-4 py-3 flex gap-3 items-start border-b border-border/50",
-                  "hover:bg-panel2 transition-colors",
+                  "hover:bg-panel2 transition-colors group/notif",
                   !n.read && "bg-signal-muted/30",
                 )}
               >
-                <div className="mt-0.5">
+                <button
+                  type="button"
+                  onClick={() => onItemClick(n)}
+                  className="mt-0.5 shrink-0"
+                >
                   <NotificationIcon type={n.type} />
-                </div>
-                <div className="flex-1 min-w-0">
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onItemClick(n)}
+                  className="flex-1 min-w-0 text-left"
+                >
                   <p className={cn("text-sm leading-snug", !n.read ? "text-text font-medium" : "text-muted")}>
                     {n.title}
                   </p>
@@ -241,11 +262,19 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
                     {n.actor_name ? `${n.actor_name} \u00b7 ` : ""}
                     {relativeTime(n.created_at)}
                   </p>
-                </div>
-                {!n.read && (
-                  <span className="mt-1.5 w-2 h-2 rounded-full bg-signal shrink-0" />
-                )}
-              </button>
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDismiss(n.id);
+                  }}
+                  className="shrink-0 mt-0.5 text-muted/0 group-hover/notif:text-muted hover:!text-text transition-colors"
+                  title="Dismiss"
+                >
+                  <X size={14} strokeWidth={2} />
+                </button>
+              </div>
             ))
           )}
         </div>

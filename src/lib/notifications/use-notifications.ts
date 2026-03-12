@@ -112,5 +112,30 @@ export function useNotifications(userId: string | undefined) {
       .eq("read", false);
   }, [userId]);
 
-  return { notifications, unreadCount, loading, markRead, markAllRead };
+  // Dismiss a single notification
+  const dismiss = useCallback(
+    async (notificationId: string) => {
+      const target = notifications.find((n) => n.id === notificationId);
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+      if (target && !target.read) {
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      }
+
+      const supabase = createSupabaseBrowserClient();
+      await supabase.from("notifications").delete().eq("id", notificationId);
+    },
+    [notifications],
+  );
+
+  // Clear all notifications
+  const clearAll = useCallback(async () => {
+    setNotifications([]);
+    setUnreadCount(0);
+
+    if (!userId) return;
+    const supabase = createSupabaseBrowserClient();
+    await supabase.from("notifications").delete().eq("user_id", userId);
+  }, [userId]);
+
+  return { notifications, unreadCount, loading, markRead, markAllRead, dismiss, clearAll };
 }
