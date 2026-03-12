@@ -272,7 +272,16 @@ export default async function ReleasePage({ params }: Props) {
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted">Artist</span>
-                  <span className="text-text font-medium">{release.artist || "\u2014"}</span>
+                  {release.artist ? (
+                    <Link
+                      href={`/app?artist=${encodeURIComponent(release.artist)}`}
+                      className="text-text font-medium hover:text-signal transition-colors"
+                    >
+                      {release.artist}
+                    </Link>
+                  ) : (
+                    <span className="text-text font-medium">{"\u2014"}</span>
+                  )}
                 </div>
                 <div className="flex justify-between text-sm items-center">
                   <span className="text-muted">Type</span>
