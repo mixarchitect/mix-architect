@@ -160,17 +160,17 @@ function buildMetadataFlags(
   for (const [key, ffmpegTag] of Object.entries(TAG_MAP)) {
     if (!metadata[key]) continue;
 
+    // Skip lyrics for MP3 — FFmpeg writes TXXX instead of proper USLT.
+    // We handle MP3 lyrics via node-id3 after conversion.
+    if (key === "lyrics" && targetFormat === "mp3") continue;
+
     // Some tag names vary by container
     let tag = ffmpegTag;
     if (key === "isrc" && (targetFormat === "flac" || targetFormat === "ogg")) {
       tag = "ISRC";
     }
     if (key === "lyrics") {
-      if (targetFormat === "mp3") {
-        tag = "lyrics-eng";
-      } else {
-        tag = "LYRICS";
-      }
+      tag = "LYRICS";
     }
 
     flags.push("-metadata", `${tag}=${metadata[key]}`);
@@ -323,5 +323,22 @@ export async function convertAudio(
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     throw new Error(`FFmpeg conversion to ${targetFormat} failed: ${message}`);
+  }
+
+  // Write lyrics via node-id3 for MP3 (FFmpeg can't write proper USLT frames)
+  if (targetFormat === "mp3" && metadata?.lyrics) {
+    try {
+      const NodeID3 = await import("node-id3");
+      const tags = {
+        unsynchronisedLyrics: {
+          language: "eng",
+          text: metadata.lyrics,
+        },
+      };
+      const ok = NodeID3.update(tags, outputPath);
+      if (!ok) console.warn("node-id3: lyrics write returned false");
+    } catch (err) {
+      console.warn("node-id3 lyrics write failed (non-fatal):", err);
+    }
   }
 }
