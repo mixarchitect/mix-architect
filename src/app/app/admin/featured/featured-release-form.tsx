@@ -1,8 +1,20 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import type { FeaturedRelease } from "@/types/featured-release";
 import { Button } from "@/components/ui/button";
+
+function handleTabInTextarea(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+  if (e.key === "Tab") {
+    e.preventDefault();
+    const ta = e.currentTarget;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const value = ta.value;
+    ta.value = value.substring(0, start) + "  " + value.substring(end);
+    ta.selectionStart = ta.selectionEnd = start + 2;
+  }
+}
 
 interface Props {
   action: (formData: FormData) => Promise<void>;
@@ -192,6 +204,7 @@ export function FeaturedReleaseForm({ action, release }: Props) {
             rows={12}
             placeholder="Full writeup, 300-800 words. Markdown supported."
             className="input resize-y"
+            onKeyDown={handleTabInTextarea}
           />
         </Field>
 
@@ -275,6 +288,7 @@ export function FeaturedReleaseForm({ action, release }: Props) {
             rows={3}
             placeholder="Producer, mixer, mastering engineer, etc."
             className="input resize-y"
+            onKeyDown={handleTabInTextarea}
           />
         </Field>
 
@@ -335,6 +349,7 @@ export function FeaturedReleaseForm({ action, release }: Props) {
             maxLength={155}
             placeholder="Custom meta description (defaults to body excerpt)"
             className="input resize-y"
+            onKeyDown={handleTabInTextarea}
           />
         </Field>
       </fieldset>
