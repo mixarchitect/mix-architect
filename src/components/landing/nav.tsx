@@ -48,6 +48,12 @@ export function LandingNav() {
           >
             Pricing
           </a>
+          <Link
+            href="/featured"
+            className="px-4 py-2 rounded-full text-white/60 hover:text-white hover:bg-white/8 transition-colors"
+          >
+            Featured
+          </Link>
         </div>
 
         <div className="flex items-center gap-2 ml-auto md:ml-0">
@@ -92,6 +98,13 @@ export function LandingNav() {
           >
             Pricing
           </a>
+          <Link
+            href="/featured"
+            onClick={() => setMenuOpen(false)}
+            className="block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
+          >
+            Featured
+          </Link>
           <Link
             href="/auth/sign-in"
             onClick={() => setMenuOpen(false)}

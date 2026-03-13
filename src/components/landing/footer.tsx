@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export function LandingFooter() {
   return (
@@ -26,7 +27,12 @@ export function LandingFooter() {
             >
               Pricing
             </a>
-            {/* Placeholder links for future pages */}
+            <Link
+              href="/featured"
+              className="hover:text-white/70 transition-colors"
+            >
+              Featured
+            </Link>
             <span className="cursor-default">Help Center</span>
             <span className="cursor-default">Contact</span>
           </nav>

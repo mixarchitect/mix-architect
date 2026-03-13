@@ -7,6 +7,8 @@ import { Pricing } from "@/components/landing/pricing";
 import { FounderNote } from "@/components/landing/founder-note";
 import { FinalCTA } from "@/components/landing/final-cta";
 import { LandingFooter } from "@/components/landing/footer";
+import { FeaturedReleaseSection } from "@/components/landing/featured-release-section";
+import { getActiveFeaturedRelease } from "@/lib/services/featured-releases";
 
 export const metadata: Metadata = {
   title: "Mix Architect | Release Management for Artists & Audio Professionals",
@@ -21,13 +23,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const featuredRelease = await getActiveFeaturedRelease();
+
   return (
     <main className="min-h-screen bg-[#0A0A0A]">
       <LandingNav />
       <Hero />
       <FeatureShowcase />
       <AudioToolsGrid />
+      {featuredRelease && <FeaturedReleaseSection release={featuredRelease} />}
       <Pricing />
       <FounderNote />
       <FinalCTA />

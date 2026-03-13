@@ -10,6 +10,8 @@ import { Plus, Sparkles, Music, Search } from "lucide-react";
 import { formatMoney } from "@/lib/format-money";
 import { getLocale, getTranslations } from "next-intl/server";
 import type { DashboardRelease } from "@/types/release";
+import { getActiveFeaturedRelease } from "@/lib/services/featured-releases";
+import { FeaturedReleaseBanner } from "@/components/dashboard/featured-release-banner";
 
 const VALID_FILTERS = ["outstanding", "earned"] as const;
 type PaymentFilter = (typeof VALID_FILTERS)[number];
@@ -45,9 +47,10 @@ export default async function DashboardPage({ searchParams }: Props) {
   }
 
   // Fire all independent queries in parallel
-  const [userRes, releasesRes] = await Promise.all([
+  const [userRes, releasesRes, featuredRelease] = await Promise.all([
     supabase.auth.getUser(),
     releasesQuery,
+    getActiveFeaturedRelease(),
   ]);
 
   const user = userRes.data.user;
@@ -409,6 +412,7 @@ export default async function DashboardPage({ searchParams }: Props) {
         </>
       )}
 
+      {featuredRelease && <FeaturedReleaseBanner release={featuredRelease} />}
       </div>
     </div>
   );

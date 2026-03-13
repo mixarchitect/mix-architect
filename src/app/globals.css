@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Toast slide-in animation */
 @keyframes toast-slide-in {
