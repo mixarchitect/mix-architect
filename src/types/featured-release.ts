@@ -6,7 +6,7 @@ export interface FeaturedRelease {
   release_type: "single" | "ep" | "album";
   source: "platform" | "external";
   release_id: string | null;
-  author_name: string;
+  author_name: string | null;
   author_bio: string | null;
   author_url: string | null;
   headline: string;
