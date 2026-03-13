@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 import type { FeaturedRelease } from "@/types/featured-release";
 import { getStreamingLinks } from "@/types/featured-release";
-import { PLATFORM_ICON_MAP } from "@/components/icons/streaming-platforms";
+import { PLATFORM_ICON_SRC } from "@/components/icons/streaming-platforms";
 
 interface StreamingLinksProps {
   release: FeaturedRelease;
@@ -20,6 +20,8 @@ export function StreamingLinks({
 
   if (links.length === 0) return null;
 
+  const iconSize = size === "sm" ? 16 : 20;
+
   return (
     <div
       className={cn(
@@ -29,7 +31,7 @@ export function StreamingLinks({
       )}
     >
       {links.map((link) => {
-        const Icon = PLATFORM_ICON_MAP[link.icon];
+        const iconSrc = PLATFORM_ICON_SRC[link.icon];
 
         return (
           <a
@@ -47,10 +49,14 @@ export function StreamingLinks({
                 "text-sm px-4 py-2 rounded-full border border-white/10 hover:border-teal-500/30",
             )}
           >
-            {Icon && (
-              <Icon
-                width={size === "sm" ? 16 : 20}
-                height={size === "sm" ? 16 : 20}
+            {iconSrc && (
+              <img
+                src={iconSrc}
+                alt=""
+                width={iconSize}
+                height={iconSize}
+                className="opacity-60 group-hover:opacity-100 transition-opacity"
+                loading="lazy"
               />
             )}
             {size !== "sm" && <span>{link.platform}</span>}

@@ -12,6 +12,7 @@ import { getCoverArtUrl } from "@/types/featured-release";
 import { CoverArt } from "@/components/featured/CoverArt";
 import { StreamingLinks } from "@/components/featured/StreamingLinks";
 import { FeaturedReleaseCard } from "@/components/featured/FeaturedReleaseCard";
+import { BandcampEmbed } from "@/components/featured/BandcampEmbed";
 import { LandingNav } from "@/components/landing/nav";
 import { LandingFooter } from "@/components/landing/footer";
 
@@ -187,6 +188,11 @@ export default async function FeaturedReleasePage({ params }: Props) {
             </p>
             <StreamingLinks release={release} size="md" layout="grid" />
           </div>
+
+          {/* Bandcamp embed */}
+          {release.link_bandcamp && (
+            <BandcampEmbed url={release.link_bandcamp} />
+          )}
 
           {/* Author byline */}
           {release.author_name && (
