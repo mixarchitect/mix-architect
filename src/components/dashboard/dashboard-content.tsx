@@ -7,6 +7,7 @@ import { TimelineView } from "./timeline-view";
 import { SortSelect } from "@/components/ui/sort-select";
 import { useToast } from "@/components/ui/toast";
 import { getCountdown } from "@/lib/timeline-utils";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  localStorage keys                                                  */
@@ -75,6 +76,7 @@ export function DashboardContent({
   // Always default to grid; timeline is opt-in via toggle or localStorage
   const [view, setView] = useState<DashboardView>("grid");
   const { toast } = useToast();
+  const t = useTranslations("dashboard");
 
   // On mount, check localStorage for persisted preference
   useEffect(() => {
@@ -106,13 +108,13 @@ export function DashboardContent({
     const timer = setTimeout(() => {
       if (celebratingReleases.length === 1) {
         const r = celebratingReleases[0];
-        toast(`🎉 It's release day for "${r.title}"! Congratulations!`, {
+        toast(`🎉 ${t("releaseDayToast", { title: r.title })}`, {
           variant: "success",
           duration: 8000,
         });
       } else {
         const titles = celebratingReleases.map((r) => r.title).join(", ");
-        toast(`🎉 Release day! ${titles} — Congratulations!`, {
+        toast(`🎉 ${t("releaseDayMultiToast", { titles })}`, {
           variant: "success",
           duration: 8000,
         });

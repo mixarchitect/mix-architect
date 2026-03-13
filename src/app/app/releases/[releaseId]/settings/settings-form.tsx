@@ -12,6 +12,9 @@ import { TagInput } from "@/components/ui/tag-input";
 import { ArrowLeft, ImageIcon, Upload, X, Trash2, UserPlus } from "lucide-react";
 import { canEdit, canEditPayment, canManageTeam, type ReleaseRole } from "@/lib/permissions";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
+import { useLocale, useTranslations } from "next-intl";
+import { formatMoney } from "@/lib/format-money";
+import { supportedCurrencies } from "@/i18n/config";
 
 type MemberRow = {
   id: string;
@@ -52,7 +55,7 @@ const PAYMENT_STATUS_OPTIONS = [
   { value: "paid", label: "Paid" },
 ];
 
-const CURRENCY_OPTIONS = ["USD", "EUR", "GBP", "CAD", "AUD"];
+const CURRENCY_OPTIONS = supportedCurrencies.map((c) => c.code);
 
 const GENRE_SUGGESTIONS = [
   "Rock", "Pop", "Hip-Hop", "R&B", "Electronic", "Country", "Jazz",
@@ -94,6 +97,9 @@ function PillSelect({
 }
 
 export function SettingsForm({ releaseId, role, initialMembers }: Props) {
+  const locale = useLocale();
+  const t = useTranslations("releaseSettings");
+  const tCommon = useTranslations("common");
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const router = useRouter();
   const editable = canEdit(role);
@@ -436,24 +442,24 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
         >
           <ArrowLeft size={14} />
-          Back to Release
+          {t("backToRelease")}
         </button>
       </div>
 
       <Panel>
         <PanelHeader>
           <h1 className="text-2xl font-semibold h2 text-text">
-            Release Settings
+            {t("title")}
           </h1>
           <p className="mt-1 text-sm text-muted">
-            {editable ? "Edit the details for this release." : "View the details for this release."}
+            {editable ? t("editDescription") : t("viewDescription")}
           </p>
         </PanelHeader>
         <Rule />
         <PanelBody className="pt-5 space-y-6">
           {/* Cover Art */}
           <div className="space-y-3">
-            <label className="label text-muted">Cover Art</label>
+            <label className="label text-muted">{t("coverArt")}</label>
             <div className="flex items-start gap-4">
               <div
                 className="relative w-[160px] h-[160px] rounded-lg border border-border overflow-hidden flex-shrink-0 flex items-center justify-center"
@@ -478,7 +484,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                       style={{ background: "var(--panel2)", color: "var(--text-muted)" }}
                     >
                       <Upload size={14} />
-                      {uploading ? "Uploading\u2026" : "Upload Image"}
+                      {uploading ? tCommon("uploading") : t("uploadImage")}
                       <input
                         type="file"
                         accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
@@ -494,7 +500,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[10px] text-muted uppercase tracking-wider">or paste URL</span>
+                    <span className="text-[10px] text-muted uppercase tracking-wider">{t("pasteUrl")}</span>
                     <input
                       type="url"
                       value={coverArtMode === "preview" && !coverArtUrl.startsWith("http") ? "" : coverArtUrl}
@@ -513,7 +519,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                       onClick={handleRemoveCover}
                       className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors"
                     >
-                      <X size={12} /> Remove
+                      <X size={12} /> {t("remove")}
                     </button>
                   )}
                 </div>
@@ -524,7 +530,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           <Rule />
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Release title</label>
+            <label className="label text-muted">{t("releaseTitle")}</label>
             <input
               type="text"
               value={title}
@@ -535,45 +541,45 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Artist / Client</label>
+            <label className="label text-muted">{t("artistClient")}</label>
             <input
               type="text"
               value={artist}
               onChange={(e) => setArtist(e.target.value)}
               disabled={!editable}
               className="input"
-              placeholder="Artist or client name"
+              placeholder={t("artistPlaceholder")}
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Release type</label>
+            <label className="label text-muted">{t("releaseType")}</label>
             <PillSelect options={TYPE_OPTIONS} value={releaseType} onChange={setReleaseType} disabled={!editable} />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Format</label>
+            <label className="label text-muted">{t("format")}</label>
             <PillSelect options={FORMAT_OPTIONS} value={format} onChange={setFormat} disabled={!editable} />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Status</label>
+            <label className="label text-muted">{t("status")}</label>
             <PillSelect options={STATUS_OPTIONS} value={status} onChange={setStatus} disabled={!editable} />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Global mix direction</label>
+            <label className="label text-muted">{t("globalDirection")}</label>
             <textarea
               value={globalDirection}
               onChange={(e) => setGlobalDirection(e.target.value)}
               disabled={!editable}
               className="input min-h-[100px] resize-y text-sm"
-              placeholder="Overall sonic vision for this release..."
+              placeholder={t("globalDirectionPlaceholder")}
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Genre tags</label>
+            <label className="label text-muted">{t("genreTags")}</label>
             <TagInput
               value={genreTags}
               onChange={editable ? setGenreTags : undefined}
@@ -584,7 +590,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Target release date</label>
+            <label className="label text-muted">{t("targetDate")}</label>
             <input
               type="date"
               value={targetDate}
@@ -597,81 +603,81 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           <Rule />
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Client name</label>
+            <label className="label text-muted">{t("clientName")}</label>
             <input
               type="text"
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
               disabled={!editable}
               className="input"
-              placeholder="Client / label contact"
+              placeholder={t("clientNamePlaceholder")}
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Client email</label>
+            <label className="label text-muted">{t("clientEmail")}</label>
             <input
               type="email"
               value={clientEmail}
               onChange={(e) => setClientEmail(e.target.value)}
               disabled={!editable}
               className="input"
-              placeholder="client@example.com"
+              placeholder={t("clientEmailPlaceholder")}
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Client phone</label>
+            <label className="label text-muted">{t("clientPhone")}</label>
             <input
               type="tel"
               value={clientPhone}
               onChange={(e) => setClientPhone(e.target.value)}
               disabled={!editable}
               className="input"
-              placeholder="+1 (555) 000-0000"
+              placeholder={t("clientPhonePlaceholder")}
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="label text-muted">Delivery notes</label>
+            <label className="label text-muted">{t("deliveryNotes")}</label>
             <textarea
               value={deliveryNotes}
               onChange={(e) => setDeliveryNotes(e.target.value)}
               disabled={!editable}
               className="input min-h-[80px] resize-y text-sm"
-              placeholder="Global delivery specs..."
+              placeholder={t("deliveryNotesPlaceholder")}
             />
           </div>
 
           <Rule />
-          <div className="label-sm text-muted">DISTRIBUTION</div>
+          <div className="label-sm text-muted">{t("distribution")}</div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="label text-muted">Distributor</label>
+              <label className="label text-muted">{t("distributor")}</label>
               <input
                 type="text"
                 value={distributor}
                 onChange={(e) => setDistributor(e.target.value)}
                 disabled={!editable}
                 className="input"
-                placeholder="e.g., DistroKid, TuneCore"
+                placeholder={t("distributorPlaceholder")}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="label text-muted">Record label</label>
+              <label className="label text-muted">{t("recordLabel")}</label>
               <input
                 type="text"
                 value={recordLabel}
                 onChange={(e) => setRecordLabel(e.target.value)}
                 disabled={!editable}
                 className="input"
-                placeholder="e.g., Self-released"
+                placeholder={t("recordLabelPlaceholder")}
               />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="label text-muted">UPC</label>
+              <label className="label text-muted">{t("upc")}</label>
               <input
                 type="text"
                 value={upc}
@@ -682,7 +688,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="label text-muted">Catalog number</label>
+              <label className="label text-muted">{t("catalogNumber")}</label>
               <input
                 type="text"
                 value={catalogNumber}
@@ -695,7 +701,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="label text-muted">&copy; Copyright holder</label>
+              <label className="label text-muted">&copy; {t("copyrightHolder")}</label>
               <input
                 type="text"
                 value={copyrightHolder}
@@ -706,7 +712,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="label text-muted">Copyright year</label>
+              <label className="label text-muted">{t("copyrightYear")}</label>
               <input
                 type="text"
                 value={copyrightYear}
@@ -718,7 +724,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="label text-muted">&#8471; Phonogram copyright</label>
+            <label className="label text-muted">&#8471; {t("phonogramCopyright")}</label>
             <input
               type="text"
               value={phonogramCopyright}
@@ -732,16 +738,16 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           {paymentsEnabled && (
             <>
               <Rule />
-              <div className="label-sm text-muted">PAYMENT</div>
+              <div className="label-sm text-muted">{t("payment")}</div>
               <div className="space-y-1.5">
-                <label className="label text-muted">Payment status</label>
+                <label className="label text-muted">{t("paymentStatus")}</label>
                 <PillSelect options={PAYMENT_STATUS_OPTIONS} value={paymentStatus} onChange={setPaymentStatus} disabled={!paymentEditable} />
               </div>
               {paymentStatus !== "no_fee" && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="label text-muted">Project fee</label>
+                      <label className="label text-muted">{t("projectFee")}</label>
                       <input
                         type="number"
                         step="0.01"
@@ -754,15 +760,15 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="label text-muted">Currency</label>
+                      <label className="label text-muted">{t("currency")}</label>
                       <select
                         value={feeCurrency}
                         onChange={(e) => setFeeCurrency(e.target.value)}
                         disabled={!paymentEditable}
                         className="input"
                       >
-                        {CURRENCY_OPTIONS.map((c) => (
-                          <option key={c} value={c}>{c}</option>
+                        {supportedCurrencies.map((c) => (
+                          <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
                         ))}
                       </select>
                     </div>
@@ -770,7 +776,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                   {paymentStatus === "partial" && (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="label text-muted">Paid amount</label>
+                        <label className="label text-muted">{t("paidAmount")}</label>
                         <input
                           type="number"
                           step="0.01"
@@ -783,9 +789,9 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                         />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="label text-muted">Balance due</label>
+                        <label className="label text-muted">{t("balanceDue")}</label>
                         <div className="input bg-transparent flex items-center text-sm text-muted tabular-nums">
-                          {(parseFloat(feeTotal || "0") - parseFloat(paidAmount || "0")).toFixed(2)} {feeCurrency}
+                          {formatMoney(parseFloat(feeTotal || "0") - parseFloat(paidAmount || "0"), feeCurrency, locale)}
                         </div>
                       </div>
                     </div>
@@ -793,13 +799,13 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                 </>
               )}
               <div className="space-y-1.5">
-                <label className="label text-muted">Payment notes</label>
+                <label className="label text-muted">{t("paymentNotes")}</label>
                 <textarea
                   value={paymentNotes}
                   onChange={(e) => setPaymentNotes(e.target.value)}
                   disabled={!paymentEditable}
                   className="input min-h-[60px] resize-y text-sm"
-                  placeholder="Payment terms, deposit info, due date..."
+                  placeholder={t("paymentNotesPlaceholder")}
                 />
               </div>
             </>
@@ -814,13 +820,13 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           {editable && (
             <div className="flex items-center gap-3 pt-2">
               <Button variant="primary" onClick={handleSave} disabled={saving}>
-                {saving ? "Saving\u2026" : "Save Changes"}
+                {saving ? tCommon("saving") : t("saveChanges")}
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => guardedNavigate(() => router.push(`/app/releases/${releaseId}`))}
               >
-                Cancel
+                {tCommon("cancel")}
               </Button>
             </div>
           )}
@@ -828,20 +834,20 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
           {!editable && (
             <div className="pt-2">
               <Link href={`/app/releases/${releaseId}`}>
-                <Button variant="secondary">Back to Release</Button>
+                <Button variant="secondary">{t("backToRelease")}</Button>
               </Link>
             </div>
           )}
         </PanelBody>
       </Panel>
 
-      {/* Team Management — Owner only */}
+      {/* Team Management, Owner only */}
       {teamEditable && (
         <Panel className="mt-6">
           <PanelHeader>
-            <h2 className="text-base font-semibold text-text">Team</h2>
+            <h2 className="text-base font-semibold text-text">{t("team")}</h2>
             <p className="mt-1 text-sm text-muted">
-              Invite collaborators and clients to this release.
+              {t("teamDesc")}
             </p>
           </PanelHeader>
           <Rule />
@@ -858,7 +864,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                     handleInvite();
                   }
                 }}
-                placeholder="Email address"
+                placeholder={t("emailPlaceholder")}
                 className="input"
               />
               <div className="flex gap-2">
@@ -867,8 +873,8 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                   onChange={(e) => setInviteRole(e.target.value as "collaborator" | "client")}
                   className="input w-[140px]"
                 >
-                  <option value="collaborator">Collaborator</option>
-                  <option value="client">Client</option>
+                  <option value="collaborator">{t("collaborator")}</option>
+                  <option value="client">{t("client")}</option>
                 </select>
                 <Button
                   variant="primary"
@@ -877,7 +883,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                   className="h-10"
                 >
                   <UserPlus size={14} />
-                  {inviting ? "Inviting\u2026" : "Invite"}
+                  {inviting ? t("inviting") : t("invite")}
                 </Button>
               </div>
               {inviteError && (
@@ -899,18 +905,18 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                           {m.invited_email}
                         </div>
                         <div className="text-[10px] text-faint mt-0.5">
-                          {m.accepted_at ? "Active" : "Pending invite"}
+                          {m.accepted_at ? t("active") : t("pendingInvite")}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <Pill className="text-[10px]">
-                        {m.role === "collaborator" ? "Collaborator" : "Client"}
+                        {m.role === "collaborator" ? t("collaborator") : t("client")}
                       </Pill>
                       {!m.accepted_at && (
                         <>
                           <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700">
-                            Pending
+                            {t("pending")}
                           </span>
                           <button
                             type="button"
@@ -919,10 +925,10 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                             className="text-[10px] text-muted hover:text-text transition-colors px-1.5 py-0.5 disabled:opacity-50"
                           >
                             {resentId === m.id
-                              ? "Sent!"
+                              ? t("sent")
                               : resendingId === m.id
-                                ? "Sending\u2026"
-                                : "Resend"}
+                                ? t("sending")
+                                : t("resend")}
                           </button>
                         </>
                       )}
@@ -939,7 +945,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                         {confirmRemoveId === m.id && (
                           <div className="absolute right-0 top-full mt-1 w-56 rounded-md border border-border bg-panel shadow-lg p-3 z-20 space-y-2">
                             <p className="text-xs text-muted">
-                              Remove <strong className="text-text">{m.invited_email}</strong>? They will lose access to this release.
+                              {t("removeMemberConfirm", { email: m.invited_email })}
                             </p>
                             <div className="flex gap-2">
                               <button
@@ -950,14 +956,14 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                                 }}
                                 className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors"
                               >
-                                Confirm
+                                {tCommon("confirm")}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setConfirmRemoveId(null)}
                                 className="flex-1 px-2 py-1.5 text-xs font-medium text-muted hover:text-text border border-border rounded transition-colors"
                               >
-                                Cancel
+                                {tCommon("cancel")}
                               </button>
                             </div>
                           </div>
@@ -969,7 +975,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
               </div>
             ) : (
               <p className="text-sm text-muted text-center py-4">
-                No team members yet. Invite someone to get started.
+                {t("noTeamMembers")}
               </p>
             )}
           </PanelBody>

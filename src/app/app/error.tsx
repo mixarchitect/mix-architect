@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function Error({
   error,
@@ -12,6 +13,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("error");
+
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -21,17 +24,16 @@ export default function Error({
       <div className="flex items-center justify-center w-12 h-12 rounded-full bg-signal-muted">
         <AlertTriangle className="w-6 h-6 text-signal" />
       </div>
-      <h2 className="text-lg font-semibold text-text">Something went wrong</h2>
+      <h2 className="text-lg font-semibold text-text">{t("title")}</h2>
       <p className="text-sm text-muted max-w-md">
-        We hit an unexpected error loading this page. You can try again, or head
-        back to the dashboard.
+        {t("description")}
       </p>
       <div className="flex gap-3 mt-2">
         <Button variant="ghost" onClick={() => reset()}>
-          Try again
+          {t("tryAgain")}
         </Button>
         <Link href="/app">
-          <Button variant="primary">Go to Dashboard</Button>
+          <Button variant="primary">{t("goToDashboard")}</Button>
         </Link>
       </div>
       {process.env.NODE_ENV === "development" && error.message && (

@@ -1,11 +1,14 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { redirect } from "next/navigation";
 import { formatMoney } from "@/lib/format-money";
+import { getLocale, getTranslations } from "next-intl/server";
 import { PaymentsTable } from "./payments-table";
 import { PaymentsActions } from "./payments-actions";
 import type { PaymentRelease, PaymentSummary } from "@/lib/db-types";
 
 export default async function PaymentsPage() {
+  const locale = await getLocale();
+  const t = await getTranslations("payments");
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -112,20 +115,19 @@ export default async function PaymentsPage() {
     <div>
       {/* Print-only header */}
       <div className="hidden print:block mb-6">
-        <h1 className="text-xl font-bold text-text">Payment Summary</h1>
+        <h1 className="text-xl font-bold text-text">{t("summary")}</h1>
         <p className="text-sm text-muted">
-          Generated{" "}
-          {new Date().toLocaleDateString("en-US", {
+          {t("generated", { date: new Date().toLocaleDateString("en-US", {
             month: "long",
             day: "numeric",
             year: "numeric",
-          })}
+          }) })}
         </p>
       </div>
 
       {/* Screen header */}
       <div className="flex items-center justify-between mb-8 print:hidden">
-        <h1 className="text-2xl font-semibold h2 text-text">Payments</h1>
+        <h1 className="text-2xl font-semibold h2 text-text">{t("title")}</h1>
         <PaymentsActions releases={releases} summary={summary} />
       </div>
 
@@ -133,35 +135,35 @@ export default async function PaymentsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 print:grid-cols-3">
         <div className="px-4 py-3 rounded-lg border border-border bg-panel">
           <div className="text-[10px] uppercase tracking-wide text-faint font-medium mb-1">
-            Outstanding
+            {t("outstanding")}
           </div>
           <div className={outstandingTotal > 0 ? "text-lg font-semibold text-signal" : "text-lg font-semibold text-text"}>
-            {formatMoney(outstandingTotal, primaryCurrency)}
+            {formatMoney(outstandingTotal, primaryCurrency, locale)}
           </div>
           <div className="text-xs text-muted mt-0.5">
-            {outstandingCount} release{outstandingCount !== 1 ? "s" : ""}
+            {t("releaseCount", { count: outstandingCount })}
           </div>
         </div>
         <div className="px-4 py-3 rounded-lg border border-border bg-panel">
           <div className="text-[10px] uppercase tracking-wide text-faint font-medium mb-1">
-            Earned
+            {t("earned")}
           </div>
           <div className="text-lg font-semibold text-text">
-            {formatMoney(earnedTotal, primaryCurrency)}
+            {formatMoney(earnedTotal, primaryCurrency, locale)}
           </div>
           <div className="text-xs text-muted mt-0.5">
-            {paidCount} release{paidCount !== 1 ? "s" : ""}
+            {t("releaseCount", { count: paidCount })}
           </div>
         </div>
         <div className="px-4 py-3 rounded-lg border border-border bg-panel">
           <div className="text-[10px] uppercase tracking-wide text-faint font-medium mb-1">
-            Total Fees
+            {t("totalFees")}
           </div>
           <div className="text-lg font-semibold text-text">
-            {formatMoney(grandTotal, primaryCurrency)}
+            {formatMoney(grandTotal, primaryCurrency, locale)}
           </div>
           <div className="text-xs text-muted mt-0.5">
-            {releases.length} release{releases.length !== 1 ? "s" : ""}
+            {t("releaseCount", { count: releases.length })}
           </div>
         </div>
       </div>

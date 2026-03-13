@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { Mail, Search } from "lucide-react";
@@ -8,24 +8,27 @@ import { KnowledgeBase } from "@/components/ui/knowledge-base";
 import { BugReportForm } from "@/components/ui/bug-report-form";
 import { FeatureBoard } from "@/components/ui/feature-board";
 import { Panel, PanelBody } from "@/components/ui/panel";
+import { useTranslations } from "next-intl";
 
 type Tab = "articles" | "bug" | "feature" | "contact";
 
-const TABS: { key: Tab; label: string }[] = [
-  { key: "articles", label: "Help Articles" },
-  { key: "bug", label: "Report a Bug" },
-  { key: "feature", label: "Suggest a Feature" },
-  { key: "contact", label: "Contact" },
-];
-
 export function HelpPortal() {
+  const t = useTranslations("help");
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") as Tab | null;
   const articleParam = searchParams.get("article");
+
+  const tabs = useMemo(() => [
+    { key: "articles" as Tab, label: t("articles") },
+    { key: "bug" as Tab, label: t("reportBug") },
+    { key: "feature" as Tab, label: t("suggestFeature") },
+    { key: "contact" as Tab, label: t("contact") },
+  ], [t]);
+
   const [activeTab, setActiveTab] = useState<Tab>(
     articleParam
       ? "articles"
-      : tabParam && TABS.some((t) => t.key === tabParam)
+      : tabParam && tabs.some((tb) => tb.key === tabParam)
         ? tabParam
         : "articles",
   );
@@ -34,10 +37,10 @@ export function HelpPortal() {
   useEffect(() => {
     if (articleParam) {
       setActiveTab("articles");
-    } else if (tabParam && TABS.some((t) => t.key === tabParam)) {
+    } else if (tabParam && tabs.some((tb) => tb.key === tabParam)) {
       setActiveTab(tabParam);
     }
-  }, [tabParam, articleParam]);
+  }, [tabParam, articleParam, tabs]);
 
   const hasSearch = query.trim().length > 0;
 
@@ -45,15 +48,15 @@ export function HelpPortal() {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-xl font-semibold h2">Help Center</h1>
+        <h1 className="text-xl font-semibold h2">{t("title")}</h1>
         <p className="text-muted text-sm mt-1">
-          Docs, bug reports, feature requests, and contact.
+          {t("description")}
         </p>
       </div>
 
       {/* Tab bar */}
       <div className="flex gap-6 border-b border-border mb-6 overflow-x-auto no-scrollbar">
-        {TABS.map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab.key}
             type="button"
@@ -81,7 +84,7 @@ export function HelpPortal() {
           type="text"
           className="input"
           style={{ paddingLeft: 40 }}
-          placeholder="Search articles..."
+          placeholder={t("searchPlaceholder")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -104,6 +107,7 @@ export function HelpPortal() {
 /* ── Contact Section (inline) ── */
 
 function ContactSection() {
+  const t = useTranslations("help");
   return (
     <Panel className="max-w-xl">
       <PanelBody className="pt-6">
@@ -111,11 +115,10 @@ function ContactSection() {
           <div className="w-10 h-10 rounded-lg bg-signal-muted flex items-center justify-center">
             <Mail size={20} strokeWidth={1.5} className="text-signal" />
           </div>
-          <h2 className="text-lg font-semibold">Get in Touch</h2>
+          <h2 className="text-lg font-semibold">{t("getInTouch")}</h2>
         </div>
         <p className="text-muted text-sm mb-5">
-          For direct support, questions, or partnership inquiries, reach out via
-          email.
+          {t("getInTouchDesc")}
         </p>
         <a
           href="mailto:support@mixarchitect.com"

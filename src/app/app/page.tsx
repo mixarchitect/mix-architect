@@ -8,6 +8,7 @@ import { DashboardContent } from "@/components/dashboard/dashboard-content";
 import { ArtistInfoBar } from "@/components/dashboard/artist-sidebar";
 import { Plus, Sparkles, Music, Search } from "lucide-react";
 import { formatMoney } from "@/lib/format-money";
+import { getLocale, getTranslations } from "next-intl/server";
 import type { DashboardRelease } from "@/types/release";
 
 const VALID_FILTERS = ["outstanding", "earned"] as const;
@@ -21,6 +22,8 @@ type Props = {
 };
 
 export default async function DashboardPage({ searchParams }: Props) {
+  const locale = await getLocale();
+  const t = await getTranslations("dashboard");
   const { payment, sort, artist: artistFilter } = await searchParams;
   const activeSort: SortOption =
     sort && VALID_SORTS.includes(sort as SortOption) ? (sort as SortOption) : "modified";
@@ -239,29 +242,29 @@ export default async function DashboardPage({ searchParams }: Props) {
       <EmptyState
         icon={Search}
         size="md"
-        title={`No ${activeFilter} releases`}
-        description="Try adjusting your search or filters."
-        action={{ label: "Clear filters", href: "/app", variant: "ghost" }}
+        title={t("noFilteredReleases", { filter: activeFilter ?? "" })}
+        description={t("noFilteredReleasesDesc")}
+        action={{ label: t("clearFilters"), href: "/app", variant: "ghost" }}
       />
     );
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold h2 text-text">Releases</h1>
+        <h1 className="text-2xl font-semibold h2 text-text">{t("title")}</h1>
         <div className="flex items-center gap-2">
           {atFreeLimit && (
             <Link href="/app/settings">
               <Button variant="secondary">
                 <Sparkles size={16} />
-                Upgrade
+                {t("upgrade")}
               </Button>
             </Link>
           )}
           <Link href="/app/releases/new">
             <Button variant="primary">
               <Plus size={16} />
-              New Release
+              {t("newRelease")}
             </Button>
           </Link>
         </div>
@@ -272,9 +275,9 @@ export default async function DashboardPage({ searchParams }: Props) {
       {artistFilter && (
         <>
         <div className="flex items-center gap-2 text-sm text-muted mb-4">
-          Showing releases by <span className="font-semibold text-text">{artistFilter}</span>
+          {t("showingBy")} <span className="font-semibold text-text">{artistFilter}</span>
           <Link href="/app" className="text-signal hover:underline text-xs">
-            Show all
+            {t("showAll")}
           </Link>
         </div>
         {user && (
@@ -298,9 +301,9 @@ export default async function DashboardPage({ searchParams }: Props) {
           style={{ background: "var(--panel2)" }}
         >
           <span className="text-muted">
-            Outstanding:{" "}
+            {t("outstanding")}:{" "}
             <span className={outstandingTotal > 0 ? "font-semibold text-signal" : "font-semibold text-text"}>
-              {formatMoney(outstandingTotal, primaryCurrency)}
+              {formatMoney(outstandingTotal, primaryCurrency, locale)}
             </span>
             <Link
               href={activeFilter === "outstanding" ? "/app" : "/app?payment=outstanding"}
@@ -309,14 +312,14 @@ export default async function DashboardPage({ searchParams }: Props) {
                 activeFilter === "outstanding" ? "text-text font-semibold" : "text-faint",
               )}
             >
-              ({outstandingCount} release{outstandingCount !== 1 ? "s" : ""})
+              ({t("releaseCount", { count: outstandingCount })})
             </Link>
           </span>
           <span className="text-faint hidden sm:inline">·</span>
           <span className="text-muted">
-            Earned:{" "}
+            {t("earned")}:{" "}
             <span className="font-semibold text-text">
-              {formatMoney(earnedTotal, primaryCurrency)}
+              {formatMoney(earnedTotal, primaryCurrency, locale)}
             </span>
             <Link
               href={activeFilter === "earned" ? "/app" : "/app?payment=earned"}
@@ -325,17 +328,17 @@ export default async function DashboardPage({ searchParams }: Props) {
                 activeFilter === "earned" ? "text-text font-semibold" : "text-faint",
               )}
             >
-              ({earnedCount} release{earnedCount !== 1 ? "s" : ""})
+              ({t("releaseCount", { count: earnedCount })})
             </Link>
           </span>
           <span className="text-faint hidden sm:inline">·</span>
           <span className="text-muted">
-            Total:{" "}
+            {t("total")}:{" "}
             <span className="font-semibold text-text">
-              {formatMoney(feeGrandTotal, primaryCurrency)}
+              {formatMoney(feeGrandTotal, primaryCurrency, locale)}
             </span>
             <span className="text-faint ml-1">
-              ({earnedCount} of {feeReleaseCount} paid)
+              {t("paidOf", { earnedCount, feeReleaseCount })}
             </span>
           </span>
           <span className="text-faint hidden sm:inline">·</span>
@@ -343,13 +346,13 @@ export default async function DashboardPage({ searchParams }: Props) {
             href="/app/payments"
             className="text-signal text-xs font-medium hover:underline hidden sm:inline"
           >
-            View all &rarr;
+            {t("viewAll")} &rarr;
           </Link>
           {activeFilter && (
             <span className="basis-full flex items-center gap-2 text-muted pt-1 border-t border-border mt-1">
-              Showing {activeFilter} releases ({displayReleases?.length ?? 0})
+              {t("showingFiltered", { filter: activeFilter, count: displayReleases?.length ?? 0 })}
               <Link href="/app" className="text-signal hover:underline">
-                Show all
+                {t("showAll")}
               </Link>
             </span>
           )}
@@ -365,15 +368,15 @@ export default async function DashboardPage({ searchParams }: Props) {
         <EmptyState
           icon={Music}
           size="lg"
-          title="No releases yet"
-          description="Create your first release to start building track briefs, managing specs, and organizing your mix workflow."
-          action={{ label: "Create your first release", href: "/app/releases/new", variant: "primary" }}
+          title={t("noReleases")}
+          description={t("noReleasesDesc")}
+          action={{ label: t("createFirst"), href: "/app/releases/new", variant: "primary" }}
         />
       ) : null}
 
       {sharedReleases.length > 0 && (
         <>
-          <h2 className="text-base font-semibold text-text mt-10 mb-4">Shared with You</h2>
+          <h2 className="text-base font-semibold text-text mt-10 mb-4">{t("sharedWithYou")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {sharedReleases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => {
               const trackCount = r.tracks?.length ?? 0;

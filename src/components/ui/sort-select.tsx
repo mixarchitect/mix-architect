@@ -1,15 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/cn";
-
-const SORT_OPTIONS = [
-  { value: "modified", label: "Last Modified" },
-  { value: "created", label: "Last Created" },
-  { value: "az", label: "A \u2013 Z" },
-] as const;
 
 export function SortSelect() {
   const [open, setOpen] = useState(false);
@@ -17,6 +12,13 @@ export function SortSelect() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const current = searchParams.get("sort") ?? "modified";
+  const t = useTranslations("releases.sort");
+
+  const sortOptions = useMemo(() => [
+    { value: "modified", label: t("lastModified") },
+    { value: "created", label: t("lastCreated") },
+    { value: "az", label: t("alphabetical") },
+  ] as const, [t]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -48,7 +50,7 @@ export function SortSelect() {
     setOpen(false);
   }
 
-  const activeLabel = SORT_OPTIONS.find((o) => o.value === current)?.label ?? "Last Modified";
+  const activeLabel = sortOptions.find((o) => o.value === current)?.label ?? t("lastModified");
 
   return (
     <div ref={ref} className="relative">
@@ -68,7 +70,7 @@ export function SortSelect() {
 
       {open && (
         <div className="absolute right-0 mt-1 w-44 rounded-md border border-border bg-panel shadow-lg py-1 z-20">
-          {SORT_OPTIONS.map((opt) => (
+          {sortOptions.map((opt) => (
             <button
               key={opt.value}
               type="button"

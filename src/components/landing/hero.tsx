@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Music, Headphones } from "lucide-react";
 import { FilledArrowRight } from "@/components/ui/filled-icon";
+import { getTranslations } from "next-intl/server";
 
-export function Hero() {
+export async function Hero() {
+  const t = await getTranslations("landing");
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background video */}
@@ -33,8 +35,7 @@ export function Hero() {
         </h1>
 
         <p className="mt-8 text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
-          Mix Architect is the release management platform built for
-          independent artists and audio professionals.
+          {t("subheadline")}
         </p>
 
         {/* Persona callouts */}
@@ -45,11 +46,10 @@ export function Hero() {
             </div>
             <div>
               <div className="text-sm font-semibold text-white">
-                For Artists
+                {t("forArtists")}
               </div>
               <p className="mt-1.5 text-sm text-white/60 leading-relaxed">
-                Releasing your own music? Organize every step from mix brief to
-                distribution.
+                {t("forArtistsDesc")}
               </p>
             </div>
           </div>
@@ -60,11 +60,10 @@ export function Hero() {
             </div>
             <div>
               <div className="text-sm font-semibold text-white">
-                For Engineers & Producers
+                {t("forEngineers")}
               </div>
               <p className="mt-1.5 text-sm text-white/60 leading-relaxed">
-                Working with clients? Manage projects, share reviews, and track
-                who owes what.
+                {t("forEngineersDesc")}
               </p>
             </div>
           </div>
@@ -76,19 +75,19 @@ export function Hero() {
             href="/auth/sign-in"
             className="h-14 w-full sm:w-56 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D9488] text-white hover:bg-[#0fb9ab] transition-colors"
           >
-            Start Free
+            {t("startFree")}
             <FilledArrowRight size={18} />
           </Link>
           <a
             href="#features"
             className="h-14 w-full sm:w-56 text-base font-medium inline-flex items-center justify-center gap-2 rounded-xl bg-[#1a1a1a] border border-white/20 text-white/80 hover:border-white/40 hover:text-white transition-colors"
           >
-            See How It Works
+            {t("seeHowItWorks")}
           </a>
         </div>
 
         <p className="mt-8 text-sm text-white/40">
-          Free to try. No credit card required.
+          {t("freeToTry")}
         </p>
       </div>
     </section>

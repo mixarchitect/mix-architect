@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Search, Disc3, Music2, Bookmark, CornerDownLeft, X, User } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useSearch, type SearchResult, type SearchResultType } from "@/hooks/use-search";
@@ -18,16 +19,16 @@ const TYPE_ICON: Record<SearchResultType, typeof Disc3> = {
   reference: Bookmark,
 };
 
-const TYPE_LABEL: Record<SearchResultType, string> = {
-  artist: "Artists",
-  release: "Releases",
-  track: "Tracks",
-  reference: "References",
-};
-
 export function CommandPalette({ isOpen, onClose }: Props) {
   const router = useRouter();
+  const t = useTranslations("search");
   const { query, results, isSearching, search, clear } = useSearch();
+  const typeLabel: Record<SearchResultType, string> = useMemo(() => ({
+    artist: t("artists"),
+    release: t("releases"),
+    track: t("tracks"),
+    reference: t("references"),
+  }), [t]);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -136,7 +137,7 @@ export function CommandPalette({ isOpen, onClose }: Props) {
               type="text"
               value={query}
               onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Search releases, tracks, references..."
+              placeholder={t("placeholder")}
               className="flex-1 bg-transparent text-base text-text placeholder:text-faint outline-none"
               aria-label="Search"
               aria-autocomplete="list"
@@ -167,13 +168,13 @@ export function CommandPalette({ isOpen, onClose }: Props) {
           >
             {query.trim() && !isSearching && results.length === 0 && (
               <div className="px-4 py-8 text-center text-sm text-muted">
-                No results for &ldquo;{query}&rdquo;
+                {t("noResultsFor", { query })}
               </div>
             )}
 
             {!query.trim() && (
               <div className="px-4 py-8 text-center text-sm text-muted">
-                Start typing to search...
+                {t("startTyping")}
               </div>
             )}
 
@@ -227,7 +228,7 @@ export function CommandPalette({ isOpen, onClose }: Props) {
                 <div key={group.type}>
                   <div className="px-4 pt-3 pb-1">
                     <span className="label-sm text-faint">
-                      {TYPE_LABEL[group.type]}
+                      {typeLabel[group.type]}
                     </span>
                   </div>
                   {groupItems}
@@ -241,15 +242,15 @@ export function CommandPalette({ isOpen, onClose }: Props) {
             <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-[10px] text-faint">
               <span className="inline-flex items-center gap-1">
                 <kbd className="px-1 py-0.5 border border-border rounded">&uarr;&darr;</kbd>
-                navigate
+                {t("navigate")}
               </span>
               <span className="inline-flex items-center gap-1">
                 <kbd className="px-1 py-0.5 border border-border rounded">&crarr;</kbd>
-                open
+                {t("open")}
               </span>
               <span className="inline-flex items-center gap-1">
                 <kbd className="px-1 py-0.5 border border-border rounded">esc</kbd>
-                close
+                {t("closeHint")}
               </span>
             </div>
           )}

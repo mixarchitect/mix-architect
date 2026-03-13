@@ -13,6 +13,8 @@ import { Timestamp } from "@/components/ui/timestamp";
 import type { ReleaseRole } from "@/lib/permissions";
 import { canDeleteRelease, canEdit } from "@/lib/permissions";
 import { formatLabel } from "@/lib/format-labels";
+import { formatMoney } from "@/lib/format-money";
+import { useLocale, useTranslations } from "next-intl";
 
 type Props = {
   id: string;
@@ -59,6 +61,10 @@ export function ReleaseCard({
   paymentStatus, feeTotal, feeCurrency, paymentsEnabled,
   coverArtUrl, pinned, role, hasNotes, className,
 }: Props) {
+  const locale = useLocale();
+  const tCard = useTranslations("releases.card");
+  const tCommon = useTranslations("common");
+  const tPayment = useTranslations("releases.payment");
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -160,7 +166,7 @@ export function ReleaseCard({
                   ? "text-signal"
                   : "text-transparent hover:text-faint",
               )}
-              title={pinned ? "Unpin release" : "Pin to top"}
+              title={pinned ? tCard("unpinRelease") : tCard("pinToTop")}
             >
               <Pin size={12} className={pinned ? "fill-current" : ""} />
             </button>
@@ -171,7 +177,7 @@ export function ReleaseCard({
           <div ref={menuRef} className="relative">
             <button
               type="button"
-              aria-label="Release options"
+              aria-label={tCard("releaseOptions")}
               aria-haspopup="true"
               aria-expanded={menuOpen}
               onClick={(e) => {
@@ -205,7 +211,7 @@ export function ReleaseCard({
                         className="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-panel2 transition-colors text-left disabled:opacity-50"
                       >
                         <Pin size={14} className={pinned ? "fill-current" : ""} />
-                        {pinned ? "Unpin Release" : "Pin to Top"}
+                        {pinned ? tCard("unpinRelease") : tCard("pinToTop")}
                       </button>
                     )}
                     {canEdit(role ?? "owner") && (
@@ -221,7 +227,7 @@ export function ReleaseCard({
                         className="w-full flex items-center gap-2 px-3 py-2 text-text hover:bg-panel2 transition-colors text-left"
                       >
                         <Pencil size={14} />
-                        Edit Release
+                        {tCard("editRelease")}
                       </button>
                     )}
                     {canDeleteRelease(role ?? "owner") && (
@@ -236,14 +242,14 @@ export function ReleaseCard({
                         className="w-full flex items-center gap-2 px-3 py-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-left"
                       >
                         <Trash2 size={14} />
-                        Delete Release
+                        {tCard("deleteRelease")}
                       </button>
                     )}
                   </>
                 ) : (
                   <div className="px-3 py-2 space-y-2">
                     <p className="text-xs text-muted">
-                      Delete <strong className="text-text">{title}</strong>? This cannot be undone.
+                      {tCard("deleteConfirm", { title })}
                     </p>
                     <div className="flex gap-2">
                       <button
@@ -256,7 +262,7 @@ export function ReleaseCard({
                         disabled={deleting}
                         className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors disabled:opacity-50"
                       >
-                        {deleting ? "Deleting\u2026" : "Confirm"}
+                        {deleting ? tCommon("deleting") : tCommon("confirm")}
                       </button>
                       <button
                         type="button"
@@ -267,7 +273,7 @@ export function ReleaseCard({
                         }}
                         className="flex-1 px-2 py-1.5 text-xs font-medium text-muted hover:text-text border border-border rounded transition-colors"
                       >
-                        Cancel
+                        {tCommon("cancel")}
                       </button>
                     </div>
                   </div>
@@ -295,7 +301,7 @@ export function ReleaseCard({
 
         <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted">
           <span className="">
-            {completedTracks} of {trackCount} track{trackCount !== 1 ? "s" : ""} briefed
+            {tCard("tracksBriefed", { completed: completedTracks, total: trackCount })}
           </span>
           <div className="flex items-center gap-2">
             {paymentsEnabled && paymentStatus && paymentStatus !== "no_fee" && (
@@ -305,8 +311,8 @@ export function ReleaseCard({
                 paymentStatus === "partial" && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
                 paymentStatus === "unpaid" && "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
               )}>
-                {paymentStatus === "paid" ? "Paid" : paymentStatus === "partial" ? "Partial" : "Unpaid"}
-                {feeTotal != null && ` \u2022 ${new Intl.NumberFormat("en-US", { style: "currency", currency: feeCurrency || "USD" }).format(feeTotal)}`}
+                {paymentStatus === "paid" ? tPayment("paid") : paymentStatus === "partial" ? tPayment("partial") : tPayment("unpaid")}
+                {feeTotal != null && ` \u2022 ${formatMoney(feeTotal, feeCurrency || "USD", locale)}`}
               </span>
             )}
             {updatedAt && <Timestamp date={updatedAt} />}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 
 type Props = {
@@ -8,6 +9,8 @@ type Props = {
 };
 
 export function AutoSaveIndicator({ status, className }: Props) {
+  const t = useTranslations("autoSave");
+
   if (status === "idle") return null;
 
   return (
@@ -20,9 +23,9 @@ export function AutoSaveIndicator({ status, className }: Props) {
         className
       )}
     >
-      {status === "saving" && "Saving\u2026"}
-      {status === "saved" && "Saved"}
-      {status === "error" && "Error saving"}
+      {status === "saving" && t("saving")}
+      {status === "saved" && t("saved")}
+      {status === "error" && t("error")}
     </span>
   );
 }

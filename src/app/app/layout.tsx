@@ -1,5 +1,8 @@
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { Shell } from "@/components/ui/shell";
 import { createNotification } from "@/lib/notifications/service";
@@ -20,7 +23,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const [defaultsRes, subRes] = await Promise.all([
     supabase
       .from("user_defaults")
-      .select("payments_enabled, theme")
+      .select("payments_enabled, theme, onboarding_completed")
       .eq("user_id", user.id)
       .maybeSingle(),
     supabase
@@ -32,6 +35,18 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   ]);
   const paymentsEnabled = defaultsRes.data?.payments_enabled ?? false;
   const theme = (defaultsRes.data?.theme as string) ?? "system";
+  const onboardingCompleted = defaultsRes.data?.onboarding_completed ?? false;
+
+  // Redirect to onboarding if not completed (but don't loop if already there)
+  const headerList = await headers();
+  const pathname = headerList.get("x-next-pathname") ?? headerList.get("x-invoke-path") ?? "";
+  if (!onboardingCompleted && !pathname.startsWith("/app/onboarding")) {
+    // Ensure user_defaults row exists before redirecting
+    if (!defaultsRes.data) {
+      await supabase.from("user_defaults").insert({ user_id: user.id });
+    }
+    redirect("/app/onboarding");
+  }
 
   // Fire-and-forget: notify release owners of new collaborators without blocking render
   void (async () => {
@@ -68,9 +83,19 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     grantedByAdmin: subRes.data?.granted_by_admin ?? false,
   };
 
+  const locale = await getLocale();
+  const messages = await getMessages();
+  const isOnboarding = pathname.startsWith("/app/onboarding");
+
   return (
-    <Shell userId={user.id} userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription}>
-      {children}
-    </Shell>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      {isOnboarding ? (
+        children
+      ) : (
+        <Shell userId={user.id} userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription}>
+          {children}
+        </Shell>
+      )}
+    </NextIntlClientProvider>
   );
 }

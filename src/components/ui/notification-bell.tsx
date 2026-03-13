@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { AlertTriangle, Bell, Check, MessageSquare, GitCommitHorizontal, DollarSign, ShieldCheck, X, Upload, UserPlus, Download } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { useNotifications, type Notification } from "@/lib/notifications/use-notifications";
 import { relativeTime } from "@/lib/relative-time";
@@ -19,6 +20,7 @@ export function NotificationBell({ userId, variant }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
+  const t = useTranslations("notifications");
 
   // Close on click outside
   useEffect(() => {
@@ -72,7 +74,7 @@ export function NotificationBell({ userId, variant }: Props) {
         >
           <Bell size={20} strokeWidth={1.5} />
           {unreadCount > 0 && <Badge count={unreadCount} />}
-          <span className="text-[10px] font-medium">Alerts</span>
+          <span className="text-[10px] font-medium">{t("alerts")}</span>
         </button>
         {open && (
           <NotificationPanel
@@ -140,7 +142,7 @@ export function NotificationBell({ userId, variant }: Props) {
           {unreadCount > 0 && <Badge count={unreadCount} />}
         </span>
         <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover/rail:opacity-100 transition-opacity duration-150 delay-75">
-          Notifications
+          {t("title")}
         </span>
       </button>
       {open && (
@@ -212,6 +214,7 @@ type PanelProps = {
 
 const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
   function NotificationPanel({ notifications, onItemClick, onMarkAllRead, onDismiss, onClearAll, onClose, position }, ref) {
+    const t = useTranslations("notifications");
     return (
       <div
         ref={ref}
@@ -228,7 +231,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-          <span className="text-sm font-semibold text-text">Notifications</span>
+          <span className="text-sm font-semibold text-text">{t("title")}</span>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -236,7 +239,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
               className="text-xs text-muted hover:text-text transition-colors flex items-center gap-1"
             >
               <Check size={12} strokeWidth={2} />
-              Mark all read
+              {t("markAllRead")}
             </button>
             {notifications.length > 0 && (
               <button
@@ -244,7 +247,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
                 onClick={onClearAll}
                 className="text-xs text-muted hover:text-text transition-colors"
               >
-                Clear all
+                {t("clearAll")}
               </button>
             )}
             <button
@@ -261,7 +264,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
         <div className="overflow-y-auto flex-1 no-scrollbar">
           {notifications.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-muted">
-              No notifications yet
+              {t("empty")}
             </div>
           ) : (
             notifications.map((n) => (
@@ -303,7 +306,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
                     onDismiss(n.id);
                   }}
                   className="shrink-0 mt-0.5 text-muted/0 group-hover/notif:text-muted hover:!text-text transition-colors"
-                  title="Dismiss"
+                  title={t("dismiss")}
                 >
                   <X size={14} strokeWidth={2} />
                 </button>

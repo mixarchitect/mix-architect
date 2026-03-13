@@ -1,0 +1,95 @@
+export const locales = [
+  "en-US",
+  "en-GB",
+  "en-CA",
+  "en-AU",
+  "en-IE",
+  "en-NG",
+  "de-DE",
+  "fr-FR",
+  "es-ES",
+  "es-MX",
+  "pt-BR",
+  "sv-SE",
+  "hi-IN",
+  "ja-JP",
+  "ko-KR",
+  "zh-CN",
+] as const;
+
+export type Locale = (typeof locales)[number];
+
+export const defaultLocale: Locale = "en-US";
+
+export const localeDisplayNames: Record<Locale, string> = {
+  "en-US": "English (US)",
+  "en-GB": "English (UK)",
+  "en-CA": "English (Canada)",
+  "en-AU": "English (Australia)",
+  "en-IE": "English (Ireland)",
+  "en-NG": "English (Nigeria)",
+  "de-DE": "Deutsch (Deutschland)",
+  "fr-FR": "Fran\u00e7ais (France)",
+  "es-ES": "Espa\u00f1ol (Espa\u00f1a)",
+  "es-MX": "Espa\u00f1ol (M\u00e9xico)",
+  "pt-BR": "Portugu\u00eas (Brasil)",
+  "sv-SE": "Svenska (Sverige)",
+  "hi-IN": "\u0939\u093f\u0928\u094d\u0926\u0940 (\u092d\u093e\u0930\u0924)",
+  "ja-JP": "\u65e5\u672c\u8a9e",
+  "ko-KR": "\ud55c\uad6d\uc5b4",
+  "zh-CN": "\u7b80\u4f53\u4e2d\u6587",
+};
+
+export const localeFlagEmojis: Record<Locale, string> = {
+  "en-US": "\ud83c\uddfa\ud83c\uddf8",
+  "en-GB": "\ud83c\uddec\ud83c\udde7",
+  "en-CA": "\ud83c\udde8\ud83c\udde6",
+  "en-AU": "\ud83c\udde6\ud83c\uddfa",
+  "en-IE": "\ud83c\uddee\ud83c\uddea",
+  "en-NG": "\ud83c\uddf3\ud83c\uddec",
+  "de-DE": "\ud83c\udde9\ud83c\uddea",
+  "fr-FR": "\ud83c\uddeb\ud83c\uddf7",
+  "es-ES": "\ud83c\uddea\ud83c\uddf8",
+  "es-MX": "\ud83c\uddf2\ud83c\uddfd",
+  "pt-BR": "\ud83c\udde7\ud83c\uddf7",
+  "sv-SE": "\ud83c\uddf8\ud83c\uddea",
+  "hi-IN": "\ud83c\uddee\ud83c\uddf3",
+  "ja-JP": "\ud83c\uddef\ud83c\uddf5",
+  "ko-KR": "\ud83c\uddf0\ud83c\uddf7",
+  "zh-CN": "\ud83c\udde8\ud83c\uddf3",
+};
+
+export const localeCurrencyMap: Record<Locale, string> = {
+  "en-US": "USD",
+  "en-GB": "GBP",
+  "en-CA": "CAD",
+  "en-AU": "AUD",
+  "en-IE": "EUR",
+  "en-NG": "NGN",
+  "de-DE": "EUR",
+  "fr-FR": "EUR",
+  "es-ES": "EUR",
+  "es-MX": "MXN",
+  "pt-BR": "BRL",
+  "sv-SE": "SEK",
+  "hi-IN": "INR",
+  "ja-JP": "JPY",
+  "ko-KR": "KRW",
+  "zh-CN": "CNY",
+};
+
+export const supportedCurrencies = [
+  { code: "USD", label: "US Dollar", symbol: "$" },
+  { code: "GBP", label: "British Pound", symbol: "\u00a3" },
+  { code: "EUR", label: "Euro", symbol: "\u20ac" },
+  { code: "CAD", label: "Canadian Dollar", symbol: "CA$" },
+  { code: "AUD", label: "Australian Dollar", symbol: "A$" },
+  { code: "MXN", label: "Mexican Peso", symbol: "MX$" },
+  { code: "BRL", label: "Brazilian Real", symbol: "R$" },
+  { code: "SEK", label: "Swedish Krona", symbol: "kr" },
+  { code: "INR", label: "Indian Rupee", symbol: "\u20b9" },
+  { code: "NGN", label: "Nigerian Naira", symbol: "\u20a6" },
+  { code: "JPY", label: "Japanese Yen", symbol: "\u00a5" },
+  { code: "KRW", label: "South Korean Won", symbol: "\u20a9" },
+  { code: "CNY", label: "Chinese Yuan", symbol: "\u00a5" },
+] as const;

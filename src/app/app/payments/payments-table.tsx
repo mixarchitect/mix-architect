@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/format-money";
+import { useLocale } from "next-intl";
 import { ChevronRight, ChevronDown, ArrowUp, ArrowDown, DollarSign } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { PaymentRelease } from "@/lib/db-types";
@@ -30,9 +31,9 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function formatShortDate(iso: string) {
+function formatShortDate(iso: string, locale: string) {
   const d = new Date(iso);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return d.toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" });
 }
 
 function SortArrow({ column, sortKey, sortDir }: { column: SortKey; sortKey: SortKey; sortDir: SortDir }) {
@@ -45,6 +46,7 @@ function SortArrow({ column, sortKey, sortDir }: { column: SortKey; sortKey: Sor
 }
 
 export function PaymentsTable({ releases, currency }: Props) {
+  const locale = useLocale();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -167,18 +169,18 @@ export function PaymentsTable({ releases, currency }: Props) {
                 </td>
                 <td className="px-4 py-3 font-medium text-text">{r.title}</td>
                 <td className="px-4 py-3 text-muted hidden sm:table-cell whitespace-nowrap">
-                  {formatShortDate(r.createdAt)}
+                  {formatShortDate(r.createdAt, locale)}
                 </td>
                 <td className="px-4 py-3 text-muted hidden sm:table-cell">{r.artist ?? "—"}</td>
                 <td className="px-4 py-3 text-right text-text">
-                  {formatMoney(r.feeTotal, r.feeCurrency)}
+                  {formatMoney(r.feeTotal, r.feeCurrency, locale)}
                 </td>
                 <td className="px-4 py-3 text-right text-text">
-                  {formatMoney(r.paidAmount, r.feeCurrency)}
+                  {formatMoney(r.paidAmount, r.feeCurrency, locale)}
                 </td>
                 <td className="px-4 py-3 text-right hidden sm:table-cell">
                   <span className={balance > 0 ? "text-signal" : "text-muted"}>
-                    {formatMoney(balance, r.feeCurrency)}
+                    {formatMoney(balance, r.feeCurrency, locale)}
                   </span>
                 </td>
                 <td className="px-4 py-3">
@@ -206,13 +208,13 @@ export function PaymentsTable({ releases, currency }: Props) {
                         {t.title}
                       </td>
                       <td className="px-4 py-2 text-right text-muted">
-                        {formatMoney(t.fee!, r.feeCurrency)}
+                        {formatMoney(t.fee!, r.feeCurrency, locale)}
                       </td>
                       <td className="px-4 py-2 text-right text-muted">
-                        {t.feePaid ? formatMoney(t.fee!, r.feeCurrency) : "—"}
+                        {t.feePaid ? formatMoney(t.fee!, r.feeCurrency, locale) : "—"}
                       </td>
                       <td className="px-4 py-2 text-right text-muted hidden sm:table-cell">
-                        {t.feePaid ? "—" : formatMoney(t.fee!, r.feeCurrency)}
+                        {t.feePaid ? "—" : formatMoney(t.fee!, r.feeCurrency, locale)}
                       </td>
                       <td className="px-4 py-2">
                         <StatusBadge status={t.feePaid ? "paid" : "unpaid"} />
@@ -229,14 +231,14 @@ export function PaymentsTable({ releases, currency }: Props) {
             <td className="hidden sm:table-cell" />
             <td className="hidden sm:table-cell" />
             <td className="px-4 py-3 text-right">
-              {formatMoney(totalFee, currency)}
+              {formatMoney(totalFee, currency, locale)}
             </td>
             <td className="px-4 py-3 text-right">
-              {formatMoney(totalPaid, currency)}
+              {formatMoney(totalPaid, currency, locale)}
             </td>
             <td className="px-4 py-3 text-right hidden sm:table-cell">
               <span className={totalBalance > 0 ? "text-signal" : "text-muted"}>
-                {formatMoney(totalBalance, currency)}
+                {formatMoney(totalBalance, currency, locale)}
               </span>
             </td>
             <td />

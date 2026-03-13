@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { Home, Users, DollarSign, LayoutTemplate } from "lucide-react";
 import { usePaymentsEnabled } from "@/lib/payments-context";
@@ -9,6 +10,7 @@ import { usePaymentsEnabled } from "@/lib/payments-context";
 export function Rail() {
   const pathname = usePathname();
   const paymentsEnabled = usePaymentsEnabled();
+  const t = useTranslations("nav");
 
   const isHome = pathname === "/app" || pathname?.startsWith("/app/releases");
   const isArtists = pathname?.startsWith("/app/artists");
@@ -27,11 +29,11 @@ export function Rail() {
       )}
       style={{ height: "calc(100dvh - 3.5rem)" }}
     >
-      <NavItem href="/app" icon={Home} label="Releases" active={isHome} />
-      <NavItem href="/app/artists" icon={Users} label="Artists" active={isArtists} />
-      <NavItem href="/app/templates" icon={LayoutTemplate} label="Templates" active={isTemplates} />
+      <NavItem href="/app" icon={Home} label={t("releases")} active={isHome} />
+      <NavItem href="/app/artists" icon={Users} label={t("artists")} active={isArtists} />
+      <NavItem href="/app/templates" icon={LayoutTemplate} label={t("templates")} active={isTemplates} />
       {paymentsEnabled && (
-        <NavItem href="/app/payments" icon={DollarSign} label="Payments" active={isPayments} />
+        <NavItem href="/app/payments" icon={DollarSign} label={t("payments")} active={isPayments} />
       )}
     </nav>
   );

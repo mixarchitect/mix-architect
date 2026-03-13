@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TemplateCard } from "@/components/templates/template-card";
 import { TemplateSearch } from "@/components/templates/template-search";
+import { getTranslations } from "next-intl/server";
 import type { ReleaseTemplate } from "@/types/template";
 
 export default async function TemplatesPage() {
+  const t = await getTranslations("templates");
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -28,11 +30,11 @@ export default async function TemplatesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold h2 text-text">Templates</h1>
+        <h1 className="text-2xl font-semibold h2 text-text">{t("title")}</h1>
         <Link href="/app/templates/new">
           <Button variant="primary">
             <Plus size={16} className="mr-1.5" />
-            New Template
+            {t("newTemplate")}
           </Button>
         </Link>
       </div>
@@ -42,10 +44,10 @@ export default async function TemplatesPage() {
           <EmptyState
             icon={LayoutTemplate}
             size="lg"
-            title="No templates yet"
-            description="Templates save your go-to release settings — specs, delivery formats, client info — so you can start new projects in seconds."
+            title={t("empty")}
+            description={t("emptyDesc")}
             action={{
-              label: "Create your first template",
+              label: t("createFirst"),
               href: "/app/templates/new",
               variant: "primary",
             }}

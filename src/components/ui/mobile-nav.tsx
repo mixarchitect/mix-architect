@@ -10,6 +10,7 @@ import {
   Settings, LogOut, Bug, Download,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { usePaymentsEnabled } from "@/lib/payments-context";
 import { NotificationBell } from "@/components/ui/notification-bell";
@@ -23,6 +24,7 @@ type Props = {
 export function MobileNav({ userId, userEmail, onSearchClick }: Props) {
   const pathname = usePathname();
   const paymentsEnabled = usePaymentsEnabled();
+  const t = useTranslations("nav");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Close drawer on navigation
@@ -46,17 +48,17 @@ export function MobileNav({ userId, userEmail, onSearchClick }: Props) {
       <nav className="fixed bottom-0 left-0 right-0 md:hidden h-16 border-t border-border bg-panel flex items-center justify-around z-50">
         <Link href="/app" className={itemClass(isHome)}>
           <Home size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">Releases</span>
+          <span className="text-[10px] font-medium">{t("releases")}</span>
         </Link>
 
         <Link href="/app/artists" className={itemClass(isArtists)}>
           <Users size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">Artists</span>
+          <span className="text-[10px] font-medium">{t("artists")}</span>
         </Link>
 
         <Link href="/app/templates" className={itemClass(isTemplates)}>
           <LayoutTemplate size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">Templates</span>
+          <span className="text-[10px] font-medium">{t("templates")}</span>
         </Link>
 
         <button
@@ -65,7 +67,7 @@ export function MobileNav({ userId, userEmail, onSearchClick }: Props) {
           className="flex flex-col items-center gap-1 px-3 py-2 transition-colors text-muted min-w-[44px]"
         >
           <Search size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">Search</span>
+          <span className="text-[10px] font-medium">{t("search")}</span>
         </button>
 
         {userId && <NotificationBell userId={userId} variant="mobile" />}
@@ -77,7 +79,7 @@ export function MobileNav({ userId, userEmail, onSearchClick }: Props) {
           aria-label="Menu"
         >
           <Menu size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">More</span>
+          <span className="text-[10px] font-medium">{t("more")}</span>
         </button>
       </nav>
 
@@ -109,6 +111,8 @@ function MobileDrawer({
 }) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const tNav = useTranslations("nav");
+  const tTheme = useTranslations("theme");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -133,7 +137,7 @@ function MobileDrawer({
   }
 
   const ThemeIcon = !mounted ? Monitor : theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
-  const themeLabel = !mounted ? "Auto" : theme === "light" ? "Light" : theme === "dark" ? "Dark" : "Auto";
+  const themeLabel = !mounted ? tTheme("system") : theme === "light" ? tTheme("light") : theme === "dark" ? tTheme("dark") : tTheme("system");
 
   const linkClass = (active?: boolean) =>
     cn(
@@ -172,7 +176,7 @@ function MobileDrawer({
           {paymentsEnabled && (
             <Link href="/app/payments" className={linkClass(pathname?.startsWith("/app/payments"))} onClick={onClose}>
               <DollarSign size={18} strokeWidth={1.5} />
-              Payments
+              {tNav("payments")}
             </Link>
           )}
 
@@ -180,26 +184,26 @@ function MobileDrawer({
 
           <Link href="/app/settings" className={linkClass(pathname?.startsWith("/app/settings"))} onClick={onClose}>
             <Settings size={18} strokeWidth={1.5} />
-            Settings
+            {tNav("settings")}
           </Link>
           <Link href="/app/help" className={linkClass(pathname?.startsWith("/app/help"))} onClick={onClose}>
             <HelpCircle size={18} strokeWidth={1.5} />
-            Help
+            {tNav("help")}
           </Link>
           <Link href="/app/help?tab=bug" className={linkClass()} onClick={onClose}>
             <Bug size={18} strokeWidth={1.5} />
-            Report a Bug
+            {tNav("reportBug")}
           </Link>
           <Link href="/api/export" className={linkClass()} onClick={onClose}>
             <Download size={18} strokeWidth={1.5} />
-            Export Data
+            {tNav("exportData")}
           </Link>
 
           <div className="border-t border-border my-2" />
 
           <button type="button" onClick={cycleTheme} className={linkClass()}>
             <ThemeIcon size={18} strokeWidth={1.5} />
-            Theme: {themeLabel}
+            {tTheme("themeLabel", { theme: themeLabel })}
           </button>
         </div>
 
@@ -211,7 +215,7 @@ function MobileDrawer({
             className="flex items-center gap-3 text-sm font-medium text-red-500 transition-colors w-full"
           >
             <LogOut size={18} strokeWidth={1.5} />
-            Sign Out
+            {tNav("signOut")}
           </button>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -12,23 +13,36 @@ import { TagInput } from "@/components/ui/tag-input";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { useSubscription } from "@/lib/subscription-context";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
-
-const FORMAT_OPTIONS = [
-  { value: "stereo", label: "Stereo" },
-  { value: "atmos", label: "Dolby Atmos" },
-  { value: "both", label: "Stereo + Atmos" },
-];
-
-const THEME_OPTIONS = [
-  { value: "light", label: "Light", Icon: Sun },
-  { value: "dark", label: "Dark", Icon: Moon },
-  { value: "system", label: "System", Icon: Monitor },
-] as const;
+import {
+  locales,
+  localeDisplayNames,
+  localeFlagEmojis,
+  localeCurrencyMap,
+  supportedCurrencies,
+  type Locale,
+} from "@/i18n/config";
+import { formatCurrency } from "@/lib/currency";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { theme: currentTheme, setTheme } = useTheme();
+  const t = useTranslations("settings");
+  const tc = useTranslations("common");
+  const tTheme = useTranslations("theme");
+  const tFormat = useTranslations("formatLabels");
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+
+  const formatOptions = useMemo(() => [
+    { value: "stereo", label: tFormat("stereo") },
+    { value: "atmos", label: tFormat("atmos") },
+    { value: "both", label: tFormat("stereoAtmos") },
+  ], [tFormat]);
+
+  const themeOptions = useMemo(() => [
+    { value: "light", label: tTheme("light"), Icon: Sun },
+    { value: "dark", label: tTheme("dark"), Icon: Moon },
+    { value: "system", label: tTheme("system"), Icon: Monitor },
+  ] as const, [tTheme]);
 
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<
@@ -46,6 +60,10 @@ export default function SettingsPage() {
     "Lead Vocal", "BGVs", "FX/Ear Candy",
   ]);
   const [paymentsEnabled, setPaymentsEnabled] = useState(false);
+  const [locale, setLocale] = useState<Locale>("en-US");
+  const [defaultCurrency, setDefaultCurrency] = useState("USD");
+  const [persona, setPersona] = useState<"artist" | "engineer" | "both" | "other">("artist");
+  const [paymentsManuallySet, setPaymentsManuallySet] = useState(false);
 
   // ── Unsaved-changes guard ──
   const initialSnapshot = useRef("");
@@ -77,6 +95,10 @@ export default function SettingsPage() {
           setDefaultElements(data.default_elements ?? []);
           setPaymentsEnabled(data.payments_enabled ?? false);
           setCompanyName(data.company_name ?? "");
+          setLocale((data.locale as Locale) ?? "en-US");
+          setDefaultCurrency(data.default_currency ?? "USD");
+          setPersona(data.persona ?? "artist");
+          setPaymentsManuallySet(data.payments_manually_set ?? false);
         }
 
         // Capture initial snapshot for dirty detection
@@ -131,13 +153,13 @@ export default function SettingsPage() {
   }
 
   if (loading) {
-    return <div className="text-sm text-muted py-12 text-center">Loading&hellip;</div>;
+    return <div className="text-sm text-muted py-12 text-center">{tc("loading")}</div>;
   }
 
   return (
     <div className="max-w-xl mx-auto">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold h2 text-text">Settings</h1>
+        <h1 className="text-2xl font-semibold h2 text-text">{t("title")}</h1>
         <AutoSaveIndicator status={saveStatus} />
       </div>
 
@@ -145,15 +167,15 @@ export default function SettingsPage() {
         {/* Appearance */}
         <Panel>
           <PanelHeader>
-            <h2 className="text-base font-semibold text-text">Appearance</h2>
+            <h2 className="text-base font-semibold text-text">{t("appearance.title")}</h2>
             <p className="text-sm text-muted mt-1">
-              Choose your preferred color theme.
+              {t("appearance.description")}
             </p>
           </PanelHeader>
           <Rule />
           <PanelBody className="pt-5">
             <div className="flex gap-2">
-              {THEME_OPTIONS.map((opt) => {
+              {themeOptions.map((opt) => {
                 const active = currentTheme === opt.value;
                 return (
                   <button
@@ -185,35 +207,109 @@ export default function SettingsPage() {
           </PanelBody>
         </Panel>
 
-        {/* Profile */}
+        {/* Region & Currency */}
         <Panel>
           <PanelHeader>
-            <h2 className="text-base font-semibold text-text">Profile</h2>
+            <h2 className="text-base font-semibold text-text">{t("regionCurrency.title")}</h2>
           </PanelHeader>
           <Rule />
           <PanelBody className="pt-5 space-y-4">
             <div className="space-y-1.5">
-              <label className="label text-muted">Display name</label>
+              <label className="label text-muted">{t("regionCurrency.locale")}</label>
+              <select
+                value={locale}
+                onChange={async (e) => {
+                  const newLocale = e.target.value as Locale;
+                  setLocale(newLocale);
+                  // Auto-update currency to match locale
+                  const mappedCurrency = localeCurrencyMap[newLocale];
+                  setDefaultCurrency(mappedCurrency);
+                  // Save immediately
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (user) {
+                    await supabase.from("user_defaults").upsert(
+                      { user_id: user.id, locale: newLocale, default_currency: mappedCurrency },
+                      { onConflict: "user_id" },
+                    );
+                    document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
+                    router.refresh();
+                  }
+                }}
+                className="input"
+              >
+                {locales.map((l) => (
+                  <option key={l} value={l}>
+                    {localeFlagEmojis[l]} {localeDisplayNames[l]}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-muted">{t("regionCurrency.localeHelp")}</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="label text-muted">{t("regionCurrency.defaultCurrency")}</label>
+              <select
+                value={defaultCurrency}
+                onChange={async (e) => {
+                  const newCurrency = e.target.value;
+                  setDefaultCurrency(newCurrency);
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (user) {
+                    await supabase.from("user_defaults").upsert(
+                      { user_id: user.id, default_currency: newCurrency },
+                      { onConflict: "user_id" },
+                    );
+                  }
+                }}
+                className="input"
+              >
+                {supportedCurrencies.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.symbol} {c.code} — {c.label}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-muted">{t("regionCurrency.defaultCurrencyHelp")}</p>
+            </div>
+
+            <div className="rounded-lg px-3 py-2" style={{ background: "var(--panel2)" }}>
+              <span className="text-xs text-muted">{t("regionCurrency.preview")}: </span>
+              <span className="text-sm font-medium text-text">
+                {formatCurrency(1234.56, defaultCurrency, locale)}
+              </span>
+            </div>
+          </PanelBody>
+        </Panel>
+
+        {/* Profile */}
+        <Panel>
+          <PanelHeader>
+            <h2 className="text-base font-semibold text-text">{t("profile.title")}</h2>
+          </PanelHeader>
+          <Rule />
+          <PanelBody className="pt-5 space-y-4">
+            <div className="space-y-1.5">
+              <label className="label text-muted">{t("profile.displayName")}</label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 className="input"
-                placeholder="Your name"
+                placeholder={t("profile.displayNamePlaceholder")}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="label text-muted">Company name (optional)</label>
+              <label className="label text-muted">{t("profile.companyName")}</label>
               <input
                 type="text"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 className="input"
-                placeholder="Studio or business name"
+                placeholder={t("profile.companyNamePlaceholder")}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="label text-muted">Email</label>
+              <label className="label text-muted">{t("profile.email")}</label>
               <input
                 type="email"
                 value={email}
@@ -222,7 +318,7 @@ export default function SettingsPage() {
               />
             </div>
             <Button variant="primary" onClick={handleSave}>
-              Save Profile
+              {t("profile.save")}
             </Button>
           </PanelBody>
         </Panel>
@@ -230,17 +326,17 @@ export default function SettingsPage() {
         {/* Mix Defaults */}
         <Panel>
           <PanelHeader>
-            <h2 className="text-base font-semibold text-text">Mix Defaults</h2>
+            <h2 className="text-base font-semibold text-text">{t("mixDefaults.title")}</h2>
             <p className="text-sm text-muted mt-1">
-              These values will be used as defaults for new tracks.
+              {t("mixDefaults.description")}
             </p>
           </PanelHeader>
           <Rule />
           <PanelBody className="pt-5 space-y-6">
             <div className="space-y-1.5">
-              <label className="label text-muted">Default format</label>
+              <label className="label text-muted">{t("mixDefaults.format")}</label>
               <div className="flex gap-2">
-                {FORMAT_OPTIONS.map((opt) => (
+                {formatOptions.map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -259,7 +355,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-muted">Default sample rate</label>
+              <label className="label text-muted">{t("mixDefaults.sampleRate")}</label>
               <select
                 value={sampleRate}
                 onChange={(e) => setSampleRate(e.target.value)}
@@ -272,7 +368,7 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-muted">Default bit depth</label>
+              <label className="label text-muted">{t("mixDefaults.bitDepth")}</label>
               <select
                 value={bitDepth}
                 onChange={(e) => setBitDepth(e.target.value)}
@@ -285,16 +381,16 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-muted">Default element list</label>
+              <label className="label text-muted">{t("mixDefaults.elementList")}</label>
               <TagInput
                 value={defaultElements}
                 onChange={setDefaultElements}
-                placeholder="Add element names"
+                placeholder={t("mixDefaults.elementListPlaceholder")}
               />
             </div>
 
             <Button variant="primary" onClick={handleSave}>
-              Save Defaults
+              {t("mixDefaults.save")}
             </Button>
           </PanelBody>
         </Panel>
@@ -302,17 +398,17 @@ export default function SettingsPage() {
         {/* Payment Tracking */}
         <Panel>
           <PanelHeader>
-            <h2 className="text-base font-semibold text-text">Payment Tracking</h2>
+            <h2 className="text-base font-semibold text-text">{t("paymentTracking.title")}</h2>
             <p className="text-sm text-muted mt-1">
-              Track fees and payment status on releases and tracks. Turn this off if you&apos;re mixing your own projects.
+              {t("paymentTracking.description")}
             </p>
           </PanelHeader>
           <Rule />
           <PanelBody className="pt-5 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-text">Enable payment tracking</div>
-                <div className="text-xs text-muted mt-0.5">Shows fee and paid/unpaid status on releases and tracks</div>
+                <div className="text-sm font-medium text-text">{t("paymentTracking.enable")}</div>
+                <div className="text-xs text-muted mt-0.5">{t("paymentTracking.enableHelp")}</div>
               </div>
               <button
                 type="button"
@@ -324,10 +420,11 @@ export default function SettingsPage() {
                     const { data: { user } } = await supabase.auth.getUser();
                     if (!user) throw new Error("Not authenticated");
                     const { error } = await supabase.from("user_defaults").upsert(
-                      { user_id: user.id, payments_enabled: next },
+                      { user_id: user.id, payments_enabled: next, payments_manually_set: true },
                       { onConflict: "user_id" },
                     );
                     if (error) throw error;
+                    setPaymentsManuallySet(true);
                     router.refresh();
                   } catch {
                     setPaymentsEnabled(prev);
@@ -346,13 +443,62 @@ export default function SettingsPage() {
           </PanelBody>
         </Panel>
 
+        {/* Persona */}
+        <Panel>
+          <PanelHeader>
+            <h2 className="text-base font-semibold text-text">{t("persona.title")}</h2>
+          </PanelHeader>
+          <Rule />
+          <PanelBody className="pt-5 space-y-3">
+            {([
+              { id: "artist" as const, label: t("persona.artistLabel") },
+              { id: "engineer" as const, label: t("persona.engineerLabel") },
+              { id: "both" as const, label: t("persona.bothLabel") },
+              { id: "other" as const, label: t("persona.otherLabel") },
+            ] as const).map((opt) => (
+              <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="persona"
+                  value={opt.id}
+                  checked={persona === opt.id}
+                  onChange={async () => {
+                    setPersona(opt.id);
+                    const updateData: Record<string, unknown> = { persona: opt.id };
+                    // Auto-toggle payments if not manually overridden
+                    if (!paymentsManuallySet) {
+                      const newPayments = opt.id !== "artist";
+                      setPaymentsEnabled(newPayments);
+                      updateData.payments_enabled = newPayments;
+                    }
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                      await supabase.from("user_defaults").upsert(
+                        { user_id: user.id, ...updateData },
+                        { onConflict: "user_id" },
+                      );
+                      router.refresh();
+                    }
+                  }}
+                  className="accent-[var(--signal)]"
+                />
+                <span className="text-sm text-text group-hover:text-text/80 transition-colors">
+                  {opt.label}
+                </span>
+              </label>
+            ))}
+            <p className="text-xs text-muted pt-1">
+              {t("persona.note")}
+            </p>
+          </PanelBody>
+        </Panel>
+
         {/* Your Data */}
         <Panel>
           <PanelHeader>
-            <h2 className="text-base font-semibold text-text">Your Data</h2>
+            <h2 className="text-base font-semibold text-text">{t("data.title")}</h2>
             <p className="text-sm text-muted mt-1">
-              Download a complete copy of your Mix Architect data, including all
-              release metadata, payment records, and audio files.
+              {t("data.description")}
             </p>
           </PanelHeader>
           <Rule />
@@ -373,6 +519,8 @@ export default function SettingsPage() {
 /* ------------------------------------------------------------------ */
 
 function SubscriptionPanel() {
+  const t = useTranslations("settings.subscription");
+  const tc = useTranslations("common");
   const sub = useSubscription();
   const [upgrading, setUpgrading] = useState(false);
   const [managingBilling, setManagingBilling] = useState(false);
@@ -418,9 +566,9 @@ function SubscriptionPanel() {
   return (
     <Panel>
       <PanelHeader>
-        <h2 className="text-base font-semibold text-text">Subscription</h2>
+        <h2 className="text-base font-semibold text-text">{t("title")}</h2>
         <p className="text-sm text-muted mt-1">
-          Manage your Mix Architect plan.
+          {t("description")}
         </p>
       </PanelHeader>
       <Rule />
@@ -439,17 +587,17 @@ function SubscriptionPanel() {
             )}
             <div>
               <div className="text-sm font-semibold text-text">
-                {isPro ? "Pro" : "Free"}
+                {isPro ? t("pro") : t("free")}
                 {isAdminGranted && (
-                  <span className="ml-1.5 text-xs font-medium text-signal">Complimentary</span>
+                  <span className="ml-1.5 text-xs font-medium text-signal">{t("complimentary")}</span>
                 )}
               </div>
               <div className="text-xs text-muted mt-0.5">
                 {isPro
                   ? isAdminGranted
-                    ? "Unlimited releases"
-                    : "$14/month \u00b7 Unlimited releases"
-                  : "1 release included"}
+                    ? t("unlimitedReleases")
+                    : t("proPrice")
+                  : t("freeLimit")}
               </div>
             </div>
           </div>
@@ -472,15 +620,13 @@ function SubscriptionPanel() {
             className="text-xs px-3 py-2 rounded-md"
             style={{ background: "var(--panel-2)" }}
           >
-            Your Pro plan will end on{" "}
-            <span className="font-semibold text-text">
-              {new Date(sub.currentPeriodEnd).toLocaleDateString(undefined, {
+            {t("cancelNote", {
+              date: new Date(sub.currentPeriodEnd).toLocaleDateString(undefined, {
                 month: "long",
                 day: "numeric",
                 year: "numeric",
-              })}
-            </span>
-            . You can resubscribe from Manage Billing.
+              }),
+            })}
           </div>
         )}
 
@@ -488,14 +634,14 @@ function SubscriptionPanel() {
         {!isPro && (
           <Button variant="primary" onClick={handleUpgrade} disabled={upgrading}>
             <Sparkles size={16} />
-            {upgrading ? "Redirecting\u2026" : "Upgrade to Pro"}
+            {upgrading ? tc("redirecting") : t("upgradeToPro")}
           </Button>
         )}
 
         {isPro && !isAdminGranted && (
           <Button variant="secondary" onClick={handleManageBilling} disabled={managingBilling}>
             <CreditCard size={16} />
-            {managingBilling ? "Redirecting\u2026" : "Manage Billing"}
+            {managingBilling ? tc("redirecting") : t("manageBilling")}
           </Button>
         )}
       </PanelBody>
@@ -522,6 +668,8 @@ type ExportEstimate = {
 };
 
 function ExportDataButton() {
+  const t = useTranslations("settings.data");
+  const tc = useTranslations("common");
   const [loading, setLoading] = useState(false);
   const [estimate, setEstimate] = useState<ExportEstimate | null>(null);
   const [exporting, setExporting] = useState(false);
@@ -598,29 +746,30 @@ function ExportDataButton() {
       {!estimate ? (
         <Button variant="secondary" onClick={handleEstimate} disabled={loading}>
           <Download size={16} />
-          {loading ? "Calculating\u2026" : "Export My Data"}
+          {loading ? tc("calculating") : t("exportButton")}
         </Button>
       ) : (
         <div className="space-y-3">
           <div className="rounded-lg bg-panel-2 border border-border p-4">
             <p className="text-sm text-text">
-              Your export is approximately{" "}
-              <span className="font-semibold">{formatBytes(totalBytes)}</span>
+              {t("exportSize", { size: formatBytes(totalBytes) })}
             </p>
             <p className="text-xs text-muted mt-1">
-              {estimate.releaseCount} {estimate.releaseCount === 1 ? "release" : "releases"},{" "}
-              {estimate.trackCount} {estimate.trackCount === 1 ? "track" : "tracks"},{" "}
-              {estimate.audioFileCount} audio {estimate.audioFileCount === 1 ? "file" : "files"}
+              {t("exportSummary", {
+                releaseCount: estimate.releaseCount,
+                trackCount: estimate.trackCount,
+                audioFileCount: estimate.audioFileCount,
+              })}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="primary" onClick={handleDownload} disabled={exporting}>
               <Download size={16} />
-              {exporting ? "Downloading\u2026" : "Download"}
+              {exporting ? tc("downloading") : t("download")}
             </Button>
             {!exporting && (
               <Button variant="secondary" onClick={() => setEstimate(null)}>
-                Cancel
+                {tc("cancel")}
               </Button>
             )}
           </div>

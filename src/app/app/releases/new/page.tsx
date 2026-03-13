@@ -11,23 +11,30 @@ import { TagInput } from "@/components/ui/tag-input";
 import { ArrowLeft, Sparkles, LayoutTemplate, Star, ArrowRight } from "lucide-react";
 import { useSubscription } from "@/lib/subscription-context";
 import { cn } from "@/lib/cn";
+import { useTranslations } from "next-intl";
 import type { ReleaseTemplate } from "@/types/template";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const TYPE_OPTIONS = [
-  { value: "single", label: "Single" },
-  { value: "ep", label: "EP" },
-  { value: "album", label: "Album" },
-];
+function useTypeOptions() {
+  const tFormat = useTranslations("formatLabels");
+  return [
+    { value: "single", label: tFormat("single") },
+    { value: "ep", label: tFormat("ep") },
+    { value: "album", label: tFormat("album") },
+  ];
+}
 
-const FORMAT_OPTIONS = [
-  { value: "stereo", label: "Stereo" },
-  { value: "atmos", label: "Dolby Atmos" },
-  { value: "both", label: "Stereo + Atmos" },
-];
+function useFormatOptions() {
+  const tFormat = useTranslations("formatLabels");
+  return [
+    { value: "stereo", label: tFormat("stereo") },
+    { value: "atmos", label: tFormat("atmos") },
+    { value: "both", label: tFormat("stereoAtmos") },
+  ];
+}
 
 const GENRE_SUGGESTIONS = [
   "Rock", "Pop", "Hip-Hop", "R&B", "Electronic", "Country", "Jazz",
@@ -121,6 +128,11 @@ function TemplateMiniCard({
 /* ------------------------------------------------------------------ */
 
 export default function NewReleasePage() {
+  const t = useTranslations("releases.new");
+  const tCommon = useTranslations("common");
+  const TYPE_OPTIONS = useTypeOptions();
+  const FORMAT_OPTIONS = useFormatOptions();
+
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [releaseType, setReleaseType] = useState("single");
@@ -230,6 +242,13 @@ export default function NewReleasePage() {
       // Generate ID client-side so we don't need .select() after insert
       const releaseId = crypto.randomUUID();
 
+      // Fetch the user's default currency
+      const { data: userDefaults } = await supabase
+        .from("user_defaults")
+        .select("default_currency")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
       // Build release insert data with optional template defaults
       const releaseInsert: Record<string, unknown> = {
         id: releaseId,
@@ -240,6 +259,7 @@ export default function NewReleasePage() {
         format,
         genre_tags: genreTags,
         target_date: targetDate || null,
+        fee_currency: userDefaults?.default_currency || "USD",
       };
       if (selectedTemplate) {
         releaseInsert.template_id = selectedTemplate.id;
@@ -317,7 +337,7 @@ export default function NewReleasePage() {
           className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
         >
           <ArrowLeft size={14} />
-          Back to Releases
+          {t("backToReleases")}
         </Link>
       </div>
 
@@ -328,7 +348,7 @@ export default function NewReleasePage() {
         >
           <Sparkles size={16} className="text-signal shrink-0" />
           <span className="text-muted">
-            Free plan includes 1 release.{" "}
+            {t("freePlanNote").split(t("upgradeToPro"))[0]}
             <button
               type="button"
               onClick={async () => {
@@ -345,9 +365,9 @@ export default function NewReleasePage() {
               disabled={upgrading}
               className="text-signal font-semibold hover:underline"
             >
-              {upgrading ? "Redirecting\u2026" : "Upgrade to Pro"}
+              {upgrading ? tCommon("redirecting") : t("upgradeToPro")}
             </button>
-            {" "}for unlimited releases.
+            {t("freePlanNote").split(t("upgradeToPro"))[1]}
           </span>
         </div>
       )}
@@ -359,11 +379,11 @@ export default function NewReleasePage() {
             <div className="flex items-center gap-2">
               <LayoutTemplate size={20} className="text-signal" />
               <h2 className="text-lg font-semibold text-text">
-                Start from a template
+                {t("startFromTemplate")}
               </h2>
             </div>
             <p className="mt-1 text-sm text-muted">
-              Pre-fill your release settings, or start from scratch.
+              {t("templateDesc")}
             </p>
           </PanelHeader>
           <Rule />
@@ -388,7 +408,7 @@ export default function NewReleasePage() {
                 disabled={!selectedTemplateId}
                 onClick={handlePickTemplate}
               >
-                Use Template
+                {t("useTemplate")}
                 <ArrowRight size={14} className="ml-1.5" />
               </Button>
               <button
@@ -396,7 +416,7 @@ export default function NewReleasePage() {
                 onClick={handleStartFromScratch}
                 className="text-sm text-muted hover:text-text transition-colors"
               >
-                Start from scratch
+                {t("startFromScratch")}
               </button>
             </div>
           </PanelBody>
@@ -407,39 +427,39 @@ export default function NewReleasePage() {
       {showForm && (
         <Panel>
           <PanelHeader>
-            <h1 className="text-2xl font-semibold h2 text-text">New Release</h1>
+            <h1 className="text-2xl font-semibold h2 text-text">{t("title")}</h1>
             <p className="mt-1 text-sm text-muted">
-              Set up your project &mdash; you can always edit these details later.
+              {t("setupNote")}
             </p>
           </PanelHeader>
           <Rule />
           <PanelBody className="pt-5">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-1.5">
-                <label className="label text-muted">Release title *</label>
+                <label className="label text-muted">{t("releaseTitle")}</label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="input"
-                  placeholder="Midnight Drive EP"
+                  placeholder={t("releaseTitlePlaceholder")}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="label text-muted">Artist / Client</label>
+                <label className="label text-muted">{t("artistClient")}</label>
                 <input
                   type="text"
                   value={artist}
                   onChange={(e) => setArtist(e.target.value)}
                   className="input"
-                  placeholder="Artist or client name"
+                  placeholder={t("artistPlaceholder")}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="label text-muted">Release type</label>
+                <label className="label text-muted">{t("releaseType")}</label>
                 <PillSelect
                   options={TYPE_OPTIONS}
                   value={releaseType}
@@ -448,7 +468,7 @@ export default function NewReleasePage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="label text-muted">Format</label>
+                <label className="label text-muted">{t("format")}</label>
                 <PillSelect
                   options={FORMAT_OPTIONS}
                   value={format}
@@ -457,17 +477,17 @@ export default function NewReleasePage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="label text-muted">Genre tags</label>
+                <label className="label text-muted">{t("genreTags")}</label>
                 <TagInput
                   value={genreTags}
                   onChange={setGenreTags}
                   suggestions={GENRE_SUGGESTIONS}
-                  placeholder="Type and press Enter to add"
+                  placeholder={t("genreTagsPlaceholder")}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="label text-muted">Target release date</label>
+                <label className="label text-muted">{t("targetDate")}</label>
                 <input
                   type="date"
                   value={targetDate}
@@ -488,7 +508,7 @@ export default function NewReleasePage() {
                   variant="primary"
                   disabled={loading || !title.trim()}
                 >
-                  {loading ? "Creating\u2026" : "Create Release"}
+                  {loading ? tCommon("creating") : t("createRelease")}
                 </Button>
                 {templates.length > 0 && (
                   <button
@@ -496,7 +516,7 @@ export default function NewReleasePage() {
                     onClick={() => setShowForm(false)}
                     className="text-sm text-muted hover:text-text transition-colors"
                   >
-                    Change template
+                    {t("changeTemplate")}
                   </button>
                 )}
               </div>

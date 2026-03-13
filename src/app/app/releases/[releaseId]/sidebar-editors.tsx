@@ -12,6 +12,8 @@ import { Pencil, Check, X, ImageIcon, Upload } from "lucide-react";
 import { canEdit, canEditCreative, canEditPayment, type ReleaseRole } from "@/lib/permissions";
 import { sendNotification } from "@/lib/notifications/client";
 import { InternalNotesEditor } from "@/components/ui/internal-notes-editor";
+import { useLocale, useTranslations } from "next-intl";
+import { formatMoney } from "@/lib/format-money";
 
 // ── Status Editor ──
 
@@ -24,11 +26,11 @@ function releaseStatusColor(s: string): "green" | "orange" | "blue" {
   return "blue";
 }
 
-function releaseStatusLabel(s: string): string {
-  if (s === "ready") return "Ready";
-  if (s === "in_progress") return "In Progress";
-  return "Draft";
-}
+const statusLabelKey: Record<string, string> = {
+  ready: "statusReady",
+  in_progress: "statusInProgress",
+  draft: "statusDraft",
+};
 
 type StatusEditorProps = {
   releaseId: string;
@@ -37,10 +39,15 @@ type StatusEditorProps = {
 };
 
 export function StatusEditor({ releaseId, initialStatus, role }: StatusEditorProps) {
+  const t = useTranslations("releaseDetail");
   const [status, setStatus] = useState<ReleaseStatus>(
     (RELEASE_STATUSES.includes(initialStatus as ReleaseStatus) ? initialStatus : "draft") as ReleaseStatus,
   );
   const router = useRouter();
+
+  function statusLabel(s: string) {
+    return t(statusLabelKey[s] ?? "statusDraft");
+  }
 
   async function cycleStatus() {
     const idx = RELEASE_STATUSES.indexOf(status);
@@ -57,7 +64,7 @@ export function StatusEditor({ releaseId, initialStatus, role }: StatusEditorPro
       router.refresh();
       sendNotification({
         type: "status_change",
-        title: `Release marked ${releaseStatusLabel(next)}`,
+        title: t("markedStatus", { status: statusLabel(next) }),
         releaseId,
       });
     } catch {
@@ -69,7 +76,7 @@ export function StatusEditor({ releaseId, initialStatus, role }: StatusEditorPro
     return (
       <StatusIndicator
         color={releaseStatusColor(status)}
-        label={releaseStatusLabel(status)}
+        label={statusLabel(status)}
       />
     );
   }
@@ -82,7 +89,7 @@ export function StatusEditor({ releaseId, initialStatus, role }: StatusEditorPro
     >
       <StatusIndicator
         color={releaseStatusColor(status)}
-        label={releaseStatusLabel(status)}
+        label={statusLabel(status)}
       />
     </button>
   );
@@ -106,6 +113,8 @@ type DirectionEditorProps = {
 };
 
 export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus, role }: DirectionEditorProps) {
+  const t = useTranslations("releaseDetail");
+  const tc = useTranslations("common");
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(initialValue ?? "");
   const [saving, setSaving] = useState(false);
@@ -142,7 +151,7 @@ export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus, 
     <Panel>
       <PanelBody className="py-5">
         <div className="flex items-center justify-between mb-2">
-          <div className="label-sm text-muted">GLOBAL MIX DIRECTION</div>
+          <div className="label-sm text-muted">{t("globalDirection")}</div>
           {!editing && canEdit(role ?? "owner") && (
             <button
               type="button"
@@ -160,7 +169,7 @@ export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus, 
               value={value}
               onChange={(e) => setValue(e.target.value)}
               className="input min-h-[80px] resize-y text-sm w-full"
-              placeholder="Overall sonic vision for this release..."
+              placeholder={t("directionPlaceholder")}
             />
             <div className="flex gap-2">
               <button
@@ -171,7 +180,7 @@ export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus, 
                 style={{ background: "var(--signal)", color: "var(--signal-on)" }}
               >
                 <Check size={12} />
-                {saving ? "Saving…" : "Save"}
+                {saving ? tc("saving") : tc("save")}
               </button>
               <button
                 type="button"
@@ -183,14 +192,14 @@ export function GlobalDirectionEditor({ releaseId, initialValue, initialStatus, 
                 style={{ background: "var(--panel2)" }}
               >
                 <X size={12} />
-                Cancel
+                {tc("cancel")}
               </button>
             </div>
           </div>
         ) : value ? (
           <p className="text-sm text-text leading-relaxed">{value}</p>
         ) : (
-          <p className="text-sm text-muted italic px-1 py-3">No global direction set yet.</p>
+          <p className="text-sm text-muted italic px-1 py-3">{t("noDirection")}</p>
         )}
       </PanelBody>
     </Panel>
@@ -215,6 +224,8 @@ type RefsEditorProps = {
 };
 
 export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, role }: RefsEditorProps) {
+  const t = useTranslations("releaseDetail");
+  const tc = useTranslations("common");
   const [refs, setRefs] = useState<Ref[]>(initialRefs);
   const [showForm, setShowForm] = useState(false);
   const [refTitle, setRefTitle] = useState("");
@@ -313,14 +324,14 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
     <Panel>
       <PanelBody className="py-5">
         <div className="flex items-center justify-between mb-2">
-          <div className="label-sm text-muted">GLOBAL REFERENCES</div>
+          <div className="label-sm text-muted">{t("globalReferences")}</div>
           {!showForm && canEditCreative(role ?? "owner") && (
             <button
               type="button"
               onClick={() => setShowForm(true)}
               className="text-xs text-muted hover:text-text transition-colors"
             >
-              + Add
+              {t("addRef")}
             </button>
           )}
         </div>
@@ -351,7 +362,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
                   searchItunes(e.target.value);
                 }}
                 onFocus={() => { if (itunesResults.length > 0) setShowItunesResults(true); }}
-                placeholder="Search for a song..."
+                placeholder={t("searchSong")}
                 className="input text-xs h-8 py-1"
                 autoFocus
               />
@@ -393,20 +404,20 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
               <input
                 value={refArtist}
                 onChange={(e) => setRefArtist(e.target.value)}
-                placeholder="Artist"
+                placeholder={t("artistLabel")}
                 className="input text-xs h-8 py-1"
               />
             )}
             <input
               value={refNote}
               onChange={(e) => setRefNote(e.target.value)}
-              placeholder="What to reference about this song"
+              placeholder={t("whatToReference")}
               className="input text-xs h-8 py-1"
             />
             <input
               value={refUrl}
               onChange={(e) => setRefUrl(e.target.value)}
-              placeholder="Link (Spotify, Apple Music, YouTube...)"
+              placeholder={t("linkPlaceholder")}
               className="input text-xs h-8 py-1"
             />
             <div className="flex gap-2">
@@ -423,7 +434,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
                 onClick={resetForm}
                 className="h-7 text-xs px-3"
               >
-                Cancel
+                {tc("cancel")}
               </Button>
             </div>
           </div>
@@ -444,7 +455,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
             ))}
           </div>
         ) : !showForm ? (
-          <p className="text-sm text-muted italic px-1 py-3">No references added yet.</p>
+          <p className="text-sm text-muted italic px-1 py-3">{t("noReferences")}</p>
         ) : null}
       </PanelBody>
     </Panel>
@@ -458,6 +469,8 @@ type CoverArtEditorProps = {
 };
 
 export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorProps) {
+  const t = useTranslations("releaseDetail");
+  const tc = useTranslations("common");
   const [editing, setEditing] = useState(false);
   const [url, setUrl] = useState(initialUrl ?? "");
   const [urlInput, setUrlInput] = useState("");
@@ -468,12 +481,12 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
   async function handleUpload(file: File) {
     const MAX_SIZE = 5 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      setError("Image must be under 5MB");
+      setError(t("imageSizeLimit"));
       return;
     }
     const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setError("Invalid image type. Use PNG, JPG, WebP, or GIF.");
+      setError(t("invalidImageType"));
       return;
     }
     setUploading(true);
@@ -497,7 +510,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
       setEditing(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      setError(err instanceof Error ? err.message : t("uploadFailed"));
     } finally {
       setUploading(false);
     }
@@ -514,7 +527,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
       setEditing(false);
       router.refresh();
     } catch {
-      setError("Failed to save URL");
+      setError(t("urlSaveFailed"));
     }
   }
 
@@ -527,7 +540,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
       setEditing(false);
       router.refresh();
     } catch {
-      setError("Failed to remove cover art");
+      setError(t("removeFailed"));
     }
   }
 
@@ -558,7 +571,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
               style={{ background: "var(--panel2)", color: "var(--text-muted)" }}
             >
               <Upload size={14} />
-              {uploading ? "Uploading\u2026" : "Upload"}
+              {uploading ? tc("uploading") : "Upload"}
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
@@ -582,7 +595,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
           </div>
 
           <div className="space-y-1">
-            <span className="text-[10px] text-muted uppercase tracking-wider">or paste URL</span>
+            <span className="text-[10px] text-muted uppercase tracking-wider">{t("pasteUrl")}</span>
             <div className="flex gap-1.5">
               <input
                 type="url"
@@ -612,7 +625,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
             }}
             className="inline-flex items-center gap-1 text-xs text-muted hover:text-text transition-colors"
           >
-            <X size={12} /> Cancel
+            <X size={12} /> {tc("cancel")}
           </button>
         </div>
       </div>
@@ -643,7 +656,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
           style={{ background: "var(--panel2)" }}
         >
           <ImageIcon size={40} className="text-muted opacity-30" />
-          <span className="text-xs text-muted">Add cover art</span>
+          <span className="text-xs text-muted">{t("addCoverArt")}</span>
         </div>
       )}
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
@@ -664,16 +677,16 @@ function paymentStatusColor(s: string): "green" | "orange" | "blue" {
   return "blue";
 }
 
-function paymentStatusLabel(s: string): string {
-  if (s === "no_fee") return "No Fee";
-  if (s === "paid") return "Paid";
-  if (s === "partial") return "Partial";
-  return "Unpaid";
-}
+const paymentLabelKey: Record<string, string> = {
+  no_fee: "noFee",
+  paid: "paid",
+  partial: "partial",
+  unpaid: "unpaid",
+};
 
-function formatCurrency(amount: number | null, currency: string): string {
+function formatCurrency(amount: number | null, currency: string, locale: string): string {
   if (amount == null) return "\u2014";
-  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
+  return new Intl.NumberFormat(locale, { style: "currency", currency }).format(amount);
 }
 
 type PaymentEditorProps = {
@@ -695,6 +708,10 @@ export function PaymentEditor({
   initialPaymentNotes,
   role,
 }: PaymentEditorProps) {
+  const locale = useLocale();
+  const t = useTranslations("releaseDetail");
+  const tp = useTranslations("releases.payment");
+  const ts = useTranslations("releaseSettings");
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(
     (PAYMENT_STATUSES.includes(initialPaymentStatus as PaymentStatus) ? initialPaymentStatus : "no_fee") as PaymentStatus,
   );
@@ -705,6 +722,10 @@ export function PaymentEditor({
   const [editingPaid, setEditingPaid] = useState(false);
   const [paidInput, setPaidInput] = useState(String(initialPaidAmount ?? 0));
   const router = useRouter();
+
+  function paymentLabel(s: string) {
+    return tp(paymentLabelKey[s] ?? "unpaid");
+  }
 
   async function cyclePaymentStatus() {
     const idx = PAYMENT_STATUSES.indexOf(paymentStatus);
@@ -721,7 +742,7 @@ export function PaymentEditor({
       router.refresh();
       sendNotification({
         type: "payment_update",
-        title: `Payment status changed to ${paymentStatusLabel(next)}`,
+        title: t("paymentChanged", { status: paymentLabel(next) }),
         releaseId,
       });
     } catch {
@@ -772,10 +793,10 @@ export function PaymentEditor({
   return (
     <Panel>
       <PanelBody className="py-5 space-y-3">
-        <div className="label-sm text-muted mb-1">PAYMENT</div>
+        <div className="label-sm text-muted mb-1">{ts("payment")}</div>
         <div className="space-y-3">
           <div className="flex justify-between text-sm items-center">
-            <span className="text-muted">Status</span>
+            <span className="text-muted">{t("statusLabel")}</span>
             {canEditPayment(role ?? "owner") ? (
               <button
                 type="button"
@@ -784,19 +805,19 @@ export function PaymentEditor({
               >
                 <StatusIndicator
                   color={paymentStatusColor(paymentStatus)}
-                  label={paymentStatusLabel(paymentStatus)}
+                  label={paymentLabel(paymentStatus)}
                 />
               </button>
             ) : (
               <StatusIndicator
                 color={paymentStatusColor(paymentStatus)}
-                label={paymentStatusLabel(paymentStatus)}
+                label={paymentLabel(paymentStatus)}
               />
             )}
           </div>
           {paymentStatus !== "no_fee" && (
             <div className="flex justify-between text-sm items-center">
-              <span className="text-muted">Fee</span>
+              <span className="text-muted">{t("feeLabel")}</span>
               {canEditPayment(role ?? "owner") ? (
                 editingFee ? (
                   <div className="flex items-center gap-1.5">
@@ -844,12 +865,12 @@ export function PaymentEditor({
                     }}
                     className="text-text text-xs cursor-pointer hover:opacity-80 transition-opacity"
                   >
-                    {formatCurrency(feeTotal, initialFeeCurrency)}
+                    {formatCurrency(feeTotal, initialFeeCurrency, locale)}
                   </button>
                 )
               ) : (
                 <span className="text-text text-xs">
-                  {formatCurrency(feeTotal, initialFeeCurrency)}
+                  {formatCurrency(feeTotal, initialFeeCurrency, locale)}
                 </span>
               )}
             </div>
@@ -857,7 +878,7 @@ export function PaymentEditor({
           {paymentStatus === "partial" && (
             <>
               <div className="flex justify-between text-sm items-center">
-                <span className="text-muted">Paid</span>
+                <span className="text-muted">{t("paidLabel")}</span>
                 {canEditPayment(role ?? "owner") ? (
                   editingPaid ? (
                     <div className="flex items-center gap-1.5">
@@ -905,19 +926,19 @@ export function PaymentEditor({
                       }}
                       className="text-text text-xs cursor-pointer hover:opacity-80 transition-opacity"
                     >
-                      {formatCurrency(paidAmount, initialFeeCurrency)}
+                      {formatCurrency(paidAmount, initialFeeCurrency, locale)}
                     </button>
                   )
                 ) : (
                   <span className="text-text text-xs">
-                    {formatCurrency(paidAmount, initialFeeCurrency)}
+                    {formatCurrency(paidAmount, initialFeeCurrency, locale)}
                   </span>
                 )}
               </div>
               <div className="flex justify-between text-sm items-center pt-1 border-t border-border/50">
-                <span className="text-muted font-medium">Balance</span>
+                <span className="text-muted font-medium">{t("balanceLabel")}</span>
                 <span className="text-xs font-medium" style={{ color: balance > 0 ? "var(--signal)" : "var(--text)" }}>
-                  {formatCurrency(balance, initialFeeCurrency)}
+                  {formatCurrency(balance, initialFeeCurrency, locale)}
                 </span>
               </div>
             </>
@@ -941,6 +962,7 @@ type ReleaseNotesEditorProps = {
 };
 
 export function ReleaseNotesEditor({ releaseId, initialValue }: ReleaseNotesEditorProps) {
+  const t = useTranslations("releaseDetail");
   const handleSave = async (value: string) => {
     const supabase = createSupabaseBrowserClient();
     const { error } = await supabase
@@ -952,10 +974,10 @@ export function ReleaseNotesEditor({ releaseId, initialValue }: ReleaseNotesEdit
 
   return (
     <InternalNotesEditor
-      label="RELEASE NOTES"
+      label={t("releaseNotes")}
       initialValue={initialValue}
       onSave={handleSave}
-      placeholder="Private notes about this release..."
+      placeholder={t("releaseNotesPlaceholder")}
     />
   );
 }
@@ -969,6 +991,7 @@ type ClientNotesEditorProps = {
 };
 
 export function ClientNotesEditor({ clientEmail, artistName, initialNotes }: ClientNotesEditorProps) {
+  const t = useTranslations("releaseDetail");
   const noteKey = clientEmail || (artistName ? `artist:${artistName.toLowerCase()}` : null);
 
   const handleSave = async (value: string) => {
@@ -989,10 +1012,10 @@ export function ClientNotesEditor({ clientEmail, artistName, initialNotes }: Cli
 
   return (
     <InternalNotesEditor
-      label="CLIENT NOTES"
+      label={t("clientNotes")}
       initialValue={initialNotes}
       onSave={handleSave}
-      placeholder="Private notes about this client..."
+      placeholder={t("clientNotesPlaceholder")}
     />
   );
 }
