@@ -36,7 +36,7 @@ function SpotlightCard({
   release: FeaturedRelease;
   className?: string;
 }) {
-  const isGuest = release.author_name !== "Mix Architect";
+  const isGuest = release.author_name && release.author_name !== "Mix Architect";
 
   return (
     <div
@@ -102,7 +102,7 @@ function ArchiveCard({
   showNowFeatured?: boolean;
   className?: string;
 }) {
-  const isGuest = release.author_name !== "Mix Architect";
+  const isGuest = release.author_name && release.author_name !== "Mix Architect";
 
   return (
     <Link

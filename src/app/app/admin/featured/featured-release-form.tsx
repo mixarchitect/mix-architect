@@ -286,7 +286,7 @@ export function FeaturedReleaseForm({ action, release }: Props) {
             name="credits"
             defaultValue={release?.credits ?? ""}
             rows={3}
-            placeholder="Producer, mixer, mastering engineer, etc."
+            placeholder={"One credit per line, e.g.:\nAaron Maine - Composer\nAbby Black - Drums"}
             className="input resize-y"
             onKeyDown={handleTabInTextarea}
           />
