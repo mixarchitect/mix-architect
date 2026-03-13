@@ -6,7 +6,6 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
   getFeaturedReleaseBySlug,
-  getFeaturedReleaseSlugs,
   getRecentFeaturedReleases,
 } from "@/lib/services/featured-releases";
 import { getCoverArtUrl } from "@/types/featured-release";
@@ -19,10 +18,6 @@ import { LandingFooter } from "@/components/landing/footer";
 export const revalidate = 3600;
 
 type Props = { params: Promise<{ slug: string }> };
-
-export async function generateStaticParams() {
-  return [];
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;

@@ -1,8 +1,8 @@
-import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { createSupabasePublicClient } from "@/lib/supabasePublicClient";
 import type { FeaturedRelease } from "@/types/featured-release";
 
 export async function getActiveFeaturedRelease(): Promise<FeaturedRelease | null> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   const { data } = await supabase
     .from("featured_releases")
     .select("*")
@@ -16,7 +16,7 @@ export async function getFeaturedReleases(
   page = 1,
   pageSize = 12,
 ): Promise<{ releases: FeaturedRelease[]; total: number }> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
@@ -35,7 +35,7 @@ export async function getFeaturedReleases(
 export async function getFeaturedReleaseBySlug(
   slug: string,
 ): Promise<FeaturedRelease | null> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   const { data } = await supabase
     .from("featured_releases")
     .select("*")
@@ -45,7 +45,7 @@ export async function getFeaturedReleaseBySlug(
 }
 
 export async function getFeaturedReleaseSlugs(): Promise<string[]> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   const { data } = await supabase
     .from("featured_releases")
     .select("slug")
@@ -57,7 +57,7 @@ export async function getRecentFeaturedReleases(
   excludeSlug?: string,
   limit = 3,
 ): Promise<FeaturedRelease[]> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   let query = supabase
     .from("featured_releases")
     .select("*")
