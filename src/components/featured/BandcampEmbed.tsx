@@ -18,16 +18,16 @@ export async function BandcampEmbed({ url }: BandcampEmbedProps) {
   const albumId = await fetchBandcampAlbumId(url);
   if (!albumId) return null;
 
-  const embedSrc = `https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=large/bgcol=0a0a0a/linkcol=2dd4bf/minimal=true/transparent=true/`;
+  const embedSrc = `https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=large/bgcol=333333/linkcol=0f91ff/artwork=none/transparent=true/`;
 
   return (
     <div className="my-8 rounded-lg overflow-hidden border border-white/10">
       <p className="text-xs font-semibold tracking-widest uppercase text-zinc-500 px-4 pt-3 pb-2">
         Listen on Bandcamp
       </p>
-      <div style={{ maxWidth: 700 }}>
+      <div>
         <iframe
-          style={{ border: 0, width: "100%", height: 472 }}
+          style={{ border: 0, width: 350, height: 472 }}
           src={embedSrc}
           seamless
           loading="lazy"
