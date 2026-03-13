@@ -387,7 +387,17 @@
     "contact": "Kontakt",
     "searchPlaceholder": "Sök artiklar...",
     "getInTouch": "Hör av dig",
-    "getInTouchDesc": "För direkt support, frågor eller partnerförfrågningar, hör av dig via e-post."
+    "getInTouchDesc": "För direkt support, frågor eller partnerförfrågningar, hör av dig via e-post.",
+    "allCategories": "Alla",
+    "noResults": "Inga artiklar hittades för \"{query}\"",
+    "categories": {
+      "getting-started": "Kom igång",
+      "releases": "Releaser",
+      "audio": "Ljud",
+      "timeline": "Tidslinje",
+      "account": "Konto",
+      "billing": "Fakturering"
+    }
   },
   "approval": {
     "awaitingReview": "Väntar på granskning",

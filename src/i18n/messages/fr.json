@@ -387,7 +387,17 @@
     "contact": "Contact",
     "searchPlaceholder": "Rechercher des articles...",
     "getInTouch": "Nous contacter",
-    "getInTouchDesc": "Pour un support direct, des questions ou des demandes de partenariat, contactez-nous par email."
+    "getInTouchDesc": "Pour un support direct, des questions ou des demandes de partenariat, contactez-nous par email.",
+    "allCategories": "Tout",
+    "noResults": "Aucun article trouvé pour \"{query}\"",
+    "categories": {
+      "getting-started": "Premiers pas",
+      "releases": "Sorties",
+      "audio": "Audio",
+      "timeline": "Chronologie",
+      "account": "Compte",
+      "billing": "Facturation"
+    }
   },
   "approval": {
     "awaitingReview": "En attente de révision",

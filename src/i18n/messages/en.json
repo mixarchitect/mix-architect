@@ -387,7 +387,17 @@
     "contact": "Contact",
     "searchPlaceholder": "Search articles...",
     "getInTouch": "Get in Touch",
-    "getInTouchDesc": "For direct support, questions, or partnership inquiries, reach out via email."
+    "getInTouchDesc": "For direct support, questions, or partnership inquiries, reach out via email.",
+    "allCategories": "All",
+    "noResults": "No articles found for \"{query}\"",
+    "categories": {
+      "getting-started": "Getting Started",
+      "releases": "Releases",
+      "audio": "Audio",
+      "timeline": "Timeline",
+      "account": "Account",
+      "billing": "Billing"
+    }
   },
   "approval": {
     "awaitingReview": "Awaiting Review",

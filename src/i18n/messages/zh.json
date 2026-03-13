@@ -387,7 +387,17 @@
     "contact": "联系我们",
     "searchPlaceholder": "搜索文章...",
     "getInTouch": "联系我们",
-    "getInTouchDesc": "如需直接支持、问询或合作咨询，请通过邮件联系我们。"
+    "getInTouchDesc": "如需直接支持、问询或合作咨询，请通过邮件联系我们。",
+    "allCategories": "全部",
+    "noResults": "未找到\"{query}\"相关文章",
+    "categories": {
+      "getting-started": "入门指南",
+      "releases": "发行",
+      "audio": "音频",
+      "timeline": "时间线",
+      "account": "账户",
+      "billing": "账单"
+    }
   },
   "approval": {
     "awaitingReview": "等待审查",

@@ -1,16 +1,5 @@
 import type { HelpArticle } from "./types";
 
-const CATEGORY_LABELS: Record<string, string> = {
-  "getting-started": "Getting Started",
-  releases: "Releases",
-  audio: "Audio",
-  timeline: "Timeline",
-  account: "Account",
-  billing: "Billing",
-};
-
-export { CATEGORY_LABELS };
-
 export const articles: HelpArticle[] = [
   /* ──────────────────────────────────────────────────────
      GETTING STARTED

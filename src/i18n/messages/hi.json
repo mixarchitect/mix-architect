@@ -387,7 +387,17 @@
     "contact": "कॉन्टैक्ट",
     "searchPlaceholder": "आर्टिकल सर्च करें...",
     "getInTouch": "संपर्क में रहें",
-    "getInTouchDesc": "डायरेक्ट सपोर्ट, सवाल या पार्टनरशिप इंक्वायरी के लिए, ईमेल के जरिए संपर्क करें।"
+    "getInTouchDesc": "डायरेक्ट सपोर्ट, सवाल या पार्टनरशिप इंक्वायरी के लिए, ईमेल के जरिए संपर्क करें।",
+    "allCategories": "सभी",
+    "noResults": "\"{query}\" के लिए कोई लेख नहीं मिला",
+    "categories": {
+      "getting-started": "शुरू करें",
+      "releases": "रिलीज़",
+      "audio": "ऑडियो",
+      "timeline": "टाइमलाइन",
+      "account": "खाता",
+      "billing": "बिलिंग"
+    }
   },
   "approval": {
     "awaitingReview": "रिव्यू का इंतज़ार",

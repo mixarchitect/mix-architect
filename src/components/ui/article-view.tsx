@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type { HelpArticle, ArticleCategory } from "@/lib/help/types";
-import { CATEGORY_LABELS } from "@/lib/help/articles";
 import { ScreenMockup } from "@/components/ui/screen-mockup";
 
 /** Wrap occurrences of `highlight` in <mark> tags within a plain string. */
@@ -55,7 +55,8 @@ type Props = {
 };
 
 export function ArticleView({ article, onBack, highlight }: Props) {
-  const categoryLabel = CATEGORY_LABELS[article.category];
+  const t = useTranslations("help");
+  const categoryLabel = t(`categories.${article.category}`);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Scroll to the first highlighted <mark> on mount
@@ -76,7 +77,7 @@ export function ArticleView({ article, onBack, highlight }: Props) {
           onClick={() => onBack()}
           className="text-muted hover:text-text transition-colors"
         >
-          Help Articles
+          {t("articles")}
         </button>
         <span className="text-faint">/</span>
         <button

@@ -387,7 +387,17 @@
     "contact": "Kontakt",
     "searchPlaceholder": "Artikel durchsuchen...",
     "getInTouch": "Kontakt aufnehmen",
-    "getInTouchDesc": "Für direkten Support, Fragen oder Partnerschaftsanfragen erreiche uns per E-Mail."
+    "getInTouchDesc": "Für direkten Support, Fragen oder Partnerschaftsanfragen erreiche uns per E-Mail.",
+    "allCategories": "Alle",
+    "noResults": "Keine Artikel gefunden für \"{query}\"",
+    "categories": {
+      "getting-started": "Erste Schritte",
+      "releases": "Veröffentlichungen",
+      "audio": "Audio",
+      "timeline": "Zeitstrahl",
+      "account": "Konto",
+      "billing": "Abrechnung"
+    }
   },
   "approval": {
     "awaitingReview": "Wartet auf Überprüfung",

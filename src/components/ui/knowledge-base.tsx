@@ -2,25 +2,50 @@
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import Fuse, { type FuseResultMatch } from "fuse.js";
 import { cn } from "@/lib/cn";
-import { articles, CATEGORY_LABELS } from "@/lib/help/articles";
+import { articles as articlesEn } from "@/lib/help/articles";
+import { getArticlesAsync } from "@/lib/help/articles-loader";
 import type { HelpArticle, ArticleCategory } from "@/lib/help/types";
 import { ArticleView } from "@/components/ui/article-view";
 
-const CATEGORIES = Object.keys(CATEGORY_LABELS) as ArticleCategory[];
+const CATEGORIES: ArticleCategory[] = [
+  "getting-started",
+  "releases",
+  "audio",
+  "timeline",
+  "account",
+  "billing",
+];
 
-const fuse = new Fuse(articles, {
-  keys: ["title", "summary", "tags", "content.heading", "content.body"],
-  threshold: 0.35,
-  ignoreLocation: true,
-  includeScore: true,
-  includeMatches: true,
-});
+function buildFuse(items: HelpArticle[]) {
+  return new Fuse(items, {
+    keys: ["title", "summary", "tags", "content.heading", "content.body"],
+    threshold: 0.35,
+    ignoreLocation: true,
+    includeScore: true,
+    includeMatches: true,
+  });
+}
 
 type SearchResult = { article: HelpArticle; matches: readonly FuseResultMatch[] };
 
 export function KnowledgeBase({ query = "" }: { query?: string }) {
+  const locale = useLocale();
+  const t = useTranslations("help");
+
+  // Load locale-specific articles
+  const [articles, setArticles] = useState<HelpArticle[]>(articlesEn);
+  useEffect(() => {
+    let cancelled = false;
+    getArticlesAsync(locale).then((a) => {
+      if (!cancelled) setArticles(a);
+    });
+    return () => { cancelled = true; };
+  }, [locale]);
+
+  const fuse = useMemo(() => buildFuse(articles), [articles]);
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -119,7 +144,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
                   : "text-muted hover:text-text hover:bg-panel2",
               )}
             >
-              All
+              {t("allCategories")}
             </button>
             {CATEGORIES.map((cat) => (
               <button
@@ -133,7 +158,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
                     : "text-muted hover:text-text hover:bg-panel2",
                 )}
               >
-                {CATEGORY_LABELS[cat]}
+                {t(`categories.${cat}`)}
               </button>
             ))}
           </nav>
@@ -149,7 +174,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
               !selectedCategory && "pill-active",
             )}
           >
-            All
+            {t("allCategories")}
           </button>
           {CATEGORIES.map((cat) => (
             <button
@@ -161,7 +186,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
                 selectedCategory === cat && "pill-active",
               )}
             >
-              {CATEGORY_LABELS[cat]}
+              {t(`categories.${cat}`)}
             </button>
           ))}
         </div>
@@ -173,7 +198,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
             <div className="space-y-2">
               {displayedResults.length === 0 ? (
                 <p className="text-muted text-sm py-8 text-center">
-                  No articles found for &ldquo;{query}&rdquo;
+                  {t("noResults", { query })}
                 </p>
               ) : (
                 displayedResults.map((r) => (
@@ -193,7 +218,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
               {Object.entries(grouped).map(([cat, items]) => (
                 <div key={cat}>
                   <div className="label text-faint mb-3">
-                    {CATEGORY_LABELS[cat] ?? cat}
+                    {t(`categories.${cat}`)}
                   </div>
                   <div className="space-y-2">
                     {items.map((article) => (
