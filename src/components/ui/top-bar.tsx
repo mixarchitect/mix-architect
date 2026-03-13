@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, HelpCircle, Sun, Moon, Monitor, LogOut, Settings, Download, Bug } from "lucide-react";
+import { Search, HelpCircle, Sun, Moon, Monitor, LogOut, Settings, Download, Bug, Sparkles } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/cn";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -70,6 +70,17 @@ export function TopBar({ userId, userEmail, onSearchClick }: Props) {
           <span className="flex-1 text-left">Search...</span>
           <kbd className="text-[10px] font-medium text-faint bg-panel border border-border rounded px-1.5 py-0.5">⌘K</kbd>
         </button>
+
+        {/* Featured releases */}
+        <Tooltip label="Featured Releases" align="right">
+          <Link
+            href="/featured"
+            aria-label="Featured Releases"
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
+          >
+            <Sparkles size={18} strokeWidth={1.5} />
+          </Link>
+        </Tooltip>
 
         {/* Notification bell */}
         {userId && (
