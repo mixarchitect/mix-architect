@@ -109,8 +109,14 @@ export default async function FeaturedReleasePage({ params }: Props) {
     },
   };
 
+  // Strip leading spaces from each line (prevents Markdown code-block interpretation)
+  const cleanBody = release.body
+    .split("\n")
+    .map((line) => line.replace(/^[ \t]+/, ""))
+    .join("\n");
+
   // Split body for pull quote insertion (~40% mark)
-  const bodyLines = release.body.split("\n\n");
+  const bodyLines = cleanBody.split("\n\n");
   const splitIndex = Math.max(1, Math.floor(bodyLines.length * 0.4));
   const bodyBefore = bodyLines.slice(0, splitIndex).join("\n\n");
   const bodyAfter = bodyLines.slice(splitIndex).join("\n\n");
