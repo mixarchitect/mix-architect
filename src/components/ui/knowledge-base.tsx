@@ -71,7 +71,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
   const activeArticle = useMemo(() => {
     if (!articleParam) return null;
     return articles.find((a) => a.id === articleParam) ?? null;
-  }, [articleParam]);
+  }, [articleParam, articles]);
 
   const setActiveArticle = useCallback(
     (article: HelpArticle | null, searchQuery?: string) => {
@@ -92,7 +92,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
   const results = useMemo((): SearchResult[] | null => {
     if (!query.trim()) return null;
     return fuse.search(query).map((r) => ({ article: r.item, matches: r.matches ?? [] }));
-  }, [query]);
+  }, [query, fuse]);
 
   // Search always returns all articles regardless of category filter
   const displayedResults = results;
@@ -101,7 +101,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
     if (displayedResults) return displayedResults.map((r) => r.article);
     if (selectedCategory) return articles.filter((a) => a.category === selectedCategory);
     return articles;
-  }, [displayedResults, selectedCategory]);
+  }, [displayedResults, selectedCategory, articles]);
 
   // Grouped view (no search query)
   const grouped = useMemo(() => {
