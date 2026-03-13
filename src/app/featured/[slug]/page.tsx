@@ -124,7 +124,7 @@ export default async function FeaturedReleasePage({ params }: Props) {
       />
 
       <div className="pt-28 pb-20 px-6">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-4xl">
           {/* Back link */}
           <Link
             href="/featured"
@@ -183,32 +183,34 @@ export default async function FeaturedReleasePage({ params }: Props) {
           </div>
 
           {/* Author byline */}
-          <div className="mb-8">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-zinc-300 font-medium">
-                {release.author_url ? (
-                  <a
-                    href={release.author_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-teal-400 transition-colors"
-                  >
-                    By {release.author_name}
-                  </a>
-                ) : (
-                  <>By {release.author_name}</>
-                )}
-              </span>
+          {release.author_name && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-zinc-300 font-medium">
+                  {release.author_url ? (
+                    <a
+                      href={release.author_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-teal-400 transition-colors"
+                    >
+                      By {release.author_name}
+                    </a>
+                  ) : (
+                    <>By {release.author_name}</>
+                  )}
+                </span>
+              </div>
+              {release.author_bio && (
+                <p className="text-sm text-zinc-500 italic mt-1">
+                  {release.author_bio}
+                </p>
+              )}
             </div>
-            {release.author_bio && (
-              <p className="text-sm text-zinc-500 italic mt-1">
-                {release.author_bio}
-              </p>
-            )}
-          </div>
+          )}
 
           {/* Body (Markdown) */}
-          <div className="prose prose-invert prose-zinc prose-sm max-w-none prose-headings:text-white prose-a:text-teal-400 prose-blockquote:border-teal-500">
+          <div className="prose prose-invert prose-zinc prose-base max-w-none font-sans prose-headings:text-white prose-headings:font-sans prose-a:text-teal-400 prose-blockquote:border-teal-500 prose-code:font-sans prose-pre:font-sans">
             <Markdown remarkPlugins={[remarkGfm]}>{bodyBefore}</Markdown>
 
             {release.pull_quote && (
@@ -228,7 +230,11 @@ export default async function FeaturedReleasePage({ params }: Props) {
               <h3 className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-3">
                 Credits
               </h3>
-              <p className="text-sm text-zinc-500">{release.credits}</p>
+              <div className="text-sm text-zinc-500 space-y-1">
+                {release.credits.split(/\n|\\n/).map((line, i) => (
+                  <p key={i}>{line.trim()}</p>
+                ))}
+              </div>
             </div>
           )}
 

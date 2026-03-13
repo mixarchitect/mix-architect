@@ -152,7 +152,7 @@ export function FeaturedReleaseForm({ action, release }: Props) {
           <input
             name="author_name"
             type="text"
-            defaultValue={release?.author_name ?? "Mix Architect"}
+            defaultValue={release?.author_name ?? ""}
             className="input"
           />
         </Field>
