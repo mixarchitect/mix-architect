@@ -21,6 +21,7 @@ export interface FeaturedRelease {
   link_tidal: string | null;
   link_amazon_music: string | null;
   link_deezer: string | null;
+  link_qobuz: string | null;
   link_website: string | null;
   genre_tags: string[];
   credits: string | null;
@@ -52,6 +53,7 @@ const STREAMING_PLATFORMS: {
   { key: "link_tidal", platform: "Tidal", icon: "tidal" },
   { key: "link_amazon_music", platform: "Amazon Music", icon: "amazon" },
   { key: "link_deezer", platform: "Deezer", icon: "deezer" },
+  { key: "link_qobuz", platform: "Qobuz", icon: "qobuz" },
   { key: "link_website", platform: "Website", icon: "globe" },
 ];
 

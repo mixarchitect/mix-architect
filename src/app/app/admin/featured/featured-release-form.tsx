@@ -249,6 +249,7 @@ export function FeaturedReleaseForm({ action, release }: Props) {
           { name: "link_tidal", label: "Tidal" },
           { name: "link_amazon_music", label: "Amazon Music" },
           { name: "link_deezer", label: "Deezer" },
+          { name: "link_qobuz", label: "Qobuz" },
           { name: "link_website", label: "Website" },
         ].map(({ name, label }) => (
           <Field key={name} label={label}>

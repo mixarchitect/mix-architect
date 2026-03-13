@@ -8,5 +8,6 @@ export const PLATFORM_ICON_SRC: Record<string, string> = {
   tidal: "/icons/streaming/tidal.svg",
   amazon: "/icons/streaming/amazon-music.svg",
   deezer: "/icons/streaming/deezer.svg",
+  qobuz: "/icons/streaming/qobuz.svg",
   globe: "/icons/streaming/globe.svg",
 };
