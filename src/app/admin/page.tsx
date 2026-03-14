@@ -7,11 +7,23 @@ import {
   DollarSign,
   TrendingDown,
   ArrowUpRight,
+  ArrowUp,
+  ArrowDown,
   UserPlus,
 } from "lucide-react";
 import Link from "next/link";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+import { DashboardRangeSelector } from "@/components/admin/DashboardRangeSelector";
 import { fetchUserDisplayMap } from "@/lib/admin-users";
+import {
+  type PresetKey,
+  type CompareKey,
+  resolvePreset,
+  resolveComparison,
+  parseDateISO,
+  startOfDay,
+  endOfDay,
+} from "@/lib/admin-date-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -23,76 +35,187 @@ const currencyFmt = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 0,
 });
 
+const PRESET_KEYS = ["today", "yesterday", "7d", "30d", "90d", "365d"];
+const COMPARE_KEYS = ["none", "previous_period", "previous_year"];
+
 interface StatCard {
   label: string;
   value: string;
   icon: typeof Users;
   href?: string;
   color: string;
+  currentRaw?: number;
+  previousRaw?: number;
 }
 
-export default async function AdminDashboard() {
+interface Props {
+  searchParams: Promise<{
+    range?: string;
+    from?: string;
+    to?: string;
+    compare?: string;
+  }>;
+}
+
+export default async function AdminDashboard({ searchParams }: Props) {
+  const {
+    range: rawRange,
+    from: rawFrom,
+    to: rawTo,
+    compare: rawCompare,
+  } = await searchParams;
+
   const supabase = createSupabaseServiceClient();
 
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  // Resolve date boundaries
+  let periodFrom: Date;
+  let periodTo: Date;
+  let periodLabel: string;
+  const isCustom = rawRange === "custom" && rawFrom && rawTo;
 
-  // Run all counts in parallel
-  const [
-    subsRes,
-    proRes,
-    churnRes,
-    activityRes,
-    profilesRes,
-    signupsRes,
-    cancellationsRes,
-  ] = await Promise.all([
-    supabase.from("subscriptions").select("id", { count: "exact", head: true }),
-    supabase
-      .from("subscriptions")
-      .select("id", { count: "exact", head: true })
-      .eq("plan", "pro")
-      .eq("status", "active"),
-    supabase
-      .from("admin_churn_signals")
-      .select("id", { count: "exact", head: true })
-      .eq("resolved", false),
-    supabase
-      .from("admin_activity_log")
-      .select("id", { count: "exact", head: true })
-      .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
-    supabase
-      .from("admin_activity_log")
-      .select("id", { count: "exact", head: true })
-      .eq("event_type", "signup")
-      .gte("created_at", sevenDaysAgo),
-    supabase
-      .from("admin_activity_log")
-      .select("id", { count: "exact", head: true })
-      .eq("event_type", "subscription_cancelled")
-      .gte("created_at", thirtyDaysAgo),
-  ]);
+  if (isCustom) {
+    periodFrom = parseDateISO(rawFrom) ?? startOfDay(new Date());
+    periodTo = endOfDay(parseDateISO(rawTo) ?? new Date());
+    const fmtOpts: Intl.DateTimeFormatOptions = {
+      month: "short",
+      day: "numeric",
+    };
+    periodLabel = `${periodFrom.toLocaleDateString("en-US", fmtOpts)} - ${periodTo.toLocaleDateString("en-US", fmtOpts)}`;
+  } else {
+    const presetKey: PresetKey = PRESET_KEYS.includes(rawRange ?? "")
+      ? (rawRange as PresetKey)
+      : "today";
+    const preset = resolvePreset(presetKey);
+    periodFrom = preset.from;
+    periodTo = preset.to;
+    const labels: Record<string, string> = {
+      today: "Today",
+      yesterday: "Yesterday",
+      "7d": "7d",
+      "30d": "30d",
+      "90d": "90d",
+      "365d": "365d",
+    };
+    periodLabel = labels[presetKey] ?? "Today";
+  }
+
+  const since = periodFrom.toISOString();
+  const until = periodTo.toISOString();
+
+  // Resolve comparison period
+  const compareKey: CompareKey = COMPARE_KEYS.includes(rawCompare ?? "")
+    ? (rawCompare as CompareKey)
+    : "none";
+  const compPeriod = resolveComparison(periodFrom, periodTo, compareKey);
+
+  // Helper: apply date range filter
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function withRange(query: any, s: string, u: string) {
+    return query.gte("created_at", s).lte("created_at", u);
+  }
+
+  // Run current period queries
+  const [proRes, churnRes, activityRes, profilesRes, signupsRes, cancellationsRes] =
+    await Promise.all([
+      supabase
+        .from("subscriptions")
+        .select("id", { count: "exact", head: true })
+        .eq("plan", "pro")
+        .eq("status", "active"),
+      supabase
+        .from("admin_churn_signals")
+        .select("id", { count: "exact", head: true })
+        .eq("resolved", false),
+      withRange(
+        supabase
+          .from("admin_activity_log")
+          .select("id", { count: "exact", head: true }),
+        since,
+        until,
+      ),
+      supabase.from("profiles").select("id", { count: "exact", head: true }),
+      withRange(
+        supabase
+          .from("admin_activity_log")
+          .select("id", { count: "exact", head: true })
+          .eq("event_type", "signup"),
+        since,
+        until,
+      ),
+      withRange(
+        supabase
+          .from("admin_activity_log")
+          .select("id", { count: "exact", head: true })
+          .eq("event_type", "subscription_cancelled"),
+        since,
+        until,
+      ),
+    ]);
+
+  // Run comparison period queries (if active)
+  let compSignups: number | undefined;
+  let compCancellations: number | undefined;
+  let compActivity: number | undefined;
+
+  if (compPeriod) {
+    const cs = compPeriod.from.toISOString();
+    const cu = compPeriod.to.toISOString();
+
+    const [cSignupsRes, cCancRes, cActivityRes] = await Promise.all([
+      withRange(
+        supabase
+          .from("admin_activity_log")
+          .select("id", { count: "exact", head: true })
+          .eq("event_type", "signup"),
+        cs,
+        cu,
+      ),
+      withRange(
+        supabase
+          .from("admin_activity_log")
+          .select("id", { count: "exact", head: true })
+          .eq("event_type", "subscription_cancelled"),
+        cs,
+        cu,
+      ),
+      withRange(
+        supabase
+          .from("admin_activity_log")
+          .select("id", { count: "exact", head: true }),
+        cs,
+        cu,
+      ),
+    ]);
+
+    compSignups = cSignupsRes.count ?? 0;
+    compCancellations = cCancRes.count ?? 0;
+    compActivity = cActivityRes.count ?? 0;
+  }
 
   const activePro = proRes.count ?? 0;
   const totalUsers = profilesRes.count ?? 0;
-  const cancellationsLast30d = cancellationsRes.count ?? 0;
-  const newSignups7d = signupsRes.count ?? 0;
+  const cancellations = cancellationsRes.count ?? 0;
+  const newSignups = signupsRes.count ?? 0;
+  const events = activityRes.count ?? 0;
 
-  // MRR
+  // MRR (always current)
   const mrr = activePro * PRO_PRICE;
 
-  // Churn rate (30d)
-  const periodStartSubs = activePro + cancellationsLast30d;
+  // Churn rate for selected period
+  const periodStartSubs = activePro + cancellations;
   const churnRate =
-    periodStartSubs > 0 ? (cancellationsLast30d / periodStartSubs) * 100 : 0;
+    periodStartSubs > 0 ? (cancellations / periodStartSubs) * 100 : 0;
 
-  // Conversion rate
+  // Conversion rate (always current)
   const conversionRate =
     totalUsers > 0 ? (activePro / totalUsers) * 100 : 0;
 
   const churnColor =
-    churnRate <= 5 ? "text-emerald-400" : churnRate <= 10 ? "text-amber-400" : "text-red-400";
+    churnRate <= 5
+      ? "text-emerald-400"
+      : churnRate <= 10
+        ? "text-amber-400"
+        : "text-red-400";
 
   const row1: StatCard[] = [
     {
@@ -110,11 +233,13 @@ export default async function AdminDashboard() {
       color: "text-emerald-400",
     },
     {
-      label: "New Signups (7d)",
-      value: String(newSignups7d),
+      label: `New Signups (${periodLabel})`,
+      value: String(newSignups),
       icon: UserPlus,
       href: "/admin/activity",
       color: "text-purple-400",
+      currentRaw: newSignups,
+      previousRaw: compSignups,
     },
   ];
 
@@ -132,7 +257,7 @@ export default async function AdminDashboard() {
       color: "text-blue-400",
     },
     {
-      label: "Churn Rate (30d)",
+      label: `Churn Rate (${periodLabel})`,
       value: `${churnRate.toFixed(1)}%`,
       icon: TrendingDown,
       color: churnColor,
@@ -148,34 +273,48 @@ export default async function AdminDashboard() {
       color: "text-amber-400",
     },
     {
-      label: "Events (24h)",
-      value: String(activityRes.count ?? 0),
+      label: `Events (${periodLabel})`,
+      value: String(events),
       icon: Activity,
       href: "/admin/activity",
       color: "text-purple-400",
+      currentRaw: events,
+      previousRaw: compActivity,
     },
   ];
 
-  // Recent activity for the feed
-  const { data: recentEvents } = await supabase
-    .from("admin_activity_log")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(10);
+  // Recent activity for the feed (also date-filtered)
+  const { data: recentEvents } = await withRange(
+    supabase
+      .from("admin_activity_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10),
+    since,
+    until,
+  );
 
   // Get user display names for recent events
-  const eventUserIds = [
-    ...new Set(
-      (recentEvents ?? []).map((e: { user_id: string }) => e.user_id),
-    ),
-  ];
+  const events2 = (recentEvents ?? []) as { user_id: string }[];
+  const eventUserIds = [...new Set(events2.map((e) => e.user_id))];
   const userNames = await fetchUserDisplayMap(eventUserIds);
+
+  // Build range props for the selector
+  const currentRange = isCustom ? "custom" : (rawRange ?? "today");
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-text">Dashboard</h1>
-        <AdminRefreshBar />
+        <div className="flex items-center gap-3">
+          <DashboardRangeSelector
+            range={currentRange}
+            from={isCustom ? rawFrom : undefined}
+            to={isCustom ? rawTo : undefined}
+            compare={rawCompare}
+          />
+          <AdminRefreshBar />
+        </div>
       </div>
 
       {/* Stat cards - Row 1: Users */}
@@ -248,6 +387,39 @@ export default async function AdminDashboard() {
 }
 
 function StatCardEl({ stat }: { stat: StatCard }) {
+  const hasDelta =
+    stat.currentRaw !== undefined &&
+    stat.previousRaw !== undefined;
+
+  let deltaEl: React.ReactNode = null;
+
+  if (hasDelta) {
+    const curr = stat.currentRaw!;
+    const prev = stat.previousRaw!;
+
+    if (prev === 0 && curr > 0) {
+      deltaEl = (
+        <span className="text-[11px] text-emerald-400 flex items-center gap-0.5 mt-1">
+          <ArrowUp size={10} /> New
+        </span>
+      );
+    } else if (prev > 0) {
+      const pctChange = ((curr - prev) / prev) * 100;
+      if (Math.abs(pctChange) >= 0.5) {
+        const isUp = pctChange > 0;
+        deltaEl = (
+          <span
+            className={`text-[11px] flex items-center gap-0.5 mt-1 ${isUp ? "text-emerald-400" : "text-red-400"}`}
+          >
+            {isUp ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
+            {isUp ? "+" : ""}
+            {pctChange.toFixed(1)}%
+          </span>
+        );
+      }
+    }
+  }
+
   const inner = (
     <>
       <div className="flex items-center gap-2 mb-2">
@@ -257,6 +429,7 @@ function StatCardEl({ stat }: { stat: StatCard }) {
         </span>
       </div>
       <div className="text-3xl font-bold text-text">{stat.value}</div>
+      {deltaEl}
     </>
   );
 

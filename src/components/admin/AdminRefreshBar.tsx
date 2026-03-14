@@ -31,7 +31,7 @@ export function AdminRefreshBar({ intervalMs = 30_000 }: { intervalMs?: number }
 
   return (
     <div className="flex items-center gap-2 text-xs text-faint">
-      <span>Updated {timeAgo}</span>
+      <span className="min-w-[90px] text-right">Updated {timeAgo}</span>
       <button
         onClick={handleRefresh}
         className="p-1 rounded hover:bg-panel2 transition-colors text-muted hover:text-text"
