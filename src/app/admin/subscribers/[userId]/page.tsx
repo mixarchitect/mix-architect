@@ -112,8 +112,8 @@ export default async function UserDetailPage({ params }: Props) {
         <div className="flex items-start justify-between mb-3">
           <div>
             <h1 className="text-2xl font-bold text-text">{name}</h1>
-            {profile.full_name && profile.email && (
-              <p className="text-sm text-muted mt-0.5">{String(profile.email)}</p>
+            {typeof profile.full_name === "string" && typeof profile.email === "string" && (
+              <p className="text-sm text-muted mt-0.5">{profile.email}</p>
             )}
           </div>
           <span

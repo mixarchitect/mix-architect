@@ -3,7 +3,17 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Gift, UserPlus, XCircle, CheckCircle, AlertTriangle } from "lucide-react";
+import { Gift, UserPlus, XCircle, CheckCircle, AlertTriangle, Clock } from "lucide-react";
+
+type Duration = "indefinite" | "30d" | "90d" | "6m" | "1y";
+
+const durationOptions: { value: Duration; label: string }[] = [
+  { value: "indefinite", label: "Indefinite" },
+  { value: "30d", label: "30 days" },
+  { value: "90d", label: "90 days" },
+  { value: "6m", label: "6 months" },
+  { value: "1y", label: "1 year" },
+];
 
 interface CompAccount {
   id: string;
@@ -12,6 +22,7 @@ interface CompAccount {
   plan: string;
   status: string;
   created_at: string;
+  current_period_end: string | null;
 }
 
 interface UserOption {
@@ -29,6 +40,7 @@ export function CompAccountsPanel({
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [reason, setReason] = useState("");
+  const [duration, setDuration] = useState<Duration>("indefinite");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMsg, setStatusMsg] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -60,6 +72,7 @@ export function CompAccountsPanel({
             userId: selectedUser.userId,
             action: "grant",
             reason: reason || undefined,
+            duration,
           }),
         });
 
@@ -72,6 +85,7 @@ export function CompAccountsPanel({
         setStatusMsg("Comp account granted");
         setEmail("");
         setReason("");
+        setDuration("indefinite");
         router.refresh();
         setTimeout(() => setStatus("idle"), 3000);
       } catch (err) {
@@ -137,17 +151,35 @@ export function CompAccountsPanel({
             </datalist>
           </div>
 
-          <div>
-            <label className="text-xs text-muted uppercase tracking-wider mb-1 block">
-              Reason (optional)
-            </label>
-            <input
-              type="text"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="e.g. Beta tester, press comp, partnership"
-              className="w-full rounded-md border border-border bg-panel px-3 py-2 text-sm text-text placeholder:text-faint focus:outline-none focus:border-amber-500/50"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs text-muted uppercase tracking-wider mb-1 block">
+                Duration *
+              </label>
+              <select
+                value={duration}
+                onChange={(e) => setDuration(e.target.value as Duration)}
+                className="w-full rounded-md border border-border bg-panel px-3 py-2 text-sm text-text focus:outline-none focus:border-amber-500/50"
+              >
+                {durationOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs text-muted uppercase tracking-wider mb-1 block">
+                Reason (optional)
+              </label>
+              <input
+                type="text"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="e.g. Beta tester, press comp"
+                className="w-full rounded-md border border-border bg-panel px-3 py-2 text-sm text-text placeholder:text-faint focus:outline-none focus:border-amber-500/50"
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -193,7 +225,19 @@ export function CompAccountsPanel({
           </div>
         ) : (
           <div className="rounded-lg border border-border bg-panel divide-y divide-border">
-            {compAccounts.map((comp) => (
+            {compAccounts.map((comp) => {
+              const expiresAt = comp.current_period_end
+                ? new Date(comp.current_period_end)
+                : null;
+              const now = new Date();
+              const daysUntilExpiry = expiresAt
+                ? Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+                : null;
+              const isExpiringSoon =
+                daysUntilExpiry !== null && daysUntilExpiry > 0 && daysUntilExpiry <= 7;
+              const isExpired = daysUntilExpiry !== null && daysUntilExpiry <= 0;
+
+              return (
               <div key={comp.id} className="px-4 py-3 flex items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
@@ -203,21 +247,41 @@ export function CompAccountsPanel({
                     <span
                       className={cn(
                         "text-xs px-1.5 py-0.5 rounded border capitalize",
-                        comp.status === "active"
+                        comp.status === "active" && !isExpired
                           ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
                           : "text-red-400 bg-red-500/10 border-red-500/20",
                       )}
                     >
-                      {comp.plan} / {comp.status}
+                      {isExpired ? "expired" : `${comp.plan} / ${comp.status}`}
                     </span>
+                    {isExpiringSoon && (
+                      <span className="flex items-center gap-1 text-xs text-amber-400">
+                        <Clock size={10} />
+                        {daysUntilExpiry}d left
+                      </span>
+                    )}
                   </div>
-                  <div className="text-xs text-faint">
-                    Granted{" "}
-                    {new Date(comp.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                  <div className="text-xs text-faint flex items-center gap-3">
+                    <span>
+                      Granted{" "}
+                      {new Date(comp.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                    {expiresAt ? (
+                      <span className={cn(isExpired ? "text-red-400" : isExpiringSoon ? "text-amber-400" : "")}>
+                        {isExpired ? "Expired" : "Expires"}{" "}
+                        {expiresAt.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    ) : (
+                      <span>Indefinite</span>
+                    )}
                   </div>
                 </div>
 
@@ -235,7 +299,8 @@ export function CompAccountsPanel({
                   {revoking === comp.user_id ? "Revoking..." : "Revoke"}
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

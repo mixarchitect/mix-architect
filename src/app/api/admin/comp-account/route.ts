@@ -12,6 +12,7 @@ import { logActivity } from "@/lib/activity-logger";
  *   userId: string;
  *   action: "grant" | "revoke";
  *   reason?: string;
+ *   duration?: "indefinite" | "30d" | "90d" | "6m" | "1y";
  * }
  */
 export async function POST(req: NextRequest) {
@@ -25,10 +26,11 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { userId, action, reason } = body as {
+    const { userId, action, reason, duration } = body as {
       userId: string;
       action: "grant" | "revoke";
       reason?: string;
+      duration?: "indefinite" | "30d" | "90d" | "6m" | "1y";
     };
 
     if (!userId || !action || !["grant", "revoke"].includes(action)) {
@@ -41,6 +43,23 @@ export async function POST(req: NextRequest) {
     const serviceClient = createSupabaseServiceClient();
 
     if (action === "grant") {
+      // Calculate expiration date based on duration
+      let expiresAt: string | null = null;
+      if (duration && duration !== "indefinite") {
+        const now = new Date();
+        const durationMap: Record<string, number> = {
+          "30d": 30,
+          "90d": 90,
+          "6m": 182,
+          "1y": 365,
+        };
+        const days = durationMap[duration] ?? 0;
+        if (days > 0) {
+          now.setDate(now.getDate() + days);
+          expiresAt = now.toISOString();
+        }
+      }
+
       // Upsert a subscription with granted_by_admin = true
       const { error } = await serviceClient.from("subscriptions").upsert(
         {
@@ -51,7 +70,7 @@ export async function POST(req: NextRequest) {
           cancel_at_period_end: false,
           stripe_customer_id: null,
           stripe_subscription_id: null,
-          current_period_end: null,
+          current_period_end: expiresAt,
         },
         { onConflict: "user_id" },
       );
@@ -64,6 +83,8 @@ export async function POST(req: NextRequest) {
       logActivity(userId, "comp_account_granted", {
         granted_by: user.id,
         reason: reason || undefined,
+        duration: duration || "indefinite",
+        expires_at: expiresAt || undefined,
       });
     } else {
       // Revoke: set plan back to free
