@@ -107,10 +107,10 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
         type="button"
         onClick={() => active && setOpen((v) => !v)}
         disabled={toggling}
-        className="btn-secondary !px-3 !gap-2"
+        className="btn-secondary !px-2.5 !gap-1.5 !h-8 !min-h-0 !text-xs"
       >
-        <Globe size={16} />
-        <span className="text-sm font-semibold">Portal</span>
+        <Globe size={14} />
+        <span className="text-xs font-semibold">Portal</span>
 
         {/* Toggle switch */}
         <span
@@ -136,7 +136,7 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
               className="inline-flex items-center cursor-pointer text-muted hover:text-text transition-colors"
               title={copied ? "Copied!" : "Copy portal link"}
             >
-              {copied ? <Check size={16} /> : <Share2 size={16} />}
+              {copied ? <Check size={14} /> : <Share2 size={14} />}
             </span>
             <a
               href={`${typeof window !== "undefined" ? window.location.origin : ""}/portal/${share!.share_token}`}
@@ -146,7 +146,7 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
               className="inline-flex items-center text-muted hover:text-text transition-colors"
               title="Open portal"
             >
-              <ExternalLink size={16} />
+              <ExternalLink size={14} />
             </a>
           </>
         )}

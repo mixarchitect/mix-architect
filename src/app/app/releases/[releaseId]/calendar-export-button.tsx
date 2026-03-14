@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CalendarDays } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/button";
 
 export function CalendarExportButton({ releaseId }: { releaseId: string }) {
   const [loading, setLoading] = useState(false);
@@ -33,14 +33,13 @@ export function CalendarExportButton({ releaseId }: { releaseId: string }) {
   }
 
   return (
-    <Button
-      variant="secondary"
-      className="h-8 w-8 p-0"
+    <IconButton
+      size="sm"
       onClick={handleExport}
       disabled={loading}
       title="Export to calendar"
     >
       <CalendarDays size={14} />
-    </Button>
+    </IconButton>
   );
 }

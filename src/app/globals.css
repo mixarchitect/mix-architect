@@ -664,6 +664,26 @@ select.input {
   color: var(--text);
 }
 
+.btn-icon-sm {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--panel);
+  color: var(--muted);
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+
+.btn-icon-sm:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
 .btn-icon-dark {
   width: 40px;
   height: 40px;

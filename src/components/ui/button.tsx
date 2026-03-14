@@ -29,17 +29,20 @@ export function Button({ className, variant = "secondary", ...props }: Props) {
 
 type IconButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "default" | "dark";
+  size?: "default" | "sm";
 };
 
 export function IconButton({
   className,
   variant = "default",
+  size = "default",
   ...props
 }: IconButtonProps) {
   return (
     <button
       className={cn(
-        variant === "default" && "btn-icon",
+        size === "sm" && variant === "default" && "btn-icon-sm",
+        size === "default" && variant === "default" && "btn-icon",
         variant === "dark" && "btn-icon-dark",
         className
       )}

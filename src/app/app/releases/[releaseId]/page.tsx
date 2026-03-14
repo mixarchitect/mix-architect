@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button, IconButton } from "@/components/ui/button";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -194,9 +194,9 @@ export default async function ReleasePage({ params }: Props) {
           )}
           {canEdit(role) && (
             <Link href={`/app/releases/${releaseId}/settings`}>
-              <Button variant="secondary" className="h-8 w-8 p-0" title="Release settings">
+              <IconButton size="sm" title="Release settings">
                 <Settings size={14} />
-              </Button>
+              </IconButton>
             </Link>
           )}
         </div>

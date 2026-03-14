@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/button";
 import { LayoutTemplate } from "lucide-react";
 import { SaveAsTemplateModal } from "./save-as-template-modal";
 
@@ -15,14 +15,13 @@ export function SaveAsTemplateButton({ releaseId, releaseTitle }: Props) {
 
   return (
     <>
-      <Button
-        variant="secondary"
-        className="h-8 w-8 p-0"
+      <IconButton
+        size="sm"
         onClick={() => setOpen(true)}
         title="Save as template"
       >
         <LayoutTemplate size={14} />
-      </Button>
+      </IconButton>
 
       {open && (
         <SaveAsTemplateModal
