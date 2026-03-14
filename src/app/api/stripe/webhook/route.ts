@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { stripe } from "@/lib/stripe-server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { logActivity } from "@/lib/activity-logger";
+import { createChurnSignal, resolveChurnSignals } from "@/lib/churn-detection";
 
 /**
  * In Stripe API v2025+, current_period_end lives on the subscription
@@ -152,8 +153,20 @@ export async function POST(req: NextRequest) {
           if (existingSub.user_id) {
             if (mappedStatus === "active") {
               logActivity(existingSub.user_id, "subscription_renewed", { plan: "pro" });
+              // Resolve any open churn signals when subscription becomes active again
+              resolveChurnSignals(existingSub.user_id);
             } else if (mappedStatus === "past_due") {
               logActivity(existingSub.user_id, "payment_failed", {});
+              createChurnSignal(existingSub.user_id, "payment_failed", "medium", {
+                stripe_customer_id: customerId,
+              });
+            }
+            // Detect intent to cancel (cancel_at_period_end toggled on)
+            if (subscription.cancel_at_period_end && mappedStatus === "active") {
+              createChurnSignal(existingSub.user_id, "subscription_cancelled", "medium", {
+                stripe_customer_id: customerId,
+                cancel_at_period_end: true,
+              });
             }
           }
         }
@@ -197,6 +210,9 @@ export async function POST(req: NextRequest) {
           console.log("[stripe/webhook] subscription canceled:", customerId);
           if (existingSub.user_id) {
             logActivity(existingSub.user_id, "subscription_cancelled", {});
+            createChurnSignal(existingSub.user_id, "subscription_cancelled", "high", {
+              stripe_customer_id: customerId,
+            });
           }
         }
         break;
