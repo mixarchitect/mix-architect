@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import {
   Home, Users, Search, Menu, X, DollarSign,
   Sun, Moon, Monitor, LayoutTemplate, HelpCircle,
-  Settings, LogOut, Bug, Download, Shield,
+  Settings, LogOut, Bug, Download, Shield, BarChart3,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
@@ -183,6 +183,10 @@ function MobileDrawer({
               {tNav("payments")}
             </Link>
           )}
+          <Link href="/app/analytics" className={linkClass(pathname?.startsWith("/app/analytics"))} onClick={onClose}>
+            <BarChart3 size={18} strokeWidth={1.5} />
+            {tNav("analytics")}
+          </Link>
 
           <div className="border-t border-border my-2" />
 
