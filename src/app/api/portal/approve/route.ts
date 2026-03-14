@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { notifyReleaseMembers } from "@/lib/notifications/service";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/portal/approve
@@ -8,6 +9,10 @@ import { notifyReleaseMembers } from "@/lib/notifications/service";
  * Also handles engineer actions: deliver, reopen.
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`portal-approve:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const body = await req.json();
     const {

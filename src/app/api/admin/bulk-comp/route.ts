@@ -4,6 +4,7 @@ import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { logActivity } from "@/lib/activity-logger";
 import { logAdminAction } from "@/lib/admin-audit-logger";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/admin/bulk-comp
@@ -16,6 +17,10 @@ import { logAdminAction } from "@/lib/admin-audit-logger";
  * }
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`admin-bulk-comp:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const supabase = await createSupabaseServerClient();
     const {
@@ -81,14 +86,14 @@ export async function POST(req: NextRequest) {
         reason: reason || undefined,
         duration: duration || "indefinite",
         bulk: true,
-      });
+      }, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
     }
 
     logAdminAction(user.id, "bulk_comp_grant", {
       count: userIds.length,
       duration: duration || "indefinite",
       reason,
-    });
+    }, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
 
     return NextResponse.json({ success: true, count: userIds.length });
   } catch (err) {

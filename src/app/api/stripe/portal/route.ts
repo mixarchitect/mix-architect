@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { stripe } from "@/lib/stripe-server";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/stripe/portal
  * Creates a Stripe Customer Portal session for managing billing.
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`stripe-portal:${ip}`, 10, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const supabase = await createSupabaseServerClient({ allowCookieWrite: true });
     const {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { stripe } from "@/lib/stripe-server";
 import { getStripePriceId, type BillingInterval } from "@/lib/pricing";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/stripe/checkout
@@ -9,6 +10,10 @@ import { getStripePriceId, type BillingInterval } from "@/lib/pricing";
  * Accepts an optional `interval` body param: "monthly" | "annual" (default: "monthly").
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`stripe-checkout:${ip}`, 10, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const body = await req.json().catch(() => ({}));
     const interval: BillingInterval =

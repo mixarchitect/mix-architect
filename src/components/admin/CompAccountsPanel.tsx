@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { Gift, UserPlus, XCircle, CheckCircle, AlertTriangle, Clock, Download } from "lucide-react";
@@ -35,37 +35,42 @@ interface UserOption {
 
 export function CompAccountsPanel({
   compAccounts,
-  userOptions,
+  searchAction,
 }: {
   compAccounts: CompAccount[];
-  userOptions: UserOption[];
+  searchAction: (query: string) => Promise<UserOption[]>;
 }) {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UserOption | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [searchResults, setSearchResults] = useState<UserOption[]>([]);
   const [reason, setReason] = useState("");
   const [duration, setDuration] = useState<Duration>("indefinite");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [statusMsg, setStatusMsg] = useState("");
   const [isPending, startTransition] = useTransition();
   const [revoking, setRevoking] = useState<string | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const selectedUser = selectedUserId
-    ? userOptions.find((u) => u.userId === selectedUserId)
-    : null;
+  useEffect(() => {
+    if (search.length < 2) {
+      setSearchResults([]);
+      return;
+    }
 
-  const searchResults = search.length >= 2
-    ? userOptions.filter((u) => {
-        const s = search.toLowerCase();
-        return (
-          u.label.toLowerCase().includes(s) ||
-          u.email.toLowerCase().includes(s) ||
-          u.phone.toLowerCase().includes(s) ||
-          u.userId.toLowerCase().includes(s)
-        );
-      }).slice(0, 10)
-    : [];
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(async () => {
+      const results = await searchAction(search);
+      setSearchResults(results);
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search, searchAction]);
 
   function handleGrant() {
     if (!selectedUser) {
@@ -104,6 +109,7 @@ export function CompAccountsPanel({
         setStatusMsg("Comp account granted");
         setSearch("");
         setSelectedUserId(null);
+        setSelectedUser(null);
         setReason("");
         setDuration("indefinite");
         router.refresh();
@@ -163,7 +169,7 @@ export function CompAccountsPanel({
                   <span className="text-muted">{selectedUser.email}</span>
                 )}
                 <button
-                  onClick={() => { setSelectedUserId(null); setSearch(""); }}
+                  onClick={() => { setSelectedUserId(null); setSelectedUser(null); setSearch(""); }}
                   className="ml-auto text-muted hover:text-text"
                 >
                   <XCircle size={14} />
@@ -188,7 +194,9 @@ export function CompAccountsPanel({
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
                       setSelectedUserId(u.userId);
+                      setSelectedUser(u);
                       setSearch("");
+                      setSearchResults([]);
                       setShowDropdown(false);
                     }}
                     className="w-full text-left px-3 py-2 text-sm hover:bg-panel2 transition-colors border-b border-border last:border-0"

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import archiver from "archiver";
 import { logActivity } from "@/lib/activity-logger";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * GET /api/export
@@ -12,6 +13,10 @@ import { logActivity } from "@/lib/activity-logger";
  * Returns estimated export size without downloading.
  */
 export async function GET(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`export:${ip}`, 5, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const supabase = await createSupabaseServerClient({
       allowCookieWrite: true,
@@ -25,7 +30,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    logActivity(user.id, "export_requested", {});
+    logActivity(user.id, "export_requested", {}, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
 
     const isEstimate = req.nextUrl.searchParams.get("estimate") === "true";
 

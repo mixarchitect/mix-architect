@@ -23,6 +23,7 @@ export function logActivity(
   userId: string,
   eventType: ActivityEventType,
   metadata?: Record<string, unknown>,
+  requestInfo?: { ip?: string; userAgent?: string },
 ): void {
   const supabase = createSupabaseServiceClient();
   supabase
@@ -31,6 +32,8 @@ export function logActivity(
       user_id: userId,
       event_type: eventType,
       event_metadata: metadata ?? {},
+      ...(requestInfo?.ip && { ip_address: requestInfo.ip }),
+      ...(requestInfo?.userAgent && { user_agent: requestInfo.userAgent }),
     })
     .then(({ error }) => {
       if (error) console.error("[activity-logger] Failed to log event:", error.message);

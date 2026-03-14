@@ -4,6 +4,7 @@ import { stripe } from "@/lib/stripe-server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { logActivity } from "@/lib/activity-logger";
 import { createChurnSignal, resolveChurnSignals } from "@/lib/churn-detection";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * In Stripe API v2025+, current_period_end lives on the subscription
@@ -22,6 +23,10 @@ function getPeriodEnd(sub: Stripe.Subscription): string | null {
  * Handles Stripe webhook events to sync subscription state.
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`stripe-webhook:${ip}`, 60, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
 

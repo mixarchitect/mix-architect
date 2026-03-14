@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { isConvertible } from "@/lib/conversion-formats";
 import { logActivity } from "@/lib/activity-logger";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/convert
@@ -15,6 +16,10 @@ import { logActivity } from "@/lib/activity-logger";
  *   - New:        { jobId, status: "pending" }
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`convert:${ip}`, 10, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const body = await req.json();
     const { audioVersionId, trackId, targetFormat } = body as {
@@ -126,7 +131,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    logActivity(user.id, "conversion_completed", { format: normalizedFormat });
+    logActivity(user.id, "conversion_completed", { format: normalizedFormat }, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
 
     return NextResponse.json({ jobId: job.id, status: "pending" });
   } catch (err) {

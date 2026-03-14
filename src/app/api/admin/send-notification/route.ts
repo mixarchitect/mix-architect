@@ -4,6 +4,7 @@ import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { buildAdminEmail } from "@/lib/email-templates/admin-notification";
 import { logAdminAction } from "@/lib/admin-audit-logger";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -28,6 +29,10 @@ function getResend() {
  * }
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`admin-notify:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     // Verify admin
     const supabase = await createSupabaseServerClient();
@@ -108,7 +113,7 @@ export async function POST(req: NextRequest) {
       recipient: recipientEmail,
       subject,
       category: category || "custom",
-    });
+    }, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
 
     return NextResponse.json({ sent: true });
   } catch (err) {

@@ -8,6 +8,7 @@ export function logAdminAction(
   adminId: string,
   action: string,
   metadata?: Record<string, unknown>,
+  requestInfo?: { ip?: string; userAgent?: string },
 ) {
   const supabase = createSupabaseServiceClient();
   supabase
@@ -16,6 +17,8 @@ export function logAdminAction(
       admin_id: adminId,
       action,
       action_metadata: metadata ?? {},
+      ...(requestInfo?.ip && { ip_address: requestInfo.ip }),
+      ...(requestInfo?.userAgent && { user_agent: requestInfo.userAgent }),
     })
     .then(({ error }) => {
       if (error) {

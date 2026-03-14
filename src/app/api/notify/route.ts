@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { notifyReleaseMembers, type NotificationType } from "@/lib/notifications/service";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/notify
@@ -8,6 +9,10 @@ import { notifyReleaseMembers, type NotificationType } from "@/lib/notifications
  * Authenticates the caller and notifies all release members except the caller.
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`notify:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const supabase = await createSupabaseServerClient({ allowCookieWrite: true });
     const {

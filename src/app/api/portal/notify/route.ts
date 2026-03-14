@@ -6,6 +6,7 @@ import {
   buildChangesRequestedEmail,
   buildTrackDeliveredEmail,
 } from "@/lib/email-templates/portal-notification";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 // Lazy-init Resend to avoid build failures when RESEND_API_KEY is missing
 function getResend() {
@@ -29,6 +30,10 @@ function getResend() {
  * }
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`portal-notify:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const resend = getResend();
     if (!resend) {

@@ -1,7 +1,8 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { CompAccountsPanel } from "@/components/admin/CompAccountsPanel";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
-import { fetchUserDisplayMap, fetchAllUsers } from "@/lib/admin-users";
+import { fetchUserDisplayMap } from "@/lib/admin-users";
+import { searchUsers } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -35,16 +36,6 @@ export default async function CompAccountsPage() {
     ...s,
     user_email: compNameMap[s.user_id] ?? s.user_id.substring(0, 8),
   }));
-
-  // Get all users for the search/autocomplete
-  const allUsers = await fetchAllUsers();
-  const userOptions = allUsers
-    .map((u) => ({
-      userId: u.id,
-      email: u.email ?? "",
-      label: u.display_name || u.email || u.id.substring(0, 8),
-      phone: u.phone ?? "",
-    }));
 
   const activeCount = enrichedComps.filter(
     (c) => c.plan === "pro" && c.status === "active",
@@ -86,7 +77,7 @@ export default async function CompAccountsPage() {
         )}
       </div>
 
-      <CompAccountsPanel compAccounts={enrichedComps} userOptions={userOptions} />
+      <CompAccountsPanel compAccounts={enrichedComps} searchAction={searchUsers} />
     </div>
   );
 }

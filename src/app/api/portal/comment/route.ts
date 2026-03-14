@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { notifyReleaseMembers } from "@/lib/notifications/service";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/portal/comment
@@ -8,6 +9,10 @@ import { notifyReleaseMembers } from "@/lib/notifications/service";
  * Uses service role to bypass RLS (anonymous portal visitors).
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`portal-comment:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const body = await req.json();
     const {
@@ -97,6 +102,10 @@ export async function POST(req: NextRequest) {
  * Deletes a comment by ID (only if author matches).
  */
 export async function DELETE(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`portal-comment:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const body = await req.json();
     const { share_token, comment_id, author_name } = body as {

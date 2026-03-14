@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { logActivity, type ActivityEventType } from "@/lib/activity-logger";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const ALLOWED_EVENTS: Set<string> = new Set([
   "login",
@@ -16,6 +17,10 @@ const ALLOWED_EVENTS: Set<string> = new Set([
  * Authenticates the caller and logs the event with their user ID.
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`admin-log:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const supabase = await createSupabaseServerClient({ allowCookieWrite: true });
     const {
@@ -36,7 +41,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid event type" }, { status: 400 });
     }
 
-    logActivity(user.id, eventType as ActivityEventType, metadata);
+    logActivity(user.id, eventType as ActivityEventType, metadata, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
 
     return NextResponse.json({ ok: true });
   } catch {

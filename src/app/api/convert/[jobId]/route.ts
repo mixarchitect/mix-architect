@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * GET /api/convert/[jobId]
@@ -9,6 +10,10 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> },
 ) {
+  const ip = getClientIp(_req);
+  const { success } = rateLimit(`convert-poll:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   try {
     const { jobId } = await params;
 
