@@ -112,7 +112,8 @@ export function AnalyticsDashboard({ summary, from, to, range, compare }: Props)
       </div>
 
       {/* Charts - only show when there's data */}
-      {releaseVelocity.totalCompleted > 0 && <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      {releaseVelocity.totalCompleted > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <ChartCard title="Release Velocity" description="Completed releases per month">
           {releaseVelocity.series.some((s) => s.value > 0) ? (
             <ResponsiveContainer width="100%" height={200}>
@@ -244,7 +245,8 @@ export function AnalyticsDashboard({ summary, from, to, range, compare }: Props)
             <EmptyChart />
           )}
         </ChartCard>
-      </div>}
+        </div>
+      )}
 
       {/* Client table */}
       {clients.length > 0 && (
