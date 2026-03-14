@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, HelpCircle, Sun, Moon, Monitor, LogOut, Settings, Download, Bug, Sparkles } from "lucide-react";
+import { Search, HelpCircle, Sun, Moon, Monitor, LogOut, Settings, Download, Bug, Sparkles, Shield } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/cn";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -14,9 +14,10 @@ type Props = {
   userId?: string;
   userEmail?: string | null;
   onSearchClick?: () => void;
+  isAdmin?: boolean;
 };
 
-export function TopBar({ userId, userEmail, onSearchClick }: Props) {
+export function TopBar({ userId, userEmail, onSearchClick, isAdmin }: Props) {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -111,6 +112,19 @@ export function TopBar({ userId, userEmail, onSearchClick }: Props) {
             <ThemeIcon size={18} strokeWidth={1.5} />
           </button>
         </Tooltip>
+
+        {/* Admin link */}
+        {isAdmin && (
+          <Tooltip label="Admin Dashboard" align="right">
+            <Link
+              href="/admin"
+              aria-label="Admin"
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-amber-500 hover:text-amber-400 hover:bg-panel2 transition-colors"
+            >
+              <Shield size={18} strokeWidth={1.5} />
+            </Link>
+          </Tooltip>
+        )}
 
         {/* Account avatar */}
         {userId && (

@@ -21,6 +21,7 @@ type ShellProps = {
   paymentsEnabled?: boolean;
   theme?: string;
   subscription?: SubscriptionState;
+  isAdmin?: boolean;
   children: React.ReactNode;
 };
 
@@ -32,7 +33,7 @@ const DEFAULT_SUB: SubscriptionState = {
   grantedByAdmin: false,
 };
 
-export function Shell({ userId, userEmail, paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, children }: ShellProps) {
+export function Shell({ userId, userEmail, paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, isAdmin = false, children }: ShellProps) {
   const { isOpen, open, close } = useCommandPalette();
   const { setTheme } = useTheme();
 
@@ -55,14 +56,14 @@ export function Shell({ userId, userEmail, paymentsEnabled = false, theme = "sys
       <SubscriptionProvider initial={subscription}>
         <div className="flex flex-col h-dvh overflow-hidden">
           {/* Full-width top bar (desktop) */}
-          <TopBar userId={userId} userEmail={userEmail ?? null} onSearchClick={open} />
+          <TopBar userId={userId} userEmail={userEmail ?? null} onSearchClick={open} isAdmin={isAdmin} />
 
           {/* Below top bar: sidebar + content */}
           <div className="flex flex-1 min-h-0">
             {/* Spacer for fixed-position Rail (desktop) */}
             <div className="hidden md:block w-14 shrink-0" />
             <Rail />
-            <MobileNav userId={userId} userEmail={userEmail} onSearchClick={open} />
+            <MobileNav userId={userId} userEmail={userEmail} onSearchClick={open} isAdmin={isAdmin} />
             <MainContent>{children}</MainContent>
           </div>
         </div>

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { requireAdmin } from "@/lib/admin";
 import {
   createFeaturedRelease,
   updateFeaturedRelease,
@@ -11,21 +11,11 @@ import {
   uploadCoverArt,
 } from "@/lib/services/featured-releases-admin";
 
-async function requireOwner() {
-  const supabase = await createSupabaseServerClient({ allowCookieWrite: true });
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || user.id !== process.env.OWNER_USER_ID) {
-    throw new Error("Unauthorized");
-  }
-  return user;
-}
-
 function revalidateAll(slug?: string) {
   revalidatePath("/");
   revalidatePath("/featured");
   revalidatePath("/app");
+  revalidatePath("/admin/featured");
   if (slug) revalidatePath(`/featured/${slug}`);
 }
 
@@ -39,7 +29,7 @@ function slugify(text: string): string {
 }
 
 export async function createFeaturedReleaseAction(formData: FormData) {
-  await requireOwner();
+  await requireAdmin();
 
   const coverFile = formData.get("cover_art") as File | null;
   const slug = (formData.get("slug") as string) || slugify(formData.get("title") as string);
@@ -88,11 +78,11 @@ export async function createFeaturedReleaseAction(formData: FormData) {
   });
 
   revalidateAll(slug);
-  redirect("/app/admin/featured");
+  redirect("/admin/featured");
 }
 
 export async function updateFeaturedReleaseAction(formData: FormData) {
-  await requireOwner();
+  await requireAdmin();
 
   const id = formData.get("id") as string;
   const slug = formData.get("slug") as string;
@@ -146,32 +136,32 @@ export async function updateFeaturedReleaseAction(formData: FormData) {
 
   await updateFeaturedRelease(id, updates);
   revalidateAll(slug);
-  redirect("/app/admin/featured");
+  redirect("/admin/featured");
 }
 
 export async function deleteFeaturedReleaseAction(formData: FormData) {
-  await requireOwner();
+  await requireAdmin();
   const id = formData.get("id") as string;
   const slug = formData.get("slug") as string;
   await deleteFeaturedRelease(id);
   revalidateAll(slug);
-  redirect("/app/admin/featured");
+  redirect("/admin/featured");
 }
 
 export async function setActiveAction(formData: FormData) {
-  await requireOwner();
+  await requireAdmin();
   const id = formData.get("id") as string;
   const slug = formData.get("slug") as string;
   await setActiveFeaturedRelease(id);
   revalidateAll(slug);
-  redirect("/app/admin/featured");
+  redirect("/admin/featured");
 }
 
 export async function deactivateAction(formData: FormData) {
-  await requireOwner();
+  await requireAdmin();
   const id = formData.get("id") as string;
   const slug = formData.get("slug") as string;
   await updateFeaturedRelease(id, { is_active: false });
   revalidateAll(slug);
-  redirect("/app/admin/featured");
+  redirect("/admin/featured");
 }

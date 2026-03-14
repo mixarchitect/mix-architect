@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import {
   Home, Users, Search, Menu, X, DollarSign,
   Sun, Moon, Monitor, LayoutTemplate, HelpCircle,
-  Settings, LogOut, Bug, Download,
+  Settings, LogOut, Bug, Download, Shield,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
@@ -19,9 +19,10 @@ type Props = {
   userId?: string;
   userEmail?: string | null;
   onSearchClick?: () => void;
+  isAdmin?: boolean;
 };
 
-export function MobileNav({ userId, userEmail, onSearchClick }: Props) {
+export function MobileNav({ userId, userEmail, onSearchClick, isAdmin }: Props) {
   const pathname = usePathname();
   const paymentsEnabled = usePaymentsEnabled();
   const t = useTranslations("nav");
@@ -90,6 +91,7 @@ export function MobileNav({ userId, userEmail, onSearchClick }: Props) {
           paymentsEnabled={paymentsEnabled}
           userEmail={userEmail ?? null}
           pathname={pathname}
+          isAdmin={isAdmin}
         />
       )}
     </>
@@ -103,11 +105,13 @@ function MobileDrawer({
   paymentsEnabled,
   userEmail,
   pathname,
+  isAdmin,
 }: {
   onClose: () => void;
   paymentsEnabled: boolean;
   userEmail: string | null;
   pathname: string | null;
+  isAdmin?: boolean;
 }) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
@@ -198,6 +202,16 @@ function MobileDrawer({
             <Download size={18} strokeWidth={1.5} />
             {tNav("exportData")}
           </Link>
+
+          {isAdmin && (
+            <>
+              <div className="border-t border-border my-2" />
+              <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-amber-500 transition-colors" onClick={onClose}>
+                <Shield size={18} strokeWidth={1.5} />
+                Admin
+              </Link>
+            </>
+          )}
 
           <div className="border-t border-border my-2" />
 

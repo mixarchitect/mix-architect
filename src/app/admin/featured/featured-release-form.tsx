@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState } from "react";
 import type { FeaturedRelease } from "@/types/featured-release";
 import { Button } from "@/components/ui/button";
 
@@ -360,7 +360,7 @@ export function FeaturedReleaseForm({ action, release }: Props) {
           {release ? "Save Changes" : "Create Featured Release"}
         </Button>
         <a
-          href="/app/admin/featured"
+          href="/admin/featured"
           className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           Cancel

@@ -19,8 +19,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     redirect("/auth/sign-in");
   }
 
-  // Run in parallel: fetch user defaults + subscription + claim any pending invites
-  const [defaultsRes, subRes] = await Promise.all([
+  // Run in parallel: fetch user defaults + subscription + admin status + claim any pending invites
+  const [defaultsRes, subRes, profileRes] = await Promise.all([
     supabase
       .from("user_defaults")
       .select("payments_enabled, theme, onboarding_completed")
@@ -31,8 +31,14 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       .select("plan, status, cancel_at_period_end, current_period_end, granted_by_admin")
       .eq("user_id", user.id)
       .maybeSingle(),
+    supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", user.id)
+      .maybeSingle(),
     supabase.rpc("claim_pending_invites"),
   ]);
+  const isAdmin = profileRes.data?.is_admin === true;
   const paymentsEnabled = defaultsRes.data?.payments_enabled ?? false;
   const theme = (defaultsRes.data?.theme as string) ?? "system";
   const onboardingCompleted = defaultsRes.data?.onboarding_completed ?? false;
@@ -92,7 +98,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       {isOnboarding ? (
         children
       ) : (
-        <Shell userId={user.id} userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription}>
+        <Shell userId={user.id} userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription} isAdmin={isAdmin}>
           {children}
         </Shell>
       )}
