@@ -365,6 +365,18 @@
       "exportSummary": "{releaseCount, plural, one {# lanzamiento} other {# lanzamientos}}, {trackCount, plural, one {# pista} other {# pistas}}, {audioFileCount, plural, one {# archivo de audio} other {# archivos de audio}}",
       "download": "Descargar"
     },
+    "calendar": {
+      "title": "Calendario",
+      "description": "Suscríbete a tus fechas de lanzamiento en cualquier app de calendario.",
+      "feedUrl": "URL del feed",
+      "enableFeed": "Activar feed de calendario",
+      "regenerate": "Regenerar URL",
+      "regenerateWarning": "Regenerar invalidará las suscripciones de calendario existentes.",
+      "setupTitle": "Cómo suscribirse",
+      "setupGoogle": "Google Calendar: Otros calendarios > Desde URL > pega el enlace",
+      "setupApple": "Apple Calendar: Archivo > Nueva suscripción > pega el enlace",
+      "setupOutlook": "Outlook: Agregar calendario > Desde Internet > pega el enlace"
+    },
     "subscription": {
       "title": "Suscripción",
       "description": "Administra tu plan de Mix Architect.",

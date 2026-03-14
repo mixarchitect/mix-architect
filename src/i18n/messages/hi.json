@@ -365,6 +365,18 @@
       "exportSummary": "{releaseCount, plural, one {# रिलीज़} other {# रिलीज़}}, {trackCount, plural, one {# ट्रैक} other {# ट्रैक}}, {audioFileCount, plural, one {# ऑडियो फाइल} other {# ऑडियो फाइल}}",
       "download": "डाउनलोड करें"
     },
+    "calendar": {
+      "title": "कैलेंडर",
+      "description": "किसी भी कैलेंडर ऐप में अपनी रिलीज़ तिथियों की सदस्यता लें।",
+      "feedUrl": "फ़ीड URL",
+      "enableFeed": "कैलेंडर फ़ीड सक्षम करें",
+      "regenerate": "URL पुनः जनरेट करें",
+      "regenerateWarning": "पुनः जनरेट करने से मौजूदा कैलेंडर सदस्यताएं अमान्य हो जाएंगी।",
+      "setupTitle": "सदस्यता कैसे लें",
+      "setupGoogle": "Google Calendar: अन्य कैलेंडर > URL से > लिंक पेस्ट करें",
+      "setupApple": "Apple Calendar: फ़ाइल > नई कैलेंडर सदस्यता > लिंक पेस्ट करें",
+      "setupOutlook": "Outlook: कैलेंडर जोड़ें > इंटरनेट से > लिंक पेस्ट करें"
+    },
     "subscription": {
       "title": "सब्स्क्रिप्शन",
       "description": "अपने Mix Architect प्लान को मैनेज करें।",

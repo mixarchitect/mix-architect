@@ -365,6 +365,18 @@
       "exportSummary": "{releaseCount, plural, one {#リリース} other {#リリース}}、{trackCount, plural, one {#トラック} other {#トラック}}、{audioFileCount, plural, one {#音声ファイル} other {#音声ファイル}}",
       "download": "ダウンロード"
     },
+    "calendar": {
+      "title": "カレンダー",
+      "description": "お使いのカレンダーアプリでリリース日を購読できます。",
+      "feedUrl": "フィードURL",
+      "enableFeed": "カレンダーフィードを有効にする",
+      "regenerate": "URLを再生成",
+      "regenerateWarning": "再生成すると既存のカレンダー購読が無効になります。",
+      "setupTitle": "購読方法",
+      "setupGoogle": "Googleカレンダー: 他のカレンダー > URLで追加 > リンクを貼り付け",
+      "setupApple": "Appleカレンダー: ファイル > 新規カレンダー購読 > リンクを貼り付け",
+      "setupOutlook": "Outlook: カレンダーを追加 > インターネットから > リンクを貼り付け"
+    },
     "subscription": {
       "title": "サブスクリプション",
       "description": "Mix Architectプランを管理します。",

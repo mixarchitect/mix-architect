@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
-import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download } from "lucide-react";
+import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download, CalendarDays, Copy, Check, RefreshCw } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -507,6 +507,9 @@ export default function SettingsPage() {
           </PanelBody>
         </Panel>
 
+        {/* Calendar Subscription */}
+        <CalendarPanel />
+
         {/* Subscription */}
         <SubscriptionPanel />
       </div>
@@ -642,6 +645,113 @@ function SubscriptionPanel() {
           <Button variant="secondary" onClick={handleManageBilling} disabled={managingBilling}>
             <CreditCard size={16} />
             {managingBilling ? tc("redirecting") : t("manageBilling")}
+          </Button>
+        )}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Calendar Subscription Panel                                         */
+/* ------------------------------------------------------------------ */
+
+function CalendarPanel() {
+  const t = useTranslations("settings.calendar");
+  const tc = useTranslations("common");
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+  const [feedToken, setFeedToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const feedUrl = feedToken
+    ? `${window.location.origin}/api/calendar/feed/${feedToken}`
+    : null;
+
+  useEffect(() => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from("user_defaults")
+          .select("calendar_feed_token")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        setFeedToken(data?.calendar_feed_token ?? null);
+      }
+      setLoading(false);
+    }
+    load();
+  }, [supabase]);
+
+  async function handleGenerate() {
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/calendar/generate-token", { method: "POST" });
+      const data = await res.json();
+      if (data.token) {
+        setFeedToken(data.token);
+      }
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  async function handleCopy() {
+    if (!feedUrl) return;
+    await navigator.clipboard.writeText(feedUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  if (loading) return null;
+
+  return (
+    <Panel>
+      <PanelHeader>
+        <h2 className="text-base font-semibold text-text">{t("title")}</h2>
+        <p className="text-sm text-muted mt-1">{t("description")}</p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-5 space-y-4">
+        {feedUrl ? (
+          <>
+            <div className="space-y-1.5">
+              <label className="label text-muted">{t("feedUrl")}</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={feedUrl}
+                  className="input flex-1 text-xs"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <Button variant="secondary" className="px-3 shrink-0" onClick={handleCopy}>
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                </Button>
+              </div>
+            </div>
+
+            <div className="rounded-lg px-3 py-2 space-y-1.5" style={{ background: "var(--panel2)" }}>
+              <p className="text-xs font-medium text-text">{t("setupTitle")}</p>
+              <ul className="text-xs text-muted space-y-1 list-disc list-inside">
+                <li>{t("setupGoogle")}</li>
+                <li>{t("setupApple")}</li>
+                <li>{t("setupOutlook")}</li>
+              </ul>
+            </div>
+
+            <Button variant="secondary" onClick={handleGenerate} disabled={generating}>
+              <RefreshCw size={14} />
+              {generating ? tc("saving") : t("regenerate")}
+            </Button>
+            <p className="text-xs text-muted">{t("regenerateWarning")}</p>
+          </>
+        ) : (
+          <Button variant="primary" onClick={handleGenerate} disabled={generating}>
+            <CalendarDays size={16} />
+            {generating ? tc("saving") : t("enableFeed")}
           </Button>
         )}
       </PanelBody>

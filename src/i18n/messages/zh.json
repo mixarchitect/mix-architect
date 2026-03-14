@@ -365,6 +365,18 @@
       "exportSummary": "{releaseCount, plural, one {# 个发行} other {# 个发行}}，{trackCount, plural, one {# 首歌曲} other {# 首歌曲}}，{audioFileCount, plural, one {# 个音频文件} other {# 个音频文件}}",
       "download": "下载"
     },
+    "calendar": {
+      "title": "日历",
+      "description": "在任何日历应用中订阅您的发行日期。",
+      "feedUrl": "订阅链接",
+      "enableFeed": "启用日历订阅",
+      "regenerate": "重新生成链接",
+      "regenerateWarning": "重新生成将使现有日历订阅失效。",
+      "setupTitle": "如何订阅",
+      "setupGoogle": "Google 日历：其他日历 > 通过网址 > 粘贴链接",
+      "setupApple": "Apple 日历：文件 > 新建日历订阅 > 粘贴链接",
+      "setupOutlook": "Outlook：添加日历 > 从互联网 > 粘贴链接"
+    },
     "subscription": {
       "title": "订阅",
       "description": "管理您的 Mix Architect 套餐。",

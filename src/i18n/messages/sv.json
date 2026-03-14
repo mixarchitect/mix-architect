@@ -365,6 +365,18 @@
       "exportSummary": "{releaseCount, plural, one {# release} other {# releaser}}, {trackCount, plural, one {# spår} other {# spår}}, {audioFileCount, plural, one {# ljudfil} other {# ljudfiler}}",
       "download": "Ladda ner"
     },
+    "calendar": {
+      "title": "Kalender",
+      "description": "Prenumerera på dina releasedatum i valfri kalenderapp.",
+      "feedUrl": "Feed-URL",
+      "enableFeed": "Aktivera kalenderflöde",
+      "regenerate": "Generera ny URL",
+      "regenerateWarning": "Att generera en ny URL gör befintliga kalenderprenumerationer ogiltiga.",
+      "setupTitle": "Så prenumererar du",
+      "setupGoogle": "Google Kalender: Andra kalendrar > Från URL > klistra in länken",
+      "setupApple": "Apple Kalender: Arkiv > Ny kalenderprenumeration > klistra in länken",
+      "setupOutlook": "Outlook: Lägg till kalender > Från internet > klistra in länken"
+    },
     "subscription": {
       "title": "Prenumeration",
       "description": "Hantera ditt Mix Architect-abonnemang.",

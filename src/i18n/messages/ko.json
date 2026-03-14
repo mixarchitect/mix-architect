@@ -365,6 +365,18 @@
       "exportSummary": "{releaseCount, plural, one {릴리스 #개} other {릴리스 #개}}, {trackCount, plural, one {트랙 #개} other {트랙 #개}}, {audioFileCount, plural, one {오디오 파일 #개} other {오디오 파일 #개}}",
       "download": "다운로드"
     },
+    "calendar": {
+      "title": "캘린더",
+      "description": "캘린더 앱에서 릴리스 날짜를 구독하세요.",
+      "feedUrl": "피드 URL",
+      "enableFeed": "캘린더 피드 활성화",
+      "regenerate": "URL 재생성",
+      "regenerateWarning": "재생성하면 기존 캘린더 구독이 무효화됩니다.",
+      "setupTitle": "구독 방법",
+      "setupGoogle": "Google 캘린더: 다른 캘린더 > URL로 > 링크 붙여넣기",
+      "setupApple": "Apple 캘린더: 파일 > 새 캘린더 구독 > 링크 붙여넣기",
+      "setupOutlook": "Outlook: 캘린더 추가 > 인터넷에서 > 링크 붙여넣기"
+    },
     "subscription": {
       "title": "구독",
       "description": "Mix Architect 플랜을 관리하세요.",
