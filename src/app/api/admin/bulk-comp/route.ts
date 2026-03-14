@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { logActivity } from "@/lib/activity-logger";
+import { logAdminAction } from "@/lib/admin-audit-logger";
 
 /**
  * POST /api/admin/bulk-comp
@@ -82,6 +83,12 @@ export async function POST(req: NextRequest) {
         bulk: true,
       });
     }
+
+    logAdminAction(user.id, "bulk_comp_grant", {
+      count: userIds.length,
+      duration: duration || "indefinite",
+      reason,
+    });
 
     return NextResponse.json({ success: true, count: userIds.length });
   } catch (err) {

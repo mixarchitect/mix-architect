@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { buildAdminEmail } from "@/lib/email-templates/admin-notification";
+import { logAdminAction } from "@/lib/admin-audit-logger";
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -100,6 +101,12 @@ export async function POST(req: NextRequest) {
       body: emailBody,
       cta_label: ctaLabel || null,
       cta_url: ctaUrl || null,
+      category: category || "custom",
+    });
+
+    logAdminAction(user.id, "send_notification", {
+      recipient: recipientEmail,
+      subject,
       category: category || "custom",
     });
 

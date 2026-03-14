@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { buildAdminEmail } from "@/lib/email-templates/admin-notification";
+import { logAdminAction } from "@/lib/admin-audit-logger";
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -91,6 +92,11 @@ export async function POST(req: NextRequest) {
     }));
 
     await serviceClient.from("admin_notifications_log").insert(logs);
+
+    logAdminAction(user.id, "bulk_email", {
+      count: recipients.length,
+      subject,
+    });
 
     return NextResponse.json({ sent: true, count: recipients.length });
   } catch (err) {

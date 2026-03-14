@@ -11,6 +11,7 @@ import {
   Bell,
   Star,
   ArrowLeft,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -21,6 +22,7 @@ const adminNavItems = [
   { label: "Comp Accounts", href: "/admin/comp-accounts", icon: Gift },
   { label: "Activity Log", href: "/admin/activity", icon: Activity },
   { label: "Notifications", href: "/admin/notifications", icon: Bell },
+  { label: "Audit Log", href: "/admin/audit", icon: Shield },
   { label: "Featured Releases", href: "/admin/featured", icon: Star },
 ];
 

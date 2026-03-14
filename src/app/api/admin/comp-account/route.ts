@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { logActivity } from "@/lib/activity-logger";
+import { logAdminAction } from "@/lib/admin-audit-logger";
 
 /**
  * POST /api/admin/comp-account
@@ -108,6 +109,8 @@ export async function POST(req: NextRequest) {
         reason: reason || undefined,
       });
     }
+
+    logAdminAction(user.id, `comp_${action}`, { target_user: userId, reason, duration });
 
     return NextResponse.json({ success: true, action });
   } catch (err) {
