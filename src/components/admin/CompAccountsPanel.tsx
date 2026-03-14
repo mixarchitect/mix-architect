@@ -29,6 +29,8 @@ interface CompAccount {
 interface UserOption {
   userId: string;
   email: string;
+  label: string;
+  phone: string;
 }
 
 export function CompAccountsPanel({
@@ -39,7 +41,9 @@ export function CompAccountsPanel({
   userOptions: UserOption[];
 }) {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [search, setSearch] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [reason, setReason] = useState("");
   const [duration, setDuration] = useState<Duration>("indefinite");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
@@ -47,11 +51,25 @@ export function CompAccountsPanel({
   const [isPending, startTransition] = useTransition();
   const [revoking, setRevoking] = useState<string | null>(null);
 
-  const selectedUser = userOptions.find((u) => u.email === email);
+  const selectedUser = selectedUserId
+    ? userOptions.find((u) => u.userId === selectedUserId)
+    : null;
+
+  const searchResults = search.length >= 2
+    ? userOptions.filter((u) => {
+        const s = search.toLowerCase();
+        return (
+          u.label.toLowerCase().includes(s) ||
+          u.email.toLowerCase().includes(s) ||
+          u.phone.toLowerCase().includes(s) ||
+          u.userId.toLowerCase().includes(s)
+        );
+      }).slice(0, 10)
+    : [];
 
   function handleGrant() {
     if (!selectedUser) {
-      setStatusMsg("Please select a valid user email.");
+      setStatusMsg("Please select a user.");
       setStatus("error");
       return;
     }
@@ -84,7 +102,8 @@ export function CompAccountsPanel({
 
         setStatus("success");
         setStatusMsg("Comp account granted");
-        setEmail("");
+        setSearch("");
+        setSelectedUserId(null);
         setReason("");
         setDuration("indefinite");
         router.refresh();
@@ -133,23 +152,56 @@ export function CompAccountsPanel({
         </h2>
 
         <div className="space-y-4">
-          <div>
+          <div className="relative">
             <label className="text-xs text-muted uppercase tracking-wider mb-1 block">
-              User Email *
+              User *
             </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              list="comp-user-emails"
-              placeholder="user@example.com"
-              className="w-full rounded-md border border-border bg-panel px-3 py-2 text-sm text-text placeholder:text-faint focus:outline-none focus:border-amber-500/50"
-            />
-            <datalist id="comp-user-emails">
-              {userOptions.map((u) => (
-                <option key={u.userId} value={u.email} />
-              ))}
-            </datalist>
+            {selectedUser ? (
+              <div className="flex items-center gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm">
+                <span className="text-text font-medium">{selectedUser.label}</span>
+                {selectedUser.email && selectedUser.label !== selectedUser.email && (
+                  <span className="text-muted">{selectedUser.email}</span>
+                )}
+                <button
+                  onClick={() => { setSelectedUserId(null); setSearch(""); }}
+                  className="ml-auto text-muted hover:text-text"
+                >
+                  <XCircle size={14} />
+                </button>
+              </div>
+            ) : (
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setShowDropdown(true); }}
+                onFocus={() => setShowDropdown(true)}
+                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+                placeholder="Search by name, email, phone, or ID..."
+                className="w-full rounded-md border border-border bg-panel px-3 py-2 text-sm text-text placeholder:text-faint focus:outline-none focus:border-amber-500/50"
+              />
+            )}
+            {showDropdown && searchResults.length > 0 && !selectedUser && (
+              <div className="absolute z-10 top-full left-0 right-0 mt-1 rounded-md border border-border bg-panel shadow-lg max-h-48 overflow-y-auto">
+                {searchResults.map((u) => (
+                  <button
+                    key={u.userId}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      setSelectedUserId(u.userId);
+                      setSearch("");
+                      setShowDropdown(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-panel2 transition-colors border-b border-border last:border-0"
+                  >
+                    <div className="font-medium text-text">{u.label}</div>
+                    <div className="text-xs text-faint">
+                      {u.email}
+                      {u.phone && ` / ${u.phone}`}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -186,10 +238,10 @@ export function CompAccountsPanel({
           <div className="flex items-center gap-3">
             <button
               onClick={handleGrant}
-              disabled={isPending || !email}
+              disabled={isPending || !selectedUser}
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-                isPending || !email
+                isPending || !selectedUser
                   ? "bg-amber-600/30 text-amber-500/50 cursor-not-allowed"
                   : "bg-amber-600 text-white hover:bg-amber-500",
               )}

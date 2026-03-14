@@ -1,7 +1,7 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { NotificationsPanel } from "@/components/admin/NotificationsPanel";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
-import { displayUserName } from "@/lib/display-user";
+import { fetchAllUsers } from "@/lib/admin-users";
 
 export const dynamic = "force-dynamic";
 
@@ -30,40 +30,25 @@ export default async function AdminNotificationsPage() {
 
   const rows = (logs ?? []) as NotificationLogRow[];
 
-  // Get subscriber emails for the compose form autocomplete
+  // Get subscriber data + user info for compose form
   const { data: subscribers } = await supabase
     .from("subscriptions")
     .select("user_id, plan, status");
 
-  const subUserIds = [...new Set((subscribers ?? []).map((s: { user_id: string }) => s.user_id))];
+  const allUsers = await fetchAllUsers();
+  const userMap = new Map(allUsers.map((u) => [u.id, u]));
+
   const userOptions: { userId: string; email: string; plan: string; status: string }[] = [];
-
-  if (subUserIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, full_name, email")
-      .in("id", subUserIds);
-
-    if (profiles) {
-      const profileMap: Record<string, { email: string; label: string }> = {};
-      for (const p of profiles) {
-        profileMap[p.id] = {
-          email: p.email ?? "",
-          label: displayUserName(p),
-        };
-      }
-
-      for (const sub of subscribers ?? []) {
-        const s = sub as { user_id: string; plan: string; status: string };
-        if (profileMap[s.user_id]?.email) {
-          userOptions.push({
-            userId: s.user_id,
-            email: profileMap[s.user_id].email,
-            plan: s.plan,
-            status: s.status,
-          });
-        }
-      }
+  for (const sub of subscribers ?? []) {
+    const s = sub as { user_id: string; plan: string; status: string };
+    const authUser = userMap.get(s.user_id);
+    if (authUser?.email) {
+      userOptions.push({
+        userId: s.user_id,
+        email: authUser.email,
+        plan: s.plan,
+        status: s.status,
+      });
     }
   }
 

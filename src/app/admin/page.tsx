@@ -11,11 +11,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
-import { displayUserName } from "@/lib/display-user";
+import { fetchUserDisplayMap } from "@/lib/admin-users";
 
 export const dynamic = "force-dynamic";
 
-const PRO_PRICE = 9; // $9/month
+const PRO_PRICE = 14; // $14/month
 
 const currencyFmt = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -169,19 +169,7 @@ export default async function AdminDashboard() {
       (recentEvents ?? []).map((e: { user_id: string }) => e.user_id),
     ),
   ];
-  const userNames: Record<string, string> = {};
-
-  if (eventUserIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, full_name, email")
-      .in("id", eventUserIds);
-    if (profiles) {
-      for (const p of profiles) {
-        userNames[p.id] = displayUserName(p);
-      }
-    }
-  }
+  const userNames = await fetchUserDisplayMap(eventUserIds);
 
   return (
     <div>

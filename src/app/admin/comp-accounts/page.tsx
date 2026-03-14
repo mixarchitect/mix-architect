@@ -1,7 +1,7 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { CompAccountsPanel } from "@/components/admin/CompAccountsPanel";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
-import { displayUserName } from "@/lib/display-user";
+import { fetchUserDisplayMap, fetchAllUsers } from "@/lib/admin-users";
 
 export const dynamic = "force-dynamic";
 
@@ -27,39 +27,23 @@ export default async function CompAccountsPage() {
 
   const rows = (compSubs ?? []) as SubscriptionRow[];
 
-  // Get display names for comp account holders
+  // Get display names for comp account holders from auth.users
   const compUserIds = rows.map((s) => s.user_id);
-  const compNameMap: Record<string, string> = {};
-
-  if (compUserIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, full_name, email")
-      .in("id", compUserIds);
-    if (profiles) {
-      for (const p of profiles) {
-        compNameMap[p.id] = displayUserName(p);
-      }
-    }
-  }
+  const compNameMap = await fetchUserDisplayMap(compUserIds);
 
   const enrichedComps = rows.map((s) => ({
     ...s,
     user_email: compNameMap[s.user_id] ?? s.user_id.substring(0, 8),
   }));
 
-  // Get all profiles for the autocomplete (users who could receive a comp)
-  const { data: allProfiles } = await supabase
-    .from("profiles")
-    .select("id, full_name, email")
-    .order("email");
-
-  const userOptions = (allProfiles ?? [])
-    .filter((p: { id: string; email: string | null }) => p.email)
-    .map((p: { id: string; full_name: string | null; email: string | null }) => ({
-      userId: p.id,
-      email: p.email as string,
-      label: displayUserName(p),
+  // Get all users for the search/autocomplete
+  const allUsers = await fetchAllUsers();
+  const userOptions = allUsers
+    .map((u) => ({
+      userId: u.id,
+      email: u.email ?? "",
+      label: u.display_name || u.email || u.id.substring(0, 8),
+      phone: u.phone ?? "",
     }));
 
   const activeCount = enrichedComps.filter(

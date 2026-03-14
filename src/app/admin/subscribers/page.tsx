@@ -1,7 +1,7 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { SubscribersList } from "@/components/admin/SubscribersList";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
-import { displayUserName } from "@/lib/display-user";
+import { fetchUserDisplayMap } from "@/lib/admin-users";
 
 export const dynamic = "force-dynamic";
 
@@ -30,21 +30,9 @@ export default async function SubscribersPage() {
 
   const rows = (subscriptions ?? []) as SubscriptionRow[];
 
-  // Get user display names
+  // Get user display names from auth.users
   const userIds = [...new Set(rows.map((s) => s.user_id))];
-  const userNameMap: Record<string, string> = {};
-
-  if (userIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, full_name, email")
-      .in("id", userIds);
-    if (profiles) {
-      for (const p of profiles) {
-        userNameMap[p.id] = displayUserName(p);
-      }
-    }
-  }
+  const userNameMap = await fetchUserDisplayMap(userIds);
 
   const enriched = rows.map((s) => ({
     ...s,

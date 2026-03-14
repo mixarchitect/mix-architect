@@ -1,5 +1,5 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
-import { displayUserName } from "@/lib/display-user";
+import { fetchUserDisplayMap } from "@/lib/admin-users";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
 import { UserDetailTabs } from "@/components/admin/UserDetailTabs";
 import Link from "next/link";
@@ -64,11 +64,14 @@ export default async function UserDetailPage({ params }: Props) {
   const churnSignals = churnRes.data ?? [];
   const releases = releasesRes.data ?? [];
 
-  const name = displayUserName({
-    full_name: profile.full_name as string | null,
-    email: profile.email as string | null,
-    id: profile.id as string,
-  });
+  // Get user display info from auth.users
+  const userDisplayMap = await fetchUserDisplayMap([userId]);
+  const name = userDisplayMap[userId] ?? userId.substring(0, 8);
+
+  // Get email from auth.users for display
+  const authUser = await supabase.auth.admin.getUserById(userId);
+  const userEmail = authUser.data?.user?.email ?? null;
+  const userPhone = authUser.data?.user?.phone ?? null;
   const isComp = subscription?.granted_by_admin === true;
 
   // Determine effective status
@@ -112,8 +115,8 @@ export default async function UserDetailPage({ params }: Props) {
         <div className="flex items-start justify-between mb-3">
           <div>
             <h1 className="text-2xl font-bold text-text">{name}</h1>
-            {typeof profile.full_name === "string" && typeof profile.email === "string" && (
-              <p className="text-sm text-muted mt-0.5">{profile.email}</p>
+            {userEmail && name !== userEmail && (
+              <p className="text-sm text-muted mt-0.5">{userEmail}</p>
             )}
           </div>
           <span
