@@ -25,6 +25,7 @@ interface Subscriber {
   current_period_end: string | null;
   granted_by_admin: boolean;
   created_at: string;
+  has_subscription: boolean;
 }
 
 type FilterTab = "all" | "pro" | "free" | "churned";
@@ -34,6 +35,7 @@ const statusColors: Record<string, string> = {
   past_due: "text-amber-400 bg-amber-500/10 border-amber-500/20",
   canceled: "text-red-400 bg-red-500/10 border-red-500/20",
   trialing: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+  none: "text-faint bg-panel2 border-border",
   incomplete: "text-faint bg-panel2 border-border",
 };
 
@@ -69,7 +71,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
       case "pro":
         return s.plan === "pro" && s.status === "active";
       case "free":
-        return s.plan === "free";
+        return s.plan === "free" || s.plan === "none";
       case "churned":
         return s.status === "canceled" || s.cancel_at_period_end;
       default:
@@ -318,7 +320,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
       <div className="flex gap-3 mb-4">
         <input
           type="text"
-          placeholder="Search by email..."
+          placeholder="Search by name or email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 rounded-md border border-border bg-panel px-3 py-1.5 text-sm text-text placeholder:text-faint focus:outline-none focus:border-amber-500/50"
@@ -328,14 +330,14 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
             downloadCsv(
               filtered.map((s) => ({
                 user: s.user_email,
-                plan: s.plan,
-                status: s.status,
+                plan: s.plan === "none" ? "no plan" : s.plan,
+                status: s.status === "none" ? "no plan" : s.status,
                 comp: s.granted_by_admin ? "yes" : "no",
                 cancel_at_period_end: s.cancel_at_period_end ? "yes" : "no",
                 period_end: s.current_period_end ?? "",
                 created: s.created_at,
               })),
-              "subscribers.csv",
+              "users.csv",
             )
           }
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted hover:text-text hover:bg-panel2 border border-border transition-colors"
@@ -365,7 +367,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
       {filtered.length === 0 ? (
         <div className="rounded-lg border border-border bg-panel p-8 text-center">
           <Users size={24} className="mx-auto mb-2 text-muted" />
-          <p className="text-sm text-muted">No subscribers found.</p>
+          <p className="text-sm text-muted">No users found.</p>
         </div>
       ) : (
         <div className="rounded-lg border border-border bg-panel divide-y divide-border">
@@ -413,6 +415,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
                       <span title="Comp account"><Gift size={12} className="text-amber-500 shrink-0" /></span>
                     )}
                   </div>
+                  {sub.has_subscription ? (
                   <div className="flex items-center gap-2 text-xs text-muted">
                     <CreditCard size={12} />
                     <span className="uppercase">{sub.plan}</span>
@@ -430,18 +433,25 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
                       </span>
                     )}
                   </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-xs text-faint">
+                    No plan
+                  </div>
+                )}
                 </div>
 
                 <span className={cn("text-xs px-1.5 py-0.5 rounded border capitalize", sevClass)}>
-                  {sub.status}
+                  {sub.status === "none" ? "No plan" : sub.status}
                 </span>
 
-                <span className="text-xs text-faint shrink-0">
-                  {new Date(sub.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
+                {sub.created_at && (
+                  <span className="text-xs text-faint shrink-0">
+                    {new Date(sub.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                )}
               </div>
             );
           })}
