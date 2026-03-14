@@ -15,6 +15,7 @@ import Link from "next/link";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
 import { DashboardRangeSelector } from "@/components/admin/DashboardRangeSelector";
 import { fetchUserDisplayMap } from "@/lib/admin-users";
+import { DashboardExportButton } from "@/components/admin/DashboardExportButton";
 import {
   type PresetKey,
   type CompareKey,
@@ -307,6 +308,19 @@ export default async function AdminDashboard({ searchParams }: Props) {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-text">Dashboard</h1>
         <div className="flex items-center gap-3">
+          <DashboardExportButton
+            metrics={{
+              period: periodLabel,
+              totalUsers,
+              activePro,
+              newSignups,
+              mrr: currencyFmt.format(mrr),
+              conversionRate: `${conversionRate.toFixed(0)}%`,
+              churnRate: `${churnRate.toFixed(1)}%`,
+              openChurnSignals: churnRes.count ?? 0,
+              events,
+            }}
+          />
           <DashboardRangeSelector
             range={currentRange}
             from={isCustom ? rawFrom : undefined}
