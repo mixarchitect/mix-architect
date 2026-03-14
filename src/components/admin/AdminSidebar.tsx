@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/cn";
 
 const adminNavItems = [
-  { label: "Overview", href: "/admin", icon: LayoutDashboard },
+  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Users", href: "/admin/subscribers", icon: Users },
   { label: "Churn Signals", href: "/admin/churn", icon: AlertTriangle },
   { label: "Comp Accounts", href: "/admin/comp-accounts", icon: Gift },
