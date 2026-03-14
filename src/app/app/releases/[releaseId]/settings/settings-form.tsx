@@ -11,6 +11,7 @@ import { Pill } from "@/components/ui/pill";
 import { TagInput } from "@/components/ui/tag-input";
 import { ArrowLeft, ImageIcon, Upload, X, Trash2, UserPlus } from "lucide-react";
 import { canEdit, canEditPayment, canManageTeam, type ReleaseRole } from "@/lib/permissions";
+import { logActivityClient } from "@/lib/activity-logger-client";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useLocale, useTranslations } from "next-intl";
 import { formatMoney } from "@/lib/format-money";
@@ -363,6 +364,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
         const sentEmail = inviteEmail.trim().toLowerCase();
         const sentRole = inviteRole;
         setInviteEmail("");
+        logActivityClient("collaborator_invited", { releaseId, role: sentRole });
 
         // Fire-and-forget email send
         try {

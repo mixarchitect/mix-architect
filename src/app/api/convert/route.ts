@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { isConvertible } from "@/lib/conversion-formats";
+import { logActivity } from "@/lib/activity-logger";
 
 /**
  * POST /api/convert
@@ -124,6 +125,8 @@ export async function POST(req: NextRequest) {
         { status: 500 },
       );
     }
+
+    logActivity(user.id, "conversion_completed", { format: normalizedFormat });
 
     return NextResponse.json({ jobId: job.id, status: "pending" });
   } catch (err) {

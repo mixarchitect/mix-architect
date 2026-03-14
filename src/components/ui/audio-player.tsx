@@ -8,6 +8,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
 import { useTheme } from "next-themes";
 import { sendNotification } from "@/lib/notifications/client";
+import { logActivityClient } from "@/lib/activity-logger-client";
 import {
   SkipBack,
   SkipForward,
@@ -681,6 +682,8 @@ export function AudioPlayer({
           releaseId,
           trackId,
         });
+
+        logActivityClient("track_uploaded", { releaseId, trackId, version: nextVersion });
       }
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed");

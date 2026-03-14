@@ -8,6 +8,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
+import { logActivityClient } from "@/lib/activity-logger-client";
 
 export default function SignInPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -42,6 +43,9 @@ export default function SignInPage() {
         });
         if (error) throw error;
       }
+
+      // Fire-and-forget activity log
+      logActivityClient(mode === "signin" ? "login" : "signup", { method: "email" });
 
       router.push("/app");
       // Don't reset loading — let the button stay disabled through navigation

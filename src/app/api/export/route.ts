@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import archiver from "archiver";
+import { logActivity } from "@/lib/activity-logger";
 
 /**
  * GET /api/export
@@ -23,6 +24,8 @@ export async function GET(req: NextRequest) {
     if (authErr || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    logActivity(user.id, "export_requested", {});
 
     const isEstimate = req.nextUrl.searchParams.get("estimate") === "true";
 

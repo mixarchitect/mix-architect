@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe-server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
+import { logActivity } from "@/lib/activity-logger";
 
 /**
  * In Stripe API v2025+, current_period_end lives on the subscription
@@ -90,6 +91,7 @@ export async function POST(req: NextRequest) {
           console.error("[stripe/webhook] upsert failed:", error);
         } else {
           console.log("[stripe/webhook] subscription activated for user:", userId);
+          logActivity(userId, "subscription_started", { plan: "pro" });
         }
         break;
       }
@@ -104,7 +106,7 @@ export async function POST(req: NextRequest) {
         // Look up the subscription row by stripe_customer_id
         const { data: existingSub } = await supabase
           .from("subscriptions")
-          .select("id, granted_by_admin")
+          .select("id, user_id, granted_by_admin")
           .eq("stripe_customer_id", customerId)
           .maybeSingle();
 
@@ -147,6 +149,13 @@ export async function POST(req: NextRequest) {
           console.error("[stripe/webhook] subscription update failed:", error);
         } else {
           console.log("[stripe/webhook] subscription updated:", customerId, mappedStatus);
+          if (existingSub.user_id) {
+            if (mappedStatus === "active") {
+              logActivity(existingSub.user_id, "subscription_renewed", { plan: "pro" });
+            } else if (mappedStatus === "past_due") {
+              logActivity(existingSub.user_id, "payment_failed", {});
+            }
+          }
         }
         break;
       }
@@ -161,7 +170,7 @@ export async function POST(req: NextRequest) {
         // Look up the subscription row
         const { data: existingSub } = await supabase
           .from("subscriptions")
-          .select("id, granted_by_admin")
+          .select("id, user_id, granted_by_admin")
           .eq("stripe_customer_id", customerId)
           .maybeSingle();
 
@@ -186,6 +195,9 @@ export async function POST(req: NextRequest) {
           console.error("[stripe/webhook] subscription delete update failed:", error);
         } else {
           console.log("[stripe/webhook] subscription canceled:", customerId);
+          if (existingSub.user_id) {
+            logActivity(existingSub.user_id, "subscription_cancelled", {});
+          }
         }
         break;
       }
