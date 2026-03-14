@@ -18,6 +18,7 @@ import {
   Gift,
   Activity,
 } from "lucide-react";
+import { downloadCsv } from "@/lib/csv-export";
 
 interface ActivityEvent {
   id: string;
@@ -97,8 +98,25 @@ export function ActivityLogList({ events, range = "7d" }: { events: ActivityEven
             {r.label}
           </button>
         ))}
-        <span className="text-xs text-faint ml-auto">
+        <span className="text-xs text-faint ml-auto flex items-center gap-2">
           {events.length} event{events.length !== 1 ? "s" : ""}
+          <button
+            onClick={() =>
+              downloadCsv(
+                filtered.map((e) => ({
+                  user: e.user_email,
+                  event: e.event_type,
+                  metadata: JSON.stringify(e.event_metadata),
+                  date: e.created_at,
+                })),
+                "activity-log.csv",
+              )
+            }
+            className="flex items-center gap-1 text-muted hover:text-text transition-colors"
+            title="Export CSV"
+          >
+            <Download size={10} />
+          </button>
         </span>
       </div>
 

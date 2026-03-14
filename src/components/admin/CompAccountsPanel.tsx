@@ -3,7 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Gift, UserPlus, XCircle, CheckCircle, AlertTriangle, Clock } from "lucide-react";
+import { Gift, UserPlus, XCircle, CheckCircle, AlertTriangle, Clock, Download } from "lucide-react";
+import { downloadCsv } from "@/lib/csv-export";
 
 type Duration = "indefinite" | "30d" | "90d" | "6m" | "1y";
 
@@ -213,10 +214,32 @@ export function CompAccountsPanel({
 
       {/* Active comp accounts */}
       <div>
-        <h2 className="text-lg font-semibold text-text mb-3 flex items-center gap-2">
-          <Gift size={18} className="text-muted" />
-          Active Comp Accounts
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-text flex items-center gap-2">
+            <Gift size={18} className="text-muted" />
+            Active Comp Accounts
+          </h2>
+          {compAccounts.length > 0 && (
+            <button
+              onClick={() =>
+                downloadCsv(
+                  compAccounts.map((c) => ({
+                    user: c.user_email,
+                    plan: c.plan,
+                    status: c.status,
+                    expires: c.current_period_end ?? "indefinite",
+                    granted: c.created_at,
+                  })),
+                  "comp-accounts.csv",
+                )
+              }
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted hover:text-text hover:bg-panel2 border border-border transition-colors"
+            >
+              <Download size={12} />
+              CSV
+            </button>
+          )}
+        </div>
 
         {compAccounts.length === 0 ? (
           <div className="rounded-lg border border-border bg-panel p-8 text-center">

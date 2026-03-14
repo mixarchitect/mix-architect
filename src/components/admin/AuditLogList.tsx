@@ -8,7 +8,9 @@ import {
   Mail,
   XCircle,
   Users,
+  Download,
 } from "lucide-react";
+import { downloadCsv } from "@/lib/csv-export";
 
 interface AuditEntry {
   id: string;
@@ -42,14 +44,33 @@ export function AuditLogList({ entries }: { entries: AuditEntry[] }) {
 
   return (
     <div>
-      <div className="mb-4">
+      <div className="flex gap-3 mb-4">
         <input
           type="text"
           placeholder="Search audit entries..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full max-w-sm rounded-md border border-border bg-panel px-3 py-1.5 text-sm text-text placeholder:text-faint focus:outline-none focus:border-amber-500/50"
+          className="flex-1 max-w-sm rounded-md border border-border bg-panel px-3 py-1.5 text-sm text-text placeholder:text-faint focus:outline-none focus:border-amber-500/50"
         />
+        {filtered.length > 0 && (
+          <button
+            onClick={() =>
+              downloadCsv(
+                filtered.map((e) => ({
+                  admin: e.admin_name,
+                  action: e.action,
+                  metadata: JSON.stringify(e.action_metadata),
+                  date: e.created_at,
+                })),
+                "audit-log.csv",
+              )
+            }
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted hover:text-text hover:bg-panel2 border border-border transition-colors"
+          >
+            <Download size={12} />
+            CSV
+          </button>
+        )}
       </div>
 
       {filtered.length === 0 ? (

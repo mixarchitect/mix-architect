@@ -11,7 +11,9 @@ import {
   AlertTriangle,
   Mail,
   X,
+  Download,
 } from "lucide-react";
+import { downloadCsv } from "@/lib/csv-export";
 
 interface Subscriber {
   id: string;
@@ -321,6 +323,27 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 rounded-md border border-border bg-panel px-3 py-1.5 text-sm text-text placeholder:text-faint focus:outline-none focus:border-amber-500/50"
         />
+        <button
+          onClick={() =>
+            downloadCsv(
+              filtered.map((s) => ({
+                user: s.user_email,
+                plan: s.plan,
+                status: s.status,
+                comp: s.granted_by_admin ? "yes" : "no",
+                cancel_at_period_end: s.cancel_at_period_end ? "yes" : "no",
+                period_end: s.current_period_end ?? "",
+                created: s.created_at,
+              })),
+              "subscribers.csv",
+            )
+          }
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs text-muted hover:text-text hover:bg-panel2 border border-border transition-colors"
+          title="Export CSV"
+        >
+          <Download size={12} />
+          CSV
+        </button>
         <div className="flex gap-1">
           {(["all", "pro", "free", "churned"] as FilterTab[]).map((tab) => (
             <button
