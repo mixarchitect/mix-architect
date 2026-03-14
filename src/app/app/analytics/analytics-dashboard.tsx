@@ -1,8 +1,21 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import type { AnalyticsSummary } from "@/types/analytics";
 import { DateRangeSelector } from "@/components/ui/date-range-selector";
 import { BarChart3, Clock, DollarSign, Users } from "lucide-react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 
 type Props = {
   summary: AnalyticsSummary;
@@ -12,8 +25,39 @@ type Props = {
   compare?: string;
 };
 
+/** Read a CSS custom property from :root */
+function getCSSVar(name: string): string {
+  return getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+}
+
 export function AnalyticsDashboard({ summary, from, to, range, compare }: Props) {
   const { releaseVelocity, turnaround, revenue, clients } = summary;
+  const { resolvedTheme } = useTheme();
+
+  // Resolve theme colors for Recharts (canvas can't use CSS vars directly)
+  const [colors, setColors] = useState({
+    signal: "#0D9488",
+    muted: "rgba(120,120,120,0.5)",
+    faint: "rgba(120,120,120,0.3)",
+    border: "rgba(120,120,120,0.1)",
+    text: "#e8e8e8",
+  });
+
+  useEffect(() => {
+    // Defer to ensure CSS vars are resolved after theme switch
+    const id = requestAnimationFrame(() => {
+      setColors({
+        signal: getCSSVar("--signal") || "#0D9488",
+        muted: getCSSVar("--muted") || "rgba(120,120,120,0.5)",
+        faint: getCSSVar("--faint") || "rgba(120,120,120,0.3)",
+        border: getCSSVar("--border") || "rgba(120,120,120,0.1)",
+        text: getCSSVar("--text") || "#e8e8e8",
+      });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [resolvedTheme]);
 
   return (
     <div>
@@ -67,24 +111,140 @@ export function AnalyticsDashboard({ summary, from, to, range, compare }: Props)
         />
       </div>
 
-      {/* Chart placeholders */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <ChartPlaceholder
-          title="Release Velocity"
-          description="Completed releases per month"
-          series={releaseVelocity.series}
-        />
-        <ChartPlaceholder
-          title="Turnaround Time"
-          description="Average days to complete per month"
-          series={turnaround.series}
-        />
-        <ChartPlaceholder
+      {/* Charts - only show when there's data */}
+      {releaseVelocity.totalCompleted > 0 && <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <ChartCard title="Release Velocity" description="Completed releases per month">
+          {releaseVelocity.series.some((s) => s.value > 0) ? (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={releaseVelocity.series} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.border} vertical={false} />
+                <XAxis
+                  dataKey="label"
+                  tickFormatter={(v: string) => v.split(" ")[0]}
+                  tick={{ fontSize: 10, fill: colors.faint }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{ fontSize: 10, fill: colors.faint }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--panel-2)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  labelStyle={{ color: colors.text, fontWeight: 600 }}
+                  itemStyle={{ color: colors.muted }}
+                  formatter={(val) => [Number(val), "Releases"]}
+                />
+                <Bar dataKey="value" fill={colors.signal} radius={[3, 3, 0, 0]} maxBarSize={32} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyChart />
+          )}
+        </ChartCard>
+
+        <ChartCard title="Turnaround Time" description="Average days to complete per month">
+          {turnaround.series.some((s) => s.value > 0) ? (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={turnaround.series} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.border} vertical={false} />
+                <XAxis
+                  dataKey="label"
+                  tickFormatter={(v: string) => v.split(" ")[0]}
+                  tick={{ fontSize: 10, fill: colors.faint }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 10, fill: colors.faint }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v: number) => `${v}d`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--panel-2)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  labelStyle={{ color: colors.text, fontWeight: 600 }}
+                  itemStyle={{ color: colors.muted }}
+                  formatter={(val) => [`${Number(val)} days`, "Turnaround"]}
+                />
+                <Bar dataKey="value" fill={`${colors.signal}99`} radius={[3, 3, 0, 0]} maxBarSize={32} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyChart />
+          )}
+        </ChartCard>
+
+        <ChartCard
           title="Revenue"
           description={`Total fee earned per month (${revenue.currency})`}
-          series={revenue.series}
-        />
-      </div>
+          className="lg:col-span-2"
+        >
+          {revenue.series.some((s) => s.value > 0) ? (
+            <ResponsiveContainer width="100%" height={200}>
+              <AreaChart data={revenue.series} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
+                <defs>
+                  <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={colors.signal} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={colors.signal} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.border} vertical={false} />
+                <XAxis
+                  dataKey="label"
+                  tickFormatter={(v: string) => v.split(" ")[0]}
+                  tick={{ fontSize: 10, fill: colors.faint }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 10, fill: colors.faint }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v: number) =>
+                    v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`
+                  }
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--panel-2)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  labelStyle={{ color: colors.text, fontWeight: 600 }}
+                  itemStyle={{ color: colors.muted }}
+                  formatter={(val) => [
+                    formatCurrency(Number(val), revenue.currency),
+                    "Revenue",
+                  ]}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  stroke={colors.signal}
+                  strokeWidth={2}
+                  fill="url(#revenueGradient)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyChart />
+          )}
+        </ChartCard>
+      </div>}
 
       {/* Client table */}
       {clients.length > 0 && (
@@ -167,51 +327,32 @@ function StatCard({
   );
 }
 
-/* ─── Chart Placeholder ──────────────────────────── */
+/* ─── Chart Card ─────────────────────────────────── */
 
-function ChartPlaceholder({
+function ChartCard({
   title,
   description,
-  series,
+  children,
+  className,
 }: {
   title: string;
   description: string;
-  series: { month: string; label: string; value: number }[];
+  children: React.ReactNode;
+  className?: string;
 }) {
-  const max = Math.max(...series.map((s) => s.value), 1);
-
   return (
-    <div className="bg-panel border border-border rounded-lg p-4">
+    <div className={`bg-panel border border-border rounded-lg p-4 ${className ?? ""}`}>
       <h3 className="text-sm font-semibold text-text mb-0.5">{title}</h3>
       <p className="text-xs text-muted mb-4">{description}</p>
-      {series.length > 0 ? (
-        <div className="flex items-end gap-1 h-32">
-          {series.map((s) => (
-            <div
-              key={s.month}
-              className="flex-1 flex flex-col items-center gap-1"
-            >
-              <div
-                className="w-full rounded-sm bg-signal/30"
-                style={{
-                  height: `${Math.max((s.value / max) * 100, 2)}%`,
-                  minHeight: s.value > 0 ? 4 : 2,
-                }}
-                title={`${s.label}: ${s.value}`}
-              />
-              {series.length <= 12 && (
-                <span className="text-[9px] text-faint truncate w-full text-center">
-                  {s.label.split(" ")[0]}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="h-32 flex items-center justify-center text-xs text-muted">
-          No data for this period
-        </div>
-      )}
+      {children}
+    </div>
+  );
+}
+
+function EmptyChart() {
+  return (
+    <div className="h-[200px] flex items-center justify-center text-xs text-muted">
+      No data for this period
     </div>
   );
 }
