@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import type { AnalyticsSummary } from "@/types/analytics";
 import { DateRangeSelector } from "@/components/ui/date-range-selector";
-import { BarChart3, Clock, DollarSign, Users } from "lucide-react";
+import { BarChart3, Clock, DollarSign, Users, ChevronRight } from "lucide-react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -82,6 +83,7 @@ export function AnalyticsDashboard({ summary, from, to, range, compare }: Props)
           label="Completed Releases"
           value={String(releaseVelocity.totalCompleted)}
           sub={`${releaseVelocity.avgPerMonth}/mo avg`}
+          href="/app"
         />
         <StatCard
           icon={Clock}
@@ -92,6 +94,7 @@ export function AnalyticsDashboard({ summary, from, to, range, compare }: Props)
               ? `${turnaround.fastestDays}d fastest, ${turnaround.slowestDays}d slowest`
               : "No completed releases"
           }
+          href="/app?view=timeline"
         />
         <StatCard
           icon={DollarSign}
@@ -102,12 +105,14 @@ export function AnalyticsDashboard({ summary, from, to, range, compare }: Props)
               ? `${formatCurrency(revenue.totalOutstanding, revenue.currency)} outstanding`
               : "All paid"
           }
+          href="/app/payments"
         />
         <StatCard
           icon={Users}
           label="Clients"
           value={String(clients.filter((c) => c.clientName !== "No client").length)}
           sub={`${clients.reduce((a, b) => a + b.releaseCount, 0)} releases total`}
+          href="/app/artists"
         />
       </div>
 
@@ -309,23 +314,35 @@ function StatCard({
   label,
   value,
   sub,
+  href,
 }: {
   icon: typeof BarChart3;
   label: string;
   value: string;
   sub: string;
+  href: string;
 }) {
   return (
-    <div className="px-4 py-3 rounded-lg border border-border bg-panel">
-      <div className="flex items-center gap-2 mb-1">
-        <Icon size={14} strokeWidth={1.5} className="text-muted" />
-        <span className="text-[10px] uppercase tracking-wide text-faint font-medium">
-          {label}
-        </span>
+    <Link
+      href={href}
+      className="group px-4 py-3 rounded-lg border border-border bg-panel hover:border-signal/30 transition-colors"
+    >
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-2">
+          <Icon size={14} strokeWidth={1.5} className="text-muted" />
+          <span className="text-[10px] uppercase tracking-wide text-faint font-medium">
+            {label}
+          </span>
+        </div>
+        <ChevronRight
+          size={14}
+          strokeWidth={1.5}
+          className="text-faint opacity-0 group-hover:opacity-100 transition-opacity -mr-1"
+        />
       </div>
       <div className="text-lg font-semibold text-text">{value}</div>
       <div className="text-xs text-muted mt-0.5">{sub}</div>
-    </div>
+    </Link>
   );
 }
 
