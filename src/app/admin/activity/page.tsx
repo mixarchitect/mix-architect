@@ -13,14 +13,39 @@ interface ActivityRow {
   created_at: string;
 }
 
-export default async function ActivityLogPage() {
+type Range = "24h" | "7d" | "30d" | "90d" | "all";
+
+const rangeDays: Record<Range, number | null> = {
+  "24h": 1,
+  "7d": 7,
+  "30d": 30,
+  "90d": 90,
+  all: null,
+};
+
+interface Props {
+  searchParams: Promise<{ range?: string }>;
+}
+
+export default async function ActivityLogPage({ searchParams }: Props) {
+  const { range: rawRange } = await searchParams;
+  const range: Range = rawRange && rawRange in rangeDays ? (rawRange as Range) : "7d";
   const supabase = createSupabaseServiceClient();
 
-  const { data: events, error } = await supabase
+  let query = supabase
     .from("admin_activity_log")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(200);
+
+  const days = rangeDays[range];
+  if (days !== null) {
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+    query = query.gte("created_at", since.toISOString());
+  }
+
+  const { data: events, error } = await query;
 
   if (error) {
     console.error("[admin/activity] Failed to fetch:", error.message);
@@ -56,10 +81,10 @@ export default async function ActivityLogPage() {
         <AdminRefreshBar />
       </div>
       <p className="text-sm text-muted mb-6">
-        Recent user actions across the platform. Showing last 200 events.
+        Recent user actions across the platform.
       </p>
 
-      <ActivityLogList events={enriched} />
+      <ActivityLogList events={enriched} range={range} />
     </div>
   );
 }
