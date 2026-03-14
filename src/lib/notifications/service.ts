@@ -15,7 +15,8 @@ export type NotificationType =
   | "audio_upload"
   | "collaborator_joined"
   | "export_complete"
-  | "spec_mismatch";
+  | "spec_mismatch"
+  | "distribution_live";
 
 type CreateNotificationParams = {
   userId: string;

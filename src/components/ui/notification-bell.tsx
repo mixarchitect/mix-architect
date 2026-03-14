@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { AlertTriangle, Bell, Check, MessageSquare, GitCommitHorizontal, DollarSign, ShieldCheck, X, Upload, UserPlus, Download } from "lucide-react";
+import { AlertTriangle, Bell, Check, MessageSquare, GitCommitHorizontal, DollarSign, ShieldCheck, X, Upload, UserPlus, Download, Radio } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { useNotifications, type Notification } from "@/lib/notifications/use-notifications";
@@ -193,6 +193,8 @@ function NotificationIcon({ type }: { type: string }) {
       return <Download size={16} strokeWidth={1.5} className={cls} />;
     case "spec_mismatch":
       return <AlertTriangle size={16} strokeWidth={1.5} className={cls} />;
+    case "distribution_live":
+      return <Radio size={16} strokeWidth={1.5} className={cls} />;
     default:
       return <Bell size={16} strokeWidth={1.5} className={cls} />;
   }

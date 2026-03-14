@@ -14,6 +14,7 @@ import { FlowProvider, ReleaseFlowContent } from "@/components/flow-simulator/re
 import { FlowBreadcrumbTitle } from "@/components/flow-simulator/flow-breadcrumb-title";
 import { SaveAsTemplateButton } from "@/components/templates/save-as-template-button";
 import { CalendarExportButton } from "./calendar-export-button";
+import { DistributionPanel } from "./distribution-panel";
 import type { FlowTrack } from "@/components/flow-simulator/use-flow-audio";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
@@ -34,7 +35,7 @@ export default async function ReleasePage({ params }: Props) {
   const supabase = await createSupabaseServerClient();
 
   // Fire all independent queries in parallel
-  const [releaseRes, userRes, tracksRes, globalRefsRes, briefShareRes] = await Promise.all([
+  const [releaseRes, userRes, tracksRes, globalRefsRes, briefShareRes, distributionRes] = await Promise.all([
     supabase.from("releases").select("*").eq("id", releaseId).maybeSingle(),
     supabase.auth.getUser(),
     supabase
@@ -53,6 +54,11 @@ export default async function ReleasePage({ params }: Props) {
       .select("*")
       .eq("release_id", releaseId)
       .maybeSingle(),
+    supabase
+      .from("release_distribution")
+      .select("*")
+      .eq("release_id", releaseId)
+      .order("platform"),
   ]);
 
   const release = releaseRes.data;
@@ -262,6 +268,15 @@ export default async function ReleasePage({ params }: Props) {
               action={canEdit(role) ? { label: "Add a track", href: `/app/releases/${releaseId}/tracks/new`, variant: "primary" } : undefined}
             />
           )}
+
+          {/* Distribution Status Tracking */}
+          <DistributionPanel
+            releaseId={releaseId}
+            initialEntries={distributionRes.data ?? []}
+            releaseTitle={release.title}
+            releaseArtist={release.artist ?? ""}
+            canEdit={canEdit(role)}
+          />
         </div>
 
         {/* Inspector sidebar */}
