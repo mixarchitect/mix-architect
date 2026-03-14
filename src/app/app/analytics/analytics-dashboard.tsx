@@ -94,7 +94,7 @@ export function AnalyticsDashboard({ summary, from, to, range, compare }: Props)
               ? `${turnaround.fastestDays}d fastest, ${turnaround.slowestDays}d slowest`
               : "No completed releases"
           }
-          href="/app?view=timeline"
+          href="/app"
         />
         <StatCard
           icon={DollarSign}
