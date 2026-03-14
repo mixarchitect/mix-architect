@@ -12,6 +12,7 @@ import { logActivityClient } from "@/lib/activity-logger-client";
 
 export default function SignInPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -40,6 +41,9 @@ export default function SignInPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: { full_name: fullName.trim() || undefined },
+          },
         });
         if (error) throw error;
       }
@@ -78,6 +82,19 @@ export default function SignInPage() {
           <Rule />
           <PanelBody className="pt-5">
             <form onSubmit={handleSubmit} className="space-y-5">
+              {mode === "signup" && (
+                <div className="space-y-1.5">
+                  <label className="label text-muted">Name</label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="input"
+                    placeholder="Your name"
+                  />
+                </div>
+              )}
+
               <div className="space-y-1.5">
                 <label className="label text-muted">Email</label>
                 <input

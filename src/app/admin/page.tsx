@@ -1,24 +1,58 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
-import { Users, AlertTriangle, Activity, CreditCard } from "lucide-react";
+import {
+  Users,
+  AlertTriangle,
+  Activity,
+  CreditCard,
+  DollarSign,
+  TrendingDown,
+  ArrowUpRight,
+  UserPlus,
+} from "lucide-react";
 import Link from "next/link";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+import { displayUserName } from "@/lib/display-user";
 
 export const dynamic = "force-dynamic";
 
+const PRO_PRICE = 9; // $9/month
+
+const currencyFmt = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 0,
+});
+
 interface StatCard {
   label: string;
-  value: number;
+  value: string;
   icon: typeof Users;
-  href: string;
+  href?: string;
   color: string;
 }
 
 export default async function AdminDashboard() {
   const supabase = createSupabaseServiceClient();
 
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
   // Run all counts in parallel
-  const [subsRes, churnRes, activityRes, proRes] = await Promise.all([
+  const [
+    subsRes,
+    proRes,
+    churnRes,
+    activityRes,
+    profilesRes,
+    signupsRes,
+    cancellationsRes,
+  ] = await Promise.all([
     supabase.from("subscriptions").select("id", { count: "exact", head: true }),
+    supabase
+      .from("subscriptions")
+      .select("id", { count: "exact", head: true })
+      .eq("plan", "pro")
+      .eq("status", "active"),
     supabase
       .from("admin_churn_signals")
       .select("id", { count: "exact", head: true })
@@ -27,38 +61,95 @@ export default async function AdminDashboard() {
       .from("admin_activity_log")
       .select("id", { count: "exact", head: true })
       .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+    supabase.from("profiles").select("id", { count: "exact", head: true }),
     supabase
-      .from("subscriptions")
+      .from("admin_activity_log")
       .select("id", { count: "exact", head: true })
-      .eq("plan", "pro")
-      .eq("status", "active"),
+      .eq("event_type", "signup")
+      .gte("created_at", sevenDaysAgo),
+    supabase
+      .from("admin_activity_log")
+      .select("id", { count: "exact", head: true })
+      .eq("event_type", "subscription_cancelled")
+      .gte("created_at", thirtyDaysAgo),
   ]);
 
-  const stats: StatCard[] = [
+  const activePro = proRes.count ?? 0;
+  const totalUsers = profilesRes.count ?? 0;
+  const cancellationsLast30d = cancellationsRes.count ?? 0;
+  const newSignups7d = signupsRes.count ?? 0;
+
+  // MRR
+  const mrr = activePro * PRO_PRICE;
+
+  // Churn rate (30d)
+  const periodStartSubs = activePro + cancellationsLast30d;
+  const churnRate =
+    periodStartSubs > 0 ? (cancellationsLast30d / periodStartSubs) * 100 : 0;
+
+  // Conversion rate
+  const conversionRate =
+    totalUsers > 0 ? (activePro / totalUsers) * 100 : 0;
+
+  const churnColor =
+    churnRate <= 5 ? "text-emerald-400" : churnRate <= 10 ? "text-amber-400" : "text-red-400";
+
+  const row1: StatCard[] = [
     {
-      label: "Total Subscribers",
-      value: subsRes.count ?? 0,
+      label: "Total Users",
+      value: String(totalUsers),
       icon: Users,
       href: "/admin/subscribers",
       color: "text-blue-400",
     },
     {
       label: "Active Pro",
-      value: proRes.count ?? 0,
+      value: String(activePro),
       icon: CreditCard,
       href: "/admin/subscribers",
       color: "text-emerald-400",
     },
     {
+      label: "New Signups (7d)",
+      value: String(newSignups7d),
+      icon: UserPlus,
+      href: "/admin/activity",
+      color: "text-purple-400",
+    },
+  ];
+
+  const row2: StatCard[] = [
+    {
+      label: "MRR",
+      value: currencyFmt.format(mrr),
+      icon: DollarSign,
+      color: "text-emerald-400",
+    },
+    {
+      label: "Conversion Rate",
+      value: `${conversionRate.toFixed(0)}%`,
+      icon: ArrowUpRight,
+      color: "text-blue-400",
+    },
+    {
+      label: "Churn Rate (30d)",
+      value: `${churnRate.toFixed(1)}%`,
+      icon: TrendingDown,
+      color: churnColor,
+    },
+  ];
+
+  const row3: StatCard[] = [
+    {
       label: "Open Churn Signals",
-      value: churnRes.count ?? 0,
+      value: String(churnRes.count ?? 0),
       icon: AlertTriangle,
       href: "/admin/churn",
       color: "text-amber-400",
     },
     {
       label: "Events (24h)",
-      value: activityRes.count ?? 0,
+      value: String(activityRes.count ?? 0),
       icon: Activity,
       href: "/admin/activity",
       color: "text-purple-400",
@@ -72,22 +163,22 @@ export default async function AdminDashboard() {
     .order("created_at", { ascending: false })
     .limit(10);
 
-  // Get emails for recent events
+  // Get user display names for recent events
   const eventUserIds = [
     ...new Set(
       (recentEvents ?? []).map((e: { user_id: string }) => e.user_id),
     ),
   ];
-  const userEmails: Record<string, string> = {};
+  const userNames: Record<string, string> = {};
 
   if (eventUserIds.length > 0) {
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, email")
+      .select("id, full_name, email")
       .in("id", eventUserIds);
     if (profiles) {
       for (const p of profiles) {
-        userEmails[p.id] = p.email ?? "Unknown";
+        userNames[p.id] = displayUserName(p);
       }
     }
   }
@@ -99,22 +190,24 @@ export default async function AdminDashboard() {
         <AdminRefreshBar />
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat) => (
-          <Link
-            key={stat.label}
-            href={stat.href}
-            className="rounded-lg border border-border bg-panel px-4 py-4 hover:bg-panel2 transition-colors"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <stat.icon size={16} className={stat.color} />
-              <span className="text-xs text-muted uppercase tracking-wider">
-                {stat.label}
-              </span>
-            </div>
-            <div className="text-3xl font-bold text-text">{stat.value}</div>
-          </Link>
+      {/* Stat cards - Row 1: Users */}
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        {row1.map((stat) => (
+          <StatCardEl key={stat.label} stat={stat} />
+        ))}
+      </div>
+
+      {/* Stat cards - Row 2: Revenue & Health */}
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        {row2.map((stat) => (
+          <StatCardEl key={stat.label} stat={stat} />
+        ))}
+      </div>
+
+      {/* Stat cards - Row 3: Operational */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        {row3.map((stat) => (
+          <StatCardEl key={stat.label} stat={stat} />
         ))}
       </div>
 
@@ -147,7 +240,7 @@ export default async function AdminDashboard() {
                 <div key={event.id} className="px-4 py-3 flex items-center gap-3">
                   <div className="flex-1 min-w-0">
                     <span className="text-sm text-text">
-                      {userEmails[event.user_id] ?? event.user_id.slice(0, 8)}
+                      {userNames[event.user_id] ?? event.user_id.slice(0, 8)}
                     </span>
                     <span className="text-sm text-muted ml-2">
                       {formatEventType(event.event_type)}
@@ -162,6 +255,37 @@ export default async function AdminDashboard() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function StatCardEl({ stat }: { stat: StatCard }) {
+  const inner = (
+    <>
+      <div className="flex items-center gap-2 mb-2">
+        <stat.icon size={16} className={stat.color} />
+        <span className="text-xs text-muted uppercase tracking-wider">
+          {stat.label}
+        </span>
+      </div>
+      <div className="text-3xl font-bold text-text">{stat.value}</div>
+    </>
+  );
+
+  if (stat.href) {
+    return (
+      <Link
+        href={stat.href}
+        className="rounded-lg border border-border bg-panel px-4 py-4 hover:bg-panel2 transition-colors"
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-border bg-panel px-4 py-4">
+      {inner}
     </div>
   );
 }

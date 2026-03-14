@@ -1,6 +1,7 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { ChurnSignalsList } from "@/components/admin/ChurnSignalsList";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+import { displayUserName } from "@/lib/display-user";
 
 export const dynamic = "force-dynamic";
 
@@ -31,26 +32,26 @@ export default async function ChurnSignalsPage() {
 
   const rows = (signals ?? []) as ChurnSignalRow[];
 
-  // Get user emails for all signals
+  // Get user display names for all signals
   const userIds = [...new Set(rows.map((s) => s.user_id))];
-  const userEmails: Record<string, string> = {};
+  const userNameMap: Record<string, string> = {};
 
   if (userIds.length > 0) {
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, email")
+      .select("id, full_name, email")
       .in("id", userIds);
 
     if (profiles) {
       for (const p of profiles) {
-        userEmails[p.id] = p.email ?? "Unknown";
+        userNameMap[p.id] = displayUserName(p);
       }
     }
   }
 
   const enrichedSignals = rows.map((s) => ({
     ...s,
-    user_email: userEmails[s.user_id] ?? "Unknown",
+    user_email: userNameMap[s.user_id] ?? s.user_id.substring(0, 8),
   }));
 
   const openCount = enrichedSignals.filter((s) => !s.resolved).length;

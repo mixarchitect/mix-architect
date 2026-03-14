@@ -1,6 +1,7 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { NotificationsPanel } from "@/components/admin/NotificationsPanel";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+import { displayUserName } from "@/lib/display-user";
 
 export const dynamic = "force-dynamic";
 
@@ -40,21 +41,24 @@ export default async function AdminNotificationsPage() {
   if (subUserIds.length > 0) {
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, email")
+      .select("id, full_name, email")
       .in("id", subUserIds);
 
     if (profiles) {
-      const emailMap: Record<string, string> = {};
+      const profileMap: Record<string, { email: string; label: string }> = {};
       for (const p of profiles) {
-        emailMap[p.id] = p.email ?? "";
+        profileMap[p.id] = {
+          email: p.email ?? "",
+          label: displayUserName(p),
+        };
       }
 
       for (const sub of subscribers ?? []) {
         const s = sub as { user_id: string; plan: string; status: string };
-        if (emailMap[s.user_id]) {
+        if (profileMap[s.user_id]?.email) {
           userOptions.push({
             userId: s.user_id,
-            email: emailMap[s.user_id],
+            email: profileMap[s.user_id].email,
             plan: s.plan,
             status: s.status,
           });

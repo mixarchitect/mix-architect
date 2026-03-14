@@ -1,6 +1,7 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { ActivityLogList } from "@/components/admin/ActivityLogList";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+import { displayUserName } from "@/lib/display-user";
 
 export const dynamic = "force-dynamic";
 
@@ -27,25 +28,25 @@ export default async function ActivityLogPage() {
 
   const rows = (events ?? []) as ActivityRow[];
 
-  // Get user emails
+  // Get user display names
   const userIds = [...new Set(rows.map((e) => e.user_id))];
-  const userEmails: Record<string, string> = {};
+  const userNameMap: Record<string, string> = {};
 
   if (userIds.length > 0) {
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, email")
+      .select("id, full_name, email")
       .in("id", userIds);
     if (profiles) {
       for (const p of profiles) {
-        userEmails[p.id] = p.email ?? "Unknown";
+        userNameMap[p.id] = displayUserName(p);
       }
     }
   }
 
   const enriched = rows.map((e) => ({
     ...e,
-    user_email: userEmails[e.user_id] ?? "Unknown",
+    user_email: userNameMap[e.user_id] ?? e.user_id.substring(0, 8),
   }));
 
   return (

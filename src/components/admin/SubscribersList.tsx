@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { CreditCard, Gift, Users } from "lucide-react";
 
@@ -27,6 +28,7 @@ const statusColors: Record<string, string> = {
 };
 
 export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<FilterTab>("all");
   const [search, setSearch] = useState("");
 
@@ -87,7 +89,11 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
             const sevClass = statusColors[sub.status] ?? statusColors.incomplete;
 
             return (
-              <div key={sub.id} className="px-4 py-3 flex items-center gap-4">
+              <div
+                key={sub.id}
+                onClick={() => router.push(`/admin/subscribers/${sub.user_id}`)}
+                className="px-4 py-3 flex items-center gap-4 cursor-pointer hover:bg-panel2 transition-colors"
+              >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-sm font-medium text-text truncate">

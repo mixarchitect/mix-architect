@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
 import {
   LogIn,
@@ -53,6 +54,7 @@ const filterGroups: Record<FilterType, string[] | null> = {
 };
 
 export function ActivityLogList({ events }: { events: ActivityEvent[] }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<FilterType>("all");
   const [search, setSearch] = useState("");
 
@@ -115,9 +117,12 @@ export function ActivityLogList({ events }: { events: ActivityEvent[] }) {
                 <Icon size={16} className={cn(config.color, "shrink-0")} />
 
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm font-medium text-text truncate">
+                  <button
+                    onClick={() => router.push(`/admin/subscribers/${event.user_id}`)}
+                    className="text-sm font-medium text-text truncate hover:text-amber-500 transition-colors"
+                  >
                     {event.user_email}
-                  </span>
+                  </button>
                   <span className="text-sm text-muted ml-2">{config.label}</span>
                   {event.event_metadata &&
                     Object.keys(event.event_metadata).length > 0 && (
