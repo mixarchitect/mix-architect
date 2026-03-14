@@ -470,12 +470,12 @@
     "backToDashboard": "ダッシュボードに戻る"
   },
   "distribution": {
-    "title": "配信",
+    "title": "配信トラッカー",
     "checkNow": "今すぐ確認",
     "markAsSubmitted": "提出済みにする",
     "addPlatform": "プラットフォームを追加",
     "emptyTitle": "トラッキング中のプラットフォームなし",
-    "emptyDescription": "ストリーミングプラットフォームでリリースを追跡します。",
+    "emptyDescription": "Spotifyでリリースを追跡します。",
     "getStarted": "始める",
     "advanceStatus": "ステータスを進める",
     "addUrl": "URLを追加",

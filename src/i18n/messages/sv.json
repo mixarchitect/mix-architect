@@ -470,12 +470,12 @@
     "backToDashboard": "Tillbaka till instrumentpanelen"
   },
   "distribution": {
-    "title": "DISTRIBUTION",
+    "title": "DISTRIBUTION TRACKER",
     "checkNow": "Kontrollera nu",
     "markAsSubmitted": "Markera som inskickad",
     "addPlatform": "Lägg till plattform",
     "emptyTitle": "Inga plattformar spårade",
-    "emptyDescription": "Spåra din release på streamingplattformar.",
+    "emptyDescription": "Spåra din release på Spotify.",
     "getStarted": "Kom igång",
     "advanceStatus": "Avancera status",
     "addUrl": "Lägg till URL",

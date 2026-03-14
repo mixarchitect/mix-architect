@@ -23,6 +23,21 @@ export function getPlatformColor(id: string): string {
   return PLATFORMS.find((p) => p.id === id)?.color ?? "#888888";
 }
 
+/** Map platform ID → SVG icon path in /public/icons/streaming/ */
+export function getPlatformIcon(id: string): string {
+  const map: Record<string, string> = {
+    spotify: "/icons/streaming/spotify.svg",
+    apple_music: "/icons/streaming/apple-music.svg",
+    tidal: "/icons/streaming/tidal.svg",
+    amazon_music: "/icons/streaming/amazon-music.svg",
+    youtube_music: "/icons/streaming/youtube-music.svg",
+    deezer: "/icons/streaming/deezer.svg",
+    soundcloud: "/icons/streaming/soundcloud.svg",
+    bandcamp: "/icons/streaming/bandcamp.svg",
+  };
+  return map[id] ?? "/icons/streaming/globe.svg";
+}
+
 // Platforms that support auto-detection
 export const AUTO_DETECTABLE_PLATFORMS: PlatformId[] = [
   "spotify",

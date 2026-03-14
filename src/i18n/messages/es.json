@@ -470,12 +470,12 @@
     "backToDashboard": "Volver al Panel Principal"
   },
   "distribution": {
-    "title": "DISTRIBUCIÓN",
+    "title": "RASTREADOR DE DISTRIBUCIÓN",
     "checkNow": "Verificar ahora",
     "markAsSubmitted": "Marcar como enviado",
     "addPlatform": "Añadir plataforma",
     "emptyTitle": "Sin plataformas rastreadas",
-    "emptyDescription": "Rastrea tu lanzamiento en plataformas de streaming.",
+    "emptyDescription": "Rastrea tu lanzamiento en Spotify.",
     "getStarted": "Empezar",
     "advanceStatus": "Avanzar estado",
     "addUrl": "Añadir URL",

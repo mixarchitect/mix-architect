@@ -24,9 +24,8 @@ import {
   PLATFORMS,
   DISTRIBUTORS,
   DISTRIBUTOR_PLATFORMS,
-  AUTO_DETECTABLE_PLATFORMS,
   statusLabel,
-  getPlatformColor,
+  getPlatformIcon,
   type DistributionEntry,
   type PlatformId,
 } from "@/lib/distribution/platforms";
@@ -101,7 +100,7 @@ export function DistributionPanel({
           await refresh();
           router.refresh();
         } else {
-          setCheckResult("Not found yet. We'll keep checking.");
+          setCheckResult("Not found yet. We'll keep checking daily.");
         }
       } else {
         setCheckResult(data.error ?? "Check failed");
@@ -136,35 +135,22 @@ export function DistributionPanel({
     await refresh();
   }
 
-  const hasSubmittedAutoDetectable = entries.some(
-    (e) =>
-      AUTO_DETECTABLE_PLATFORMS.includes(e.platform as PlatformId) &&
-      (e.status === "submitted" || e.status === "processing"),
-  );
+  // Split entries into Spotify (auto) and other (manual)
+  const spotifyEntry = entries.find((e) => e.platform === "spotify");
+  const otherEntries = entries.filter((e) => e.platform !== "spotify");
+
+  const hasSpotifySubmitted =
+    spotifyEntry &&
+    (spotifyEntry.status === "submitted" || spotifyEntry.status === "processing");
 
   return (
     <Panel>
       <PanelBody className="py-5">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <div className="label-sm text-muted">DISTRIBUTION</div>
+          <div className="label-sm text-muted">DISTRIBUTION TRACKER</div>
           {canEdit && entries.length > 0 && (
             <div className="flex items-center gap-2">
-              {hasSubmittedAutoDetectable && (
-                <button
-                  type="button"
-                  onClick={handleCheckNow}
-                  disabled={checking}
-                  className="flex items-center gap-1 text-[11px] text-muted hover:text-signal transition-colors disabled:opacity-50"
-                >
-                  {checking ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <Search size={12} />
-                  )}
-                  Check Now
-                </button>
-              )}
               <button
                 type="button"
                 onClick={() => {
@@ -190,20 +176,6 @@ export function DistributionPanel({
             </div>
           )}
         </div>
-
-        {/* Check result feedback */}
-        {checkResult && (
-          <div className="text-xs text-muted bg-panel2 rounded-md px-3 py-2 mb-3 flex items-center justify-between">
-            <span>{checkResult}</span>
-            <button
-              type="button"
-              onClick={() => setCheckResult(null)}
-              className="text-faint hover:text-text ml-2"
-            >
-              <X size={12} />
-            </button>
-          </div>
-        )}
 
         {/* Bulk Submit Form */}
         {showBulkForm && canEdit && (
@@ -231,12 +203,12 @@ export function DistributionPanel({
           />
         )}
 
-        {/* Platform List */}
+        {/* Empty State */}
         {entries.length === 0 && !showBulkForm && !showAddForm ? (
           <EmptyState
             icon={Radio}
             title="No platforms tracked"
-            description="Track your release across streaming platforms."
+            description="Track your release on Spotify."
             size="sm"
             action={
               canEdit
@@ -248,19 +220,82 @@ export function DistributionPanel({
             }
           />
         ) : (
-          <div className="space-y-0.5">
-            {entries.map((entry) => (
-              <PlatformRow
-                key={entry.id}
-                entry={entry}
-                canEdit={canEdit}
-                onDelete={() => handleDelete(entry.id)}
-                onStatusChange={(status) =>
-                  handleStatusChange(entry.id, status)
-                }
-                onSetUrl={(url) => handleSetUrl(entry.id, url)}
-              />
-            ))}
+          <div className="space-y-4">
+            {/* ── Spotify Section (Auto-detected) ── */}
+            {spotifyEntry && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5 text-[11px] text-muted">
+                    <Sparkles size={11} className="text-signal" />
+                    Updates automatically
+                  </div>
+                  {hasSpotifySubmitted && (
+                    <button
+                      type="button"
+                      onClick={handleCheckNow}
+                      disabled={checking}
+                      className="flex items-center gap-1 text-[11px] text-muted hover:text-signal transition-colors disabled:opacity-50"
+                    >
+                      {checking ? (
+                        <Loader2 size={12} className="animate-spin" />
+                      ) : (
+                        <Search size={12} />
+                      )}
+                      Check Now
+                    </button>
+                  )}
+                </div>
+
+                {/* Check result feedback */}
+                {checkResult && (
+                  <div className="text-xs text-muted bg-panel2 rounded-md px-3 py-2 mb-2 flex items-center justify-between">
+                    <span>{checkResult}</span>
+                    <button
+                      type="button"
+                      onClick={() => setCheckResult(null)}
+                      className="text-faint hover:text-text ml-2"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                )}
+
+                <PlatformRow
+                  entry={spotifyEntry}
+                  canEdit={canEdit}
+                  onDelete={() => handleDelete(spotifyEntry.id)}
+                  onStatusChange={(status) =>
+                    handleStatusChange(spotifyEntry.id, status)
+                  }
+                  onSetUrl={(url) => handleSetUrl(spotifyEntry.id, url)}
+                />
+              </div>
+            )}
+
+            {/* ── Other Platforms Section (Manual) ── */}
+            {otherEntries.length > 0 && (
+              <div>
+                {spotifyEntry && (
+                  <div className="flex items-center gap-1.5 text-[11px] text-muted mb-2">
+                    Manually updated
+                  </div>
+                )}
+                <div className="space-y-0.5">
+                  {otherEntries.map((entry) => (
+                    <PlatformRow
+                      key={entry.id}
+                      entry={entry}
+                      canEdit={canEdit}
+                      onDelete={() => handleDelete(entry.id)}
+                      onStatusChange={(status) =>
+                        handleStatusChange(entry.id, status)
+                      }
+                      onSetUrl={(url) => handleSetUrl(entry.id, url)}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </PanelBody>
@@ -292,26 +327,31 @@ function PlatformRow({
 
   return (
     <div className="flex items-center gap-3 py-2 px-1 rounded-md hover:bg-panel2/50 transition-colors group">
-      {/* Platform dot + name */}
-      <span
-        className="w-2.5 h-2.5 rounded-full shrink-0"
-        style={{ backgroundColor: getPlatformColor(entry.platform) }}
+      {/* Platform icon + name */}
+      <img
+        src={getPlatformIcon(entry.platform)}
+        alt=""
+        className="w-4 h-4 shrink-0 object-contain"
       />
-      <span className="text-sm text-text min-w-[100px]">
+      <span className="text-sm text-text w-[120px] shrink-0">
         {platform?.label ?? entry.platform}
       </span>
 
       {/* Status */}
-      <StatusIndicator
-        color={getStatusColor(entry.status)}
-        label={statusLabel(entry.status)}
-        className="text-xs"
-      />
+      <span className="w-[80px] shrink-0">
+        <StatusIndicator
+          color={getStatusColor(entry.status)}
+          label={statusLabel(entry.status)}
+          className="text-xs"
+        />
+      </span>
 
       {/* Distributor pill */}
-      {entry.distributor && (
-        <Pill className="text-[10px]">{entry.distributor}</Pill>
-      )}
+      <span className="w-[90px] shrink-0">
+        {entry.distributor ? (
+          <Pill className="text-[10px]">{entry.distributor}</Pill>
+        ) : null}
+      </span>
 
       {/* Auto-detected sparkle */}
       {entry.auto_detected && (
@@ -405,6 +445,7 @@ function PlatformRow({
             className="input h-6 text-xs w-40"
             placeholder="https://..."
             autoFocus
+            style={{ padding: "4px 8px" }}
           />
           <Button
             type="submit"
@@ -497,7 +538,8 @@ function BulkSubmitForm({
         <select
           value={distributor}
           onChange={(e) => handleDistributorChange(e.target.value)}
-          className="input h-8 text-xs"
+          className="input text-xs w-full"
+          style={{ height: "32px", padding: "4px 36px 4px 10px" }}
         >
           <option value="">Select distributor...</option>
           {DISTRIBUTORS.map((d) => (
@@ -530,9 +572,10 @@ function BulkSubmitForm({
                     disabled={alreadyExists}
                     className="rounded border-border accent-[var(--signal)]"
                   />
-                  <span
-                    className="w-2 h-2 rounded-full shrink-0"
-                    style={{ backgroundColor: p.color }}
+                  <img
+                    src={getPlatformIcon(p.id)}
+                    alt=""
+                    className="w-3.5 h-3.5 shrink-0 object-contain"
                   />
                   <span className="text-text">
                     {p.label}
@@ -623,7 +666,8 @@ function AddPlatformForm({
       <select
         value={platform}
         onChange={(e) => setPlatform(e.target.value)}
-        className="input h-8 text-xs flex-1"
+        className="input text-xs flex-1"
+        style={{ height: "32px", padding: "4px 36px 4px 10px" }}
       >
         {available.map((p) => (
           <option key={p.id} value={p.id}>

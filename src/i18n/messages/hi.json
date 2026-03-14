@@ -470,12 +470,12 @@
     "backToDashboard": "डैशबोर्ड पर वापस जाएं"
   },
   "distribution": {
-    "title": "वितरण",
+    "title": "वितरण ट्रैकर",
     "checkNow": "अभी जांचें",
     "markAsSubmitted": "सबमिट के रूप में चिह्नित करें",
     "addPlatform": "प्लेटफ़ॉर्म जोड़ें",
     "emptyTitle": "कोई प्लेटफ़ॉर्म ट्रैक नहीं",
-    "emptyDescription": "स्ट्रीमिंग प्लेटफ़ॉर्म पर अपनी रिलीज़ ट्रैक करें।",
+    "emptyDescription": "Spotify पर अपनी रिलीज़ ट्रैक करें।",
     "getStarted": "शुरू करें",
     "advanceStatus": "स्थिति आगे बढ़ाएं",
     "addUrl": "URL जोड़ें",

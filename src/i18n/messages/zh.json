@@ -96,7 +96,7 @@
     }
   },
   "dashboard": {
-    "title": "发行",
+    "title": "发行追踪器",
     "newRelease": "新建发行",
     "upgrade": "升级",
     "noReleases": "暂无发行",
@@ -470,12 +470,12 @@
     "backToDashboard": "返回仪表板"
   },
   "distribution": {
-    "title": "发行",
+    "title": "发行追踪器",
     "checkNow": "立即检查",
     "markAsSubmitted": "标记为已提交",
     "addPlatform": "添加平台",
     "emptyTitle": "未追踪任何平台",
-    "emptyDescription": "在流媒体平台上追踪您的发行。",
+    "emptyDescription": "在Spotify上追踪您的发行。",
     "getStarted": "开始",
     "advanceStatus": "推进状态",
     "addUrl": "添加 URL",

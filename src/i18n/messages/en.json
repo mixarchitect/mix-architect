@@ -470,12 +470,12 @@
     "backToDashboard": "Back to Dashboard"
   },
   "distribution": {
-    "title": "DISTRIBUTION",
+    "title": "DISTRIBUTION TRACKER",
     "checkNow": "Check Now",
     "markAsSubmitted": "Mark as Submitted",
     "addPlatform": "Add Platform",
     "emptyTitle": "No platforms tracked",
-    "emptyDescription": "Track your release across streaming platforms.",
+    "emptyDescription": "Track your release on Spotify.",
     "getStarted": "Get Started",
     "advanceStatus": "Advance status",
     "addUrl": "Add URL",

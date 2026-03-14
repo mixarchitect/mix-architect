@@ -470,12 +470,12 @@
     "backToDashboard": "대시보드로 돌아가기"
   },
   "distribution": {
-    "title": "배포",
+    "title": "배포 트래커",
     "checkNow": "지금 확인",
     "markAsSubmitted": "제출됨으로 표시",
     "addPlatform": "플랫폼 추가",
     "emptyTitle": "추적 중인 플랫폼 없음",
-    "emptyDescription": "스트리밍 플랫폼에서 릴리스를 추적하세요.",
+    "emptyDescription": "Spotify에서 릴리스를 추적하세요.",
     "getStarted": "시작하기",
     "advanceStatus": "상태 진행",
     "addUrl": "URL 추가",
