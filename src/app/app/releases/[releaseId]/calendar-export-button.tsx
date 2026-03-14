@@ -35,12 +35,12 @@ export function CalendarExportButton({ releaseId }: { releaseId: string }) {
   return (
     <Button
       variant="secondary"
-      className="px-3"
+      className="h-8 w-8 p-0"
       onClick={handleExport}
       disabled={loading}
       title="Export to calendar"
     >
-      <CalendarDays size={16} />
+      <CalendarDays size={14} />
     </Button>
   );
 }

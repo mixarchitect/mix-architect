@@ -17,11 +17,11 @@ export function SaveAsTemplateButton({ releaseId, releaseTitle }: Props) {
     <>
       <Button
         variant="secondary"
-        className="px-3"
+        className="h-8 w-8 p-0"
         onClick={() => setOpen(true)}
-        title="Save as Template"
+        title="Save as template"
       >
-        <LayoutTemplate size={16} />
+        <LayoutTemplate size={14} />
       </Button>
 
       {open && (

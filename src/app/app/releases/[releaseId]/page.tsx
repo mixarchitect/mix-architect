@@ -165,7 +165,7 @@ export default async function ReleasePage({ params }: Props) {
             canEdit={canEdit(role)}
           />
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           {canEdit(role) && (
             <PortalToggle
               releaseId={releaseId}
@@ -194,8 +194,8 @@ export default async function ReleasePage({ params }: Props) {
           )}
           {canEdit(role) && (
             <Link href={`/app/releases/${releaseId}/settings`}>
-              <Button variant="secondary" className="px-3">
-                <Settings size={16} />
+              <Button variant="secondary" className="h-8 w-8 p-0" title="Release settings">
+                <Settings size={14} />
               </Button>
             </Link>
           )}
