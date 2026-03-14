@@ -377,6 +377,23 @@
       "setupApple": "Apple Kalender: Arkiv > Ny kalenderprenumeration > klistra in länken",
       "setupOutlook": "Outlook: Lägg till kalender > Från internet > klistra in länken"
     },
+    "integrations": {
+      "title": "Integrationer",
+      "description": "Anslut molnlagring för att importera filer direkt till dina releaser.",
+      "providers": {
+        "googleDrive": "Google Drive",
+        "dropbox": "Dropbox"
+      },
+      "connected": "Ansluten som {email}",
+      "notConnected": "Inte ansluten",
+      "connect": "Anslut",
+      "disconnect": "Koppla från",
+      "connecting": "Ansluter...",
+      "disconnecting": "Kopplar från...",
+      "connectSuccess": "{provider} har anslutits.",
+      "connectError": "Anslutningen misslyckades. Försök igen.",
+      "disconnectConfirm": "Koppla från {provider}? Du kan återansluta när som helst."
+    },
     "subscription": {
       "title": "Prenumeration",
       "description": "Hantera ditt Mix Architect-abonnemang.",

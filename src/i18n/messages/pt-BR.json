@@ -377,6 +377,23 @@
       "setupApple": "Apple Calendário: Arquivo > Nova assinatura > cole o link",
       "setupOutlook": "Outlook: Adicionar calendário > Da Internet > cole o link"
     },
+    "integrations": {
+      "title": "Integrações",
+      "description": "Conecte armazenamento em nuvem para importar arquivos diretamente para seus releases.",
+      "providers": {
+        "googleDrive": "Google Drive",
+        "dropbox": "Dropbox"
+      },
+      "connected": "Conectado como {email}",
+      "notConnected": "Não conectado",
+      "connect": "Conectar",
+      "disconnect": "Desconectar",
+      "connecting": "Conectando...",
+      "disconnecting": "Desconectando...",
+      "connectSuccess": "{provider} foi conectado com sucesso.",
+      "connectError": "Falha ao conectar. Por favor, tente novamente.",
+      "disconnectConfirm": "Desconectar {provider}? Você pode reconectar a qualquer momento."
+    },
     "subscription": {
       "title": "Assinatura",
       "description": "Gerencie seu plano do Mix Architect.",

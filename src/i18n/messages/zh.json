@@ -377,6 +377,23 @@
       "setupApple": "Apple 日历：文件 > 新建日历订阅 > 粘贴链接",
       "setupOutlook": "Outlook：添加日历 > 从互联网 > 粘贴链接"
     },
+    "integrations": {
+      "title": "集成",
+      "description": "连接云存储，将文件直接导入到您的发行版中。",
+      "providers": {
+        "googleDrive": "Google Drive",
+        "dropbox": "Dropbox"
+      },
+      "connected": "已连接为 {email}",
+      "notConnected": "未连接",
+      "connect": "连接",
+      "disconnect": "断开",
+      "connecting": "正在连接...",
+      "disconnecting": "正在断开...",
+      "connectSuccess": "已成功连接 {provider}。",
+      "connectError": "连接失败，请重试。",
+      "disconnectConfirm": "断开 {provider}？您可以随时重新连接。"
+    },
     "subscription": {
       "title": "订阅",
       "description": "管理您的 Mix Architect 套餐。",

@@ -377,6 +377,23 @@
       "setupApple": "Apple Calendar: फ़ाइल > नई कैलेंडर सदस्यता > लिंक पेस्ट करें",
       "setupOutlook": "Outlook: कैलेंडर जोड़ें > इंटरनेट से > लिंक पेस्ट करें"
     },
+    "integrations": {
+      "title": "इंटीग्रेशन",
+      "description": "क्लाउड स्टोरेज कनेक्ट करें और फ़ाइलें सीधे अपने रिलीज़ में इम्पोर्ट करें।",
+      "providers": {
+        "googleDrive": "Google Drive",
+        "dropbox": "Dropbox"
+      },
+      "connected": "{email} के रूप में कनेक्टेड",
+      "notConnected": "कनेक्ट नहीं है",
+      "connect": "कनेक्ट करें",
+      "disconnect": "डिस्कनेक्ट करें",
+      "connecting": "कनेक्ट हो रहा है...",
+      "disconnecting": "डिस्कनेक्ट हो रहा है...",
+      "connectSuccess": "{provider} सफलतापूर्वक कनेक्ट हो गया।",
+      "connectError": "कनेक्ट करने में विफल। कृपया पुनः प्रयास करें।",
+      "disconnectConfirm": "{provider} डिस्कनेक्ट करें? आप कभी भी फिर से कनेक्ट कर सकते हैं।"
+    },
     "subscription": {
       "title": "सब्स्क्रिप्शन",
       "description": "अपने Mix Architect प्लान को मैनेज करें।",

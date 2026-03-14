@@ -377,6 +377,23 @@
       "setupApple": "Apple 캘린더: 파일 > 새 캘린더 구독 > 링크 붙여넣기",
       "setupOutlook": "Outlook: 캘린더 추가 > 인터넷에서 > 링크 붙여넣기"
     },
+    "integrations": {
+      "title": "연동",
+      "description": "클라우드 스토리지를 연결하여 파일을 릴리스에 직접 가져올 수 있습니다.",
+      "providers": {
+        "googleDrive": "Google Drive",
+        "dropbox": "Dropbox"
+      },
+      "connected": "{email}(으)로 연결됨",
+      "notConnected": "연결되지 않음",
+      "connect": "연결",
+      "disconnect": "연결 해제",
+      "connecting": "연결 중...",
+      "disconnecting": "연결 해제 중...",
+      "connectSuccess": "{provider}이(가) 성공적으로 연결되었습니다.",
+      "connectError": "연결에 실패했습니다. 다시 시도해 주세요.",
+      "disconnectConfirm": "{provider} 연결을 해제하시겠습니까? 언제든지 다시 연결할 수 있습니다."
+    },
     "subscription": {
       "title": "구독",
       "description": "Mix Architect 플랜을 관리하세요.",

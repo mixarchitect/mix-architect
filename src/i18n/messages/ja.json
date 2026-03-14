@@ -377,6 +377,23 @@
       "setupApple": "Appleカレンダー: ファイル > 新規カレンダー購読 > リンクを貼り付け",
       "setupOutlook": "Outlook: カレンダーを追加 > インターネットから > リンクを貼り付け"
     },
+    "integrations": {
+      "title": "連携",
+      "description": "クラウドストレージを接続して、ファイルをリリースに直接インポートできます。",
+      "providers": {
+        "googleDrive": "Google Drive",
+        "dropbox": "Dropbox"
+      },
+      "connected": "{email} として接続中",
+      "notConnected": "未接続",
+      "connect": "接続",
+      "disconnect": "切断",
+      "connecting": "接続中...",
+      "disconnecting": "切断中...",
+      "connectSuccess": "{provider} に正常に接続しました。",
+      "connectError": "接続に失敗しました。もう一度お試しください。",
+      "disconnectConfirm": "{provider} を切断しますか？いつでも再接続できます。"
+    },
     "subscription": {
       "title": "サブスクリプション",
       "description": "Mix Architectプランを管理します。",

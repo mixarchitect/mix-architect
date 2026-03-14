@@ -377,6 +377,23 @@
       "setupApple": "Apple Calendrier : Fichier > Nouvel abonnement > collez le lien",
       "setupOutlook": "Outlook : Ajouter un calendrier > Depuis Internet > collez le lien"
     },
+    "integrations": {
+      "title": "Intégrations",
+      "description": "Connectez un stockage cloud pour importer des fichiers directement dans vos releases.",
+      "providers": {
+        "googleDrive": "Google Drive",
+        "dropbox": "Dropbox"
+      },
+      "connected": "Connecté en tant que {email}",
+      "notConnected": "Non connecté",
+      "connect": "Connecter",
+      "disconnect": "Déconnecter",
+      "connecting": "Connexion en cours...",
+      "disconnecting": "Déconnexion en cours...",
+      "connectSuccess": "{provider} a été connecté avec succès.",
+      "connectError": "Échec de la connexion. Veuillez réessayer.",
+      "disconnectConfirm": "Déconnecter {provider} ? Vous pouvez vous reconnecter à tout moment."
+    },
     "subscription": {
       "title": "Abonnement",
       "description": "Gérez votre plan Mix Architect.",

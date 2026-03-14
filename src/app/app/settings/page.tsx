@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
-import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download, CalendarDays, Copy, Check, RefreshCw } from "lucide-react";
+import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download, CalendarDays, Copy, Check, RefreshCw, HardDrive, Cloud, Unplug } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -510,6 +510,9 @@ export default function SettingsPage() {
         {/* Calendar Subscription */}
         <CalendarPanel />
 
+        {/* Integrations */}
+        <IntegrationsPanel />
+
         {/* Subscription */}
         <SubscriptionPanel />
       </div>
@@ -754,6 +757,178 @@ function CalendarPanel() {
             {generating ? tc("saving") : t("enableFeed")}
           </Button>
         )}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Integrations Panel                                                  */
+/* ------------------------------------------------------------------ */
+
+const PROVIDER_DISPLAY: Record<string, { icon: React.ElementType; nameKey: string }> = {
+  google_drive: { icon: HardDrive, nameKey: "googleDrive" },
+  dropbox: { icon: Cloud, nameKey: "dropbox" },
+};
+
+type IntegrationItem = {
+  id: string;
+  provider: string;
+  provider_email: string | null;
+};
+
+function IntegrationsPanel() {
+  const t = useTranslations("settings.integrations");
+  const [integrations, setIntegrations] = useState<IntegrationItem[]>([]);
+  const [availableProviders, setAvailableProviders] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [connecting, setConnecting] = useState<string | null>(null);
+  const [disconnecting, setDisconnecting] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch("/api/integrations");
+        if (res.ok) {
+          const data = await res.json();
+          setIntegrations(data.integrations ?? []);
+          setAvailableProviders(data.availableProviders ?? []);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  // Check URL params for connection result
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const result = params.get("integration");
+    if (result === "connected") {
+      // Refresh the list
+      fetch("/api/integrations")
+        .then((res) => res.json())
+        .then((data) => {
+          setIntegrations(data.integrations ?? []);
+          setAvailableProviders(data.availableProviders ?? []);
+        });
+      // Clean URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete("integration");
+      url.searchParams.delete("provider");
+      window.history.replaceState({}, "", url.toString());
+    } else if (result === "error") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("integration");
+      url.searchParams.delete("message");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
+  async function handleConnect(provider: string) {
+    setConnecting(provider);
+    try {
+      const res = await fetch(`/api/integrations/${provider}/connect`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (data.authUrl) {
+        window.location.href = data.authUrl;
+      }
+    } finally {
+      setConnecting(null);
+    }
+  }
+
+  async function handleDisconnect(id: string, provider: string) {
+    if (!confirm(t("disconnectConfirm", { provider: PROVIDER_DISPLAY[provider]?.nameKey ? t(`providers.${PROVIDER_DISPLAY[provider].nameKey}`) : provider }))) {
+      return;
+    }
+    setDisconnecting(id);
+    try {
+      const res = await fetch(`/api/integrations/disconnect/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setIntegrations((prev) => prev.filter((i) => i.id !== id));
+      }
+    } finally {
+      setDisconnecting(null);
+    }
+  }
+
+  if (loading) return null;
+  if (availableProviders.length === 0) return null;
+
+  const connectedMap = new Map(
+    integrations.map((i) => [i.provider, i]),
+  );
+
+  return (
+    <Panel>
+      <PanelHeader>
+        <h2 className="text-base font-semibold text-text">{t("title")}</h2>
+        <p className="text-sm text-muted mt-1">{t("description")}</p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {availableProviders.map((provider) => {
+            const display = PROVIDER_DISPLAY[provider];
+            if (!display) return null;
+            const Icon = display.icon;
+            const connected = connectedMap.get(provider);
+            const isConnecting = connecting === provider;
+            const isDisconnecting = disconnecting === connected?.id;
+
+            return (
+              <div
+                key={provider}
+                className="rounded-lg border border-border p-4 flex flex-col gap-3"
+                style={{ background: "var(--panel-2)" }}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: "var(--panel)" }}
+                  >
+                    <Icon size={18} className="text-text" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-text">
+                      {t(`providers.${display.nameKey}`)}
+                    </div>
+                    <div className="text-xs text-muted truncate">
+                      {connected
+                        ? t("connected", { email: connected.provider_email ?? "" })
+                        : t("notConnected")}
+                    </div>
+                  </div>
+                </div>
+                {connected ? (
+                  <button
+                    type="button"
+                    onClick={() => handleDisconnect(connected.id, provider)}
+                    disabled={isDisconnecting}
+                    className="flex items-center justify-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-400 transition-colors py-1.5 rounded-md"
+                    style={{ background: "var(--panel)" }}
+                  >
+                    <Unplug size={12} />
+                    {isDisconnecting ? t("disconnecting") : t("disconnect")}
+                  </button>
+                ) : (
+                  <Button
+                    variant="primary"
+                    className="text-xs h-8"
+                    onClick={() => handleConnect(provider)}
+                    disabled={isConnecting}
+                  >
+                    {isConnecting ? t("connecting") : t("connect")}
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </PanelBody>
     </Panel>
   );
