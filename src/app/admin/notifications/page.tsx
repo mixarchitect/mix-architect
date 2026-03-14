@@ -1,5 +1,8 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { NotificationsPanel } from "@/components/admin/NotificationsPanel";
+import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+
+export const dynamic = "force-dynamic";
 
 interface NotificationLogRow {
   id: string;
@@ -62,7 +65,10 @@ export default async function AdminNotificationsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-2 text-text">Notifications</h1>
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-2xl font-bold text-text">Notifications</h1>
+        <AdminRefreshBar />
+      </div>
       <p className="text-sm text-muted mb-6">
         Send email notifications to users. All sent notifications are logged below.
       </p>

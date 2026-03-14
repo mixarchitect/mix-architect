@@ -1,6 +1,9 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { Users, AlertTriangle, Activity, CreditCard } from "lucide-react";
 import Link from "next/link";
+import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+
+export const dynamic = "force-dynamic";
 
 interface StatCard {
   label: string;
@@ -91,7 +94,10 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6 text-text">Dashboard</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-text">Dashboard</h1>
+        <AdminRefreshBar />
+      </div>
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -160,8 +166,24 @@ export default async function AdminDashboard() {
   );
 }
 
+const eventLabels: Record<string, string> = {
+  signup: "signed up",
+  login: "logged in",
+  release_created: "created release",
+  track_uploaded: "uploaded track",
+  collaborator_invited: "invited collaborator",
+  subscription_started: "started subscription",
+  subscription_cancelled: "cancelled subscription",
+  subscription_renewed: "renewed subscription",
+  payment_failed: "payment failed",
+  export_requested: "exported data",
+  conversion_completed: "converted audio",
+  comp_account_granted: "comp account granted",
+  comp_account_revoked: "comp account revoked",
+};
+
 function formatEventType(type: string): string {
-  return type.replace(/_/g, " ");
+  return eventLabels[type] ?? type.replace(/_/g, " ");
 }
 
 function formatRelativeTime(iso: string): string {

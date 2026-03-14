@@ -1,5 +1,8 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { ActivityLogList } from "@/components/admin/ActivityLogList";
+import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+
+export const dynamic = "force-dynamic";
 
 interface ActivityRow {
   id: string;
@@ -47,7 +50,10 @@ export default async function ActivityLogPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-2 text-text">Activity Log</h1>
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-2xl font-bold text-text">Activity Log</h1>
+        <AdminRefreshBar />
+      </div>
       <p className="text-sm text-muted mb-6">
         Recent user actions across the platform. Showing last 200 events.
       </p>

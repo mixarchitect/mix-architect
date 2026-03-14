@@ -1,5 +1,8 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { SubscribersList } from "@/components/admin/SubscribersList";
+import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+
+export const dynamic = "force-dynamic";
 
 interface SubscriptionRow {
   id: string;
@@ -52,7 +55,10 @@ export default async function SubscribersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-2 text-text">Subscribers</h1>
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-2xl font-bold text-text">Subscribers</h1>
+        <AdminRefreshBar />
+      </div>
       <p className="text-sm text-muted mb-6">All users with subscription records.</p>
 
       <div className="flex gap-4 mb-6">

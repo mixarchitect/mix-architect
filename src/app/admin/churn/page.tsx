@@ -1,5 +1,8 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { ChurnSignalsList } from "@/components/admin/ChurnSignalsList";
+import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
+
+export const dynamic = "force-dynamic";
 
 interface ChurnSignalRow {
   id: string;
@@ -55,7 +58,10 @@ export default async function ChurnSignalsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-2 text-text">Churn Signals</h1>
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-2xl font-bold text-text">Churn Signals</h1>
+        <AdminRefreshBar />
+      </div>
       <p className="text-sm text-muted mb-6">
         Detected risk indicators for subscriber retention.
       </p>
