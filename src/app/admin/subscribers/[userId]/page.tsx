@@ -11,6 +11,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { notFound } from "next/navigation";
+import { AdminToggleButton } from "@/components/admin/AdminToggleButton";
 
 export const dynamic = "force-dynamic";
 
@@ -178,9 +179,7 @@ export default async function UserDetailPage({ params }: Props) {
             </a>
           )}
 
-          {profile.is_admin === true && (
-            <span className="text-amber-500 font-medium">Admin</span>
-          )}
+          <AdminToggleButton userId={userId} isAdmin={profile.is_admin === true} />
         </div>
 
         {subscription?.current_period_end && (
