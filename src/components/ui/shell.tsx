@@ -18,6 +18,7 @@ import { ToastProvider } from "@/components/ui/toast";
 type ShellProps = {
   userId?: string;
   userEmail?: string | null;
+  displayName?: string | null;
   paymentsEnabled?: boolean;
   theme?: string;
   subscription?: SubscriptionState;
@@ -33,7 +34,7 @@ const DEFAULT_SUB: SubscriptionState = {
   grantedByAdmin: false,
 };
 
-export function Shell({ userId, userEmail, paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, isAdmin = false, children }: ShellProps) {
+export function Shell({ userId, userEmail, displayName, paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, isAdmin = false, children }: ShellProps) {
   const { isOpen, open, close } = useCommandPalette();
   const { setTheme } = useTheme();
 
@@ -56,7 +57,7 @@ export function Shell({ userId, userEmail, paymentsEnabled = false, theme = "sys
       <SubscriptionProvider initial={subscription}>
         <div className="flex flex-col h-dvh overflow-hidden">
           {/* Full-width top bar (desktop) */}
-          <TopBar userId={userId} userEmail={userEmail ?? null} onSearchClick={open} isAdmin={isAdmin} />
+          <TopBar userId={userId} userEmail={userEmail ?? null} displayName={displayName ?? null} onSearchClick={open} isAdmin={isAdmin} />
 
           {/* Below top bar: sidebar + content */}
           <div className="flex flex-1 min-h-0">

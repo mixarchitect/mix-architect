@@ -98,7 +98,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       {isOnboarding ? (
         children
       ) : (
-        <Shell userId={user.id} userEmail={user.email ?? null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription} isAdmin={isAdmin}>
+        <Shell userId={user.id} userEmail={user.email ?? null} displayName={user.user_metadata?.display_name || user.user_metadata?.full_name || null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription} isAdmin={isAdmin}>
           {children}
         </Shell>
       )}

@@ -13,11 +13,19 @@ import { Tooltip } from "@/components/ui/tooltip";
 type Props = {
   userId?: string;
   userEmail?: string | null;
+  displayName?: string | null;
   onSearchClick?: () => void;
   isAdmin?: boolean;
 };
 
-export function TopBar({ userId, userEmail, onSearchClick, isAdmin }: Props) {
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin }: Props) {
   const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -41,17 +49,24 @@ export function TopBar({ userId, userEmail, onSearchClick, isAdmin }: Props) {
 
   return (
     <header className="hidden md:flex h-14 shrink-0 items-center justify-between px-6 border-b border-border bg-panel">
-      {/* Left: logo */}
-      <Link
-        href="/app"
-        className="flex items-center hover:opacity-90 transition-opacity"
-      >
-        <img
-          src={mounted && resolvedTheme === "dark" ? "/mix-architect-logo-white.svg" : "/mix-architect-logo.svg"}
-          alt="Mix Architect"
-          className="h-6 w-auto"
-        />
-      </Link>
+      {/* Left: greeting + logo */}
+      <div className="flex items-center gap-3">
+        <Link
+          href="/app"
+          className="flex items-center hover:opacity-90 transition-opacity"
+        >
+          <img
+            src={mounted && resolvedTheme === "dark" ? "/mix-architect-logo-white.svg" : "/mix-architect-logo.svg"}
+            alt="Mix Architect"
+            className="h-6 w-auto"
+          />
+        </Link>
+        {displayName && (
+          <span className="text-sm text-muted">
+            {getGreeting()}, <span className="text-text font-medium">{displayName.split(" ")[0]}</span>
+          </span>
+        )}
+      </div>
 
       {/* Right: utility items */}
       <div className="flex items-center gap-1">
@@ -130,7 +145,7 @@ export function TopBar({ userId, userEmail, onSearchClick, isAdmin }: Props) {
         {userId && (
           <Tooltip label="Account" align="right">
             <span className="ml-1">
-              <AccountMenu userEmail={userEmail ?? null} />
+              <AccountMenu userEmail={userEmail ?? null} displayName={displayName ?? null} />
             </span>
           </Tooltip>
         )}
@@ -141,13 +156,13 @@ export function TopBar({ userId, userEmail, onSearchClick, isAdmin }: Props) {
 
 /* ─── Account Dropdown ──────────────────────────────────── */
 
-function AccountMenu({ userEmail }: { userEmail: string | null }) {
+function AccountMenu({ userEmail, displayName }: { userEmail: string | null; displayName: string | null }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
 
-  const initial = userEmail ? userEmail[0].toUpperCase() : "?";
+  const initial = displayName ? displayName[0].toUpperCase() : userEmail ? userEmail[0].toUpperCase() : "?";
 
   useEffect(() => {
     if (!open) return;
@@ -199,7 +214,8 @@ function AccountMenu({ userEmail }: { userEmail: string | null }) {
         >
           {/* User info */}
           <div className="px-3 py-2 border-b border-border">
-            <p className="text-sm text-text font-medium truncate">{userEmail}</p>
+            {displayName && <p className="text-sm text-text font-medium truncate">{displayName}</p>}
+            <p className={cn("text-sm truncate", displayName ? "text-muted" : "text-text font-medium")}>{userEmail}</p>
           </div>
 
           {/* Menu items */}
