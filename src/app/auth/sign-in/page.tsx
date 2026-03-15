@@ -16,6 +16,7 @@ export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [confirmationSent, setConfirmationSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -43,6 +44,7 @@ export default function SignInPage() {
           password,
           options: {
             data: { full_name: fullName.trim() || undefined },
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
         if (error) throw error;
@@ -50,6 +52,12 @@ export default function SignInPage() {
 
       // Fire-and-forget activity log
       logActivityClient(mode === "signin" ? "login" : "signup", { method: "email" });
+
+      if (mode === "signup") {
+        setConfirmationSent(true);
+        setLoading(false);
+        return;
+      }
 
       router.push("/app");
       // Don't reset loading — let the button stay disabled through navigation
@@ -81,6 +89,26 @@ export default function SignInPage() {
           </PanelHeader>
           <Rule />
           <PanelBody className="pt-5">
+            {confirmationSent ? (
+              <div className="text-center space-y-3 py-4">
+                <div className="text-3xl">✉️</div>
+                <h2 className="text-lg font-semibold text-text">Check your email</h2>
+                <p className="text-sm text-muted">
+                  We sent a confirmation link to <strong className="text-text">{email}</strong>. Click the link to activate your account.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirmationSent(false);
+                    setMode("signin");
+                  }}
+                  className="text-sm text-text underline underline-offset-2 hover:text-signal transition-colors mt-2"
+                >
+                  Back to sign in
+                </button>
+              </div>
+            ) : (
+            <>
             <form onSubmit={handleSubmit} className="space-y-5">
               {mode === "signup" && (
                 <div className="space-y-1.5">
@@ -180,6 +208,8 @@ export default function SignInPage() {
                 ← Back to home
               </Link>
             </div>
+            </>
+            )}
           </PanelBody>
         </Panel>
       </div>

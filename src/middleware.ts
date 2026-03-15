@@ -4,6 +4,9 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
 
+  // Expose pathname so server components (e.g. app layout) can read it
+  response.headers.set("x-next-pathname", request.nextUrl.pathname);
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -36,5 +39,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/app/:path*"],
+  matcher: ["/app/:path*", "/auth/callback"],
 };
