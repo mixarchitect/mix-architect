@@ -311,7 +311,7 @@
     "releaseCount": "{count, plural, one {# release} other {# releases}}"
   },
   "settings": {
-    "title": "Settings",
+    "title": "User Settings",
     "appearance": {
       "title": "Appearance",
       "description": "Choose your preferred color theme."

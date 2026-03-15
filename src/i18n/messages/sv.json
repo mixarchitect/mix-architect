@@ -311,7 +311,7 @@
     "releaseCount": "{count, plural, one {# release} other {# releaser}}"
   },
   "settings": {
-    "title": "Inställningar",
+    "title": "Användarinställningar",
     "appearance": {
       "title": "Utseende",
       "description": "Välj ditt föredragna färgtema."

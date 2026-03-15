@@ -311,7 +311,7 @@
     "releaseCount": "{count, plural, one {# रिलीज़} other {# रिलीज़}}"
   },
   "settings": {
-    "title": "सेटिंग्स",
+    "title": "उपयोगकर्ता सेटिंग्स",
     "appearance": {
       "title": "अपीयरेंस",
       "description": "अपनी पसंदीदा कलर थीम चुनें।"

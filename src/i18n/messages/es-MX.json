@@ -311,7 +311,7 @@
     "releaseCount": "{count, plural, one {# lanzamiento} other {# lanzamientos}}"
   },
   "settings": {
-    "title": "Configuración",
+    "title": "Configuración de usuario",
     "appearance": {
       "title": "Apariencia",
       "description": "Elige tu tema de color preferido."

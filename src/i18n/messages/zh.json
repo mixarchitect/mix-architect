@@ -311,7 +311,7 @@
     "releaseCount": "{count, plural, one {# 个发行} other {# 个发行}}"
   },
   "settings": {
-    "title": "设置",
+    "title": "用户设置",
     "appearance": {
       "title": "外观",
       "description": "选择您偏好的颜色主题。"
