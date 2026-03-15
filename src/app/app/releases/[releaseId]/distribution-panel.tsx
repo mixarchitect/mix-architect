@@ -501,7 +501,8 @@ function PlatformRow({
           />
           <button
             type="submit"
-            className="btn-primary h-[28px] text-[11px] px-2.5 rounded-sm"
+            className="inline-flex items-center justify-center rounded-sm text-[11px] font-semibold text-white"
+            style={{ height: 28, padding: "0 10px", background: "var(--signal)" }}
           >
             Save
           </button>
