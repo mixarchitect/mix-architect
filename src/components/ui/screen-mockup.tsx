@@ -2,7 +2,7 @@
 
 /* ═══════════════════════════════════════════════════════════
    SCREEN MOCKUP — Help article visual aids using real components
-   47 mockups (14 articles, ~3 each; Article 4 has 6)
+   58 mockups (16 articles, ~3 each; Article 4 has 6)
    ═══════════════════════════════════════════════════════════ */
 
 import {
@@ -13,6 +13,7 @@ import {
   Calendar, Upload, GripVertical, Copy, Link2,
   Shield, CreditCard, CheckCircle2, Clock,
   ClipboardList, FileText, Users, Sparkles, Eye,
+  Radio, ExternalLink, RefreshCw, BarChart3, TrendingUp, DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -1831,6 +1832,380 @@ function ResubscribeMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   ARTICLE 15: DISTRIBUTION TRACKER (6 mockups)
+   ═══════════════════════════════════════════════════════════ */
+
+function DistributionPlatformDot({ color }: { color: string }) {
+  return <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />;
+}
+
+function DistributionAddPlatformMockup() {
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelHeader>
+          <div className="flex items-center justify-between w-full">
+            <span className="text-xs font-semibold tracking-wide text-faint uppercase">Distribution</span>
+            <Button variant="primary"><Plus size={14} /> Add Platform</Button>
+          </div>
+        </PanelHeader>
+        <PanelBody className="pt-6 space-y-3">
+          <MockSelect text="Select platform" />
+          <MockSelect text="Select distributor" />
+          <MockInput text="Optional notes" placeholder />
+          <Button variant="primary">Add</Button>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function DistributionStatusMockup() {
+  const rows: { platform: string; color: string; status: string; statusColor: string }[] = [
+    { platform: "Spotify", color: "#1DB954", status: "LIVE", statusColor: "var(--status-green)" },
+    { platform: "Apple Music", color: "#FC3C44", status: "PROCESSING", statusColor: "var(--status-orange)" },
+    { platform: "Tidal", color: "#00FFFF", status: "SUBMITTED", statusColor: "var(--status-blue)" },
+    { platform: "Amazon Music", color: "#25D1DA", status: "SUBMITTED", statusColor: "var(--status-blue)" },
+    { platform: "YouTube Music", color: "#FF0000", status: "NOT SUBMITTED", statusColor: "var(--text-faint)" },
+  ];
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelBody className="pt-6 space-y-0">
+          {rows.map((r, i) => (
+            <div key={r.platform}>
+              <div className="flex items-center gap-3 py-3">
+                <DistributionPlatformDot color={r.color} />
+                <span className="text-sm font-medium text-text flex-1">{r.platform}</span>
+                <span
+                  className="text-[10px] font-medium uppercase tracking-wide"
+                  style={{ color: r.statusColor }}
+                >
+                  {r.status}
+                </span>
+              </div>
+              {i < rows.length - 1 && <Rule />}
+            </div>
+          ))}
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function DistributionSpotifyMockup() {
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelBody className="pt-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <DistributionPlatformDot color="#1DB954" />
+            <span className="text-sm font-semibold text-text">Spotify</span>
+            <Pill className="bg-status-green/10 text-status-green border-status-green/20">Live</Pill>
+          </div>
+          <AccentPanel>
+            <div className="flex items-center gap-3 mb-2">
+              <CheckCircle2 size={18} className="text-white" />
+              <span className="text-sm font-semibold text-white">Auto-detected on Spotify</span>
+            </div>
+            <p className="text-xs text-white/70">Matched by ISRC: USRC12345678</p>
+          </AccentPanel>
+          <div className="flex items-center gap-3">
+            <ExternalLink size={14} className="text-signal" />
+            <span className="text-xs text-signal truncate">open.spotify.com/album/3Kx...</span>
+          </div>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function DistributionEditMockup() {
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelBody className="pt-6 space-y-4">
+          <div className="flex items-center gap-3 mb-1">
+            <DistributionPlatformDot color="#FC3C44" />
+            <span className="text-sm font-semibold text-text flex-1">Apple Music</span>
+            <Pencil size={14} className="text-muted" />
+          </div>
+          <div className="space-y-3">
+            <div>
+              <span className="label text-xs text-faint mb-1.5 block">STATUS</span>
+              <MockSelect text="Processing" />
+            </div>
+            <div>
+              <span className="label text-xs text-faint mb-1.5 block">EXTERNAL LINK</span>
+              <MockInput text="https://music.apple.com/album/..." />
+            </div>
+            <div>
+              <span className="label text-xs text-faint mb-1.5 block">NOTES</span>
+              <MockInput text="Submitted via DistroKid on Mar 10" />
+            </div>
+          </div>
+          <Button variant="primary">Save</Button>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function DistributionBulkMockup() {
+  const platforms = [
+    { name: "Spotify", color: "#1DB954", checked: true },
+    { name: "Apple Music", color: "#FC3C44", checked: true },
+    { name: "Tidal", color: "#00FFFF", checked: true },
+    { name: "Amazon Music", color: "#25D1DA", checked: true },
+    { name: "YouTube Music", color: "#FF0000", checked: false },
+    { name: "Deezer", color: "#A238FF", checked: false },
+  ];
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelHeader>
+          <span className="text-xs font-semibold tracking-wide text-faint uppercase">Bulk Submit</span>
+        </PanelHeader>
+        <PanelBody className="pt-6 space-y-4">
+          <div>
+            <span className="label text-xs text-faint mb-1.5 block">DISTRIBUTOR</span>
+            <MockSelect text="DistroKid" />
+          </div>
+          <div>
+            <span className="label text-xs text-faint mb-2 block">PLATFORMS</span>
+            <div className="grid grid-cols-2 gap-2">
+              {platforms.map((p) => (
+                <div key={p.name} className="flex items-center gap-2 py-1.5">
+                  <div className={cn(
+                    "w-4 h-4 rounded border flex items-center justify-center",
+                    p.checked ? "bg-signal border-signal" : "border-border bg-panel",
+                  )}>
+                    {p.checked && <Check size={10} className="text-signal-on" />}
+                  </div>
+                  <DistributionPlatformDot color={p.color} />
+                  <span className="text-xs text-text">{p.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <Button variant="primary">Mark as Submitted</Button>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function DistributionDistributorMockup() {
+  const entries = [
+    { platform: "Spotify", color: "#1DB954", distributor: "DistroKid", status: "Live" },
+    { platform: "Apple Music", color: "#FC3C44", distributor: "DistroKid", status: "Processing" },
+    { platform: "Bandcamp", color: "#1DA0C3", distributor: "Self-released", status: "Live" },
+    { platform: "SoundCloud", color: "#FF5500", distributor: "Self-released", status: "Live" },
+  ];
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelBody className="pt-6 space-y-0">
+          {entries.map((e, i) => (
+            <div key={e.platform}>
+              <div className="flex items-center gap-3 py-3">
+                <DistributionPlatformDot color={e.color} />
+                <span className="text-sm font-medium text-text flex-1">{e.platform}</span>
+                <Pill>{e.distributor}</Pill>
+                <span className={cn(
+                  "text-[10px] font-medium uppercase tracking-wide",
+                  e.status === "Live" ? "text-status-green" : "text-status-orange",
+                )}>{e.status}</span>
+              </div>
+              {i < entries.length - 1 && <Rule />}
+            </div>
+          ))}
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ARTICLE 16: USER ANALYTICS (5 mockups)
+   ═══════════════════════════════════════════════════════════ */
+
+function AnalyticsOverviewMockup() {
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <span className="text-lg font-semibold text-text">Analytics</span>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: "RELEASES", value: "24", sub: "+3 this month" },
+            { label: "AVG TURNAROUND", value: "6.2d", sub: "from first upload" },
+            { label: "REVENUE", value: "$18,400", sub: "last 90 days" },
+            { label: "ACTIVE CLIENTS", value: "8", sub: "with open projects" },
+          ].map((s) => (
+            <Panel key={s.label} variant="flat" className="px-4 py-3 border border-border">
+              <span className="text-[10px] uppercase tracking-wide text-faint font-medium">{s.label}</span>
+              <div className="text-lg font-semibold text-text mt-1">{s.value}</div>
+              <span className="text-xs text-muted">{s.sub}</span>
+            </Panel>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function AnalyticsVelocityMockup() {
+  const months = ["Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
+  const values = [2, 4, 3, 5, 4, 6];
+  const max = Math.max(...values);
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelHeader>
+          <div className="flex items-center gap-2">
+            <TrendingUp size={14} className="text-muted" />
+            <span className="text-xs font-semibold tracking-wide text-faint uppercase">Release Velocity</span>
+          </div>
+        </PanelHeader>
+        <PanelBody className="pt-6 space-y-3">
+          <div className="flex items-end gap-2 h-24">
+            {months.map((m, i) => (
+              <div key={m} className="flex-1 flex flex-col items-center gap-1">
+                <div
+                  className="w-full rounded-sm"
+                  style={{
+                    height: `${(values[i] / max) * 80}px`,
+                    background: i === months.length - 1 ? "var(--signal)" : "var(--panel2)",
+                  }}
+                />
+                <span className="text-[10px] text-faint">{m}</span>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-4 pt-2">
+            <DataCell label="Avg/Month" value="4.0" size="small" />
+            <DataCell label="Trend" value="+50%" size="small" />
+          </div>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function AnalyticsRevenueMockup() {
+  const months = ["Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
+  const values = [2400, 3100, 2800, 4200, 3600, 5100];
+  const max = Math.max(...values);
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelHeader>
+          <div className="flex items-center gap-2">
+            <DollarSign size={14} className="text-muted" />
+            <span className="text-xs font-semibold tracking-wide text-faint uppercase">Revenue</span>
+          </div>
+        </PanelHeader>
+        <PanelBody className="pt-6 space-y-3">
+          {/* Simplified area chart with bars */}
+          <div className="flex items-end gap-2 h-24">
+            {months.map((m, i) => (
+              <div key={m} className="flex-1 flex flex-col items-center gap-1">
+                <div
+                  className="w-full rounded-sm"
+                  style={{
+                    height: `${(values[i] / max) * 80}px`,
+                    background: "var(--signal)",
+                    opacity: 0.3 + (i / months.length) * 0.7,
+                  }}
+                />
+                <span className="text-[10px] text-faint">{m}</span>
+              </div>
+            ))}
+          </div>
+          <Rule />
+          <div className="flex items-center gap-4">
+            <DataCell label="Total" value="$21,200" size="small" />
+            <DataCell label="Avg/Month" value="$3,533" size="small" />
+          </div>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function AnalyticsClientsMockup() {
+  const clients = [
+    { name: "Alex Rivera", initials: "AR", releases: 6, revenue: "$5,400", color: "#6366F1" },
+    { name: "Jordan Lee", initials: "JL", releases: 4, revenue: "$3,800", color: "#F59E0B" },
+    { name: "Sam Chen", initials: "SC", releases: 3, revenue: "$2,700", color: "#EC4899" },
+    { name: "Morgan Hayes", initials: "MH", releases: 2, revenue: "$1,800", color: "#10B981" },
+  ];
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelHeader>
+          <div className="flex items-center gap-2">
+            <Users size={14} className="text-muted" />
+            <span className="text-xs font-semibold tracking-wide text-faint uppercase">Client Breakdown</span>
+          </div>
+        </PanelHeader>
+        <PanelBody className="pt-6 space-y-0">
+          <div className="flex items-center gap-3 py-2 text-xs font-medium text-faint">
+            <span className="flex-1">Client</span>
+            <span className="w-16 text-right">Releases</span>
+            <span className="w-20 text-right">Revenue</span>
+          </div>
+          <Rule />
+          {clients.map((c) => (
+            <div key={c.name} className="flex items-center gap-3 py-2.5">
+              <MockAvatar initials={c.initials} size="sm" color={c.color} />
+              <span className="text-sm font-medium text-text flex-1">{c.name}</span>
+              <span className="w-16 text-right text-sm text-muted">{c.releases}</span>
+              <span className="w-20 text-right text-sm text-text">{c.revenue}</span>
+            </div>
+          ))}
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+function AnalyticsDateRangeMockup() {
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelBody className="pt-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <Calendar size={14} className="text-muted" />
+            <span className="text-sm font-semibold text-text">Date Range</span>
+          </div>
+          <div className="flex gap-2">
+            {["7d", "30d", "90d", "1y", "All"].map((r, i) => (
+              <div
+                key={r}
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-xs font-medium",
+                  i === 2
+                    ? "bg-signal text-signal-on"
+                    : "bg-panel2 text-muted border border-border",
+                )}
+              >
+                {r}
+              </div>
+            ))}
+          </div>
+          <Rule />
+          <DataGrid>
+            <DataCell label="From" value="Dec 14, 2025" size="small" />
+            <DataCell label="To" value="Mar 14, 2026" size="small" />
+          </DataGrid>
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    MOCKUP REGISTRY
    ═══════════════════════════════════════════════════════════ */
 
@@ -1897,6 +2272,19 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "cancel-subscription": CancelSubscriptionMockup,
   "data-after-cancel": DataAfterCancelMockup,
   "resubscribe": ResubscribeMockup,
+  /* Article 15: Distribution Tracker */
+  "distribution-add-platform": DistributionAddPlatformMockup,
+  "distribution-status": DistributionStatusMockup,
+  "distribution-spotify": DistributionSpotifyMockup,
+  "distribution-edit": DistributionEditMockup,
+  "distribution-bulk": DistributionBulkMockup,
+  "distribution-distributor": DistributionDistributorMockup,
+  /* Article 16: User Analytics */
+  "analytics-overview": AnalyticsOverviewMockup,
+  "analytics-velocity": AnalyticsVelocityMockup,
+  "analytics-revenue": AnalyticsRevenueMockup,
+  "analytics-clients": AnalyticsClientsMockup,
+  "analytics-date-range": AnalyticsDateRangeMockup,
 };
 
 /* ═══════════════════════════════════════════════════════════
