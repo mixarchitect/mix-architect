@@ -75,22 +75,22 @@ export default async function SubscribersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
         <h1 className="text-2xl font-bold text-text">Users</h1>
         <AdminRefreshBar />
       </div>
       <p className="text-sm text-muted mb-6">All registered users.</p>
 
-      <div className="flex gap-4 mb-6">
-        <div className="rounded-lg border border-border bg-panel px-4 py-3 min-w-[120px]">
+      <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 sm:gap-4 mb-6">
+        <div className="rounded-lg border border-border bg-panel px-4 py-3 min-w-0 sm:min-w-[120px]">
           <div className="text-xs text-muted uppercase tracking-wider mb-1">Pro</div>
           <div className="text-2xl font-bold text-emerald-500">{proCount}</div>
         </div>
-        <div className="rounded-lg border border-border bg-panel px-4 py-3 min-w-[120px]">
+        <div className="rounded-lg border border-border bg-panel px-4 py-3 min-w-0 sm:min-w-[120px]">
           <div className="text-xs text-muted uppercase tracking-wider mb-1">Free / No Plan</div>
           <div className="text-2xl font-bold text-text">{freeCount}</div>
         </div>
-        <div className="rounded-lg border border-border bg-panel px-4 py-3 min-w-[120px]">
+        <div className="rounded-lg border border-border bg-panel px-4 py-3 min-w-0 sm:min-w-[120px]">
           <div className="text-xs text-muted uppercase tracking-wider mb-1">Total</div>
           <div className="text-2xl font-bold text-text">{enriched.length}</div>
         </div>

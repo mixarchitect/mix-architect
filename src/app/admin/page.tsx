@@ -305,9 +305,9 @@ export default async function AdminDashboard({ searchParams }: Props) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold text-text">Dashboard</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <DashboardExportButton
             metrics={{
               period: periodLabel,
@@ -332,21 +332,21 @@ export default async function AdminDashboard({ searchParams }: Props) {
       </div>
 
       {/* Stat cards - Row 1: Users */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4">
         {row1.map((stat) => (
           <StatCardEl key={stat.label} stat={stat} />
         ))}
       </div>
 
       {/* Stat cards - Row 2: Revenue & Health */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4">
         {row2.map((stat) => (
           <StatCardEl key={stat.label} stat={stat} />
         ))}
       </div>
 
       {/* Stat cards - Row 3: Operational */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-8">
         {row3.map((stat) => (
           <StatCardEl key={stat.label} stat={stat} />
         ))}

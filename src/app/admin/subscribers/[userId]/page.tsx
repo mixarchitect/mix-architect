@@ -99,7 +99,7 @@ export default async function UserDetailPage({ params }: Props) {
   return (
     <div>
       {/* Back link + refresh */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
         <Link
           href="/admin/subscribers"
           className="flex items-center gap-1.5 text-sm text-muted hover:text-text transition-colors"

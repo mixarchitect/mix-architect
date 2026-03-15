@@ -13,11 +13,11 @@ export default async function AdminFeaturedPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
         <h1 className="text-2xl font-semibold text-text">
           Featured Releases
         </h1>
-        <Link href="/admin/featured/new">
+        <Link href="/admin/featured/new" className="shrink-0">
           <Button variant="primary">
             <Plus size={16} />
             New Featured Release
@@ -66,7 +66,7 @@ export default async function AdminFeaturedPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
                 <Link
                   href={`/admin/featured/${release.id}/edit`}
                   className="text-xs text-zinc-400 hover:text-white transition-colors px-2 py-1"

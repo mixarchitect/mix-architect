@@ -54,7 +54,7 @@ export default async function AdminNotificationsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
         <h1 className="text-2xl font-bold text-text">Notifications</h1>
         <AdminRefreshBar />
       </div>

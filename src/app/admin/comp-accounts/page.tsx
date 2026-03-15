@@ -52,7 +52,7 @@ export default async function CompAccountsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
         <h1 className="text-2xl font-bold text-text">Comp Accounts</h1>
         <AdminRefreshBar />
       </div>
@@ -60,17 +60,17 @@ export default async function CompAccountsPage() {
         Grant or revoke complimentary Pro access for users.
       </p>
 
-      <div className="flex gap-4 mb-6">
-        <div className="rounded-lg border border-border bg-panel px-4 py-3 min-w-[120px]">
+      <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 sm:gap-4 mb-6">
+        <div className="rounded-lg border border-border bg-panel px-4 py-3">
           <div className="text-xs text-muted uppercase tracking-wider mb-1">Active Comps</div>
           <div className="text-2xl font-bold text-amber-500">{activeCount}</div>
         </div>
-        <div className="rounded-lg border border-border bg-panel px-4 py-3 min-w-[120px]">
+        <div className="rounded-lg border border-border bg-panel px-4 py-3">
           <div className="text-xs text-muted uppercase tracking-wider mb-1">Total Granted</div>
           <div className="text-2xl font-bold text-text">{enrichedComps.length}</div>
         </div>
         {expiringCount > 0 && (
-          <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3 min-w-[120px]">
+          <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3 col-span-2 sm:col-span-1">
             <div className="text-xs text-amber-400 uppercase tracking-wider mb-1">Expiring Soon</div>
             <div className="text-2xl font-bold text-amber-500">{expiringCount}</div>
           </div>
