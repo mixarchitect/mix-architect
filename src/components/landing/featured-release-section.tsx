@@ -34,10 +34,10 @@ export function FeaturedReleaseSection({
       />
 
       <div className="mx-auto max-w-4xl">
-        <h2 className="text-center text-2xl font-bold text-white mb-2">
+        <h2 className="text-center text-3xl md:text-4xl font-bold text-white mb-2">
           Featured Release
         </h2>
-        <p className="text-center text-sm text-zinc-400 mb-8">
+        <p className="text-center mt-4 text-white/50 mb-8">
           Spotlighting great releases and the people behind the sound.
         </p>
 
