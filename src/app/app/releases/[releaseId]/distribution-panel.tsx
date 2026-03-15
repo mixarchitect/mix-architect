@@ -307,6 +307,15 @@ export function DistributionPanel({
 /*  Platform Row                                                       */
 /* ------------------------------------------------------------------ */
 
+const EDITABLE_STATUSES = [
+  "not_submitted",
+  "submitted",
+  "processing",
+  "live",
+  "rejected",
+  "taken_down",
+] as const;
+
 function PlatformRow({
   entry,
   canEdit,
@@ -320,116 +329,159 @@ function PlatformRow({
   onStatusChange: (status: string) => void;
   onSetUrl: (url: string) => void;
 }) {
+  const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlValue, setUrlValue] = useState(entry.external_url ?? "");
 
   const platform = PLATFORMS.find((p) => p.id === entry.platform);
 
   return (
-    <div className="flex items-center gap-3 py-2 px-1 rounded-md hover:bg-panel2/50 transition-colors group">
-      {/* Platform icon + name */}
-      <img
-        src={getPlatformIcon(entry.platform)}
-        alt=""
-        className="w-4 h-4 shrink-0 object-contain"
-      />
-      <span className="text-sm text-text w-[120px] shrink-0">
-        {platform?.label ?? entry.platform}
-      </span>
-
-      {/* Status */}
-      <span className="w-[80px] shrink-0">
-        <StatusIndicator
-          color={getStatusColor(entry.status)}
-          label={statusLabel(entry.status)}
-          className="text-xs"
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-3 py-2 px-1 rounded-md hover:bg-panel2/50 transition-colors group">
+        {/* Platform icon + name */}
+        <img
+          src={getPlatformIcon(entry.platform)}
+          alt=""
+          className="w-4 h-4 shrink-0 object-contain"
         />
-      </span>
-
-      {/* Distributor pill */}
-      <span className="w-[90px] shrink-0">
-        {entry.distributor ? (
-          <Pill className="text-[10px]">{entry.distributor}</Pill>
-        ) : null}
-      </span>
-
-      {/* Auto-detected sparkle */}
-      {entry.auto_detected && (
-        <span title="Automatically detected">
-          <Sparkles
-            size={12}
-            className="text-signal shrink-0"
-          />
+        <span className="text-sm text-text w-[120px] shrink-0">
+          {platform?.label ?? entry.platform}
         </span>
-      )}
 
-      {/* Spacer */}
-      <span className="flex-1" />
-
-      {/* External link */}
-      {entry.external_url && (
-        <a
-          href={entry.external_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-muted hover:text-signal transition-colors"
-          title="Open on platform"
-        >
-          <ExternalLink size={13} />
-        </a>
-      )}
-
-      {/* Actions (visible on hover) */}
-      {canEdit && (
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {/* Status cycle */}
-          {entry.status !== "live" && (
+        {/* Status (clickable dropdown when editable) */}
+        <span className="w-[80px] shrink-0">
+          {canEdit ? (
             <button
               type="button"
-              onClick={() => {
-                const cycle: Record<string, string> = {
-                  not_submitted: "submitted",
-                  submitted: "processing",
-                  processing: "live",
-                };
-                const next = cycle[entry.status];
-                if (next) onStatusChange(next);
-              }}
-              className="text-[10px] text-muted hover:text-signal transition-colors px-1"
-              title="Advance status"
+              onClick={() => setShowStatusMenu(!showStatusMenu)}
+              className="flex items-center gap-1 hover:opacity-80 transition-opacity"
             >
-              <ChevronDown size={12} className="rotate-[-90deg]" />
+              <StatusIndicator
+                color={getStatusColor(entry.status)}
+                label={statusLabel(entry.status)}
+                className="text-xs"
+              />
+              <ChevronDown size={10} className="text-faint" />
             </button>
+          ) : (
+            <StatusIndicator
+              color={getStatusColor(entry.status)}
+              label={statusLabel(entry.status)}
+              className="text-xs"
+            />
           )}
+        </span>
 
-          {/* Add URL */}
-          {!entry.external_url && (
+        {/* Distributor pill */}
+        <span className="w-[90px] shrink-0">
+          {entry.distributor ? (
+            <Pill className="text-[10px]">{entry.distributor}</Pill>
+          ) : null}
+        </span>
+
+        {/* Auto-detected sparkle */}
+        {entry.auto_detected && (
+          <span title="Automatically detected">
+            <Sparkles
+              size={12}
+              className="text-signal shrink-0"
+            />
+          </span>
+        )}
+
+        {/* Spacer */}
+        <span className="flex-1" />
+
+        {/* Link button: opens URL or shows input */}
+        {canEdit ? (
+          entry.external_url ? (
+            <div className="flex items-center gap-1">
+              <a
+                href={entry.external_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted hover:text-signal transition-colors"
+                title="Open on platform"
+              >
+                <ExternalLink size={13} />
+              </a>
+              <button
+                type="button"
+                onClick={() => setShowUrlInput(!showUrlInput)}
+                className="text-[10px] text-muted hover:text-signal transition-colors opacity-0 group-hover:opacity-100"
+                title="Edit URL"
+              >
+                Edit
+              </button>
+            </div>
+          ) : (
             <button
               type="button"
               onClick={() => setShowUrlInput(!showUrlInput)}
-              className="text-[10px] text-muted hover:text-signal transition-colors px-1"
-              title="Add URL"
+              className="flex items-center gap-1 text-[11px] text-muted hover:text-signal transition-colors"
+              title="Add link"
             >
               <ExternalLink size={12} />
+              <span>Add link</span>
             </button>
-          )}
+          )
+        ) : entry.external_url ? (
+          <a
+            href={entry.external_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted hover:text-signal transition-colors"
+            title="Open on platform"
+          >
+            <ExternalLink size={13} />
+          </a>
+        ) : null}
 
-          {/* Delete */}
+        {/* Delete (hover only) */}
+        {canEdit && (
           <button
             type="button"
             onClick={onDelete}
-            className="text-[10px] text-muted hover:text-red-400 transition-colors px-1"
+            className="text-[10px] text-muted hover:text-red-400 transition-colors px-1 opacity-0 group-hover:opacity-100"
             title="Remove"
           >
             <Trash2 size={12} />
           </button>
+        )}
+      </div>
+
+      {/* Status dropdown */}
+      {showStatusMenu && canEdit && (
+        <div className="flex items-center gap-1 pl-8 pb-1">
+          {EDITABLE_STATUSES.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => {
+                onStatusChange(s);
+                setShowStatusMenu(false);
+              }}
+              className={cn(
+                "flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-md transition-colors",
+                s === entry.status
+                  ? "bg-panel2 text-text"
+                  : "text-muted hover:bg-panel2/50 hover:text-text",
+              )}
+            >
+              <StatusIndicator
+                color={getStatusColor(s)}
+                label={statusLabel(s)}
+                className="text-[10px]"
+              />
+            </button>
+          ))}
         </div>
       )}
 
-      {/* Inline URL input */}
-      {showUrlInput && (
+      {/* URL input */}
+      {showUrlInput && canEdit && (
         <form
-          className="flex items-center gap-1 ml-2"
+          className="flex items-center gap-2 pl-8 pb-1"
           onSubmit={(e) => {
             e.preventDefault();
             if (urlValue.trim()) {
@@ -442,18 +494,25 @@ function PlatformRow({
             type="url"
             value={urlValue}
             onChange={(e) => setUrlValue(e.target.value)}
-            className="input h-6 text-xs w-40"
-            placeholder="https://..."
+            className="input text-xs flex-1"
+            placeholder="https://open.spotify.com/album/..."
             autoFocus
-            style={{ padding: "4px 8px" }}
+            style={{ height: "28px", padding: "4px 10px" }}
           />
           <Button
             type="submit"
             variant="primary"
-            className="h-6 text-[10px] px-2"
+            className="h-[28px] text-[11px] px-2.5"
           >
             Save
           </Button>
+          <button
+            type="button"
+            onClick={() => setShowUrlInput(false)}
+            className="text-[11px] text-muted hover:text-text transition-colors"
+          >
+            Cancel
+          </button>
         </form>
       )}
     </div>
