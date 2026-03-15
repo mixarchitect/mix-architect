@@ -2,7 +2,7 @@
 
 /* ═══════════════════════════════════════════════════════════
    SCREEN MOCKUP — Help article visual aids using real components
-   58 mockups (16 articles, ~3 each; Article 4 has 6)
+   75 mockups (18 articles)
    ═══════════════════════════════════════════════════════════ */
 
 import {
@@ -14,6 +14,8 @@ import {
   Shield, CreditCard, CheckCircle2, Clock,
   ClipboardList, FileText, Users, Sparkles, Eye,
   ExternalLink, BarChart3, DollarSign,
+  Sun, Moon, Monitor, Mail, Gift, HardDrive, Cloud,
+  RefreshCw, User, Unplug, Trash2, UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -2455,6 +2457,564 @@ function SettingsEmailPrefsMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   ARTICLE 17b: USER SETTINGS (expanded)
+   ═══════════════════════════════════════════════════════════ */
+
+function SettingsProfileMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Profile</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Display Name</span>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Jordan Rivera</div>
+        </div>
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Company Name</span>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Riverstone Audio</div>
+        </div>
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Email</span>
+          <div className="rounded-md px-3 py-1.5 text-xs text-muted opacity-60" style={{ background: "var(--panel2)" }}>jordan@riverstone.audio</div>
+        </div>
+        <Button variant="primary" className="text-xs px-3 py-1.5">Save</Button>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SettingsSubscriptionMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Subscription</span>
+        <p className="text-xs text-muted mt-1">Manage your Mix Architect plan.</p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-text">$14/month</span>
+              <Pill className="bg-signal/20 text-signal text-[10px]">PRO</Pill>
+            </div>
+            <p className="text-xs text-muted mt-0.5">Unlimited releases</p>
+          </div>
+          <Button variant="secondary" className="text-xs px-3 py-1.5">Manage Billing</Button>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SettingsRegionMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Region & Currency</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Locale</span>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel2)" }}>
+            <span>🇺🇸 English</span>
+            <ChevronDown size={12} className="text-muted" />
+          </div>
+        </div>
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Currency</span>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel2)" }}>
+            <span>$ USD</span>
+            <ChevronDown size={12} className="text-muted" />
+          </div>
+        </div>
+        <div className="rounded-lg px-3 py-2" style={{ background: "var(--panel2)" }}>
+          <span className="text-[10px] text-muted">Preview: </span>
+          <span className="text-xs font-medium text-text">$1,234.56</span>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SettingsAppearanceMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Appearance</span>
+        <p className="text-xs text-muted mt-1">Choose how Mix Architect looks to you.</p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4">
+        <div className="flex gap-2">
+          {[
+            { icon: Sun, label: "Light", active: false },
+            { icon: Moon, label: "Dark", active: true },
+            { icon: Monitor, label: "System", active: false },
+          ].map((opt) => (
+            <div
+              key={opt.label}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md"
+              style={
+                opt.active
+                  ? { background: "var(--signal)", color: "var(--signal-on)" }
+                  : { background: "var(--panel2)", color: "var(--text-muted)" }
+              }
+            >
+              <opt.icon size={14} />
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SettingsPersonaMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Persona</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-2">
+        {[
+          { label: "Artist", active: false },
+          { label: "Engineer", active: true },
+          { label: "Both", active: false },
+          { label: "Other", active: false },
+        ].map((opt) => (
+          <label key={opt.label} className="flex items-center gap-2.5">
+            <div className={cn("w-3.5 h-3.5 rounded-full border-2", opt.active ? "border-signal bg-signal" : "border-muted")} />
+            <span className="text-xs text-text">{opt.label}</span>
+          </label>
+        ))}
+        <p className="text-[10px] text-muted pt-1">Your persona tailors default settings like payment tracking.</p>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SettingsPaymentTrackingMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Payment Tracking</span>
+        <p className="text-xs text-muted mt-1">Show payment stats on your dashboard and releases.</p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-xs font-medium text-text">Enable payment tracking</div>
+            <div className="text-[10px] text-muted mt-0.5">Show fees, payments, and balance on releases</div>
+          </div>
+          <div className="relative w-10 h-[22px] rounded-full bg-signal shrink-0">
+            <div className="absolute top-[3px] w-4 h-4 rounded-full bg-white shadow" style={{ left: 20 }} />
+          </div>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SettingsIntegrationsMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Integrations</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        {[
+          { name: "Google Drive", icon: HardDrive, connected: true },
+          { name: "Dropbox", icon: Cloud, connected: false },
+        ].map((svc) => (
+          <div key={svc.name} className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ background: "var(--panel2)" }}>
+            <div className="flex items-center gap-2.5">
+              <svc.icon size={16} className="text-muted" />
+              <div>
+                <div className="text-xs font-medium text-text">{svc.name}</div>
+                <div className="text-[10px] text-muted">{svc.connected ? "Connected" : "Not connected"}</div>
+              </div>
+            </div>
+            {svc.connected ? (
+              <div className="flex items-center gap-1.5">
+                <Pill className="bg-signal/20 text-signal text-[10px]">Connected</Pill>
+                <button className="text-[10px] text-muted hover:text-text">
+                  <Unplug size={12} />
+                </button>
+              </div>
+            ) : (
+              <Button variant="secondary" className="text-[10px] px-2 py-1">Connect</Button>
+            )}
+          </div>
+        ))}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SettingsMixDefaultsMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Mix Defaults</span>
+        <p className="text-xs text-muted mt-1">Set default values for new releases.</p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Format</span>
+          <div className="flex gap-1.5">
+            {["Stereo", "Dolby Atmos", "Stereo + Atmos"].map((f, i) => (
+              <div
+                key={f}
+                className="px-2.5 py-1 text-[10px] font-medium rounded-md"
+                style={
+                  i === 0
+                    ? { background: "var(--signal)", color: "var(--signal-on)" }
+                    : { background: "var(--panel2)", color: "var(--text-muted)" }
+                }
+              >
+                {f}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted">Sample Rate</span>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel2)" }}>
+              <span>48kHz</span>
+              <ChevronDown size={12} className="text-muted" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted">Bit Depth</span>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel2)" }}>
+              <span>24-bit</span>
+              <ChevronDown size={12} className="text-muted" />
+            </div>
+          </div>
+        </div>
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Default Elements</span>
+          <div className="flex gap-1.5 flex-wrap">
+            {["Vocals", "Bass", "Drums"].map((tag) => (
+              <Pill key={tag} className="text-[10px]">{tag}</Pill>
+            ))}
+          </div>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SettingsCalendarMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Calendar</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Feed URL</span>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 rounded-md px-3 py-1.5 text-[10px] text-muted truncate" style={{ background: "var(--panel2)" }}>
+              https://mixarchitect.com/api/cal/abc123...
+            </div>
+            <button className="shrink-0 p-1.5 rounded-md" style={{ background: "var(--panel2)" }}>
+              <Copy size={12} className="text-muted" />
+            </button>
+          </div>
+        </div>
+        <div className="rounded-lg px-3 py-2 text-[10px] text-muted space-y-1" style={{ background: "var(--panel2)" }}>
+          <p>Add this URL to your calendar app:</p>
+          <p>Google Calendar, Apple Calendar, Outlook</p>
+        </div>
+        <button className="flex items-center gap-1.5 text-[10px] text-muted hover:text-text">
+          <RefreshCw size={12} />
+          Regenerate feed URL
+        </button>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SettingsDataMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Your Data</span>
+        <p className="text-xs text-muted mt-1">Download a copy of all your data.</p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        <div className="text-xs text-muted">
+          Estimated export size: <span className="font-medium text-text">~2.4 MB</span>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="primary" className="text-xs px-3 py-1.5 flex items-center gap-1.5">
+            <Download size={12} />
+            Download Export
+          </Button>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ARTICLE 18: RELEASE SETTINGS
+   ═══════════════════════════════════════════════════════════ */
+
+function ReleaseSettingsOverviewMockup() {
+  const sections = [
+    { icon: Music, label: "Release Details", desc: "Title, artist, type, format, status, genre, date" },
+    { icon: User, label: "Client Information", desc: "Client name, email, phone, delivery notes" },
+    { icon: Globe, label: "Distribution", desc: "Distributor, label, UPC, copyright" },
+    { icon: CreditCard, label: "Payment", desc: "Status, fee, paid amount, balance" },
+    { icon: Users, label: "Team Management", desc: "Invite and manage collaborators" },
+  ];
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <div className="flex items-center gap-2">
+          <Settings size={14} className="text-muted" />
+          <span className="text-sm font-semibold text-text">Release Settings</span>
+        </div>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-3 space-y-0.5">
+        {sections.map((s) => (
+          <div key={s.label} className="flex items-center gap-2.5 px-2 py-2 rounded-md" style={{ background: "var(--panel2)" }}>
+            <s.icon size={14} className="text-muted shrink-0" />
+            <div>
+              <div className="text-xs font-medium text-text">{s.label}</div>
+              <div className="text-[10px] text-muted">{s.desc}</div>
+            </div>
+          </div>
+        ))}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function ReleaseSettingsDetailsMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Release Details</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        <div className="flex items-start gap-3">
+          <div className="w-14 h-14 rounded-md shrink-0 flex items-center justify-center" style={{ background: "var(--panel2)" }}>
+            <Image size={20} className="text-muted opacity-30" />
+          </div>
+          <div className="flex-1 space-y-2">
+            <div className="space-y-1">
+              <span className="text-[10px] text-muted">Title</span>
+              <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Midnight Sessions</div>
+            </div>
+            <div className="space-y-1">
+              <span className="text-[10px] text-muted">Artist</span>
+              <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Luna Park</div>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Type</span>
+          <div className="flex gap-1.5">
+            {["Single", "EP", "Album"].map((t, i) => (
+              <div key={t} className="px-2.5 py-1 text-[10px] font-medium rounded-md" style={i === 2 ? { background: "var(--signal)", color: "var(--signal-on)" } : { background: "var(--panel2)", color: "var(--text-muted)" }}>{t}</div>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Status</span>
+          <div className="flex gap-1.5">
+            {["Draft", "In Progress", "Ready"].map((s, i) => (
+              <div key={s} className="px-2.5 py-1 text-[10px] font-medium rounded-md" style={i === 1 ? { background: "var(--signal)", color: "var(--signal-on)" } : { background: "var(--panel2)", color: "var(--text-muted)" }}>{s}</div>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Genre Tags</span>
+          <div className="flex gap-1.5 flex-wrap">
+            {["Electronic", "Ambient"].map((g) => <Pill key={g} className="text-[10px]">{g}</Pill>)}
+          </div>
+        </div>
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Target Date</span>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>2026-04-15</div>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function ReleaseSettingsClientMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Client Information</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        {[
+          { label: "Client Name", value: "Apex Records" },
+          { label: "Client Email", value: "info@apexrecords.com" },
+          { label: "Client Phone", value: "+1 (555) 012-3456" },
+        ].map((f) => (
+          <div key={f.label} className="space-y-1">
+            <span className="text-[10px] text-muted">{f.label}</span>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>{f.value}</div>
+          </div>
+        ))}
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Delivery Notes</span>
+          <div className="rounded-md px-3 py-2 text-xs text-text min-h-[48px]" style={{ background: "var(--panel2)" }}>
+            WAV 48kHz/24-bit. Label copy needed by April 1.
+          </div>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function ReleaseSettingsDistributionMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Distribution</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: "Distributor", value: "DistroKid" },
+            { label: "Record Label", value: "Apex Records" },
+            { label: "UPC / EAN", value: "0123456789012" },
+            { label: "Catalog Number", value: "APX-2026-003" },
+          ].map((f) => (
+            <div key={f.label} className="space-y-1">
+              <span className="text-[10px] text-muted">{f.label}</span>
+              <div className="rounded-md px-3 py-1.5 text-[10px] text-text" style={{ background: "var(--panel2)" }}>{f.value}</div>
+            </div>
+          ))}
+        </div>
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Copyright Holder</span>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Apex Records LLC</div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted">Copyright Year</span>
+            <div className="rounded-md px-3 py-1.5 text-[10px] text-text" style={{ background: "var(--panel2)" }}>2026</div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted">P-line</span>
+            <div className="rounded-md px-3 py-1.5 text-[10px] text-text" style={{ background: "var(--panel2)" }}>Apex Records LLC</div>
+          </div>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function ReleaseSettingsPaymentMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Payment</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        <div className="space-y-1">
+          <span className="text-[10px] text-muted">Payment Status</span>
+          <div className="flex gap-1.5">
+            {["No Fee", "Unpaid", "Partial", "Paid"].map((s, i) => (
+              <div key={s} className="px-2.5 py-1 text-[10px] font-medium rounded-md" style={i === 2 ? { background: "var(--signal)", color: "var(--signal-on)" } : { background: "var(--panel2)", color: "var(--text-muted)" }}>{s}</div>
+            ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted">Project Fee</span>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>$2,500.00</div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted">Paid Amount</span>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>$1,000.00</div>
+          </div>
+        </div>
+        <div className="rounded-lg px-3 py-2" style={{ background: "var(--panel2)" }}>
+          <span className="text-[10px] text-muted">Balance Due: </span>
+          <span className="text-xs font-semibold text-text">$1,500.00</span>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function ReleaseSettingsTeamMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>
+        <span className="text-sm font-semibold text-text">Team Management</span>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="flex-1 rounded-md px-3 py-1.5 text-xs text-muted" style={{ background: "var(--panel2)" }}>
+            Email address
+          </div>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center gap-1" style={{ background: "var(--panel2)" }}>
+            Collaborator
+            <ChevronDown size={10} className="text-muted" />
+          </div>
+          <Button variant="primary" className="text-[10px] px-2 py-1 flex items-center gap-1">
+            <UserPlus size={10} />
+            Invite
+          </Button>
+        </div>
+        <div className="space-y-1.5">
+          {[
+            { name: "Jordan Rivera", role: "Owner", color: "text-signal" },
+            { name: "alex@studio.com", role: "Collaborator", color: "text-muted", pending: false },
+            { name: "client@label.com", role: "Client", color: "text-muted", pending: true },
+          ].map((m) => (
+            <div key={m.name} className="flex items-center justify-between py-1.5 px-2 rounded-md" style={{ background: "var(--panel2)" }}>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium" style={{ background: "var(--border)" }}>
+                  {m.name[0].toUpperCase()}
+                </div>
+                <div>
+                  <div className="text-xs text-text">{m.name}</div>
+                  <div className={cn("text-[10px]", m.color)}>{m.role}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {m.pending && <Pill className="text-[10px] bg-orange-500/20 text-orange-400">Invited</Pill>}
+                {m.role !== "Owner" && <Trash2 size={12} className="text-muted opacity-50" />}
+              </div>
+            </div>
+          ))}
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    MOCKUP REGISTRY
    ═══════════════════════════════════════════════════════════ */
 
@@ -2536,7 +3096,24 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "analytics-date-range": AnalyticsDateRangeMockup,
   /* Article 17: User Settings */
   "settings-overview": SettingsOverviewMockup,
+  "settings-profile": SettingsProfileMockup,
+  "settings-subscription": SettingsSubscriptionMockup,
+  "settings-region": SettingsRegionMockup,
+  "settings-appearance": SettingsAppearanceMockup,
+  "settings-persona": SettingsPersonaMockup,
+  "settings-payment-tracking": SettingsPaymentTrackingMockup,
   "settings-email-prefs": SettingsEmailPrefsMockup,
+  "settings-integrations": SettingsIntegrationsMockup,
+  "settings-mix-defaults": SettingsMixDefaultsMockup,
+  "settings-calendar": SettingsCalendarMockup,
+  "settings-data": SettingsDataMockup,
+  /* Article 18: Release Settings */
+  "release-settings-overview": ReleaseSettingsOverviewMockup,
+  "release-settings-details": ReleaseSettingsDetailsMockup,
+  "release-settings-client": ReleaseSettingsClientMockup,
+  "release-settings-distribution": ReleaseSettingsDistributionMockup,
+  "release-settings-payment": ReleaseSettingsPaymentMockup,
+  "release-settings-team": ReleaseSettingsTeamMockup,
 };
 
 /* ═══════════════════════════════════════════════════════════

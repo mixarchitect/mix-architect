@@ -336,6 +336,49 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "release-settings",
+    "title": "릴리스 설정",
+    "category": "releases",
+    "summary":
+      "각 릴리스의 릴리스 세부 정보, 클라이언트 정보, 배포 메타데이터, 결제 추적, 팀 멤버를 구성합니다.",
+    "tags": ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
+    "updatedAt": "2026-03-15",
+    "content": [
+      {
+        "heading": "릴리스 설정 열기",
+        "body": "릴리스에서 릴리스 툴바의 톱니바퀴 아이콘을 클릭하거나 점 세 개 메뉴에서 \"Settings\"를 선택합니다. 설정 페이지에는 다섯 개의 섹션이 있습니다: Release Details, Client Information, Distribution, Payment, Team Management. 상단의 뒤로 화살표를 클릭하면 릴리스 보기로 돌아갑니다. 폼 하단의 Save 버튼을 클릭하면 변경 사항이 저장됩니다.",
+        "mockup": "release-settings-overview"
+      },
+      {
+        "heading": "릴리스 세부 정보",
+        "body": "Release Details 섹션에는 프로젝트의 핵심 메타데이터가 포함되어 있습니다. 이미지 영역을 클릭하여 커버 아트를 업로드하거나 변경합니다. 텍스트 필드에서 릴리스 Title과 Artist name을 설정합니다. 필 스타일 셀렉터로 Release Type(Single, EP, Album)과 Format(Stereo, Dolby Atmos, Stereo + Atmos)을 선택합니다. 같은 방식으로 Status(Draft, In Progress, Ready)를 설정합니다. 자동 완성 제안(Rock, Pop, Hip-Hop, Electronic 등)이 있는 태그 입력으로 Genre Tags를 추가합니다. 릴리스 마감일로 Target Date를 설정합니다. 이 날짜는 Calendar 구독에도 반영됩니다.",
+        "mockup": "release-settings-details"
+      },
+      {
+        "heading": "클라이언트 정보",
+        "body": "Client Information 섹션은 이 릴리스와 관련된 클라이언트의 연락처 세부 정보를 저장합니다. 필드에는 Client Name, Client Email, Client Phone, Delivery Notes가 포함됩니다. 클라이언트 이름은 Analytics 클라이언트 분석 및 결제 보고서에 표시됩니다. Delivery Notes는 선호하는 파일 명명 규칙이나 납품 플랫폼과 같은 특별 지침을 위한 자유 텍스트 영역입니다.",
+        "mockup": "release-settings-client"
+      },
+      {
+        "heading": "배포 메타데이터",
+        "body": "Distribution 섹션은 디지털 배포에 필요한 메타데이터를 캡처합니다. 필드에는 Distributor(예: DistroKid, TuneCore), Record Label, UPC/EAN 바코드, Catalog Number, Copyright Holder, Copyright Year, Phonographic Copyright(P-line)가 포함됩니다. 이 값들은 Distribution Tracker에서 사용되며 데이터 내보내기에 표시됩니다.",
+        "mockup": "release-settings-distribution"
+      },
+      {
+        "heading": "결제 설정",
+        "body": "Payment 섹션은 User Settings에서 결제 추적이 활성화된 경우에만 표시됩니다. 필 셀렉터(No Fee, Unpaid, Partial, Paid)로 Payment Status가 표시되며, 통화 셀렉터가 있는 Project Fee 필드, Paid Amount, 계산된 Balance Due가 있습니다. Payment Notes 텍스트 영역에서 결제 조건이나 인보이스 참조를 기록할 수 있습니다. 결제 상태와 금액은 대시보드 카드와 Analytics 수익 차트에 표시됩니다.",
+        "mockup": "release-settings-payment",
+        "tip": "계약금을 수령하면 결제 상태를 \"Partial\"로 설정하세요. Balance due는 프로젝트 수수료에서 결제 완료 금액을 빼서 자동으로 계산됩니다."
+      },
+      {
+        "heading": "팀 관리",
+        "body": "Team Management 섹션에서 릴리스에 협업자와 클라이언트를 초대할 수 있습니다. 이메일 주소를 입력하고, 역할(Collaborator 또는 Client)을 선택한 후 Invite를 클릭합니다. 보류 중인 초대는 \"Invited\" 뱃지와 Resend 버튼으로 표시됩니다. 수락한 멤버는 표시 이름, 역할, 제거 옵션이 표시됩니다. 릴리스 소유자는 항상 목록에 있으며 제거할 수 없습니다. Collaborator는 트랙을 편집하고 댓글을 남길 수 있습니다. Client는 읽기 전용 접근 권한을 가지며 클라이언트 포털을 통해 트랙을 승인할 수 있습니다.",
+        "mockup": "release-settings-team",
+        "warning": "팀 멤버를 제거하면 접근 권한이 즉시 취소됩니다. 해당 릴리스나 트랙을 더 이상 볼 수 없게 됩니다."
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "오디오 업로드 및 관리",
     "category": "audio",
@@ -518,17 +561,44 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "프로필, 외관, 이메일 알림, 믹스 기본값 등을 구성합니다.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
-    "updatedAt": "2026-03-14",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "설정 개요",
-        "body": "사이드바 또는 상단 바의 계정 메뉴에서 [User Settings](/app/settings)를 엽니다. 설정은 패널별로 구성되어 있습니다: Profile, Subscription, Appearance, Region & Currency, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, Data. 각 패널에서 상호작용하면 변경 사항이 즉시 저장됩니다.",
+        "body": "사이드바 또는 상단 바의 계정 메뉴에서 [User Settings](/app/settings)를 엽니다. 설정은 패널별로 구성되어 있습니다: Profile, Subscription, Region & Currency, Appearance, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, Your Data. 각 패널에서 상호작용하면 변경 사항이 즉시 저장됩니다.",
         "mockup": "settings-overview"
       },
       {
         "heading": "프로필",
-        "body": "Profile 패널에서 댓글, 알림, 협업자에게 전송되는 이메일 알림에 표시되는 표시 이름을 설정할 수 있습니다. 이메일 주소는 표시되지만 인증 제공자를 통해 관리됩니다. 상단 바에 이름을 사용한 맞춤 인사가 표시됩니다."
+        "body": "Profile 패널은 페이지의 첫 번째 섹션입니다. 세 가지 필드가 있습니다: Display Name(댓글, 알림, 협업자에게 전송되는 이메일에 표시), Company Name(선택 사항, 브랜딩용), Email(읽기 전용, 인증 제공자를 통해 관리). 이름을 입력하고 Save를 클릭합니다. 상단 바에 이름을 사용한 맞춤 인사가 표시됩니다.",
+        "mockup": "settings-profile"
+      },
+      {
+        "heading": "구독",
+        "body": "Subscription 패널은 현재 플랜을 보여줍니다. Pro 계정은 녹색 \"PRO\" 뱃지, 월 요금, 결제 수단 업데이트, 인보이스 확인, 영수증 다운로드를 위한 Stripe 포털을 여는 \"Manage Billing\" 버튼을 표시합니다. 무료 계정에는 \"Upgrade to Pro\" 버튼이 대신 표시됩니다. Pro는 무제한 릴리스, 오디오 포맷 변환, 우선 지원을 잠금 해제합니다.",
+        "mockup": "settings-subscription"
+      },
+      {
+        "heading": "지역 및 통화",
+        "body": "Region & Currency 패널에는 두 개의 드롭다운이 있습니다. Locale 드롭다운은 언어와 날짜 형식을 설정하며, 각 옵션 옆에 국기 이모지가 표시됩니다. Locale을 변경하면 기본 통화도 자동으로 업데이트됩니다. Currency 드롭다운은 결제 추적에 사용되는 통화를 재정의할 수 있습니다. 하단의 형식 미리보기에 금액이 어떻게 표시되는지 보여줍니다(예: \"$1,234.56\").",
+        "mockup": "settings-region"
+      },
+      {
+        "heading": "외관",
+        "body": "Appearance 패널에서 세 가지 스타일 버튼을 사용하여 Light, Dark, System 테마 간에 전환할 수 있습니다. 활성 테마는 악센트 색상으로 강조 표시됩니다. System 모드는 운영 체제 설정을 따릅니다. 테마 선택은 계정에 저장되며 모든 기기에 적용됩니다.",
+        "mockup": "settings-appearance"
+      },
+      {
+        "heading": "페르소나",
+        "body": "Persona 패널은 Mix Architect를 어떻게 사용하는지 묻습니다. 라디오 버튼을 사용하여 Artist, Engineer, Both, Other 중에서 선택합니다. 선택에 따라 경험이 맞춤화됩니다: Engineer 또는 Both를 선택하면 결제 추적이 자동으로 활성화되고, Artist는 기본적으로 비활성화됩니다. 결제 추적은 언제든지 독립적으로 재정의할 수 있습니다. 옵션 아래에 페르소나가 기본 설정에 어떤 영향을 미치는지 설명하는 안내문이 있습니다.",
+        "mockup": "settings-persona"
+      },
+      {
+        "heading": "결제 추적",
+        "body": "Payment Tracking 패널에는 단일 토글 스위치가 있습니다. 활성화하면 대시보드의 릴리스 카드에 결제 요약 통계(Outstanding, Earned, Total fees)가 표시되고, 각 릴리스 설정에 Payment 섹션이 추가됩니다. 비활성화하면 모든 결제 관련 UI가 숨겨집니다. 토글은 즉시 저장되며 페이지가 새로고침됩니다.",
+        "mockup": "settings-payment-tracking",
+        "tip": "페르소나에서 Engineer 또는 Both를 선택하면 결제 추적이 자동으로 활성화되고, Artist에서는 비활성화됩니다. 언제든지 수동으로 재정의할 수 있습니다."
       },
       {
         "heading": "이메일 알림",
@@ -537,12 +607,25 @@ export const articles: HelpArticle[] = [
         "tip": "알림 이메일 하단의 수신 거부 링크를 클릭하여 특정 이메일 카테고리의 수신을 거부할 수도 있습니다. 로그인이 필요하지 않습니다."
       },
       {
-        "heading": "믹스 기본값",
-        "body": "기본 포맷(Stereo, Dolby Atmos, 또는 Stereo + Atmos), 샘플 레이트, 비트 뎁스를 설정합니다. 새 릴리스를 생성할 때 이 기본값이 자동으로 적용되어 반복적인 설정 시간을 절약합니다. 개별 릴리스에서 언제든지 재정의할 수 있습니다."
+        "heading": "인테그레이션",
+        "body": "Integrations 패널은 사용 가능한 클라우드 스토리지 연결을 보여줍니다. 각 인테그레이션은 서비스 이름, 설명, Connect 또는 Disconnect 버튼을 표시합니다. 현재 지원: Google Drive 및 Dropbox. 연결된 서비스는 녹색 \"Connected\" 뱃지를 표시합니다. 릴리스와 함께 더 쉬운 파일 관리를 위해 인테그레이션을 사용하여 클라우드 스토리지를 연결하세요.",
+        "mockup": "settings-integrations"
       },
       {
-        "heading": "외관 및 지역",
-        "body": "Appearance에서 Light, Dark, System 테마 간에 전환할 수 있습니다. Region & Currency는 결제 추적에 사용할 선호 통화를 설정합니다. 두 설정 모두 계정에 저장되며 모든 기기에 적용됩니다."
+        "heading": "믹스 기본값",
+        "body": "Mix Defaults 패널은 새 릴리스를 위한 기본 시작 값을 설정합니다. 필 스타일 버튼으로 기본 Format(Stereo, Dolby Atmos, Stereo + Atmos)을 선택합니다. 드롭다운에서 기본 Sample Rate(44.1kHz, 48kHz, 96kHz)와 Bit Depth(16-bit, 24-bit, 32-bit float)를 선택합니다. 태그 입력을 사용하여 기본 Element List(예: Vocals, Bass, Drums)도 정의할 수 있습니다. 새 릴리스를 생성하면 이 기본값이 자동으로 적용되어 반복적인 설정 시간을 절약합니다. Save를 클릭하여 선택 사항을 저장합니다.",
+        "mockup": "settings-mix-defaults"
+      },
+      {
+        "heading": "캘린더",
+        "body": "Calendar 패널은 릴리스 마감일을 위한 iCal 구독 피드를 제공합니다. 읽기 전용 URL 필드에 개인 피드 주소가 표시되며 클립보드에 복사할 수 있는 Copy 버튼이 있습니다. 아래에 Google Calendar, Apple Calendar, Outlook에 피드를 추가하는 설정 안내가 있습니다. 이전 링크에 대한 접근을 취소해야 하는 경우 Regenerate 버튼으로 새 피드 URL을 생성할 수 있습니다.",
+        "mockup": "settings-calendar",
+        "warning": "캘린더 피드 URL을 재생성하면 이전 링크가 무효화됩니다. 이전 URL로 구독했던 캘린더는 더 이상 업데이트를 수신하지 않습니다."
+      },
+      {
+        "heading": "내 데이터",
+        "body": "Your Data 패널에서 모든 Mix Architect 데이터를 내보낼 수 있습니다. 예상 내보내기 크기가 표시되며 Download 버튼이 제공됩니다. 내보내기에는 모든 릴리스, 트랙, 오디오 파일 메타데이터, 노트, 댓글, 협업자 목록, 설정이 포함됩니다. 백업이나 작업의 로컬 사본이 필요할 때 사용하세요.",
+        "mockup": "settings-data"
       }
     ]
   },

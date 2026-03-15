@@ -353,6 +353,48 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "release-settings",
+    "title": "Paramètres de sortie",
+    "category": "releases",
+    "summary": "Configurez les détails de sortie, les informations client, les métadonnées de distribution, le suivi des paiements et les membres de l'équipe pour chaque sortie.",
+    "tags": ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
+    "updatedAt": "2026-03-15",
+    "content": [
+      {
+        "heading": "Ouvrir les paramètres de sortie",
+        "body": "Depuis n'importe quelle sortie, cliquez sur l'icone d'engrenage dans la barre d'outils de la sortie ou sélectionnez \"Paramètres\" dans le menu trois points. La page des paramètres comporte cinq sections : Détails de la sortie, Informations client, Distribution, Paiement et Gestion d'équipe. Une flèche de retour en haut vous ramène a la vue de la sortie. Les modifications sont enregistrées lorsque vous cliquez sur le bouton Enregistrer en bas du formulaire.",
+        "mockup": "release-settings-overview"
+      },
+      {
+        "heading": "Détails de la sortie",
+        "body": "La section Détails de la sortie contient les métadonnées principales de votre projet. Téléchargez ou modifiez la pochette en cliquant sur la zone d'image. Définissez le titre de la sortie et le nom de l'artiste dans les champs de texte. Choisissez le type de sortie (Single, EP ou Album) et le format (Stéréo, Dolby Atmos ou Stéréo + Atmos) a l'aide de sélecteurs en forme de pilule. Définissez le statut (Brouillon, En cours ou Pret) de la meme manière. Ajoutez des tags de genre a l'aide de la saisie de tags avec suggestions automatiques (Rock, Pop, Hip-Hop, Électronique, etc.). Définissez une date cible pour votre échéance de sortie, qui alimente également l'abonnement au calendrier.",
+        "mockup": "release-settings-details"
+      },
+      {
+        "heading": "Informations client",
+        "body": "La section Informations client stocke les coordonnées du client associé a cette sortie. Les champs comprennent Nom du client, E-mail du client, Téléphone du client et Notes de livraison. Le nom du client apparait dans la répartition par client des Analyses et dans les rapports de paiement. Notes de livraison est une zone de texte libre pour les instructions spéciales comme les conventions de nommage de fichiers préférées ou les plateformes de livraison.",
+        "mockup": "release-settings-client"
+      },
+      {
+        "heading": "Métadonnées de distribution",
+        "body": "La section Distribution capture les métadonnées nécessaires a la distribution numérique. Les champs comprennent Distributeur (par ex. DistroKid, TuneCore), Label, Code-barres UPC/EAN, Numéro de catalogue, Titulaire du copyright, Année de copyright et Copyright phonographique (la ligne P). Ces valeurs sont utilisées par le suivi de distribution et apparaissent dans votre export de données.",
+        "mockup": "release-settings-distribution"
+      },
+      {
+        "heading": "Paramètres de paiement",
+        "body": "La section Paiement n'est visible que lorsque le suivi des paiements est activé dans vos Paramètres utilisateur. Elle affiche le statut de paiement a l'aide de sélecteurs en pilule (Pas d'honoraires, Impayé, Partiel, Payé), un champ Honoraires du projet avec sélecteur de devise, le Montant payé et le Solde du calculé. Une zone de texte Notes de paiement permet d'enregistrer les conditions de paiement ou les références de facture. Le statut de paiement et les montants apparaissent sur les cartes du tableau de bord et dans les graphiques de revenus des Analyses.",
+        "mockup": "release-settings-payment",
+        "tip": "Définissez le statut de paiement sur \"Partiel\" lorsqu'un acompte a été reçu. Le solde du est calculé automatiquement a partir des honoraires du projet moins le montant payé."
+      },
+      {
+        "heading": "Gestion d'équipe",
+        "body": "La section Gestion d'équipe vous permet d'inviter des collaborateurs et des clients a la sortie. Saisissez une adresse e-mail, choisissez un role (Collaborateur ou Client) et cliquez sur Inviter. Les invitations en attente affichent un badge \"Invité\" avec un bouton Renvoyer. Les membres acceptés affichent leur nom d'affichage, leur role et une option pour les supprimer. Le propriétaire de la sortie est toujours listé et ne peut pas etre supprimé. Les collaborateurs peuvent modifier les pistes et laisser des commentaires; les clients ont un accès en lecture seule ainsi que la possibilité d'approuver les pistes via le portail client.",
+        "mockup": "release-settings-team",
+        "warning": "Supprimer un membre de l'équipe révoque immédiatement son accès. Cette personne ne pourra plus voir la sortie ni aucune de ses pistes."
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Télécharger et gérer l'audio",
     "category": "audio",
@@ -533,33 +575,72 @@ export const articles: HelpArticle[] = [
     "id": "user-settings",
     "title": "Paramètres utilisateur",
     "category": "account",
-    "summary":
-      "Configurez votre profil, apparence, notifications par e-mail, paramètres de mix par défaut et plus encore.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
-    "updatedAt": "2026-03-14",
+    "summary": "Configurez votre profil, apparence, notifications par e-mail, paramètres de mix par défaut et plus encore.",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "Aperçu des paramètres",
-        "body": "Ouvrez les [Paramètres utilisateur](/app/settings) depuis la barre latérale ou le menu du compte dans la barre supérieure. Les paramètres sont organisés en panneaux : Profil, Abonnement, Apparence, Région et devise, Persona, Suivi des paiements, Préférences e-mail, Intégrations, Paramètres de mix par défaut, Calendrier et Données. Les modifications sont enregistrées instantanément lorsque vous interagissez avec chaque panneau.",
+        "body": "Ouvrez les [Paramètres utilisateur](/app/settings) depuis la barre latérale ou le menu du compte dans la barre supérieure. Les paramètres sont organisés en panneaux : Profil, Abonnement, Région et devise, Apparence, Persona, Suivi des paiements, Préférences e-mail, Intégrations, Paramètres de mix par défaut, Calendrier et Vos données. Les modifications sont enregistrées instantanément lorsque vous interagissez avec chaque panneau.",
         "mockup": "settings-overview"
       },
       {
         "heading": "Profil",
-        "body": "Le panneau Profil vous permet de définir votre nom d'affichage, qui apparaît sur les commentaires, les notifications et les alertes e-mail envoyées aux collaborateurs. Votre adresse e-mail est affichée mais gérée par votre fournisseur d'authentification. Un message d'accueil personnalisé utilisant votre prénom apparaît dans la barre supérieure."
+        "body": "Le panneau Profil est la première section de la page. Il contient trois champs : Nom d'affichage (affiché sur les commentaires, les notifications et les e-mails aux collaborateurs), Nom de l'entreprise (optionnel, pour votre image de marque) et E-mail (lecture seule, géré par votre fournisseur d'authentification). Saisissez votre nom et cliquez sur Enregistrer. Un message d'accueil personnalisé utilisant votre prénom apparait dans la barre supérieure.",
+        "mockup": "settings-profile"
+      },
+      {
+        "heading": "Abonnement",
+        "body": "Le panneau Abonnement affiche votre plan actuel. Les comptes Pro affichent un badge vert \"PRO\", le prix mensuel et un bouton \"Gérer la facturation\" qui ouvre le portail Stripe pour mettre a jour les moyens de paiement, consulter les factures et télécharger les reçus. Les comptes gratuits voient un bouton \"Passer a Pro\" a la place. Pro débloque les sorties illimitées, la conversion de format audio et le support prioritaire.",
+        "mockup": "settings-subscription"
+      },
+      {
+        "heading": "Région et devise",
+        "body": "Le panneau Région et devise contient deux menus déroulants. Le menu Langue définit votre langue et votre format de date, avec un emoji drapeau a coté de chaque option. Changer votre langue met également a jour automatiquement la devise par défaut. Le menu Devise vous permet de remplacer la devise utilisée pour le suivi des paiements. Un aperçu du format en bas montre comment les montants seront affichés (par ex. \"1 234,56 $\").",
+        "mockup": "settings-region"
+      },
+      {
+        "heading": "Apparence",
+        "body": "Le panneau Apparence vous permet de basculer entre les thèmes Clair, Sombre et Système a l'aide de trois boutons stylisés. Le thème actif est mis en valeur avec votre couleur d'accentuation. Le mode Système suit les préférences de votre système d'exploitation. Votre choix de thème est enregistré dans votre compte et s'applique sur tous vos appareils.",
+        "mockup": "settings-appearance"
+      },
+      {
+        "heading": "Persona",
+        "body": "Le panneau Persona demande comment vous utilisez Mix Architect. Choisissez entre Artiste, Ingénieur, Les deux ou Autre a l'aide de boutons radio. Votre sélection adapte l'expérience : choisir Ingénieur ou Les deux active automatiquement le suivi des paiements, tandis qu'Artiste le laisse désactivé par défaut. Vous pouvez toujours modifier le suivi des paiements indépendamment. Une note sous les options explique comment la persona affecte les paramètres par défaut.",
+        "mockup": "settings-persona"
+      },
+      {
+        "heading": "Suivi des paiements",
+        "body": "Le panneau Suivi des paiements contient un seul interrupteur. Lorsqu'il est activé, les cartes de sortie sur le tableau de bord affichent des statistiques de paiement (Impayé, Perçu, Total des honoraires), et chaque sortie obtient une section Paiement dans ses paramètres. Lorsqu'il est désactivé, toute l'interface liée aux paiements est masquée. L'interrupteur enregistre instantanément et rafraichit la page.",
+        "mockup": "settings-payment-tracking",
+        "tip": "Le suivi des paiements est automatiquement activé lorsque vous sélectionnez Ingénieur ou Les deux comme persona, et désactivé pour Artiste. Vous pouvez modifier cela manuellement a tout moment."
       },
       {
         "heading": "Notifications par e-mail",
-        "body": "Le panneau Préférences e-mail contrôle les e-mails transactionnels que vous recevez de Mix Architect. Chaque catégorie dispose d'un bouton d'activation/désactivation. Les catégories comprennent : Alertes de mise en ligne (lorsqu'une sortie est publiée sur une plateforme), Alertes de nouveaux commentaires (lorsque quelqu'un commente votre sortie), Résumé hebdomadaire (un récapitulatif de l'activité de toutes vos sorties), Rappels de paiement (lorsqu'un paiement d'abonnement échoue), Confirmations de paiement (lorsqu'un paiement est traité), Confirmations d'abonnement (lorsque votre plan est activé) et Avis d'annulation (lorsque votre plan est annulé). Toutes les catégories sont activées par défaut. Chaque e-mail inclut un lien de désabonnement en bas.",
+        "body": "Le panneau Préférences e-mail controle les e-mails transactionnels que vous recevez de Mix Architect. Chaque catégorie dispose d'un interrupteur. Les catégories comprennent : Alertes de mise en ligne (lorsqu'une sortie est publiée sur une plateforme), Alertes de nouveaux commentaires (lorsque quelqu'un commente votre sortie), Résumé hebdomadaire (un récapitulatif de l'activité de toutes vos sorties), Rappels de paiement (lorsqu'un paiement d'abonnement échoue), Confirmations de paiement (lorsqu'un paiement est traité), Confirmations d'abonnement (lorsque votre plan est activé) et Avis d'annulation (lorsque votre plan est annulé). Toutes les catégories sont activées par défaut. Chaque e-mail inclut un lien de désabonnement en bas.",
         "mockup": "settings-email-prefs",
         "tip": "Vous pouvez également vous désabonner d'une catégorie d'e-mail spécifique en cliquant sur le lien de désabonnement en bas de n'importe quel e-mail de notification. Aucune connexion requise."
       },
       {
-        "heading": "Paramètres de mix par défaut",
-        "body": "Définissez votre format par défaut (Stéréo, Dolby Atmos ou Stéréo + Atmos), la fréquence d'échantillonnage et la profondeur de bits. Ces paramètres par défaut sont appliqués automatiquement lorsque vous créez de nouvelles sorties, vous faisant gagner du temps sur les configurations répétitives. Vous pouvez toujours les modifier pour des sorties individuelles."
+        "heading": "Intégrations",
+        "body": "Le panneau Intégrations affiche les connexions de stockage cloud disponibles. Chaque intégration affiche le nom du service, une description et un bouton Connecter ou Déconnecter. Actuellement pris en charge : Google Drive et Dropbox. Les services connectés affichent un badge vert \"Connecté\". Utilisez les intégrations pour relier votre stockage cloud afin de faciliter la gestion des fichiers aux cotés de vos sorties.",
+        "mockup": "settings-integrations"
       },
       {
-        "heading": "Apparence et région",
-        "body": "Apparence vous permet de basculer entre les thèmes Clair, Sombre et Système. Région et devise définit votre devise préférée pour le suivi des paiements. Les deux préférences sont enregistrées dans votre compte et s'appliquent sur tous vos appareils."
+        "heading": "Paramètres de mix par défaut",
+        "body": "Le panneau Paramètres de mix par défaut définit vos valeurs de départ préférées pour les nouvelles sorties. Choisissez un format par défaut (Stéréo, Dolby Atmos ou Stéréo + Atmos) a l'aide de boutons en forme de pilule. Sélectionnez une fréquence d'échantillonnage par défaut (44,1 kHz, 48 kHz ou 96 kHz) et une profondeur de bits (16 bits, 24 bits ou 32 bits float) dans les menus déroulants. Vous pouvez également définir une liste d'éléments par défaut a l'aide de la saisie de tags (par ex. Voix, Basse, Batterie). Ces valeurs par défaut sont appliquées automatiquement lorsque vous créez de nouvelles sorties, évitant les configurations répétitives. Cliquez sur Enregistrer pour conserver vos choix.",
+        "mockup": "settings-mix-defaults"
+      },
+      {
+        "heading": "Calendrier",
+        "body": "Le panneau Calendrier fournit un flux d'abonnement iCal pour vos échéances de sortie. Un champ URL en lecture seule affiche l'adresse de votre flux personnel avec un bouton Copier pour le copier dans votre presse-papiers. En dessous, des instructions d'installation expliquent comment ajouter le flux a Google Agenda, Apple Calendrier ou Outlook. Un bouton Régénérer crée une nouvelle URL de flux si vous devez révoquer l'accès a l'ancienne.",
+        "mockup": "settings-calendar",
+        "warning": "Régénérer l'URL de votre flux de calendrier invalide l'ancien lien. Tous les calendriers abonnés a l'URL précédente cesseront de recevoir des mises a jour."
+      },
+      {
+        "heading": "Vos données",
+        "body": "Le panneau Vos données vous permet d'exporter toutes vos données Mix Architect. Il affiche une taille d'export estimée et fournit un bouton Télécharger. L'export comprend toutes les sorties, pistes, métadonnées de fichiers audio, notes, commentaires, listes de collaborateurs et paramètres. Utilisez-le pour des sauvegardes ou si vous souhaitez une copie locale de votre travail.",
+        "mockup": "settings-data"
       }
     ]
   },

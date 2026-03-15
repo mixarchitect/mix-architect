@@ -353,6 +353,48 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "release-settings",
+    "title": "Configuración de Lanzamiento",
+    "category": "releases",
+    "summary": "Configura detalles del lanzamiento, información del cliente, metadatos de distribución, seguimiento de pagos y miembros del equipo para cada lanzamiento.",
+    "tags": ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
+    "updatedAt": "2026-03-15",
+    "content": [
+      {
+        "heading": "Abrir configuración de lanzamiento",
+        "body": "Desde cualquier lanzamiento, haz clic en el icono de engranaje en la barra de herramientas del lanzamiento o selecciona \"Configuración\" en el menú de tres puntos. La página de configuración tiene cinco secciones: Detalles del lanzamiento, Información del cliente, Distribución, Pago y Gestión de equipo. Una flecha de retorno en la parte superior te devuelve a la vista del lanzamiento. Los cambios se guardan al hacer clic en el botón Guardar en la parte inferior del formulario.",
+        "mockup": "release-settings-overview"
+      },
+      {
+        "heading": "Detalles del lanzamiento",
+        "body": "La sección Detalles del lanzamiento contiene los metadatos principales de tu proyecto. Sube o cambia la portada haciendo clic en el área de imagen. Establece el título del lanzamiento y el nombre del artista en campos de texto. Elige el tipo de lanzamiento (Sencillo, EP o Álbum) y el formato (Estéreo, Dolby Atmos o Estéreo + Atmos) usando selectores tipo píldora. Establece el estado (Borrador, En progreso o Listo) de la misma manera. Añade etiquetas de género usando la entrada de etiquetas con sugerencias automáticas (Rock, Pop, Hip-Hop, Electrónica, etc.). Establece una fecha objetivo para tu fecha límite de lanzamiento, que también se integra en la suscripción del calendario.",
+        "mockup": "release-settings-details"
+      },
+      {
+        "heading": "Información del cliente",
+        "body": "La sección Información del cliente almacena los datos de contacto del cliente asociado a este lanzamiento. Los campos incluyen Nombre del cliente, Correo electrónico del cliente, Teléfono del cliente y Notas de entrega. El nombre del cliente aparece en el desglose de clientes de Analíticas y en los informes de pago. Notas de entrega es un área de texto libre para instrucciones especiales como convenciones de nombres de archivo preferidas o plataformas de entrega.",
+        "mockup": "release-settings-client"
+      },
+      {
+        "heading": "Metadatos de distribución",
+        "body": "La sección Distribución captura los metadatos necesarios para la distribución digital. Los campos incluyen Distribuidor (por ej. DistroKid, TuneCore), Sello discográfico, Código de barras UPC/EAN, Número de catálogo, Titular del copyright, Año de copyright y Copyright fonográfico (la línea P). Estos valores son utilizados por el rastreador de distribución y aparecen en tu exportación de datos.",
+        "mockup": "release-settings-distribution"
+      },
+      {
+        "heading": "Configuración de pago",
+        "body": "La sección Pago solo es visible cuando el seguimiento de pagos está habilitado en tu Configuración de Usuario. Muestra el estado de pago mediante selectores tipo píldora (Sin honorarios, Impagado, Parcial, Pagado), un campo de Honorarios del proyecto con selector de moneda, el Importe pagado y el Saldo pendiente calculado. Un área de texto de Notas de pago permite registrar condiciones de pago o referencias de factura. El estado de pago y los importes aparecen en las tarjetas del panel de control y en los gráficos de ingresos de Analíticas.",
+        "mockup": "release-settings-payment",
+        "tip": "Establece el estado de pago en \"Parcial\" cuando se ha recibido un anticipo. El saldo pendiente se calcula automáticamente a partir de los honorarios del proyecto menos el importe pagado."
+      },
+      {
+        "heading": "Gestión de equipo",
+        "body": "La sección Gestión de equipo te permite invitar a colaboradores y clientes al lanzamiento. Introduce una dirección de correo electrónico, elige un rol (Colaborador o Cliente) y haz clic en Invitar. Las invitaciones pendientes muestran una insignia \"Invitado\" con un botón de Reenviar. Los miembros aceptados muestran su nombre para mostrar, su rol y una opción para eliminarlos. El propietario del lanzamiento siempre aparece en la lista y no puede ser eliminado. Los colaboradores pueden editar pistas y dejar comentarios; los clientes tienen acceso de solo lectura además de la posibilidad de aprobar pistas a través del portal de cliente.",
+        "mockup": "release-settings-team",
+        "warning": "Eliminar a un miembro del equipo revoca su acceso inmediatamente. Ya no podrá ver el lanzamiento ni ninguna de sus pistas."
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Subir y Gestionar Audio",
     "category": "audio",
@@ -533,33 +575,72 @@ export const articles: HelpArticle[] = [
     "id": "user-settings",
     "title": "Configuración de Usuario",
     "category": "account",
-    "summary":
-      "Configura tu perfil, apariencia, notificaciones por correo electrónico, valores predeterminados de mezcla y más.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
-    "updatedAt": "2026-03-14",
+    "summary": "Configura tu perfil, apariencia, notificaciones por correo electrónico, valores predeterminados de mezcla y más.",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "Descripción general de la configuración",
-        "body": "Abre la [Configuración de Usuario](/app/settings) desde la barra lateral o el menú de cuenta en la barra superior. La configuración está organizada en paneles: Perfil, Suscripción, Apariencia, Región y moneda, Persona, Seguimiento de pagos, Preferencias de correo electrónico, Integraciones, Valores predeterminados de mezcla, Calendario y Datos. Los cambios se guardan instantáneamente al interactuar con cada panel.",
+        "body": "Abre la [Configuración de Usuario](/app/settings) desde la barra lateral o el menú de cuenta en la barra superior. La configuración está organizada en paneles: Perfil, Suscripción, Región y moneda, Apariencia, Persona, Seguimiento de pagos, Preferencias de correo electrónico, Integraciones, Valores predeterminados de mezcla, Calendario y Tus datos. Los cambios se guardan instantáneamente al interactuar con cada panel.",
         "mockup": "settings-overview"
       },
       {
         "heading": "Perfil",
-        "body": "El panel de Perfil te permite establecer tu nombre para mostrar, que aparece en comentarios, notificaciones y alertas por correo electrónico enviadas a colaboradores. Tu dirección de correo electrónico se muestra, pero se gestiona a través de tu proveedor de autenticación. Un saludo personalizado con tu nombre aparece en la barra superior."
+        "body": "El panel de Perfil es la primera sección de la página. Tiene tres campos: Nombre para mostrar (se muestra en comentarios, notificaciones y correos electrónicos a colaboradores), Nombre de empresa (opcional, para tu marca) y Correo electrónico (solo lectura, gestionado a través de tu proveedor de autenticación). Introduce tu nombre y haz clic en Guardar. Un saludo personalizado con tu nombre aparece en la barra superior.",
+        "mockup": "settings-profile"
+      },
+      {
+        "heading": "Suscripción",
+        "body": "El panel de Suscripción muestra tu plan actual. Las cuentas Pro muestran una insignia verde \"PRO\", el precio mensual y un botón \"Gestionar Facturación\" que abre el portal de Stripe para actualizar métodos de pago, ver facturas y descargar recibos. Las cuentas gratuitas ven un botón \"Actualizar a Pro\" en su lugar. Pro desbloquea lanzamientos ilimitados, conversión de formato de audio y soporte prioritario.",
+        "mockup": "settings-subscription"
+      },
+      {
+        "heading": "Región y moneda",
+        "body": "El panel de Región y moneda tiene dos menús desplegables. El desplegable de Idioma establece tu idioma y formato de fecha, con un emoji de bandera junto a cada opción. Cambiar tu idioma también actualiza automáticamente la moneda predeterminada. El desplegable de Moneda te permite anular la moneda utilizada para el seguimiento de pagos. Una vista previa del formato en la parte inferior muestra cómo aparecerán los importes (por ej. \"1.234,56 $\").",
+        "mockup": "settings-region"
+      },
+      {
+        "heading": "Apariencia",
+        "body": "El panel de Apariencia te permite cambiar entre los temas Claro, Oscuro y Sistema mediante tres botones estilizados. El tema activo se resalta con tu color de acento. El modo Sistema sigue la preferencia de tu sistema operativo. Tu elección de tema se guarda en tu cuenta y se aplica en todos los dispositivos.",
+        "mockup": "settings-appearance"
+      },
+      {
+        "heading": "Persona",
+        "body": "El panel de Persona pregunta cómo usas Mix Architect. Elige entre Artista, Ingeniero, Ambos u Otro mediante botones de radio. Tu selección adapta la experiencia: elegir Ingeniero o Ambos activa automáticamente el seguimiento de pagos, mientras que Artista lo mantiene desactivado por defecto. Siempre puedes anular el seguimiento de pagos de forma independiente. Una nota debajo de las opciones explica cómo la persona afecta la configuración predeterminada.",
+        "mockup": "settings-persona"
+      },
+      {
+        "heading": "Seguimiento de pagos",
+        "body": "El panel de Seguimiento de pagos tiene un único interruptor. Cuando está activado, las tarjetas de lanzamiento en el panel de control muestran estadísticas de pago (Pendiente, Ganado, Total de honorarios), y cada lanzamiento obtiene una sección de Pago en su configuración. Cuando está desactivado, toda la interfaz relacionada con pagos se oculta. El interruptor se guarda instantáneamente y actualiza la página.",
+        "mockup": "settings-payment-tracking",
+        "tip": "El seguimiento de pagos se activa automáticamente cuando seleccionas Ingeniero o Ambos como persona, y se desactiva para Artista. Puedes anular esto manualmente en cualquier momento."
       },
       {
         "heading": "Notificaciones por correo electrónico",
-        "body": "El panel de Preferencias de correo electrónico controla los correos transaccionales que recibes de Mix Architect. Cada categoría tiene un interruptor de activar/desactivar. Las categorías incluyen: Alertas de lanzamiento en vivo (cuando un lanzamiento sale en una plataforma), Alertas de nuevos comentarios (cuando alguien comenta en tu lanzamiento), Resumen semanal (un resumen de la actividad en todos tus lanzamientos), Recordatorios de pago (cuando falla un pago de suscripción), Confirmaciones de pago (cuando se procesa un pago), Confirmaciones de suscripción (cuando se activa tu plan) y Avisos de cancelación (cuando se cancela tu plan). Todas las categorías están habilitadas por defecto. Cada correo incluye un enlace para cancelar la suscripción en la parte inferior.",
+        "body": "El panel de Preferencias de correo electrónico controla qué correos transaccionales recibes de Mix Architect. Cada categoría tiene un interruptor de activar/desactivar. Las categorías incluyen: Alertas de lanzamiento en vivo (cuando un lanzamiento sale en una plataforma), Alertas de nuevos comentarios (cuando alguien comenta en tu lanzamiento), Resumen semanal (un resumen de la actividad en todos tus lanzamientos), Recordatorios de pago (cuando falla un pago de suscripción), Confirmaciones de pago (cuando se procesa un pago), Confirmaciones de suscripción (cuando se activa tu plan) y Avisos de cancelación (cuando se cancela tu plan). Todas las categorías están habilitadas por defecto. Cada correo incluye un enlace para cancelar la suscripción en la parte inferior.",
         "mockup": "settings-email-prefs",
         "tip": "También puedes cancelar la suscripción de una categoría de correo específica haciendo clic en el enlace de cancelación de suscripción en la parte inferior de cualquier correo de notificación. No se requiere iniciar sesión."
       },
       {
-        "heading": "Valores predeterminados de mezcla",
-        "body": "Establece tu formato predeterminado (Estéreo, Dolby Atmos o Estéreo + Atmos), frecuencia de muestreo y profundidad de bits. Estos valores predeterminados se aplican automáticamente al crear nuevos lanzamientos, ahorrando tiempo en configuraciones repetitivas. Siempre puedes modificarlos en lanzamientos individuales."
+        "heading": "Integraciones",
+        "body": "El panel de Integraciones muestra las conexiones de almacenamiento en la nube disponibles. Cada integración muestra el nombre del servicio, una descripción y un botón de Conectar o Desconectar. Actualmente compatible: Google Drive y Dropbox. Los servicios conectados muestran una insignia verde \"Conectado\". Usa las integraciones para vincular tu almacenamiento en la nube y facilitar la gestión de archivos junto a tus lanzamientos.",
+        "mockup": "settings-integrations"
       },
       {
-        "heading": "Apariencia y región",
-        "body": "Apariencia te permite cambiar entre los temas Claro, Oscuro y Sistema. Región y moneda establece tu moneda preferida para el seguimiento de pagos. Ambas preferencias se guardan en tu cuenta y se aplican en todos tus dispositivos."
+        "heading": "Valores predeterminados de mezcla",
+        "body": "El panel de Valores predeterminados de mezcla establece tus valores iniciales preferidos para nuevos lanzamientos. Elige un formato predeterminado (Estéreo, Dolby Atmos o Estéreo + Atmos) mediante botones tipo píldora. Selecciona una frecuencia de muestreo predeterminada (44,1 kHz, 48 kHz o 96 kHz) y profundidad de bits (16 bits, 24 bits o 32 bits float) en los menús desplegables. También puedes definir una lista de elementos predeterminada usando la entrada de etiquetas (por ej. Voces, Bajo, Batería). Estos valores predeterminados se aplican automáticamente al crear nuevos lanzamientos, ahorrando configuración repetitiva. Haz clic en Guardar para conservar tus opciones.",
+        "mockup": "settings-mix-defaults"
+      },
+      {
+        "heading": "Calendario",
+        "body": "El panel de Calendario proporciona un feed de suscripción iCal para tus fechas límite de lanzamiento. Un campo URL de solo lectura muestra tu dirección de feed personal con un botón Copiar para copiarlo al portapapeles. Debajo, las instrucciones de configuración explican cómo añadir el feed a Google Calendar, Apple Calendar u Outlook. Un botón Regenerar crea una nueva URL del feed si necesitas revocar el acceso a la anterior.",
+        "mockup": "settings-calendar",
+        "warning": "Regenerar la URL de tu feed de calendario invalida el enlace anterior. Cualquier calendario suscrito a la URL anterior dejará de recibir actualizaciones."
+      },
+      {
+        "heading": "Tus datos",
+        "body": "El panel de Tus datos te permite exportar todos tus datos de Mix Architect. Muestra un tamaño de exportación estimado y proporciona un botón de Descarga. La exportación incluye todos los lanzamientos, pistas, metadatos de archivos de audio, notas, comentarios, listas de colaboradores y configuración. Úsalo para copias de seguridad o si deseas una copia local de tu trabajo.",
+        "mockup": "settings-data"
       }
     ]
   },

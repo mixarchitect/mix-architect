@@ -336,6 +336,49 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "release-settings",
+    "title": "Releaseinställningar",
+    "category": "releases",
+    "summary":
+      "Konfigurera releasedetaljer, klientinformation, distributionsmetadata, betalningsuppföljning och teammedlemmar för varje release.",
+    "tags": ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
+    "updatedAt": "2026-03-15",
+    "content": [
+      {
+        "heading": "Öppna Releaseinställningar",
+        "body": "Från valfri release klickar du på kugghjulsikonen i releasens verktygsfält eller väljer \"Inställningar\" från trepunktsmenyn. Inställningssidan har fem sektioner: Releasedetaljer, Klientinformation, Distribution, Betalning och Teamhantering. En tillbaka-pil högst upp tar dig tillbaka till releasevyn. Ändringar sparas när du klickar på Spara-knappen längst ner i formuläret.",
+        "mockup": "release-settings-overview"
+      },
+      {
+        "heading": "Releasedetaljer",
+        "body": "Sektionen Releasedetaljer innehåller kärnmetadata för ditt projekt. Ladda upp eller ändra omslaget genom att klicka på bildytan. Ange releasens Titel och Artistnamn i textfälten. Välj Releasetyp (Single, EP eller Album) och Format (Stereo, Dolby Atmos eller Stereo + Atmos) med pill-stilväljare. Ange Status (Utkast, Pågående eller Klar) på samma sätt. Lägg till Genretaggar med tagginmatningen med autokompletteringsförslag (Rock, Pop, Hip-Hop, Elektronisk osv.). Ange ett Måldatum för din releasedeadline, som även matar in i Kalenderprenumerationen.",
+        "mockup": "release-settings-details"
+      },
+      {
+        "heading": "Klientinformation",
+        "body": "Sektionen Klientinformation lagrar kontaktuppgifter för klienten kopplad till denna release. Fälten inkluderar Klientnamn, Klient-e-post, Klienttelefon och Leveransanteckningar. Klientnamnet visas i Analysens klientuppdelning och i betalningsrapporter. Leveransanteckningar är en fritextyta för speciella instruktioner som föredragna filnamnkonventioner eller leveransplattformar.",
+        "mockup": "release-settings-client"
+      },
+      {
+        "heading": "Distributionsmetadata",
+        "body": "Distributionssektionen fångar metadata som behövs för digital distribution. Fälten inkluderar Distributör (t.ex. DistroKid, TuneCore), Skivbolag, UPC/EAN-streckkod, Katalognummer, Upphovsrättsinnehavare, Upphovsrättsår och Fonografisk upphovsrätt (P-raden). Dessa värden används av Distribution Tracker och visas i din dataexport.",
+        "mockup": "release-settings-distribution"
+      },
+      {
+        "heading": "Betalningsinställningar",
+        "body": "Betalningssektionen är synlig endast när betalningsuppföljning är aktiverad i dina Användarinställningar. Den visar Betalningsstatus med pill-väljare (Inget arvode, Obetald, Delvis, Betald), ett Projektarvode-fält med valutaväljare, Betalt belopp och det beräknade Utestående saldot. En Betalningsanteckningar-textyta låter dig registrera betalningsvillkor eller fakturareferenser. Betalningsstatus och belopp visas på instrumentpanelens kort och i Analysens intäktsdiagram.",
+        "mockup": "release-settings-payment",
+        "tip": "Ställ in betalningsstatusen till \"Delvis\" när en handpenning har mottagits. Det utestående saldot beräknas automatiskt från projektarvodet minus det betalda beloppet."
+      },
+      {
+        "heading": "Teamhantering",
+        "body": "Sektionen Teamhantering låter dig bjuda in medarbetare och klienter till releasen. Ange en e-postadress, välj en roll (Medarbetare eller Klient) och klicka Bjud in. Väntande inbjudningar visar en \"Inbjuden\"-etikett med en Skicka igen-knapp. Accepterade medlemmar visar sitt visningsnamn, roll och ett alternativ att ta bort dem. Releaseägaren listas alltid och kan inte tas bort. Medarbetare kan redigera spår och lämna kommentarer; Klienter har skrivskyddad åtkomst plus möjligheten att godkänna spår via klientportalen.",
+        "mockup": "release-settings-team",
+        "warning": "Att ta bort en teammedlem återkallar deras åtkomst omedelbart. De kommer inte längre att kunna se releasen eller något av dess spår."
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Ladda upp och hantera ljud",
     "category": "audio",
@@ -518,17 +561,44 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "Konfigurera din profil, utseende, e-postnotifieringar, mixstandarder och mer.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
-    "updatedAt": "2026-03-14",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "Översikt över Inställningar",
-        "body": "Öppna [Användarinställningar](/app/settings) från sidofältet eller kontomenyn i toppfältet. Inställningarna är organiserade i paneler: Profil, Prenumeration, Utseende, Region och Valuta, Persona, Betalningsuppföljning, E-postpreferenser, Integrationer, Mixstandarder, Kalender och Data. Ändringar sparas direkt när du interagerar med varje panel.",
+        "body": "Öppna [Användarinställningar](/app/settings) från sidofältet eller kontomenyn i toppfältet. Inställningarna är organiserade i paneler: Profil, Prenumeration, Region och Valuta, Utseende, Persona, Betalningsuppföljning, E-postpreferenser, Integrationer, Mixstandarder, Kalender och Dina Data. Ändringar sparas direkt när du interagerar med varje panel.",
         "mockup": "settings-overview"
       },
       {
         "heading": "Profil",
-        "body": "Profilpanelen låter dig ange ditt visningsnamn, som visas på kommentarer, notifieringar och e-postvarningar som skickas till medarbetare. Din e-postadress visas men hanteras via din autentiseringsleverantör. En personlig hälsning med ditt förnamn visas i toppfältet."
+        "body": "Profilpanelen är den första sektionen på sidan. Den har tre fält: Visningsnamn (visas på kommentarer, notifieringar och e-post till medarbetare), Företagsnamn (valfritt, för varumärkning) och E-post (skrivskyddad, hanteras via din autentiseringsleverantör). Ange ditt namn och klicka Spara. En personlig hälsning med ditt förnamn visas i toppfältet.",
+        "mockup": "settings-profile"
+      },
+      {
+        "heading": "Prenumeration",
+        "body": "Prenumerationspanelen visar din aktuella plan. Pro-konton visar en grön \"PRO\"-etikett, månadspriset och en knapp \"Hantera fakturering\" som öppnar Stripe-portalen för att uppdatera betalningsmetoder, visa fakturor och ladda ner kvitton. Gratiskonton ser istället en knapp \"Uppgradera till Pro\". Pro låser upp obegränsade releaser, konvertering av ljudformat och prioriterad support.",
+        "mockup": "settings-subscription"
+      },
+      {
+        "heading": "Region och Valuta",
+        "body": "Panelen Region och Valuta har två rullgardinsmenyer. Rullgardinsmenyn för Språk ställer in ditt språk och datumformat, med en flaggemoji bredvid varje alternativ. Att ändra ditt språk uppdaterar även standardvalutan automatiskt. Rullgardinsmenyn för Valuta låter dig överskriva valutan som används för betalningsuppföljning. En formatförhandsvisning längst ner visar hur belopp kommer att visas (t.ex. \"$1,234.56\").",
+        "mockup": "settings-region"
+      },
+      {
+        "heading": "Utseende",
+        "body": "Utseendepanelen låter dig växla mellan Ljust, Mörkt och Systemtema med tre stiliserade knappar. Det aktiva temat markeras med din accentfärg. Systemläget följer ditt operativsystems inställning. Ditt temaval sparas till ditt konto och gäller på alla enheter.",
+        "mockup": "settings-appearance"
+      },
+      {
+        "heading": "Persona",
+        "body": "Personapanelen frågar hur du använder Mix Architect. Välj mellan Artist, Tekniker, Båda eller Annat med radioknappar. Ditt val anpassar upplevelsen: att välja Tekniker eller Båda aktiverar automatiskt betalningsuppföljning, medan Artist håller den avstängd som standard. Du kan alltid ändra betalningsuppföljning oberoende. En anteckning under alternativen förklarar hur persona påverkar standardinställningar.",
+        "mockup": "settings-persona"
+      },
+      {
+        "heading": "Betalningsuppföljning",
+        "body": "Panelen för Betalningsuppföljning har en enda vippströmbrytare. När den är aktiverad visar releasekort på instrumentpanelen betalningssammanfattning (Utestående, Intjänat, Totala arvoden), och varje release får en Betalningssektion i sina inställningar. När den är avstängd döljs all betalningsrelaterad gränssnitt. Vippströmbrytaren sparas direkt och uppdaterar sidan.",
+        "mockup": "settings-payment-tracking",
+        "tip": "Betalningsuppföljning aktiveras automatiskt när du väljer Tekniker eller Båda som din persona, och stängs av för Artist. Du kan manuellt ändra detta när som helst."
       },
       {
         "heading": "E-postnotifieringar",
@@ -537,12 +607,25 @@ export const articles: HelpArticle[] = [
         "tip": "Du kan också avprenumerera från en specifik e-postkategori genom att klicka på avprenumerationslänken längst ner i valfritt notifieringsmeddelande. Ingen inloggning krävs."
       },
       {
-        "heading": "Mixstandarder",
-        "body": "Ställ in ditt standardformat (Stereo, Dolby Atmos eller Stereo + Atmos), samplingsfrekvens och bitdjup. Dessa standarder tillämpas automatiskt när du skapar nya releaser, vilket sparar tid på repetitiva inställningar. Du kan alltid ändra dem på enskilda releaser."
+        "heading": "Integrationer",
+        "body": "Integrationspanelen visar tillgängliga molnlagringsanslutningar. Varje integration visar tjänstens namn, en beskrivning och en knapp för Anslut eller Koppla från. Stöds för närvarande: Google Drive och Dropbox. Anslutna tjänster visar en grön \"Ansluten\"-etikett. Använd integrationer för att koppla din molnlagring för enklare filhantering tillsammans med dina releaser.",
+        "mockup": "settings-integrations"
       },
       {
-        "heading": "Utseende och Region",
-        "body": "Utseende låter dig växla mellan Ljust, Mörkt och Systemtema. Region och Valuta anger din föredragna valuta för betalningsuppföljning. Båda inställningarna sparas till ditt konto och gäller på alla enheter."
+        "heading": "Mixstandarder",
+        "body": "Panelen Mixstandarder ställer in dina föredragna startvärden för nya releaser. Välj ett standardformat (Stereo, Dolby Atmos eller Stereo + Atmos) med pill-stilknappar. Välj en standardsamplingsfrekvens (44,1kHz, 48kHz eller 96kHz) och bitdjup (16-bit, 24-bit eller 32-bit float) från rullgardinsmenyer. Du kan även definiera en standardelementlista med tagginmatning (t.ex. Sång, Bas, Trummor). Dessa standarder fylls i automatiskt när du skapar nya releaser, vilket sparar repetitiva inställningar. Klicka Spara för att spara dina val.",
+        "mockup": "settings-mix-defaults"
+      },
+      {
+        "heading": "Kalender",
+        "body": "Kalenderpanelen tillhandahåller ett iCal-prenumerationsflöde för dina releasedeadlines. Ett skrivskyddat URL-fält visar din personliga flödesadress med en Kopiera-knapp för att kopiera den till urklipp. Under det förklarar installationsinstruktioner hur du lägger till flödet i Google Calendar, Apple Calendar eller Outlook. En Regenerera-knapp skapar en ny flödes-URL om du behöver återkalla åtkomsten till den gamla.",
+        "mockup": "settings-calendar",
+        "warning": "Att regenerera din kalenderflödes-URL ogiltigförklarar den gamla länken. Alla kalendrar som prenumererar på den tidigare URL:en slutar ta emot uppdateringar."
+      },
+      {
+        "heading": "Dina Data",
+        "body": "Panelen Dina Data låter dig exportera alla dina Mix Architect-data. Den visar en uppskattad exportstorlek och ger en Ladda ner-knapp. Exporten inkluderar alla releaser, spår, ljudfilsmetadata, anteckningar, kommentarer, medarbetarlistor och inställningar. Använd detta för säkerhetskopior eller om du vill ha en lokal kopia av ditt arbete.",
+        "mockup": "settings-data"
       }
     ]
   },

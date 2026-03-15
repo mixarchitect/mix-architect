@@ -336,6 +336,49 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "release-settings",
+    "title": "发行设置",
+    "category": "releases",
+    "summary":
+      "为每个发行配置发行详情、客户信息、分发元数据、付款跟踪和团队成员。",
+    "tags": ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
+    "updatedAt": "2026-03-15",
+    "content": [
+      {
+        "heading": "打开发行设置",
+        "body": "从任何发行中，点击发行工具栏中的齿轮图标，或从三点菜单中选择\"Settings\"。设置页面有五个部分：Release Details、Client Information、Distribution、Payment 和 Team Management。顶部的返回箭头可返回发行视图。点击表单底部的 Save 按钮保存更改。",
+        "mockup": "release-settings-overview"
+      },
+      {
+        "heading": "发行详情",
+        "body": "Release Details 部分包含项目的核心元数据。点击图片区域上传或更换封面图。在文本字段中设置发行 Title 和 Artist name。使用药丸样式选择器选择 Release Type（Single、EP 或 Album）和 Format（Stereo、Dolby Atmos 或 Stereo + Atmos）。以同样方式设置 Status（Draft、In Progress 或 Ready）。使用带自动完成建议（Rock、Pop、Hip-Hop、Electronic 等）的标签输入添加 Genre Tags。设置发行截止日期的 Target Date，该日期也会同步到日历订阅中。",
+        "mockup": "release-settings-details"
+      },
+      {
+        "heading": "客户信息",
+        "body": "Client Information 部分存储与此发行相关的客户联系方式。字段包括 Client Name、Client Email、Client Phone 和 Delivery Notes。客户名称会显示在分析的客户明细和付款报告中。Delivery Notes 是一个自由文本区域，用于记录特殊说明，如首选文件命名规则或交付平台。",
+        "mockup": "release-settings-client"
+      },
+      {
+        "heading": "分发元数据",
+        "body": "Distribution 部分捕获数字分发所需的元数据。字段包括 Distributor（例如 DistroKid、TuneCore）、Record Label、UPC/EAN 条形码、Catalog Number、Copyright Holder、Copyright Year 和 Phonographic Copyright（P-line）。这些值由 Distribution Tracker 使用，并出现在您的数据导出中。",
+        "mockup": "release-settings-distribution"
+      },
+      {
+        "heading": "付款设置",
+        "body": "Payment 部分仅在您的用户设置中启用了付款跟踪时才可见。它使用药丸选择器显示 Payment Status（No Fee、Unpaid、Partial、Paid），以及带货币选择器的 Project Fee 字段、Paid Amount 和计算得出的 Balance Due。Payment Notes 文本区域可用于记录付款条件或发票参考。付款状态和金额显示在仪表盘卡片和分析收入图表中。",
+        "mockup": "release-settings-payment",
+        "tip": "收到定金后，将付款状态设置为\"Partial\"。余额会根据项目费用减去已付金额自动计算。"
+      },
+      {
+        "heading": "团队管理",
+        "body": "Team Management 部分允许您邀请协作者和客户加入发行。输入电子邮件地址，选择角色（Collaborator 或 Client），然后点击 Invite。待处理的邀请显示\"Invited\"徽章和 Resend 按钮。已接受的成员显示其显示名称、角色和移除选项。发行所有者始终列出且无法移除。Collaborator 可以编辑曲目和留下评论；Client 拥有只读访问权限，并可通过客户门户审批曲目。",
+        "mockup": "release-settings-team",
+        "warning": "移除团队成员会立即撤销其访问权限。他们将无法再查看该发行或其任何曲目。"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "上传和管理音频",
     "category": "audio",
@@ -518,17 +561,44 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "配置您的个人资料、外观、电子邮件通知、混音默认值等。",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
-    "updatedAt": "2026-03-14",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "设置概览",
-        "body": "从侧边栏或顶部栏的账户菜单打开[User Settings](/app/settings)。设置按面板组织：Profile、Subscription、Appearance、Region & Currency、Persona、Payment Tracking、Email Preferences、Integrations、Mix Defaults、Calendar 和 Data。当您与每个面板交互时，更改会即时保存。",
+        "body": "从侧边栏或顶部栏的账户菜单打开[User Settings](/app/settings)。设置按面板组织：Profile、Subscription、Region & Currency、Appearance、Persona、Payment Tracking、Email Preferences、Integrations、Mix Defaults、Calendar 和 Your Data。当您与每个面板交互时，更改会即时保存。",
         "mockup": "settings-overview"
       },
       {
         "heading": "个人资料",
-        "body": "Profile 面板允许您设置显示名称，该名称会显示在评论、通知以及发送给协作者的电子邮件提醒中。您的电子邮件地址会显示，但通过您的身份验证提供商管理。顶部栏会显示使用您名字的个性化问候语。"
+        "body": "Profile 面板是页面的第一个部分。它有三个字段：Display Name（显示在评论、通知和发送给协作者的电子邮件中）、Company Name（可选，用于品牌标识）和 Email（只读，通过您的身份验证提供商管理）。输入您的名称并点击 Save。顶部栏会显示使用您名字的个性化问候语。",
+        "mockup": "settings-profile"
+      },
+      {
+        "heading": "订阅",
+        "body": "Subscription 面板显示您的当前计划。Pro 账户显示绿色\"PRO\"徽章、月费以及一个\"Manage Billing\"按钮，点击可打开 Stripe 门户来更新付款方式、查看发票和下载收据。免费账户则显示\"Upgrade to Pro\"按钮。Pro 可解锁无限发行、音频格式转换和优先支持。",
+        "mockup": "settings-subscription"
+      },
+      {
+        "heading": "地区和货币",
+        "body": "Region & Currency 面板有两个下拉菜单。Locale 下拉菜单设置您的语言和日期格式，每个选项旁边都有国旗表情。更改 Locale 也会自动更新默认货币。Currency 下拉菜单允许您覆盖用于付款跟踪的货币。底部的格式预览显示金额的显示方式（例如\"$1,234.56\"）。",
+        "mockup": "settings-region"
+      },
+      {
+        "heading": "外观",
+        "body": "Appearance 面板允许您使用三个样式化按钮在 Light、Dark 和 System 主题之间切换。当前主题会以您的强调色高亮显示。System 模式跟随您的操作系统偏好设置。您的主题选择保存到账户中，并在所有设备上生效。",
+        "mockup": "settings-appearance"
+      },
+      {
+        "heading": "身份角色",
+        "body": "Persona 面板询问您如何使用 Mix Architect。使用单选按钮从 Artist、Engineer、Both 或 Other 中选择。您的选择会定制体验：选择 Engineer 或 Both 会自动启用付款跟踪，而 Artist 默认关闭此功能。您随时可以独立覆盖付款跟踪设置。选项下方有一条说明解释身份角色如何影响默认设置。",
+        "mockup": "settings-persona"
+      },
+      {
+        "heading": "付款跟踪",
+        "body": "Payment Tracking 面板有一个单独的切换开关。启用后，仪表盘上的发行卡片会显示付款汇总统计（未付款、已收款、总费用），每个发行的设置中也会出现 Payment 部分。禁用后，所有付款相关的 UI 都会隐藏。切换会即时保存并刷新页面。",
+        "mockup": "settings-payment-tracking",
+        "tip": "当您的身份角色选择 Engineer 或 Both 时，付款跟踪会自动启用；选择 Artist 时则自动禁用。您可以随时手动覆盖此设置。"
       },
       {
         "heading": "电子邮件通知",
@@ -537,12 +607,25 @@ export const articles: HelpArticle[] = [
         "tip": "您也可以通过点击任何通知电子邮件底部的退订链接来取消订阅特定的电子邮件类别。无需登录。"
       },
       {
-        "heading": "混音默认值",
-        "body": "设置您的默认格式（Stereo、Dolby Atmos 或 Stereo + Atmos）、采样率和位深度。创建新发行时，这些默认值会自动应用，节省重复设置的时间。您始终可以在单个发行上覆盖这些设置。"
+        "heading": "集成",
+        "body": "Integrations 面板显示可用的云存储连接。每个集成显示服务名称、描述以及 Connect 或 Disconnect 按钮。目前支持：Google Drive 和 Dropbox。已连接的服务显示绿色\"Connected\"徽章。使用集成链接您的云存储，以便更轻松地管理发行文件。",
+        "mockup": "settings-integrations"
       },
       {
-        "heading": "外观和地区",
-        "body": "Appearance 允许您在 Light、Dark 和 System 主题之间切换。Region & Currency 设置您用于付款跟踪的首选货币。两项偏好设置都保存到您的账户中，并在所有设备上生效。"
+        "heading": "混音默认值",
+        "body": "Mix Defaults 面板设置新发行的首选起始值。使用药丸样式按钮选择默认 Format（Stereo、Dolby Atmos 或 Stereo + Atmos）。从下拉菜单中选择默认 Sample Rate（44.1kHz、48kHz 或 96kHz）和 Bit Depth（16-bit、24-bit 或 32-bit float）。您还可以使用标签输入定义默认 Element List（例如 Vocals、Bass、Drums）。创建新发行时，这些默认值会自动填充，节省重复设置的时间。点击 Save 保存您的选择。",
+        "mockup": "settings-mix-defaults"
+      },
+      {
+        "heading": "日历",
+        "body": "Calendar 面板提供用于发行截止日期的 iCal 订阅源。只读 URL 字段显示您的个人源地址，旁边有一个 Copy 按钮用于复制到剪贴板。下方的设置说明解释如何将源添加到 Google Calendar、Apple Calendar 或 Outlook。如果需要撤销旧链接的访问权限，Regenerate 按钮会创建一个新的源 URL。",
+        "mockup": "settings-calendar",
+        "warning": "重新生成日历源 URL 会使旧链接失效。所有订阅了先前 URL 的日历将不再收到更新。"
+      },
+      {
+        "heading": "您的数据",
+        "body": "Your Data 面板允许您导出所有 Mix Architect 数据。它显示预估的导出大小并提供 Download 按钮。导出包括所有发行、曲目、音频文件元数据、备注、评论、协作者列表和设置。用于备份或在本地保存您的工作副本。",
+        "mockup": "settings-data"
       }
     ]
   },

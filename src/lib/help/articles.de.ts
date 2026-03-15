@@ -353,6 +353,48 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "release-settings",
+    "title": "Veröffentlichungs-Einstellungen",
+    "category": "releases",
+    "summary": "Konfigurieren Sie Veröffentlichungsdetails, Kundeninformationen, Vertriebsmetadaten, Zahlungsverfolgung und Teammitglieder für jede Veröffentlichung.",
+    "tags": ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
+    "updatedAt": "2026-03-15",
+    "content": [
+      {
+        "heading": "Veröffentlichungs-Einstellungen öffnen",
+        "body": "Klicken Sie in einer beliebigen Veröffentlichung auf das Zahnradsymbol in der Veröffentlichungs-Werkzeugleiste oder wählen Sie \"Einstellungen\" aus dem Drei-Punkte-Menü. Die Einstellungsseite hat fünf Abschnitte: Veröffentlichungsdetails, Kundeninformationen, Vertrieb, Zahlung und Teamverwaltung. Ein Zurück-Pfeil oben bringt Sie zurück zur Veröffentlichungsansicht. Änderungen werden gespeichert, wenn Sie auf die Schaltfläche Speichern am unteren Rand des Formulars klicken.",
+        "mockup": "release-settings-overview"
+      },
+      {
+        "heading": "Veröffentlichungsdetails",
+        "body": "Der Abschnitt Veröffentlichungsdetails enthält die Kernmetadaten Ihres Projekts. Laden Sie ein Cover hoch oder ändern Sie es, indem Sie auf den Bildbereich klicken. Legen Sie den Veröffentlichungstitel und den Künstlernamen in Textfeldern fest. Wählen Sie den Veröffentlichungstyp (Single, EP oder Album) und das Format (Stereo, Dolby Atmos oder Stereo + Atmos) über Pill-Schaltflächen. Setzen Sie den Status (Entwurf, In Bearbeitung oder Fertig) auf die gleiche Weise. Fügen Sie Genre-Tags über die Tag-Eingabe mit Autovervollständigung hinzu (Rock, Pop, Hip-Hop, Electronic usw.). Legen Sie ein Zieldatum für Ihre Veröffentlichungsfrist fest, das auch in das Kalender-Abonnement einfließt.",
+        "mockup": "release-settings-details"
+      },
+      {
+        "heading": "Kundeninformationen",
+        "body": "Der Abschnitt Kundeninformationen speichert Kontaktdaten für den mit dieser Veröffentlichung verbundenen Kunden. Die Felder umfassen Kundenname, Kunden-E-Mail, Kundentelefon und Lieferhinweise. Der Kundenname erscheint in der Analytics-Kundenaufschlüsselung und in Zahlungsberichten. Lieferhinweise ist ein Freitextbereich für besondere Anweisungen wie bevorzugte Dateinamenskonventionen oder Lieferplattformen.",
+        "mockup": "release-settings-client"
+      },
+      {
+        "heading": "Vertriebsmetadaten",
+        "body": "Der Abschnitt Vertrieb erfasst die für den digitalen Vertrieb benötigten Metadaten. Die Felder umfassen Vertriebspartner (z.B. DistroKid, TuneCore), Plattenlabel, UPC/EAN-Barcode, Katalognummer, Copyright-Inhaber, Copyright-Jahr und Phonographisches Copyright (die P-Zeile). Diese Werte werden vom Vertriebstracker verwendet und erscheinen in Ihrem Datenexport.",
+        "mockup": "release-settings-distribution"
+      },
+      {
+        "heading": "Zahlungseinstellungen",
+        "body": "Der Abschnitt Zahlung ist nur sichtbar, wenn die Zahlungsverfolgung in Ihren Benutzereinstellungen aktiviert ist. Er zeigt den Zahlungsstatus über Pill-Schaltflächen (Kein Honorar, Unbezahlt, Teilweise, Bezahlt), ein Projekthonorar-Feld mit Währungsauswahl, den Bezahlten Betrag und den berechneten Restbetrag. Ein Zahlungsnotizen-Textbereich ermöglicht die Erfassung von Zahlungsbedingungen oder Rechnungsreferenzen. Der Zahlungsstatus und die Beträge erscheinen auf Dashboard-Karten und in den Analytics-Umsatzdiagrammen.",
+        "mockup": "release-settings-payment",
+        "tip": "Setzen Sie den Zahlungsstatus auf \"Teilweise\", wenn eine Anzahlung eingegangen ist. Der Restbetrag wird automatisch aus dem Projekthonorar abzüglich des bezahlten Betrags berechnet."
+      },
+      {
+        "heading": "Teamverwaltung",
+        "body": "Der Abschnitt Teamverwaltung ermöglicht es Ihnen, Mitarbeiter und Kunden zur Veröffentlichung einzuladen. Geben Sie eine E-Mail-Adresse ein, wählen Sie eine Rolle (Mitarbeiter oder Kunde) und klicken Sie auf Einladen. Ausstehende Einladungen zeigen ein \"Eingeladen\"-Badge mit einer Erneut-senden-Schaltfläche. Akzeptierte Mitglieder zeigen ihren Anzeigenamen, ihre Rolle und eine Option zum Entfernen. Der Veröffentlichungseigentümer wird immer aufgelistet und kann nicht entfernt werden. Mitarbeiter können Tracks bearbeiten und Kommentare hinterlassen; Kunden haben schreibgeschützten Zugriff sowie die Möglichkeit, Tracks über das Kundenportal freizugeben.",
+        "mockup": "release-settings-team",
+        "warning": "Das Entfernen eines Teammitglieds widerruft dessen Zugriff sofort. Die Person kann die Veröffentlichung und deren Tracks nicht mehr einsehen."
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Audio hochladen und verwalten",
     "category": "audio",
@@ -533,33 +575,72 @@ export const articles: HelpArticle[] = [
     "id": "user-settings",
     "title": "Benutzereinstellungen",
     "category": "account",
-    "summary":
-      "Konfigurieren Sie Ihr Profil, Erscheinungsbild, E-Mail-Benachrichtigungen, Mix-Standardwerte und mehr.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
-    "updatedAt": "2026-03-14",
+    "summary": "Konfigurieren Sie Ihr Profil, Erscheinungsbild, E-Mail-Benachrichtigungen, Mix-Standardwerte und mehr.",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "Einstellungen im Überblick",
-        "body": "Öffnen Sie die [Benutzereinstellungen](/app/settings) über die Seitenleiste oder das Kontomenü in der oberen Leiste. Die Einstellungen sind in Bereiche unterteilt: Profil, Abonnement, Erscheinungsbild, Region & Währung, Persona, Zahlungsverfolgung, E-Mail-Einstellungen, Integrationen, Mix-Standardwerte, Kalender und Daten. Änderungen werden sofort gespeichert, wenn Sie mit den einzelnen Bereichen interagieren.",
+        "body": "Öffnen Sie die [Benutzereinstellungen](/app/settings) über die Seitenleiste oder das Kontomenü in der oberen Leiste. Die Einstellungen sind in Bereiche unterteilt: Profil, Abonnement, Region & Währung, Erscheinungsbild, Persona, Zahlungsverfolgung, E-Mail-Einstellungen, Integrationen, Mix-Standardwerte, Kalender und Ihre Daten. Änderungen werden sofort gespeichert, wenn Sie mit den einzelnen Bereichen interagieren.",
         "mockup": "settings-overview"
       },
       {
         "heading": "Profil",
-        "body": "Im Bereich Profil können Sie Ihren Anzeigenamen festlegen, der bei Kommentaren, Benachrichtigungen und E-Mail-Benachrichtigungen an Mitarbeiter angezeigt wird. Ihre E-Mail-Adresse wird angezeigt, aber über Ihren Authentifizierungsanbieter verwaltet. Eine personalisierte Begrüßung mit Ihrem Vornamen erscheint in der oberen Leiste."
+        "body": "Der Bereich Profil ist der erste Abschnitt auf der Seite. Er enthält drei Felder: Anzeigename (wird bei Kommentaren, Benachrichtigungen und E-Mails an Mitarbeiter angezeigt), Firmenname (optional, für Ihr Branding) und E-Mail (schreibgeschützt, wird über Ihren Authentifizierungsanbieter verwaltet). Geben Sie Ihren Namen ein und klicken Sie auf Speichern. Eine personalisierte Begrüßung mit Ihrem Vornamen erscheint in der oberen Leiste.",
+        "mockup": "settings-profile"
+      },
+      {
+        "heading": "Abonnement",
+        "body": "Der Bereich Abonnement zeigt Ihren aktuellen Tarif an. Pro-Konten zeigen ein grünes \"PRO\"-Badge, den Monatspreis und eine Schaltfläche \"Abrechnung verwalten\", die das Stripe-Portal öffnet, um Zahlungsmethoden zu aktualisieren, Rechnungen einzusehen und Belege herunterzuladen. Kostenlose Konten sehen stattdessen eine Schaltfläche \"Auf Pro upgraden\". Pro schaltet unbegrenzte Veröffentlichungen, Audio-Formatkonvertierung und Prioritäts-Support frei.",
+        "mockup": "settings-subscription"
+      },
+      {
+        "heading": "Region und Währung",
+        "body": "Der Bereich Region & Währung enthält zwei Dropdowns. Das Gebietsschema-Dropdown legt Ihre Sprache und Ihr Datumsformat fest, mit einem Flaggen-Emoji neben jeder Option. Eine Änderung des Gebietsschemas aktualisiert auch automatisch die Standardwährung. Das Währungs-Dropdown ermöglicht es Ihnen, die für die Zahlungsverfolgung verwendete Währung zu überschreiben. Eine Formatvorschau unten zeigt, wie Beträge dargestellt werden (z.B. \"1.234,56 $\").",
+        "mockup": "settings-region"
+      },
+      {
+        "heading": "Erscheinungsbild",
+        "body": "Der Bereich Erscheinungsbild ermöglicht den Wechsel zwischen Hell, Dunkel und System über drei gestaltete Schaltflächen. Das aktive Thema wird mit Ihrer Akzentfarbe hervorgehoben. Der Systemmodus folgt der Einstellung Ihres Betriebssystems. Ihre Theme-Auswahl wird in Ihrem Konto gespeichert und gilt auf allen Geräten.",
+        "mockup": "settings-appearance"
+      },
+      {
+        "heading": "Persona",
+        "body": "Der Bereich Persona fragt, wie Sie Mix Architect verwenden. Wählen Sie zwischen Künstler, Ingenieur, Beides oder Anderes über Radiobuttons. Ihre Auswahl passt das Erlebnis an: Die Auswahl von Ingenieur oder Beides aktiviert automatisch die Zahlungsverfolgung, während Künstler sie standardmäßig deaktiviert lässt. Sie können die Zahlungsverfolgung jederzeit unabhängig überschreiben. Ein Hinweis unter den Optionen erklärt, wie die Persona die Standardeinstellungen beeinflusst.",
+        "mockup": "settings-persona"
+      },
+      {
+        "heading": "Zahlungsverfolgung",
+        "body": "Der Bereich Zahlungsverfolgung enthält einen einzelnen Umschalter. Wenn aktiviert, zeigen Veröffentlichungskarten im Dashboard Zahlungsstatistiken (Ausstehend, Verdient, Gesamthonorare), und jede Veröffentlichung erhält einen Zahlungsbereich in ihren Einstellungen. Wenn deaktiviert, werden alle zahlungsbezogenen Elemente ausgeblendet. Der Umschalter speichert sofort und aktualisiert die Seite.",
+        "mockup": "settings-payment-tracking",
+        "tip": "Die Zahlungsverfolgung wird automatisch aktiviert, wenn Sie Ingenieur oder Beides als Persona auswählen, und für Künstler deaktiviert. Sie können dies jederzeit manuell überschreiben."
       },
       {
         "heading": "E-Mail-Benachrichtigungen",
-        "body": "Der Bereich E-Mail-Einstellungen steuert, welche transaktionalen E-Mails Sie von Mix Architect erhalten. Jede Kategorie hat einen Ein/Aus-Schalter. Die Kategorien umfassen: Veröffentlichungs-Benachrichtigungen (wenn eine Veröffentlichung auf einer Plattform live geht), Neue Kommentar-Benachrichtigungen (wenn jemand Ihre Veröffentlichung kommentiert), Wöchentliche Zusammenfassung (eine Übersicht der Aktivitäten über alle Veröffentlichungen), Zahlungserinnerungen (wenn eine Abonnementzahlung fehlschlägt), Zahlungsbestätigungen (wenn eine Zahlung verarbeitet wird), Abonnementbestätigungen (wenn Ihr Tarif aktiviert wird) und Kündigungsbenachrichtigungen (wenn Ihr Tarif gekündigt wird). Alle Kategorien sind standardmäßig aktiviert. Jede E-Mail enthält einen Abmeldelink am Ende.",
+        "body": "Der Bereich E-Mail-Einstellungen steuert, welche transaktionalen E-Mails Sie von Mix Architect erhalten. Jede Kategorie hat einen Ein/Aus-Schalter. Die Kategorien umfassen: Veröffentlichungs-Live-Benachrichtigungen (wenn eine Veröffentlichung auf einer Plattform live geht), Neue Kommentar-Benachrichtigungen (wenn jemand Ihre Veröffentlichung kommentiert), Wöchentliche Zusammenfassung (eine Übersicht der Aktivitäten über alle Veröffentlichungen), Zahlungserinnerungen (wenn eine Abonnementzahlung fehlschlägt), Zahlungsbestätigungen (wenn eine Zahlung verarbeitet wird), Abonnementbestätigungen (wenn Ihr Tarif aktiviert wird) und Kündigungsbenachrichtigungen (wenn Ihr Tarif gekündigt wird). Alle Kategorien sind standardmäßig aktiviert. Jede E-Mail enthält einen Abmeldelink am Ende.",
         "mockup": "settings-email-prefs",
         "tip": "Sie können sich auch von einer bestimmten E-Mail-Kategorie abmelden, indem Sie auf den Abmeldelink am Ende einer Benachrichtigungs-E-Mail klicken. Keine Anmeldung erforderlich."
       },
       {
-        "heading": "Mix-Standardwerte",
-        "body": "Legen Sie Ihr Standardformat (Stereo, Dolby Atmos oder Stereo + Atmos), Abtastrate und Bittiefe fest. Diese Standardwerte werden automatisch angewendet, wenn Sie neue Veröffentlichungen erstellen, und sparen Zeit bei der wiederkehrenden Einrichtung. Sie können sie jederzeit bei einzelnen Veröffentlichungen überschreiben."
+        "heading": "Integrationen",
+        "body": "Der Bereich Integrationen zeigt verfügbare Cloud-Speicher-Verbindungen. Jede Integration zeigt den Dienstnamen, eine Beschreibung und eine Schaltfläche zum Verbinden oder Trennen. Derzeit unterstützt: Google Drive und Dropbox. Verbundene Dienste zeigen ein grünes \"Verbunden\"-Badge. Nutzen Sie Integrationen, um Ihren Cloud-Speicher für eine einfachere Dateiverwaltung neben Ihren Veröffentlichungen zu verknüpfen.",
+        "mockup": "settings-integrations"
       },
       {
-        "heading": "Erscheinungsbild und Region",
-        "body": "Unter Erscheinungsbild können Sie zwischen den Themen Hell, Dunkel und System wechseln. Region & Währung legt Ihre bevorzugte Währung für die Zahlungsverfolgung fest. Beide Einstellungen werden in Ihrem Konto gespeichert und gelten auf allen Geräten."
+        "heading": "Mix-Standardwerte",
+        "body": "Der Bereich Mix-Standardwerte legt Ihre bevorzugten Startwerte für neue Veröffentlichungen fest. Wählen Sie ein Standardformat (Stereo, Dolby Atmos oder Stereo + Atmos) über Pill-Schaltflächen. Wählen Sie eine Standard-Abtastrate (44,1 kHz, 48 kHz oder 96 kHz) und Bittiefe (16-Bit, 24-Bit oder 32-Bit Float) aus Dropdowns. Sie können auch eine Standard-Elementliste über das Tag-Eingabefeld definieren (z.B. Gesang, Bass, Drums). Diese Standardwerte werden automatisch angewendet, wenn Sie neue Veröffentlichungen erstellen, und sparen wiederkehrende Einrichtung. Klicken Sie auf Speichern, um Ihre Auswahl zu sichern.",
+        "mockup": "settings-mix-defaults"
+      },
+      {
+        "heading": "Kalender",
+        "body": "Der Bereich Kalender bietet einen iCal-Abonnement-Feed für Ihre Veröffentlichungsfristen. Ein schreibgeschütztes URL-Feld zeigt Ihre persönliche Feed-Adresse mit einer Kopieren-Schaltfläche, um sie in die Zwischenablage zu kopieren. Darunter erklären Einrichtungshinweise, wie Sie den Feed zu Google Kalender, Apple Kalender oder Outlook hinzufügen. Eine Regenerieren-Schaltfläche erstellt eine neue Feed-URL, falls Sie den Zugang zur alten widerrufen müssen.",
+        "mockup": "settings-calendar",
+        "warning": "Das Regenerieren Ihrer Kalender-Feed-URL macht den alten Link ungültig. Alle Kalender, die die vorherige URL abonniert haben, erhalten keine Updates mehr."
+      },
+      {
+        "heading": "Ihre Daten",
+        "body": "Der Bereich Ihre Daten ermöglicht den Export aller Ihrer Mix Architect-Daten. Er zeigt eine geschätzte Exportgröße und bietet eine Download-Schaltfläche. Der Export umfasst alle Veröffentlichungen, Tracks, Audio-Datei-Metadaten, Notizen, Kommentare, Mitarbeiterlisten und Einstellungen. Nutzen Sie dies für Backups oder wenn Sie eine lokale Kopie Ihrer Arbeit wünschen.",
+        "mockup": "settings-data"
       }
     ]
   },

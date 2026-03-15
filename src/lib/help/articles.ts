@@ -311,6 +311,50 @@ export const articles: HelpArticle[] = [
     ],
   },
 
+  {
+    id: "release-settings",
+    title: "Release Settings",
+    category: "releases",
+    summary:
+      "Configure release details, client information, distribution metadata, payment tracking, and team members for each release.",
+    tags: ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
+    updatedAt: "2026-03-15",
+    content: [
+      {
+        heading: "Opening Release Settings",
+        body: "From any release, click the gear icon in the release toolbar or select \"Settings\" from the three-dot menu. The settings page has five sections: Release Details, Client Information, Distribution, Payment, and Team Management. A back arrow at the top returns you to the release view. Changes are saved when you click the Save button at the bottom of the form.",
+        mockup: "release-settings-overview",
+      },
+      {
+        heading: "Release Details",
+        body: "The Release Details section contains the core metadata for your project. Upload or change cover art by clicking the image area. Set the release Title and Artist name in text fields. Choose the Release Type (Single, EP, or Album) and Format (Stereo, Dolby Atmos, or Stereo + Atmos) using pill-style selectors. Set the Status (Draft, In Progress, or Ready) the same way. Add Genre Tags using the tag input with autocomplete suggestions (Rock, Pop, Hip-Hop, Electronic, etc.). Set a Target Date for your release deadline, which also feeds into the Calendar subscription.",
+        mockup: "release-settings-details",
+      },
+      {
+        heading: "Client Information",
+        body: "The Client Information section stores contact details for the client associated with this release. Fields include Client Name, Client Email, Client Phone, and Delivery Notes. The client name appears in the Analytics client breakdown and on payment reports. Delivery Notes is a free-text area for special instructions like preferred file naming conventions or delivery platforms.",
+        mockup: "release-settings-client",
+      },
+      {
+        heading: "Distribution Metadata",
+        body: "The Distribution section captures metadata needed for digital distribution. Fields include Distributor (e.g. DistroKid, TuneCore), Record Label, UPC/EAN barcode, Catalog Number, Copyright Holder, Copyright Year, and Phonographic Copyright (the P-line). These values are used by the Distribution Tracker and appear in your data export.",
+        mockup: "release-settings-distribution",
+      },
+      {
+        heading: "Payment Settings",
+        body: "The Payment section is visible only when payment tracking is enabled in your User Settings. It shows the Payment Status using pill selectors (No Fee, Unpaid, Partial, Paid), a Project Fee field with currency selector, Paid Amount, and the calculated Balance Due. A Payment Notes text area lets you record payment terms or invoice references. The payment status and amounts appear on dashboard cards and in the Analytics revenue charts.",
+        mockup: "release-settings-payment",
+        tip: "Set the payment status to \"Partial\" when a deposit has been received. The balance due is calculated automatically from the project fee minus the paid amount.",
+      },
+      {
+        heading: "Team Management",
+        body: "The Team Management section lets you invite collaborators and clients to the release. Enter an email address, choose a role (Collaborator or Client), and click Invite. Pending invitations show an \"Invited\" badge with a Resend button. Accepted members show their display name, role, and an option to remove them. The release owner is always listed and cannot be removed. Collaborators can edit tracks and leave comments; Clients have read-only access plus the ability to approve tracks through the client portal.",
+        mockup: "release-settings-team",
+        warning: "Removing a team member revokes their access immediately. They will no longer be able to view the release or any of its tracks.",
+      },
+    ],
+  },
+
   /* ──────────────────────────────────────────────────────
      AUDIO
      ────────────────────────────────────────────────────── */
@@ -472,17 +516,44 @@ export const articles: HelpArticle[] = [
     category: "account",
     summary:
       "Configure your profile, appearance, email notifications, mix defaults, and more.",
-    tags: ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
-    updatedAt: "2026-03-14",
+    tags: ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    updatedAt: "2026-03-15",
     content: [
       {
         heading: "Settings Overview",
-        body: "Open [User Settings](/app/settings) from the sidebar or the account menu in the top bar. Settings are organized into panels: Profile, Subscription, Appearance, Region & Currency, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, and Data. Changes save instantly as you interact with each panel.",
+        body: "Open [User Settings](/app/settings) from the sidebar or the account menu in the top bar. Settings are organized into panels: Profile, Subscription, Region & Currency, Appearance, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, and Your Data. Changes save instantly as you interact with each panel.",
         mockup: "settings-overview",
       },
       {
         heading: "Profile",
-        body: "The Profile panel lets you set your display name, which appears on comments, notifications, and email alerts sent to collaborators. Your email address is shown but managed through your authentication provider. A personalized greeting using your first name appears in the top bar.",
+        body: "The Profile panel is the first section on the page. It has three fields: Display Name (shown on comments, notifications, and emails to collaborators), Company Name (optional, for branding), and Email (read-only, managed through your authentication provider). Enter your name and click Save. A personalized greeting using your first name appears in the top bar.",
+        mockup: "settings-profile",
+      },
+      {
+        heading: "Subscription",
+        body: "The Subscription panel shows your current plan. Pro accounts display a green \"PRO\" badge, the monthly price, and a \"Manage Billing\" button that opens the Stripe portal for updating payment methods, viewing invoices, and downloading receipts. Free accounts see an \"Upgrade to Pro\" button instead. Pro unlocks unlimited releases, audio format conversion, and priority support.",
+        mockup: "settings-subscription",
+      },
+      {
+        heading: "Region and Currency",
+        body: "The Region & Currency panel has two dropdowns. The Locale dropdown sets your language and date format, with a flag emoji next to each option. Changing your locale also updates the default currency automatically to match. The Currency dropdown lets you override the currency used for payment tracking. A format preview at the bottom shows how amounts will appear (e.g. \"$1,234.56\").",
+        mockup: "settings-region",
+      },
+      {
+        heading: "Appearance",
+        body: "The Appearance panel lets you switch between Light, Dark, and System themes using three styled buttons. The active theme is highlighted with your accent color. System mode follows your operating system preference. Your theme choice is saved to your account and applies across all devices.",
+        mockup: "settings-appearance",
+      },
+      {
+        heading: "Persona",
+        body: "The Persona panel asks how you use Mix Architect. Choose from Artist, Engineer, Both, or Other using radio buttons. Your selection tailors the experience: choosing Engineer or Both automatically enables payment tracking, while Artist keeps it off by default. You can always override payment tracking independently. A note below the options explains how persona affects default settings.",
+        mockup: "settings-persona",
+      },
+      {
+        heading: "Payment Tracking",
+        body: "The Payment Tracking panel has a single toggle switch. When enabled, release cards on the dashboard show payment summary stats (Outstanding, Earned, Total fees), and each release gets a Payment section in its settings. When disabled, all payment-related UI is hidden. The toggle saves instantly and refreshes the page.",
+        mockup: "settings-payment-tracking",
+        tip: "Payment tracking is automatically enabled when you select Engineer or Both as your persona, and disabled for Artist. You can manually override this at any time.",
       },
       {
         heading: "Email Notifications",
@@ -491,12 +562,25 @@ export const articles: HelpArticle[] = [
         tip: "You can also unsubscribe from a specific email category by clicking the unsubscribe link at the bottom of any notification email. No sign-in required.",
       },
       {
-        heading: "Mix Defaults",
-        body: "Set your default format (Stereo, Dolby Atmos, or Stereo + Atmos), sample rate, and bit depth. These defaults are applied automatically when you create new releases, saving time on repetitive setup. You can always override them on individual releases.",
+        heading: "Integrations",
+        body: "The Integrations panel shows available cloud storage connections. Each integration displays the service name, a description, and a Connect or Disconnect button. Currently supported: Google Drive and Dropbox. Connected services show a green \"Connected\" badge. Use integrations to link your cloud storage for easier file management alongside your releases.",
+        mockup: "settings-integrations",
       },
       {
-        heading: "Appearance and Region",
-        body: "Appearance lets you switch between Light, Dark, and System themes. Region & Currency sets your preferred currency for payment tracking. Both preferences are saved to your account and apply across all devices.",
+        heading: "Mix Defaults",
+        body: "The Mix Defaults panel sets your preferred starting values for new releases. Choose a default Format (Stereo, Dolby Atmos, or Stereo + Atmos) using pill-style buttons. Select a default Sample Rate (44.1kHz, 48kHz, or 96kHz) and Bit Depth (16-bit, 24-bit, or 32-bit float) from dropdowns. You can also define a default Element List using the tag input (e.g. Vocals, Bass, Drums). These defaults auto-populate when you create new releases, saving repetitive setup. Click Save to persist your choices.",
+        mockup: "settings-mix-defaults",
+      },
+      {
+        heading: "Calendar",
+        body: "The Calendar panel provides an iCal subscription feed for your release deadlines. A read-only URL field shows your personal feed address with a Copy button to copy it to your clipboard. Below that, setup instructions explain how to add the feed to Google Calendar, Apple Calendar, or Outlook. A Regenerate button creates a new feed URL if you need to revoke access to the old one.",
+        mockup: "settings-calendar",
+        warning: "Regenerating your calendar feed URL invalidates the old link. Any calendars subscribed to the previous URL will stop receiving updates.",
+      },
+      {
+        heading: "Your Data",
+        body: "The Your Data panel lets you export all of your Mix Architect data. It shows an estimated export size and provides a Download button. The export includes all releases, tracks, audio file metadata, notes, comments, collaborator lists, and settings. Use this for backups or if you want a local copy of your work.",
+        mockup: "settings-data",
       },
     ],
   },

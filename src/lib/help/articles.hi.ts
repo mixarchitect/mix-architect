@@ -336,6 +336,49 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "release-settings",
+    "title": "रिलीज़ सेटिंग्स",
+    "category": "releases",
+    "summary":
+      "प्रत्येक रिलीज़ के लिए रिलीज़ विवरण, क्लाइंट जानकारी, डिस्ट्रीब्यूशन मेटाडेटा, पेमेंट ट्रैकिंग, और टीम सदस्यों को कॉन्फ़िगर करें।",
+    "tags": ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
+    "updatedAt": "2026-03-15",
+    "content": [
+      {
+        "heading": "रिलीज़ सेटिंग्स खोलना",
+        "body": "किसी भी रिलीज़ से, रिलीज़ toolbar में gear आइकन पर क्लिक करें या three-dot मेनू से \"Settings\" चुनें। सेटिंग्स पेज में पाँच सेक्शन हैं: Release Details, Client Information, Distribution, Payment, और Team Management। शीर्ष पर एक back arrow आपको रिलीज़ view पर वापस ले जाता है। फ़ॉर्म के नीचे Save बटन पर क्लिक करने पर बदलाव सेव होते हैं।",
+        "mockup": "release-settings-overview"
+      },
+      {
+        "heading": "रिलीज़ विवरण",
+        "body": "Release Details सेक्शन में आपके प्रोजेक्ट का मुख्य मेटाडेटा होता है। Image area पर क्लिक करके cover art अपलोड या बदलें। Text fields में रिलीज़ Title और Artist name सेट करें। Pill-style selectors का उपयोग करके Release Type (Single, EP, या Album) और Format (Stereo, Dolby Atmos, या Stereo + Atmos) चुनें। उसी तरह Status (Draft, In Progress, या Ready) सेट करें। Autocomplete suggestions (Rock, Pop, Hip-Hop, Electronic, आदि) वाले tag input का उपयोग करके Genre Tags जोड़ें। अपनी रिलीज़ deadline के लिए Target Date सेट करें, जो Calendar subscription में भी दिखाई देती है।",
+        "mockup": "release-settings-details"
+      },
+      {
+        "heading": "क्लाइंट जानकारी",
+        "body": "Client Information सेक्शन इस रिलीज़ से जुड़े क्लाइंट के संपर्क विवरण संग्रहीत करता है। फ़ील्ड में Client Name, Client Email, Client Phone, और Delivery Notes शामिल हैं। क्लाइंट का नाम Analytics client breakdown और payment reports में दिखाई देता है। Delivery Notes एक free-text area है जहाँ विशेष निर्देश जैसे preferred file naming conventions या delivery platforms लिखे जा सकते हैं।",
+        "mockup": "release-settings-client"
+      },
+      {
+        "heading": "डिस्ट्रीब्यूशन मेटाडेटा",
+        "body": "Distribution सेक्शन digital distribution के लिए आवश्यक मेटाडेटा कैप्चर करता है। फ़ील्ड में Distributor (उदा. DistroKid, TuneCore), Record Label, UPC/EAN barcode, Catalog Number, Copyright Holder, Copyright Year, और Phonographic Copyright (P-line) शामिल हैं। ये वैल्यूज़ Distribution Tracker द्वारा उपयोग की जाती हैं और आपके data export में दिखाई देती हैं।",
+        "mockup": "release-settings-distribution"
+      },
+      {
+        "heading": "पेमेंट सेटिंग्स",
+        "body": "Payment सेक्शन केवल तभी दिखाई देता है जब आपकी User Settings में payment tracking सक्षम हो। यह pill selectors (No Fee, Unpaid, Partial, Paid) का उपयोग करके Payment Status दिखाता है, एक Project Fee फ़ील्ड currency selector के साथ, Paid Amount, और calculated Balance Due। एक Payment Notes text area आपको payment terms या invoice references रिकॉर्ड करने देता है। Payment status और amounts dashboard cards और Analytics revenue charts में दिखाई देते हैं।",
+        "mockup": "release-settings-payment",
+        "tip": "जब deposit प्राप्त हो जाए तो payment status को \"Partial\" पर सेट करें। Balance due project fee में से paid amount घटाकर स्वचालित रूप से calculated होता है।"
+      },
+      {
+        "heading": "टीम प्रबंधन",
+        "body": "Team Management सेक्शन आपको रिलीज़ में collaborators और clients को invite करने देता है। Email address दर्ज करें, role (Collaborator या Client) चुनें, और Invite पर क्लिक करें। Pending invitations एक \"Invited\" badge और Resend बटन के साथ दिखाई देती हैं। स्वीकृत सदस्य अपना display name, role, और उन्हें remove करने का विकल्प दिखाते हैं। Release owner हमेशा सूचीबद्ध रहता है और उसे remove नहीं किया जा सकता। Collaborators ट्रैक संपादित कर सकते हैं और कमेंट छोड़ सकते हैं; Clients के पास read-only access है और वे client portal के माध्यम से tracks approve कर सकते हैं।",
+        "mockup": "release-settings-team",
+        "warning": "किसी टीम सदस्य को remove करने से उनका access तुरंत रद्द हो जाता है। वे रिलीज़ या उसके किसी भी ट्रैक को देखने में सक्षम नहीं रहेंगे।"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Audio अपलोड और प्रबंधन",
     "category": "audio",
@@ -518,17 +561,44 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "अपनी प्रोफ़ाइल, दिखावट, ईमेल सूचनाएँ, मिक्स डिफ़ॉल्ट्स, और अन्य सेटिंग्स कॉन्फ़िगर करें।",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
-    "updatedAt": "2026-03-14",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "सेटिंग्स अवलोकन",
-        "body": "साइडबार या टॉप बार में अकाउंट मेनू से [User Settings](/app/settings) खोलें। सेटिंग्स पैनलों में व्यवस्थित हैं: Profile, Subscription, Appearance, Region & Currency, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, और Data। जैसे ही आप किसी पैनल के साथ इंटरैक्ट करते हैं, बदलाव तुरंत सेव हो जाते हैं।",
+        "body": "साइडबार या टॉप बार में अकाउंट मेनू से [User Settings](/app/settings) खोलें। सेटिंग्स पैनलों में व्यवस्थित हैं: Profile, Subscription, Region & Currency, Appearance, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, और Your Data। जैसे ही आप किसी पैनल के साथ इंटरैक्ट करते हैं, बदलाव तुरंत सेव हो जाते हैं।",
         "mockup": "settings-overview"
       },
       {
         "heading": "प्रोफ़ाइल",
-        "body": "Profile पैनल आपको अपना डिस्प्ले नाम सेट करने देता है, जो कमेंट्स, नोटिफ़िकेशन्स, और सहयोगियों को भेजे गए ईमेल अलर्ट्स पर दिखाई देता है। आपका ईमेल पता दिखाया जाता है लेकिन आपके ऑथेंटिकेशन प्रोवाइडर के माध्यम से प्रबंधित होता है। टॉप बार में आपके पहले नाम का उपयोग करके एक व्यक्तिगत अभिवादन दिखाई देता है।"
+        "body": "Profile पैनल पेज पर पहला सेक्शन है। इसमें तीन फ़ील्ड हैं: Display Name (कमेंट्स, नोटिफ़िकेशन्स, और सहयोगियों को भेजे गए ईमेल पर दिखता है), Company Name (वैकल्पिक, ब्रांडिंग के लिए), और Email (केवल पठनीय, आपके ऑथेंटिकेशन प्रोवाइडर के माध्यम से प्रबंधित)। अपना नाम दर्ज करें और Save पर क्लिक करें। टॉप बार में आपके पहले नाम का उपयोग करके एक व्यक्तिगत अभिवादन दिखाई देता है।",
+        "mockup": "settings-profile"
+      },
+      {
+        "heading": "सब्सक्रिप्शन",
+        "body": "Subscription पैनल आपका वर्तमान प्लान दिखाता है। Pro अकाउंट्स एक हरा \"PRO\" बैज, मासिक मूल्य, और एक \"Manage Billing\" बटन प्रदर्शित करते हैं जो Stripe portal खोलता है जहाँ आप payment methods अपडेट कर सकते हैं, invoices देख सकते हैं, और receipts download कर सकते हैं। Free अकाउंट्स इसके बजाय \"Upgrade to Pro\" बटन दिखाते हैं। Pro unlimited releases, audio format conversion, और priority support अनलॉक करता है।",
+        "mockup": "settings-subscription"
+      },
+      {
+        "heading": "क्षेत्र और मुद्रा",
+        "body": "Region & Currency पैनल में दो ड्रॉपडाउन हैं। Locale ड्रॉपडाउन आपकी भाषा और date format सेट करता है, प्रत्येक विकल्प के बगल में एक flag emoji के साथ। अपना locale बदलने से डिफ़ॉल्ट मुद्रा भी स्वचालित रूप से अपडेट हो जाती है। Currency ड्रॉपडाउन आपको payment tracking के लिए उपयोग की जाने वाली मुद्रा को ओवरराइड करने देता है। नीचे एक format preview दिखाता है कि राशियाँ कैसी दिखेंगी (उदा. \"$1,234.56\")।",
+        "mockup": "settings-region"
+      },
+      {
+        "heading": "दिखावट",
+        "body": "Appearance पैनल आपको तीन स्टाइल्ड बटनों का उपयोग करके Light, Dark, और System थीम के बीच स्विच करने देता है। सक्रिय थीम आपके accent color के साथ हाइलाइट होती है। System मोड आपके ऑपरेटिंग सिस्टम की प्राथमिकता का पालन करता है। आपकी थीम पसंद आपके अकाउंट में सेव होती है और सभी डिवाइस पर लागू होती है।",
+        "mockup": "settings-appearance"
+      },
+      {
+        "heading": "पर्सोना",
+        "body": "Persona पैनल पूछता है कि आप Mix Architect का उपयोग कैसे करते हैं। Radio buttons का उपयोग करके Artist, Engineer, Both, या Other में से चुनें। आपका चयन अनुभव को अनुकूलित करता है: Engineer या Both चुनने से payment tracking स्वचालित रूप से सक्षम हो जाती है, जबकि Artist इसे डिफ़ॉल्ट रूप से बंद रखता है। आप payment tracking को हमेशा स्वतंत्र रूप से ओवरराइड कर सकते हैं। विकल्पों के नीचे एक नोट बताता है कि persona डिफ़ॉल्ट सेटिंग्स को कैसे प्रभावित करता है।",
+        "mockup": "settings-persona"
+      },
+      {
+        "heading": "पेमेंट ट्रैकिंग",
+        "body": "Payment Tracking पैनल में एक सिंगल टॉगल स्विच है। सक्षम होने पर, डैशबोर्ड पर रिलीज़ कार्ड payment summary stats (Outstanding, Earned, Total fees) दिखाते हैं, और प्रत्येक रिलीज़ की सेटिंग्स में एक Payment सेक्शन मिलता है। अक्षम होने पर, सभी payment-related UI छिप जाती है। टॉगल तुरंत सेव होता है और पेज रिफ़्रेश करता है।",
+        "mockup": "settings-payment-tracking",
+        "tip": "जब आप अपने persona के रूप में Engineer या Both चुनते हैं तो Payment tracking स्वचालित रूप से सक्षम हो जाती है, और Artist के लिए अक्षम हो जाती है। आप इसे किसी भी समय मैन्युअल रूप से ओवरराइड कर सकते हैं।"
       },
       {
         "heading": "ईमेल सूचनाएँ",
@@ -537,12 +607,25 @@ export const articles: HelpArticle[] = [
         "tip": "आप किसी भी नोटिफ़िकेशन ईमेल के नीचे अनसब्सक्राइब लिंक पर क्लिक करके किसी विशिष्ट ईमेल श्रेणी से भी अनसब्सक्राइब कर सकते हैं। साइन-इन की आवश्यकता नहीं है।"
       },
       {
-        "heading": "मिक्स डिफ़ॉल्ट्स",
-        "body": "अपना डिफ़ॉल्ट फ़ॉर्मेट (Stereo, Dolby Atmos, या Stereo + Atmos), सैंपल रेट, और बिट डेप्थ सेट करें। जब आप नई रिलीज़ बनाते हैं तो ये डिफ़ॉल्ट्स स्वचालित रूप से लागू होते हैं, जिससे दोहराव वाले सेटअप पर समय बचता है। आप इन्हें व्यक्तिगत रिलीज़ पर हमेशा ओवरराइड कर सकते हैं।"
+        "heading": "इंटीग्रेशन",
+        "body": "Integrations पैनल उपलब्ध cloud storage कनेक्शन दिखाता है। प्रत्येक integration सर्विस का नाम, विवरण, और एक Connect या Disconnect बटन प्रदर्शित करता है। वर्तमान में समर्थित: Google Drive और Dropbox। कनेक्टेड सर्विसेज एक हरा \"Connected\" बैज दिखाती हैं। अपनी रिलीज़ के साथ आसान फ़ाइल प्रबंधन के लिए अपने cloud storage को लिंक करने के लिए integrations का उपयोग करें।",
+        "mockup": "settings-integrations"
       },
       {
-        "heading": "दिखावट और क्षेत्र",
-        "body": "Appearance आपको Light, Dark, और System थीम के बीच स्विच करने देता है। Region & Currency पेमेंट ट्रैकिंग के लिए आपकी पसंदीदा मुद्रा सेट करता है। दोनों प्राथमिकताएँ आपके अकाउंट में सेव होती हैं और सभी डिवाइस पर लागू होती हैं।"
+        "heading": "मिक्स डिफ़ॉल्ट्स",
+        "body": "Mix Defaults पैनल नई रिलीज़ के लिए आपकी पसंदीदा शुरुआती वैल्यूज़ सेट करता है। Pill-style buttons का उपयोग करके डिफ़ॉल्ट Format (Stereo, Dolby Atmos, या Stereo + Atmos) चुनें। ड्रॉपडाउन से डिफ़ॉल्ट Sample Rate (44.1kHz, 48kHz, या 96kHz) और Bit Depth (16-bit, 24-bit, या 32-bit float) चुनें। आप tag input का उपयोग करके एक डिफ़ॉल्ट Element List भी परिभाषित कर सकते हैं (उदा. Vocals, Bass, Drums)। जब आप नई रिलीज़ बनाते हैं तो ये डिफ़ॉल्ट्स स्वचालित रूप से भर जाते हैं, जिससे दोहराव वाले सेटअप पर समय बचता है। अपनी पसंद सेव करने के लिए Save पर क्लिक करें।",
+        "mockup": "settings-mix-defaults"
+      },
+      {
+        "heading": "कैलेंडर",
+        "body": "Calendar पैनल आपकी रिलीज़ deadline के लिए एक iCal subscription feed प्रदान करता है। एक read-only URL फ़ील्ड आपका व्यक्तिगत feed address दिखाता है, जिसमें clipboard पर कॉपी करने के लिए एक Copy बटन है। उसके नीचे, setup instructions बताते हैं कि Google Calendar, Apple Calendar, या Outlook में feed कैसे जोड़ें। एक Regenerate बटन एक नया feed URL बनाता है अगर आपको पुराने तक पहुँच रद्द करनी हो।",
+        "mockup": "settings-calendar",
+        "warning": "अपना calendar feed URL regenerate करने से पुराना लिंक अमान्य हो जाता है। पिछले URL से subscribe किए गए किसी भी calendar को अपडेट मिलना बंद हो जाएगा।"
+      },
+      {
+        "heading": "आपका डेटा",
+        "body": "Your Data पैनल आपको अपना सारा Mix Architect डेटा export करने देता है। यह एक अनुमानित export आकार दिखाता है और एक Download बटन प्रदान करता है। Export में सभी releases, tracks, audio file metadata, notes, comments, collaborator lists, और settings शामिल हैं। बैकअप के लिए या अगर आप अपने काम की local copy चाहते हैं तो इसका उपयोग करें।",
+        "mockup": "settings-data"
       }
     ]
   },

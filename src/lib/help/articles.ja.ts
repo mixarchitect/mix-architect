@@ -336,6 +336,49 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "release-settings",
+    "title": "リリース設定",
+    "category": "releases",
+    "summary":
+      "各リリースのリリース詳細、クライアント情報、ディストリビューションメタデータ、支払い追跡、チームメンバーを設定します。",
+    "tags": ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
+    "updatedAt": "2026-03-15",
+    "content": [
+      {
+        "heading": "リリース設定を開く",
+        "body": "任意のリリースから、リリースツールバーの歯車アイコンをクリックするか、三点メニューから「Settings」を選択します。設定ページには5つのセクションがあります: Release Details、Client Information、Distribution、Payment、Team Management。上部のバックアローでリリースビューに戻ります。フォーム下部のSaveボタンをクリックすると変更が保存されます。",
+        "mockup": "release-settings-overview"
+      },
+      {
+        "heading": "リリース詳細",
+        "body": "Release Detailsセクションには、プロジェクトのコアメタデータが含まれています。画像エリアをクリックしてカバーアートをアップロードまたは変更します。テキストフィールドでリリースTitleとArtist nameを設定します。ピルスタイルのセレクターでRelease Type（Single、EP、Album）とFormat（Stereo、Dolby Atmos、Stereo + Atmos）を選択します。同じ方法でStatus（Draft、In Progress、Ready）を設定します。オートコンプリート候補（Rock、Pop、Hip-Hop、Electronicなど）のあるタグ入力でGenre Tagsを追加します。リリースの締め切りとしてTarget Dateを設定します。これはCalendarサブスクリプションにも反映されます。",
+        "mockup": "release-settings-details"
+      },
+      {
+        "heading": "クライアント情報",
+        "body": "Client Informationセクションには、このリリースに関連するクライアントの連絡先詳細が保存されます。フィールドにはClient Name、Client Email、Client Phone、Delivery Notesが含まれます。クライアント名はAnalyticsのクライアント内訳と支払いレポートに表示されます。Delivery Notesは、ファイル命名規則やデリバリープラットフォームの優先事項などの特別な指示を記録するためのフリーテキストエリアです。",
+        "mockup": "release-settings-client"
+      },
+      {
+        "heading": "ディストリビューションメタデータ",
+        "body": "Distributionセクションでは、デジタルディストリビューションに必要なメタデータをキャプチャします。フィールドにはDistributor（例: DistroKid、TuneCore）、Record Label、UPC/EANバーコード、Catalog Number、Copyright Holder、Copyright Year、Phonographic Copyright（P-line）が含まれます。これらの値はDistribution Trackerで使用され、データエクスポートに表示されます。",
+        "mockup": "release-settings-distribution"
+      },
+      {
+        "heading": "支払い設定",
+        "body": "Paymentセクションは、User Settingsで支払い追跡が有効な場合にのみ表示されます。ピルセレクター（No Fee、Unpaid、Partial、Paid）でPayment Statusが表示され、通貨セレクター付きのProject Feeフィールド、Paid Amount、計算されたBalance Dueがあります。Payment Notesテキストエリアでは、支払い条件や請求書参照を記録できます。支払いステータスと金額はダッシュボードカードとAnalyticsの収益チャートに表示されます。",
+        "mockup": "release-settings-payment",
+        "tip": "デポジットを受領したら、支払いステータスを「Partial」に設定してください。Balance dueはProject feeからPaid amountを差し引いて自動計算されます。"
+      },
+      {
+        "heading": "チーム管理",
+        "body": "Team Managementセクションでは、リリースにコラボレーターとクライアントを招待できます。メールアドレスを入力し、ロール（CollaboratorまたはClient）を選択して、Inviteをクリックします。保留中の招待は「Invited」バッジとResendボタンで表示されます。承認済みメンバーには表示名、ロール、削除オプションが表示されます。リリースオーナーは常にリストされ、削除できません。Collaboratorはトラックの編集とコメントが可能です。Clientは閲覧のみのアクセス権を持ち、クライアントポータルを通じてトラックを承認できます。",
+        "mockup": "release-settings-team",
+        "warning": "チームメンバーを削除すると、そのアクセスは即座に取り消されます。リリースやそのトラックを閲覧することができなくなります。"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "オーディオのアップロードと管理",
     "category": "audio",
@@ -518,17 +561,44 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "プロフィール、外観、メール通知、ミックスデフォルト、その他の設定を構成します。",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
-    "updatedAt": "2026-03-14",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "設定の概要",
-        "body": "サイドバーまたはトップバーのアカウントメニューから[User Settings](/app/settings)を開きます。設定はパネルごとに整理されています: Profile、Subscription、Appearance、Region & Currency、Persona、Payment Tracking、Email Preferences、Integrations、Mix Defaults、Calendar、Data。各パネルを操作すると、変更は即座に保存されます。",
+        "body": "サイドバーまたはトップバーのアカウントメニューから[User Settings](/app/settings)を開きます。設定はパネルごとに整理されています: Profile、Subscription、Region & Currency、Appearance、Persona、Payment Tracking、Email Preferences、Integrations、Mix Defaults、Calendar、Your Data。各パネルを操作すると、変更は即座に保存されます。",
         "mockup": "settings-overview"
       },
       {
         "heading": "プロフィール",
-        "body": "Profileパネルでは、コメント、通知、コラボレーターに送信されるメールアラートに表示される表示名を設定できます。メールアドレスは表示されますが、認証プロバイダーを通じて管理されます。トップバーにはファーストネームを使用したパーソナライズされた挨拶が表示されます。"
+        "body": "Profileパネルはページの最初のセクションです。3つのフィールドがあります: Display Name（コメント、通知、コラボレーターへのメールに表示）、Company Name（オプション、ブランディング用）、Email（読み取り専用、認証プロバイダーを通じて管理）。名前を入力してSaveをクリックします。トップバーにはファーストネームを使用したパーソナライズされた挨拶が表示されます。",
+        "mockup": "settings-profile"
+      },
+      {
+        "heading": "サブスクリプション",
+        "body": "Subscriptionパネルには現在のプランが表示されます。Proアカウントでは、緑色の「PRO」バッジ、月額料金、支払い方法の更新、請求書の表示、領収書のダウンロードができるStripeポータルを開く「Manage Billing」ボタンが表示されます。無料アカウントでは「Upgrade to Pro」ボタンが表示されます。Proでは無制限のリリース、オーディオフォーマット変換、優先サポートがアンロックされます。",
+        "mockup": "settings-subscription"
+      },
+      {
+        "heading": "リージョンと通貨",
+        "body": "Region & Currencyパネルには2つのドロップダウンがあります。Localeドロップダウンで言語と日付フォーマットを設定します。各オプションの横にフラグ絵文字が表示されます。Localeを変更すると、デフォルトの通貨も自動的に更新されます。Currencyドロップダウンでは、支払い追跡に使用する通貨をオーバーライドできます。下部のフォーマットプレビューに金額の表示例（例: 「$1,234.56」）が表示されます。",
+        "mockup": "settings-region"
+      },
+      {
+        "heading": "外観",
+        "body": "Appearanceパネルでは、3つのスタイルボタンを使用してLight、Dark、Systemテーマを切り替えることができます。アクティブなテーマはアクセントカラーでハイライトされます。Systemモードはオペレーティングシステムの設定に従います。テーマの選択はアカウントに保存され、すべてのデバイスに適用されます。",
+        "mockup": "settings-appearance"
+      },
+      {
+        "heading": "ペルソナ",
+        "body": "Personaパネルでは、Mix Architectの使い方を選択します。ラジオボタンを使用してArtist、Engineer、Both、Otherから選択します。選択に応じて体験がカスタマイズされます: EngineerまたはBothを選択すると、支払い追跡が自動的に有効になります。Artistではデフォルトで無効のままです。支払い追跡はいつでも個別にオーバーライドできます。オプションの下にペルソナがデフォルト設定にどう影響するかの説明があります。",
+        "mockup": "settings-persona"
+      },
+      {
+        "heading": "支払い追跡",
+        "body": "Payment Trackingパネルには単一のトグルスイッチがあります。有効にすると、ダッシュボードのリリースカードに支払いサマリー統計（Outstanding、Earned、Total fees）が表示され、各リリースの設定にPaymentセクションが追加されます。無効にすると、支払い関連のUIがすべて非表示になります。トグルは即座に保存され、ページがリフレッシュされます。",
+        "mockup": "settings-payment-tracking",
+        "tip": "ペルソナでEngineerまたはBothを選択すると、支払い追跡が自動的に有効になり、Artistでは無効になります。いつでも手動でオーバーライドできます。"
       },
       {
         "heading": "メール通知",
@@ -537,12 +607,25 @@ export const articles: HelpArticle[] = [
         "tip": "通知メールの下部にある配信停止リンクをクリックすることで、特定のメールカテゴリの配信を停止することもできます。サインインは不要です。"
       },
       {
-        "heading": "ミックスデフォルト",
-        "body": "デフォルトのフォーマット（Stereo、Dolby Atmos、またはStereo + Atmos）、サンプルレート、ビット深度を設定します。新しいリリースを作成する際にこれらのデフォルトが自動的に適用され、繰り返しのセットアップ時間を節約できます。個別のリリースでいつでもオーバーライドできます。"
+        "heading": "インテグレーション",
+        "body": "Integrationsパネルには、利用可能なクラウドストレージ接続が表示されます。各インテグレーションにはサービス名、説明、ConnectまたはDisconnectボタンが表示されます。現在サポート: Google DriveとDropbox。接続済みのサービスには緑色の「Connected」バッジが表示されます。リリースと一緒にファイル管理を容易にするために、インテグレーションを使用してクラウドストレージをリンクしてください。",
+        "mockup": "settings-integrations"
       },
       {
-        "heading": "外観とリージョン",
-        "body": "Appearanceでは、Light、Dark、Systemテーマを切り替えることができます。Region & Currencyでは、支払い追跡に使用する通貨を設定します。両方の設定はアカウントに保存され、すべてのデバイスに適用されます。"
+        "heading": "ミックスデフォルト",
+        "body": "Mix Defaultsパネルでは、新しいリリースのための優先的な開始値を設定します。ピルスタイルのボタンでデフォルトのFormat（Stereo、Dolby Atmos、またはStereo + Atmos）を選択します。ドロップダウンからデフォルトのSample Rate（44.1kHz、48kHz、96kHz）とBit Depth（16-bit、24-bit、32-bit float）を選択します。タグ入力を使用してデフォルトのElement List（例: Vocals、Bass、Drums）を定義することもできます。新しいリリースを作成すると、これらのデフォルトが自動的に適用され、繰り返しのセットアップ時間を節約できます。Saveをクリックして選択を保存します。",
+        "mockup": "settings-mix-defaults"
+      },
+      {
+        "heading": "カレンダー",
+        "body": "Calendarパネルでは、リリースの締め切りのためのiCalサブスクリプションフィードが提供されます。読み取り専用のURLフィールドに個人のフィードアドレスが表示され、クリップボードにコピーするためのCopyボタンがあります。その下に、Google Calendar、Apple Calendar、Outlookにフィードを追加する方法の設定手順が表示されます。古いリンクへのアクセスを取り消す必要がある場合は、Regenerateボタンで新しいフィードURLを作成できます。",
+        "mockup": "settings-calendar",
+        "warning": "カレンダーフィードURLを再生成すると、古いリンクが無効になります。以前のURLでサブスクライブしていたカレンダーは、更新を受信できなくなります。"
+      },
+      {
+        "heading": "あなたのデータ",
+        "body": "Your Dataパネルでは、すべてのMix Architectデータをエクスポートできます。推定エクスポートサイズが表示され、Downloadボタンが提供されます。エクスポートには、すべてのリリース、トラック、オーディオファイルメタデータ、ノート、コメント、コラボレーターリスト、設定が含まれます。バックアップや作業のローカルコピーが必要な場合にご利用ください。",
+        "mockup": "settings-data"
       }
     ]
   },
