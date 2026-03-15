@@ -34,7 +34,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       .maybeSingle(),
     supabase
       .from("profiles")
-      .select("is_admin, attributed_to_engineer")
+      .select("is_admin")
       .eq("id", user.id)
       .maybeSingle(),
     supabase.rpc("claim_pending_invites"),
@@ -88,10 +88,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       const cookieStore = await cookies();
       const attributionId = cookieStore.get("mix_attribution_id")?.value;
       if (!attributionId) return;
-      // Only attribute if user doesn't already have an attribution
-      if (profileRes.data?.attributed_to_engineer) return;
 
+      // Check if user already has an attribution (separate query to avoid breaking main profile fetch)
       const serviceClient = createSupabaseServiceClient();
+      const { data: profile } = await serviceClient
+        .from("profiles")
+        .select("attributed_to_engineer")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (profile?.attributed_to_engineer) return;
+
       const { data: attribution } = await serviceClient
         .from("signup_attributions")
         .select("id, engineer_id, status")
