@@ -394,6 +394,26 @@
       "connectError": "Verbindung fehlgeschlagen. Bitte versuche es erneut.",
       "disconnectConfirm": "{provider} trennen? Du kannst dich jederzeit erneut verbinden."
     },
+    "emailNotifications": {
+      "title": "E-Mail-Benachrichtigungen",
+      "description": "Wahlen Sie, welche E-Mails Sie von Mix Architect erhalten.",
+      "welcome": "Willkommens-E-Mail",
+      "welcomeHelp": "Wird bei der Kontoerstellung gesendet",
+      "releaseLive": "Release-Live-Benachrichtigungen",
+      "releaseLiveHelp": "Wenn Ihr Release auf einer Plattform live geht",
+      "newComment": "Neue Kommentare",
+      "newCommentHelp": "Wenn jemand Ihr Release kommentiert",
+      "paymentReminder": "Zahlungserinnerungen",
+      "paymentReminderHelp": "Wenn eine Abonnementzahlung fehlschlagt",
+      "paymentReceived": "Zahlungsbestatigungen",
+      "paymentReceivedHelp": "Wenn eine Abonnementzahlung verarbeitet wird",
+      "weeklyDigest": "Wochentliche Zusammenfassung",
+      "weeklyDigestHelp": "Eine wochentliche Zusammenfassung der Aktivitaten Ihrer Releases",
+      "subscriptionConfirmed": "Abonnementbestatigungen",
+      "subscriptionConfirmedHelp": "Wenn Ihr Abonnement aktiviert wird",
+      "subscriptionCancelled": "Kundigungsbenachrichtigungen",
+      "subscriptionCancelledHelp": "Wenn Ihr Abonnement gekundigt wird"
+    },
     "subscription": {
       "title": "Abonnement",
       "description": "Verwalte deinen Mix Architect-Plan.",

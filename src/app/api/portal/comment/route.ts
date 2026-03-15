@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { notifyReleaseMembers } from "@/lib/notifications/service";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { emailReleaseMembers } from "@/lib/email/release-email";
+import { buildNewCommentEmail } from "@/lib/email-templates/transactional";
 
 /**
  * POST /api/portal/comment
@@ -89,6 +91,28 @@ export async function POST(req: NextRequest) {
       body: content.trim().slice(0, 120),
       trackId: track_id,
       actorName: actor,
+    });
+
+    // Fire-and-forget email to release members
+    const { data: releaseInfo } = await supabase
+      .from("releases")
+      .select("title")
+      .eq("id", share.release_id)
+      .maybeSingle();
+
+    const appUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com"}/app/releases/${share.release_id}`;
+    emailReleaseMembers({
+      releaseId: share.release_id,
+      category: "new_comment",
+      buildEmail: ({ unsubscribeUrl }) =>
+        buildNewCommentEmail({
+          releaseTitle: releaseInfo?.title ?? "Untitled Release",
+          trackTitle: track.title ?? "Untitled Track",
+          commentAuthor: actor,
+          commentPreview: content.trim().slice(0, 200),
+          appUrl,
+          unsubscribeUrl,
+        }),
     });
 
     return NextResponse.json(comment);

@@ -394,6 +394,26 @@
       "connectError": "Failed to connect. Please try again.",
       "disconnectConfirm": "Disconnect {provider}? You can reconnect at any time."
     },
+    "emailNotifications": {
+      "title": "Email Notifications",
+      "description": "Choose which emails you receive from Mix Architect.",
+      "welcome": "Welcome email",
+      "welcomeHelp": "Sent when you create your account",
+      "releaseLive": "Release live alerts",
+      "releaseLiveHelp": "When your release goes live on a platform",
+      "newComment": "New comment alerts",
+      "newCommentHelp": "When someone comments on your release",
+      "paymentReminder": "Payment reminders",
+      "paymentReminderHelp": "When a subscription payment fails",
+      "paymentReceived": "Payment confirmations",
+      "paymentReceivedHelp": "When a subscription payment is processed",
+      "weeklyDigest": "Weekly digest",
+      "weeklyDigestHelp": "A weekly summary of activity across your releases",
+      "subscriptionConfirmed": "Subscription confirmations",
+      "subscriptionConfirmedHelp": "When your subscription is activated",
+      "subscriptionCancelled": "Cancellation notices",
+      "subscriptionCancelledHelp": "When your subscription is cancelled"
+    },
     "subscription": {
       "title": "Subscription",
       "description": "Manage your Mix Architect plan.",

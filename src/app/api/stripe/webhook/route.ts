@@ -5,6 +5,18 @@ import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { logActivity } from "@/lib/activity-logger";
 import { createChurnSignal, resolveChurnSignals } from "@/lib/churn-detection";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import {
+  sendTransactionalEmail,
+  buildUnsubscribeUrl,
+  getUserEmail,
+  getUserDisplayName,
+} from "@/lib/email/service";
+import {
+  buildSubscriptionConfirmedEmail,
+  buildSubscriptionCancelledEmail,
+  buildPaymentReminderEmail,
+  buildPaymentReceivedEmail,
+} from "@/lib/email-templates/transactional";
 
 /**
  * In Stripe API v2025+, current_period_end lives on the subscription
@@ -98,6 +110,9 @@ export async function POST(req: NextRequest) {
         } else {
           console.log("[stripe/webhook] subscription activated for user:", userId);
           logActivity(userId, "subscription_started", { plan: "pro" });
+
+          // Send subscription confirmed email (fire-and-forget)
+          sendSubscriptionEmail(supabase, userId, "subscription_confirmed");
         }
         break;
       }
@@ -218,8 +233,102 @@ export async function POST(req: NextRequest) {
             createChurnSignal(existingSub.user_id, "subscription_cancelled", "high", {
               stripe_customer_id: customerId,
             });
+
+            // Send subscription cancelled email (fire-and-forget)
+            sendSubscriptionEmail(supabase, existingSub.user_id, "subscription_cancelled");
           }
         }
+        break;
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId =
+          typeof invoice.customer === "string"
+            ? invoice.customer
+            : invoice.customer?.id;
+
+        if (!customerId) break;
+
+        const { data: sub } = await supabase
+          .from("subscriptions")
+          .select("user_id, granted_by_admin")
+          .eq("stripe_customer_id", customerId)
+          .maybeSingle();
+
+        if (!sub?.user_id || sub.granted_by_admin) break;
+
+        // Send payment reminder email (fire-and-forget)
+        sendPaymentEmail(supabase, sub.user_id, "payment_reminder");
+        break;
+      }
+
+      case "invoice.payment_succeeded": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId =
+          typeof invoice.customer === "string"
+            ? invoice.customer
+            : invoice.customer?.id;
+
+        if (!customerId) break;
+
+        const { data: sub } = await supabase
+          .from("subscriptions")
+          .select("user_id, granted_by_admin, current_period_end")
+          .eq("stripe_customer_id", customerId)
+          .maybeSingle();
+
+        if (!sub?.user_id || sub.granted_by_admin) break;
+
+        // Format amount
+        const amount = invoice.amount_paid
+          ? `$${(invoice.amount_paid / 100).toFixed(2)}`
+          : "$0.00";
+
+        // Format period end
+        const nextBilling = sub.current_period_end
+          ? new Date(sub.current_period_end).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })
+          : "your next billing date";
+
+        // Send payment received email (fire-and-forget)
+        (async () => {
+          try {
+            const email = await getUserEmail(sub.user_id);
+            if (!email) return;
+            const displayName = await getUserDisplayName(sub.user_id);
+
+            const { data: prefs } = await supabase
+              .from("email_preferences")
+              .select("unsubscribe_token")
+              .eq("user_id", sub.user_id)
+              .maybeSingle();
+
+            const unsubscribeUrl = prefs?.unsubscribe_token
+              ? buildUnsubscribeUrl(prefs.unsubscribe_token, "payment_received")
+              : undefined;
+
+            const { subject, html } = buildPaymentReceivedEmail({
+              displayName,
+              amount,
+              periodEnd: nextBilling,
+              unsubscribeUrl,
+            });
+
+            await sendTransactionalEmail({
+              userId: sub.user_id,
+              to: email,
+              category: "payment_received",
+              subject,
+              html,
+            });
+          } catch (err) {
+            console.error("[stripe/webhook] payment received email error:", err);
+          }
+        })();
         break;
       }
 
@@ -232,4 +341,106 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({ received: true });
+}
+
+// ─── Email helpers (fire-and-forget) ─────────────────────────────────
+
+async function sendSubscriptionEmail(
+  supabase: ReturnType<typeof createSupabaseServiceClient>,
+  userId: string,
+  category: "subscription_confirmed" | "subscription_cancelled",
+) {
+  try {
+    const email = await getUserEmail(userId);
+    if (!email) return;
+    const displayName = await getUserDisplayName(userId);
+
+    const { data: prefs } = await supabase
+      .from("email_preferences")
+      .select("unsubscribe_token")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    const unsubscribeUrl = prefs?.unsubscribe_token
+      ? buildUnsubscribeUrl(prefs.unsubscribe_token, category)
+      : undefined;
+
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("current_period_end")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    let templateResult: { subject: string; html: string };
+
+    if (category === "subscription_confirmed") {
+      templateResult = buildSubscriptionConfirmedEmail({
+        displayName,
+        plan: "Pro",
+        unsubscribeUrl,
+      });
+    } else {
+      const periodEnd = sub?.current_period_end
+        ? new Date(sub.current_period_end).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          })
+        : "your current billing period";
+
+      templateResult = buildSubscriptionCancelledEmail({
+        displayName,
+        periodEnd,
+        unsubscribeUrl,
+      });
+    }
+
+    await sendTransactionalEmail({
+      userId,
+      to: email,
+      category,
+      subject: templateResult.subject,
+      html: templateResult.html,
+    });
+  } catch (err) {
+    console.error(`[stripe/webhook] ${category} email error:`, err);
+  }
+}
+
+async function sendPaymentEmail(
+  supabase: ReturnType<typeof createSupabaseServiceClient>,
+  userId: string,
+  category: "payment_reminder",
+) {
+  try {
+    const email = await getUserEmail(userId);
+    if (!email) return;
+    const displayName = await getUserDisplayName(userId);
+
+    const { data: prefs } = await supabase
+      .from("email_preferences")
+      .select("unsubscribe_token")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    const unsubscribeUrl = prefs?.unsubscribe_token
+      ? buildUnsubscribeUrl(prefs.unsubscribe_token, category)
+      : undefined;
+
+    const { subject, html } = buildPaymentReminderEmail({
+      displayName,
+      appUrl: "https://mixarchitect.com/app/settings",
+      unsubscribeUrl,
+    });
+
+    await sendTransactionalEmail({
+      userId,
+      to: email,
+      category,
+      subject,
+      html,
+    });
+  } catch (err) {
+    console.error(`[stripe/webhook] ${category} email error:`, err);
+  }
 }

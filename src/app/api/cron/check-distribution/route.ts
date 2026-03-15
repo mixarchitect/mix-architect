@@ -10,6 +10,8 @@ import {
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { notifyReleaseMembers } from "@/lib/notifications/service";
 import { getPlatformLabel } from "@/lib/distribution/platforms";
+import { emailReleaseMembers } from "@/lib/email/release-email";
+import { buildReleaseLiveEmail } from "@/lib/email-templates/transactional";
 
 const MAX_PER_RUN = 50;
 const MAX_ERRORS = 5; // circuit breaker
@@ -132,6 +134,21 @@ export async function GET(request: NextRequest) {
             type: "distribution_live",
             title: `${release.title} is now live on ${platformLabel}`,
             body: detection.url ?? undefined,
+          });
+
+          // Send release-live email to all release members (fire-and-forget)
+          const appUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com"}/app/releases/${releaseId}`;
+          emailReleaseMembers({
+            releaseId,
+            category: "release_live",
+            buildEmail: ({ unsubscribeUrl }) =>
+              buildReleaseLiveEmail({
+                releaseTitle: release.title,
+                platformLabel,
+                externalUrl: detection.url,
+                appUrl,
+                unsubscribeUrl,
+              }),
           });
         }
       } catch (err) {

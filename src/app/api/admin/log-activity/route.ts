@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { logActivity, type ActivityEventType } from "@/lib/activity-logger";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { sendTransactionalEmail, buildUnsubscribeUrl } from "@/lib/email/service";
+import { buildWelcomeEmail } from "@/lib/email-templates/transactional";
+import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 
 const ALLOWED_EVENTS: Set<string> = new Set([
   "login",
@@ -42,6 +45,50 @@ export async function POST(req: NextRequest) {
     }
 
     logActivity(user.id, eventType as ActivityEventType, metadata, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
+
+    // Send welcome email on signup (fire-and-forget)
+    if (eventType === "signup" && user.email) {
+      (async () => {
+        try {
+          const svc = createSupabaseServiceClient();
+
+          // Ensure email_preferences row exists for this new user
+          await svc
+            .from("email_preferences")
+            .upsert({ user_id: user.id }, { onConflict: "user_id" });
+
+          // Get unsubscribe token
+          const { data: prefs } = await svc
+            .from("email_preferences")
+            .select("unsubscribe_token")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          const unsubscribeUrl = prefs?.unsubscribe_token
+            ? buildUnsubscribeUrl(prefs.unsubscribe_token, "welcome")
+            : undefined;
+
+          const displayName =
+            user.user_metadata?.display_name ??
+            user.email!.split("@")[0];
+
+          const { subject, html } = buildWelcomeEmail({
+            displayName,
+            unsubscribeUrl,
+          });
+
+          await sendTransactionalEmail({
+            userId: user.id,
+            to: user.email!,
+            category: "welcome",
+            subject,
+            html,
+          });
+        } catch (err) {
+          console.error("[log-activity] welcome email error:", err);
+        }
+      })();
+    }
 
     return NextResponse.json({ ok: true });
   } catch {

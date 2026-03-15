@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
-import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download, CalendarDays, Copy, Check, RefreshCw, HardDrive, Cloud, Unplug } from "lucide-react";
+import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download, CalendarDays, Copy, Check, RefreshCw, HardDrive, Cloud, Unplug, Mail } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -513,10 +513,142 @@ export default function SettingsPage() {
         {/* Integrations */}
         <IntegrationsPanel />
 
+        {/* Email Notifications */}
+        <EmailPreferencesPanel />
+
         {/* Subscription */}
         <SubscriptionPanel />
       </div>
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Email Preferences Panel                                             */
+/* ------------------------------------------------------------------ */
+
+type EmailPrefKey =
+  | "welcome"
+  | "release_live"
+  | "new_comment"
+  | "payment_reminder"
+  | "payment_received"
+  | "weekly_digest"
+  | "subscription_confirmed"
+  | "subscription_cancelled";
+
+const EMAIL_PREF_ITEMS: { key: EmailPrefKey; labelKey: string; helpKey: string }[] = [
+  { key: "release_live", labelKey: "releaseLive", helpKey: "releaseLiveHelp" },
+  { key: "new_comment", labelKey: "newComment", helpKey: "newCommentHelp" },
+  { key: "weekly_digest", labelKey: "weeklyDigest", helpKey: "weeklyDigestHelp" },
+  { key: "payment_reminder", labelKey: "paymentReminder", helpKey: "paymentReminderHelp" },
+  { key: "payment_received", labelKey: "paymentReceived", helpKey: "paymentReceivedHelp" },
+  { key: "subscription_confirmed", labelKey: "subscriptionConfirmed", helpKey: "subscriptionConfirmedHelp" },
+  { key: "subscription_cancelled", labelKey: "subscriptionCancelled", helpKey: "subscriptionCancelledHelp" },
+  { key: "welcome", labelKey: "welcome", helpKey: "welcomeHelp" },
+];
+
+function EmailPreferencesPanel() {
+  const t = useTranslations("settings.emailNotifications");
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+  const [prefs, setPrefs] = useState<Record<EmailPrefKey, boolean>>({
+    welcome: true,
+    release_live: true,
+    new_comment: true,
+    payment_reminder: true,
+    payment_received: true,
+    weekly_digest: true,
+    subscription_confirmed: true,
+    subscription_cancelled: true,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLoading(false); return; }
+
+      const { data } = await supabase
+        .from("email_preferences")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (data) {
+        setPrefs({
+          welcome: data.welcome ?? true,
+          release_live: data.release_live ?? true,
+          new_comment: data.new_comment ?? true,
+          payment_reminder: data.payment_reminder ?? true,
+          payment_received: data.payment_received ?? true,
+          weekly_digest: data.weekly_digest ?? true,
+          subscription_confirmed: data.subscription_confirmed ?? true,
+          subscription_cancelled: data.subscription_cancelled ?? true,
+        });
+      }
+      setLoading(false);
+    }
+    load();
+  }, [supabase]);
+
+  async function handleToggle(key: EmailPrefKey) {
+    const prev = prefs[key];
+    const next = !prev;
+    setPrefs((p) => ({ ...p, [key]: next }));
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { error } = await supabase
+        .from("email_preferences")
+        .upsert(
+          { user_id: user.id, [key]: next },
+          { onConflict: "user_id" },
+        );
+
+      if (error) throw error;
+    } catch {
+      // Revert on failure
+      setPrefs((p) => ({ ...p, [key]: prev }));
+    }
+  }
+
+  if (loading) return null;
+
+  return (
+    <Panel>
+      <PanelHeader>
+        <div className="flex items-center gap-2">
+          <Mail size={18} className="text-muted" />
+          <h2 className="text-base font-semibold text-text">{t("title")}</h2>
+        </div>
+        <p className="text-sm text-muted mt-1">{t("description")}</p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-5 space-y-1">
+        {EMAIL_PREF_ITEMS.map((item) => (
+          <div key={item.key} className="flex items-center justify-between py-2.5">
+            <div>
+              <div className="text-sm font-medium text-text">{t(item.labelKey)}</div>
+              <div className="text-xs text-muted mt-0.5">{t(item.helpKey)}</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleToggle(item.key)}
+              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                prefs[item.key] ? "bg-signal" : "bg-black/20 dark:bg-white/20"
+              }`}
+            >
+              <span
+                className="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform"
+                style={{ transform: prefs[item.key] ? "translateX(22px)" : "translateX(3px)" }}
+              />
+            </button>
+          </div>
+        ))}
+      </PanelBody>
+    </Panel>
   );
 }
 

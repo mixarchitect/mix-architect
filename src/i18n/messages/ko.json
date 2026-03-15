@@ -394,6 +394,26 @@
       "connectError": "연결에 실패했습니다. 다시 시도해 주세요.",
       "disconnectConfirm": "{provider} 연결을 해제하시겠습니까? 언제든지 다시 연결할 수 있습니다."
     },
+    "emailNotifications": {
+      "title": "이메일 알림",
+      "description": "Mix Architect에서 받을 이메일을 선택하세요.",
+      "welcome": "환영 이메일",
+      "welcomeHelp": "계정 생성 시 발송됩니다",
+      "releaseLive": "릴리스 라이브 알림",
+      "releaseLiveHelp": "릴리스가 플랫폼에서 라이브될 때",
+      "newComment": "새 댓글 알림",
+      "newCommentHelp": "누군가 릴리스에 댓글을 달았을 때",
+      "paymentReminder": "결제 알림",
+      "paymentReminderHelp": "구독 결제가 실패했을 때",
+      "paymentReceived": "결제 확인",
+      "paymentReceivedHelp": "구독 결제가 처리되었을 때",
+      "weeklyDigest": "주간 요약",
+      "weeklyDigestHelp": "릴리스 활동의 주간 요약",
+      "subscriptionConfirmed": "구독 확인",
+      "subscriptionConfirmedHelp": "구독이 활성화되었을 때",
+      "subscriptionCancelled": "취소 알림",
+      "subscriptionCancelledHelp": "구독이 취소되었을 때"
+    },
     "subscription": {
       "title": "구독",
       "description": "Mix Architect 플랜을 관리하세요.",

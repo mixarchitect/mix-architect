@@ -394,6 +394,26 @@
       "connectError": "Anslutningen misslyckades. Försök igen.",
       "disconnectConfirm": "Koppla från {provider}? Du kan återansluta när som helst."
     },
+    "emailNotifications": {
+      "title": "E-postnotifikationer",
+      "description": "Valj vilka e-postmeddelanden du far fran Mix Architect.",
+      "welcome": "Valkomstmail",
+      "welcomeHelp": "Skickas nar du skapar ditt konto",
+      "releaseLive": "Aviseringar om lansering",
+      "releaseLiveHelp": "Nar din release gar live pa en plattform",
+      "newComment": "Aviseringar om nya kommentarer",
+      "newCommentHelp": "Nar nagon kommenterar din release",
+      "paymentReminder": "Betalningspaminnelser",
+      "paymentReminderHelp": "Nar en prenumerationsbetalning misslyckas",
+      "paymentReceived": "Betalningsbekraftelser",
+      "paymentReceivedHelp": "Nar en prenumerationsbetalning behandlas",
+      "weeklyDigest": "Veckosammanfattning",
+      "weeklyDigestHelp": "En veckosammanfattning av aktiviteten for dina releaser",
+      "subscriptionConfirmed": "Prenumerationsbekraftelser",
+      "subscriptionConfirmedHelp": "Nar din prenumeration aktiveras",
+      "subscriptionCancelled": "Avbokningsmeddelanden",
+      "subscriptionCancelledHelp": "Nar din prenumeration avbryts"
+    },
     "subscription": {
       "title": "Prenumeration",
       "description": "Hantera ditt Mix Architect-abonnemang.",

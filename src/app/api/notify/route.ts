@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { notifyReleaseMembers, type NotificationType } from "@/lib/notifications/service";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { emailReleaseMembers } from "@/lib/email/release-email";
+import { buildNewCommentEmail } from "@/lib/email-templates/transactional";
 
 /**
  * POST /api/notify
@@ -38,6 +41,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    const resolvedActorName = actorName || user.user_metadata?.display_name || user.email || "Someone";
+
     await notifyReleaseMembers({
       releaseId,
       excludeUserId: user.id,
@@ -45,8 +50,38 @@ export async function POST(req: NextRequest) {
       title,
       body: notifBody,
       trackId,
-      actorName: actorName || user.user_metadata?.display_name || user.email || "Someone",
+      actorName: resolvedActorName,
     });
+
+    // Send email for comment notifications (fire-and-forget)
+    if (type === "comment") {
+      const svc = createSupabaseServiceClient();
+      const { data: releaseInfo } = await svc
+        .from("releases")
+        .select("title")
+        .eq("id", releaseId)
+        .maybeSingle();
+
+      const { data: trackInfo } = trackId
+        ? await svc.from("tracks").select("title").eq("id", trackId).maybeSingle()
+        : { data: null };
+
+      const appUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com"}/app/releases/${releaseId}`;
+      emailReleaseMembers({
+        releaseId,
+        excludeUserId: user.id,
+        category: "new_comment",
+        buildEmail: ({ unsubscribeUrl }) =>
+          buildNewCommentEmail({
+            releaseTitle: releaseInfo?.title ?? "Untitled Release",
+            trackTitle: trackInfo?.title ?? "Untitled Track",
+            commentAuthor: resolvedActorName,
+            commentPreview: (notifBody ?? "").slice(0, 200),
+            appUrl,
+            unsubscribeUrl,
+          }),
+      });
+    }
 
     return NextResponse.json({ ok: true });
   } catch {

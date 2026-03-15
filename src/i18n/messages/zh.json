@@ -394,6 +394,26 @@
       "connectError": "连接失败，请重试。",
       "disconnectConfirm": "断开 {provider}？您可以随时重新连接。"
     },
+    "emailNotifications": {
+      "title": "邮件通知",
+      "description": "选择您希望从 Mix Architect 收到的邮件。",
+      "welcome": "欢迎邮件",
+      "welcomeHelp": "创建账户时发送",
+      "releaseLive": "发行上线提醒",
+      "releaseLiveHelp": "当您的发行在平台上线时",
+      "newComment": "新评论提醒",
+      "newCommentHelp": "当有人评论您的发行时",
+      "paymentReminder": "付款提醒",
+      "paymentReminderHelp": "当订阅付款失败时",
+      "paymentReceived": "付款确认",
+      "paymentReceivedHelp": "当订阅付款成功时",
+      "weeklyDigest": "每周摘要",
+      "weeklyDigestHelp": "您发行活动的每周摘要",
+      "subscriptionConfirmed": "订阅确认",
+      "subscriptionConfirmedHelp": "当您的订阅被激活时",
+      "subscriptionCancelled": "取消通知",
+      "subscriptionCancelledHelp": "当您的订阅被取消时"
+    },
     "subscription": {
       "title": "订阅",
       "description": "管理您的 Mix Architect 套餐。",

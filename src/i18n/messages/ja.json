@@ -394,6 +394,26 @@
       "connectError": "接続に失敗しました。もう一度お試しください。",
       "disconnectConfirm": "{provider} を切断しますか？いつでも再接続できます。"
     },
+    "emailNotifications": {
+      "title": "メール通知",
+      "description": "Mix Architectから受け取るメールを選択してください。",
+      "welcome": "ウェルカムメール",
+      "welcomeHelp": "アカウント作成時に送信されます",
+      "releaseLive": "リリース公開アラート",
+      "releaseLiveHelp": "リリースがプラットフォームで公開されたとき",
+      "newComment": "新しいコメントアラート",
+      "newCommentHelp": "リリースにコメントがあったとき",
+      "paymentReminder": "支払いリマインダー",
+      "paymentReminderHelp": "サブスクリプションの支払いが失敗したとき",
+      "paymentReceived": "支払い確認",
+      "paymentReceivedHelp": "サブスクリプションの支払いが処理されたとき",
+      "weeklyDigest": "週間ダイジェスト",
+      "weeklyDigestHelp": "リリースのアクティビティの週間サマリー",
+      "subscriptionConfirmed": "サブスクリプション確認",
+      "subscriptionConfirmedHelp": "サブスクリプションが有効化されたとき",
+      "subscriptionCancelled": "キャンセル通知",
+      "subscriptionCancelledHelp": "サブスクリプションがキャンセルされたとき"
+    },
     "subscription": {
       "title": "サブスクリプション",
       "description": "Mix Architectプランを管理します。",

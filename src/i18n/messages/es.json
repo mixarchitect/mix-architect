@@ -394,6 +394,26 @@
       "connectError": "Error al conectar. Por favor, inténtalo de nuevo.",
       "disconnectConfirm": "¿Desconectar {provider}? Puedes volver a conectarte en cualquier momento."
     },
+    "emailNotifications": {
+      "title": "Notificaciones por correo",
+      "description": "Elige que correos recibes de Mix Architect.",
+      "welcome": "Correo de bienvenida",
+      "welcomeHelp": "Se envia al crear tu cuenta",
+      "releaseLive": "Alertas de lanzamiento en vivo",
+      "releaseLiveHelp": "Cuando tu lanzamiento esta disponible en una plataforma",
+      "newComment": "Alertas de nuevos comentarios",
+      "newCommentHelp": "Cuando alguien comenta en tu lanzamiento",
+      "paymentReminder": "Recordatorios de pago",
+      "paymentReminderHelp": "Cuando falla un pago de suscripcion",
+      "paymentReceived": "Confirmaciones de pago",
+      "paymentReceivedHelp": "Cuando se procesa un pago de suscripcion",
+      "weeklyDigest": "Resumen semanal",
+      "weeklyDigestHelp": "Un resumen semanal de la actividad de tus lanzamientos",
+      "subscriptionConfirmed": "Confirmaciones de suscripcion",
+      "subscriptionConfirmedHelp": "Cuando tu suscripcion se activa",
+      "subscriptionCancelled": "Avisos de cancelacion",
+      "subscriptionCancelledHelp": "Cuando tu suscripcion se cancela"
+    },
     "subscription": {
       "title": "Suscripción",
       "description": "Gestiona tu plan de Mix Architect.",
