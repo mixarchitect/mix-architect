@@ -28,7 +28,7 @@ export function FeaturedReleaseBanner({ release }: Props) {
           <X size={14} />
         </button>
       </div>
-      <FeaturedReleaseCard release={release} variant="spotlight" />
+      <FeaturedReleaseCard release={release} variant="spotlight" basePath="/app/featured" />
     </div>
   );
 }

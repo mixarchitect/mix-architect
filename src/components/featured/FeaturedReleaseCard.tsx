@@ -9,6 +9,8 @@ interface FeaturedReleaseCardProps {
   variant: "spotlight" | "archive";
   showNowFeatured?: boolean;
   className?: string;
+  /** Base path for links: "/featured" (landing, default) or "/app/featured" (in-app) */
+  basePath?: string;
 }
 
 export function FeaturedReleaseCard({
@@ -16,15 +18,17 @@ export function FeaturedReleaseCard({
   variant,
   showNowFeatured,
   className,
+  basePath = "/featured",
 }: FeaturedReleaseCardProps) {
   if (variant === "spotlight") {
-    return <SpotlightCard release={release} className={className} />;
+    return <SpotlightCard release={release} className={className} basePath={basePath} />;
   }
   return (
     <ArchiveCard
       release={release}
       showNowFeatured={showNowFeatured}
       className={className}
+      basePath={basePath}
     />
   );
 }
@@ -32,9 +36,11 @@ export function FeaturedReleaseCard({
 function SpotlightCard({
   release,
   className,
+  basePath = "/featured",
 }: {
   release: FeaturedRelease;
   className?: string;
+  basePath?: string;
 }) {
   const isGuest = release.author_name && release.author_name !== "Mix Architect";
 
@@ -82,7 +88,7 @@ function SpotlightCard({
           <StreamingLinks release={release} size="sm" layout="row" />
 
           <Link
-            href={`/featured/${release.slug}`}
+            href={`${basePath}/${release.slug}`}
             className="text-sm text-teal-500 hover:text-teal-400 transition-colors mt-auto self-start"
           >
             Read more &rarr;
@@ -97,16 +103,18 @@ function ArchiveCard({
   release,
   showNowFeatured,
   className,
+  basePath = "/featured",
 }: {
   release: FeaturedRelease;
   showNowFeatured?: boolean;
   className?: string;
+  basePath?: string;
 }) {
   const isGuest = release.author_name && release.author_name !== "Mix Architect";
 
   return (
     <Link
-      href={`/featured/${release.slug}`}
+      href={`${basePath}/${release.slug}`}
       className={cn(
         "group relative bg-panel border border-border rounded-lg overflow-hidden transition-colors hover:border-white/20",
         showNowFeatured && release.is_active && "border-teal-500/40",

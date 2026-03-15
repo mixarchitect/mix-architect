@@ -93,7 +93,7 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
         {/* Featured releases */}
         <Tooltip label="Featured Releases" align="right">
           <Link
-            href="/featured"
+            href="/app/featured"
             aria-label="Featured Releases"
             className="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
           >
