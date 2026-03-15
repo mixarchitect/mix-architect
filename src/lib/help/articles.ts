@@ -464,6 +464,44 @@ export const articles: HelpArticle[] = [
   },
 
   /* ──────────────────────────────────────────────────────
+     ACCOUNT
+     ────────────────────────────────────────────────────── */
+  {
+    id: "user-settings",
+    title: "User Settings",
+    category: "account",
+    summary:
+      "Configure your profile, appearance, email notifications, mix defaults, and more.",
+    tags: ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
+    updatedAt: "2026-03-14",
+    content: [
+      {
+        heading: "Settings Overview",
+        body: "Open [User Settings](/app/settings) from the sidebar or the account menu in the top bar. Settings are organized into panels: Profile, Subscription, Appearance, Region & Currency, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, and Data. Changes save instantly as you interact with each panel.",
+        mockup: "settings-overview",
+      },
+      {
+        heading: "Profile",
+        body: "The Profile panel lets you set your display name, which appears on comments, notifications, and email alerts sent to collaborators. Your email address is shown but managed through your authentication provider. A personalized greeting using your first name appears in the top bar.",
+      },
+      {
+        heading: "Email Notifications",
+        body: "The Email Preferences panel controls which transactional emails you receive from Mix Architect. Each category has an on/off toggle. Categories include: Release Live Alerts (when a release goes live on a platform), New Comment Alerts (when someone comments on your release), Weekly Digest (a summary of activity across your releases), Payment Reminders (when a subscription payment fails), Payment Confirmations (when a payment is processed), Subscription Confirmations (when your plan is activated), and Cancellation Notices (when your plan is cancelled). All categories are enabled by default. Every email includes an unsubscribe link at the bottom.",
+        mockup: "settings-email-prefs",
+        tip: "You can also unsubscribe from a specific email category by clicking the unsubscribe link at the bottom of any notification email. No sign-in required.",
+      },
+      {
+        heading: "Mix Defaults",
+        body: "Set your default format (Stereo, Dolby Atmos, or Stereo + Atmos), sample rate, and bit depth. These defaults are applied automatically when you create new releases, saving time on repetitive setup. You can always override them on individual releases.",
+      },
+      {
+        heading: "Appearance and Region",
+        body: "Appearance lets you switch between Light, Dark, and System themes. Region & Currency sets your preferred currency for payment tracking. Both preferences are saved to your account and apply across all devices.",
+      },
+    ],
+  },
+
+  /* ──────────────────────────────────────────────────────
      BILLING
      ────────────────────────────────────────────────────── */
   {

@@ -513,6 +513,40 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "user-settings",
+    "title": "ユーザー設定",
+    "category": "account",
+    "summary":
+      "プロフィール、外観、メール通知、ミックスデフォルト、その他の設定を構成します。",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "設定の概要",
+        "body": "サイドバーまたはトップバーのアカウントメニューから[User Settings](/app/settings)を開きます。設定はパネルごとに整理されています: Profile、Subscription、Appearance、Region & Currency、Persona、Payment Tracking、Email Preferences、Integrations、Mix Defaults、Calendar、Data。各パネルを操作すると、変更は即座に保存されます。",
+        "mockup": "settings-overview"
+      },
+      {
+        "heading": "プロフィール",
+        "body": "Profileパネルでは、コメント、通知、コラボレーターに送信されるメールアラートに表示される表示名を設定できます。メールアドレスは表示されますが、認証プロバイダーを通じて管理されます。トップバーにはファーストネームを使用したパーソナライズされた挨拶が表示されます。"
+      },
+      {
+        "heading": "メール通知",
+        "body": "Email Preferencesパネルでは、Mix Architectから受信するトランザクションメールを制御します。各カテゴリにはオン/オフトグルがあります。カテゴリには以下が含まれます: Release Live Alerts（リリースがプラットフォームで公開されたとき）、New Comment Alerts（誰かがあなたのリリースにコメントしたとき）、Weekly Digest（リリース全体のアクティビティの週次サマリー）、Payment Reminders（サブスクリプションの支払いが失敗したとき）、Payment Confirmations（支払いが処理されたとき）、Subscription Confirmations（プランが有効化されたとき）、Cancellation Notices（プランがキャンセルされたとき）。すべてのカテゴリはデフォルトで有効です。すべてのメールの下部に配信停止リンクが含まれています。",
+        "mockup": "settings-email-prefs",
+        "tip": "通知メールの下部にある配信停止リンクをクリックすることで、特定のメールカテゴリの配信を停止することもできます。サインインは不要です。"
+      },
+      {
+        "heading": "ミックスデフォルト",
+        "body": "デフォルトのフォーマット（Stereo、Dolby Atmos、またはStereo + Atmos）、サンプルレート、ビット深度を設定します。新しいリリースを作成する際にこれらのデフォルトが自動的に適用され、繰り返しのセットアップ時間を節約できます。個別のリリースでいつでもオーバーライドできます。"
+      },
+      {
+        "heading": "外観とリージョン",
+        "body": "Appearanceでは、Light、Dark、Systemテーマを切り替えることができます。Region & Currencyでは、支払い追跡に使用する通貨を設定します。両方の設定はアカウントに保存され、すべてのデバイスに適用されます。"
+      }
+    ]
+  },
+  {
     "id": "manage-subscription",
     "title": "Proサブスクリプションの管理",
     "category": "billing",

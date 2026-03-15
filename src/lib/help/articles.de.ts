@@ -530,6 +530,40 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "user-settings",
+    "title": "Benutzereinstellungen",
+    "category": "account",
+    "summary":
+      "Konfigurieren Sie Ihr Profil, Erscheinungsbild, E-Mail-Benachrichtigungen, Mix-Standardwerte und mehr.",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Einstellungen im Überblick",
+        "body": "Öffnen Sie die [Benutzereinstellungen](/app/settings) über die Seitenleiste oder das Kontomenü in der oberen Leiste. Die Einstellungen sind in Bereiche unterteilt: Profil, Abonnement, Erscheinungsbild, Region & Währung, Persona, Zahlungsverfolgung, E-Mail-Einstellungen, Integrationen, Mix-Standardwerte, Kalender und Daten. Änderungen werden sofort gespeichert, wenn Sie mit den einzelnen Bereichen interagieren.",
+        "mockup": "settings-overview"
+      },
+      {
+        "heading": "Profil",
+        "body": "Im Bereich Profil können Sie Ihren Anzeigenamen festlegen, der bei Kommentaren, Benachrichtigungen und E-Mail-Benachrichtigungen an Mitarbeiter angezeigt wird. Ihre E-Mail-Adresse wird angezeigt, aber über Ihren Authentifizierungsanbieter verwaltet. Eine personalisierte Begrüßung mit Ihrem Vornamen erscheint in der oberen Leiste."
+      },
+      {
+        "heading": "E-Mail-Benachrichtigungen",
+        "body": "Der Bereich E-Mail-Einstellungen steuert, welche transaktionalen E-Mails Sie von Mix Architect erhalten. Jede Kategorie hat einen Ein/Aus-Schalter. Die Kategorien umfassen: Veröffentlichungs-Benachrichtigungen (wenn eine Veröffentlichung auf einer Plattform live geht), Neue Kommentar-Benachrichtigungen (wenn jemand Ihre Veröffentlichung kommentiert), Wöchentliche Zusammenfassung (eine Übersicht der Aktivitäten über alle Veröffentlichungen), Zahlungserinnerungen (wenn eine Abonnementzahlung fehlschlägt), Zahlungsbestätigungen (wenn eine Zahlung verarbeitet wird), Abonnementbestätigungen (wenn Ihr Tarif aktiviert wird) und Kündigungsbenachrichtigungen (wenn Ihr Tarif gekündigt wird). Alle Kategorien sind standardmäßig aktiviert. Jede E-Mail enthält einen Abmeldelink am Ende.",
+        "mockup": "settings-email-prefs",
+        "tip": "Sie können sich auch von einer bestimmten E-Mail-Kategorie abmelden, indem Sie auf den Abmeldelink am Ende einer Benachrichtigungs-E-Mail klicken. Keine Anmeldung erforderlich."
+      },
+      {
+        "heading": "Mix-Standardwerte",
+        "body": "Legen Sie Ihr Standardformat (Stereo, Dolby Atmos oder Stereo + Atmos), Abtastrate und Bittiefe fest. Diese Standardwerte werden automatisch angewendet, wenn Sie neue Veröffentlichungen erstellen, und sparen Zeit bei der wiederkehrenden Einrichtung. Sie können sie jederzeit bei einzelnen Veröffentlichungen überschreiben."
+      },
+      {
+        "heading": "Erscheinungsbild und Region",
+        "body": "Unter Erscheinungsbild können Sie zwischen den Themen Hell, Dunkel und System wechseln. Region & Währung legt Ihre bevorzugte Währung für die Zahlungsverfolgung fest. Beide Einstellungen werden in Ihrem Konto gespeichert und gelten auf allen Geräten."
+      }
+    ]
+  },
+  {
     "id": "manage-subscription",
     "title": "Ihr Pro-Abonnement verwalten",
     "category": "billing",

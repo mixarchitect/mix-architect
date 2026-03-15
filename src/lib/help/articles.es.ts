@@ -530,6 +530,40 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "user-settings",
+    "title": "Configuración de Usuario",
+    "category": "account",
+    "summary":
+      "Configura tu perfil, apariencia, notificaciones por correo electrónico, valores predeterminados de mezcla y más.",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Descripción general de la configuración",
+        "body": "Abre la [Configuración de Usuario](/app/settings) desde la barra lateral o el menú de cuenta en la barra superior. La configuración está organizada en paneles: Perfil, Suscripción, Apariencia, Región y moneda, Persona, Seguimiento de pagos, Preferencias de correo electrónico, Integraciones, Valores predeterminados de mezcla, Calendario y Datos. Los cambios se guardan instantáneamente al interactuar con cada panel.",
+        "mockup": "settings-overview"
+      },
+      {
+        "heading": "Perfil",
+        "body": "El panel de Perfil te permite establecer tu nombre para mostrar, que aparece en comentarios, notificaciones y alertas por correo electrónico enviadas a colaboradores. Tu dirección de correo electrónico se muestra, pero se gestiona a través de tu proveedor de autenticación. Un saludo personalizado con tu nombre aparece en la barra superior."
+      },
+      {
+        "heading": "Notificaciones por correo electrónico",
+        "body": "El panel de Preferencias de correo electrónico controla los correos transaccionales que recibes de Mix Architect. Cada categoría tiene un interruptor de activar/desactivar. Las categorías incluyen: Alertas de lanzamiento en vivo (cuando un lanzamiento sale en una plataforma), Alertas de nuevos comentarios (cuando alguien comenta en tu lanzamiento), Resumen semanal (un resumen de la actividad en todos tus lanzamientos), Recordatorios de pago (cuando falla un pago de suscripción), Confirmaciones de pago (cuando se procesa un pago), Confirmaciones de suscripción (cuando se activa tu plan) y Avisos de cancelación (cuando se cancela tu plan). Todas las categorías están habilitadas por defecto. Cada correo incluye un enlace para cancelar la suscripción en la parte inferior.",
+        "mockup": "settings-email-prefs",
+        "tip": "También puedes cancelar la suscripción de una categoría de correo específica haciendo clic en el enlace de cancelación de suscripción en la parte inferior de cualquier correo de notificación. No se requiere iniciar sesión."
+      },
+      {
+        "heading": "Valores predeterminados de mezcla",
+        "body": "Establece tu formato predeterminado (Estéreo, Dolby Atmos o Estéreo + Atmos), frecuencia de muestreo y profundidad de bits. Estos valores predeterminados se aplican automáticamente al crear nuevos lanzamientos, ahorrando tiempo en configuraciones repetitivas. Siempre puedes modificarlos en lanzamientos individuales."
+      },
+      {
+        "heading": "Apariencia y región",
+        "body": "Apariencia te permite cambiar entre los temas Claro, Oscuro y Sistema. Región y moneda establece tu moneda preferida para el seguimiento de pagos. Ambas preferencias se guardan en tu cuenta y se aplican en todos tus dispositivos."
+      }
+    ]
+  },
+  {
     "id": "manage-subscription",
     "title": "Gestionar tu Suscripción Pro",
     "category": "billing",

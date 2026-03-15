@@ -2363,6 +2363,97 @@ function AnalyticsDateRangeMockup() {
   );
 }
 
+/* ───────────────────────────────────────────────────────
+   Article 17: User Settings
+   ─────────────────────────────────────────────────────── */
+
+function SettingsOverviewMockup() {
+  const panels = [
+    "Profile",
+    "Subscription",
+    "Appearance",
+    "Region & Currency",
+    "Persona",
+    "Payment Tracking",
+    "Email Preferences",
+    "Integrations",
+    "Mix Defaults",
+    "Calendar",
+    "Data",
+  ];
+  return (
+    <>
+      <div className="m-4 space-y-2">
+        <div className="flex items-center gap-3 mb-4">
+          <Settings size={18} className="text-signal" />
+          <span className="text-sm font-semibold text-text">User Settings</span>
+        </div>
+        {panels.map((p) => (
+          <div
+            key={p}
+            className={cn(
+              "flex items-center justify-between px-3 py-2 rounded-lg border text-sm",
+              p === "Email Preferences"
+                ? "border-signal/40 bg-signal/5 text-text font-medium"
+                : "border-border bg-panel text-muted",
+            )}
+          >
+            {p}
+            <ChevronDown size={14} className="text-faint -rotate-90" />
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function SettingsEmailPrefsMockup() {
+  const prefs = [
+    { label: "Release Live Alerts", help: "When your release goes live on a platform", on: true },
+    { label: "New Comment Alerts", help: "When someone comments on your release", on: true },
+    { label: "Weekly Digest", help: "A weekly summary of activity across your releases", on: true },
+    { label: "Payment Reminders", help: "When a subscription payment fails", on: false },
+    { label: "Payment Confirmations", help: "When a subscription payment is processed", on: true },
+    { label: "Subscription Confirmations", help: "When your subscription is activated", on: true },
+    { label: "Cancellation Notices", help: "When your subscription is cancelled", on: true },
+  ];
+  return (
+    <>
+      <Panel className="m-4">
+        <PanelHeader>
+          <div className="flex items-center gap-2">
+            <Send size={16} className="text-muted" />
+            <span className="text-sm font-semibold text-text">Email Preferences</span>
+          </div>
+          <p className="text-xs text-muted mt-1">Choose which emails you receive from Mix Architect.</p>
+        </PanelHeader>
+        <Rule />
+        <PanelBody className="pt-4 space-y-0.5">
+          {prefs.map((p) => (
+            <div key={p.label} className="flex items-center justify-between py-2">
+              <div>
+                <div className="text-xs font-medium text-text">{p.label}</div>
+                <div className="text-[10px] text-muted mt-0.5">{p.help}</div>
+              </div>
+              <div
+                className={cn(
+                  "relative w-9 h-5 rounded-full transition-colors shrink-0",
+                  p.on ? "bg-signal" : "bg-black/20 dark:bg-white/20",
+                )}
+              >
+                <div
+                  className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform"
+                  style={{ left: p.on ? 18 : 2 }}
+                />
+              </div>
+            </div>
+          ))}
+        </PanelBody>
+      </Panel>
+    </>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════
    MOCKUP REGISTRY
    ═══════════════════════════════════════════════════════════ */
@@ -2443,6 +2534,9 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "analytics-revenue": AnalyticsRevenueMockup,
   "analytics-clients": AnalyticsClientsMockup,
   "analytics-date-range": AnalyticsDateRangeMockup,
+  /* Article 17: User Settings */
+  "settings-overview": SettingsOverviewMockup,
+  "settings-email-prefs": SettingsEmailPrefsMockup,
 };
 
 /* ═══════════════════════════════════════════════════════════

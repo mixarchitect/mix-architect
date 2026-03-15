@@ -513,6 +513,40 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "user-settings",
+    "title": "사용자 설정",
+    "category": "account",
+    "summary":
+      "프로필, 외관, 이메일 알림, 믹스 기본값 등을 구성합니다.",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "설정 개요",
+        "body": "사이드바 또는 상단 바의 계정 메뉴에서 [User Settings](/app/settings)를 엽니다. 설정은 패널별로 구성되어 있습니다: Profile, Subscription, Appearance, Region & Currency, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, Data. 각 패널에서 상호작용하면 변경 사항이 즉시 저장됩니다.",
+        "mockup": "settings-overview"
+      },
+      {
+        "heading": "프로필",
+        "body": "Profile 패널에서 댓글, 알림, 협업자에게 전송되는 이메일 알림에 표시되는 표시 이름을 설정할 수 있습니다. 이메일 주소는 표시되지만 인증 제공자를 통해 관리됩니다. 상단 바에 이름을 사용한 맞춤 인사가 표시됩니다."
+      },
+      {
+        "heading": "이메일 알림",
+        "body": "Email Preferences 패널은 Mix Architect에서 수신하는 트랜잭션 이메일을 제어합니다. 각 카테고리에는 켜기/끄기 토글이 있습니다. 카테고리에는 다음이 포함됩니다: Release Live Alerts(릴리스가 플랫폼에서 라이브될 때), New Comment Alerts(누군가 릴리스에 댓글을 남길 때), Weekly Digest(릴리스 전체 활동의 주간 요약), Payment Reminders(구독 결제가 실패할 때), Payment Confirmations(결제가 처리될 때), Subscription Confirmations(플랜이 활성화될 때), Cancellation Notices(플랜이 취소될 때). 모든 카테고리는 기본적으로 활성화되어 있습니다. 모든 이메일 하단에 수신 거부 링크가 포함되어 있습니다.",
+        "mockup": "settings-email-prefs",
+        "tip": "알림 이메일 하단의 수신 거부 링크를 클릭하여 특정 이메일 카테고리의 수신을 거부할 수도 있습니다. 로그인이 필요하지 않습니다."
+      },
+      {
+        "heading": "믹스 기본값",
+        "body": "기본 포맷(Stereo, Dolby Atmos, 또는 Stereo + Atmos), 샘플 레이트, 비트 뎁스를 설정합니다. 새 릴리스를 생성할 때 이 기본값이 자동으로 적용되어 반복적인 설정 시간을 절약합니다. 개별 릴리스에서 언제든지 재정의할 수 있습니다."
+      },
+      {
+        "heading": "외관 및 지역",
+        "body": "Appearance에서 Light, Dark, System 테마 간에 전환할 수 있습니다. Region & Currency는 결제 추적에 사용할 선호 통화를 설정합니다. 두 설정 모두 계정에 저장되며 모든 기기에 적용됩니다."
+      }
+    ]
+  },
+  {
     "id": "manage-subscription",
     "title": "Pro 구독 관리",
     "category": "billing",

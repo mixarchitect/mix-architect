@@ -530,6 +530,40 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "user-settings",
+    "title": "Paramètres utilisateur",
+    "category": "account",
+    "summary":
+      "Configurez votre profil, apparence, notifications par e-mail, paramètres de mix par défaut et plus encore.",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Aperçu des paramètres",
+        "body": "Ouvrez les [Paramètres utilisateur](/app/settings) depuis la barre latérale ou le menu du compte dans la barre supérieure. Les paramètres sont organisés en panneaux : Profil, Abonnement, Apparence, Région et devise, Persona, Suivi des paiements, Préférences e-mail, Intégrations, Paramètres de mix par défaut, Calendrier et Données. Les modifications sont enregistrées instantanément lorsque vous interagissez avec chaque panneau.",
+        "mockup": "settings-overview"
+      },
+      {
+        "heading": "Profil",
+        "body": "Le panneau Profil vous permet de définir votre nom d'affichage, qui apparaît sur les commentaires, les notifications et les alertes e-mail envoyées aux collaborateurs. Votre adresse e-mail est affichée mais gérée par votre fournisseur d'authentification. Un message d'accueil personnalisé utilisant votre prénom apparaît dans la barre supérieure."
+      },
+      {
+        "heading": "Notifications par e-mail",
+        "body": "Le panneau Préférences e-mail contrôle les e-mails transactionnels que vous recevez de Mix Architect. Chaque catégorie dispose d'un bouton d'activation/désactivation. Les catégories comprennent : Alertes de mise en ligne (lorsqu'une sortie est publiée sur une plateforme), Alertes de nouveaux commentaires (lorsque quelqu'un commente votre sortie), Résumé hebdomadaire (un récapitulatif de l'activité de toutes vos sorties), Rappels de paiement (lorsqu'un paiement d'abonnement échoue), Confirmations de paiement (lorsqu'un paiement est traité), Confirmations d'abonnement (lorsque votre plan est activé) et Avis d'annulation (lorsque votre plan est annulé). Toutes les catégories sont activées par défaut. Chaque e-mail inclut un lien de désabonnement en bas.",
+        "mockup": "settings-email-prefs",
+        "tip": "Vous pouvez également vous désabonner d'une catégorie d'e-mail spécifique en cliquant sur le lien de désabonnement en bas de n'importe quel e-mail de notification. Aucune connexion requise."
+      },
+      {
+        "heading": "Paramètres de mix par défaut",
+        "body": "Définissez votre format par défaut (Stéréo, Dolby Atmos ou Stéréo + Atmos), la fréquence d'échantillonnage et la profondeur de bits. Ces paramètres par défaut sont appliqués automatiquement lorsque vous créez de nouvelles sorties, vous faisant gagner du temps sur les configurations répétitives. Vous pouvez toujours les modifier pour des sorties individuelles."
+      },
+      {
+        "heading": "Apparence et région",
+        "body": "Apparence vous permet de basculer entre les thèmes Clair, Sombre et Système. Région et devise définit votre devise préférée pour le suivi des paiements. Les deux préférences sont enregistrées dans votre compte et s'appliquent sur tous vos appareils."
+      }
+    ]
+  },
+  {
     "id": "manage-subscription",
     "title": "Gérer votre abonnement Pro",
     "category": "billing",

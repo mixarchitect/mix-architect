@@ -513,6 +513,40 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "user-settings",
+    "title": "Användarinställningar",
+    "category": "account",
+    "summary":
+      "Konfigurera din profil, utseende, e-postnotifieringar, mixstandarder och mer.",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Översikt över Inställningar",
+        "body": "Öppna [Användarinställningar](/app/settings) från sidofältet eller kontomenyn i toppfältet. Inställningarna är organiserade i paneler: Profil, Prenumeration, Utseende, Region och Valuta, Persona, Betalningsuppföljning, E-postpreferenser, Integrationer, Mixstandarder, Kalender och Data. Ändringar sparas direkt när du interagerar med varje panel.",
+        "mockup": "settings-overview"
+      },
+      {
+        "heading": "Profil",
+        "body": "Profilpanelen låter dig ange ditt visningsnamn, som visas på kommentarer, notifieringar och e-postvarningar som skickas till medarbetare. Din e-postadress visas men hanteras via din autentiseringsleverantör. En personlig hälsning med ditt förnamn visas i toppfältet."
+      },
+      {
+        "heading": "E-postnotifieringar",
+        "body": "Panelen för E-postpreferenser styr vilka transaktionsmeddelanden du får från Mix Architect. Varje kategori har en på/av-knapp. Kategorierna inkluderar: Aviseringar för Lanseringar (när en release går live på en plattform), Aviseringar för Nya Kommentarer (när någon kommenterar din release), Veckosammanfattning (en sammanfattning av aktivitet för alla dina releaser), Betalningspåminnelser (när en prenumerationsbetalning misslyckas), Betalningsbekräftelser (när en betalning behandlas), Prenumerationsbekräftelser (när din plan aktiveras) och Uppsägningsmeddelanden (när din plan avslutas). Alla kategorier är aktiverade som standard. Varje e-postmeddelande innehåller en avprenumerationslänk längst ner.",
+        "mockup": "settings-email-prefs",
+        "tip": "Du kan också avprenumerera från en specifik e-postkategori genom att klicka på avprenumerationslänken längst ner i valfritt notifieringsmeddelande. Ingen inloggning krävs."
+      },
+      {
+        "heading": "Mixstandarder",
+        "body": "Ställ in ditt standardformat (Stereo, Dolby Atmos eller Stereo + Atmos), samplingsfrekvens och bitdjup. Dessa standarder tillämpas automatiskt när du skapar nya releaser, vilket sparar tid på repetitiva inställningar. Du kan alltid ändra dem på enskilda releaser."
+      },
+      {
+        "heading": "Utseende och Region",
+        "body": "Utseende låter dig växla mellan Ljust, Mörkt och Systemtema. Region och Valuta anger din föredragna valuta för betalningsuppföljning. Båda inställningarna sparas till ditt konto och gäller på alla enheter."
+      }
+    ]
+  },
+  {
     "id": "manage-subscription",
     "title": "Hantera din Pro-prenumeration",
     "category": "billing",

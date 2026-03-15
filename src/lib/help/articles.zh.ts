@@ -513,6 +513,40 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "user-settings",
+    "title": "用户设置",
+    "category": "account",
+    "summary":
+      "配置您的个人资料、外观、电子邮件通知、混音默认值等。",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "设置概览",
+        "body": "从侧边栏或顶部栏的账户菜单打开[User Settings](/app/settings)。设置按面板组织：Profile、Subscription、Appearance、Region & Currency、Persona、Payment Tracking、Email Preferences、Integrations、Mix Defaults、Calendar 和 Data。当您与每个面板交互时，更改会即时保存。",
+        "mockup": "settings-overview"
+      },
+      {
+        "heading": "个人资料",
+        "body": "Profile 面板允许您设置显示名称，该名称会显示在评论、通知以及发送给协作者的电子邮件提醒中。您的电子邮件地址会显示，但通过您的身份验证提供商管理。顶部栏会显示使用您名字的个性化问候语。"
+      },
+      {
+        "heading": "电子邮件通知",
+        "body": "Email Preferences 面板控制您从 Mix Architect 接收哪些事务性电子邮件。每个类别都有一个开/关切换。类别包括：Release Live Alerts（当发行在平台上线时）、New Comment Alerts（当有人评论您的发行时）、Weekly Digest（您所有发行活动的每周摘要）、Payment Reminders（当订阅付款失败时）、Payment Confirmations（当付款处理完成时）、Subscription Confirmations（当您的计划激活时）以及 Cancellation Notices（当您的计划取消时）。所有类别默认启用。每封电子邮件底部都包含退订链接。",
+        "mockup": "settings-email-prefs",
+        "tip": "您也可以通过点击任何通知电子邮件底部的退订链接来取消订阅特定的电子邮件类别。无需登录。"
+      },
+      {
+        "heading": "混音默认值",
+        "body": "设置您的默认格式（Stereo、Dolby Atmos 或 Stereo + Atmos）、采样率和位深度。创建新发行时，这些默认值会自动应用，节省重复设置的时间。您始终可以在单个发行上覆盖这些设置。"
+      },
+      {
+        "heading": "外观和地区",
+        "body": "Appearance 允许您在 Light、Dark 和 System 主题之间切换。Region & Currency 设置您用于付款跟踪的首选货币。两项偏好设置都保存到您的账户中，并在所有设备上生效。"
+      }
+    ]
+  },
+  {
     "id": "manage-subscription",
     "title": "管理您的 Pro 订阅",
     "category": "billing",

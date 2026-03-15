@@ -530,6 +530,40 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "user-settings",
+    "title": "Configurações do Usuário",
+    "category": "account",
+    "summary":
+      "Configure seu perfil, aparência, notificações por e-mail, padrões de mixagem e mais.",
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Visão Geral das Configurações",
+        "body": "Abra [Configurações do Usuário](/app/settings) pela barra lateral ou pelo menu de conta na barra superior. As configurações são organizadas em painéis: Perfil, Assinatura, Aparência, Região e Moeda, Persona, Acompanhamento de Pagamentos, Preferências de E-mail, Integrações, Padrões de Mixagem, Calendário e Dados. As alterações são salvas instantaneamente conforme você interage com cada painel.",
+        "mockup": "settings-overview"
+      },
+      {
+        "heading": "Perfil",
+        "body": "O painel de Perfil permite definir seu nome de exibição, que aparece em comentários, notificações e alertas por e-mail enviados a colaboradores. Seu endereço de e-mail é exibido, mas gerenciado pelo seu provedor de autenticação. Uma saudação personalizada usando seu primeiro nome aparece na barra superior."
+      },
+      {
+        "heading": "Notificações por E-mail",
+        "body": "O painel de Preferências de E-mail controla quais e-mails transacionais você recebe do Mix Architect. Cada categoria possui um botão liga/desliga. As categorias incluem: Alertas de Lançamento ao Vivo (quando um lançamento entra no ar em uma plataforma), Alertas de Novos Comentários (quando alguém comenta no seu lançamento), Resumo Semanal (um resumo de atividades em todos os seus lançamentos), Lembretes de Pagamento (quando um pagamento de assinatura falha), Confirmações de Pagamento (quando um pagamento é processado), Confirmações de Assinatura (quando seu plano é ativado) e Avisos de Cancelamento (quando seu plano é cancelado). Todas as categorias são habilitadas por padrão. Cada e-mail inclui um link de cancelamento de inscrição na parte inferior.",
+        "mockup": "settings-email-prefs",
+        "tip": "Você também pode cancelar a inscrição de uma categoria específica de e-mail clicando no link de cancelamento na parte inferior de qualquer e-mail de notificação. Não é necessário fazer login."
+      },
+      {
+        "heading": "Padrões de Mixagem",
+        "body": "Defina seu formato padrão (Estéreo, Dolby Atmos ou Estéreo + Atmos), taxa de amostragem e profundidade de bits. Esses padrões são aplicados automaticamente quando você cria novos lançamentos, economizando tempo em configurações repetitivas. Você sempre pode alterá-los em lançamentos individuais."
+      },
+      {
+        "heading": "Aparência e Região",
+        "body": "Aparência permite alternar entre os temas Claro, Escuro e Sistema. Região e Moeda define sua moeda preferida para acompanhamento de pagamentos. Ambas as preferências são salvas na sua conta e aplicadas em todos os dispositivos."
+      }
+    ]
+  },
+  {
     "id": "manage-subscription",
     "title": "Gerenciando Sua Assinatura Pro",
     "category": "billing",
