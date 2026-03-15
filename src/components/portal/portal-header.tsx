@@ -55,7 +55,7 @@ export function PortalHeader({
 
       {/* Compact sticky header */}
       {isCompact && (
-        <div className="fixed top-0 left-0 right-0 z-30 bg-white/90 dark:bg-[#1a1a1a]/90 backdrop-blur-md border-b border-border print:hidden">
+        <div className="fixed top-0 left-0 right-0 z-30 backdrop-blur-md border-b border-border print:hidden" style={{ background: "color-mix(in srgb, var(--bg) 90%, transparent)" }}>
           <div className="max-w-3xl mx-auto px-6 py-3 flex items-center gap-4">
             {release.cover_art_url && (
               <img
