@@ -499,13 +499,12 @@ function PlatformRow({
             autoFocus
             style={{ height: "28px", padding: "4px 10px" }}
           />
-          <Button
+          <button
             type="submit"
-            variant="primary"
-            className="h-[28px] text-[11px] px-2.5"
+            className="btn-primary h-[28px] text-[11px] px-2.5 rounded-sm"
           >
             Save
-          </Button>
+          </button>
           <button
             type="button"
             onClick={() => setShowUrlInput(false)}
