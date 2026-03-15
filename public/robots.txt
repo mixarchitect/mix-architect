@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /featured
+Disallow: /app/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /admin/
+Disallow: /portal/
+
+Sitemap: https://mixarchitect.com/sitemap.xml
