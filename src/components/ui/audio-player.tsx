@@ -718,6 +718,15 @@ export function AudioPlayer({
       setNewCommentText("");
       setCommentInput(null);
       setHighlightedCommentId(data.id);
+
+      // Notify + email release members about the new comment
+      sendNotification({
+        type: "comment",
+        title: `${currentUserName} commented on "${trackTitle}"`,
+        body: data.content.slice(0, 120),
+        releaseId,
+        trackId,
+      });
     }
   }
 
