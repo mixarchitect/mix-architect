@@ -17,6 +17,11 @@ import {
   Play,
   SkipForward,
   GripVertical,
+  Radio,
+  BarChart3,
+  Users,
+  ExternalLink,
+  TrendingUp,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -574,6 +579,212 @@ function FlowSimulatorMock() {
   );
 }
 
+function DistributionTrackerMock() {
+  const platforms = [
+    {
+      name: "Spotify",
+      icon: "/icons/streaming/spotify.svg",
+      status: "LIVE",
+      color: "#22C55E",
+      distributor: "DistroKid",
+      auto: true,
+    },
+    {
+      name: "Apple Music",
+      icon: "/icons/streaming/apple-music.svg",
+      status: "PROCESSING",
+      color: "#FE5E0E",
+      distributor: "DistroKid",
+    },
+    {
+      name: "Tidal",
+      icon: "/icons/streaming/tidal.svg",
+      status: "SUBMITTED",
+      color: "#3B82F6",
+      distributor: "DistroKid",
+    },
+    {
+      name: "Amazon Music",
+      icon: "/icons/streaming/amazon-music.svg",
+      status: "SUBMITTED",
+      color: "#3B82F6",
+      distributor: "DistroKid",
+    },
+    {
+      name: "YouTube Music",
+      icon: "/icons/streaming/youtube-music.svg",
+      status: "NOT SUBMITTED",
+      color: "rgba(255,255,255,0.35)",
+    },
+  ];
+
+  return (
+    <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-2">
+          <Radio size={14} className="text-[#0D9488]" />
+          <span className="text-sm font-semibold text-white">
+            Distribution Tracker
+          </span>
+        </div>
+        <button className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/50">
+          + Add Platform
+        </button>
+      </div>
+      <div className="space-y-2">
+        {platforms.map((p) => (
+          <div
+            key={p.name}
+            className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-white/4"
+          >
+            <div className="flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={p.icon}
+                alt={p.name}
+                width={16}
+                height={16}
+                className="shrink-0"
+              />
+              <span className="text-sm text-white/80">{p.name}</span>
+              {p.auto && (
+                <span className="text-[9px] text-[#0D9488]/70 ml-0.5">
+                  Auto
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {p.distributor && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/40">
+                  {p.distributor}
+                </span>
+              )}
+              <span
+                className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                style={{
+                  color: p.color,
+                  background: `${p.color}15`,
+                }}
+              >
+                {p.status}
+              </span>
+              {p.status === "LIVE" && (
+                <ExternalLink size={10} className="text-white/30" />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsMock() {
+  const months = [
+    { label: "Oct", velocity: 3, revenue: 2400 },
+    { label: "Nov", velocity: 5, revenue: 4100 },
+    { label: "Dec", velocity: 2, revenue: 1800 },
+    { label: "Jan", velocity: 4, revenue: 3200 },
+    { label: "Feb", velocity: 6, revenue: 5600 },
+    { label: "Mar", velocity: 4, revenue: 3800 },
+  ];
+
+  const maxV = Math.max(...months.map((m) => m.velocity));
+
+  return (
+    <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
+      {/* KPI row */}
+      <div className="grid grid-cols-4 gap-3 mb-5">
+        {[
+          {
+            label: "Releases",
+            value: "24",
+            icon: BarChart3,
+            color: "#0D9488",
+          },
+          {
+            label: "Avg Turnaround",
+            value: "8.2d",
+            icon: Clock,
+            color: "#3B82F6",
+          },
+          {
+            label: "Revenue",
+            value: "$21k",
+            icon: DollarSign,
+            color: "#22C55E",
+          },
+          { label: "Clients", value: "12", icon: Users, color: "#FE5E0E" },
+        ].map((kpi) => (
+          <div
+            key={kpi.label}
+            className="rounded-lg bg-white/4 p-3 text-center"
+          >
+            <kpi.icon
+              size={14}
+              className="mx-auto mb-1.5"
+              style={{ color: kpi.color }}
+            />
+            <div className="text-lg font-bold text-white">{kpi.value}</div>
+            <div className="text-[10px] text-white/40">{kpi.label}</div>
+          </div>
+        ))}
+      </div>
+      {/* Release velocity bar chart */}
+      <div className="mb-4">
+        <div className="flex items-center gap-1.5 mb-3">
+          <TrendingUp size={12} className="text-[#0D9488]" />
+          <span className="text-xs text-white/50 font-medium">
+            Release Velocity
+          </span>
+        </div>
+        <div className="flex items-end gap-2 h-20">
+          {months.map((m) => (
+            <div key={m.label} className="flex-1 flex flex-col items-center">
+              <div
+                className="w-full rounded-t"
+                style={{
+                  height: `${(m.velocity / maxV) * 100}%`,
+                  background:
+                    m.label === "Feb"
+                      ? "#0D9488"
+                      : "rgba(13,148,136,0.3)",
+                }}
+              />
+              <span className="text-[9px] text-white/30 mt-1.5">
+                {m.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Client table */}
+      <div className="space-y-1.5">
+        {[
+          { name: "Aria Voss", releases: 8, revenue: "$9.6k" },
+          { name: "Jay Park", releases: 6, revenue: "$5.4k" },
+          { name: "Luna Ray", releases: 4, revenue: "$3.2k" },
+        ].map((c) => (
+          <div
+            key={c.name}
+            className="flex items-center justify-between py-2 px-3 rounded-lg bg-white/4"
+          >
+            <span className="text-xs text-white/70">{c.name}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] text-white/40">
+                {c.releases} releases
+              </span>
+              <span className="text-xs font-medium text-[#22C55E]">
+                {c.revenue}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Main export                                                        */
 /* ------------------------------------------------------------------ */
@@ -617,6 +828,23 @@ export function FeatureShowcase() {
           badge="Built for freelance engineers and producers"
           badgeColor="orange"
           visual={<PaymentsMock />}
+        />
+
+        <FeatureSection
+          headline="See where every release stands, across every platform"
+          body="Track submission status for Spotify, Apple Music, Amazon, Tidal, YouTube Music, and more. Spotify auto-detects when your release goes live. One dashboard instead of six."
+          badge="Distribution Tracker"
+          badgeColor="teal"
+          visual={<DistributionTrackerMock />}
+          reverse
+        />
+
+        <FeatureSection
+          headline="Know your numbers without a spreadsheet"
+          body="Release velocity, turnaround time, revenue by month, and a per-client breakdown. See which clients drive your business and where your time goes."
+          badge="Analytics"
+          badgeColor="blue"
+          visual={<AnalyticsMock />}
         />
 
         <FeatureSection

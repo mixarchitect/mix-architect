@@ -258,6 +258,101 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "distribution-tracker",
+    "title": "Distributions-Tracker",
+    "category": "releases",
+    "summary": "Verfolgen Sie, wo Ihre Veröffentlichung eingereicht wurde, überwachen Sie den Status auf verschiedenen Plattformen und erhalten Sie eine Benachrichtigung, wenn sie auf Spotify live geht.",
+    "tags": [
+      "distribution",
+      "tracker",
+      "spotify",
+      "apple music",
+      "platform",
+      "status",
+      "live",
+      "submitted"
+    ],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Plattformen zu einer Veröffentlichung hinzufügen",
+        "body": "Öffnen Sie eine beliebige Veröffentlichung und scrollen Sie nach unten zum Distributions-Tracker-Panel unterhalb der Trackliste. Klicken Sie auf \"+ Plattform hinzufügen\", um eine Streaming-Plattform hinzuzufügen. Wählen Sie aus Spotify, Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud oder Bandcamp. Jede Plattform erscheint als Zeile mit ihrem offiziellen Logo, einem Statusindikator und einem Distributor-Tag. Sie können auch \"Als eingereicht markieren\" verwenden, um mehrere Plattformen gleichzeitig hinzuzufügen: Wählen Sie einen Distributor (DistroKid, TuneCore, CD Baby, LANDR, Ditto, AWAL, UnitedMasters, Amuse, RouteNote oder Selbstveröffentlicht), markieren Sie die Plattformen, bei denen Sie eingereicht haben, und klicken Sie auf Einreichen.",
+        "mockup": "distribution-add-platform"
+      },
+      {
+        "heading": "Statuswerte",
+        "body": "Jeder Plattformeintrag hat einen Status, der verfolgt, wo er sich in der Veröffentlichungs-Pipeline befindet. Die sechs Statuswerte sind: Nicht eingereicht (grau, Standard für neu hinzugefügte Plattformen), Eingereicht (blau, Sie haben die Veröffentlichung an Ihren Distributor gesendet), In Bearbeitung (orange, der Distributor prüft oder verarbeitet), Live (grün, die Veröffentlichung ist auf der Plattform verfügbar), Abgelehnt (rot, die Plattform oder der Distributor hat die Veröffentlichung abgelehnt) und Entfernt (rot, die Veröffentlichung war zuvor live, wurde aber entfernt). Klicken Sie auf den Statusindikator in einer Plattformzeile, um ihn zu ändern. Statusänderungen werden im Plattformverlauf protokolliert, sodass Sie sehen können, wann jeder Übergang stattgefunden hat.",
+        "mockup": "distribution-status"
+      },
+      {
+        "heading": "Automatische Spotify-Erkennung",
+        "body": "Spotify wird oben im Distributions-Tracker mit dem Label \"Aktualisiert automatisch\" angezeigt. Sobald Sie Spotify als Eingereicht markieren, überprüft Mix Architect regelmäßig den Spotify-Katalog auf Ihre Veröffentlichung anhand des ISRC-Codes (aus dem Distribution-Tab des Tracks) oder des Veröffentlichungstitels und Künstlernamens. Wenn Ihre Veröffentlichung auf Spotify gefunden wird, ändert sich der Status automatisch auf Live, die Spotify-URL wird gespeichert und Sie erhalten eine Benachrichtigung. Sie können auch auf \"Jetzt prüfen\" klicken, um eine sofortige Überprüfung auszulösen. Die automatische Erkennung läuft täglich für alle eingereichten Spotify-Einträge.",
+        "tip": "Tragen Sie den ISRC-Code im Distribution-Tab Ihres Tracks ein, bevor Sie einreichen. Die ISRC-basierte Erkennung ist zuverlässiger als der Abgleich nach Titel/Künstler, insbesondere bei häufig vorkommenden Namen.",
+        "mockup": "distribution-spotify"
+      },
+      {
+        "heading": "Status aktualisieren und Links hinzufügen",
+        "body": "Um den Status einer Plattform zu ändern, klicken Sie auf den Statusindikator in der Plattformzeile. Eine Reihe von Status-Badges erscheint, in der Sie den neuen Status auswählen können. Um einen Link zur Veröffentlichung auf dieser Plattform hinzuzufügen, klicken Sie auf \"Link hinzufügen\" neben dem Plattformnamen. Geben Sie die URL ein (zum Beispiel den Spotify-Album-Link oder die Apple Music-Seite) und klicken Sie auf Speichern. Das Link-Symbol wird zu einem anklickbaren externen Link, der die Veröffentlichungsseite auf dieser Plattform öffnet. Verwenden Sie das Drei-Punkte-Menü in jeder Plattformzeile für weitere Optionen: Details bearbeiten, Plattform entfernen oder den Statusänderungsverlauf anzeigen.",
+        "mockup": "distribution-edit"
+      },
+      {
+        "heading": "Sammeleinreichung und Aktualisierung",
+        "body": "\"Als eingereicht markieren\" ermöglicht es Ihnen, eine Sammeleinreichung bei Ihrem Distributor zu erfassen. Wählen Sie den Distributor aus dem Dropdown-Menü, markieren Sie die Plattformen, bei denen Sie eingereicht haben, und klicken Sie auf Einreichen. Alle ausgewählten Plattformen werden mit dem Status Eingereicht und dem Distributor-Tag hinzugefügt. \"Jetzt prüfen\" erscheint bei Spotify-Einträgen, die eingereicht wurden. Ein Klick darauf löst eine sofortige Spotify-Katalogsuche aus. Wenn die Veröffentlichung gefunden wird, aktualisiert sich der Status auf Live und die URL wird automatisch gespeichert. Für alle anderen Plattformen (Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud, Bandcamp) aktualisieren Sie den Status manuell, sobald Sie bestätigen, dass die Veröffentlichung live ist.",
+        "mockup": "distribution-bulk"
+      },
+      {
+        "heading": "Distributor-Tags",
+        "body": "Jeder Plattformeintrag kann ein Distributor-Tag haben, das anzeigt, welchen Dienst Sie für die Einreichung verwendet haben (DistroKid, TuneCore, CD Baby usw.). Dieses erscheint als kleines Badge neben dem Statusindikator. Distributor-Tags werden automatisch gesetzt, wenn Sie \"Als eingereicht markieren\" verwenden, oder Sie können sie einzeln beim Bearbeiten eines Plattformeintrags festlegen. So behalten Sie den Überblick, welcher Distributor welche Plattform betreut hat, insbesondere wenn Sie verschiedene Distributoren für verschiedene Gebiete oder Plattformen nutzen.",
+        "warning": "Die Analysen spiegeln nur Daten wider, die Sie in Mix Architect erfasst haben. Wenn Sie über das Dashboard eines Distributors einreichen, denken Sie daran, den Status hier zu aktualisieren, damit Ihr Tracker korrekt bleibt.",
+        "mockup": "distribution-distributor"
+      }
+    ]
+  },
+  {
+    "id": "user-analytics",
+    "title": "Benutzeranalysen",
+    "category": "releases",
+    "summary": "Sehen Sie Ihre abgeschlossenen Veröffentlichungen, durchschnittliche Bearbeitungszeit, Gesamtumsatz und eine Aufschlüsselung pro Kunde im Analytics-Dashboard.",
+    "tags": [
+      "analytics",
+      "dashboard",
+      "revenue",
+      "turnaround",
+      "velocity",
+      "clients",
+      "charts"
+    ],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Was die Analytics-Seite zeigt",
+        "body": "Rufen Sie die Seite [Analysen](/app/analytics) über die Seitenleiste auf. Das Dashboard zeigt oben vier Zusammenfassungskarten: Abgeschlossene Veröffentlichungen (Gesamtanzahl fertiger Projekte mit monatlichem Durchschnitt), Durchschnittliche Bearbeitungszeit (Tage von der Erstellung bis zum Abschluss, mit Aufschlüsselung nach schnellstem und langsamstem Wert), Gesamtumsatz (Summe aller erfassten Honorare mit ausstehendem Saldo) und Kunden (Anzahl einzigartiger Kunden mit Gesamtanzahl der Veröffentlichungen). Unterhalb der Zusammenfassungskarten visualisieren drei Diagramme Ihre Daten im Zeitverlauf, und eine Kundenaufschlüsselungstabelle zeigt Statistiken pro Kunde.",
+        "mockup": "analytics-overview"
+      },
+      {
+        "heading": "Veröffentlichungsgeschwindigkeit und Bearbeitungszeit",
+        "body": "Das Diagramm Veröffentlichungsgeschwindigkeit ist ein Balkendiagramm, das zeigt, wie viele Veröffentlichungen Sie pro Monat im ausgewählten Zeitraum abgeschlossen haben. Höhere Balken bedeuten produktivere Monate. Nutzen Sie es, um Trends in Ihrer Leistung zu erkennen und arbeitsreiche oder ruhige Phasen zu identifizieren. Das Diagramm Bearbeitungszeit zeigt die durchschnittliche Anzahl der Tage von der Erstellung bis zum Abschluss der Veröffentlichung pro Monat. Niedrigere Balken bedeuten schnellere Lieferung. Zusammen helfen Ihnen diese Diagramme, Ihre Kapazität zu verstehen und festzustellen, ob Ihr Workflow schneller oder langsamer wird.",
+        "mockup": "analytics-velocity"
+      },
+      {
+        "heading": "Umsatzdiagramm",
+        "body": "Das Umsatzdiagramm ist ein Flächendiagramm, das die monatlich verdienten Gesamthonorare anzeigt. Es erfasst die bei Ihren Veröffentlichungen aufgezeichneten Zahlungsbeträge und spiegelt wider, was Kunden tatsächlich bezahlt haben. Nutzen Sie es, um Einkommenstrends zu erkennen, Ihre umsatzstärksten Monate zu identifizieren und ruhigere Phasen zu planen. Die Umsatzdaten stammen aus der Zahlungsverfolgungsfunktion bei jeder Veröffentlichung. Stellen Sie daher sicher, dass Honorare und Zahlungsstatus für eine genaue Berichterstattung aktuell sind.",
+        "mockup": "analytics-revenue"
+      },
+      {
+        "heading": "Kundenaufschlüsselung",
+        "body": "Die Kundenaufschlüsselungstabelle am unteren Rand der Analytics-Seite listet jeden Kunden mit seinen wichtigsten Kennzahlen auf: Anzahl der Veröffentlichungen, Gesamtumsatz, bezahlter Betrag und durchschnittliche Bearbeitungszeit. So können Sie erkennen, welche Kunden die meiste Arbeit und den meisten Umsatz bringen, wer pünktlich zahlt und wo Ihre Zeit aufgewendet wird. Klicken Sie auf eine Kundenzeile, um deren Veröffentlichungen anzuzeigen. Die Tabelle ist standardmäßig nach Umsatz sortiert.",
+        "mockup": "analytics-clients"
+      },
+      {
+        "heading": "Datumsbereichsauswahl",
+        "body": "Verwenden Sie die Datumsbereichsauswahl in der oberen rechten Ecke, um festzulegen, welchen Zeitraum die Analysen abdecken. Voreingestellte Bereiche umfassen Letzte 7 Tage, Letzte 30 Tage, Letzte 90 Tage und Letzte 365 Tage. Sie können auch einen benutzerdefinierten Datumsbereich festlegen, indem Sie ein bestimmtes Start- und Enddatum auswählen. Alle vier Zusammenfassungskarten und alle drei Diagramme werden aktualisiert, um den ausgewählten Zeitraum widerzuspiegeln. Die Datumsbereichsauswahl funktioniert im gesamten Analytics-Dashboard auf die gleiche Weise.",
+        "tip": "Verwenden Sie den 365-Tage-Bereich für Jahresrückblicke und die Steuervorbereitung. Der 30-Tage-Bereich ist nützlich für monatliche Überprüfungen Ihrer Geschäftsentwicklung.",
+        "mockup": "analytics-date-range"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Audio hochladen und verwalten",
     "category": "audio",

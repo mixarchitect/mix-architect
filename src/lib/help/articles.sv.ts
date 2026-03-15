@@ -258,6 +258,84 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "distribution-tracker",
+    "title": "Distributionsspårare",
+    "category": "releases",
+    "summary": "Spåra var din release har skickats in, övervaka status på olika plattformar och bli notifierad när den går live på Spotify.",
+    "tags": ["distribution", "tracker", "spotify", "apple music", "platform", "status", "live", "submitted"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Lägga till plattformar till en release",
+        "body": "Öppna valfri release och scrolla ner till panelen Distribution Tracker under spårlistan. Klicka \"+ Add Platform\" för att lägga till en streamingplattform. Välj bland Spotify, Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud eller Bandcamp. Varje plattform visas som en rad med sin officiella logotyp, en statusindikator och en distributörstagg. Du kan även använda \"Mark as Submitted\" för att lägga till flera plattformar samtidigt: välj en distributör (DistroKid, TuneCore, CD Baby, LANDR, Ditto, AWAL, UnitedMasters, Amuse, RouteNote eller Self-released), markera vilka plattformar du skickade till och klicka Submit.",
+        "mockup": "distribution-add-platform"
+      },
+      {
+        "heading": "Statuslägen",
+        "body": "Varje plattformspost har en status som spårar var den befinner sig i releasepipelinen. De sex lägena är: Not Submitted (grå, standard för nyligen tillagda plattformar), Submitted (blå, du har skickat releasen till din distributör), Processing (orange, distributören granskar eller bearbetar), Live (grön, releasen är tillgänglig på plattformen), Rejected (röd, plattformen eller distributören avvisade releasen) och Taken Down (röd, releasen var tidigare live men har tagits bort). Klicka på statusindikatorn på valfri plattformsrad för att ändra den. Statusändringar loggas i plattformshistoriken så att du kan se när varje övergång skedde.",
+        "mockup": "distribution-status"
+      },
+      {
+        "heading": "Spotify automatisk upptäckt",
+        "body": "Spotify listas högst upp i Distribution Tracker med en etikett \"Updates automatically\". När du markerar Spotify som Submitted kontrollerar Mix Architect regelbundet Spotifys katalog efter din release med hjälp av ISRC-koden (från spårets Distribution-flik) eller releasens titel och artistnamn. När din release hittas på Spotify ändras statusen automatiskt till Live, Spotify-URL:en sparas och du får en notifikation. Du kan också klicka \"Check Now\" för att utlösa en omedelbar kontroll. Automatisk upptäckt körs dagligen för alla inskickade Spotify-poster.",
+        "tip": "Fyll i ISRC-koden på ditt spårs Distribution-flik innan du skickar in. ISRC-baserad upptäckt är mer tillförlitlig än titel/artist-matchning, särskilt för vanliga namn.",
+        "mockup": "distribution-spotify"
+      },
+      {
+        "heading": "Uppdatera status och lägga till länkar",
+        "body": "För att ändra en plattforms status klickar du på statusindikatorn på plattformsraden. En rad med statusetiketter visas där du kan välja det nya läget. För att lägga till en länk till releasen på den plattformen klickar du på \"Add link\" bredvid plattformsnamnet. Ange URL:en (till exempel Spotify-albumlänken eller Apple Music-sidan) och klicka Save. Länkikonen förvandlas till en klickbar extern länk som öppnar releasesidan på den plattformen. Använd trepunktsmenyn på valfri plattformsrad för ytterligare alternativ: redigera detaljer, ta bort plattformen eller visa historiken över statusändringar.",
+        "mockup": "distribution-edit"
+      },
+      {
+        "heading": "Massinskickning och uppdatering",
+        "body": "\"Mark as Submitted\" låter dig registrera en massinskickning till din distributör. Välj distributören från rullgardinsmenyn, markera plattformarna du skickade till och klicka Submit. Alla valda plattformar läggs till med statusen Submitted och distributörstaggen. \"Check Now\" visas på Spotify-poster som har skickats in. Att klicka på den utlöser en omedelbar Spotify-katalogsökning. Om releasen hittas uppdateras statusen till Live och URL:en sparas automatiskt. För alla andra plattformar (Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud, Bandcamp) uppdaterar du statusen manuellt när du bekräftar att releasen är live.",
+        "mockup": "distribution-bulk"
+      },
+      {
+        "heading": "Distributörstaggar",
+        "body": "Varje plattformspost kan ha en distributörstagg som visar vilken tjänst du använde för att skicka in (DistroKid, TuneCore, CD Baby osv.). Denna visas som en liten etikett bredvid statusindikatorn. Distributörstaggar sätts automatiskt när du använder \"Mark as Submitted\", eller så kan du ställa in dem individuellt när du redigerar en plattformspost. Detta hjälper dig att spåra vilken distributör som hanterade vilken plattform, särskilt om du använder olika distributörer för olika territorier eller plattformar.",
+        "warning": "Analys återspeglar bara data du har spårat i Mix Architect. Om du skickar in via en distributörs egen instrumentpanel, kom ihåg att uppdatera statusen här så att din spårare förblir korrekt.",
+        "mockup": "distribution-distributor"
+      }
+    ]
+  },
+  {
+    "id": "user-analytics",
+    "title": "Användaranalys",
+    "category": "releases",
+    "summary": "Visa dina avslutade releaser, genomsnittlig handläggningstid, total intäkt och uppdelning per klient i analysinstrumentpanelen.",
+    "tags": ["analytics", "dashboard", "revenue", "turnaround", "velocity", "clients", "charts"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Vad analyssidan visar",
+        "body": "Gå till sidan [Analys](/app/analytics) från sidofältet. Instrumentpanelen visar fyra sammanfattningskort högst upp: Avslutade releaser (totalt antal färdiga projekt med månadsgenomsnitt), Genomsnittlig handläggningstid (dagar från skapande till färdigställande, med uppdelning på snabbast och långsammast), Total intäkt (summan av alla spårade arvoden med utestående saldo) och Klienter (unikt klientantal med totalt antal releaser). Under sammanfattningskorten visualiserar tre diagram din data över tid, och en klientuppdelningstabell visar statistik per klient.",
+        "mockup": "analytics-overview"
+      },
+      {
+        "heading": "Releasehastighet och handläggningstid",
+        "body": "Diagrammet Releasehastighet är ett stapeldiagram som visar hur många releaser du färdigställde varje månad inom det valda datumintervallet. Högre staplar innebär mer produktiva månader. Använd detta för att upptäcka trender i din produktion och identifiera intensiva eller lugna perioder. Diagrammet Handläggningstid visar det genomsnittliga antalet dagar från skapande till färdigställande per månad. Lägre staplar innebär snabbare leverans. Tillsammans hjälper dessa diagram dig att förstå din kapacitet och om ditt arbetsflöde blir snabbare eller långsammare över tid.",
+        "mockup": "analytics-velocity"
+      },
+      {
+        "heading": "Intäktsdiagram",
+        "body": "Intäktsdiagrammet är ett ytdiagram som visar totala arvoden intjänade per månad. Det spårar betalningsbeloppen registrerade på dina releaser, så det återspeglar vad klienter faktiskt har betalat. Använd detta för att se intäktstrender, identifiera dina mest inkomstbringande månader och planera för lugnare perioder. Intäktsdata kommer från betalningsspårningsfunktionen på varje release, så se till att arvoden och betalningsstatusar är uppdaterade för korrekt rapportering.",
+        "mockup": "analytics-revenue"
+      },
+      {
+        "heading": "Klientuppdelning",
+        "body": "Tabellen Klientuppdelning längst ner på analyssidan listar varje klient med sina nyckeltal: antal releaser, total intäkt, betalt belopp och genomsnittlig handläggningstid. Detta hjälper dig att identifiera vilka klienter som genererar mest arbete och intäkt, vem som betalar i tid och var din tid spenderas. Klicka på valfri klientrad för att se deras releaser. Tabellen sorteras efter intäkt som standard.",
+        "mockup": "analytics-clients"
+      },
+      {
+        "heading": "Datumintervallväljare",
+        "body": "Använd datumintervallväljaren i övre högra hörnet för att styra vilken period analysen täcker. Förinställda intervall inkluderar Senaste 7 dagarna, Senaste 30 dagarna, Senaste 90 dagarna och Senaste 365 dagarna. Du kan också ställa in ett anpassat datumintervall genom att välja specifika start- och slutdatum. Alla fyra sammanfattningskort och alla tre diagram uppdateras för att återspegla den valda perioden. Datumintervallväljaren fungerar på samma sätt i hela analysinstrumentpanelen.",
+        "tip": "Använd 365-dagarsintervallet för årsöversikter och skatteförberedelser. 30-dagarsintervallet är användbart för månatliga avstämningar av din verksamhets hälsa.",
+        "mockup": "analytics-date-range"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Ladda upp och hantera ljud",
     "category": "audio",

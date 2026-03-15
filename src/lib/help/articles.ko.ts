@@ -258,6 +258,84 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "distribution-tracker",
+    "title": "배포 트래커",
+    "category": "releases",
+    "summary": "릴리스가 제출된 곳을 추적하고, 플랫폼 전체의 상태를 모니터링하고, Spotify에 게시되면 알림을 받습니다.",
+    "tags": ["distribution", "tracker", "spotify", "apple music", "platform", "status", "live", "submitted"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "릴리스에 플랫폼 추가하기",
+        "body": "릴리스를 열고 트랙 목록 아래의 Distribution Tracker 패널까지 스크롤합니다. \"+ Add Platform\"을 클릭하여 스트리밍 플랫폼을 추가합니다. Spotify, Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud, Bandcamp 중에서 선택할 수 있습니다. 각 플랫폼은 공식 로고, 상태 표시기, 배포사 태그가 있는 행으로 표시됩니다. \"Mark as Submitted\"를 사용하여 여러 플랫폼을 한 번에 추가할 수도 있습니다. 배포사(DistroKid, TuneCore, CD Baby, LANDR, Ditto, AWAL, UnitedMasters, Amuse, RouteNote, Self-released)를 선택하고, 제출한 플랫폼을 체크한 후 Submit을 클릭합니다.",
+        "mockup": "distribution-add-platform"
+      },
+      {
+        "heading": "상태 유형",
+        "body": "각 플랫폼 항목에는 릴리스 파이프라인에서의 현재 위치를 추적하는 상태가 있습니다. 6가지 상태는 다음과 같습니다: Not Submitted(회색, 새로 추가된 플랫폼의 기본값), Submitted(파란색, 배포사에 릴리스를 전송함), Processing(주황색, 배포사가 검토 또는 처리 중), Live(녹색, 플랫폼에서 릴리스 공개 중), Rejected(빨간색, 플랫폼 또는 배포사가 릴리스를 거부함), Taken Down(빨간색, 이전에 공개되었으나 삭제됨). 플랫폼 행의 상태 표시기를 클릭하여 변경할 수 있습니다. 상태 변경은 플랫폼 기록에 기록되므로 각 전환이 언제 발생했는지 확인할 수 있습니다.",
+        "mockup": "distribution-status"
+      },
+      {
+        "heading": "Spotify 자동 감지",
+        "body": "Spotify는 Distribution Tracker 최상단에 \"자동 업데이트\" 라벨과 함께 표시됩니다. Spotify를 Submitted로 표시하면, Mix Architect가 ISRC 코드(트랙의 Distribution 탭에서 가져옴) 또는 릴리스 제목과 아티스트 이름을 사용하여 Spotify 카탈로그를 주기적으로 확인합니다. Spotify에서 릴리스가 발견되면 상태가 자동으로 Live로 변경되고, Spotify URL이 저장되며, 알림을 받게 됩니다. \"Check Now\"를 클릭하여 즉시 확인을 실행할 수도 있습니다. 자동 감지는 모든 Submitted 상태의 Spotify 항목에 대해 매일 실행됩니다.",
+        "tip": "제출 전에 트랙의 Distribution 탭에서 ISRC 코드를 입력하세요. ISRC 기반 감지가 제목/아티스트 매칭보다 더 신뢰할 수 있으며, 특히 흔한 이름의 경우 더욱 그렇습니다.",
+        "mockup": "distribution-spotify"
+      },
+      {
+        "heading": "상태 업데이트 및 링크 추가",
+        "body": "플랫폼의 상태를 변경하려면 플랫폼 행의 상태 표시기를 클릭합니다. 새 상태를 선택할 수 있는 상태 필 행이 나타납니다. 해당 플랫폼에서의 릴리스 링크를 추가하려면 플랫폼 이름 옆의 \"Add link\"를 클릭합니다. URL(예: Spotify 앨범 링크 또는 Apple Music 페이지)을 입력하고 저장을 클릭합니다. 링크 아이콘이 클릭 가능한 외부 링크로 바뀌어 해당 플랫폼의 릴리스 페이지를 열 수 있습니다. 플랫폼 행의 점 세 개 메뉴에서 세부 정보 편집, 플랫폼 제거, 상태 변경 기록 보기 등의 추가 옵션을 사용할 수 있습니다.",
+        "mockup": "distribution-edit"
+      },
+      {
+        "heading": "일괄 제출 및 새로고침",
+        "body": "\"Mark as Submitted\"를 사용하면 배포사에 대한 일괄 제출을 기록할 수 있습니다. 드롭다운에서 배포사를 선택하고, 제출한 플랫폼을 체크한 후 Submit을 클릭합니다. 선택한 모든 플랫폼이 Submitted 상태와 배포사 태그와 함께 추가됩니다. \"Check Now\"는 Submitted 상태의 Spotify 항목에 표시됩니다. 클릭하면 Spotify 카탈로그 즉시 검색이 실행됩니다. 발견되면 상태가 Live로 업데이트되고 URL이 자동으로 저장됩니다. 다른 모든 플랫폼(Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud, Bandcamp)의 경우, 릴리스가 공개된 것을 확인한 후 수동으로 상태를 업데이트하세요.",
+        "mockup": "distribution-bulk"
+      },
+      {
+        "heading": "배포사 태그",
+        "body": "각 플랫폼 항목에는 제출에 사용한 서비스(DistroKid, TuneCore, CD Baby 등)를 표시하는 배포사 태그를 지정할 수 있습니다. 이 태그는 상태 표시기 옆에 작은 필로 표시됩니다. 배포사 태그는 \"Mark as Submitted\" 사용 시 자동으로 설정되며, 플랫폼 항목 편집 시 개별적으로 설정할 수도 있습니다. 이를 통해 특히 지역이나 플랫폼별로 다른 배포사를 사용하는 경우, 어떤 배포사가 어떤 플랫폼을 담당했는지 추적할 수 있습니다.",
+        "warning": "애널리틱스는 Mix Architect에서 추적한 데이터만 반영합니다. 배포사의 대시보드에서 직접 제출한 경우, 트래커의 정확성을 유지하기 위해 여기에서 상태를 업데이트하는 것을 잊지 마세요.",
+        "mockup": "distribution-distributor"
+      }
+    ]
+  },
+  {
+    "id": "user-analytics",
+    "title": "사용자 애널리틱스",
+    "category": "releases",
+    "summary": "완료된 릴리스 수, 평균 처리 시간, 총 수익, 클라이언트별 분석을 애널리틱스 대시보드에서 확인합니다.",
+    "tags": ["analytics", "dashboard", "revenue", "turnaround", "velocity", "clients", "charts"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "애널리틱스 페이지 개요",
+        "body": "사이드바에서 [애널리틱스](/app/analytics) 페이지에 접근합니다. 대시보드 상단에 네 가지 요약 카드가 표시됩니다: 완료된 릴리스(총 완료 프로젝트 수와 월평균), 평균 처리 시간(생성에서 완료까지의 일수, 최단 및 최장 분석 포함), 총 수익(추적된 모든 수수료의 합계와 미수금 잔액), 클라이언트(고유 클라이언트 수와 총 릴리스 수). 요약 카드 아래에는 시간에 따른 데이터를 시각화하는 세 개의 차트와 클라이언트별 통계를 보여주는 클라이언트 분석 테이블이 있습니다.",
+        "mockup": "analytics-overview"
+      },
+      {
+        "heading": "릴리스 속도 및 처리 시간",
+        "body": "릴리스 속도 차트는 선택한 기간 내 월별 완료 릴리스 수를 보여주는 막대 차트입니다. 막대가 높을수록 더 생산적인 달이었음을 의미합니다. 이를 사용하여 산출량의 추세를 파악하고 바쁜 기간이나 한가한 기간을 식별할 수 있습니다. 처리 시간 차트는 월별 릴리스 생성에서 완료까지의 평균 일수를 보여줍니다. 막대가 낮을수록 더 빠른 납품을 의미합니다. 이 두 차트를 함께 보면 자신의 처리 능력과 워크플로가 시간이 지남에 따라 빨라지고 있는지 느려지고 있는지 이해할 수 있습니다.",
+        "mockup": "analytics-velocity"
+      },
+      {
+        "heading": "수익 차트",
+        "body": "수익 차트는 월별 총 수수료 수입을 보여주는 영역 차트입니다. 릴리스에 기록된 결제 금액을 추적하므로 클라이언트가 실제로 지불한 금액을 반영합니다. 이를 사용하여 수입 추세를 파악하고, 가장 높은 수입을 올린 달을 식별하고, 한가한 기간에 대비할 수 있습니다. 수익 데이터는 각 릴리스의 결제 추적 기능에서 가져오므로, 정확한 보고를 위해 수수료와 결제 상태를 최신 상태로 유지하세요.",
+        "mockup": "analytics-revenue"
+      },
+      {
+        "heading": "클라이언트 분석",
+        "body": "애널리틱스 페이지 하단의 클라이언트 분석 테이블에는 모든 클라이언트의 주요 지표가 나열됩니다: 릴리스 수, 총 수익, 결제 완료 금액, 평균 처리 시간. 이를 통해 가장 많은 작업과 수익을 가져오는 클라이언트, 제때 결제하는 클라이언트, 시간이 어디에 소요되는지 파악할 수 있습니다. 클라이언트 행을 클릭하면 해당 클라이언트의 릴리스를 확인할 수 있습니다. 테이블은 기본적으로 수익순으로 정렬됩니다.",
+        "mockup": "analytics-clients"
+      },
+      {
+        "heading": "기간 선택기",
+        "body": "오른쪽 상단의 기간 선택기를 사용하여 애널리틱스의 대상 기간을 제어합니다. 프리셋 범위에는 최근 7일, 최근 30일, 최근 90일, 최근 365일이 있습니다. 특정 시작일과 종료일을 선택하여 사용자 지정 기간을 설정할 수도 있습니다. 네 가지 요약 카드와 세 가지 차트 모두가 선택한 기간을 반영하여 업데이트됩니다. 기간 선택기는 애널리틱스 대시보드 전체에서 동일하게 작동합니다.",
+        "tip": "연간 검토 및 세금 준비에는 365일 범위를 사용하세요. 30일 범위는 매월 비즈니스 건전성을 점검하는 데 유용합니다.",
+        "mockup": "analytics-date-range"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "오디오 업로드 및 관리",
     "category": "audio",

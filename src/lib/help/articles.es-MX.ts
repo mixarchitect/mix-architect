@@ -258,6 +258,101 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "distribution-tracker",
+    "title": "Rastreador de Distribución",
+    "category": "releases",
+    "summary": "Rastrea dónde se ha enviado tu lanzamiento, monitorea el estado en todas las plataformas y recibe notificaciones cuando esté disponible en Spotify.",
+    "tags": [
+      "distribution",
+      "tracker",
+      "spotify",
+      "apple music",
+      "platform",
+      "status",
+      "live",
+      "submitted"
+    ],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Agregar Plataformas a un Lanzamiento",
+        "body": "Abre cualquier lanzamiento y desplázate hacia abajo hasta el panel Rastreador de Distribución debajo de la lista de pistas. Haz clic en \"+ Agregar Plataforma\" para añadir una plataforma de streaming. Elige entre Spotify, Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud o Bandcamp. Cada plataforma aparece como una fila con su logotipo oficial, un indicador de estado y una etiqueta de distribuidor. También puedes usar \"Marcar como Enviado\" para agregar múltiples plataformas a la vez: selecciona un distribuidor (DistroKid, TuneCore, CD Baby, LANDR, Ditto, AWAL, UnitedMasters, Amuse, RouteNote o Auto-lanzamiento), marca las plataformas a las que enviaste y haz clic en Enviar.",
+        "mockup": "distribution-add-platform"
+      },
+      {
+        "heading": "Estados de Estado",
+        "body": "Cada entrada de plataforma tiene un estado que rastrea en qué punto del proceso de lanzamiento se encuentra. Los seis estados son: No Enviado (gris, predeterminado para plataformas recién agregadas), Enviado (azul, has enviado el lanzamiento a tu distribuidor), Procesando (naranja, el distribuidor está revisando o procesando), En Vivo (verde, el lanzamiento está disponible en la plataforma), Rechazado (rojo, la plataforma o el distribuidor rechazó el lanzamiento) y Retirado (rojo, el lanzamiento estuvo disponible previamente pero fue eliminado). Haz clic en el indicador de estado en cualquier fila de plataforma para cambiarlo. Los cambios de estado se registran en el historial de la plataforma para que puedas ver cuándo ocurrió cada transición.",
+        "mockup": "distribution-status"
+      },
+      {
+        "heading": "Detección Automática de Spotify",
+        "body": "Spotify aparece en la parte superior del Rastreador de Distribución con una etiqueta \"Se actualiza automáticamente\". Una vez que marques Spotify como Enviado, Mix Architect verifica periódicamente el catálogo de Spotify buscando tu lanzamiento usando el código ISRC (de la pestaña Distribución de la pista) o el título del lanzamiento y nombre del artista. Cuando tu lanzamiento se encuentra en Spotify, el estado cambia automáticamente a En Vivo, la URL de Spotify se guarda y recibes una notificación. También puedes hacer clic en \"Verificar Ahora\" para activar una verificación inmediata. La detección automática se ejecuta diariamente para todas las entradas de Spotify enviadas.",
+        "tip": "Completa el código ISRC en la pestaña Distribución de tu pista antes de enviar. La detección basada en ISRC es más confiable que la coincidencia por título/artista, especialmente para nombres comunes.",
+        "mockup": "distribution-spotify"
+      },
+      {
+        "heading": "Actualizar Estado y Agregar Enlaces",
+        "body": "Para cambiar el estado de una plataforma, haz clic en el indicador de estado en la fila de la plataforma. Aparece una fila de píldoras de estado donde puedes seleccionar el nuevo estado. Para agregar un enlace al lanzamiento en esa plataforma, haz clic en \"Agregar enlace\" junto al nombre de la plataforma. Ingresa la URL (por ejemplo, el enlace del álbum en Spotify o la página de Apple Music) y haz clic en Guardar. El ícono de enlace se convierte en un enlace externo clicable que abre la página del lanzamiento en esa plataforma. Usa el menú de tres puntos en cualquier fila de plataforma para opciones adicionales: editar detalles, eliminar la plataforma o ver el historial de cambios de estado.",
+        "mockup": "distribution-edit"
+      },
+      {
+        "heading": "Envío Masivo y Actualización",
+        "body": "\"Marcar como Enviado\" te permite registrar un envío por lotes a tu distribuidor. Selecciona el distribuidor del menú desplegable, marca las plataformas a las que enviaste y haz clic en Enviar. Todas las plataformas seleccionadas se agregan con estado Enviado y la etiqueta del distribuidor. \"Verificar Ahora\" aparece en las entradas de Spotify que han sido enviadas. Al hacer clic se activa una búsqueda inmediata en el catálogo de Spotify. Si se encuentra, el estado se actualiza a En Vivo y la URL se guarda automáticamente. Para todas las demás plataformas (Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud, Bandcamp), actualiza el estado manualmente cuando confirmes que el lanzamiento está disponible.",
+        "mockup": "distribution-bulk"
+      },
+      {
+        "heading": "Etiquetas de Distribuidor",
+        "body": "Cada entrada de plataforma puede tener una etiqueta de distribuidor que muestra qué servicio usaste para enviar (DistroKid, TuneCore, CD Baby, etc.). Esto aparece como una pequeña píldora junto al indicador de estado. Las etiquetas de distribuidor se establecen automáticamente cuando usas \"Marcar como Enviado\", o puedes establecerlas individualmente al editar una entrada de plataforma. Esto te ayuda a rastrear qué distribuidor manejó cada plataforma, especialmente si usas diferentes distribuidores para diferentes territorios o plataformas.",
+        "warning": "Los análisis solo reflejan los datos que has rastreado en Mix Architect. Si envías a través del panel de tu distribuidor, recuerda actualizar el estado aquí para que tu rastreador se mantenga preciso.",
+        "mockup": "distribution-distributor"
+      }
+    ]
+  },
+  {
+    "id": "user-analytics",
+    "title": "Análisis de Usuario",
+    "category": "releases",
+    "summary": "Consulta tus lanzamientos completados, tiempo promedio de entrega, ingresos totales y desglose por cliente en el tablero de Análisis.",
+    "tags": [
+      "analytics",
+      "dashboard",
+      "revenue",
+      "turnaround",
+      "velocity",
+      "clients",
+      "charts"
+    ],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Qué Muestra la Página de Análisis",
+        "body": "Accede a la página de [Análisis](/app/analytics) desde la barra lateral. El tablero muestra cuatro tarjetas de resumen en la parte superior: Lanzamientos Completados (total de proyectos terminados con promedio mensual), Tiempo Promedio de Entrega (días desde la creación hasta la finalización, con desglose del más rápido y más lento), Ingresos Totales (suma de todas las tarifas rastreadas con saldo pendiente) y Clientes (conteo de clientes únicos con total de lanzamientos). Debajo de las tarjetas de resumen, tres gráficas visualizan tus datos a lo largo del tiempo, y una tabla de desglose por cliente muestra estadísticas por cada cliente.",
+        "mockup": "analytics-overview"
+      },
+      {
+        "heading": "Velocidad de Lanzamiento y Tiempo de Entrega",
+        "body": "La gráfica de Velocidad de Lanzamiento es una gráfica de barras que muestra cuántos lanzamientos completaste cada mes dentro del rango de fechas seleccionado. Barras más altas significan meses más productivos. Usa esto para detectar tendencias en tu producción e identificar períodos ocupados o lentos. La gráfica de Tiempo de Entrega muestra el promedio de días desde la creación del lanzamiento hasta su finalización por mes. Barras más bajas significan entregas más rápidas. Juntas, estas gráficas te ayudan a entender tu capacidad y si tu flujo de trabajo se está volviendo más rápido o más lento con el tiempo.",
+        "mockup": "analytics-velocity"
+      },
+      {
+        "heading": "Gráfica de Ingresos",
+        "body": "La gráfica de Ingresos es una gráfica de área que muestra las tarifas totales ganadas por mes. Rastrea los montos de pago registrados en tus lanzamientos, así que refleja lo que los clientes realmente han pagado. Usa esto para ver tendencias de ingresos, identificar tus meses de mayores ganancias y planificar para períodos más tranquilos. Los datos de ingresos provienen de la función de seguimiento de pagos en cada lanzamiento, así que asegúrate de que las tarifas y los estados de pago estén actualizados para obtener reportes precisos.",
+        "mockup": "analytics-revenue"
+      },
+      {
+        "heading": "Desglose por Cliente",
+        "body": "La tabla de Desglose por Cliente en la parte inferior de la página de Análisis lista a cada cliente con sus métricas clave: número de lanzamientos, ingresos totales, monto pagado y tiempo promedio de entrega. Esto te ayuda a identificar qué clientes generan más trabajo e ingresos, quién paga a tiempo y dónde se invierte tu tiempo. Haz clic en cualquier fila de cliente para ver sus lanzamientos. La tabla se ordena por ingresos de forma predeterminada.",
+        "mockup": "analytics-clients"
+      },
+      {
+        "heading": "Selector de Rango de Fechas",
+        "body": "Usa el selector de rango de fechas en la esquina superior derecha para controlar qué período cubren los análisis. Los rangos predefinidos incluyen Últimos 7 Días, Últimos 30 Días, Últimos 90 Días y Últimos 365 Días. También puedes establecer un rango de fechas personalizado seleccionando fechas de inicio y fin específicas. Las cuatro tarjetas de resumen y las tres gráficas se actualizan para reflejar el período seleccionado. El selector de rango de fechas funciona de la misma manera en todo el tablero de análisis.",
+        "tip": "Usa el rango de 365 días para revisiones anuales y preparación de impuestos. El rango de 30 días es útil para revisiones mensuales de la salud de tu negocio.",
+        "mockup": "analytics-date-range"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Subir y Gestionar Audio",
     "category": "audio",

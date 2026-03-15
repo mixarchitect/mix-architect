@@ -68,7 +68,7 @@ export function PersonaSplit() {
             features={[
               "Release timeline management",
               "Mix brief builder with intent & references",
-              "Distributor task checklist",
+              "Distribution tracker across all platforms",
               "Audio review with waveform & comments",
               "Technical specs (LUFS targets, format, sample rate)",
               "Audio format conversion",
@@ -81,11 +81,11 @@ export function PersonaSplit() {
             subtitle="You're running a business and need to manage client projects professionally."
             features={[
               "Everything artists get, plus:",
+              "Analytics dashboard (velocity, revenue, clients)",
               "Payment tracking with export",
               "Web portal for client delivery",
               "Download gating until payment confirmed",
               "Multi-project dashboard with outstanding balances",
-              "Audio format conversion (WAV, AIFF, FLAC, MP3)",
             ]}
           />
         </div>

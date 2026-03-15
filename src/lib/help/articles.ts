@@ -230,6 +230,87 @@ export const articles: HelpArticle[] = [
     ],
   },
 
+  {
+    id: "distribution-tracker",
+    title: "Distribution Tracker",
+    category: "releases",
+    summary:
+      "Track where your release has been submitted, monitor status across platforms, and get notified when it goes live on Spotify.",
+    tags: ["distribution", "tracker", "spotify", "apple music", "platform", "status", "live", "submitted"],
+    updatedAt: "2026-03-14",
+    content: [
+      {
+        heading: "Adding Platforms to a Release",
+        body: "Open any release and scroll down to the Distribution Tracker panel below the track list. Click \"+ Add Platform\" to add a streaming platform. Choose from Spotify, Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud, or Bandcamp. Each platform appears as a row with its official logo, a status indicator, and a distributor tag. You can also use \"Mark as Submitted\" to add multiple platforms at once: select a distributor (DistroKid, TuneCore, CD Baby, LANDR, Ditto, AWAL, UnitedMasters, Amuse, RouteNote, or Self-released), check which platforms you submitted to, and click Submit.",
+        mockup: "distribution-add-platform",
+      },
+      {
+        heading: "Status States",
+        body: "Each platform entry has a status that tracks where it is in the release pipeline. The six states are: Not Submitted (gray, default for newly added platforms), Submitted (blue, you have sent the release to your distributor), Processing (orange, the distributor is reviewing or processing), Live (green, the release is available on the platform), Rejected (red, the platform or distributor rejected the release), and Taken Down (red, the release was previously live but has been removed). Click the status indicator on any platform row to change it. Status changes are logged in the platform history so you can see when each transition happened.",
+        mockup: "distribution-status",
+      },
+      {
+        heading: "Spotify Auto-Detection",
+        body: "Spotify is listed at the top of the Distribution Tracker with an \"Updates automatically\" label. Once you mark Spotify as Submitted, Mix Architect periodically checks the Spotify catalog for your release using the ISRC code (from the track Distribution tab) or the release title and artist name. When your release is found on Spotify, the status automatically changes to Live, the Spotify URL is saved, and you receive a notification. You can also click \"Check Now\" to trigger an immediate check. Auto-detection runs daily for all submitted Spotify entries.",
+        tip: "Fill in the ISRC code on your track's Distribution tab before submitting. ISRC-based detection is more reliable than title/artist matching, especially for common names.",
+        mockup: "distribution-spotify",
+      },
+      {
+        heading: "Updating Status and Adding Links",
+        body: "To change a platform's status, click the status indicator on the platform row. A row of status pills appears where you can select the new state. To add a link to the release on that platform, click \"Add link\" next to the platform name. Enter the URL (for example, the Spotify album link or Apple Music page) and click Save. The link icon turns into a clickable external link that opens the release page on that platform. Use the three-dot menu on any platform row for additional options: edit details, remove the platform, or view the status change history.",
+        mockup: "distribution-edit",
+      },
+      {
+        heading: "Bulk Submit and Refresh",
+        body: "\"Mark as Submitted\" lets you record a batch submission to your distributor. Select the distributor from the dropdown, check the platforms you submitted to, and click Submit. All selected platforms are added with Submitted status and the distributor tag. \"Check Now\" appears on Spotify entries that have been submitted. Clicking it triggers an immediate Spotify catalog search. If found, the status updates to Live and the URL is saved automatically. For all other platforms (Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud, Bandcamp), update the status manually when you confirm the release is live.",
+        mockup: "distribution-bulk",
+      },
+      {
+        heading: "Distributor Tags",
+        body: "Each platform entry can have a distributor tag showing which service you used to submit (DistroKid, TuneCore, CD Baby, etc.). This appears as a small pill next to the status indicator. Distributor tags are set automatically when you use \"Mark as Submitted\", or you can set them individually when editing a platform entry. This helps you track which distributor handled which platform, especially if you use different distributors for different territories or platforms.",
+        warning: "Analytics only reflect data you have tracked in Mix Architect. If you submit through a distributor's own dashboard, remember to update the status here so your tracker stays accurate.",
+        mockup: "distribution-distributor",
+      },
+    ],
+  },
+  {
+    id: "user-analytics",
+    title: "User Analytics",
+    category: "releases",
+    summary:
+      "View your completed releases, average turnaround time, total revenue, and per-client breakdown in the Analytics dashboard.",
+    tags: ["analytics", "dashboard", "revenue", "turnaround", "velocity", "clients", "charts"],
+    updatedAt: "2026-03-14",
+    content: [
+      {
+        heading: "What the Analytics Page Shows",
+        body: "Access the [Analytics](/app/analytics) page from the sidebar. The dashboard displays four summary cards at the top: Completed Releases (total finished projects with monthly average), Average Turnaround Time (days from creation to completion, with fastest and slowest breakdown), Total Revenue (sum of all tracked fees with outstanding balance), and Clients (unique client count with total releases). Below the summary cards, three charts visualize your data over time, and a client breakdown table shows per-client statistics.",
+        mockup: "analytics-overview",
+      },
+      {
+        heading: "Release Velocity and Turnaround Time",
+        body: "The Release Velocity chart is a bar chart showing how many releases you completed each month within the selected date range. Taller bars mean more productive months. Use this to spot trends in your output and identify busy or slow periods. The Turnaround Time chart shows the average number of days from release creation to completion per month. Lower bars mean faster delivery. Together, these charts help you understand your capacity and whether your workflow is getting faster or slower over time.",
+        mockup: "analytics-velocity",
+      },
+      {
+        heading: "Revenue Chart",
+        body: "The Revenue chart is an area chart showing total fees earned per month. It tracks the payment amounts recorded on your releases, so it reflects what clients have actually paid. Use this to see income trends, identify your highest-earning months, and plan for quieter periods. Revenue data comes from the payment tracking feature on each release, so make sure fees and payment statuses are up to date for accurate reporting.",
+        mockup: "analytics-revenue",
+      },
+      {
+        heading: "Client Breakdown",
+        body: "The Client Breakdown table at the bottom of the Analytics page lists every client with their key metrics: number of releases, total revenue, amount paid, and average turnaround time. This helps you identify which clients drive the most work and revenue, who pays on time, and where your time is spent. Click any client row to see their releases. The table sorts by revenue by default.",
+        mockup: "analytics-clients",
+      },
+      {
+        heading: "Date Range Picker",
+        body: "Use the date range picker in the top right corner to control which period the analytics cover. Preset ranges include Last 7 Days, Last 30 Days, Last 90 Days, and Last 365 Days. You can also set a custom date range by selecting specific start and end dates. All four summary cards and all three charts update to reflect the selected period. The date range picker works the same way across the analytics dashboard.",
+        tip: "Use the 365-day range for annual reviews and tax preparation. The 30-day range is useful for monthly check-ins on your business health.",
+        mockup: "analytics-date-range",
+      },
+    ],
+  },
+
   /* ──────────────────────────────────────────────────────
      AUDIO
      ────────────────────────────────────────────────────── */

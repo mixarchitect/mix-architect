@@ -258,6 +258,101 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "distribution-tracker",
+    "title": "Suivi de distribution",
+    "category": "releases",
+    "summary": "Suivez les plateformes sur lesquelles votre sortie a été soumise, surveillez le statut et recevez une notification lorsqu'elle est disponible sur Spotify.",
+    "tags": [
+      "distribution",
+      "tracker",
+      "spotify",
+      "apple music",
+      "platform",
+      "status",
+      "live",
+      "submitted"
+    ],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Ajouter des plateformes à une sortie",
+        "body": "Ouvrez n'importe quelle sortie et faites défiler vers le bas jusqu'au panneau Suivi de distribution sous la liste des morceaux. Cliquez sur « + Ajouter une plateforme » pour ajouter une plateforme de streaming. Choisissez parmi Spotify, Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud ou Bandcamp. Chaque plateforme apparaît sous forme de ligne avec son logo officiel, un indicateur de statut et une étiquette de distributeur. Vous pouvez également utiliser « Marquer comme soumis » pour ajouter plusieurs plateformes en une fois : sélectionnez un distributeur (DistroKid, TuneCore, CD Baby, LANDR, Ditto, AWAL, UnitedMasters, Amuse, RouteNote ou Auto-distribué), cochez les plateformes auxquelles vous avez soumis, puis cliquez sur Soumettre.",
+        "mockup": "distribution-add-platform"
+      },
+      {
+        "heading": "États de statut",
+        "body": "Chaque entrée de plateforme possède un statut qui indique où elle se trouve dans le processus de sortie. Les six états sont : Non soumis (gris, par défaut pour les plateformes nouvellement ajoutées), Soumis (bleu, vous avez envoyé la sortie à votre distributeur), En traitement (orange, le distributeur examine ou traite la sortie), En ligne (vert, la sortie est disponible sur la plateforme), Rejeté (rouge, la plateforme ou le distributeur a rejeté la sortie) et Retiré (rouge, la sortie était précédemment en ligne mais a été supprimée). Cliquez sur l'indicateur de statut de n'importe quelle ligne de plateforme pour le modifier. Les changements de statut sont enregistrés dans l'historique de la plateforme afin que vous puissiez voir quand chaque transition a eu lieu.",
+        "mockup": "distribution-status"
+      },
+      {
+        "heading": "Détection automatique Spotify",
+        "body": "Spotify est affiché en haut du Suivi de distribution avec un libellé « Mise à jour automatique ». Une fois que vous marquez Spotify comme Soumis, Mix Architect vérifie périodiquement le catalogue Spotify pour votre sortie en utilisant le code ISRC (depuis l'onglet Distribution du morceau) ou le titre de la sortie et le nom de l'artiste. Lorsque votre sortie est trouvée sur Spotify, le statut passe automatiquement à En ligne, l'URL Spotify est enregistrée et vous recevez une notification. Vous pouvez également cliquer sur « Vérifier maintenant » pour déclencher une vérification immédiate. La détection automatique s'exécute quotidiennement pour toutes les entrées Spotify soumises.",
+        "tip": "Renseignez le code ISRC dans l'onglet Distribution de votre morceau avant de soumettre. La détection basée sur l'ISRC est plus fiable que la correspondance par titre/artiste, surtout pour les noms courants.",
+        "mockup": "distribution-spotify"
+      },
+      {
+        "heading": "Mettre à jour le statut et ajouter des liens",
+        "body": "Pour changer le statut d'une plateforme, cliquez sur l'indicateur de statut de la ligne de plateforme. Une rangée de pastilles de statut apparaît où vous pouvez sélectionner le nouvel état. Pour ajouter un lien vers la sortie sur cette plateforme, cliquez sur « Ajouter un lien » à côté du nom de la plateforme. Entrez l'URL (par exemple, le lien de l'album Spotify ou la page Apple Music) et cliquez sur Enregistrer. L'icône de lien se transforme en un lien externe cliquable qui ouvre la page de la sortie sur cette plateforme. Utilisez le menu trois points sur n'importe quelle ligne de plateforme pour des options supplémentaires : modifier les détails, supprimer la plateforme ou consulter l'historique des changements de statut.",
+        "mockup": "distribution-edit"
+      },
+      {
+        "heading": "Soumission groupée et actualisation",
+        "body": "« Marquer comme soumis » vous permet d'enregistrer une soumission groupée à votre distributeur. Sélectionnez le distributeur dans le menu déroulant, cochez les plateformes auxquelles vous avez soumis et cliquez sur Soumettre. Toutes les plateformes sélectionnées sont ajoutées avec le statut Soumis et l'étiquette du distributeur. « Vérifier maintenant » apparaît sur les entrées Spotify qui ont été soumises. Cliquer dessus déclenche une recherche immédiate dans le catalogue Spotify. Si la sortie est trouvée, le statut passe à En ligne et l'URL est enregistrée automatiquement. Pour toutes les autres plateformes (Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud, Bandcamp), mettez à jour le statut manuellement lorsque vous confirmez que la sortie est en ligne.",
+        "mockup": "distribution-bulk"
+      },
+      {
+        "heading": "Étiquettes de distributeur",
+        "body": "Chaque entrée de plateforme peut avoir une étiquette de distributeur indiquant quel service vous avez utilisé pour soumettre (DistroKid, TuneCore, CD Baby, etc.). Celle-ci apparaît sous forme de petite pastille à côté de l'indicateur de statut. Les étiquettes de distributeur sont définies automatiquement lorsque vous utilisez « Marquer comme soumis », ou vous pouvez les définir individuellement lors de la modification d'une entrée de plateforme. Cela vous aide à suivre quel distributeur a géré quelle plateforme, surtout si vous utilisez différents distributeurs pour différents territoires ou plateformes.",
+        "warning": "Les analyses ne reflètent que les données que vous avez suivies dans Mix Architect. Si vous soumettez via le tableau de bord de votre distributeur, pensez à mettre à jour le statut ici pour que votre suivi reste précis.",
+        "mockup": "distribution-distributor"
+      }
+    ]
+  },
+  {
+    "id": "user-analytics",
+    "title": "Analyses utilisateur",
+    "category": "releases",
+    "summary": "Consultez vos sorties terminées, le délai moyen de réalisation, le revenu total et la répartition par client dans le tableau de bord Analyses.",
+    "tags": [
+      "analytics",
+      "dashboard",
+      "revenue",
+      "turnaround",
+      "velocity",
+      "clients",
+      "charts"
+    ],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Ce que la page Analyses affiche",
+        "body": "Accédez à la page [Analyses](/app/analytics) depuis la barre latérale. Le tableau de bord affiche quatre cartes de résumé en haut : Sorties terminées (total des projets terminés avec la moyenne mensuelle), Délai moyen de réalisation (jours de la création à l'achèvement, avec le détail du plus rapide et du plus lent), Revenu total (somme de tous les honoraires suivis avec le solde impayé) et Clients (nombre de clients uniques avec le total des sorties). Sous les cartes de résumé, trois graphiques visualisent vos données dans le temps, et un tableau de répartition par client affiche les statistiques par client.",
+        "mockup": "analytics-overview"
+      },
+      {
+        "heading": "Cadence de sorties et délai de réalisation",
+        "body": "Le graphique Cadence de sorties est un diagramme en barres montrant combien de sorties vous avez terminées chaque mois dans la plage de dates sélectionnée. Des barres plus hautes signifient des mois plus productifs. Utilisez-le pour repérer les tendances de votre production et identifier les périodes chargées ou calmes. Le graphique Délai de réalisation montre le nombre moyen de jours entre la création et l'achèvement d'une sortie par mois. Des barres plus basses signifient une livraison plus rapide. Ensemble, ces graphiques vous aident à comprendre votre capacité et si votre flux de travail s'accélère ou ralentit au fil du temps.",
+        "mockup": "analytics-velocity"
+      },
+      {
+        "heading": "Graphique des revenus",
+        "body": "Le graphique des revenus est un graphique en aires montrant le total des honoraires perçus par mois. Il suit les montants de paiement enregistrés sur vos sorties et reflète donc ce que les clients ont effectivement payé. Utilisez-le pour voir les tendances de revenus, identifier vos mois les plus rentables et planifier les périodes plus calmes. Les données de revenus proviennent de la fonctionnalité de suivi des paiements sur chaque sortie. Assurez-vous que les honoraires et les statuts de paiement sont à jour pour un reporting précis.",
+        "mockup": "analytics-revenue"
+      },
+      {
+        "heading": "Répartition par client",
+        "body": "Le tableau Répartition par client en bas de la page Analyses liste chaque client avec ses métriques clés : nombre de sorties, revenu total, montant payé et délai moyen de réalisation. Cela vous aide à identifier quels clients génèrent le plus de travail et de revenus, qui paie à temps et où votre temps est consacré. Cliquez sur n'importe quelle ligne de client pour voir ses sorties. Le tableau est trié par revenu par défaut.",
+        "mockup": "analytics-clients"
+      },
+      {
+        "heading": "Sélecteur de plage de dates",
+        "body": "Utilisez le sélecteur de plage de dates en haut à droite pour contrôler la période couverte par les analyses. Les plages prédéfinies incluent les 7 derniers jours, les 30 derniers jours, les 90 derniers jours et les 365 derniers jours. Vous pouvez également définir une plage de dates personnalisée en sélectionnant des dates de début et de fin spécifiques. Les quatre cartes de résumé et les trois graphiques se mettent à jour pour refléter la période sélectionnée. Le sélecteur de plage de dates fonctionne de la même manière dans tout le tableau de bord d'analyses.",
+        "tip": "Utilisez la plage de 365 jours pour les bilans annuels et la préparation fiscale. La plage de 30 jours est utile pour les points mensuels sur la santé de votre activité.",
+        "mockup": "analytics-date-range"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Télécharger et gérer l'audio",
     "category": "audio",

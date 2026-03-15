@@ -258,6 +258,84 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "distribution-tracker",
+    "title": "Distribution Tracker",
+    "category": "releases",
+    "summary": "ट्रैक करें कि आपकी रिलीज़ कहाँ submit की गई है, विभिन्न platforms पर status मॉनिटर करें, और Spotify पर live होने पर notification पाएँ।",
+    "tags": ["distribution", "tracker", "spotify", "apple music", "platform", "status", "live", "submitted"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "रिलीज़ में Platforms जोड़ना",
+        "body": "कोई भी रिलीज़ खोलें और track list के नीचे Distribution Tracker पैनल तक स्क्रॉल करें। Streaming platform जोड़ने के लिए \"+ Add Platform\" पर क्लिक करें। Spotify, Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud या Bandcamp में से चुनें। प्रत्येक platform एक row के रूप में अपने official logo, status indicator और distributor tag के साथ दिखता है। आप \"Mark as Submitted\" का उपयोग करके एक साथ कई platforms भी जोड़ सकते हैं: एक distributor चुनें (DistroKid, TuneCore, CD Baby, LANDR, Ditto, AWAL, UnitedMasters, Amuse, RouteNote या Self-released), जिन platforms पर submit किया उन्हें check करें, और Submit पर क्लिक करें।",
+        "mockup": "distribution-add-platform"
+      },
+      {
+        "heading": "Status States",
+        "body": "प्रत्येक platform entry का एक status होता है जो ट्रैक करता है कि वह release pipeline में कहाँ है। छह states हैं: Not Submitted (gray, नए जोड़े गए platforms के लिए default), Submitted (नीला, आपने रिलीज़ अपने distributor को भेज दी है), Processing (नारंगी, distributor review या processing कर रहा है), Live (हरा, रिलीज़ platform पर उपलब्ध है), Rejected (लाल, platform या distributor ने रिलीज़ को reject कर दिया), और Taken Down (लाल, रिलीज़ पहले live थी लेकिन हटा दी गई है)। इसे बदलने के लिए किसी भी platform row पर status indicator पर क्लिक करें। Status changes platform history में log होते हैं ताकि आप देख सकें कि हर transition कब हुआ।",
+        "mockup": "distribution-status"
+      },
+      {
+        "heading": "Spotify Auto-Detection",
+        "body": "Spotify, Distribution Tracker में सबसे ऊपर \"Updates automatically\" label के साथ listed है। एक बार जब आप Spotify को Submitted के रूप में mark करते हैं, Mix Architect समय-समय पर ISRC code (track के Distribution tab से) या release title और artist name का उपयोग करके Spotify catalog में आपकी रिलीज़ की जाँच करता है। जब आपकी रिलीज़ Spotify पर मिलती है, तो status स्वचालित रूप से Live में बदल जाता है, Spotify URL सहेजा जाता है, और आपको notification मिलता है। तुरंत जाँच शुरू करने के लिए आप \"Check Now\" पर भी क्लिक कर सकते हैं। Auto-detection सभी submitted Spotify entries के लिए प्रतिदिन चलता है।",
+        "tip": "Submit करने से पहले अपने track के Distribution tab पर ISRC code भरें। ISRC-आधारित detection, title/artist matching से अधिक विश्वसनीय है, विशेषकर सामान्य नामों के लिए।",
+        "mockup": "distribution-spotify"
+      },
+      {
+        "heading": "Status अपडेट करना और Links जोड़ना",
+        "body": "किसी platform का status बदलने के लिए, platform row पर status indicator पर क्लिक करें। Status pills की एक row दिखती है जहाँ आप नया state चुन सकते हैं। उस platform पर रिलीज़ का link जोड़ने के लिए, platform name के बगल में \"Add link\" पर क्लिक करें। URL दर्ज करें (उदाहरण के लिए, Spotify album link या Apple Music page) और Save पर क्लिक करें। Link icon एक clickable external link में बदल जाता है जो उस platform पर release page खोलता है। अतिरिक्त विकल्पों के लिए किसी भी platform row पर three-dot menu का उपयोग करें: details संपादित करें, platform हटाएँ, या status change history देखें।",
+        "mockup": "distribution-edit"
+      },
+      {
+        "heading": "Bulk Submit और Refresh",
+        "body": "\"Mark as Submitted\" आपको अपने distributor को batch submission record करने देता है। Dropdown से distributor चुनें, जिन platforms पर submit किया उन्हें check करें, और Submit पर क्लिक करें। सभी चुने हुए platforms Submitted status और distributor tag के साथ जोड़ दिए जाते हैं। \"Check Now\" उन Spotify entries पर दिखता है जो submit की गई हैं। इस पर क्लिक करने से तुरंत Spotify catalog search शुरू होती है। अगर मिल जाती है, तो status Live में अपडेट हो जाता है और URL स्वचालित रूप से सहेजा जाता है। अन्य सभी platforms (Apple Music, Tidal, Amazon Music, YouTube Music, Deezer, SoundCloud, Bandcamp) के लिए, जब आप confirm करें कि रिलीज़ live है तो status manually अपडेट करें।",
+        "mockup": "distribution-bulk"
+      },
+      {
+        "heading": "Distributor Tags",
+        "body": "प्रत्येक platform entry में एक distributor tag हो सकता है जो दिखाता है कि आपने submit करने के लिए कौन सी service उपयोग की (DistroKid, TuneCore, CD Baby आदि)। यह status indicator के बगल में एक छोटे pill के रूप में दिखता है। Distributor tags स्वचालित रूप से set होते हैं जब आप \"Mark as Submitted\" उपयोग करते हैं, या आप platform entry संपादित करते समय उन्हें individually set कर सकते हैं। यह आपको ट्रैक करने में मदद करता है कि किस distributor ने कौन सा platform handle किया, विशेषकर अगर आप विभिन्न territories या platforms के लिए अलग-अलग distributors उपयोग करते हैं।",
+        "warning": "Analytics केवल वही data दर्शाता है जो आपने Mix Architect में ट्रैक किया है। अगर आप distributor के अपने dashboard के माध्यम से submit करते हैं, तो यहाँ status अपडेट करना न भूलें ताकि आपका tracker सटीक रहे।",
+        "mockup": "distribution-distributor"
+      }
+    ]
+  },
+  {
+    "id": "user-analytics",
+    "title": "User Analytics",
+    "category": "releases",
+    "summary": "Analytics dashboard में अपनी पूर्ण रिलीज़, औसत turnaround time, कुल revenue और per-client breakdown देखें।",
+    "tags": ["analytics", "dashboard", "revenue", "turnaround", "velocity", "clients", "charts"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "Analytics पेज क्या दिखाता है",
+        "body": "साइडबार से [Analytics](/app/analytics) पेज पर जाएँ। Dashboard शीर्ष पर चार summary cards दिखाता है: Completed Releases (कुल पूर्ण projects, monthly average के साथ), Average Turnaround Time (creation से completion तक के दिन, fastest और slowest breakdown के साथ), Total Revenue (सभी tracked fees का योग, outstanding balance के साथ), और Clients (unique client count, कुल releases के साथ)। Summary cards के नीचे, तीन charts आपके data को समय के साथ visualize करते हैं, और एक client breakdown table per-client statistics दिखाती है।",
+        "mockup": "analytics-overview"
+      },
+      {
+        "heading": "Release Velocity और Turnaround Time",
+        "body": "Release Velocity chart एक bar chart है जो दिखाता है कि चुनी गई date range में आपने प्रत्येक महीने कितनी releases पूरी कीं। ऊँचे bars का मतलब अधिक productive महीने। इसका उपयोग अपनी output में trends पहचानने और busy या slow periods identify करने के लिए करें। Turnaround Time chart प्रति माह release creation से completion तक के औसत दिनों की संख्या दिखाता है। कम bars का मतलब तेज़ delivery। साथ मिलकर, ये charts आपको अपनी capacity समझने और यह जानने में मदद करते हैं कि आपका workflow समय के साथ तेज़ हो रहा है या धीमा।",
+        "mockup": "analytics-velocity"
+      },
+      {
+        "heading": "Revenue Chart",
+        "body": "Revenue chart एक area chart है जो प्रति माह कुल earned fees दिखाता है। यह आपकी releases पर recorded payment amounts को track करता है, इसलिए यह दर्शाता है कि clients ने वास्तव में क्या भुगतान किया है। Income trends देखने, अपने highest-earning months identify करने और शांत periods के लिए plan करने के लिए इसका उपयोग करें। Revenue data प्रत्येक release की payment tracking feature से आता है, इसलिए सटीक reporting के लिए सुनिश्चित करें कि fees और payment statuses अपडेट हैं।",
+        "mockup": "analytics-revenue"
+      },
+      {
+        "heading": "Client Breakdown",
+        "body": "Analytics पेज के नीचे Client Breakdown table हर client को उनके key metrics के साथ सूचीबद्ध करती है: releases की संख्या, कुल revenue, भुगतान की गई राशि, और औसत turnaround time। यह आपको पहचानने में मदद करता है कि कौन से clients सबसे अधिक काम और revenue generate करते हैं, कौन समय पर भुगतान करता है, और आपका समय कहाँ खर्च होता है। उनकी releases देखने के लिए किसी भी client row पर क्लिक करें। Table डिफ़ॉल्ट रूप से revenue के अनुसार sort होती है।",
+        "mockup": "analytics-clients"
+      },
+      {
+        "heading": "Date Range Picker",
+        "body": "Analytics किस अवधि को cover करे, यह नियंत्रित करने के लिए ऊपरी दाएँ कोने में date range picker का उपयोग करें। Preset ranges में Last 7 Days, Last 30 Days, Last 90 Days और Last 365 Days शामिल हैं। आप specific start और end dates चुनकर custom date range भी set कर सकते हैं। सभी चार summary cards और तीनों charts चुनी गई अवधि को reflect करने के लिए अपडेट होते हैं। Date range picker पूरे analytics dashboard में समान तरीके से काम करता है।",
+        "tip": "वार्षिक समीक्षा और tax तैयारी के लिए 365-day range का उपयोग करें। अपने business की monthly स्थिति जाँचने के लिए 30-day range उपयोगी है।",
+        "mockup": "analytics-date-range"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "Audio अपलोड और प्रबंधन",
     "category": "audio",

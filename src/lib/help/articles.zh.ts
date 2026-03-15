@@ -258,6 +258,84 @@ export const articles: HelpArticle[] = [
     ]
   },
   {
+    "id": "distribution-tracker",
+    "title": "发行跟踪器",
+    "category": "releases",
+    "summary": "跟踪您的发行提交到了哪些平台，监控各平台的状态，并在 Spotify 上线时收到通知。",
+    "tags": ["distribution", "tracker", "spotify", "apple music", "platform", "status", "live", "submitted"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "为发行添加平台",
+        "body": "打开任意发行，向下滚动到曲目列表下方的 Distribution Tracker 面板。点击\"+ Add Platform\"添加流媒体平台。可从 Spotify、Apple Music、Tidal、Amazon Music、YouTube Music、Deezer、SoundCloud 或 Bandcamp 中选择。每个平台以一行显示，包含官方 Logo、状态指示器和分发商标签。您也可以使用\"Mark as Submitted\"一次添加多个平台：选择分发商（DistroKid、TuneCore、CD Baby、LANDR、Ditto、AWAL、UnitedMasters、Amuse、RouteNote 或 Self-released），勾选您提交的平台，然后点击 Submit。",
+        "mockup": "distribution-add-platform"
+      },
+      {
+        "heading": "状态类型",
+        "body": "每个平台条目都有一个状态，用于跟踪发行在流程中的当前位置。六种状态分别是：Not Submitted（灰色，新添加平台的默认状态）、Submitted（蓝色，您已将发行发送给分发商）、Processing（橙色，分发商正在审核或处理中）、Live（绿色，发行已在该平台上线）、Rejected（红色，平台或分发商拒绝了该发行）和 Taken Down（红色，发行之前已上线但已被移除）。点击任意平台行的状态指示器即可更改状态。状态变更会记录在平台历史中，方便您查看每次转换发生的时间。",
+        "mockup": "distribution-status"
+      },
+      {
+        "heading": "Spotify 自动检测",
+        "body": "Spotify 显示在 Distribution Tracker 的最顶部，带有\"自动更新\"标签。当您将 Spotify 标记为 Submitted 后，Mix Architect 会使用 ISRC 代码（来自曲目的 Distribution 选项卡）或发行标题和艺人名称定期检查 Spotify 目录。当在 Spotify 上找到您的发行时，状态会自动变为 Live，Spotify URL 会被保存，您会收到通知。您也可以点击\"Check Now\"触发即时检查。自动检测每天对所有已提交的 Spotify 条目运行一次。",
+        "tip": "提交前请在曲目的 Distribution 选项卡中填写 ISRC 代码。基于 ISRC 的检测比标题/艺人匹配更可靠，尤其是对于常见名称。",
+        "mockup": "distribution-spotify"
+      },
+      {
+        "heading": "更新状态和添加链接",
+        "body": "要更改平台的状态，请点击平台行上的状态指示器。会出现一行状态药丸供您选择新状态。要添加该平台上发行的链接，请点击平台名称旁的\"Add link\"。输入 URL（例如 Spotify 专辑链接或 Apple Music 页面），然后点击保存。链接图标会变为可点击的外部链接，可打开该平台上的发行页面。使用任意平台行的三点菜单可进行更多操作：编辑详情、移除平台或查看状态变更历史。",
+        "mockup": "distribution-edit"
+      },
+      {
+        "heading": "批量提交和刷新",
+        "body": "\"Mark as Submitted\"可让您记录向分发商的批量提交。从下拉菜单中选择分发商，勾选您提交的平台，然后点击 Submit。所有选定的平台会以 Submitted 状态和分发商标签添加。\"Check Now\"会显示在已提交的 Spotify 条目上。点击后会触发 Spotify 目录即时搜索。如果找到，状态会更新为 Live，URL 会自动保存。对于所有其他平台（Apple Music、Tidal、Amazon Music、YouTube Music、Deezer、SoundCloud、Bandcamp），请在确认发行已上线后手动更新状态。",
+        "mockup": "distribution-bulk"
+      },
+      {
+        "heading": "分发商标签",
+        "body": "每个平台条目可以附带一个分发商标签，显示您使用了哪个服务提交（DistroKid、TuneCore、CD Baby 等）。标签以小药丸形式显示在状态指示器旁边。使用\"Mark as Submitted\"时会自动设置分发商标签，您也可以在编辑平台条目时单独设置。这有助于跟踪哪个分发商负责了哪个平台，尤其是当您为不同地区或平台使用不同分发商时。",
+        "warning": "分析数据仅反映您在 Mix Architect 中跟踪的数据。如果您通过分发商的仪表盘直接提交，请记得在此处更新状态，以保持跟踪器的准确性。",
+        "mockup": "distribution-distributor"
+      }
+    ]
+  },
+  {
+    "id": "user-analytics",
+    "title": "用户分析",
+    "category": "releases",
+    "summary": "在分析仪表盘中查看已完成的发行数量、平均交付时间、总收入和按客户的明细。",
+    "tags": ["analytics", "dashboard", "revenue", "turnaround", "velocity", "clients", "charts"],
+    "updatedAt": "2026-03-14",
+    "content": [
+      {
+        "heading": "分析页面概览",
+        "body": "从侧边栏访问[分析](/app/analytics)页面。仪表盘顶部显示四张汇总卡片：已完成发行（已完成项目总数及月均值）、平均交付时间（从创建到完成的天数，含最快和最慢的详细分析）、总收入（所有跟踪费用的总和及未付余额）和客户（唯一客户数及总发行数）。汇总卡片下方有三个图表，以时间维度可视化您的数据，还有一个客户明细表显示按客户的统计数据。",
+        "mockup": "analytics-overview"
+      },
+      {
+        "heading": "发行速度与交付时间",
+        "body": "发行速度图表是一个柱状图，显示在选定日期范围内每月完成的发行数量。柱子越高表示该月产出越多。使用它来发现产出趋势，识别繁忙或空闲时期。交付时间图表显示每月从发行创建到完成的平均天数。柱子越低表示交付越快。将这两个图表结合使用，可以帮助您了解自己的产能，以及工作流程是否随时间推移变快或变慢。",
+        "mockup": "analytics-velocity"
+      },
+      {
+        "heading": "收入图表",
+        "body": "收入图表是一个面积图，显示每月赚取的总费用。它跟踪记录在发行上的付款金额，因此反映的是客户实际支付的金额。使用它来查看收入趋势，找出收入最高的月份，并为淡季做好规划。收入数据来自每个发行的付款跟踪功能，因此请确保费用和付款状态保持最新，以获得准确的报告。",
+        "mockup": "analytics-revenue"
+      },
+      {
+        "heading": "客户明细",
+        "body": "分析页面底部的客户明细表列出了每位客户的关键指标：发行数量、总收入、已付金额和平均交付时间。这有助于您识别哪些客户带来了最多的工作和收入，谁按时付款，以及您的时间花在了哪里。点击任意客户行可查看其发行列表。表格默认按收入排序。",
+        "mockup": "analytics-clients"
+      },
+      {
+        "heading": "日期范围选择器",
+        "body": "使用右上角的日期范围选择器来控制分析涵盖的时间段。预设范围包括过去 7 天、过去 30 天、过去 90 天和过去 365 天。您也可以通过选择特定的开始和结束日期来设置自定义日期范围。四张汇总卡片和三个图表都会更新以反映所选时间段。日期范围选择器在整个分析仪表盘中的工作方式相同。",
+        "tip": "使用 365 天范围进行年度回顾和税务准备。30 天范围适合每月检查您的业务健康状况。",
+        "mockup": "analytics-date-range"
+      }
+    ]
+  },
+  {
     "id": "upload-audio-tracks",
     "title": "上传和管理音频",
     "category": "audio",
