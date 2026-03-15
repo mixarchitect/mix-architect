@@ -210,7 +210,7 @@ function AccountMenu({ userEmail }: { userEmail: string | null }) {
             className="flex items-center gap-2 px-3 py-2 text-sm text-text hover:bg-panel2 transition-colors"
           >
             <Settings size={15} strokeWidth={1.5} />
-            Settings
+            User Settings
           </Link>
           <Link
             href="/api/export"
