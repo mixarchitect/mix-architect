@@ -403,6 +403,8 @@
       "releaseLiveHelp": "Nar din release gar live pa en plattform",
       "newComment": "Aviseringar om nya kommentarer",
       "newCommentHelp": "Nar nagon kommenterar din release",
+      "clientFeedback": "Kundfeedback-aviseringar",
+      "clientFeedbackHelp": "När en kund godkänner eller begär ändringar på ett spår",
       "paymentReminder": "Betalningspaminnelser",
       "paymentReminderHelp": "Nar en prenumerationsbetalning misslyckas",
       "paymentReceived": "Betalningsbekraftelser",

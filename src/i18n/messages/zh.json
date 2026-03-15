@@ -403,6 +403,8 @@
       "releaseLiveHelp": "当您的发行在平台上线时",
       "newComment": "新评论提醒",
       "newCommentHelp": "当有人评论您的发行时",
+      "clientFeedback": "客户反馈提醒",
+      "clientFeedbackHelp": "当客户批准或请求修改某个音轨时",
       "paymentReminder": "付款提醒",
       "paymentReminderHelp": "当订阅付款失败时",
       "paymentReceived": "付款确认",

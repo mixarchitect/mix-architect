@@ -602,7 +602,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "メール通知",
-        "body": "Email Preferencesパネルでは、Mix Architectから受信するトランザクションメールを制御します。各カテゴリにはオン/オフトグルがあります。カテゴリには以下が含まれます: Release Live Alerts（リリースがプラットフォームで公開されたとき）、New Comment Alerts（誰かがあなたのリリースにコメントしたとき）、Weekly Digest（リリース全体のアクティビティの週次サマリー）、Payment Reminders（サブスクリプションの支払いが失敗したとき）、Payment Confirmations（支払いが処理されたとき）、Subscription Confirmations（プランが有効化されたとき）、Cancellation Notices（プランがキャンセルされたとき）。すべてのカテゴリはデフォルトで有効です。すべてのメールの下部に配信停止リンクが含まれています。",
+        "body": "Email Preferencesパネルでは、Mix Architectから受信するトランザクションメールを制御します。各カテゴリにはオン/オフトグルがあります。カテゴリには以下が含まれます: Release Live Alerts（リリースがプラットフォームで公開されたとき）、New Comment Alerts（誰かがあなたのリリースにコメントしたとき）、Weekly Digest（リリース全体のアクティビティの週次サマリー）、Payment Reminders（サブスクリプションの支払いが失敗したとき）、Payment Confirmations（支払いが処理されたとき）、Subscription Confirmations（プランが有効化されたとき）、Cancellation Notices（プランがキャンセルされたとき）、Client Feedback（クライアントが承認または変更を依頼したとき）。すべてのカテゴリはデフォルトで有効です。すべてのメールの下部に配信停止リンクが含まれています。",
         "mockup": "settings-email-prefs",
         "tip": "通知メールの下部にある配信停止リンクをクリックすることで、特定のメールカテゴリの配信を停止することもできます。サインインは不要です。"
       },

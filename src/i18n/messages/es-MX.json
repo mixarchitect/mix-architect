@@ -403,6 +403,8 @@
       "releaseLiveHelp": "Cuando tu lanzamiento esta disponible en una plataforma",
       "newComment": "Alertas de nuevos comentarios",
       "newCommentHelp": "Cuando alguien comenta en tu lanzamiento",
+      "clientFeedback": "Alertas de retroalimentación del cliente",
+      "clientFeedbackHelp": "Cuando un cliente aprueba o solicita cambios en una pista",
       "paymentReminder": "Recordatorios de pago",
       "paymentReminderHelp": "Cuando falla un pago de suscripcion",
       "paymentReceived": "Confirmaciones de pago",

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { notifyReleaseMembers } from "@/lib/notifications/service";
+import { emailReleaseMembers } from "@/lib/email/release-email";
+import { buildClientFeedbackEmail } from "@/lib/email-templates/transactional";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
@@ -169,7 +171,7 @@ export async function POST(req: NextRequest) {
 
     console.log("[portal/approve] success:", { action, newStatus, portalStatus });
 
-    // Fire-and-forget notification to release members
+    // Notify + email release members (awaited so Vercel doesn't kill the function)
     const actor = actor_name?.trim() || "Client";
     const actionLabels: Record<string, string> = {
       approve: "approved",
@@ -177,14 +179,39 @@ export async function POST(req: NextRequest) {
       deliver: "delivered",
       reopen: "reopened",
     };
-    notifyReleaseMembers({
-      releaseId: share.release_id,
-      type: "approval",
-      title: `${actor} ${actionLabels[action] ?? action} "${track.title}"`,
-      body: note?.trim()?.slice(0, 120),
-      trackId: track_id,
-      actorName: actor,
-    });
+
+    const { data: releaseInfo } = await supabase
+      .from("releases")
+      .select("title")
+      .eq("id", share.release_id)
+      .maybeSingle();
+
+    const appUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com"}/app/releases/${share.release_id}`;
+
+    await Promise.allSettled([
+      notifyReleaseMembers({
+        releaseId: share.release_id,
+        type: "approval",
+        title: `${actor} ${actionLabels[action] ?? action} "${track.title}"`,
+        body: note?.trim()?.slice(0, 120),
+        trackId: track_id,
+        actorName: actor,
+      }),
+      emailReleaseMembers({
+        releaseId: share.release_id,
+        category: "client_feedback",
+        buildEmail: ({ unsubscribeUrl }) =>
+          buildClientFeedbackEmail({
+            releaseTitle: releaseInfo?.title ?? "Untitled Release",
+            trackTitle: track.title ?? "Untitled Track",
+            actorName: actor,
+            action,
+            note: note?.trim()?.slice(0, 200),
+            appUrl,
+            unsubscribeUrl,
+          }),
+      }),
+    ]);
 
     return NextResponse.json({
       approval_status: newStatus,

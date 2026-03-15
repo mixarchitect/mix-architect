@@ -403,6 +403,8 @@
       "releaseLiveHelp": "Wenn Ihr Release auf einer Plattform live geht",
       "newComment": "Neue Kommentare",
       "newCommentHelp": "Wenn jemand Ihr Release kommentiert",
+      "clientFeedback": "Kundenfeedback-Benachrichtigungen",
+      "clientFeedbackHelp": "Wenn ein Kunde einen Track genehmigt oder Änderungen anfordert",
       "paymentReminder": "Zahlungserinnerungen",
       "paymentReminderHelp": "Wenn eine Abonnementzahlung fehlschlagt",
       "paymentReceived": "Zahlungsbestatigungen",

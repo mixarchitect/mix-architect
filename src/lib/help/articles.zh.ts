@@ -602,7 +602,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "电子邮件通知",
-        "body": "Email Preferences 面板控制您从 Mix Architect 接收哪些事务性电子邮件。每个类别都有一个开/关切换。类别包括：Release Live Alerts（当发行在平台上线时）、New Comment Alerts（当有人评论您的发行时）、Weekly Digest（您所有发行活动的每周摘要）、Payment Reminders（当订阅付款失败时）、Payment Confirmations（当付款处理完成时）、Subscription Confirmations（当您的计划激活时）以及 Cancellation Notices（当您的计划取消时）。所有类别默认启用。每封电子邮件底部都包含退订链接。",
+        "body": "Email Preferences 面板控制您从 Mix Architect 接收哪些事务性电子邮件。每个类别都有一个开/关切换。类别包括：Release Live Alerts（当发行在平台上线时）、New Comment Alerts（当有人评论您的发行时）、Weekly Digest（您所有发行活动的每周摘要）、Payment Reminders（当订阅付款失败时）、Payment Confirmations（当付款处理完成时）、Subscription Confirmations（当您的计划激活时）以及 Cancellation Notices（当您的计划取消时）以及 Client Feedback（当客户批准或请求更改时）。所有类别默认启用。每封电子邮件底部都包含退订链接。",
         "mockup": "settings-email-prefs",
         "tip": "您也可以通过点击任何通知电子邮件底部的退订链接来取消订阅特定的电子邮件类别。无需登录。"
       },

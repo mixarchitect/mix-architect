@@ -530,6 +530,7 @@ export default function SettingsPage() {
 type EmailPrefKey =
   | "release_live"
   | "new_comment"
+  | "client_feedback"
   | "payment_reminder"
   | "payment_received"
   | "weekly_digest"
@@ -539,6 +540,7 @@ type EmailPrefKey =
 const EMAIL_PREF_ITEMS: { key: EmailPrefKey; labelKey: string; helpKey: string }[] = [
   { key: "release_live", labelKey: "releaseLive", helpKey: "releaseLiveHelp" },
   { key: "new_comment", labelKey: "newComment", helpKey: "newCommentHelp" },
+  { key: "client_feedback", labelKey: "clientFeedback", helpKey: "clientFeedbackHelp" },
   { key: "weekly_digest", labelKey: "weeklyDigest", helpKey: "weeklyDigestHelp" },
   { key: "payment_reminder", labelKey: "paymentReminder", helpKey: "paymentReminderHelp" },
   { key: "payment_received", labelKey: "paymentReceived", helpKey: "paymentReceivedHelp" },
@@ -552,6 +554,7 @@ function EmailPreferencesPanel() {
   const [prefs, setPrefs] = useState<Record<EmailPrefKey, boolean>>({
     release_live: true,
     new_comment: true,
+    client_feedback: true,
     payment_reminder: true,
     payment_received: true,
     weekly_digest: true,
@@ -575,6 +578,7 @@ function EmailPreferencesPanel() {
         setPrefs({
           release_live: data.release_live ?? true,
           new_comment: data.new_comment ?? true,
+          client_feedback: data.client_feedback ?? true,
           payment_reminder: data.payment_reminder ?? true,
           payment_received: data.payment_received ?? true,
           weekly_digest: data.weekly_digest ?? true,

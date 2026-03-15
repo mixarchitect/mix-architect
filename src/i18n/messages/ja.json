@@ -403,6 +403,8 @@
       "releaseLiveHelp": "リリースがプラットフォームで公開されたとき",
       "newComment": "新しいコメントアラート",
       "newCommentHelp": "リリースにコメントがあったとき",
+      "clientFeedback": "クライアントフィードバック通知",
+      "clientFeedbackHelp": "クライアントがトラックを承認または変更をリクエストした時",
       "paymentReminder": "支払いリマインダー",
       "paymentReminderHelp": "サブスクリプションの支払いが失敗したとき",
       "paymentReceived": "支払い確認",

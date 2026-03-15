@@ -403,6 +403,8 @@
       "releaseLiveHelp": "릴리스가 플랫폼에서 라이브될 때",
       "newComment": "새 댓글 알림",
       "newCommentHelp": "누군가 릴리스에 댓글을 달았을 때",
+      "clientFeedback": "클라이언트 피드백 알림",
+      "clientFeedbackHelp": "클라이언트가 트랙을 승인하거나 변경을 요청할 때",
       "paymentReminder": "결제 알림",
       "paymentReminderHelp": "구독 결제가 실패했을 때",
       "paymentReceived": "결제 확인",

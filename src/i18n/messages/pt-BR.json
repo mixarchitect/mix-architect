@@ -403,6 +403,8 @@
       "releaseLiveHelp": "Quando seu lancamento fica disponivel em uma plataforma",
       "newComment": "Alertas de novos comentarios",
       "newCommentHelp": "Quando alguem comenta no seu lancamento",
+      "clientFeedback": "Alertas de feedback do cliente",
+      "clientFeedbackHelp": "Quando um cliente aprova ou solicita alterações em uma faixa",
       "paymentReminder": "Lembretes de pagamento",
       "paymentReminderHelp": "Quando um pagamento de assinatura falha",
       "paymentReceived": "Confirmacoes de pagamento",

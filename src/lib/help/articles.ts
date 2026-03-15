@@ -557,7 +557,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Email Notifications",
-        body: "The Email Preferences panel controls which transactional emails you receive from Mix Architect. Each category has an on/off toggle. Categories include: Release Live Alerts (when a release goes live on a platform), New Comment Alerts (when someone comments on your release), Weekly Digest (a summary of activity across your releases), Payment Reminders (when a subscription payment fails), Payment Confirmations (when a payment is processed), Subscription Confirmations (when your plan is activated), and Cancellation Notices (when your plan is cancelled). All categories are enabled by default. Every email includes an unsubscribe link at the bottom.",
+        body: "The Email Preferences panel controls which transactional emails you receive from Mix Architect. Each category has an on/off toggle. Categories include: Release Live Alerts (when a release goes live on a platform), New Comment Alerts (when someone comments on your release), Weekly Digest (a summary of activity across your releases), Payment Reminders (when a subscription payment fails), Payment Confirmations (when a payment is processed), Subscription Confirmations (when your plan is activated), Cancellation Notices (when your plan is cancelled), and Client Feedback (when a client approves or requests changes). All categories are enabled by default. Every email includes an unsubscribe link at the bottom.",
         mockup: "settings-email-prefs",
         tip: "You can also unsubscribe from a specific email category by clicking the unsubscribe link at the bottom of any notification email. No sign-in required.",
       },

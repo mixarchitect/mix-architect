@@ -602,7 +602,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "이메일 알림",
-        "body": "Email Preferences 패널은 Mix Architect에서 수신하는 트랜잭션 이메일을 제어합니다. 각 카테고리에는 켜기/끄기 토글이 있습니다. 카테고리에는 다음이 포함됩니다: Release Live Alerts(릴리스가 플랫폼에서 라이브될 때), New Comment Alerts(누군가 릴리스에 댓글을 남길 때), Weekly Digest(릴리스 전체 활동의 주간 요약), Payment Reminders(구독 결제가 실패할 때), Payment Confirmations(결제가 처리될 때), Subscription Confirmations(플랜이 활성화될 때), Cancellation Notices(플랜이 취소될 때). 모든 카테고리는 기본적으로 활성화되어 있습니다. 모든 이메일 하단에 수신 거부 링크가 포함되어 있습니다.",
+        "body": "Email Preferences 패널은 Mix Architect에서 수신하는 트랜잭션 이메일을 제어합니다. 각 카테고리에는 켜기/끄기 토글이 있습니다. 카테고리에는 다음이 포함됩니다: Release Live Alerts(릴리스가 플랫폼에서 라이브될 때), New Comment Alerts(누군가 릴리스에 댓글을 남길 때), Weekly Digest(릴리스 전체 활동의 주간 요약), Payment Reminders(구독 결제가 실패할 때), Payment Confirmations(결제가 처리될 때), Subscription Confirmations(플랜이 활성화될 때), Cancellation Notices(플랜이 취소될 때), Client Feedback(클라이언트가 승인하거나 변경을 요청할 때). 모든 카테고리는 기본적으로 활성화되어 있습니다. 모든 이메일 하단에 수신 거부 링크가 포함되어 있습니다.",
         "mockup": "settings-email-prefs",
         "tip": "알림 이메일 하단의 수신 거부 링크를 클릭하여 특정 이메일 카테고리의 수신을 거부할 수도 있습니다. 로그인이 필요하지 않습니다."
       },

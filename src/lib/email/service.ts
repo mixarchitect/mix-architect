@@ -15,7 +15,8 @@ export type EmailCategory =
   | "payment_received"
   | "weekly_digest"
   | "subscription_confirmed"
-  | "subscription_cancelled";
+  | "subscription_cancelled"
+  | "client_feedback";
 
 const FROM = "Mix Architect <team@mixarchitect.com>";
 

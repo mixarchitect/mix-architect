@@ -403,6 +403,8 @@
       "releaseLiveHelp": "Quand votre release est en ligne sur une plateforme",
       "newComment": "Alertes de nouveaux commentaires",
       "newCommentHelp": "Quand quelqu'un commente votre release",
+      "clientFeedback": "Alertes de retour client",
+      "clientFeedbackHelp": "Quand un client approuve ou demande des modifications sur un titre",
       "paymentReminder": "Rappels de paiement",
       "paymentReminderHelp": "Quand un paiement d'abonnement echoue",
       "paymentReceived": "Confirmations de paiement",

@@ -144,7 +144,55 @@ export function buildNewCommentEmail({
   };
 }
 
-// ─── 4. Payment Reminder ─────────────────────────────────────────────
+// ─── 4. Client Feedback ─────────────────────────────────────────────
+
+export function buildClientFeedbackEmail({
+  releaseTitle,
+  trackTitle,
+  actorName,
+  action,
+  note,
+  appUrl,
+  unsubscribeUrl,
+}: {
+  releaseTitle: string;
+  trackTitle: string;
+  actorName: string;
+  action: string;
+  note?: string;
+  appUrl: string;
+  unsubscribeUrl?: string;
+}) {
+  const actionLabels: Record<string, string> = {
+    approve: "approved",
+    request_changes: "requested changes on",
+    deliver: "delivered",
+    reopen: "reopened",
+  };
+  const actionLabel = actionLabels[action] ?? action;
+  const subject = `${actorName} ${actionLabel} "${trackTitle}" in ${releaseTitle}`;
+
+  const noteBlock = note?.trim()
+    ? `<div style="margin:12px 0;padding:12px 16px;background:#f9fafb;border-left:3px solid #0D9488;border-radius:0 4px 4px 0;font-size:14px;color:#666;line-height:1.6">
+        ${escapeHtml(note.trim().slice(0, 300))}
+      </div>`
+    : "";
+
+  return {
+    subject,
+    html: wrap(
+      `
+      ${heading("Client Feedback")}
+      ${paragraph(`<strong style="color:#1a1a1a">${escapeHtml(actorName)}</strong> ${actionLabel} <strong style="color:#1a1a1a">${escapeHtml(trackTitle)}</strong> in ${escapeHtml(releaseTitle)}.`)}
+      ${noteBlock}
+      ${cta("View Release", appUrl)}
+    `,
+      unsubscribeUrl,
+    ),
+  };
+}
+
+// ─── 5. Payment Reminder ─────────────────────────────────────────────
 
 export function buildPaymentReminderEmail({
   displayName,
