@@ -13,7 +13,7 @@ import {
   Calendar, Upload, GripVertical, Copy, Link2,
   Shield, CreditCard, CheckCircle2, Clock,
   ClipboardList, FileText, Users, Sparkles, Eye,
-  Radio, ExternalLink, RefreshCw, BarChart3, TrendingUp, DollarSign,
+  ExternalLink, BarChart3, DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -1833,27 +1833,55 @@ function ResubscribeMockup() {
 
 /* ═══════════════════════════════════════════════════════════
    ARTICLE 15: DISTRIBUTION TRACKER (6 mockups)
+   Matches: src/app/app/releases/[releaseId]/distribution-panel.tsx
    ═══════════════════════════════════════════════════════════ */
 
-function DistributionPlatformDot({ color }: { color: string }) {
-  return <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />;
+/** Platform icon placeholder matching real app's <img> from /icons/streaming/ */
+function MockPlatformIcon({ color }: { color: string }) {
+  return (
+    <span
+      className="w-4 h-4 rounded-sm shrink-0 flex items-center justify-center"
+      style={{ background: color }}
+    >
+      <Music size={9} className="text-white" />
+    </span>
+  );
 }
 
 function DistributionAddPlatformMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelHeader>
-          <div className="flex items-center justify-between w-full">
-            <span className="text-xs font-semibold tracking-wide text-faint uppercase">Distribution</span>
-            <Button variant="primary"><Plus size={14} /> Add Platform</Button>
+        <PanelBody className="py-5">
+          {/* Header — matches real panel header */}
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">Distribution Tracker</span>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1 text-[11px] text-muted"><Send size={12} /> Mark as Submitted</span>
+              <span className="flex items-center gap-1 text-[11px] text-signal font-medium"><Plus size={12} /> Add Platform</span>
+            </div>
           </div>
-        </PanelHeader>
-        <PanelBody className="pt-6 space-y-3">
-          <MockSelect text="Select platform" />
-          <MockSelect text="Select distributor" />
-          <MockInput text="Optional notes" placeholder />
-          <Button variant="primary">Add</Button>
+
+          {/* Inline add form — matches real bordered div with select + button */}
+          <div className="border border-border rounded-lg p-3 flex items-center gap-3 mb-4">
+            <MockSelect text="YouTube Music" className="flex-1 text-xs" />
+            <Button variant="primary" className="h-7 text-xs">Add</Button>
+            <span className="text-xs text-muted">Cancel</span>
+          </div>
+
+          {/* Existing rows preview */}
+          <div className="space-y-0.5">
+            {[
+              { name: "Spotify", color: "#1DB954", status: "Live", sColor: "green" as const },
+              { name: "Apple Music", color: "#FA243C", status: "Submitted", sColor: "orange" as const },
+            ].map((p) => (
+              <div key={p.name} className="flex items-center gap-3 py-2 px-1">
+                <MockPlatformIcon color={p.color} />
+                <span className="text-sm text-text w-[120px]">{p.name}</span>
+                <StatusIndicator color={p.sColor} label={p.status} className="text-xs" />
+              </div>
+            ))}
+          </div>
         </PanelBody>
       </Panel>
     </>
@@ -1861,32 +1889,55 @@ function DistributionAddPlatformMockup() {
 }
 
 function DistributionStatusMockup() {
-  const rows: { platform: string; color: string; status: string; statusColor: string }[] = [
-    { platform: "Spotify", color: "#1DB954", status: "LIVE", statusColor: "var(--status-green)" },
-    { platform: "Apple Music", color: "#FC3C44", status: "PROCESSING", statusColor: "var(--status-orange)" },
-    { platform: "Tidal", color: "#00FFFF", status: "SUBMITTED", statusColor: "var(--status-blue)" },
-    { platform: "Amazon Music", color: "#25D1DA", status: "SUBMITTED", statusColor: "var(--status-blue)" },
-    { platform: "YouTube Music", color: "#FF0000", status: "NOT SUBMITTED", statusColor: "var(--text-faint)" },
+  const rows: { name: string; color: string; status: string; sColor: "green" | "orange" | "blue"; dist?: string }[] = [
+    { name: "Spotify", color: "#1DB954", status: "Live", sColor: "green", dist: "DistroKid" },
+    { name: "Apple Music", color: "#FA243C", status: "Processing", sColor: "orange", dist: "DistroKid" },
+    { name: "Tidal", color: "#000000", status: "Submitted", sColor: "orange", dist: "DistroKid" },
+    { name: "Amazon Music", color: "#25D1DA", status: "Submitted", sColor: "orange", dist: "DistroKid" },
+    { name: "YouTube Music", color: "#FF0000", status: "Not Submitted", sColor: "blue" },
   ];
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="pt-6 space-y-0">
-          {rows.map((r, i) => (
-            <div key={r.platform}>
-              <div className="flex items-center gap-3 py-3">
-                <DistributionPlatformDot color={r.color} />
-                <span className="text-sm font-medium text-text flex-1">{r.platform}</span>
-                <span
-                  className="text-[10px] font-medium uppercase tracking-wide"
-                  style={{ color: r.statusColor }}
-                >
-                  {r.status}
-                </span>
-              </div>
-              {i < rows.length - 1 && <Rule />}
+        <PanelBody className="py-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">Distribution Tracker</span>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1 text-[11px] text-muted"><Send size={12} /> Mark as Submitted</span>
+              <span className="flex items-center gap-1 text-[11px] text-muted"><Plus size={12} /> Add Platform</span>
             </div>
-          ))}
+          </div>
+
+          {/* Spotify section */}
+          <div className="mb-3">
+            <div className="flex items-center gap-1.5 text-[11px] text-muted mb-2">
+              <Sparkles size={11} className="text-signal" />
+              Updates automatically
+            </div>
+            <div className="flex items-center gap-3 py-2 px-1">
+              <MockPlatformIcon color="#1DB954" />
+              <span className="text-sm text-text w-[120px]">Spotify</span>
+              <span className="w-[80px]"><StatusIndicator color="green" label="Live" className="text-xs" /></span>
+              <Pill className="text-[10px]">DistroKid</Pill>
+              <span className="flex-1" />
+              <ExternalLink size={13} className="text-muted" />
+            </div>
+          </div>
+
+          {/* Manual section */}
+          <div className="flex items-center gap-1.5 text-[11px] text-muted mb-2">Manually updated</div>
+          <div className="space-y-0.5">
+            {rows.slice(1).map((r) => (
+              <div key={r.name} className="flex items-center gap-3 py-2 px-1">
+                <MockPlatformIcon color={r.color} />
+                <span className="text-sm text-text w-[120px]">{r.name}</span>
+                <span className="w-[80px]"><StatusIndicator color={r.sColor} label={r.status} className="text-xs" /></span>
+                {r.dist && <Pill className="text-[10px]">{r.dist}</Pill>}
+                <span className="flex-1" />
+                {r.status !== "Not Submitted" && <ExternalLink size={13} className="text-muted" />}
+              </div>
+            ))}
+          </div>
         </PanelBody>
       </Panel>
     </>
@@ -1897,22 +1948,35 @@ function DistributionSpotifyMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="pt-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <DistributionPlatformDot color="#1DB954" />
-            <span className="text-sm font-semibold text-text">Spotify</span>
-            <Pill className="bg-status-green/10 text-status-green border-status-green/20">Live</Pill>
+        <PanelBody className="py-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">Distribution Tracker</span>
           </div>
-          <AccentPanel>
-            <div className="flex items-center gap-3 mb-2">
-              <CheckCircle2 size={18} className="text-white" />
-              <span className="text-sm font-semibold text-white">Auto-detected on Spotify</span>
+
+          {/* Auto section header with Check Now */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5 text-[11px] text-muted">
+              <Sparkles size={11} className="text-signal" />
+              Updates automatically
             </div>
-            <p className="text-xs text-white/70">Matched by ISRC: USRC12345678</p>
-          </AccentPanel>
-          <div className="flex items-center gap-3">
-            <ExternalLink size={14} className="text-signal" />
-            <span className="text-xs text-signal truncate">open.spotify.com/album/3Kx...</span>
+            <span className="flex items-center gap-1 text-[11px] text-muted"><Search size={12} /> Check Now</span>
+          </div>
+
+          {/* Check result feedback */}
+          <div className="text-xs text-muted bg-panel2 rounded-md px-3 py-2 mb-3 flex items-center justify-between">
+            <span>Found on Spotify!</span>
+            <X size={12} className="text-faint" />
+          </div>
+
+          {/* Spotify row with live status and auto-detected sparkle */}
+          <div className="flex items-center gap-3 py-2 px-1">
+            <MockPlatformIcon color="#1DB954" />
+            <span className="text-sm text-text w-[120px]">Spotify</span>
+            <span className="w-[80px]"><StatusIndicator color="green" label="Live" className="text-xs" /></span>
+            <Pill className="text-[10px]">DistroKid</Pill>
+            <Sparkles size={12} className="text-signal shrink-0" />
+            <span className="flex-1" />
+            <ExternalLink size={13} className="text-muted" />
           </div>
         </PanelBody>
       </Panel>
@@ -1924,27 +1988,54 @@ function DistributionEditMockup() {
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="pt-6 space-y-4">
-          <div className="flex items-center gap-3 mb-1">
-            <DistributionPlatformDot color="#FC3C44" />
-            <span className="text-sm font-semibold text-text flex-1">Apple Music</span>
-            <Pencil size={14} className="text-muted" />
+        <PanelBody className="py-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">Distribution Tracker</span>
           </div>
-          <div className="space-y-3">
-            <div>
-              <span className="label text-xs text-faint mb-1.5 block">STATUS</span>
-              <MockSelect text="Processing" />
-            </div>
-            <div>
-              <span className="label text-xs text-faint mb-1.5 block">EXTERNAL LINK</span>
-              <MockInput text="https://music.apple.com/album/..." />
-            </div>
-            <div>
-              <span className="label text-xs text-faint mb-1.5 block">NOTES</span>
-              <MockInput text="Submitted via DistroKid on Mar 10" />
-            </div>
+
+          {/* Platform row */}
+          <div className="flex items-center gap-3 py-2 px-1 mb-1">
+            <MockPlatformIcon color="#FA243C" />
+            <span className="text-sm text-text w-[120px]">Apple Music</span>
+            <span className="w-[80px]">
+              <span className="flex items-center gap-1">
+                <StatusIndicator color="orange" label="Processing" className="text-xs" />
+                <ChevronDown size={10} className="text-faint" />
+              </span>
+            </span>
+            <Pill className="text-[10px]">DistroKid</Pill>
+            <span className="flex-1" />
+            <span className="text-[11px] text-muted">Add link</span>
           </div>
-          <Button variant="primary">Save</Button>
+
+          {/* Inline status dropdown expanded */}
+          <div className="flex items-center gap-1 pl-8 pb-2">
+            {(["Not Submitted", "Submitted", "Processing", "Live"] as const).map((s, i) => (
+              <span
+                key={s}
+                className={cn(
+                  "flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-md",
+                  i === 2 ? "bg-panel2 text-text" : "text-muted",
+                )}
+              >
+                <StatusIndicator
+                  color={i === 3 ? "green" : i >= 1 ? "orange" : "blue"}
+                  label={s}
+                  className="text-[10px]"
+                />
+              </span>
+            ))}
+          </div>
+
+          {/* Inline URL input */}
+          <div className="flex items-center gap-2 pl-8 pt-1">
+            <MockInput text="https://music.apple.com/album/..." className="flex-1 text-xs" />
+            <span
+              className="inline-flex items-center justify-center rounded-sm text-[11px] font-semibold text-white px-2.5 py-1"
+              style={{ background: "var(--signal)" }}
+            >Save</span>
+            <span className="text-[11px] text-muted">Cancel</span>
+          </div>
         </PanelBody>
       </Panel>
     </>
@@ -1954,41 +2045,52 @@ function DistributionEditMockup() {
 function DistributionBulkMockup() {
   const platforms = [
     { name: "Spotify", color: "#1DB954", checked: true },
-    { name: "Apple Music", color: "#FC3C44", checked: true },
-    { name: "Tidal", color: "#00FFFF", checked: true },
+    { name: "Apple Music", color: "#FA243C", checked: true },
+    { name: "Tidal", color: "#000000", checked: true },
     { name: "Amazon Music", color: "#25D1DA", checked: true },
-    { name: "YouTube Music", color: "#FF0000", checked: false },
-    { name: "Deezer", color: "#A238FF", checked: false },
+    { name: "YouTube Music", color: "#FF0000", checked: true },
+    { name: "Deezer", color: "#A238FF", checked: true },
   ];
   return (
     <>
       <Panel className="m-4">
-        <PanelHeader>
-          <span className="text-xs font-semibold tracking-wide text-faint uppercase">Bulk Submit</span>
-        </PanelHeader>
-        <PanelBody className="pt-6 space-y-4">
-          <div>
-            <span className="label text-xs text-faint mb-1.5 block">DISTRIBUTOR</span>
-            <MockSelect text="DistroKid" />
+        <PanelBody className="py-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">Distribution Tracker</span>
           </div>
-          <div>
-            <span className="label text-xs text-faint mb-2 block">PLATFORMS</span>
-            <div className="grid grid-cols-2 gap-2">
-              {platforms.map((p) => (
-                <div key={p.name} className="flex items-center gap-2 py-1.5">
-                  <div className={cn(
-                    "w-4 h-4 rounded border flex items-center justify-center",
-                    p.checked ? "bg-signal border-signal" : "border-border bg-panel",
-                  )}>
-                    {p.checked && <Check size={10} className="text-signal-on" />}
+
+          {/* Bordered inline form — matches real BulkSubmitForm */}
+          <div className="border border-border rounded-lg p-3 space-y-3">
+            <span className="text-xs font-medium text-text">Mark as Submitted</span>
+
+            <div className="space-y-1">
+              <label className="text-[11px] text-muted">Distributor</label>
+              <MockSelect text="DistroKid" className="text-xs" />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] text-muted">Platforms</label>
+              <div className="grid grid-cols-2 gap-1">
+                {platforms.map((p) => (
+                  <div key={p.name} className="flex items-center gap-2 text-xs py-1 px-1">
+                    <div className={cn(
+                      "w-4 h-4 rounded border flex items-center justify-center",
+                      p.checked ? "bg-signal border-signal" : "border-border bg-panel",
+                    )}>
+                      {p.checked && <Check size={10} className="text-signal-on" />}
+                    </div>
+                    <MockPlatformIcon color={p.color} />
+                    <span className="text-text">{p.name}</span>
                   </div>
-                  <DistributionPlatformDot color={p.color} />
-                  <span className="text-xs text-text">{p.name}</span>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button variant="primary" className="h-7 text-xs">Submit 6 Platforms</Button>
+              <span className="text-xs text-muted">Cancel</span>
             </div>
           </div>
-          <Button variant="primary">Mark as Submitted</Button>
         </PanelBody>
       </Panel>
     </>
@@ -1996,30 +2098,31 @@ function DistributionBulkMockup() {
 }
 
 function DistributionDistributorMockup() {
-  const entries = [
-    { platform: "Spotify", color: "#1DB954", distributor: "DistroKid", status: "Live" },
-    { platform: "Apple Music", color: "#FC3C44", distributor: "DistroKid", status: "Processing" },
-    { platform: "Bandcamp", color: "#1DA0C3", distributor: "Self-released", status: "Live" },
-    { platform: "SoundCloud", color: "#FF5500", distributor: "Self-released", status: "Live" },
+  const entries: { name: string; color: string; dist: string; status: string; sColor: "green" | "orange" }[] = [
+    { name: "Spotify", color: "#1DB954", dist: "DistroKid", status: "Live", sColor: "green" },
+    { name: "Apple Music", color: "#FA243C", dist: "DistroKid", status: "Processing", sColor: "orange" },
+    { name: "Bandcamp", color: "#1DA0C3", dist: "Self-released", status: "Live", sColor: "green" },
+    { name: "SoundCloud", color: "#FF5500", dist: "Self-released", status: "Live", sColor: "green" },
   ];
   return (
     <>
       <Panel className="m-4">
-        <PanelBody className="pt-6 space-y-0">
-          {entries.map((e, i) => (
-            <div key={e.platform}>
-              <div className="flex items-center gap-3 py-3">
-                <DistributionPlatformDot color={e.color} />
-                <span className="text-sm font-medium text-text flex-1">{e.platform}</span>
-                <Pill>{e.distributor}</Pill>
-                <span className={cn(
-                  "text-[10px] font-medium uppercase tracking-wide",
-                  e.status === "Live" ? "text-status-green" : "text-status-orange",
-                )}>{e.status}</span>
+        <PanelBody className="py-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted">Distribution Tracker</span>
+          </div>
+          <div className="space-y-0.5">
+            {entries.map((e) => (
+              <div key={e.name} className="flex items-center gap-3 py-2 px-1">
+                <MockPlatformIcon color={e.color} />
+                <span className="text-sm text-text w-[120px]">{e.name}</span>
+                <span className="w-[80px]"><StatusIndicator color={e.sColor} label={e.status} className="text-xs" /></span>
+                <Pill className="text-[10px]">{e.dist}</Pill>
+                <span className="flex-1" />
+                <ExternalLink size={13} className="text-muted" />
               </div>
-              {i < entries.length - 1 && <Rule />}
-            </div>
-          ))}
+            ))}
+          </div>
         </PanelBody>
       </Panel>
     </>
@@ -2028,26 +2131,58 @@ function DistributionDistributorMockup() {
 
 /* ═══════════════════════════════════════════════════════════
    ARTICLE 16: USER ANALYTICS (5 mockups)
+   Matches: src/app/app/analytics/analytics-dashboard.tsx
    ═══════════════════════════════════════════════════════════ */
+
+/** StatCard clone matching real analytics StatCard (Link with icon+label, value, sub) */
+function MockStatCard({ icon: Icon, label, value, sub }: {
+  icon: typeof BarChart3; label: string; value: string; sub: string;
+}) {
+  return (
+    <div className="px-4 py-3 rounded-lg border border-border bg-panel">
+      <div className="flex items-center gap-2 mb-1">
+        <Icon size={14} strokeWidth={1.5} className="text-muted" />
+        <span className="text-[10px] uppercase tracking-wide text-faint font-medium">{label}</span>
+      </div>
+      <div className="text-lg font-semibold text-text">{value}</div>
+      <div className="text-xs text-muted mt-0.5">{sub}</div>
+    </div>
+  );
+}
+
+/** ChartCard clone matching real analytics ChartCard (bg-panel border p-4, title + description) */
+function MockChartCard({ title, description, children, className }: {
+  title: string; description: string; children: React.ReactNode; className?: string;
+}) {
+  return (
+    <div className={cn("bg-panel border border-border rounded-lg p-4", className)}>
+      <h3 className="text-sm font-semibold text-text mb-0.5">{title}</h3>
+      <p className="text-xs text-muted mb-4">{description}</p>
+      {children}
+    </div>
+  );
+}
 
 function AnalyticsOverviewMockup() {
   return (
     <>
       <div className="p-4 space-y-4">
-        <span className="text-lg font-semibold text-text">Analytics</span>
+        {/* Header matches real: h1 + DateRangeSelector */}
+        <div className="flex items-center justify-between">
+          <span className="text-2xl font-semibold text-text">Analytics</span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-xs text-muted">
+            <Calendar size={12} />
+            <span>Last 90 days</span>
+            <ChevronDown size={12} />
+          </div>
+        </div>
+
+        {/* KPI cards — matches real 4-col StatCard grid */}
         <div className="grid grid-cols-2 gap-3">
-          {[
-            { label: "RELEASES", value: "24", sub: "+3 this month" },
-            { label: "AVG TURNAROUND", value: "6.2d", sub: "from first upload" },
-            { label: "REVENUE", value: "$18,400", sub: "last 90 days" },
-            { label: "ACTIVE CLIENTS", value: "8", sub: "with open projects" },
-          ].map((s) => (
-            <Panel key={s.label} variant="flat" className="px-4 py-3 border border-border">
-              <span className="text-[10px] uppercase tracking-wide text-faint font-medium">{s.label}</span>
-              <div className="text-lg font-semibold text-text mt-1">{s.value}</div>
-              <span className="text-xs text-muted">{s.sub}</span>
-            </Panel>
-          ))}
+          <MockStatCard icon={BarChart3} label="Completed Releases" value="24" sub="4/mo avg" />
+          <MockStatCard icon={Clock} label="Avg Turnaround" value="6.2d" sub="3d fastest, 12d slowest" />
+          <MockStatCard icon={DollarSign} label="Total Revenue" value="$18,400" sub="$2,100 outstanding" />
+          <MockStatCard icon={Users} label="Clients" value="8" sub="24 releases total" />
         </div>
       </div>
     </>
@@ -2060,34 +2195,25 @@ function AnalyticsVelocityMockup() {
   const max = Math.max(...values);
   return (
     <>
-      <Panel className="m-4">
-        <PanelHeader>
-          <div className="flex items-center gap-2">
-            <TrendingUp size={14} className="text-muted" />
-            <span className="text-xs font-semibold tracking-wide text-faint uppercase">Release Velocity</span>
-          </div>
-        </PanelHeader>
-        <PanelBody className="pt-6 space-y-3">
-          <div className="flex items-end gap-2 h-24">
+      <div className="p-4">
+        <MockChartCard title="Release Velocity" description="Completed releases per month">
+          <div className="flex items-end gap-2 h-[120px]">
             {months.map((m, i) => (
               <div key={m} className="flex-1 flex flex-col items-center gap-1">
                 <div
-                  className="w-full rounded-sm"
+                  className="w-full max-w-[32px] mx-auto"
                   style={{
-                    height: `${(values[i] / max) * 80}px`,
-                    background: i === months.length - 1 ? "var(--signal)" : "var(--panel2)",
+                    height: `${(values[i] / max) * 100}px`,
+                    background: "var(--signal)",
+                    borderRadius: "3px 3px 0 0",
                   }}
                 />
                 <span className="text-[10px] text-faint">{m}</span>
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-4 pt-2">
-            <DataCell label="Avg/Month" value="4.0" size="small" />
-            <DataCell label="Trend" value="+50%" size="small" />
-          </div>
-        </PanelBody>
-      </Panel>
+        </MockChartCard>
+      </div>
     </>
   );
 }
@@ -2098,109 +2224,141 @@ function AnalyticsRevenueMockup() {
   const max = Math.max(...values);
   return (
     <>
-      <Panel className="m-4">
-        <PanelHeader>
-          <div className="flex items-center gap-2">
-            <DollarSign size={14} className="text-muted" />
-            <span className="text-xs font-semibold tracking-wide text-faint uppercase">Revenue</span>
-          </div>
-        </PanelHeader>
-        <PanelBody className="pt-6 space-y-3">
-          {/* Simplified area chart with bars */}
-          <div className="flex items-end gap-2 h-24">
-            {months.map((m, i) => (
-              <div key={m} className="flex-1 flex flex-col items-center gap-1">
-                <div
-                  className="w-full rounded-sm"
-                  style={{
-                    height: `${(values[i] / max) * 80}px`,
-                    background: "var(--signal)",
-                    opacity: 0.3 + (i / months.length) * 0.7,
-                  }}
-                />
-                <span className="text-[10px] text-faint">{m}</span>
-              </div>
+      <div className="p-4">
+        <MockChartCard title="Revenue" description="Total fee earned per month (USD)">
+          {/* Simplified area chart — gradient bars mimic the real AreaChart fill */}
+          <div className="relative h-[120px]">
+            {/* Horizontal grid lines */}
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="absolute left-0 right-0 border-t border-border"
+                style={{ top: `${i * 33.3}%`, borderStyle: "dashed" }}
+              />
             ))}
+            <div className="flex items-end gap-2 h-full relative z-10">
+              {months.map((m, i) => (
+                <div key={m} className="flex-1 flex flex-col items-center gap-1">
+                  <div className="w-full relative" style={{ height: `${(values[i] / max) * 100}px` }}>
+                    <div
+                      className="absolute inset-0 rounded-t-sm"
+                      style={{
+                        background: "linear-gradient(to bottom, var(--signal), transparent)",
+                        opacity: 0.3,
+                      }}
+                    />
+                    <div
+                      className="absolute top-0 left-0 right-0 h-0.5 rounded-full"
+                      style={{ background: "var(--signal)" }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-faint">{m}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <Rule />
-          <div className="flex items-center gap-4">
-            <DataCell label="Total" value="$21,200" size="small" />
-            <DataCell label="Avg/Month" value="$3,533" size="small" />
-          </div>
-        </PanelBody>
-      </Panel>
+        </MockChartCard>
+      </div>
     </>
   );
 }
 
 function AnalyticsClientsMockup() {
   const clients = [
-    { name: "Alex Rivera", initials: "AR", releases: 6, revenue: "$5,400", color: "#6366F1" },
-    { name: "Jordan Lee", initials: "JL", releases: 4, revenue: "$3,800", color: "#F59E0B" },
-    { name: "Sam Chen", initials: "SC", releases: 3, revenue: "$2,700", color: "#EC4899" },
-    { name: "Morgan Hayes", initials: "MH", releases: 2, revenue: "$1,800", color: "#10B981" },
+    { name: "Alex Rivera", releases: 6, revenue: "$5,400", paid: "$5,400", turnaround: "4d" },
+    { name: "Jordan Lee", releases: 4, revenue: "$3,800", paid: "$2,600", turnaround: "7d" },
+    { name: "Sam Chen", releases: 3, revenue: "$2,700", paid: "$2,700", turnaround: "5d" },
+    { name: "Morgan Hayes", releases: 2, revenue: "$1,800", paid: "$0", turnaround: "9d" },
   ];
   return (
     <>
-      <Panel className="m-4">
-        <PanelHeader>
-          <div className="flex items-center gap-2">
-            <Users size={14} className="text-muted" />
-            <span className="text-xs font-semibold tracking-wide text-faint uppercase">Client Breakdown</span>
-          </div>
-        </PanelHeader>
-        <PanelBody className="pt-6 space-y-0">
-          <div className="flex items-center gap-3 py-2 text-xs font-medium text-faint">
-            <span className="flex-1">Client</span>
-            <span className="w-16 text-right">Releases</span>
-            <span className="w-20 text-right">Revenue</span>
-          </div>
-          <Rule />
-          {clients.map((c) => (
-            <div key={c.name} className="flex items-center gap-3 py-2.5">
-              <MockAvatar initials={c.initials} size="sm" color={c.color} />
-              <span className="text-sm font-medium text-text flex-1">{c.name}</span>
-              <span className="w-16 text-right text-sm text-muted">{c.releases}</span>
-              <span className="w-20 text-right text-sm text-text">{c.revenue}</span>
-            </div>
-          ))}
-        </PanelBody>
-      </Panel>
+      {/* Matches real: bg-panel border rounded-lg with table */}
+      <div className="m-4 bg-panel border border-border rounded-lg">
+        <div className="px-4 py-3 border-b border-border">
+          <h2 className="text-sm font-semibold text-text">Client Breakdown</h2>
+        </div>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-[10px] uppercase tracking-wide text-faint">
+              <th className="px-4 py-2 font-medium">Client</th>
+              <th className="px-4 py-2 font-medium text-right">Releases</th>
+              <th className="px-4 py-2 font-medium text-right">Revenue</th>
+              <th className="px-4 py-2 font-medium text-right">Paid</th>
+              <th className="px-4 py-2 font-medium text-right">Avg Turn.</th>
+            </tr>
+          </thead>
+          <tbody>
+            {clients.map((c) => (
+              <tr key={c.name} className="border-t border-border">
+                <td className="px-4 py-2.5 text-text font-medium">{c.name}</td>
+                <td className="px-4 py-2.5 text-right text-muted">{c.releases}</td>
+                <td className="px-4 py-2.5 text-right text-text">{c.revenue}</td>
+                <td className="px-4 py-2.5 text-right text-muted">{c.paid}</td>
+                <td className="px-4 py-2.5 text-right text-muted">{c.turnaround}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }
 
 function AnalyticsDateRangeMockup() {
+  const presets = [
+    { label: "Today", key: "today" },
+    { label: "Last 7 days", key: "7d" },
+    { label: "Last 30 days", key: "30d" },
+    { label: "Last 90 days", key: "90d", active: true },
+    { label: "Year to date", key: "ytd" },
+    { label: "All time", key: "all" },
+  ];
   return (
     <>
-      <Panel className="m-4">
-        <PanelBody className="pt-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <Calendar size={14} className="text-muted" />
-            <span className="text-sm font-semibold text-text">Date Range</span>
+      <div className="p-4 space-y-3">
+        {/* Trigger button — matches real DateRangeSelector trigger */}
+        <div className="flex justify-end">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-xs"
+            style={{ borderColor: "var(--signal)", color: "var(--signal)", background: "var(--signal-muted)" }}>
+            <Calendar size={12} />
+            <span>Last 90 days</span>
+            <ChevronDown size={12} />
           </div>
-          <div className="flex gap-2">
-            {["7d", "30d", "90d", "1y", "All"].map((r, i) => (
+        </div>
+
+        {/* Dropdown — matches real preset list + calendar area */}
+        <div className="border border-border rounded-lg bg-panel overflow-hidden">
+          <div className="p-3 space-y-0.5">
+            {presets.map((p) => (
               <div
-                key={r}
+                key={p.key}
                 className={cn(
-                  "px-3 py-1.5 rounded-md text-xs font-medium",
-                  i === 2
-                    ? "bg-signal text-signal-on"
-                    : "bg-panel2 text-muted border border-border",
+                  "flex items-center justify-between px-3 py-1.5 rounded-md text-xs",
+                  p.active ? "font-medium" : "text-muted",
                 )}
+                style={p.active ? { background: "var(--signal-muted)", color: "var(--signal)" } : undefined}
               >
-                {r}
+                <span>{p.label}</span>
+                {p.active && <Check size={12} style={{ color: "var(--signal)" }} />}
               </div>
             ))}
           </div>
           <Rule />
-          <DataGrid>
-            <DataCell label="From" value="Dec 14, 2025" size="small" />
-            <DataCell label="To" value="Mar 14, 2026" size="small" />
-          </DataGrid>
-        </PanelBody>
-      </Panel>
+          <div className="p-3">
+            <div className="text-[11px] text-faint mb-2 font-medium">Custom range</div>
+            <div className="grid grid-cols-2 gap-2">
+              <MockInput text="Dec 14, 2025" className="text-xs" />
+              <MockInput text="Mar 14, 2026" className="text-xs" />
+            </div>
+            <div className="mt-3 flex justify-end">
+              <span
+                className="px-3 py-1.5 rounded-md text-xs font-medium"
+                style={{ background: "var(--signal-muted)", color: "var(--signal)" }}
+              >Apply</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
