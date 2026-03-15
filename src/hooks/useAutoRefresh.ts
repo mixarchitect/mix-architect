@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
  * Periodically calls router.refresh() to re-fetch server component data.
  * Returns { lastRefreshed, refresh } for manual trigger and display.
  */
-export function useAutoRefresh(intervalMs = 30_000) {
+export function useAutoRefresh(intervalMs = 60_000) {
   const router = useRouter();
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
