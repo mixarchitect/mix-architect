@@ -528,7 +528,6 @@ export default function SettingsPage() {
 /* ------------------------------------------------------------------ */
 
 type EmailPrefKey =
-  | "welcome"
   | "release_live"
   | "new_comment"
   | "payment_reminder"
@@ -545,14 +544,12 @@ const EMAIL_PREF_ITEMS: { key: EmailPrefKey; labelKey: string; helpKey: string }
   { key: "payment_received", labelKey: "paymentReceived", helpKey: "paymentReceivedHelp" },
   { key: "subscription_confirmed", labelKey: "subscriptionConfirmed", helpKey: "subscriptionConfirmedHelp" },
   { key: "subscription_cancelled", labelKey: "subscriptionCancelled", helpKey: "subscriptionCancelledHelp" },
-  { key: "welcome", labelKey: "welcome", helpKey: "welcomeHelp" },
 ];
 
 function EmailPreferencesPanel() {
   const t = useTranslations("settings.emailNotifications");
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [prefs, setPrefs] = useState<Record<EmailPrefKey, boolean>>({
-    welcome: true,
     release_live: true,
     new_comment: true,
     payment_reminder: true,
@@ -576,7 +573,6 @@ function EmailPreferencesPanel() {
 
       if (data) {
         setPrefs({
-          welcome: data.welcome ?? true,
           release_live: data.release_live ?? true,
           new_comment: data.new_comment ?? true,
           payment_reminder: data.payment_reminder ?? true,
