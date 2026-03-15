@@ -46,15 +46,6 @@ const eventConfig: Record<string, { label: string; icon: typeof Activity; color:
 };
 
 type FilterType = "all" | "subscription" | "content" | "auth";
-type Range = "24h" | "7d" | "30d" | "90d" | "all";
-
-const rangeLabels: { value: Range; label: string }[] = [
-  { value: "24h", label: "24h" },
-  { value: "7d", label: "7d" },
-  { value: "30d", label: "30d" },
-  { value: "90d", label: "90d" },
-  { value: "all", label: "All" },
-];
 
 const filterGroups: Record<FilterType, string[] | null> = {
   all: null,
@@ -63,7 +54,7 @@ const filterGroups: Record<FilterType, string[] | null> = {
   subscription: ["subscription_started", "subscription_cancelled", "subscription_renewed", "payment_failed", "comp_account_granted", "comp_account_revoked"],
 };
 
-export function ActivityLogList({ events, range = "7d" }: { events: ActivityEvent[]; range?: Range }) {
+export function ActivityLogList({ events }: { events: ActivityEvent[] }) {
   const router = useRouter();
   const [filter, setFilter] = useState<FilterType>("all");
   const [search, setSearch] = useState("");
@@ -81,46 +72,32 @@ export function ActivityLogList({ events, range = "7d" }: { events: ActivityEven
 
   return (
     <div>
-      {/* Date range selector */}
-      <div className="flex items-center gap-1 mb-3">
-        <span className="text-xs text-muted mr-2">Period:</span>
-        {rangeLabels.map((r) => (
-          <button
-            key={r.value}
-            onClick={() => router.push(`/admin/activity?range=${r.value}`)}
-            className={cn(
-              "px-2.5 py-1 text-xs rounded-md transition-colors",
-              range === r.value
-                ? "bg-amber-600/15 text-amber-500 font-medium"
-                : "text-muted hover:text-text hover:bg-panel2",
-            )}
-          >
-            {r.label}
-          </button>
-        ))}
-        <span className="text-xs text-faint ml-auto flex items-center gap-2">
+      {/* Event count + CSV export */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs text-faint">
           {events.length} event{events.length !== 1 ? "s" : ""}
-          <button
-            onClick={() =>
-              downloadCsv(
-                filtered.map((e) => ({
-                  user: e.user_email,
-                  event: e.event_type,
-                  metadata: JSON.stringify(e.event_metadata),
-                  date: e.created_at,
-                })),
-                "activity-log.csv",
-              )
-            }
-            className="flex items-center gap-1 text-muted hover:text-text transition-colors"
-            title="Export CSV"
-          >
-            <Download size={10} />
-          </button>
         </span>
+        <button
+          onClick={() =>
+            downloadCsv(
+              filtered.map((e) => ({
+                user: e.user_email,
+                event: e.event_type,
+                metadata: JSON.stringify(e.event_metadata),
+                date: e.created_at,
+              })),
+              "activity-log.csv",
+            )
+          }
+          className="flex items-center gap-1 text-xs text-muted hover:text-text transition-colors"
+          title="Export CSV"
+        >
+          <Download size={10} />
+          Export
+        </button>
       </div>
 
-      <div className="flex gap-3 mb-4">
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <input
           type="text"
           placeholder="Search by email..."
