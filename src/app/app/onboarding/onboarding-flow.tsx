@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -20,8 +20,11 @@ export function OnboardingFlow({ userId }: Props) {
   const [persona, setPersona] = useState<Persona>("artist");
   const [locale, setLocale] = useState<Locale>("en-US");
   const [saving, setSaving] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const { resolvedTheme } = useTheme();
+
+  useEffect(() => setMounted(true), []);
 
   const defaultCurrency = localeCurrencyMap[locale];
 
@@ -76,7 +79,7 @@ export function OnboardingFlow({ userId }: Props) {
   );
 
   const logoSrc =
-    resolvedTheme === "dark"
+    mounted && resolvedTheme === "dark"
       ? "/mix-architect-logo-white.svg"
       : "/mix-architect-logo.svg";
 
