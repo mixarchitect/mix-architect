@@ -561,12 +561,12 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "Konfigurera din profil, utseende, e-postnotifieringar, mixstandarder och mer.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
     "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "Översikt över Inställningar",
-        "body": "Öppna [Användarinställningar](/app/settings) från sidofältet eller kontomenyn i toppfältet. Inställningarna är organiserade i paneler: Profil, Prenumeration, Region och Valuta, Utseende, Persona, Betalningsuppföljning, E-postpreferenser, Integrationer, Mixstandarder, Kalender och Dina Data. Ändringar sparas direkt när du interagerar med varje panel.",
+        "body": "Öppna [Användarinställningar](/app/settings) från sidofältet eller kontomenyn i toppfältet. Inställningarna är organiserade i paneler: Profil, Prenumeration, Region och Valuta, Utseende, Persona, Betalningsuppföljning, E-postpreferenser, Mixstandarder, Kalender och Dina Data. Ändringar sparas direkt när du interagerar med varje panel.",
         "mockup": "settings-overview"
       },
       {
@@ -605,11 +605,6 @@ export const articles: HelpArticle[] = [
         "body": "Panelen för E-postpreferenser styr vilka transaktionsmeddelanden du får från Mix Architect. Varje kategori har en på/av-knapp. Kategorierna inkluderar: Aviseringar för Lanseringar (när en release går live på en plattform), Aviseringar för Nya Kommentarer (när någon kommenterar din release), Veckosammanfattning (en sammanfattning av aktivitet för alla dina releaser), Betalningspåminnelser (när en prenumerationsbetalning misslyckas), Betalningsbekräftelser (när en betalning behandlas), Prenumerationsbekräftelser (när din plan aktiveras) och Uppsägningsmeddelanden (när din plan avslutas). Alla kategorier är aktiverade som standard. Varje e-postmeddelande innehåller en avprenumerationslänk längst ner.",
         "mockup": "settings-email-prefs",
         "tip": "Du kan också avprenumerera från en specifik e-postkategori genom att klicka på avprenumerationslänken längst ner i valfritt notifieringsmeddelande. Ingen inloggning krävs."
-      },
-      {
-        "heading": "Integrationer",
-        "body": "Integrationspanelen visar tillgängliga molnlagringsanslutningar. Varje integration visar tjänstens namn, en beskrivning och en knapp för Anslut eller Koppla från. Stöds för närvarande: Google Drive och Dropbox. Anslutna tjänster visar en grön \"Ansluten\"-etikett. Använd integrationer för att koppla din molnlagring för enklare filhantering tillsammans med dina releaser.",
-        "mockup": "settings-integrations"
       },
       {
         "heading": "Mixstandarder",

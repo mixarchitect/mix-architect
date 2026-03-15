@@ -576,12 +576,12 @@ export const articles: HelpArticle[] = [
     "title": "Benutzereinstellungen",
     "category": "account",
     "summary": "Konfigurieren Sie Ihr Profil, Erscheinungsbild, E-Mail-Benachrichtigungen, Mix-Standardwerte und mehr.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
     "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "Einstellungen im Überblick",
-        "body": "Öffnen Sie die [Benutzereinstellungen](/app/settings) über die Seitenleiste oder das Kontomenü in der oberen Leiste. Die Einstellungen sind in Bereiche unterteilt: Profil, Abonnement, Region & Währung, Erscheinungsbild, Persona, Zahlungsverfolgung, E-Mail-Einstellungen, Integrationen, Mix-Standardwerte, Kalender und Ihre Daten. Änderungen werden sofort gespeichert, wenn Sie mit den einzelnen Bereichen interagieren.",
+        "body": "Öffnen Sie die [Benutzereinstellungen](/app/settings) über die Seitenleiste oder das Kontomenü in der oberen Leiste. Die Einstellungen sind in Bereiche unterteilt: Profil, Abonnement, Region & Währung, Erscheinungsbild, Persona, Zahlungsverfolgung, E-Mail-Einstellungen, Mix-Standardwerte, Kalender und Ihre Daten. Änderungen werden sofort gespeichert, wenn Sie mit den einzelnen Bereichen interagieren.",
         "mockup": "settings-overview"
       },
       {
@@ -620,11 +620,6 @@ export const articles: HelpArticle[] = [
         "body": "Der Bereich E-Mail-Einstellungen steuert, welche transaktionalen E-Mails Sie von Mix Architect erhalten. Jede Kategorie hat einen Ein/Aus-Schalter. Die Kategorien umfassen: Veröffentlichungs-Live-Benachrichtigungen (wenn eine Veröffentlichung auf einer Plattform live geht), Neue Kommentar-Benachrichtigungen (wenn jemand Ihre Veröffentlichung kommentiert), Wöchentliche Zusammenfassung (eine Übersicht der Aktivitäten über alle Veröffentlichungen), Zahlungserinnerungen (wenn eine Abonnementzahlung fehlschlägt), Zahlungsbestätigungen (wenn eine Zahlung verarbeitet wird), Abonnementbestätigungen (wenn Ihr Tarif aktiviert wird) und Kündigungsbenachrichtigungen (wenn Ihr Tarif gekündigt wird). Alle Kategorien sind standardmäßig aktiviert. Jede E-Mail enthält einen Abmeldelink am Ende.",
         "mockup": "settings-email-prefs",
         "tip": "Sie können sich auch von einer bestimmten E-Mail-Kategorie abmelden, indem Sie auf den Abmeldelink am Ende einer Benachrichtigungs-E-Mail klicken. Keine Anmeldung erforderlich."
-      },
-      {
-        "heading": "Integrationen",
-        "body": "Der Bereich Integrationen zeigt verfügbare Cloud-Speicher-Verbindungen. Jede Integration zeigt den Dienstnamen, eine Beschreibung und eine Schaltfläche zum Verbinden oder Trennen. Derzeit unterstützt: Google Drive und Dropbox. Verbundene Dienste zeigen ein grünes \"Verbunden\"-Badge. Nutzen Sie Integrationen, um Ihren Cloud-Speicher für eine einfachere Dateiverwaltung neben Ihren Veröffentlichungen zu verknüpfen.",
-        "mockup": "settings-integrations"
       },
       {
         "heading": "Mix-Standardwerte",

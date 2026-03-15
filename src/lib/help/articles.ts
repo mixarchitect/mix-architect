@@ -516,12 +516,12 @@ export const articles: HelpArticle[] = [
     category: "account",
     summary:
       "Configure your profile, appearance, email notifications, mix defaults, and more.",
-    tags: ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    tags: ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
     updatedAt: "2026-03-15",
     content: [
       {
         heading: "Settings Overview",
-        body: "Open [User Settings](/app/settings) from the sidebar or the account menu in the top bar. Settings are organized into panels: Profile, Subscription, Region & Currency, Appearance, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, and Your Data. Changes save instantly as you interact with each panel.",
+        body: "Open [User Settings](/app/settings) from the sidebar or the account menu in the top bar. Settings are organized into panels: Profile, Subscription, Region & Currency, Appearance, Persona, Payment Tracking, Email Preferences, Mix Defaults, Calendar, and Your Data. Changes save instantly as you interact with each panel.",
         mockup: "settings-overview",
       },
       {
@@ -560,11 +560,6 @@ export const articles: HelpArticle[] = [
         body: "The Email Preferences panel controls which transactional emails you receive from Mix Architect. Each category has an on/off toggle. Categories include: Release Live Alerts (when a release goes live on a platform), New Comment Alerts (when someone comments on your release), Weekly Digest (a summary of activity across your releases), Payment Reminders (when a subscription payment fails), Payment Confirmations (when a payment is processed), Subscription Confirmations (when your plan is activated), and Cancellation Notices (when your plan is cancelled). All categories are enabled by default. Every email includes an unsubscribe link at the bottom.",
         mockup: "settings-email-prefs",
         tip: "You can also unsubscribe from a specific email category by clicking the unsubscribe link at the bottom of any notification email. No sign-in required.",
-      },
-      {
-        heading: "Integrations",
-        body: "The Integrations panel shows available cloud storage connections. Each integration displays the service name, a description, and a Connect or Disconnect button. Currently supported: Google Drive and Dropbox. Connected services show a green \"Connected\" badge. Use integrations to link your cloud storage for easier file management alongside your releases.",
-        mockup: "settings-integrations",
       },
       {
         heading: "Mix Defaults",

@@ -561,12 +561,12 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "अपनी प्रोफ़ाइल, दिखावट, ईमेल सूचनाएँ, मिक्स डिफ़ॉल्ट्स, और अन्य सेटिंग्स कॉन्फ़िगर करें।",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
     "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "सेटिंग्स अवलोकन",
-        "body": "साइडबार या टॉप बार में अकाउंट मेनू से [User Settings](/app/settings) खोलें। सेटिंग्स पैनलों में व्यवस्थित हैं: Profile, Subscription, Region & Currency, Appearance, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, और Your Data। जैसे ही आप किसी पैनल के साथ इंटरैक्ट करते हैं, बदलाव तुरंत सेव हो जाते हैं।",
+        "body": "साइडबार या टॉप बार में अकाउंट मेनू से [User Settings](/app/settings) खोलें। सेटिंग्स पैनलों में व्यवस्थित हैं: Profile, Subscription, Region & Currency, Appearance, Persona, Payment Tracking, Email Preferences, Mix Defaults, Calendar, और Your Data। जैसे ही आप किसी पैनल के साथ इंटरैक्ट करते हैं, बदलाव तुरंत सेव हो जाते हैं।",
         "mockup": "settings-overview"
       },
       {
@@ -605,11 +605,6 @@ export const articles: HelpArticle[] = [
         "body": "Email Preferences पैनल नियंत्रित करता है कि आप Mix Architect से कौन से ट्रांज़ैक्शनल ईमेल प्राप्त करते हैं। प्रत्येक श्रेणी में एक ऑन/ऑफ़ टॉगल है। श्रेणियों में शामिल हैं: Release Live Alerts (जब कोई रिलीज़ किसी प्लेटफ़ॉर्म पर लाइव होती है), New Comment Alerts (जब कोई आपकी रिलीज़ पर कमेंट करता है), Weekly Digest (आपकी रिलीज़ों की गतिविधि का साप्ताहिक सारांश), Payment Reminders (जब सब्सक्रिप्शन भुगतान विफल होता है), Payment Confirmations (जब भुगतान प्रोसेस होता है), Subscription Confirmations (जब आपका प्लान एक्टिवेट होता है), और Cancellation Notices (जब आपका प्लान रद्द होता है)। सभी श्रेणियाँ डिफ़ॉल्ट रूप से सक्षम हैं। प्रत्येक ईमेल के नीचे एक अनसब्सक्राइब लिंक शामिल होता है।",
         "mockup": "settings-email-prefs",
         "tip": "आप किसी भी नोटिफ़िकेशन ईमेल के नीचे अनसब्सक्राइब लिंक पर क्लिक करके किसी विशिष्ट ईमेल श्रेणी से भी अनसब्सक्राइब कर सकते हैं। साइन-इन की आवश्यकता नहीं है।"
-      },
-      {
-        "heading": "इंटीग्रेशन",
-        "body": "Integrations पैनल उपलब्ध cloud storage कनेक्शन दिखाता है। प्रत्येक integration सर्विस का नाम, विवरण, और एक Connect या Disconnect बटन प्रदर्शित करता है। वर्तमान में समर्थित: Google Drive और Dropbox। कनेक्टेड सर्विसेज एक हरा \"Connected\" बैज दिखाती हैं। अपनी रिलीज़ के साथ आसान फ़ाइल प्रबंधन के लिए अपने cloud storage को लिंक करने के लिए integrations का उपयोग करें।",
-        "mockup": "settings-integrations"
       },
       {
         "heading": "मिक्स डिफ़ॉल्ट्स",

@@ -576,12 +576,12 @@ export const articles: HelpArticle[] = [
     "title": "Configuración de Usuario",
     "category": "account",
     "summary": "Configura tu perfil, apariencia, notificaciones por correo, valores predeterminados de mezcla y más.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
     "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "Resumen de Configuración",
-        "body": "Abre [Configuración de Usuario](/app/settings) desde la barra lateral o el menú de cuenta en la barra superior. La configuración está organizada en paneles: Perfil, Suscripción, Región y Moneda, Apariencia, Persona, Seguimiento de Pagos, Preferencias de Correo, Integraciones, Valores Predeterminados de Mezcla, Calendario y Tus Datos. Los cambios se guardan al instante cuando interactúas con cada panel.",
+        "body": "Abre [Configuración de Usuario](/app/settings) desde la barra lateral o el menú de cuenta en la barra superior. La configuración está organizada en paneles: Perfil, Suscripción, Región y Moneda, Apariencia, Persona, Seguimiento de Pagos, Preferencias de Correo, Valores Predeterminados de Mezcla, Calendario y Tus Datos. Los cambios se guardan al instante cuando interactúas con cada panel.",
         "mockup": "settings-overview"
       },
       {
@@ -620,11 +620,6 @@ export const articles: HelpArticle[] = [
         "body": "El panel de Preferencias de Correo controla qué correos transaccionales recibes de Mix Architect. Cada categoría tiene un interruptor de activar/desactivar. Las categorías incluyen: Alertas de Lanzamiento en Vivo (cuando un lanzamiento sale en una plataforma), Alertas de Nuevos Comentarios (cuando alguien comenta en tu lanzamiento), Resumen Semanal (un resumen de actividad en todos tus lanzamientos), Recordatorios de Pago (cuando falla un pago de suscripción), Confirmaciones de Pago (cuando se procesa un pago), Confirmaciones de Suscripción (cuando se activa tu plan) y Avisos de Cancelación (cuando se cancela tu plan). Todas las categorías están habilitadas por defecto. Cada correo incluye un enlace para cancelar la suscripción en la parte inferior.",
         "mockup": "settings-email-prefs",
         "tip": "También puedes cancelar la suscripción de una categoría específica de correo haciendo clic en el enlace para cancelar suscripción en la parte inferior de cualquier correo de notificación. No se requiere iniciar sesión."
-      },
-      {
-        "heading": "Integraciones",
-        "body": "El panel de Integraciones muestra las conexiones de almacenamiento en la nube disponibles. Cada integración muestra el nombre del servicio, una descripción y un botón de Conectar o Desconectar. Actualmente compatible: Google Drive y Dropbox. Los servicios conectados muestran un distintivo verde \"Conectado\". Usa las integraciones para vincular tu almacenamiento en la nube y facilitar la gestión de archivos junto a tus lanzamientos.",
-        "mockup": "settings-integrations"
       },
       {
         "heading": "Valores Predeterminados de Mezcla",

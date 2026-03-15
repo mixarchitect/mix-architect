@@ -2,7 +2,7 @@
 
 /* ═══════════════════════════════════════════════════════════
    SCREEN MOCKUP — Help article visual aids using real components
-   75 mockups (18 articles)
+   74 mockups (18 articles)
    ═══════════════════════════════════════════════════════════ */
 
 import {
@@ -14,8 +14,8 @@ import {
   Shield, CreditCard, CheckCircle2, Clock,
   ClipboardList, FileText, Users, Sparkles, Eye,
   ExternalLink, BarChart3, DollarSign,
-  Sun, Moon, Monitor, Mail, Gift, HardDrive, Cloud,
-  RefreshCw, User, Unplug, Trash2, UserPlus,
+  Sun, Moon, Monitor, Mail, Gift,
+  RefreshCw, User, Trash2, UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -2378,7 +2378,6 @@ function SettingsOverviewMockup() {
     "Persona",
     "Payment Tracking",
     "Email Preferences",
-    "Integrations",
     "Mix Defaults",
     "Calendar",
     "Data",
@@ -2618,43 +2617,6 @@ function SettingsPaymentTrackingMockup() {
             <div className="absolute top-[3px] w-4 h-4 rounded-full bg-white shadow" style={{ left: 20 }} />
           </div>
         </div>
-      </PanelBody>
-    </Panel>
-  );
-}
-
-function SettingsIntegrationsMockup() {
-  return (
-    <Panel className="m-4">
-      <PanelHeader>
-        <span className="text-sm font-semibold text-text">Integrations</span>
-      </PanelHeader>
-      <Rule />
-      <PanelBody className="pt-4 space-y-3">
-        {[
-          { name: "Google Drive", icon: HardDrive, connected: true },
-          { name: "Dropbox", icon: Cloud, connected: false },
-        ].map((svc) => (
-          <div key={svc.name} className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ background: "var(--panel2)" }}>
-            <div className="flex items-center gap-2.5">
-              <svc.icon size={16} className="text-muted" />
-              <div>
-                <div className="text-xs font-medium text-text">{svc.name}</div>
-                <div className="text-[10px] text-muted">{svc.connected ? "Connected" : "Not connected"}</div>
-              </div>
-            </div>
-            {svc.connected ? (
-              <div className="flex items-center gap-1.5">
-                <Pill className="bg-signal/20 text-signal text-[10px]">Connected</Pill>
-                <button className="text-[10px] text-muted hover:text-text">
-                  <Unplug size={12} />
-                </button>
-              </div>
-            ) : (
-              <Button variant="secondary" className="text-[10px] px-2 py-1">Connect</Button>
-            )}
-          </div>
-        ))}
       </PanelBody>
     </Panel>
   );
@@ -3103,7 +3065,6 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "settings-persona": SettingsPersonaMockup,
   "settings-payment-tracking": SettingsPaymentTrackingMockup,
   "settings-email-prefs": SettingsEmailPrefsMockup,
-  "settings-integrations": SettingsIntegrationsMockup,
   "settings-mix-defaults": SettingsMixDefaultsMockup,
   "settings-calendar": SettingsCalendarMockup,
   "settings-data": SettingsDataMockup,

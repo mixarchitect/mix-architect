@@ -561,12 +561,12 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "프로필, 외관, 이메일 알림, 믹스 기본값 등을 구성합니다.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
     "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "설정 개요",
-        "body": "사이드바 또는 상단 바의 계정 메뉴에서 [User Settings](/app/settings)를 엽니다. 설정은 패널별로 구성되어 있습니다: Profile, Subscription, Region & Currency, Appearance, Persona, Payment Tracking, Email Preferences, Integrations, Mix Defaults, Calendar, Your Data. 각 패널에서 상호작용하면 변경 사항이 즉시 저장됩니다.",
+        "body": "사이드바 또는 상단 바의 계정 메뉴에서 [User Settings](/app/settings)를 엽니다. 설정은 패널별로 구성되어 있습니다: Profile, Subscription, Region & Currency, Appearance, Persona, Payment Tracking, Email Preferences, Mix Defaults, Calendar, Your Data. 각 패널에서 상호작용하면 변경 사항이 즉시 저장됩니다.",
         "mockup": "settings-overview"
       },
       {
@@ -605,11 +605,6 @@ export const articles: HelpArticle[] = [
         "body": "Email Preferences 패널은 Mix Architect에서 수신하는 트랜잭션 이메일을 제어합니다. 각 카테고리에는 켜기/끄기 토글이 있습니다. 카테고리에는 다음이 포함됩니다: Release Live Alerts(릴리스가 플랫폼에서 라이브될 때), New Comment Alerts(누군가 릴리스에 댓글을 남길 때), Weekly Digest(릴리스 전체 활동의 주간 요약), Payment Reminders(구독 결제가 실패할 때), Payment Confirmations(결제가 처리될 때), Subscription Confirmations(플랜이 활성화될 때), Cancellation Notices(플랜이 취소될 때). 모든 카테고리는 기본적으로 활성화되어 있습니다. 모든 이메일 하단에 수신 거부 링크가 포함되어 있습니다.",
         "mockup": "settings-email-prefs",
         "tip": "알림 이메일 하단의 수신 거부 링크를 클릭하여 특정 이메일 카테고리의 수신을 거부할 수도 있습니다. 로그인이 필요하지 않습니다."
-      },
-      {
-        "heading": "인테그레이션",
-        "body": "Integrations 패널은 사용 가능한 클라우드 스토리지 연결을 보여줍니다. 각 인테그레이션은 서비스 이름, 설명, Connect 또는 Disconnect 버튼을 표시합니다. 현재 지원: Google Drive 및 Dropbox. 연결된 서비스는 녹색 \"Connected\" 뱃지를 표시합니다. 릴리스와 함께 더 쉬운 파일 관리를 위해 인테그레이션을 사용하여 클라우드 스토리지를 연결하세요.",
-        "mockup": "settings-integrations"
       },
       {
         "heading": "믹스 기본값",

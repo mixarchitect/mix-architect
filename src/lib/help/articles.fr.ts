@@ -576,12 +576,12 @@ export const articles: HelpArticle[] = [
     "title": "Paramètres utilisateur",
     "category": "account",
     "summary": "Configurez votre profil, apparence, notifications par e-mail, paramètres de mix par défaut et plus encore.",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
     "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "Aperçu des paramètres",
-        "body": "Ouvrez les [Paramètres utilisateur](/app/settings) depuis la barre latérale ou le menu du compte dans la barre supérieure. Les paramètres sont organisés en panneaux : Profil, Abonnement, Région et devise, Apparence, Persona, Suivi des paiements, Préférences e-mail, Intégrations, Paramètres de mix par défaut, Calendrier et Vos données. Les modifications sont enregistrées instantanément lorsque vous interagissez avec chaque panneau.",
+        "body": "Ouvrez les [Paramètres utilisateur](/app/settings) depuis la barre latérale ou le menu du compte dans la barre supérieure. Les paramètres sont organisés en panneaux : Profil, Abonnement, Région et devise, Apparence, Persona, Suivi des paiements, Préférences e-mail, Paramètres de mix par défaut, Calendrier et Vos données. Les modifications sont enregistrées instantanément lorsque vous interagissez avec chaque panneau.",
         "mockup": "settings-overview"
       },
       {
@@ -620,11 +620,6 @@ export const articles: HelpArticle[] = [
         "body": "Le panneau Préférences e-mail controle les e-mails transactionnels que vous recevez de Mix Architect. Chaque catégorie dispose d'un interrupteur. Les catégories comprennent : Alertes de mise en ligne (lorsqu'une sortie est publiée sur une plateforme), Alertes de nouveaux commentaires (lorsque quelqu'un commente votre sortie), Résumé hebdomadaire (un récapitulatif de l'activité de toutes vos sorties), Rappels de paiement (lorsqu'un paiement d'abonnement échoue), Confirmations de paiement (lorsqu'un paiement est traité), Confirmations d'abonnement (lorsque votre plan est activé) et Avis d'annulation (lorsque votre plan est annulé). Toutes les catégories sont activées par défaut. Chaque e-mail inclut un lien de désabonnement en bas.",
         "mockup": "settings-email-prefs",
         "tip": "Vous pouvez également vous désabonner d'une catégorie d'e-mail spécifique en cliquant sur le lien de désabonnement en bas de n'importe quel e-mail de notification. Aucune connexion requise."
-      },
-      {
-        "heading": "Intégrations",
-        "body": "Le panneau Intégrations affiche les connexions de stockage cloud disponibles. Chaque intégration affiche le nom du service, une description et un bouton Connecter ou Déconnecter. Actuellement pris en charge : Google Drive et Dropbox. Les services connectés affichent un badge vert \"Connecté\". Utilisez les intégrations pour relier votre stockage cloud afin de faciliter la gestion des fichiers aux cotés de vos sorties.",
-        "mockup": "settings-integrations"
       },
       {
         "heading": "Paramètres de mix par défaut",

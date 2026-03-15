@@ -561,12 +561,12 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "配置您的个人资料、外观、电子邮件通知、混音默认值等。",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
     "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "设置概览",
-        "body": "从侧边栏或顶部栏的账户菜单打开[User Settings](/app/settings)。设置按面板组织：Profile、Subscription、Region & Currency、Appearance、Persona、Payment Tracking、Email Preferences、Integrations、Mix Defaults、Calendar 和 Your Data。当您与每个面板交互时，更改会即时保存。",
+        "body": "从侧边栏或顶部栏的账户菜单打开[User Settings](/app/settings)。设置按面板组织：Profile、Subscription、Region & Currency、Appearance、Persona、Payment Tracking、Email Preferences、Mix Defaults、Calendar 和 Your Data。当您与每个面板交互时，更改会即时保存。",
         "mockup": "settings-overview"
       },
       {
@@ -605,11 +605,6 @@ export const articles: HelpArticle[] = [
         "body": "Email Preferences 面板控制您从 Mix Architect 接收哪些事务性电子邮件。每个类别都有一个开/关切换。类别包括：Release Live Alerts（当发行在平台上线时）、New Comment Alerts（当有人评论您的发行时）、Weekly Digest（您所有发行活动的每周摘要）、Payment Reminders（当订阅付款失败时）、Payment Confirmations（当付款处理完成时）、Subscription Confirmations（当您的计划激活时）以及 Cancellation Notices（当您的计划取消时）。所有类别默认启用。每封电子邮件底部都包含退订链接。",
         "mockup": "settings-email-prefs",
         "tip": "您也可以通过点击任何通知电子邮件底部的退订链接来取消订阅特定的电子邮件类别。无需登录。"
-      },
-      {
-        "heading": "集成",
-        "body": "Integrations 面板显示可用的云存储连接。每个集成显示服务名称、描述以及 Connect 或 Disconnect 按钮。目前支持：Google Drive 和 Dropbox。已连接的服务显示绿色\"Connected\"徽章。使用集成链接您的云存储，以便更轻松地管理发行文件。",
-        "mockup": "settings-integrations"
       },
       {
         "heading": "混音默认值",

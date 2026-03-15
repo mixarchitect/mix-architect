@@ -561,12 +561,12 @@ export const articles: HelpArticle[] = [
     "category": "account",
     "summary":
       "プロフィール、外観、メール通知、ミックスデフォルト、その他の設定を構成します。",
-    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "integrations", "calendar", "export"],
+    "tags": ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
     "updatedAt": "2026-03-15",
     "content": [
       {
         "heading": "設定の概要",
-        "body": "サイドバーまたはトップバーのアカウントメニューから[User Settings](/app/settings)を開きます。設定はパネルごとに整理されています: Profile、Subscription、Region & Currency、Appearance、Persona、Payment Tracking、Email Preferences、Integrations、Mix Defaults、Calendar、Your Data。各パネルを操作すると、変更は即座に保存されます。",
+        "body": "サイドバーまたはトップバーのアカウントメニューから[User Settings](/app/settings)を開きます。設定はパネルごとに整理されています: Profile、Subscription、Region & Currency、Appearance、Persona、Payment Tracking、Email Preferences、Mix Defaults、Calendar、Your Data。各パネルを操作すると、変更は即座に保存されます。",
         "mockup": "settings-overview"
       },
       {
@@ -605,11 +605,6 @@ export const articles: HelpArticle[] = [
         "body": "Email Preferencesパネルでは、Mix Architectから受信するトランザクションメールを制御します。各カテゴリにはオン/オフトグルがあります。カテゴリには以下が含まれます: Release Live Alerts（リリースがプラットフォームで公開されたとき）、New Comment Alerts（誰かがあなたのリリースにコメントしたとき）、Weekly Digest（リリース全体のアクティビティの週次サマリー）、Payment Reminders（サブスクリプションの支払いが失敗したとき）、Payment Confirmations（支払いが処理されたとき）、Subscription Confirmations（プランが有効化されたとき）、Cancellation Notices（プランがキャンセルされたとき）。すべてのカテゴリはデフォルトで有効です。すべてのメールの下部に配信停止リンクが含まれています。",
         "mockup": "settings-email-prefs",
         "tip": "通知メールの下部にある配信停止リンクをクリックすることで、特定のメールカテゴリの配信を停止することもできます。サインインは不要です。"
-      },
-      {
-        "heading": "インテグレーション",
-        "body": "Integrationsパネルには、利用可能なクラウドストレージ接続が表示されます。各インテグレーションにはサービス名、説明、ConnectまたはDisconnectボタンが表示されます。現在サポート: Google DriveとDropbox。接続済みのサービスには緑色の「Connected」バッジが表示されます。リリースと一緒にファイル管理を容易にするために、インテグレーションを使用してクラウドストレージをリンクしてください。",
-        "mockup": "settings-integrations"
       },
       {
         "heading": "ミックスデフォルト",
