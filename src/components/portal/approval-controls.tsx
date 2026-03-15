@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Check, MessageCircle, RefreshCw, Package } from "lucide-react";
 
 import type { ApprovalStatus } from "@/lib/portal-types";
+import type { PromptTrigger } from "@/hooks/usePostActionPrompt";
 
 const CLIENT_NAME_KEY = "portal_client_name";
 
@@ -69,6 +70,7 @@ type ApprovalControlsProps = {
   initialStatus: ApprovalStatus;
   approvalDate: string | null;
   onStatusChange?: (newStatus: ApprovalStatus) => void;
+  onPromoTrigger?: (trigger: PromptTrigger) => void;
 };
 
 export function ApprovalControls({
@@ -77,6 +79,7 @@ export function ApprovalControls({
   initialStatus,
   approvalDate,
   onStatusChange,
+  onPromoTrigger,
 }: ApprovalControlsProps) {
   const [status, setStatus] = useState<ApprovalStatus>(initialStatus);
   const clientName = typeof window !== "undefined" ? localStorage.getItem(CLIENT_NAME_KEY) || "Client" : "Client";
@@ -102,6 +105,7 @@ export function ApprovalControls({
       if (res.ok) {
         setStatus("approved");
         onStatusChange?.("approved");
+        onPromoTrigger?.("approval");
       } else {
         const data = await res.json().catch(() => ({}));
         setError(data.error || "Failed to approve — please try again");
@@ -132,6 +136,7 @@ export function ApprovalControls({
       if (res.ok) {
         setStatus("changes_requested");
         onStatusChange?.("changes_requested");
+        onPromoTrigger?.("approval");
         setChangeNote("");
         setShowRequestForm(false);
       } else {

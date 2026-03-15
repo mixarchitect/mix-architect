@@ -5,6 +5,7 @@ import { ApprovalControls, PortalStatusBadge } from "@/components/portal/approva
 import { PortalReferenceItem } from "@/components/portal/portal-reference-item";
 import { ChevronRight } from "lucide-react";
 import type { PortalTrack, ApprovalStatus } from "@/lib/portal-types";
+import type { PromptTrigger } from "@/hooks/usePostActionPrompt";
 import { formatLabel } from "@/lib/format-labels";
 
 type PortalTrackCardProps = {
@@ -21,6 +22,7 @@ type PortalTrackCardProps = {
   showLyrics?: boolean;
   paymentGated: boolean;
   onStatusChange?: (newStatus: ApprovalStatus) => void;
+  onPromoTrigger?: (trigger: PromptTrigger) => void;
 };
 
 export function PortalTrackCard({
@@ -37,6 +39,7 @@ export function PortalTrackCard({
   showLyrics,
   paymentGated,
   onStatusChange,
+  onPromoTrigger,
 }: PortalTrackCardProps) {
   const hasAudio = track.versions.length > 0;
   const isApproved = track.approvalStatus === "approved";
@@ -109,6 +112,7 @@ export function PortalTrackCard({
             releaseTitle={releaseTitle}
             downloadEnabled={track.downloadEnabled}
             paymentGated={paymentGated}
+            onPromoTrigger={onPromoTrigger}
           />
         </div>
       )}
@@ -141,6 +145,7 @@ export function PortalTrackCard({
             initialStatus={track.approvalStatus}
             approvalDate={track.approvalDate}
             onStatusChange={onStatusChange}
+            onPromoTrigger={onPromoTrigger}
           />
         </div>
       )}

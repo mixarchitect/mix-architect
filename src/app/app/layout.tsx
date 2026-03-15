@@ -1,9 +1,10 @@
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { Shell } from "@/components/ui/shell";
 import { createNotification } from "@/lib/notifications/service";
 
@@ -33,7 +34,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       .maybeSingle(),
     supabase
       .from("profiles")
-      .select("is_admin")
+      .select("is_admin, attributed_to_engineer")
       .eq("id", user.id)
       .maybeSingle(),
     supabase.rpc("claim_pending_invites"),
@@ -78,6 +79,46 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           });
         }
       }
+    }
+  })();
+
+  // Fire-and-forget: capture signup attribution if cookie is present and user is new
+  void (async () => {
+    try {
+      const cookieStore = await cookies();
+      const attributionId = cookieStore.get("mix_attribution_id")?.value;
+      if (!attributionId) return;
+      // Only attribute if user doesn't already have an attribution
+      if (profileRes.data?.attributed_to_engineer) return;
+
+      const serviceClient = createSupabaseServiceClient();
+      const { data: attribution } = await serviceClient
+        .from("signup_attributions")
+        .select("id, engineer_id, status")
+        .eq("id", attributionId)
+        .maybeSingle();
+
+      if (!attribution || attribution.status === "signed_up") return;
+
+      await Promise.allSettled([
+        serviceClient
+          .from("signup_attributions")
+          .update({
+            attributed_user_id: user.id,
+            status: "signed_up",
+            signed_up_at: new Date().toISOString(),
+          })
+          .eq("id", attributionId),
+        attribution.engineer_id
+          ? serviceClient
+              .from("profiles")
+              .update({ attributed_to_engineer: attribution.engineer_id })
+              .eq("id", user.id)
+          : Promise.resolve(),
+      ]);
+      // Cookie will be cleared on next response via middleware or naturally expires
+    } catch {
+      // Non-fatal: attribution failure should never block app load
     }
   })();
 

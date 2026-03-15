@@ -92,5 +92,6 @@ export type PortalRelease = {
   fee_currency: string;
   paid_amount: number | null;
   engineer_name: string | null;
+  engineer_id: string;
   distribution: PortalReleaseDistribution | null;
 };

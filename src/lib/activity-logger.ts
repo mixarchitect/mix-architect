@@ -13,7 +13,9 @@ export type ActivityEventType =
   | "export_requested"
   | "conversion_completed"
   | "comp_account_granted"
-  | "comp_account_revoked";
+  | "comp_account_revoked"
+  | "attribution_click"
+  | "attribution_signup";
 
 /**
  * Log a user activity event. Fire-and-forget on the server side.

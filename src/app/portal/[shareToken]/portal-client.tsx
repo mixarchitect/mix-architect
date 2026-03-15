@@ -5,6 +5,8 @@ import { PortalHeader } from "@/components/portal/portal-header";
 import { PortalTrackCard } from "@/components/portal/portal-track-card";
 import { PortalFooter } from "@/components/portal/portal-footer";
 import { PortalReferenceItem } from "@/components/portal/portal-reference-item";
+import { PostActionPrompt } from "@/components/referral/PostActionPrompt";
+import { usePostActionPrompt } from "@/hooks/usePostActionPrompt";
 import { ChevronRight } from "lucide-react";
 import type { PortalRelease, PortalTrack, PortalShare, ApprovalStatus } from "@/lib/portal-types";
 import type { BriefReference } from "@/lib/db-types";
@@ -29,6 +31,7 @@ export function PortalClient({
   const [tracks, setTracks] = useState(initialTracks);
   const paymentGated =
     share.require_payment_for_download && release.payment_status !== "paid";
+  const { showPrompt, promptTrigger, triggerPrompt, dismissPrompt } = usePostActionPrompt();
 
   // Update a single track's approval status reactively (no page reload)
   const handleStatusChange = useCallback((trackId: string, newStatus: ApprovalStatus) => {
@@ -119,6 +122,7 @@ export function PortalClient({
               showLyrics={share.show_lyrics}
               paymentGated={paymentGated}
               onStatusChange={(newStatus) => handleStatusChange(track.id, newStatus)}
+              onPromoTrigger={triggerPrompt}
             />
           ))}
 
@@ -142,6 +146,15 @@ export function PortalClient({
           paymentGated={paymentGated}
         />
       </div>
+
+      {/* Post-action signup prompt */}
+      {showPrompt && promptTrigger && (
+        <PostActionPrompt
+          trigger={promptTrigger}
+          engineerId={release.engineer_id}
+          onDismiss={dismissPrompt}
+        />
+      )}
     </main>
   );
 }

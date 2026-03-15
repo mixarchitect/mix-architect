@@ -45,6 +45,7 @@ type PortalAudioPlayerProps = {
   releaseTitle: string;
   downloadEnabled: boolean;
   paymentGated: boolean;
+  onPromoTrigger?: (trigger: "approval" | "download" | "comment") => void;
 };
 
 /* ------------------------------------------------------------------ */
@@ -95,6 +96,7 @@ export function PortalAudioPlayer({
   releaseTitle,
   downloadEnabled,
   paymentGated,
+  onPromoTrigger,
 }: PortalAudioPlayerProps) {
   const { resolvedTheme } = useTheme();
   const audio = useAudio();
@@ -336,6 +338,7 @@ export function PortalAudioPlayer({
     } catch {
       window.open(activeVersion.audio_url, "_blank");
     }
+    onPromoTrigger?.("download");
   }
 
   /* ---------------------------------------------------------------- */
@@ -375,6 +378,7 @@ export function PortalAudioPlayer({
       setNewCommentText("");
       setCommentInput(null);
       setHighlightedCommentId(data.id);
+      onPromoTrigger?.("comment");
     } catch {
       // Silently fail
     }

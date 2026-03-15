@@ -298,6 +298,7 @@ export default async function PortalPage({ params }: Props) {
     fee_currency: release.fee_currency,
     paid_amount: release.paid_amount ?? 0,
     engineer_name: engineerName,
+    engineer_id: release.user_id,
     distribution: releaseDistribution,
   };
 

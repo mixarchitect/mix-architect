@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { PoweredByBanner } from "@/components/referral/PoweredByBanner";
 import type { PortalRelease, PortalTrack, PortalReleaseDistribution } from "@/lib/portal-types";
 
 type PortalFooterProps = {
@@ -191,46 +192,8 @@ export function PortalFooter({
         </div>
       )}
 
-      {/* Powered by footer */}
-      <footer className="pt-8 pb-12 text-center space-y-2">
-        <a
-          href="https://mixarchitect.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 group"
-        >
-          <img
-            src="/mix-architect-logo.svg"
-            alt="Mix Architect"
-            className="h-4 w-auto opacity-40 group-hover:opacity-60 transition-opacity"
-          />
-          <span className="text-xs text-faint group-hover:text-muted transition-colors">
-            Powered by Mix Architect
-          </span>
-        </a>
-        <div className="space-y-1">
-          <div>
-            <a
-              href="https://mixarchitect.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[10px] text-faint/60 hover:text-muted transition-colors"
-            >
-              Manage your releases &rarr;
-            </a>
-          </div>
-          <div>
-            <a
-              href="https://mixarchitect.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[10px] text-faint/60 hover:text-muted transition-colors"
-            >
-              Sign up to track all your projects in one place &rarr;
-            </a>
-          </div>
-        </div>
-      </footer>
+      {/* Powered by footer with attribution tracking */}
+      <PoweredByBanner engineerId={release.engineer_id} />
     </div>
   );
 }

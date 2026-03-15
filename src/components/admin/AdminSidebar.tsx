@@ -13,6 +13,7 @@ import {
   Star,
   ArrowLeft,
   Shield,
+  TrendingUp,
   Menu,
   X,
 } from "lucide-react";
@@ -26,6 +27,7 @@ const adminNavItems = [
   { label: "Activity Log", href: "/admin/activity", icon: Activity },
   { label: "Notifications", href: "/admin/notifications", icon: Bell },
   { label: "Audit Log", href: "/admin/audit", icon: Shield },
+  { label: "Attributions", href: "/admin/attributions", icon: TrendingUp },
   { label: "Featured Releases", href: "/admin/featured", icon: Star },
 ];
 
