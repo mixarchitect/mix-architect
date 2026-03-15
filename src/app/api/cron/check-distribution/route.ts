@@ -136,9 +136,9 @@ export async function GET(request: NextRequest) {
             body: detection.url ?? undefined,
           });
 
-          // Send release-live email to all release members (fire-and-forget)
+          // Send release-live email to all release members
           const appUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com"}/app/releases/${releaseId}`;
-          emailReleaseMembers({
+          await emailReleaseMembers({
             releaseId,
             category: "release_live",
             buildEmail: ({ unsubscribeUrl }) =>

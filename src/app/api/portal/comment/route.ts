@@ -82,18 +82,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Fire-and-forget notification to release members
+    // Notify + email release members (awaited so Vercel doesn't kill the function)
     const actor = author_name?.trim() || "Client";
-    notifyReleaseMembers({
-      releaseId: share.release_id,
-      type: "portal_comment",
-      title: `${actor} commented on "${track.title}"`,
-      body: content.trim().slice(0, 120),
-      trackId: track_id,
-      actorName: actor,
-    });
-
-    // Fire-and-forget email to release members
     const { data: releaseInfo } = await supabase
       .from("releases")
       .select("title")
@@ -101,19 +91,30 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     const appUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com"}/app/releases/${share.release_id}`;
-    emailReleaseMembers({
-      releaseId: share.release_id,
-      category: "new_comment",
-      buildEmail: ({ unsubscribeUrl }) =>
-        buildNewCommentEmail({
-          releaseTitle: releaseInfo?.title ?? "Untitled Release",
-          trackTitle: track.title ?? "Untitled Track",
-          commentAuthor: actor,
-          commentPreview: content.trim().slice(0, 200),
-          appUrl,
-          unsubscribeUrl,
-        }),
-    });
+
+    await Promise.allSettled([
+      notifyReleaseMembers({
+        releaseId: share.release_id,
+        type: "portal_comment",
+        title: `${actor} commented on "${track.title}"`,
+        body: content.trim().slice(0, 120),
+        trackId: track_id,
+        actorName: actor,
+      }),
+      emailReleaseMembers({
+        releaseId: share.release_id,
+        category: "new_comment",
+        buildEmail: ({ unsubscribeUrl }) =>
+          buildNewCommentEmail({
+            releaseTitle: releaseInfo?.title ?? "Untitled Release",
+            trackTitle: track.title ?? "Untitled Track",
+            commentAuthor: actor,
+            commentPreview: content.trim().slice(0, 200),
+            appUrl,
+            unsubscribeUrl,
+          }),
+      }),
+    ]);
 
     return NextResponse.json(comment);
   } catch {

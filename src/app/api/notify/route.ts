@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
         : { data: null };
 
       const appUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com"}/app/releases/${releaseId}`;
-      emailReleaseMembers({
+      await emailReleaseMembers({
         releaseId,
         excludeUserId: user.id,
         category: "new_comment",
