@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
       }
 
       const displayName =
-        user.user_metadata?.display_name ?? user.email.split("@")[0];
+        user.user_metadata?.display_name ?? user.user_metadata?.full_name ?? user.email.split("@")[0];
 
       const unsubscribeUrl = pref.unsubscribe_token
         ? buildUnsubscribeUrl(pref.unsubscribe_token, "weekly_digest")

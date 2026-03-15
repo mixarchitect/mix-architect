@@ -64,7 +64,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       .gte("accepted_at", cutoff);
 
     if (recentJoins?.length) {
-      const displayName = user.user_metadata?.display_name || user.email?.split("@")[0] || "Someone";
+      const displayName = user.user_metadata?.display_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "Someone";
       for (const join of recentJoins) {
         const release = join.releases as unknown as { user_id: string; title: string };
         if (release?.user_id && release.user_id !== user.id) {

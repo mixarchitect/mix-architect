@@ -80,7 +80,7 @@ export default function SettingsPage() {
       } = await supabase.auth.getUser();
       if (user) {
         setEmail(user.email ?? "");
-        setDisplayName(user.user_metadata?.display_name ?? "");
+        setDisplayName(user.user_metadata?.display_name ?? user.user_metadata?.full_name ?? "");
 
         const { data } = await supabase
           .from("user_defaults")

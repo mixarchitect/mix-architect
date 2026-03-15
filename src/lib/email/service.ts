@@ -228,6 +228,9 @@ export async function getUserDisplayName(userId: string): Promise<string> {
   if (user?.user_metadata?.display_name) {
     return user.user_metadata.display_name;
   }
+  if (user?.user_metadata?.full_name) {
+    return user.user_metadata.full_name;
+  }
   if (user?.email) {
     return user.email.split("@")[0];
   }
