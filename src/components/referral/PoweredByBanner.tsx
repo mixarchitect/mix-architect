@@ -37,14 +37,9 @@ export function PoweredByBanner({ engineerId }: PoweredByBannerProps) {
         className="inline-flex items-center gap-2 group"
       >
         <img
-          src="/mix-architect-logo.svg"
-          alt="Mix Architect"
-          className="h-4 w-auto opacity-40 group-hover:opacity-60 transition-opacity dark:hidden"
-        />
-        <img
           src="/mix-architect-logo-white.svg"
           alt="Mix Architect"
-          className="h-4 w-auto opacity-40 group-hover:opacity-60 transition-opacity hidden dark:block"
+          className="h-4 w-auto opacity-40 group-hover:opacity-60 transition-opacity"
         />
         <span className="text-xs text-faint group-hover:text-muted transition-colors">
           Powered by Mix Architect
