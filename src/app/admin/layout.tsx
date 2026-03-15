@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { requireAdmin } from "@/lib/admin";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { TopBar } from "@/components/ui/top-bar";
+import { AdminTopBar } from "@/components/admin/AdminTopBar";
 
 export default async function AdminLayout({
   children,
@@ -18,11 +18,10 @@ export default async function AdminLayout({
 
   return (
     <div className="flex flex-col min-h-dvh">
-      <TopBar
+      <AdminTopBar
         userId={userId}
         userEmail={user?.email ?? null}
         displayName={displayName}
-        isAdmin
       />
       <div className="flex flex-1 overflow-hidden">
         <AdminSidebar />
