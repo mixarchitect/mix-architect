@@ -50,7 +50,7 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
   return (
     <header className="hidden md:flex h-14 shrink-0 items-center justify-between px-6 border-b border-border bg-panel">
       {/* Left: greeting + logo */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <Link
           href="/app"
           className="flex items-center hover:opacity-90 transition-opacity"
@@ -62,9 +62,12 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
           />
         </Link>
         {displayName && (
-          <span className="text-sm text-muted">
-            {getGreeting()}, <span className="text-text font-medium">{displayName.split(" ")[0]}</span>
-          </span>
+          <>
+            <div className="h-4 w-px bg-border" />
+            <span className="text-sm text-muted">
+              {getGreeting()}, <span className="text-text font-medium">{displayName.split(" ")[0]}</span>
+            </span>
+          </>
         )}
       </div>
 
