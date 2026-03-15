@@ -164,48 +164,50 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-6">
-        {/* Appearance */}
+        {/* Profile */}
         <Panel>
           <PanelHeader>
-            <h2 className="text-base font-semibold text-text">{t("appearance.title")}</h2>
-            <p className="text-sm text-muted mt-1">
-              {t("appearance.description")}
-            </p>
+            <h2 className="text-base font-semibold text-text">{t("profile.title")}</h2>
           </PanelHeader>
           <Rule />
-          <PanelBody className="pt-5">
-            <div className="flex gap-2">
-              {themeOptions.map((opt) => {
-                const active = currentTheme === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={async () => {
-                      setTheme(opt.value);
-                      const { data: { user } } = await supabase.auth.getUser();
-                      if (user) {
-                        await supabase.from("user_defaults").upsert(
-                          { user_id: user.id, theme: opt.value },
-                          { onConflict: "user_id" },
-                        );
-                      }
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                    style={
-                      active
-                        ? { background: "var(--signal)", color: "var(--signal-on)" }
-                        : { background: "var(--panel-2)", color: "var(--muted)" }
-                    }
-                  >
-                    <opt.Icon size={16} strokeWidth={1.5} />
-                    {opt.label}
-                  </button>
-                );
-              })}
+          <PanelBody className="pt-5 space-y-4">
+            <div className="space-y-1.5">
+              <label className="label text-muted">{t("profile.displayName")}</label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="input"
+                placeholder={t("profile.displayNamePlaceholder")}
+              />
             </div>
+            <div className="space-y-1.5">
+              <label className="label text-muted">{t("profile.companyName")}</label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="input"
+                placeholder={t("profile.companyNamePlaceholder")}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="label text-muted">{t("profile.email")}</label>
+              <input
+                type="email"
+                value={email}
+                disabled
+                className="input opacity-60"
+              />
+            </div>
+            <Button variant="primary" onClick={handleSave}>
+              {t("profile.save")}
+            </Button>
           </PanelBody>
         </Panel>
+
+        {/* Subscription */}
+        <SubscriptionPanel />
 
         {/* Region & Currency */}
         <Panel>
@@ -281,47 +283,152 @@ export default function SettingsPage() {
           </PanelBody>
         </Panel>
 
-        {/* Profile */}
+        {/* Appearance */}
         <Panel>
           <PanelHeader>
-            <h2 className="text-base font-semibold text-text">{t("profile.title")}</h2>
+            <h2 className="text-base font-semibold text-text">{t("appearance.title")}</h2>
+            <p className="text-sm text-muted mt-1">
+              {t("appearance.description")}
+            </p>
+          </PanelHeader>
+          <Rule />
+          <PanelBody className="pt-5">
+            <div className="flex gap-2">
+              {themeOptions.map((opt) => {
+                const active = currentTheme === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={async () => {
+                      setTheme(opt.value);
+                      const { data: { user } } = await supabase.auth.getUser();
+                      if (user) {
+                        await supabase.from("user_defaults").upsert(
+                          { user_id: user.id, theme: opt.value },
+                          { onConflict: "user_id" },
+                        );
+                      }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors"
+                    style={
+                      active
+                        ? { background: "var(--signal)", color: "var(--signal-on)" }
+                        : { background: "var(--panel-2)", color: "var(--muted)" }
+                    }
+                  >
+                    <opt.Icon size={16} strokeWidth={1.5} />
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </PanelBody>
+        </Panel>
+
+        {/* Persona */}
+        <Panel>
+          <PanelHeader>
+            <h2 className="text-base font-semibold text-text">{t("persona.title")}</h2>
+          </PanelHeader>
+          <Rule />
+          <PanelBody className="pt-5 space-y-3">
+            {([
+              { id: "artist" as const, label: t("persona.artistLabel") },
+              { id: "engineer" as const, label: t("persona.engineerLabel") },
+              { id: "both" as const, label: t("persona.bothLabel") },
+              { id: "other" as const, label: t("persona.otherLabel") },
+            ] as const).map((opt) => (
+              <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="radio"
+                  name="persona"
+                  value={opt.id}
+                  checked={persona === opt.id}
+                  onChange={async () => {
+                    setPersona(opt.id);
+                    const updateData: Record<string, unknown> = { persona: opt.id };
+                    // Auto-toggle payments if not manually overridden
+                    if (!paymentsManuallySet) {
+                      const newPayments = opt.id !== "artist";
+                      setPaymentsEnabled(newPayments);
+                      updateData.payments_enabled = newPayments;
+                    }
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                      await supabase.from("user_defaults").upsert(
+                        { user_id: user.id, ...updateData },
+                        { onConflict: "user_id" },
+                      );
+                      router.refresh();
+                    }
+                  }}
+                  className="accent-[var(--signal)]"
+                />
+                <span className="text-sm text-text group-hover:text-text/80 transition-colors">
+                  {opt.label}
+                </span>
+              </label>
+            ))}
+            <p className="text-xs text-muted pt-1">
+              {t("persona.note")}
+            </p>
+          </PanelBody>
+        </Panel>
+
+        {/* Payment Tracking */}
+        <Panel>
+          <PanelHeader>
+            <h2 className="text-base font-semibold text-text">{t("paymentTracking.title")}</h2>
+            <p className="text-sm text-muted mt-1">
+              {t("paymentTracking.description")}
+            </p>
           </PanelHeader>
           <Rule />
           <PanelBody className="pt-5 space-y-4">
-            <div className="space-y-1.5">
-              <label className="label text-muted">{t("profile.displayName")}</label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="input"
-                placeholder={t("profile.displayNamePlaceholder")}
-              />
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-medium text-text">{t("paymentTracking.enable")}</div>
+                <div className="text-xs text-muted mt-0.5">{t("paymentTracking.enableHelp")}</div>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  const prev = paymentsEnabled;
+                  const next = !prev;
+                  setPaymentsEnabled(next);
+                  try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) throw new Error("Not authenticated");
+                    const { error } = await supabase.from("user_defaults").upsert(
+                      { user_id: user.id, payments_enabled: next, payments_manually_set: true },
+                      { onConflict: "user_id" },
+                    );
+                    if (error) throw error;
+                    setPaymentsManuallySet(true);
+                    router.refresh();
+                  } catch {
+                    setPaymentsEnabled(prev);
+                  }
+                }}
+                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
+                  paymentsEnabled ? "bg-signal" : "bg-black/20 dark:bg-white/20"
+                }`}
+              >
+                <span
+                  className="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform"
+                  style={{ transform: paymentsEnabled ? "translateX(22px)" : "translateX(3px)" }}
+                />
+              </button>
             </div>
-            <div className="space-y-1.5">
-              <label className="label text-muted">{t("profile.companyName")}</label>
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                className="input"
-                placeholder={t("profile.companyNamePlaceholder")}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="label text-muted">{t("profile.email")}</label>
-              <input
-                type="email"
-                value={email}
-                disabled
-                className="input opacity-60"
-              />
-            </div>
-            <Button variant="primary" onClick={handleSave}>
-              {t("profile.save")}
-            </Button>
           </PanelBody>
         </Panel>
+
+        {/* Email Notifications */}
+        <EmailPreferencesPanel />
+
+        {/* Integrations */}
+        <IntegrationsPanel />
 
         {/* Mix Defaults */}
         <Panel>
@@ -395,103 +502,8 @@ export default function SettingsPage() {
           </PanelBody>
         </Panel>
 
-        {/* Payment Tracking */}
-        <Panel>
-          <PanelHeader>
-            <h2 className="text-base font-semibold text-text">{t("paymentTracking.title")}</h2>
-            <p className="text-sm text-muted mt-1">
-              {t("paymentTracking.description")}
-            </p>
-          </PanelHeader>
-          <Rule />
-          <PanelBody className="pt-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm font-medium text-text">{t("paymentTracking.enable")}</div>
-                <div className="text-xs text-muted mt-0.5">{t("paymentTracking.enableHelp")}</div>
-              </div>
-              <button
-                type="button"
-                onClick={async () => {
-                  const prev = paymentsEnabled;
-                  const next = !prev;
-                  setPaymentsEnabled(next);
-                  try {
-                    const { data: { user } } = await supabase.auth.getUser();
-                    if (!user) throw new Error("Not authenticated");
-                    const { error } = await supabase.from("user_defaults").upsert(
-                      { user_id: user.id, payments_enabled: next, payments_manually_set: true },
-                      { onConflict: "user_id" },
-                    );
-                    if (error) throw error;
-                    setPaymentsManuallySet(true);
-                    router.refresh();
-                  } catch {
-                    setPaymentsEnabled(prev);
-                  }
-                }}
-                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                  paymentsEnabled ? "bg-signal" : "bg-black/20 dark:bg-white/20"
-                }`}
-              >
-                <span
-                  className="inline-block h-5 w-5 rounded-full bg-white shadow transition-transform"
-                  style={{ transform: paymentsEnabled ? "translateX(22px)" : "translateX(3px)" }}
-                />
-              </button>
-            </div>
-          </PanelBody>
-        </Panel>
-
-        {/* Persona */}
-        <Panel>
-          <PanelHeader>
-            <h2 className="text-base font-semibold text-text">{t("persona.title")}</h2>
-          </PanelHeader>
-          <Rule />
-          <PanelBody className="pt-5 space-y-3">
-            {([
-              { id: "artist" as const, label: t("persona.artistLabel") },
-              { id: "engineer" as const, label: t("persona.engineerLabel") },
-              { id: "both" as const, label: t("persona.bothLabel") },
-              { id: "other" as const, label: t("persona.otherLabel") },
-            ] as const).map((opt) => (
-              <label key={opt.id} className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="radio"
-                  name="persona"
-                  value={opt.id}
-                  checked={persona === opt.id}
-                  onChange={async () => {
-                    setPersona(opt.id);
-                    const updateData: Record<string, unknown> = { persona: opt.id };
-                    // Auto-toggle payments if not manually overridden
-                    if (!paymentsManuallySet) {
-                      const newPayments = opt.id !== "artist";
-                      setPaymentsEnabled(newPayments);
-                      updateData.payments_enabled = newPayments;
-                    }
-                    const { data: { user } } = await supabase.auth.getUser();
-                    if (user) {
-                      await supabase.from("user_defaults").upsert(
-                        { user_id: user.id, ...updateData },
-                        { onConflict: "user_id" },
-                      );
-                      router.refresh();
-                    }
-                  }}
-                  className="accent-[var(--signal)]"
-                />
-                <span className="text-sm text-text group-hover:text-text/80 transition-colors">
-                  {opt.label}
-                </span>
-              </label>
-            ))}
-            <p className="text-xs text-muted pt-1">
-              {t("persona.note")}
-            </p>
-          </PanelBody>
-        </Panel>
+        {/* Calendar Subscription */}
+        <CalendarPanel />
 
         {/* Your Data */}
         <Panel>
@@ -506,18 +518,6 @@ export default function SettingsPage() {
             <ExportDataButton />
           </PanelBody>
         </Panel>
-
-        {/* Calendar Subscription */}
-        <CalendarPanel />
-
-        {/* Integrations */}
-        <IntegrationsPanel />
-
-        {/* Email Notifications */}
-        <EmailPreferencesPanel />
-
-        {/* Subscription */}
-        <SubscriptionPanel />
       </div>
     </div>
   );
