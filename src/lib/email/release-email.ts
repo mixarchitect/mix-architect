@@ -61,28 +61,17 @@ export async function emailReleaseMembers({
     recipientIds.delete(excludeUserId);
   }
 
-  console.log(`[email/release-email] releaseId=${releaseId} category=${category} owner=${release?.user_id ?? "none"} members=${members?.length ?? 0} recipients=${recipientIds.size} excludeUserId=${excludeUserId ?? "none"}`);
-
   if (recipientIds.size === 0) return;
 
   // Send emails in parallel (fire-and-forget per recipient)
   const promises = Array.from(recipientIds).map(async (userId) => {
     try {
-      console.log(`[email/release-email] sending to userId=${userId}`);
       const {
         data: { user },
         error: userError,
       } = await supabase.auth.admin.getUserById(userId);
 
-      if (userError) {
-        console.error(`[email/release-email] getUserById error for ${userId}:`, userError);
-        return;
-      }
-
-      if (!user?.email) {
-        console.warn(`[email/release-email] no email for userId=${userId}`);
-        return;
-      }
+      if (userError || !user?.email) return;
 
       const displayName =
         user.user_metadata?.display_name ??
