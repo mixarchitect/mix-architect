@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const resolvedActorName = actorName || user.user_metadata?.display_name || user.email || "Someone";
+    const resolvedActorName = actorName || user.user_metadata?.display_name || user.email?.split("@")[0] || "Someone";
 
     await notifyReleaseMembers({
       releaseId,

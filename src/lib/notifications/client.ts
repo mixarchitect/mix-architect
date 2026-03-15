@@ -8,6 +8,7 @@ export function sendNotification(params: {
   body?: string;
   releaseId: string;
   trackId?: string;
+  actorName?: string;
 }) {
   fetch("/api/notify", {
     method: "POST",

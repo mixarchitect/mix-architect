@@ -49,7 +49,7 @@ export default async function TrackDetailPage({ params }: Props) {
   // Fetch user + role
   const { data: { user } } = await supabase.auth.getUser();
   const role = user ? await getReleaseRole(supabase, releaseId, user.id) : null;
-  const currentUserName = user?.user_metadata?.display_name || user?.email || "You";
+  const currentUserName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "You";
 
   // Fetch portal approval data if brief share exists
   let portalApprovalStatus: string | null = null;

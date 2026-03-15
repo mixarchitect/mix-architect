@@ -412,6 +412,7 @@ export function TrackDetailClient({
         body: newNote.trim().slice(0, 120),
         releaseId,
         trackId: track.id,
+        actorName: currentUserName,
       });
     }
   }

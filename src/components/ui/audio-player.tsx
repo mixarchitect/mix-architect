@@ -726,6 +726,7 @@ export function AudioPlayer({
         body: data.content.slice(0, 120),
         releaseId,
         trackId,
+        actorName: currentUserName,
       });
     }
   }
