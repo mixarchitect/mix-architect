@@ -38,14 +38,16 @@ export default async function SubscribersPage() {
   // Merge: every auth user gets a row, with subscription data if it exists
   const enriched = allUsers.map((user) => {
     const sub = subByUser.get(user.id);
-    const displayName =
-      user.display_name || user.email || user.phone || user.id.substring(0, 8);
+    const base = {
+      user_id: user.id,
+      user_email: user.email ?? null,
+      display_name: user.display_name ?? null,
+    };
 
     if (sub) {
       return {
         id: sub.id,
-        user_id: user.id,
-        user_email: displayName,
+        ...base,
         plan: sub.plan,
         status: sub.status,
         cancel_at_period_end: sub.cancel_at_period_end,
@@ -58,8 +60,7 @@ export default async function SubscribersPage() {
 
     return {
       id: user.id,
-      user_id: user.id,
-      user_email: displayName,
+      ...base,
       plan: "none",
       status: "none",
       cancel_at_period_end: false,

@@ -18,7 +18,8 @@ import { downloadCsv } from "@/lib/csv-export";
 interface Subscriber {
   id: string;
   user_id: string;
-  user_email: string;
+  user_email: string | null;
+  display_name: string | null;
   plan: string;
   status: string;
   cancel_at_period_end: boolean;
@@ -63,8 +64,12 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   const filtered = subscribers.filter((s) => {
+    const q = search.toLowerCase();
     const matchesSearch =
-      !search || s.user_email.toLowerCase().includes(search.toLowerCase());
+      !search ||
+      (s.display_name?.toLowerCase().includes(q) ?? false) ||
+      (s.user_email?.toLowerCase().includes(q) ?? false) ||
+      s.user_id.toLowerCase().includes(q);
     if (!matchesSearch) return false;
 
     switch (filter) {
@@ -140,7 +145,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
     const recipients = Array.from(selected).map((userId) => {
       const sub = subscribers.find((s) => s.user_id === userId);
       return { userId, email: sub?.user_email ?? "" };
-    }).filter((r) => r.email && r.email.includes("@"));
+    }).filter((r) => r.email.includes("@"));
 
     if (recipients.length === 0) {
       showFeedback("error", "No valid email addresses in selection");
@@ -329,7 +334,9 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
           onClick={() =>
             downloadCsv(
               filtered.map((s) => ({
-                user: s.user_email,
+                name: s.display_name ?? "",
+                email: s.user_email ?? "",
+                user_id: s.user_id,
                 plan: s.plan === "none" ? "no plan" : s.plan,
                 status: s.status === "none" ? "no plan" : s.status,
                 comp: s.granted_by_admin ? "yes" : "no",
@@ -409,14 +416,18 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
                 >
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-sm font-medium text-text truncate">
-                      {sub.user_email}
+                      {sub.display_name || sub.user_email || sub.user_id.substring(0, 8)}
                     </span>
                     {sub.granted_by_admin && (
                       <span title="Comp account"><Gift size={12} className="text-amber-500 shrink-0" /></span>
                     )}
                   </div>
+                  {sub.user_email && (
+                    <div className="text-xs text-muted truncate">{sub.user_email}</div>
+                  )}
+                  <div className="text-[10px] text-faint truncate">{sub.user_id}</div>
                   {sub.has_subscription ? (
-                  <div className="flex items-center gap-2 text-xs text-muted">
+                  <div className="flex items-center gap-2 text-xs text-muted mt-0.5">
                     <CreditCard size={12} />
                     <span className="uppercase">{sub.plan}</span>
                     {sub.cancel_at_period_end && (
@@ -434,7 +445,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 text-xs text-faint">
+                  <div className="flex items-center gap-2 text-xs text-faint mt-0.5">
                     No plan
                   </div>
                 )}
