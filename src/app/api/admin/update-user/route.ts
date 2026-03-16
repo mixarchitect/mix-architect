@@ -58,8 +58,7 @@ export async function POST(req: NextRequest) {
         }
         const { error } = await service
           .from("user_defaults")
-          .update({ persona: value })
-          .eq("user_id", userId);
+          .upsert({ user_id: userId, persona: value }, { onConflict: "user_id" });
         if (error) {
           return NextResponse.json({ error: error.message }, { status: 500 });
         }
