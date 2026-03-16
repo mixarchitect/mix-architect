@@ -36,13 +36,13 @@ export function PoweredByBanner({ engineerId }: PoweredByBannerProps) {
         onClick={() => handleClick("portal_branding")}
         className="inline-flex items-center gap-2 group"
       >
-        <span className="text-xs text-faint group-hover:text-muted transition-colors">
+        <span className="text-xs text-[rgba(255,255,255,0.4)] group-hover:text-[rgba(255,255,255,0.6)] transition-colors">
           Powered by
         </span>
         <img
           src="/mix-architect-logo-white.svg"
           alt="Mix Architect"
-          className="h-4 w-auto opacity-40 group-hover:opacity-60 transition-opacity"
+          className="h-4 w-auto opacity-60 group-hover:opacity-80 transition-opacity"
         />
       </a>
       <div>

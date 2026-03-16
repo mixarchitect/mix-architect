@@ -72,6 +72,32 @@ export async function fetchUserDisplayMap(
 }
 
 /**
+ * Fetch persona values from user_defaults for a list of user IDs.
+ * Returns a map of userId -> persona string (artist, engineer, both, other).
+ */
+export async function fetchUserPersonaMap(
+  userIds: string[],
+): Promise<Record<string, string>> {
+  if (userIds.length === 0) return {};
+
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from("user_defaults")
+    .select("user_id, persona")
+    .in("user_id", userIds);
+
+  if (error || !data) return {};
+
+  const map: Record<string, string> = {};
+  for (const row of data) {
+    if (row.persona) {
+      map[row.user_id] = row.persona;
+    }
+  }
+  return map;
+}
+
+/**
  * Fetch all users for admin search/autocomplete.
  * Returns basic info for each user.
  */

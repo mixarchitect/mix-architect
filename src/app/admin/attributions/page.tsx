@@ -7,7 +7,7 @@ import {
   endOfDay,
   subDays,
 } from "@/lib/admin-date-utils";
-import { fetchUserDisplayMap } from "@/lib/admin-users";
+import { fetchUserDisplayMap, fetchUserPersonaMap } from "@/lib/admin-users";
 import { AttributionsRangeSelector } from "./range-selector";
 import { AttributionsExportButton } from "./export-button";
 
@@ -108,28 +108,32 @@ export default async function AttributionsDashboard({ searchParams }: Props) {
     };
   });
 
-  // Top engineers by attributed signups
-  const engineerMap = new Map<string, { clicks: number; signups: number }>();
+  // Top users by attributed signups
+  const userMap = new Map<string, { clicks: number; signups: number }>();
   for (const a of attributions) {
     if (!a.engineer_id) continue;
-    const existing = engineerMap.get(a.engineer_id) ?? { clicks: 0, signups: 0 };
+    const existing = userMap.get(a.engineer_id) ?? { clicks: 0, signups: 0 };
     existing.clicks++;
     if (a.status === "signed_up") existing.signups++;
-    engineerMap.set(a.engineer_id, existing);
+    userMap.set(a.engineer_id, existing);
   }
 
-  // Fetch engineer names for top engineers
-  const engineerIds = [...engineerMap.keys()];
-  const engineerNames: Record<string, string> = engineerIds.length > 0
-    ? await fetchUserDisplayMap(engineerIds.slice(0, 20))
-    : {};
+  // Fetch user names and personas for all users in attributions
+  const userIds = [...userMap.keys()];
+  const [userNames, userPersonas] = userIds.length > 0
+    ? await Promise.all([
+        fetchUserDisplayMap(userIds),
+        fetchUserPersonaMap(userIds),
+      ])
+    : [{} as Record<string, string>, {} as Record<string, string>];
 
-  const topEngineers = [...engineerMap.entries()]
+  const topUsers = [...userMap.entries()]
     .sort((a, b) => b[1].signups - a[1].signups)
     .slice(0, 20)
     .map(([id, stats]) => ({
       id,
-      name: engineerNames[id] ?? id.slice(0, 8),
+      name: userNames[id] ?? id.slice(0, 8),
+      persona: userPersonas[id] ?? null,
       ...stats,
       rate: stats.clicks > 0 ? ((stats.signups / stats.clicks) * 100).toFixed(1) : "0.0",
     }));
@@ -142,8 +146,9 @@ export default async function AttributionsDashboard({ searchParams }: Props) {
     ID: a.id,
     Source: a.source === "portal_branding" ? "Portal Branding" : "Post-Action Prompt",
     "Page Type": a.page_type ?? "delivery_portal",
-    "Engineer ID": a.engineer_id ?? "",
-    Engineer: a.engineer_id ? (engineerNames[a.engineer_id] ?? "") : "",
+    "User ID": a.engineer_id ?? "",
+    User: a.engineer_id ? (userNames[a.engineer_id] ?? "") : "",
+    Persona: a.engineer_id ? (userPersonas[a.engineer_id] ?? "") : "",
     Status: a.status === "signed_up" ? "Signed Up" : "Clicked",
     "Clicked At": a.clicked_at,
     "Signed Up At": a.signed_up_at ?? "",
@@ -216,31 +221,33 @@ export default async function AttributionsDashboard({ searchParams }: Props) {
           )}
         </div>
 
-        {/* Top Engineers */}
+        {/* Top Users */}
         <div className="rounded-lg border border-border bg-panel p-5">
           <h2 className="text-xs uppercase tracking-wider text-faint font-semibold mb-4">
-            Top Engineers by Signups
+            Top Users by Signups
           </h2>
-          {topEngineers.length === 0 ? (
+          {topUsers.length === 0 ? (
             <p className="text-sm text-muted">No data yet</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left text-faint text-xs font-medium pb-2">Engineer</th>
+                    <th className="text-left text-faint text-xs font-medium pb-2">User</th>
+                    <th className="text-left text-faint text-xs font-medium pb-2">Persona</th>
                     <th className="text-right text-faint text-xs font-medium pb-2">Clicks</th>
                     <th className="text-right text-faint text-xs font-medium pb-2">Signups</th>
                     <th className="text-right text-faint text-xs font-medium pb-2">Rate</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {topEngineers.map((e) => (
-                    <tr key={e.id} className="border-b border-border/50 last:border-0">
-                      <td className="py-2 text-text truncate max-w-[180px]">{e.name}</td>
-                      <td className="py-2 text-muted text-right">{e.clicks}</td>
-                      <td className="py-2 text-text text-right font-medium">{e.signups}</td>
-                      <td className="py-2 text-muted text-right">{e.rate}%</td>
+                  {topUsers.map((u) => (
+                    <tr key={u.id} className="border-b border-border/50 last:border-0">
+                      <td className="py-2 text-text truncate max-w-[180px]">{u.name}</td>
+                      <td className="py-2 text-muted text-xs capitalize">{u.persona ?? "-"}</td>
+                      <td className="py-2 text-muted text-right">{u.clicks}</td>
+                      <td className="py-2 text-text text-right font-medium">{u.signups}</td>
+                      <td className="py-2 text-muted text-right">{u.rate}%</td>
                     </tr>
                   ))}
                 </tbody>
@@ -298,7 +305,8 @@ export default async function AttributionsDashboard({ searchParams }: Props) {
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left text-faint text-xs font-medium pb-2">Source</th>
-                  <th className="text-left text-faint text-xs font-medium pb-2 hidden sm:table-cell">Engineer</th>
+                  <th className="text-left text-faint text-xs font-medium pb-2 hidden sm:table-cell">User</th>
+                  <th className="text-left text-faint text-xs font-medium pb-2 hidden md:table-cell">Persona</th>
                   <th className="text-left text-faint text-xs font-medium pb-2">Status</th>
                   <th className="text-right text-faint text-xs font-medium pb-2">Date</th>
                 </tr>
@@ -310,7 +318,10 @@ export default async function AttributionsDashboard({ searchParams }: Props) {
                       {a.source === "portal_branding" ? "Portal Branding" : "Post-Action"}
                     </td>
                     <td className="py-2 text-muted truncate max-w-[160px] hidden sm:table-cell">
-                      {a.engineer_id ? (engineerNames[a.engineer_id] ?? a.engineer_id.slice(0, 8)) : "-"}
+                      {a.engineer_id ? (userNames[a.engineer_id] ?? a.engineer_id.slice(0, 8)) : "-"}
+                    </td>
+                    <td className="py-2 text-muted text-xs capitalize hidden md:table-cell">
+                      {a.engineer_id ? (userPersonas[a.engineer_id] ?? "-") : "-"}
                     </td>
                     <td className="py-2">
                       {a.status === "signed_up" ? (
