@@ -19,13 +19,16 @@ interface SubscriptionRow {
 export default async function SubscribersPage() {
   const supabase = createSupabaseServiceClient();
 
-  // Fetch all auth users and all subscriptions in parallel
-  const [allUsers, { data: subscriptions, error }] = await Promise.all([
+  // Fetch all auth users, subscriptions, and test account flags in parallel
+  const [allUsers, { data: subscriptions, error }, { data: profileFlags }] = await Promise.all([
     fetchAllUsers(),
     supabase
       .from("subscriptions")
       .select("*")
       .order("created_at", { ascending: false }),
+    supabase
+      .from("profiles")
+      .select("id, is_test_account"),
   ]);
 
   if (error) {
@@ -34,6 +37,9 @@ export default async function SubscribersPage() {
 
   const rows = (subscriptions ?? []) as SubscriptionRow[];
   const subByUser = new Map(rows.map((s) => [s.user_id, s]));
+  const testAccountSet = new Set(
+    (profileFlags ?? []).filter((p) => p.is_test_account).map((p) => p.id),
+  );
 
   // Merge: every auth user gets a row, with subscription data if it exists
   const enriched = allUsers.map((user) => {
@@ -42,6 +48,7 @@ export default async function SubscribersPage() {
       user_id: user.id,
       user_email: user.email ?? null,
       display_name: user.display_name ?? null,
+      is_test_account: testAccountSet.has(user.id),
     };
 
     if (sub) {
@@ -71,8 +78,10 @@ export default async function SubscribersPage() {
     };
   });
 
-  const proCount = enriched.filter((s) => s.plan === "pro" && s.status === "active").length;
-  const freeCount = enriched.filter((s) => s.plan === "none" || s.plan === "free" || s.status === "canceled").length;
+  const real = enriched.filter((s) => !s.is_test_account);
+  const testCount = enriched.length - real.length;
+  const proCount = real.filter((s) => s.plan === "pro" && s.status === "active").length;
+  const freeCount = real.filter((s) => s.plan === "none" || s.plan === "free" || s.status === "canceled").length;
 
   return (
     <div>
@@ -93,8 +102,14 @@ export default async function SubscribersPage() {
         </div>
         <div className="rounded-lg border border-border bg-panel px-4 py-3 min-w-0 sm:min-w-[120px]">
           <div className="text-xs text-muted uppercase tracking-wider mb-1">Total</div>
-          <div className="text-2xl font-bold text-text">{enriched.length}</div>
+          <div className="text-2xl font-bold text-text">{real.length}</div>
         </div>
+        {testCount > 0 && (
+          <div className="rounded-lg border border-purple-500/20 bg-purple-500/5 px-4 py-3 min-w-0 sm:min-w-[120px]">
+            <div className="text-xs text-purple-400 uppercase tracking-wider mb-1">Test</div>
+            <div className="text-2xl font-bold text-purple-400">{testCount}</div>
+          </div>
+        )}
       </div>
 
       <SubscribersList subscribers={enriched} />

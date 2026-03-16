@@ -12,6 +12,7 @@ import {
   Mail,
   X,
   Download,
+  FlaskConical,
 } from "lucide-react";
 import { downloadCsv } from "@/lib/csv-export";
 
@@ -27,6 +28,7 @@ interface Subscriber {
   granted_by_admin: boolean;
   created_at: string;
   has_subscription: boolean;
+  is_test_account: boolean;
 }
 
 type FilterTab = "all" | "pro" | "free" | "churned";
@@ -420,6 +422,9 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
                     </span>
                     {sub.granted_by_admin && (
                       <span title="Comp account"><Gift size={12} className="text-amber-500 shrink-0" /></span>
+                    )}
+                    {sub.is_test_account && (
+                      <span title="Test account"><FlaskConical size={12} className="text-purple-400 shrink-0" /></span>
                     )}
                   </div>
                   {sub.user_email && (

@@ -2,6 +2,7 @@ import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { fetchUserDisplayMap } from "@/lib/admin-users";
 import { AdminRefreshBar } from "@/components/admin/AdminRefreshBar";
 import { UserDetailTabs } from "@/components/admin/UserDetailTabs";
+import { UserDetailHeader } from "@/components/admin/UserDetailHeader";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -69,10 +70,19 @@ export default async function UserDetailPage({ params }: Props) {
   const userDisplayMap = await fetchUserDisplayMap([userId]);
   const name = userDisplayMap[userId] ?? userId.substring(0, 8);
 
-  // Get email from auth.users for display
-  const authUser = await supabase.auth.admin.getUserById(userId);
+  // Get email + persona from auth.users and user_defaults
+  const [authUser, personaRes] = await Promise.all([
+    supabase.auth.admin.getUserById(userId),
+    supabase
+      .from("user_defaults")
+      .select("persona")
+      .eq("user_id", userId)
+      .maybeSingle(),
+  ]);
   const userEmail = authUser.data?.user?.email ?? null;
   const userPhone = authUser.data?.user?.phone ?? null;
+  const persona = (personaRes.data?.persona as string) ?? null;
+  const isTestAccount = profile.is_test_account === true;
   const isComp = subscription?.granted_by_admin === true;
 
   // Determine effective status
@@ -113,16 +123,16 @@ export default async function UserDetailPage({ params }: Props) {
 
       {/* Header */}
       <div className="rounded-lg border border-border bg-panel p-5 mb-6">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h1 className="text-2xl font-bold text-text">{name}</h1>
-            {userEmail && name !== userEmail && (
-              <p className="text-sm text-muted mt-0.5">{userEmail}</p>
-            )}
-            <p className="text-[10px] text-faint mt-0.5">{userId}</p>
-          </div>
+        <div className="flex items-start justify-between mb-4">
+          <UserDetailHeader
+            userId={userId}
+            name={name}
+            email={userEmail}
+            persona={persona}
+            isTestAccount={isTestAccount}
+          />
           <span
-            className={`text-xs font-medium px-2 py-1 rounded border ${statusColor}`}
+            className={`text-xs font-medium px-2 py-1 rounded border shrink-0 ${statusColor}`}
           >
             {status}
           </span>
