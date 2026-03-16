@@ -119,6 +119,7 @@ export default async function UserDetailPage({ params }: Props) {
             {userEmail && name !== userEmail && (
               <p className="text-sm text-muted mt-0.5">{userEmail}</p>
             )}
+            <p className="text-[10px] text-faint mt-0.5">{userId}</p>
           </div>
           <span
             className={`text-xs font-medium px-2 py-1 rounded border ${statusColor}`}
