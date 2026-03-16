@@ -59,8 +59,8 @@ export default function SignInPage() {
         return;
       }
 
-      router.push("/app");
-      // Don't reset loading — let the button stay disabled through navigation
+      // Full page load so session cookies are ready for server-side checks
+      window.location.href = "/app";
     } catch (err: unknown) {
       setLoading(false);
       if (err instanceof Error) {

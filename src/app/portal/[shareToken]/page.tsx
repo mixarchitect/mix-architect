@@ -1,4 +1,3 @@
-import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { notFound } from "next/navigation";
 import { PortalClient } from "./portal-client";
@@ -23,7 +22,7 @@ type Props = { params: Promise<{ shareToken: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { shareToken } = await params;
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
 
   const { data: share } = await supabase
     .from("brief_shares")
@@ -62,7 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PortalPage({ params }: Props) {
   const { shareToken } = await params;
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
 
   /* ── 1. Fetch share record ──────────────────────────────────────── */
 
@@ -175,12 +174,11 @@ export default async function PortalPage({ params }: Props) {
   const allDistribution = (distributionRes.data ?? []) as (PortalDistribution & { track_id: string; lyrics: string | null })[];
   const approvalEvents = (approvalEventsRes.data ?? []) as { track_id: string; event_type: string; created_at: string }[];
 
-  /* ── 4b. Fetch engineer name (requires service client for RLS) ── */
+  /* ── 4b. Fetch engineer name ──────────────────────────────────── */
 
   let engineerName: string | null = null;
   try {
-    const serviceClient = createSupabaseServiceClient();
-    const { data: userDefaults } = await serviceClient
+    const { data: userDefaults } = await supabase
       .from("user_defaults")
       .select("company_name")
       .eq("user_id", release.user_id)
