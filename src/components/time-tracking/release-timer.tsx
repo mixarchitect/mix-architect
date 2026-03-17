@@ -145,16 +145,30 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
 
   const isActive = state === "running" || state === "paused";
 
-  // Minimized state: small teal dot
+  // Minimized state (running/paused but dismissed): small teal icon
   if (minimized && isActive) {
     return (
       <button
         type="button"
         onClick={() => setMinimized(false)}
-        className="fixed bottom-6 right-6 max-sm:bottom-20 z-40 w-10 h-10 rounded-full bg-signal/20 border border-signal/40 flex items-center justify-center shadow-lg shadow-black/20 hover:bg-signal/30 transition-colors transition-all duration-200"
+        className="fixed bottom-6 right-6 max-sm:bottom-20 z-40 w-10 h-10 rounded-full bg-signal/20 border border-signal/40 flex items-center justify-center shadow-lg shadow-black/20 hover:bg-signal/30 transition-all duration-200"
         title="Expand timer"
       >
         <Timer size={16} className="text-signal" />
+      </button>
+    );
+  }
+
+  // Collapsed state: just the stopwatch icon when not active and no log form
+  if (state === "stopped" && !showLogForm) {
+    return (
+      <button
+        type="button"
+        onClick={handleStart}
+        className="fixed bottom-6 right-6 max-sm:bottom-20 z-40 w-10 h-10 rounded-full border border-border bg-panel flex items-center justify-center shadow-lg shadow-black/20 hover:border-signal/40 hover:bg-signal/10 transition-all duration-200 group"
+        title="Start timer"
+      >
+        <Timer size={16} className="text-faint group-hover:text-signal transition-colors" />
       </button>
     );
   }
@@ -166,14 +180,12 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
         "max-sm:left-4 max-sm:right-4",
         showLogForm
           ? "w-80 max-sm:w-auto rounded-xl border border-border bg-panel"
-          : isActive
-            ? "rounded-xl border border-signal/30 bg-panel"
-            : "rounded-full border border-border bg-panel",
+          : "rounded-xl border border-signal/30 bg-panel",
       )}
     >
       {!showLogForm ? (
         <div className="flex items-center gap-3 px-4 py-2.5">
-          <Timer size={14} className={isActive ? "text-signal" : "text-faint"} />
+          <Timer size={14} className="text-signal" />
 
           <span
             className={cn(
@@ -186,16 +198,6 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
           </span>
 
           <div className="flex items-center gap-1.5">
-            {state === "stopped" && (
-              <button
-                type="button"
-                onClick={handleStart}
-                className="flex items-center gap-1 px-3 py-1 rounded-full bg-signal/10 text-signal text-xs font-medium hover:bg-signal/20 transition-colors"
-              >
-                <Play size={12} />
-                Start
-              </button>
-            )}
             {state === "running" && (
               <>
                 <button
@@ -239,16 +241,14 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
           </div>
 
           {/* Minimize button when running/paused */}
-          {isActive && (
-            <button
-              type="button"
-              onClick={handleMinimize}
-              className="p-1 rounded text-faint hover:text-muted transition-colors ml-auto"
-              title="Minimize timer"
-            >
-              <X size={12} />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleMinimize}
+            className="p-1 rounded text-faint hover:text-muted transition-colors ml-auto"
+            title="Minimize timer"
+          >
+            <X size={12} />
+          </button>
         </div>
       ) : (
         /* Log entry form after stopping */
