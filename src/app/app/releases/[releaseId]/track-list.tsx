@@ -30,6 +30,13 @@ function statusColor(s: string): "green" | "orange" | "blue" {
   return "blue";
 }
 
+function statusLabel(s: string): string {
+  if (s === "complete") return "Approved";
+  if (s === "in_progress") return "In progress";
+  if (s === "not_started") return "Not started";
+  return s.replace(/_/g, " ");
+}
+
 export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDelete }: Props) {
   const [localTracks, setLocalTracks] = useState(initialTracks);
 
@@ -146,18 +153,18 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
           onDrop={canReorder ? () => { if (dragIdx !== null) handleDrop(dragIdx, idx); } : undefined}
           onDragEnd={() => { setDragIdx(null); setDragOverIdx(null); }}
           className={cn(
-            "flex items-center gap-2 rounded-md border bg-panel px-5 py-4 transition-all duration-150",
-            "border-border hover:border-border-strong hover:shadow-sm",
+            "group/row flex items-center gap-2 rounded-md border bg-panel px-4 py-2.5 transition-all duration-150",
+            "border-border hover:border-border-strong",
             dragIdx === idx && "opacity-40",
             dragOverIdx === idx && dragIdx !== idx && "border-signal border-dashed",
           )}
         >
           {canReorder && (
             <>
-              {/* Desktop: drag handle */}
+              {/* Desktop: drag handle — visible on hover/focus */}
               <GripVertical
                 size={14}
-                className="hidden md:block text-faint cursor-grab shrink-0 active:cursor-grabbing"
+                className="hidden md:block text-faint cursor-grab shrink-0 active:cursor-grabbing opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100 transition-opacity duration-150"
               />
               {/* Mobile: up/down arrows */}
               <div className="flex flex-col md:hidden shrink-0 -my-1">
@@ -200,23 +207,18 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
               <div className="font-semibold text-text text-sm group-hover:text-signal transition-colors truncate">
                 {t.title}
               </div>
-              <div className="mt-0.5 text-xs text-muted truncate">
-                {t.intentPreview
-                  ? t.intentPreview.length > 60
-                    ? t.intentPreview.slice(0, 60) + "\u2026"
-                    : t.intentPreview
-                  : "No intent defined"}
-              </div>
             </div>
             {t.portalApprovalStatus && t.portalApprovalStatus !== "awaiting_review" && (
               <PortalApprovalBadge status={t.portalApprovalStatus} />
             )}
-            <StatusDot color={statusColor(t.status)} />
+            <span title={statusLabel(t.status)}>
+              <StatusDot color={statusColor(t.status)} />
+            </span>
           </Link>
 
           {/* Delete track */}
           {canDelete && (
-            <div className="relative shrink-0" ref={confirmDeleteId === t.id ? confirmRef : undefined}>
+            <div className={cn("relative shrink-0 transition-opacity duration-150", confirmDeleteId === t.id ? "opacity-100" : "opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100")} ref={confirmDeleteId === t.id ? confirmRef : undefined}>
               <button
                 type="button"
                 onClick={(e) => {

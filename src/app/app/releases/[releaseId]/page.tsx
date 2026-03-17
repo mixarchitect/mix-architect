@@ -15,6 +15,7 @@ import { ReleaseTimer } from "@/components/time-tracking/release-timer";
 import { TimeEntryList } from "@/components/time-tracking/time-entry-list";
 import { getTimeEntriesByRelease } from "./time-entry-actions";
 import { FinancialSummary } from "@/components/payments/financial-summary";
+import { ContentTabs } from "@/components/ui/content-tabs";
 import { FlowSimulatorButton } from "@/components/flow-simulator/flow-simulator-button";
 import { FlowProvider, ReleaseFlowContent } from "@/components/flow-simulator/release-flow-context";
 import { FlowBreadcrumbTitle } from "@/components/flow-simulator/flow-breadcrumb-title";
@@ -29,7 +30,11 @@ import { getLocale } from "next-intl/server";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+const VALID_TABS = ["tracks", "distribution", "financials"] as const;
+type TabId = (typeof VALID_TABS)[number];
 
 function typeLabel(t: string | undefined | null): string {
   if (!t) return "—";
@@ -37,8 +42,9 @@ function typeLabel(t: string | undefined | null): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-export default async function ReleasePage({ params }: Props) {
+export default async function ReleasePage({ params, searchParams }: Props) {
   const { releaseId } = await params;
+  const sp = await searchParams;
   const supabase = await createSupabaseServerClient();
 
   // Fire all independent queries in parallel
@@ -88,6 +94,15 @@ export default async function ReleasePage({ params }: Props) {
   ]);
   const paymentsEnabled = defaultsRes2.data?.payments_enabled ?? false;
   const defaultHourlyRate = defaultsRes2.data?.default_hourly_rate ?? null;
+
+  // Resolve current tab from search params
+  const rawTab = typeof sp.tab === "string" ? sp.tab : "";
+  const isValidTab = VALID_TABS.includes(rawTab as TabId);
+  // If financials tab requested but payments disabled, fall back to tracks
+  const currentTab: TabId =
+    isValidTab && (rawTab !== "financials" || paymentsEnabled)
+      ? (rawTab as TabId)
+      : "tracks";
 
   // Fetch client notes if client email is present
   let clientNotes = "";
@@ -162,11 +177,20 @@ export default async function ReleasePage({ params }: Props) {
     }
   }
 
+  // Build tab list
+  const tabs = [
+    { id: "tracks" as const, label: "Tracks", count: tracks?.length ?? 0 },
+    { id: "distribution" as const, label: "Distribution" },
+    ...(paymentsEnabled
+      ? [{ id: "financials" as const, label: "Financials" }]
+      : []),
+  ];
+
   return (
     <FlowProvider>
     <div>
       {/* Toolbar */}
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
         <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/app"
@@ -227,67 +251,113 @@ export default async function ReleasePage({ params }: Props) {
         releaseTitle={release.title as string}
       >
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
-        {/* Main: Track list */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-text">
-              Tracks
-              <span className="ml-2 text-xs text-muted">
-                {tracks?.length ?? 0}
-              </span>
-            </h2>
-            <div className="flex items-center gap-2">
-              <FlowSimulatorButton
-                tracks={flowTracks}
-              />
-              {canEdit(role) && (
-                <Link href={`/app/releases/${releaseId}/tracks/new`}>
-                  <Button variant="secondary" className="h-9 text-xs">
-                    <Plus size={14} />
-                    Add Track
-                  </Button>
-                </Link>
+        {/* Main content with tabs */}
+        <div>
+          <ContentTabs tabs={tabs} activeTab={currentTab} className="mb-6" />
+
+          {/* Tracks tab */}
+          {currentTab === "tracks" && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FlowSimulatorButton
+                    tracks={flowTracks}
+                  />
+                </div>
+                {canEdit(role) && (
+                  <Link href={`/app/releases/${releaseId}/tracks/new`}>
+                    <Button variant="secondary" className="h-9 text-xs">
+                      <Plus size={14} />
+                      Add Track
+                    </Button>
+                  </Link>
+                )}
+              </div>
+
+              {tracks && tracks.length > 0 ? (
+                <TrackList
+                  releaseId={releaseId}
+                  tracks={tracks.map((t: Record<string, unknown> & { track_intent?: { mix_vision?: string } | { mix_vision?: string }[] }) => {
+                    const intent = Array.isArray(t.track_intent)
+                      ? t.track_intent[0]
+                      : t.track_intent;
+                    return {
+                      id: t.id as string,
+                      track_number: t.track_number as number,
+                      title: t.title as string,
+                      status: t.status as string,
+                      intentPreview: intent?.mix_vision,
+                      portalApprovalStatus: portalApprovalMap[t.id as string] ?? null,
+                    };
+                  })}
+                  canReorder={canEdit(role)}
+                  canDelete={canEdit(role)}
+                />
+              ) : (
+                <EmptyState
+                  icon={ListMusic}
+                  size="md"
+                  title="No tracks added"
+                  description={canEdit(role) ? "Add tracks to start building out this release." : "No tracks have been added yet."}
+                  action={canEdit(role) ? { label: "Add a track", href: `/app/releases/${releaseId}/tracks/new`, variant: "primary" } : undefined}
+                />
               )}
             </div>
-          </div>
+          )}
 
-          {tracks && tracks.length > 0 ? (
-            <TrackList
+          {/* Distribution tab */}
+          {currentTab === "distribution" && (
+            <DistributionPanel
               releaseId={releaseId}
-              tracks={tracks.map((t: Record<string, unknown> & { track_intent?: { mix_vision?: string } | { mix_vision?: string }[] }) => {
-                const intent = Array.isArray(t.track_intent)
-                  ? t.track_intent[0]
-                  : t.track_intent;
-                return {
-                  id: t.id as string,
-                  track_number: t.track_number as number,
-                  title: t.title as string,
-                  status: t.status as string,
-                  intentPreview: intent?.mix_vision,
-                  portalApprovalStatus: portalApprovalMap[t.id as string] ?? null,
-                };
-              })}
-              canReorder={canEdit(role)}
-              canDelete={canEdit(role)}
-            />
-          ) : (
-            <EmptyState
-              icon={ListMusic}
-              size="md"
-              title="No tracks added"
-              description={canEdit(role) ? "Add tracks to start building out this release." : "No tracks have been added yet."}
-              action={canEdit(role) ? { label: "Add a track", href: `/app/releases/${releaseId}/tracks/new`, variant: "primary" } : undefined}
+              initialEntries={distributionRes.data ?? []}
+              releaseTitle={release.title}
+              releaseArtist={release.artist ?? ""}
+              canEdit={canEdit(role)}
             />
           )}
 
-          {/* Distribution Status Tracking */}
-          <DistributionPanel
-            releaseId={releaseId}
-            initialEntries={distributionRes.data ?? []}
-            releaseTitle={release.title}
-            releaseArtist={release.artist ?? ""}
-            canEdit={canEdit(role)}
-          />
+          {/* Financials tab */}
+          {currentTab === "financials" && paymentsEnabled && (
+            <div className="space-y-6">
+              {/* Top row: Summary + Payment */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <FinancialSummary
+                  feeTotal={release.fee_total}
+                  feeCurrency={release.fee_currency ?? "USD"}
+                  paymentStatus={release.payment_status ?? "no_fee"}
+                  expenses={expenses}
+                  timeEntries={timeEntries}
+                  locale={locale}
+                />
+                <PaymentEditor
+                  releaseId={releaseId}
+                  initialPaymentStatus={release.payment_status ?? "no_fee"}
+                  initialFeeTotal={release.fee_total}
+                  initialPaidAmount={release.paid_amount ?? 0}
+                  initialFeeCurrency={release.fee_currency ?? "USD"}
+                  initialPaymentNotes={release.payment_notes}
+                  role={role}
+                />
+              </div>
+
+              {/* Time Log */}
+              <TimeEntryList
+                releaseId={releaseId}
+                timeEntries={timeEntries}
+                currency={release.fee_currency ?? "USD"}
+                locale={locale}
+                defaultRate={defaultHourlyRate}
+              />
+
+              {/* Expenses */}
+              <ExpensePanel
+                releaseId={releaseId}
+                expenses={expenses}
+                currency={release.fee_currency ?? "USD"}
+                locale={locale}
+              />
+            </div>
+          )}
         </div>
 
         {/* Inspector sidebar */}
@@ -404,62 +474,6 @@ export default async function ReleasePage({ params }: Props) {
             </Panel>
           )}
 
-          {/* Financial Summary */}
-          {paymentsEnabled && (
-            <FinancialSummary
-              feeTotal={release.fee_total}
-              feeCurrency={release.fee_currency ?? "USD"}
-              paymentStatus={release.payment_status ?? "no_fee"}
-              expenses={expenses}
-              timeEntries={timeEntries}
-              locale={locale}
-            />
-          )}
-
-          {/* Payment */}
-          {paymentsEnabled && (
-            <PaymentEditor
-              releaseId={releaseId}
-              initialPaymentStatus={release.payment_status ?? "no_fee"}
-              initialFeeTotal={release.fee_total}
-              initialPaidAmount={release.paid_amount ?? 0}
-              initialFeeCurrency={release.fee_currency ?? "USD"}
-              initialPaymentNotes={release.payment_notes}
-              role={role}
-            />
-          )}
-
-          {/* Timer */}
-          {paymentsEnabled && (
-            <ReleaseTimer
-              releaseId={releaseId}
-              defaultRate={defaultHourlyRate}
-              currency={release.fee_currency ?? "USD"}
-              locale={locale}
-            />
-          )}
-
-          {/* Time Log */}
-          {paymentsEnabled && (
-            <TimeEntryList
-              releaseId={releaseId}
-              timeEntries={timeEntries}
-              currency={release.fee_currency ?? "USD"}
-              locale={locale}
-              defaultRate={defaultHourlyRate}
-            />
-          )}
-
-          {/* Expenses */}
-          {paymentsEnabled && (
-            <ExpensePanel
-              releaseId={releaseId}
-              expenses={expenses}
-              currency={release.fee_currency ?? "USD"}
-              locale={locale}
-            />
-          )}
-
           {/* Internal Notes (engineer-only) */}
           <ReleaseNotesEditor
             releaseId={releaseId}
@@ -476,6 +490,16 @@ export default async function ReleasePage({ params }: Props) {
         </aside>
       </div>
       </ReleaseFlowContent>
+
+      {/* Floating Timer — renders at fixed position, only when payments enabled */}
+      {paymentsEnabled && (
+        <ReleaseTimer
+          releaseId={releaseId}
+          defaultRate={defaultHourlyRate}
+          currency={release.fee_currency ?? "USD"}
+          locale={locale}
+        />
+      )}
     </div>
     </FlowProvider>
   );

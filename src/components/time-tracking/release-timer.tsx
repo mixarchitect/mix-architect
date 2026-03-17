@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Play, Pause, Square } from "lucide-react";
-import { Panel, PanelBody } from "@/components/ui/panel";
+import { Play, Pause, Square, Timer, X } from "lucide-react";
 import { createTimeEntry } from "@/app/app/releases/[releaseId]/time-entry-actions";
+import { cn } from "@/lib/cn";
 
 type TimerState = "stopped" | "running" | "paused";
 
@@ -30,8 +30,9 @@ interface Props {
 export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props) {
   const router = useRouter();
   const [state, setState] = useState<TimerState>("stopped");
-  const [elapsed, setElapsed] = useState(0); // ms
+  const [elapsed, setElapsed] = useState(0);
   const [showLogForm, setShowLogForm] = useState(false);
+  const [minimized, setMinimized] = useState(false);
 
   const startTimeRef = useRef<number>(0);
   const accumulatedRef = useRef<number>(0);
@@ -45,17 +46,16 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
   const [logDesc, setLogDesc] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const clearTimer = useCallback(() => {
+  const clearTimerInterval = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
-    return () => clearTimer();
-  }, [clearTimer]);
+    return () => clearTimerInterval();
+  }, [clearTimerInterval]);
 
   function handleStart() {
     startTimeRef.current = Date.now();
@@ -63,6 +63,7 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
     timerStartedAtRef.current = new Date().toISOString();
     setState("running");
     setElapsed(0);
+    setMinimized(false);
 
     intervalRef.current = setInterval(() => {
       setElapsed(accumulatedRef.current + (Date.now() - startTimeRef.current));
@@ -71,7 +72,7 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
 
   function handlePause() {
     accumulatedRef.current += Date.now() - startTimeRef.current;
-    clearTimer();
+    clearTimerInterval();
     setState("paused");
     setElapsed(accumulatedRef.current);
   }
@@ -86,16 +87,14 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
   }
 
   function handleStop() {
-    // Calculate final elapsed
     let finalMs = accumulatedRef.current;
     if (state === "running") {
       finalMs += Date.now() - startTimeRef.current;
     }
-    clearTimer();
+    clearTimerInterval();
     setState("stopped");
     setElapsed(0);
 
-    // Pre-fill the log form
     const rawHours = finalMs / (1000 * 60 * 60);
     const rounded = roundToQuarter(rawHours);
     setLogHours(String(Math.max(rounded, 0.25)));
@@ -110,6 +109,12 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
     setLogHours("");
     setLogRate("");
     setLogDesc("");
+  }
+
+  function handleMinimize() {
+    if (state === "running" || state === "paused") {
+      setMinimized(true);
+    }
   }
 
   async function handleSaveEntry() {
@@ -138,154 +143,198 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
   const fmtCurrency = (amount: number) =>
     new Intl.NumberFormat(locale, { style: "currency", currency }).format(amount);
 
+  const isActive = state === "running" || state === "paused";
+
+  // Minimized state: small teal dot
+  if (minimized && isActive) {
+    return (
+      <button
+        type="button"
+        onClick={() => setMinimized(false)}
+        className="fixed bottom-6 right-6 max-sm:bottom-20 z-40 w-10 h-10 rounded-full bg-signal/20 border border-signal/40 flex items-center justify-center shadow-lg shadow-black/20 hover:bg-signal/30 transition-colors transition-all duration-200"
+        title="Expand timer"
+      >
+        <Timer size={16} className="text-signal" />
+      </button>
+    );
+  }
+
   return (
-    <Panel>
-      <PanelBody className="py-5">
-        <div className="label-sm text-muted mb-3">TIMER</div>
+    <div
+      className={cn(
+        "fixed bottom-6 right-6 max-sm:bottom-20 z-40 shadow-lg shadow-black/20 transition-all duration-200",
+        "max-sm:left-4 max-sm:right-4",
+        showLogForm
+          ? "w-80 max-sm:w-auto rounded-xl border border-border bg-panel"
+          : isActive
+            ? "rounded-xl border border-signal/30 bg-panel"
+            : "rounded-full border border-border bg-panel",
+      )}
+    >
+      {!showLogForm ? (
+        <div className="flex items-center gap-3 px-4 py-2.5">
+          <Timer size={14} className={isActive ? "text-signal" : "text-faint"} />
 
-        {!showLogForm ? (
-          <>
-            {/* Timer display */}
-            <div className="text-center mb-3">
-              <span
-                className={`text-2xl font-mono tabular-nums ${
-                  state === "running" ? "text-signal" : "text-muted"
-                }`}
+          <span
+            className={cn(
+              "text-sm tabular-nums",
+              state === "running" ? "text-signal" : "text-muted",
+            )}
+            style={{ fontVariantNumeric: "tabular-nums" }}
+          >
+            {formatElapsed(elapsed)}
+          </span>
+
+          <div className="flex items-center gap-1.5">
+            {state === "stopped" && (
+              <button
+                type="button"
+                onClick={handleStart}
+                className="flex items-center gap-1 px-3 py-1 rounded-full bg-signal/10 text-signal text-xs font-medium hover:bg-signal/20 transition-colors"
               >
-                {formatElapsed(elapsed)}
-              </span>
-            </div>
-
-            {/* Controls */}
-            <div className="flex justify-center gap-2">
-              {state === "stopped" && (
+                <Play size={12} />
+                Start
+              </button>
+            )}
+            {state === "running" && (
+              <>
                 <button
                   type="button"
-                  onClick={handleStart}
-                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-signal/10 text-signal text-sm font-medium hover:bg-signal/20 transition-colors"
+                  onClick={handlePause}
+                  className="p-1.5 rounded-full text-muted hover:text-text hover:bg-panel2 transition-colors"
+                  title="Pause"
                 >
-                  <Play size={14} />
-                  Start
+                  <Pause size={14} />
                 </button>
-              )}
-              {state === "running" && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handlePause}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel2 border border-border text-muted text-sm hover:text-text transition-colors"
-                  >
-                    <Pause size={14} />
-                    Pause
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleStop}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel2 border border-border text-muted text-sm hover:text-text transition-colors"
-                  >
-                    <Square size={14} />
-                    Stop
-                  </button>
-                </>
-              )}
-              {state === "paused" && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleResume}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-signal/10 text-signal text-sm font-medium hover:bg-signal/20 transition-colors"
-                  >
-                    <Play size={14} />
-                    Resume
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleStop}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-panel2 border border-border text-muted text-sm hover:text-text transition-colors"
-                  >
-                    <Square size={14} />
-                    Stop
-                  </button>
-                </>
-              )}
-            </div>
-          </>
-        ) : (
-          /* Log entry form after stopping */
-          <div className="space-y-2">
-            <p className="text-xs text-muted mb-2">Log this session:</p>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-[10px] text-faint uppercase">Hours</label>
-                <input
-                  type="number"
-                  step="0.25"
-                  min="0.25"
-                  value={logHours}
-                  onChange={(e) => setLogHours(e.target.value)}
-                  className="input text-xs h-7 w-full"
-                  autoFocus
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-faint uppercase">Rate/hr</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={logBillable ? logRate : ""}
-                  onChange={(e) => setLogRate(e.target.value)}
-                  className="input text-xs h-7 w-full"
-                  placeholder="—"
-                  disabled={!logBillable}
-                />
-              </div>
-            </div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={logBillable}
-                onChange={(e) => setLogBillable(e.target.checked)}
-                className="accent-signal"
-              />
-              <span className="text-xs text-muted">Billable</span>
-            </label>
-            {logBillable && logHours && logRate && (
-              <p className="text-xs text-faint">
-                Total: {fmtCurrency(parseFloat(logHours || "0") * parseFloat(logRate || "0"))}
-              </p>
+                <button
+                  type="button"
+                  onClick={handleStop}
+                  className="p-1.5 rounded-full text-muted hover:text-text hover:bg-panel2 transition-colors"
+                  title="Stop & save"
+                >
+                  <Square size={14} />
+                </button>
+              </>
             )}
-            <input
-              type="text"
-              value={logDesc}
-              onChange={(e) => setLogDesc(e.target.value)}
-              className="input text-xs h-7 w-full"
-              placeholder="What did you work on?"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSaveEntry();
-                if (e.key === "Escape") handleDiscard();
-              }}
-            />
-            <div className="flex gap-2 justify-end pt-1">
-              <button
-                type="button"
-                onClick={handleDiscard}
-                className="text-xs text-muted hover:text-text transition-colors px-2 py-1"
-              >
-                Discard
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveEntry}
-                disabled={saving || !logHours || parseFloat(logHours) <= 0}
-                className="text-xs text-signal hover:text-teal-300 transition-colors px-2 py-1 disabled:opacity-50"
-              >
-                {saving ? "Saving..." : "Save Entry"}
-              </button>
+            {state === "paused" && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleResume}
+                  className="flex items-center gap-1 px-3 py-1 rounded-full bg-signal/10 text-signal text-xs font-medium hover:bg-signal/20 transition-colors"
+                >
+                  <Play size={12} />
+                  Resume
+                </button>
+                <button
+                  type="button"
+                  onClick={handleStop}
+                  className="p-1.5 rounded-full text-muted hover:text-text hover:bg-panel2 transition-colors"
+                  title="Stop & save"
+                >
+                  <Square size={14} />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Minimize button when running/paused */}
+          {isActive && (
+            <button
+              type="button"
+              onClick={handleMinimize}
+              className="p-1 rounded text-faint hover:text-muted transition-colors ml-auto"
+              title="Minimize timer"
+            >
+              <X size={12} />
+            </button>
+          )}
+        </div>
+      ) : (
+        /* Log entry form after stopping */
+        <div className="p-4 space-y-2">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-xs text-muted">Log this session</p>
+            <button
+              type="button"
+              onClick={handleDiscard}
+              className="p-1 rounded text-faint hover:text-muted transition-colors"
+              title="Discard"
+            >
+              <X size={12} />
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] text-faint uppercase">Hours</label>
+              <input
+                type="number"
+                step="0.25"
+                min="0.25"
+                value={logHours}
+                onChange={(e) => setLogHours(e.target.value)}
+                className="input text-xs h-7 w-full"
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="text-[10px] text-faint uppercase">Rate/hr</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={logBillable ? logRate : ""}
+                onChange={(e) => setLogRate(e.target.value)}
+                className="input text-xs h-7 w-full"
+                placeholder="—"
+                disabled={!logBillable}
+              />
             </div>
           </div>
-        )}
-      </PanelBody>
-    </Panel>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={logBillable}
+              onChange={(e) => setLogBillable(e.target.checked)}
+              className="accent-signal"
+            />
+            <span className="text-xs text-muted">Billable</span>
+          </label>
+          {logBillable && logHours && logRate && (
+            <p className="text-xs text-faint">
+              Total: {fmtCurrency(parseFloat(logHours || "0") * parseFloat(logRate || "0"))}
+            </p>
+          )}
+          <input
+            type="text"
+            value={logDesc}
+            onChange={(e) => setLogDesc(e.target.value)}
+            className="input text-xs h-7 w-full"
+            placeholder="What did you work on?"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSaveEntry();
+              if (e.key === "Escape") handleDiscard();
+            }}
+          />
+          <div className="flex gap-2 justify-end pt-1">
+            <button
+              type="button"
+              onClick={handleDiscard}
+              className="text-xs text-muted hover:text-text transition-colors px-2 py-1"
+            >
+              Discard
+            </button>
+            <button
+              type="button"
+              onClick={handleSaveEntry}
+              disabled={saving || !logHours || parseFloat(logHours) <= 0}
+              className="text-xs text-signal hover:text-teal-300 transition-colors px-2 py-1 disabled:opacity-50"
+            >
+              {saving ? "Saving..." : "Save Entry"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
