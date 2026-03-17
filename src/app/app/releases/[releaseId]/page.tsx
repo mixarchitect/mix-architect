@@ -33,7 +33,7 @@ type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-const VALID_TABS = ["tracks", "distribution", "financials"] as const;
+const VALID_TABS = ["tracks", "globals", "distribution", "financials"] as const;
 type TabId = (typeof VALID_TABS)[number];
 
 function typeLabel(t: string | undefined | null): string {
@@ -180,6 +180,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   // Build tab list
   const tabs = [
     { id: "tracks" as const, label: "Tracks", count: tracks?.length ?? 0 },
+    { id: "globals" as const, label: "Globals" },
     { id: "distribution" as const, label: "Distribution" },
     ...(paymentsEnabled
       ? [{ id: "financials" as const, label: "Financials" }]
@@ -302,6 +303,30 @@ export default async function ReleasePage({ params, searchParams }: Props) {
               )}
             </div>
 
+            {/* Globals tab */}
+            <div className="space-y-6">
+              <GlobalDirectionEditor
+                releaseId={releaseId}
+                initialValue={release.global_direction}
+                initialStatus={release.status}
+                role={role}
+              />
+              <GlobalReferencesEditor
+                releaseId={releaseId}
+                initialRefs={(globalRefs ?? []).map((r: Record<string, unknown>) => ({
+                  id: r.id as string,
+                  song_title: r.song_title as string,
+                  artist: r.artist as string | null,
+                  note: r.note as string | null,
+                  url: r.url as string | null,
+                  artwork_url: r.artwork_url as string | null,
+                  sort_order: (r.sort_order as number) ?? 0,
+                }))}
+                initialStatus={release.status}
+                role={role}
+              />
+            </div>
+
             {/* Distribution tab */}
             <DistributionPanel
               releaseId={releaseId}
@@ -412,30 +437,6 @@ export default async function ReleasePage({ params, searchParams }: Props) {
               </div>
             </PanelBody>
           </Panel>
-
-          {/* Global Mix Direction */}
-          <GlobalDirectionEditor
-            releaseId={releaseId}
-            initialValue={release.global_direction}
-            initialStatus={release.status}
-            role={role}
-          />
-
-          {/* Global References */}
-          <GlobalReferencesEditor
-            releaseId={releaseId}
-            initialRefs={(globalRefs ?? []).map((r: Record<string, unknown>) => ({
-              id: r.id as string,
-              song_title: r.song_title as string,
-              artist: r.artist as string | null,
-              note: r.note as string | null,
-              url: r.url as string | null,
-              artwork_url: r.artwork_url as string | null,
-              sort_order: (r.sort_order as number) ?? 0,
-            }))}
-            initialStatus={release.status}
-            role={role}
-          />
 
           {/* Client Info */}
           {(release.client_name || release.client_email || release.client_phone) && (
