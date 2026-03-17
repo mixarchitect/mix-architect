@@ -33,6 +33,7 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
   const [elapsed, setElapsed] = useState(0);
   const [showLogForm, setShowLogForm] = useState(false);
   const [minimized, setMinimized] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const startTimeRef = useRef<number>(0);
   const accumulatedRef = useRef<number>(0);
@@ -159,17 +160,47 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
     );
   }
 
-  // Collapsed state: just the stopwatch icon when not active and no log form
-  if (state === "stopped" && !showLogForm) {
+  // Collapsed state: just the stopwatch icon when idle
+  if (state === "stopped" && !showLogForm && !expanded) {
     return (
       <button
         type="button"
-        onClick={handleStart}
+        onClick={() => setExpanded(true)}
         className="fixed bottom-6 right-6 max-sm:bottom-20 z-40 w-10 h-10 rounded-full border border-border bg-panel flex items-center justify-center shadow-lg shadow-black/20 hover:border-signal/40 hover:bg-signal/10 transition-all duration-200 group"
         title="Time tracking"
       >
         <Timer size={16} className="text-faint group-hover:text-signal transition-colors" />
       </button>
+    );
+  }
+
+  // Expanded idle state: pill with Start button
+  if (state === "stopped" && !showLogForm && expanded) {
+    return (
+      <div className="fixed bottom-6 right-6 max-sm:bottom-20 z-40 rounded-full border border-border bg-panel shadow-lg shadow-black/20 transition-all duration-200">
+        <div className="flex items-center gap-3 px-4 py-2.5">
+          <Timer size={14} className="text-faint" />
+          <span className="text-sm tabular-nums text-muted" style={{ fontVariantNumeric: "tabular-nums" }}>
+            00:00:00
+          </span>
+          <button
+            type="button"
+            onClick={() => { setExpanded(false); handleStart(); }}
+            className="flex items-center gap-1 px-3 py-1 rounded-full bg-signal/10 text-signal text-xs font-medium hover:bg-signal/20 transition-colors"
+          >
+            <Play size={12} />
+            Start
+          </button>
+          <button
+            type="button"
+            onClick={() => setExpanded(false)}
+            className="p-1 rounded text-faint hover:text-muted transition-colors"
+            title="Close"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      </div>
     );
   }
 
