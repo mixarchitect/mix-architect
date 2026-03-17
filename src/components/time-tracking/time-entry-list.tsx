@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, Check, X, Timer, PenLine } from "lucide-react";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { createTimeEntry, updateTimeEntry, deleteTimeEntry } from "@/app/app/releases/[releaseId]/time-entry-actions";
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency, locale, defaultRate }: Props) {
+  const router = useRouter();
   const [entries, setEntries] = useState(initialEntries);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -30,11 +32,13 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
 
   // Add form
   const [newHours, setNewHours] = useState("");
+  const [newBillable, setNewBillable] = useState(true);
   const [newRate, setNewRate] = useState(defaultRate != null ? String(defaultRate) : "");
   const [newDesc, setNewDesc] = useState("");
 
   // Edit form
   const [editHours, setEditHours] = useState("");
+  const [editBillable, setEditBillable] = useState(true);
   const [editRate, setEditRate] = useState("");
   const [editDesc, setEditDesc] = useState("");
 
@@ -46,6 +50,7 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
 
   function resetAddForm() {
     setNewHours("");
+    setNewBillable(true);
     setNewRate(defaultRate != null ? String(defaultRate) : "");
     setNewDesc("");
     setIsAdding(false);
@@ -54,14 +59,15 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
   function startEdit(e: ReleaseTimeEntry) {
     setEditingId(e.id);
     setEditHours(String(e.hours));
-    setEditRate(e.rate != null ? String(e.rate) : "");
+    setEditBillable(e.rate != null);
+    setEditRate(e.rate != null ? String(e.rate) : (defaultRate != null ? String(defaultRate) : ""));
     setEditDesc(e.description ?? "");
   }
 
   function handleAdd() {
     const hours = parseFloat(newHours);
     if (isNaN(hours) || hours <= 0) return;
-    const rate = newRate.trim() ? parseFloat(newRate) : null;
+    const rate = newBillable && newRate.trim() ? parseFloat(newRate) : null;
 
     startTransition(async () => {
       const result = await createTimeEntry({
@@ -89,6 +95,7 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
           ...prev,
         ]);
         resetAddForm();
+        router.refresh();
       }
     });
   }
@@ -97,7 +104,7 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
     if (!editingId) return;
     const hours = parseFloat(editHours);
     if (isNaN(hours) || hours <= 0) return;
-    const rate = editRate.trim() ? parseFloat(editRate) : null;
+    const rate = editBillable && editRate.trim() ? parseFloat(editRate) : null;
 
     startTransition(async () => {
       const result = await updateTimeEntry({
@@ -116,6 +123,7 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
           ),
         );
         setEditingId(null);
+        router.refresh();
       }
     });
   }
@@ -125,6 +133,7 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
       const result = await deleteTimeEntry(id, releaseId);
       if (!result.error) {
         setEntries((prev) => prev.filter((e) => e.id !== id));
+        router.refresh();
       }
     });
   }
@@ -178,16 +187,26 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
                   type="number"
                   step="0.01"
                   min="0"
-                  value={newRate}
+                  value={newBillable ? newRate : ""}
                   onChange={(e) => setNewRate(e.target.value)}
                   className="input text-xs h-7 w-full"
                   placeholder="—"
+                  disabled={!newBillable}
                   onKeyDown={(e) => {
                     if (e.key === "Escape") resetAddForm();
                   }}
                 />
               </div>
             </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={newBillable}
+                onChange={(e) => setNewBillable(e.target.checked)}
+                className="accent-signal"
+              />
+              <span className="text-xs text-muted">Billable</span>
+            </label>
             <input
               type="text"
               value={newDesc}
@@ -244,13 +263,23 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
                         type="number"
                         step="0.01"
                         min="0"
-                        value={editRate}
+                        value={editBillable ? editRate : ""}
                         onChange={(e) => setEditRate(e.target.value)}
                         className="input text-xs h-7 w-full"
                         placeholder="—"
+                        disabled={!editBillable}
                       />
                     </div>
                   </div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editBillable}
+                      onChange={(e) => setEditBillable(e.target.checked)}
+                      className="accent-signal"
+                    />
+                    <span className="text-xs text-muted">Billable</span>
+                  </label>
                   <input
                     type="text"
                     value={editDesc}

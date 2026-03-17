@@ -40,6 +40,7 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
 
   // Log form state
   const [logHours, setLogHours] = useState("");
+  const [logBillable, setLogBillable] = useState(true);
   const [logRate, setLogRate] = useState(defaultRate != null ? String(defaultRate) : "");
   const [logDesc, setLogDesc] = useState("");
   const [saving, setSaving] = useState(false);
@@ -98,6 +99,7 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
     const rawHours = finalMs / (1000 * 60 * 60);
     const rounded = roundToQuarter(rawHours);
     setLogHours(String(Math.max(rounded, 0.25)));
+    setLogBillable(true);
     setLogRate(defaultRate != null ? String(defaultRate) : "");
     setLogDesc("");
     setShowLogForm(true);
@@ -113,7 +115,7 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
   async function handleSaveEntry() {
     const hours = parseFloat(logHours);
     if (isNaN(hours) || hours <= 0) return;
-    const rate = logRate.trim() ? parseFloat(logRate) : null;
+    const rate = logBillable && logRate.trim() ? parseFloat(logRate) : null;
 
     setSaving(true);
     const result = await createTimeEntry({
@@ -231,14 +233,24 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
                   type="number"
                   step="0.01"
                   min="0"
-                  value={logRate}
+                  value={logBillable ? logRate : ""}
                   onChange={(e) => setLogRate(e.target.value)}
                   className="input text-xs h-7 w-full"
                   placeholder="—"
+                  disabled={!logBillable}
                 />
               </div>
             </div>
-            {logHours && logRate && (
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={logBillable}
+                onChange={(e) => setLogBillable(e.target.checked)}
+                className="accent-signal"
+              />
+              <span className="text-xs text-muted">Billable</span>
+            </label>
+            {logBillable && logHours && logRate && (
               <p className="text-xs text-faint">
                 Total: {fmtCurrency(parseFloat(logHours || "0") * parseFloat(logRate || "0"))}
               </p>

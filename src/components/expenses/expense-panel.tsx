@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Pencil, Trash2, Check, X } from "lucide-react";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { createExpense, updateExpense, deleteExpense } from "@/app/app/releases/[releaseId]/expense-actions";
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, locale }: Props) {
+  const router = useRouter();
   const [expenses, setExpenses] = useState(initialExpenses);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -82,6 +84,7 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
           },
         ]);
         resetAddForm();
+        router.refresh();
       }
     });
   }
@@ -109,6 +112,7 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
           ),
         );
         setEditingId(null);
+        router.refresh();
       }
     });
   }
@@ -118,6 +122,7 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
       const result = await deleteExpense(id, releaseId);
       if (!result.error) {
         setExpenses((prev) => prev.filter((e) => e.id !== id));
+        router.refresh();
       }
     });
   }

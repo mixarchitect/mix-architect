@@ -37,10 +37,12 @@ export function FinancialSummary({ feeTotal, feeCurrency, paymentStatus, expense
   }, 0);
   const expensesTotal = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
+  // Respect payment status — if "no_fee", don't show fee even if a value exists in DB
+  const effectiveFee = paymentStatus === "no_fee" ? null : feeTotal;
   // If no fee set but time entries have rates, use time total as implied fee
-  const feeDisplay = feeTotal ?? (timeBillable > 0 ? timeBillable : null);
+  const feeDisplay = effectiveFee ?? (timeBillable > 0 ? timeBillable : null);
   const net = feeDisplay != null ? feeDisplay - expensesTotal : -expensesTotal;
-  const hasAnyData = feeTotal != null || timeEntries.length > 0 || expenses.length > 0;
+  const hasAnyData = effectiveFee != null || timeEntries.length > 0 || expenses.length > 0;
 
   if (!hasAnyData) return null;
 
@@ -50,10 +52,10 @@ export function FinancialSummary({ feeTotal, feeCurrency, paymentStatus, expense
         <div className="label-sm text-muted mb-3">FINANCIAL SUMMARY</div>
         <div className="space-y-2 text-sm">
           {/* Project fee */}
-          {feeTotal != null && (
+          {effectiveFee != null && (
             <div className="flex justify-between">
               <span className="text-muted">Project fee</span>
-              <span className="text-text">{fmt(feeTotal, feeCurrency, locale)}</span>
+              <span className="text-text">{fmt(effectiveFee, feeCurrency, locale)}</span>
             </div>
           )}
 
