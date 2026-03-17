@@ -166,7 +166,7 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
         type="button"
         onClick={handleStart}
         className="fixed bottom-6 right-6 max-sm:bottom-20 z-40 w-10 h-10 rounded-full border border-border bg-panel flex items-center justify-center shadow-lg shadow-black/20 hover:border-signal/40 hover:bg-signal/10 transition-all duration-200 group"
-        title="Start timer"
+        title="Time tracking"
       >
         <Timer size={16} className="text-faint group-hover:text-signal transition-colors" />
       </button>
