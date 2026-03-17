@@ -213,12 +213,12 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Enabling Payment Tracking",
-        body: "Go to [Settings](/app/settings) and find the Payment Tracking section. The section reads: \"Track fees and payment status on releases and tracks. Turn this off if you're mixing your own projects.\" Toggle \"Enable payment tracking\" on. Once enabled, payment-related features appear throughout the app: fee stats on the [Dashboard](/app) (Outstanding, Earned, Total Fees), a Payment section in the inspector sidebar on each release, and the [Payments](/app/payments) page in the sidebar navigation.",
+        body: "Go to [Settings](/app/settings) and find the Payment Tracking section. The section reads: \"Track fees and payment status on releases and tracks. Turn this off if you're mixing your own projects.\" Toggle \"Enable payment tracking\" on. Once enabled, payment-related features appear throughout the app: fee stats on the [Dashboard](/app) (Outstanding, Earned, Total Fees), a Financials tab on each release detail page with Financial Summary, Payment status, Time Log, and Expenses, and the [Payments](/app/payments) page in the sidebar navigation.",
         mockup: "payment-dashboard",
       },
       {
         heading: "Setting Release Fees",
-        body: "Open Release Settings (click the gear icon on any release). Scroll down to the Payment section. Set the Payment Status: No Fee, Unpaid, Partial, or Paid. Use the Payment Notes text area to record terms, deposit info, or due dates. The fee amount and payment info is also visible in the inspector sidebar on the release detail page under the Payment heading, where you can click the status to quickly change it.",
+        body: "Open Release Settings (click the gear icon on any release). Scroll down to the Payment section. Set the Payment Status: No Fee, Unpaid, Partial, or Paid. Use the Payment Notes text area to record terms, deposit info, or due dates. The fee amount and payment info is also visible on the Financials tab of the release detail page, where you can click the status to quickly change it.",
         mockup: "payment-release-fees",
       },
       {
@@ -647,25 +647,30 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Enabling Expense Tracking",
-        body: "Expense tracking is part of the Payment Tracking feature. To enable it, go to [Settings](/app/settings) and toggle on \"Payment Tracking\" in the Payment section. Once enabled, an Expenses panel appears in the inspector sidebar of every release detail page.",
+        body: "Expense tracking is part of the Payment Tracking feature. To enable it, go to [Settings](/app/settings) and toggle on \"Payment Tracking\" in the Payment section. Once enabled, a Financials tab appears on every release detail page — this is where you'll find Expenses alongside your Financial Summary, Payment status, and Time Log.",
         tip: "Expenses are per-release, so each project keeps its own running total.",
+        mockup: "expense-financials-tab",
       },
       {
         heading: "Adding an Expense",
-        body: "Open any release and scroll down in the right sidebar to the EXPENSES panel. Click \"+ Add\" to reveal the inline form. Enter a description (e.g. \"Studio rental\"), the amount, and optionally who paid and who owes. Press Enter or click the check icon to save. The expense appears immediately in the list and the running total updates.",
+        body: "Open any release and switch to the Financials tab. In the Expenses section, click \"+ Add\" to reveal the inline form. Enter a description (e.g. \"Studio rental\"), the amount, and optionally who paid and who owes. Press Enter or click the check icon to save. The expense appears immediately in the list and the running total updates.",
+        mockup: "expense-add",
       },
       {
         heading: "Editing and Deleting Expenses",
         body: "Hover over any expense line item to reveal the edit and delete icons. Click the pencil icon to edit the description, amount, paid-by, or owed-by fields inline. Click the trash icon to remove an expense. All changes are saved automatically.",
         warning: "Deleting an expense cannot be undone. Double-check before removing an entry.",
+        mockup: "expense-list",
       },
       {
         heading: "Expenses in the Financial Summary",
-        body: "The Financial Summary panel at the top of the sidebar aggregates your project fee, time logged, and total expenses into a single view. The net amount shown is your fee minus expenses, giving you a quick picture of project profitability. The [Payments](/app/payments) page also shows aggregate expense totals across all releases.",
+        body: "The Financial Summary at the top of the Financials tab aggregates your project fee, time logged, and total expenses into a single view. The net amount shown is your fee minus expenses, giving you a quick picture of project profitability. The [Payments](/app/payments) page also shows aggregate expense totals across all releases.",
+        mockup: "expense-financial-summary",
       },
       {
         heading: "Exporting Expense Data",
-        body: "When you export your release data from the dashboard, all expenses are included in the export as a dedicated expenses.csv file. Each row includes the description, amount, paid-by, owed-by, and timestamps.",
+        body: "When you export your release data from the dashboard, all expenses are included in the export as a dedicated expenses.csv file. Each row includes the description, amount, paid-by, owed-by, and timestamps. Time entries are also exported in a separate time-entries.csv file.",
+        mockup: "expense-export",
       },
     ],
   },
@@ -681,23 +686,28 @@ export const articles: HelpArticle[] = [
       {
         heading: "Enabling Time Tracking",
         body: "Time tracking is part of the Payment Tracking feature. Go to [Settings](/app/settings) and toggle on \"Payment Tracking\". You can also set a default hourly rate in the same section — this rate is pre-filled whenever you log a new time entry.",
+        mockup: "timer-settings",
       },
       {
         heading: "Using the Timer",
-        body: "Open any release and find the TIMER panel in the right sidebar. Click \"Start\" to begin timing. The stopwatch runs in real time. You can pause and resume as needed. When you are finished, click \"Stop\" — a log entry form appears with the elapsed time (rounded to the nearest quarter hour), your default hourly rate, and a description field. Edit any values and click the check icon to save the entry to the Time Log.",
-        tip: "The timer uses your system clock so it stays accurate even if the display tab is in the background. However, it does not persist across page reloads.",
+        body: "A floating timer button appears in the bottom-right corner of every release page. Click the stopwatch icon to expand it, then click \"Start\" to begin timing. The stopwatch runs in real time — you can pause and resume as needed. When you're finished, click the stop button. A log entry form appears with the elapsed time (rounded to the nearest quarter hour), your default hourly rate, a billable toggle, and a description field. Edit any values and click \"Save Entry\" to add it to the Time Log.",
+        tip: "The timer uses your system clock so it stays accurate even if the browser tab is in the background. However, it does not persist across page reloads.",
+        mockup: "timer-floating",
+      },
+      {
+        heading: "Saving a Timer Session",
+        body: "When you stop the timer, a compact form appears. Choose whether the entry is billable (toggle on by default), adjust the hours and rate if needed, and add a description of what you worked on. Click \"Save Entry\" to add it to the Time Log on the Financials tab, or \"Discard\" to throw away the session. You can also press Enter in the description field to save quickly.",
+        mockup: "timer-log-form",
       },
       {
         heading: "Manual Time Entries",
-        body: "In the TIME LOG panel below the timer, click \"+ Add\" to create a manual entry. Enter the hours worked, an optional hourly rate, and a description. Manual entries are marked with a pencil icon, while timer entries show a stopwatch icon, so you can easily tell them apart.",
-      },
-      {
-        heading: "Editing and Deleting Entries",
-        body: "Hover over any time entry to reveal edit and delete icons. Click the pencil to edit hours, rate, or description inline. Click the trash icon to remove an entry. The total hours and billable amount update instantly.",
+        body: "Switch to the Financials tab on any release. In the Time Log section, click \"+ Add\" to create a manual entry. Enter the hours worked, an optional hourly rate, toggle billable on or off, and add a description. Manual entries are marked with a pencil icon, while timer entries show a stopwatch icon, so you can easily tell them apart.",
+        mockup: "time-entry-list",
       },
       {
         heading: "Financial Summary and Export",
-        body: "Time entries feed into the Financial Summary panel, which shows total hours logged and the billable total alongside your project fee and expenses. The [Payments](/app/payments) page shows aggregate time stats across all releases. When you export data, time entries are included as a time-entries.csv file with hours, rate, description, entry type, and timestamps.",
+        body: "Time entries feed into the Financial Summary at the top of the Financials tab, which shows total hours logged and the billable total alongside your project fee and expenses. The [Payments](/app/payments) page shows aggregate time stats across all releases. When you export data, time entries are included as a time-entries.csv file with hours, rate, description, entry type, and timestamps.",
+        mockup: "time-export",
       },
     ],
   },

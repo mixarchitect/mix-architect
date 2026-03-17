@@ -16,6 +16,7 @@ import {
   ExternalLink, BarChart3, DollarSign,
   Sun, Moon, Monitor, Mail, Gift,
   RefreshCw, User, Trash2, UserPlus,
+  Pause, Square,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -2977,6 +2978,296 @@ function ReleaseSettingsTeamMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   ARTICLE 19: TRACKING EXPENSES (5 mockups)
+   ═══════════════════════════════════════════════════════════ */
+
+function ExpenseFinancialsTabMockup() {
+  return (
+    <div className="p-4 space-y-4">
+      {/* Tab bar */}
+      <div className="flex gap-0 border-b border-border">
+        {["Tracks", "Globals", "Distribution", "Financials"].map((t) => (
+          <span
+            key={t}
+            className={cn(
+              "px-4 py-2.5 text-sm font-medium relative",
+              t === "Financials" ? "text-text" : "text-muted",
+            )}
+          >
+            {t}
+            {t === "Financials" && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-signal" />}
+          </span>
+        ))}
+      </div>
+      <p className="text-xs text-muted">Expenses are on the <span className="text-text font-medium">Financials</span> tab of each release, alongside your Financial Summary, Payment status, and Time Log.</p>
+    </div>
+  );
+}
+
+function ExpenseAddMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelBody className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="label-sm text-muted">EXPENSES</span>
+          <span className="text-xs text-signal font-medium">+ Add</span>
+        </div>
+        <Rule />
+        {/* Inline add form */}
+        <div className="space-y-2">
+          <MockInput text="Studio rental — 2 days" className="text-xs h-7" />
+          <div className="grid grid-cols-3 gap-2">
+            <MockInput text="$450.00" className="text-xs h-7" />
+            <MockInput text="Mike G" className="text-xs h-7" />
+            <MockInput text="Client" className="text-xs h-7" />
+          </div>
+          <div className="flex gap-2 justify-end">
+            <span className="p-1"><X size={12} className="text-faint" /></span>
+            <span className="p-1"><Check size={12} className="text-signal" /></span>
+          </div>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function ExpenseListMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelBody className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="label-sm text-muted">EXPENSES</span>
+          <span className="text-xs text-signal font-medium">+ Add</span>
+        </div>
+        <Rule />
+        {[
+          { desc: "Studio rental — 2 days", amount: "$450.00", by: "Mike G" },
+          { desc: "Mastering reference tracks", amount: "$29.99", by: "Mike G" },
+          { desc: "Session musician (bass)", amount: "$200.00", by: "Client" },
+        ].map((e) => (
+          <div key={e.desc} className="flex items-center gap-3 py-1.5 group">
+            <div className="flex-1 min-w-0">
+              <span className="text-sm text-text truncate block">{e.desc}</span>
+              <span className="text-[10px] text-faint">Paid by {e.by}</span>
+            </div>
+            <span className="text-sm text-text font-medium tabular-nums">{e.amount}</span>
+            <Pencil size={12} className="text-faint opacity-40" />
+            <Trash2 size={12} className="text-faint opacity-40" />
+          </div>
+        ))}
+        <Rule />
+        <div className="flex justify-between text-xs">
+          <span className="text-muted">3 items</span>
+          <span className="text-text font-semibold">$679.99</span>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function ExpenseFinancialSummaryMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelBody className="space-y-2">
+        <span className="label-sm text-muted">FINANCIAL SUMMARY</span>
+        <Rule />
+        <div className="flex justify-between text-sm"><span className="text-muted">Project fee</span><span className="text-text">$2,500.00</span></div>
+        <div className="flex justify-between text-sm"><span className="text-muted">Time logged</span><span className="text-text"><span className="text-faint">6.5 hrs</span> $325.00</span></div>
+        <div className="flex justify-between text-sm"><span className="text-muted">Expenses</span><span className="text-status-orange">3 items ($679.99)</span></div>
+        <Rule />
+        <div className="flex justify-between text-sm font-semibold"><span className="text-muted">Net</span><span className="text-text">$1,820.01</span></div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function ExpenseExportMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelBody className="space-y-2">
+        <span className="label-sm text-muted">EXPORT INCLUDES</span>
+        <Rule />
+        {[
+          { icon: FileText, label: "metadata.json", desc: "Release + track data with expenses array" },
+          { icon: DollarSign, label: "expenses.csv", desc: "Description, amount, paid_by, owed_by, timestamps" },
+          { icon: Clock, label: "time-entries.csv", desc: "Hours, rate, description, entry type, timestamps" },
+        ].map((f) => (
+          <div key={f.label} className="flex items-center gap-3 py-1.5">
+            <f.icon size={14} className="text-signal shrink-0" />
+            <div className="min-w-0 flex-1">
+              <span className="text-sm text-text block">{f.label}</span>
+              <span className="text-[10px] text-faint">{f.desc}</span>
+            </div>
+          </div>
+        ))}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ARTICLE 20: LOGGING TIME (5 mockups)
+   ═══════════════════════════════════════════════════════════ */
+
+function TimerSettingsMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelBody className="space-y-3">
+        <span className="label-sm text-muted">PAYMENT TRACKING</span>
+        <Rule />
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-sm text-text block">Enable payment tracking</span>
+            <span className="text-xs text-faint">Track fees and payment status on releases</span>
+          </div>
+          <div className="w-9 h-5 rounded-full bg-signal relative">
+            <span className="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white" />
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-text">Default hourly rate</span>
+          <MockInput text="$50.00" className="text-xs h-7 w-24 text-right" />
+        </div>
+        <p className="text-[10px] text-faint">Pre-filled when logging timer or manual entries</p>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function TimerFloatingMockup() {
+  return (
+    <div className="p-4 space-y-4">
+      <p className="text-xs text-muted">The floating timer appears in the bottom-right of every release page when Payment Tracking is enabled.</p>
+      <div className="flex items-center gap-4">
+        {/* Collapsed state */}
+        <div className="flex flex-col items-center gap-1">
+          <div className="w-10 h-10 rounded-full border border-border bg-panel flex items-center justify-center">
+            <Clock size={16} className="text-faint" />
+          </div>
+          <span className="text-[10px] text-faint">Idle</span>
+        </div>
+        <ArrowRight size={14} className="text-faint" />
+        {/* Expanded state */}
+        <div className="flex flex-col items-center gap-1">
+          <div className="rounded-full border border-border bg-panel flex items-center gap-3 px-4 py-2">
+            <Clock size={14} className="text-faint" />
+            <span className="text-sm text-muted tabular-nums">00:00:00</span>
+            <span className="px-3 py-1 rounded-full bg-signal/10 text-signal text-xs font-medium flex items-center gap-1"><Play size={10} /> Start</span>
+          </div>
+          <span className="text-[10px] text-faint">Expanded</span>
+        </div>
+        <ArrowRight size={14} className="text-faint" />
+        {/* Running state */}
+        <div className="flex flex-col items-center gap-1">
+          <div className="rounded-xl border border-signal/30 bg-panel flex items-center gap-3 px-4 py-2">
+            <Clock size={14} className="text-signal" />
+            <span className="text-sm text-signal tabular-nums font-medium">01:23:45</span>
+            <span className="p-1"><Pause size={12} className="text-muted" /></span>
+            <span className="p-1"><Square size={12} className="text-muted" /></span>
+          </div>
+          <span className="text-[10px] text-faint">Running</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TimerLogFormMockup() {
+  return (
+    <Panel className="m-4 max-w-xs">
+      <PanelBody className="space-y-2">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs text-muted">Log this session</span>
+          <X size={12} className="text-faint" />
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <span className="text-[10px] text-faint uppercase">Hours</span>
+            <MockInput text="1.5" className="text-xs h-7" />
+          </div>
+          <div>
+            <span className="text-[10px] text-faint uppercase">Rate/hr</span>
+            <MockInput text="$50.00" className="text-xs h-7" />
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3.5 h-3.5 rounded-sm bg-signal flex items-center justify-center"><Check size={10} className="text-white" /></div>
+          <span className="text-xs text-muted">Billable</span>
+        </div>
+        <p className="text-xs text-faint">Total: $75.00</p>
+        <MockInput text="Mix revisions for track 3" className="text-xs h-7" />
+        <div className="flex gap-2 justify-end pt-1">
+          <span className="text-xs text-muted">Discard</span>
+          <span className="text-xs text-signal font-medium">Save Entry</span>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function TimeEntryListMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelBody className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="label-sm text-muted">TIME LOG</span>
+          <span className="text-xs text-signal font-medium">+ Add</span>
+        </div>
+        <Rule />
+        {[
+          { icon: Clock, desc: "Mix revisions for track 3", hrs: "1.50", rate: "$50", total: "$75.00", type: "timer" },
+          { icon: Pencil, desc: "Initial session — rough mix", hrs: "3.00", rate: "$50", total: "$150.00", type: "manual" },
+          { icon: Clock, desc: "Mastering pass", hrs: "2.00", rate: "$50", total: "$100.00", type: "timer" },
+        ].map((e) => (
+          <div key={e.desc} className="flex items-center gap-3 py-1.5">
+            <e.icon size={12} className="text-faint shrink-0" />
+            <div className="flex-1 min-w-0">
+              <span className="text-sm text-text truncate block">{e.desc}</span>
+              <span className="text-[10px] text-faint">{e.hrs} hrs × {e.rate}/hr</span>
+            </div>
+            <span className="text-sm text-text font-medium tabular-nums">{e.total}</span>
+          </div>
+        ))}
+        <Rule />
+        <div className="flex justify-between text-xs">
+          <span className="text-muted">6.50 hrs total</span>
+          <span className="text-text font-semibold">$325.00</span>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function TimeExportMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelBody className="space-y-2">
+        <span className="label-sm text-muted">TIME ENTRIES IN EXPORT</span>
+        <Rule />
+        <div className="overflow-x-auto">
+          <div className="text-[10px] font-medium text-faint flex gap-4 py-1">
+            <span className="w-16">Hours</span><span className="w-16">Rate</span><span className="flex-1">Description</span><span className="w-14">Type</span>
+          </div>
+          <Rule />
+          {[
+            { hrs: "1.50", rate: "$50.00", desc: "Mix revisions for track 3", type: "timer" },
+            { hrs: "3.00", rate: "$50.00", desc: "Initial session — rough mix", type: "manual" },
+            { hrs: "2.00", rate: "$50.00", desc: "Mastering pass", type: "timer" },
+          ].map((r) => (
+            <div key={r.desc} className="text-xs text-muted flex gap-4 py-1.5">
+              <span className="w-16 tabular-nums text-text">{r.hrs}</span>
+              <span className="w-16 tabular-nums text-text">{r.rate}</span>
+              <span className="flex-1 truncate">{r.desc}</span>
+              <span className="w-14"><Pill className="text-[9px]">{r.type}</Pill></span>
+            </div>
+          ))}
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    MOCKUP REGISTRY
    ═══════════════════════════════════════════════════════════ */
 
@@ -3075,6 +3366,18 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "release-settings-distribution": ReleaseSettingsDistributionMockup,
   "release-settings-payment": ReleaseSettingsPaymentMockup,
   "release-settings-team": ReleaseSettingsTeamMockup,
+  /* Article 19: Tracking Expenses */
+  "expense-financials-tab": ExpenseFinancialsTabMockup,
+  "expense-add": ExpenseAddMockup,
+  "expense-list": ExpenseListMockup,
+  "expense-financial-summary": ExpenseFinancialSummaryMockup,
+  "expense-export": ExpenseExportMockup,
+  /* Article 20: Logging Time */
+  "timer-settings": TimerSettingsMockup,
+  "timer-floating": TimerFloatingMockup,
+  "timer-log-form": TimerLogFormMockup,
+  "time-entry-list": TimeEntryListMockup,
+  "time-export": TimeExportMockup,
 };
 
 /* ═══════════════════════════════════════════════════════════
