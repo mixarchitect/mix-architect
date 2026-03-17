@@ -1,32 +1,33 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
 import { cn } from "@/lib/cn";
 
 type Tab = { id: string; label: string; count?: number };
 
 type Props = {
   tabs: Tab[];
-  activeTab: string;
+  initialTab: string;
   className?: string;
-  children?: React.ReactNode;
+  children: React.ReactNode[];
 };
 
 /**
- * ContentTabs + ContentTabPanel work together for instant client-side tab
- * switching. All panels are rendered in the DOM; inactive ones get `hidden`.
- * The URL search param is synced via replaceState (no server round-trip).
+ * TabbedContent renders a tab bar and ALL children simultaneously.
+ * Inactive panels are hidden with `hidden` attribute (display:none).
+ * URL is synced via replaceState — no server round-trip on tab switch.
+ *
+ * Children must be in the same order as `tabs`.
  */
-export function ContentTabs({ tabs, activeTab: serverTab, className, children }: Props) {
-  const [currentTab, setCurrentTab] = useState(serverTab);
+export function TabbedContent({ tabs, initialTab, className, children }: Props) {
+  const [currentTab, setCurrentTab] = useState(initialTab);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const handleTabChange = useCallback(
     (tabId: string) => {
       setCurrentTab(tabId);
-      // Sync URL without triggering navigation / server re-render
       const params = new URLSearchParams(searchParams.toString());
       if (tabId === tabs[0]?.id) {
         params.delete("tab");
@@ -70,27 +71,12 @@ export function ContentTabs({ tabs, activeTab: serverTab, className, children }:
           </button>
         ))}
       </div>
-      {/* Render children, passing current tab via data attribute context */}
-      {typeof children === "function"
-        ? (children as (tab: string) => React.ReactNode)(currentTab)
-        : children}
-    </div>
-  );
-}
 
-/** Wraps a tab panel — always in the DOM, hidden when inactive. */
-export function ContentTabPanel({
-  id,
-  activeTab,
-  children,
-}: {
-  id: string;
-  activeTab: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div role="tabpanel" hidden={activeTab !== id}>
-      {children}
+      {tabs.map((tab, i) => (
+        <div key={tab.id} role="tabpanel" hidden={currentTab !== tab.id}>
+          {children[i]}
+        </div>
+      ))}
     </div>
   );
 }

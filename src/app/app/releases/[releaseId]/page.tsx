@@ -15,7 +15,7 @@ import { ReleaseTimer } from "@/components/time-tracking/release-timer";
 import { TimeEntryList } from "@/components/time-tracking/time-entry-list";
 import { getTimeEntriesByRelease } from "./time-entry-actions";
 import { FinancialSummary } from "@/components/payments/financial-summary";
-import { ContentTabs } from "@/components/ui/content-tabs";
+import { TabbedContent } from "@/components/ui/tabbed-content";
 import { FlowSimulatorButton } from "@/components/flow-simulator/flow-simulator-button";
 import { FlowProvider, ReleaseFlowContent } from "@/components/flow-simulator/release-flow-context";
 import { FlowBreadcrumbTitle } from "@/components/flow-simulator/flow-breadcrumb-title";
@@ -253,10 +253,8 @@ export default async function ReleasePage({ params, searchParams }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
         {/* Main content with tabs */}
         <div>
-          <ContentTabs tabs={tabs} activeTab={currentTab} className="mb-6" />
-
-          {/* Tracks tab */}
-          {currentTab === "tracks" && (
+          <TabbedContent tabs={tabs} initialTab={currentTab}>
+            {/* Tracks tab */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -303,10 +301,8 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                 />
               )}
             </div>
-          )}
 
-          {/* Distribution tab */}
-          {currentTab === "distribution" && (
+            {/* Distribution tab */}
             <DistributionPanel
               releaseId={releaseId}
               initialEntries={distributionRes.data ?? []}
@@ -314,50 +310,50 @@ export default async function ReleasePage({ params, searchParams }: Props) {
               releaseArtist={release.artist ?? ""}
               canEdit={canEdit(role)}
             />
-          )}
 
-          {/* Financials tab */}
-          {currentTab === "financials" && paymentsEnabled && (
-            <div className="space-y-6">
-              {/* Top row: Summary + Payment */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <FinancialSummary
-                  feeTotal={release.fee_total}
-                  feeCurrency={release.fee_currency ?? "USD"}
-                  paymentStatus={release.payment_status ?? "no_fee"}
-                  expenses={expenses}
+            {/* Financials tab (only rendered when paymentsEnabled, matching tabs array) */}
+            {paymentsEnabled && (
+              <div className="space-y-6">
+                {/* Top row: Summary + Payment */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <FinancialSummary
+                    feeTotal={release.fee_total}
+                    feeCurrency={release.fee_currency ?? "USD"}
+                    paymentStatus={release.payment_status ?? "no_fee"}
+                    expenses={expenses}
+                    timeEntries={timeEntries}
+                    locale={locale}
+                  />
+                  <PaymentEditor
+                    releaseId={releaseId}
+                    initialPaymentStatus={release.payment_status ?? "no_fee"}
+                    initialFeeTotal={release.fee_total}
+                    initialPaidAmount={release.paid_amount ?? 0}
+                    initialFeeCurrency={release.fee_currency ?? "USD"}
+                    initialPaymentNotes={release.payment_notes}
+                    role={role}
+                  />
+                </div>
+
+                {/* Time Log */}
+                <TimeEntryList
+                  releaseId={releaseId}
                   timeEntries={timeEntries}
+                  currency={release.fee_currency ?? "USD"}
+                  locale={locale}
+                  defaultRate={defaultHourlyRate}
+                />
+
+                {/* Expenses */}
+                <ExpensePanel
+                  releaseId={releaseId}
+                  expenses={expenses}
+                  currency={release.fee_currency ?? "USD"}
                   locale={locale}
                 />
-                <PaymentEditor
-                  releaseId={releaseId}
-                  initialPaymentStatus={release.payment_status ?? "no_fee"}
-                  initialFeeTotal={release.fee_total}
-                  initialPaidAmount={release.paid_amount ?? 0}
-                  initialFeeCurrency={release.fee_currency ?? "USD"}
-                  initialPaymentNotes={release.payment_notes}
-                  role={role}
-                />
               </div>
-
-              {/* Time Log */}
-              <TimeEntryList
-                releaseId={releaseId}
-                timeEntries={timeEntries}
-                currency={release.fee_currency ?? "USD"}
-                locale={locale}
-                defaultRate={defaultHourlyRate}
-              />
-
-              {/* Expenses */}
-              <ExpensePanel
-                releaseId={releaseId}
-                expenses={expenses}
-                currency={release.fee_currency ?? "USD"}
-                locale={locale}
-              />
-            </div>
-          )}
+            )}
+          </TabbedContent>
         </div>
 
         {/* Inspector sidebar */}
