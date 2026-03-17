@@ -308,7 +308,9 @@
     "outstanding": "Outstanding",
     "earned": "Earned",
     "totalFees": "Total Fees",
-    "releaseCount": "{count, plural, one {# release} other {# releases}}"
+    "releaseCount": "{count, plural, one {# release} other {# releases}}",
+    "timeLogged": "Time Logged",
+    "totalExpenses": "Total Expenses"
   },
   "settings": {
     "title": "User Settings",
@@ -438,6 +440,16 @@
     "suggestFeature": "Suggest a Feature",
     "contact": "Contact",
     "searchPlaceholder": "Search articles...",
+    "whatsNew": "What's New",
+    "whatsNewDesc": "Latest updates and improvements to Mix Architect.",
+    "noChangelog": "No updates yet — check back soon!",
+    "viewAllChangelog": "View all updates",
+    "systemStatus": "System Status",
+    "systemStatusTitle": "System Status",
+    "allSystemsOperational": "All systems operational",
+    "someSystemsDegraded": "Some systems experiencing issues",
+    "systemOutage": "System outage detected",
+    "lastChecked": "Last checked",
     "getInTouch": "Get in Touch",
     "getInTouchDesc": "For direct support, questions, or partnership inquiries, reach out via email.",
     "allCategories": "All",

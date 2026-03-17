@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, HelpCircle, Sun, Moon, Monitor, LogOut, Settings, Download, Bug, Sparkles, Shield, Megaphone } from "lucide-react";
+import { Search, HelpCircle, Sun, Moon, Monitor, LogOut, Settings, Download, Bug, Sparkles, Shield } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/cn";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -89,11 +89,6 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
           <span className="flex-1 text-left">Search...</span>
           <kbd className="text-[10px] font-medium text-faint bg-panel border border-border rounded px-1.5 py-0.5">⌘K</kbd>
         </button>
-
-        {/* What's New */}
-        <Tooltip label="What's New" align="right">
-          <WhatsNewButton />
-        </Tooltip>
 
         {/* Featured releases */}
         <Tooltip label="Featured Releases" align="right">
@@ -272,47 +267,3 @@ function AccountMenu({ userEmail, displayName }: { userEmail: string | null; dis
   );
 }
 
-/* ─── What's New Button ──────────────────────────────────── */
-
-const CHANGELOG_STORAGE_KEY = "ma_last_seen_changelog";
-
-function WhatsNewButton() {
-  const [hasNew, setHasNew] = useState(false);
-
-  useEffect(() => {
-    async function check() {
-      try {
-        const res = await fetch("/api/changelog/latest");
-        const { published_at } = await res.json();
-        if (!published_at) return;
-
-        const lastSeen = localStorage.getItem(CHANGELOG_STORAGE_KEY);
-        if (!lastSeen || new Date(published_at) > new Date(lastSeen)) {
-          setHasNew(true);
-        }
-      } catch {
-        // Non-critical — fail silently
-      }
-    }
-    check();
-  }, []);
-
-  function handleClick() {
-    localStorage.setItem(CHANGELOG_STORAGE_KEY, new Date().toISOString());
-    setHasNew(false);
-  }
-
-  return (
-    <Link
-      href="/app/changelog"
-      aria-label="What's New"
-      onClick={handleClick}
-      className="relative w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
-    >
-      <Megaphone size={18} strokeWidth={1.5} />
-      {hasNew && (
-        <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-teal-500" />
-      )}
-    </Link>
-  );
-}
