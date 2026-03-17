@@ -60,6 +60,7 @@ export default function SettingsPage() {
     "Lead Vocal", "BGVs", "FX/Ear Candy",
   ]);
   const [paymentsEnabled, setPaymentsEnabled] = useState(false);
+  const [defaultHourlyRate, setDefaultHourlyRate] = useState("");
   const [locale, setLocale] = useState<Locale>("en-US");
   const [defaultCurrency, setDefaultCurrency] = useState("USD");
   const [persona, setPersona] = useState<"artist" | "engineer" | "both" | "other">("artist");
@@ -94,6 +95,7 @@ export default function SettingsPage() {
           setBitDepth(data.default_bit_depth ?? "24-bit");
           setDefaultElements(data.default_elements ?? []);
           setPaymentsEnabled(data.payments_enabled ?? false);
+          setDefaultHourlyRate(data.default_hourly_rate != null ? String(data.default_hourly_rate) : "");
           setCompanyName(data.company_name ?? "");
           setLocale((data.locale as Locale) ?? "en-US");
           setDefaultCurrency(data.default_currency ?? "USD");
@@ -421,6 +423,38 @@ export default function SettingsPage() {
                 />
               </button>
             </div>
+            {paymentsEnabled && (
+              <div>
+                <label className="text-sm font-medium text-text">Default hourly rate</label>
+                <p className="text-xs text-muted mt-0.5 mb-2">Pre-fills the rate when logging time on releases</p>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={defaultHourlyRate}
+                    onChange={(e) => setDefaultHourlyRate(e.target.value)}
+                    className="input text-sm h-9 w-32"
+                    placeholder="0.00"
+                    onBlur={async () => {
+                      const parsed = defaultHourlyRate.trim() ? parseFloat(defaultHourlyRate) : null;
+                      if (defaultHourlyRate.trim() && (isNaN(parsed!) || parsed! < 0)) return;
+                      try {
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (!user) return;
+                        await supabase.from("user_defaults").upsert(
+                          { user_id: user.id, default_hourly_rate: parsed },
+                          { onConflict: "user_id" },
+                        );
+                      } catch {
+                        // fail silently
+                      }
+                    }}
+                  />
+                  <span className="text-sm text-muted">/hr</span>
+                </div>
+              </div>
+            )}
           </PanelBody>
         </Panel>
 

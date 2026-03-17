@@ -9,6 +9,12 @@ import { TrackList } from "./track-list";
 import { Plus, Settings, ArrowLeft, ListMusic } from "lucide-react";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor, ReleaseNotesEditor, ClientNotesEditor } from "./sidebar-editors";
+import { ExpensePanel } from "@/components/expenses/expense-panel";
+import { getExpensesByRelease } from "./expense-actions";
+import { ReleaseTimer } from "@/components/time-tracking/release-timer";
+import { TimeEntryList } from "@/components/time-tracking/time-entry-list";
+import { getTimeEntriesByRelease } from "./time-entry-actions";
+import { FinancialSummary } from "@/components/payments/financial-summary";
 import { FlowSimulatorButton } from "@/components/flow-simulator/flow-simulator-button";
 import { FlowProvider, ReleaseFlowContent } from "@/components/flow-simulator/release-flow-context";
 import { FlowBreadcrumbTitle } from "@/components/flow-simulator/flow-breadcrumb-title";
@@ -19,6 +25,7 @@ import type { FlowTrack } from "@/components/flow-simulator/use-flow-audio";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
 import { formatLabel } from "@/lib/format-labels";
+import { getLocale } from "next-intl/server";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
@@ -67,16 +74,20 @@ export default async function ReleasePage({ params }: Props) {
   const user = userRes.data.user;
   if (!user) notFound();
 
-  // Fetch role + user defaults in parallel
-  const [role, defaultsRes2] = await Promise.all([
+  // Fetch role + user defaults + expenses + time entries + locale in parallel
+  const [role, defaultsRes2, expenses, timeEntries, locale] = await Promise.all([
     getReleaseRole(supabase, releaseId, user.id),
     supabase
       .from("user_defaults")
-      .select("payments_enabled")
+      .select("*")
       .eq("user_id", user.id)
       .maybeSingle(),
+    getExpensesByRelease(releaseId),
+    getTimeEntriesByRelease(releaseId),
+    getLocale(),
   ]);
   const paymentsEnabled = defaultsRes2.data?.payments_enabled ?? false;
+  const defaultHourlyRate = defaultsRes2.data?.default_hourly_rate ?? null;
 
   // Fetch client notes if client email is present
   let clientNotes = "";
@@ -393,6 +404,18 @@ export default async function ReleasePage({ params }: Props) {
             </Panel>
           )}
 
+          {/* Financial Summary */}
+          {paymentsEnabled && (
+            <FinancialSummary
+              feeTotal={release.fee_total}
+              feeCurrency={release.fee_currency ?? "USD"}
+              paymentStatus={release.payment_status ?? "no_fee"}
+              expenses={expenses}
+              timeEntries={timeEntries}
+              locale={locale}
+            />
+          )}
+
           {/* Payment */}
           {paymentsEnabled && (
             <PaymentEditor
@@ -403,6 +426,37 @@ export default async function ReleasePage({ params }: Props) {
               initialFeeCurrency={release.fee_currency ?? "USD"}
               initialPaymentNotes={release.payment_notes}
               role={role}
+            />
+          )}
+
+          {/* Timer */}
+          {paymentsEnabled && (
+            <ReleaseTimer
+              releaseId={releaseId}
+              defaultRate={defaultHourlyRate}
+              currency={release.fee_currency ?? "USD"}
+              locale={locale}
+            />
+          )}
+
+          {/* Time Log */}
+          {paymentsEnabled && (
+            <TimeEntryList
+              releaseId={releaseId}
+              timeEntries={timeEntries}
+              currency={release.fee_currency ?? "USD"}
+              locale={locale}
+              defaultRate={defaultHourlyRate}
+            />
+          )}
+
+          {/* Expenses */}
+          {paymentsEnabled && (
+            <ExpensePanel
+              releaseId={releaseId}
+              expenses={expenses}
+              currency={release.fee_currency ?? "USD"}
+              locale={locale}
             />
           )}
 

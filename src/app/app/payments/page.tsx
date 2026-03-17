@@ -35,15 +35,40 @@ export default async function PaymentsPage() {
 
   const releaseIds = (rawReleases ?? []).map((r) => r.id as string);
 
-  // Fetch all tracks for those releases in one query
-  const { data: rawTracks } =
+  // Fetch tracks, time entries, and expenses in parallel
+  const [tracksRes, timeEntriesRes, expensesRes] = await Promise.all([
     releaseIds.length > 0
-      ? await supabase
+      ? supabase
           .from("tracks")
           .select("id, title, track_number, fee, fee_paid, release_id")
           .in("release_id", releaseIds)
           .order("track_number")
-      : { data: [] as Record<string, unknown>[] };
+      : Promise.resolve({ data: [] as Record<string, unknown>[] }),
+    releaseIds.length > 0
+      ? supabase
+          .from("release_time_entries")
+          .select("hours, rate")
+          .in("release_id", releaseIds)
+      : Promise.resolve({ data: [] as { hours: number; rate: number | null }[] }),
+    releaseIds.length > 0
+      ? supabase
+          .from("release_expenses")
+          .select("amount")
+          .in("release_id", releaseIds)
+      : Promise.resolve({ data: [] as { amount: number }[] }),
+  ]);
+
+  const rawTracks = tracksRes.data;
+
+  // Aggregate time & expenses
+  const timeEntries = (timeEntriesRes.data ?? []) as { hours: number; rate: number | null }[];
+  const totalHoursLogged = timeEntries.reduce((sum, e) => sum + Number(e.hours), 0);
+  const totalTimeBillable = timeEntries.reduce((sum, e) => {
+    if (e.rate != null) return sum + Number(e.hours) * Number(e.rate);
+    return sum;
+  }, 0);
+  const expenseItems = (expensesRes.data ?? []) as { amount: number }[];
+  const totalExpenses = expenseItems.reduce((sum, e) => sum + Number(e.amount), 0);
 
   // Build typed data
   type RawTrack = { id: unknown; title: unknown; track_number: unknown; fee: unknown; fee_paid: unknown; release_id: unknown };
@@ -167,6 +192,40 @@ export default async function PaymentsPage() {
           </div>
         </div>
       </div>
+
+      {/* Time & Expenses KPI row */}
+      {(totalHoursLogged > 0 || totalExpenses > 0) && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 print:grid-cols-2">
+          {totalHoursLogged > 0 && (
+            <div className="px-4 py-3 rounded-lg border border-border bg-panel">
+              <div className="text-[10px] uppercase tracking-wide text-faint font-medium mb-1">
+                {t("timeLogged")}
+              </div>
+              <div className="text-lg font-semibold text-text">
+                {totalHoursLogged.toFixed(2)} hrs
+              </div>
+              {totalTimeBillable > 0 && (
+                <div className="text-xs text-muted mt-0.5">
+                  {formatMoney(totalTimeBillable, primaryCurrency, locale)} billable
+                </div>
+              )}
+            </div>
+          )}
+          {totalExpenses > 0 && (
+            <div className="px-4 py-3 rounded-lg border border-border bg-panel">
+              <div className="text-[10px] uppercase tracking-wide text-faint font-medium mb-1">
+                {t("totalExpenses")}
+              </div>
+              <div className="text-lg font-semibold text-text">
+                {formatMoney(totalExpenses, primaryCurrency, locale)}
+              </div>
+              <div className="text-xs text-muted mt-0.5">
+                {expenseItems.length} item{expenseItems.length !== 1 ? "s" : ""}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Table */}
       <div className="bg-panel border border-border rounded-lg shadow-sm print:shadow-none print:border-none print:rounded-none">

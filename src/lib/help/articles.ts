@@ -636,4 +636,69 @@ export const articles: HelpArticle[] = [
       },
     ],
   },
+  {
+    id: "tracking-expenses",
+    title: "Tracking Project Expenses",
+    category: "billing",
+    summary:
+      "Record and manage expenses for each release — gear rentals, session fees, travel, and more.",
+    tags: ["expenses", "costs", "budget", "money", "tracking", "payments"],
+    updatedAt: "2026-03-17",
+    content: [
+      {
+        heading: "Enabling Expense Tracking",
+        body: "Expense tracking is part of the Payment Tracking feature. To enable it, go to [Settings](/app/settings) and toggle on \"Payment Tracking\" in the Payment section. Once enabled, an Expenses panel appears in the inspector sidebar of every release detail page.",
+        tip: "Expenses are per-release, so each project keeps its own running total.",
+      },
+      {
+        heading: "Adding an Expense",
+        body: "Open any release and scroll down in the right sidebar to the EXPENSES panel. Click \"+ Add\" to reveal the inline form. Enter a description (e.g. \"Studio rental\"), the amount, and optionally who paid and who owes. Press Enter or click the check icon to save. The expense appears immediately in the list and the running total updates.",
+      },
+      {
+        heading: "Editing and Deleting Expenses",
+        body: "Hover over any expense line item to reveal the edit and delete icons. Click the pencil icon to edit the description, amount, paid-by, or owed-by fields inline. Click the trash icon to remove an expense. All changes are saved automatically.",
+        warning: "Deleting an expense cannot be undone. Double-check before removing an entry.",
+      },
+      {
+        heading: "Expenses in the Financial Summary",
+        body: "The Financial Summary panel at the top of the sidebar aggregates your project fee, time logged, and total expenses into a single view. The net amount shown is your fee minus expenses, giving you a quick picture of project profitability. The [Payments](/app/payments) page also shows aggregate expense totals across all releases.",
+      },
+      {
+        heading: "Exporting Expense Data",
+        body: "When you export your release data from the dashboard, all expenses are included in the export as a dedicated expenses.csv file. Each row includes the description, amount, paid-by, owed-by, and timestamps.",
+      },
+    ],
+  },
+  {
+    id: "logging-time",
+    title: "Logging Time on Releases",
+    category: "billing",
+    summary:
+      "Use the built-in timer or manual entry to track hours spent on each release.",
+    tags: ["time", "timer", "hours", "rate", "billing", "tracking", "stopwatch"],
+    updatedAt: "2026-03-17",
+    content: [
+      {
+        heading: "Enabling Time Tracking",
+        body: "Time tracking is part of the Payment Tracking feature. Go to [Settings](/app/settings) and toggle on \"Payment Tracking\". You can also set a default hourly rate in the same section — this rate is pre-filled whenever you log a new time entry.",
+      },
+      {
+        heading: "Using the Timer",
+        body: "Open any release and find the TIMER panel in the right sidebar. Click \"Start\" to begin timing. The stopwatch runs in real time. You can pause and resume as needed. When you are finished, click \"Stop\" — a log entry form appears with the elapsed time (rounded to the nearest quarter hour), your default hourly rate, and a description field. Edit any values and click the check icon to save the entry to the Time Log.",
+        tip: "The timer uses your system clock so it stays accurate even if the display tab is in the background. However, it does not persist across page reloads.",
+      },
+      {
+        heading: "Manual Time Entries",
+        body: "In the TIME LOG panel below the timer, click \"+ Add\" to create a manual entry. Enter the hours worked, an optional hourly rate, and a description. Manual entries are marked with a pencil icon, while timer entries show a stopwatch icon, so you can easily tell them apart.",
+      },
+      {
+        heading: "Editing and Deleting Entries",
+        body: "Hover over any time entry to reveal edit and delete icons. Click the pencil to edit hours, rate, or description inline. Click the trash icon to remove an entry. The total hours and billable amount update instantly.",
+      },
+      {
+        heading: "Financial Summary and Export",
+        body: "Time entries feed into the Financial Summary panel, which shows total hours logged and the billable total alongside your project fee and expenses. The [Payments](/app/payments) page shows aggregate time stats across all releases. When you export data, time entries are included as a time-entries.csv file with hours, rate, description, entry type, and timestamps.",
+      },
+    ],
+  },
 ];

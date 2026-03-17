@@ -106,6 +106,8 @@ export async function GET(req: NextRequest) {
       templatesRes,
       defaultsRes,
       clientNotesRes,
+      expensesRes,
+      timeEntriesRes,
     ] = await Promise.all([
       trackIds.length > 0
         ? supabase.from("track_intent").select("*").in("track_id", trackIds)
@@ -177,6 +179,20 @@ export async function GET(req: NextRequest) {
         .from("client_notes")
         .select("*")
         .eq("engineer_id", user.id),
+      releaseIds.length > 0
+        ? supabase
+            .from("release_expenses")
+            .select("*")
+            .in("release_id", releaseIds)
+            .order("created_at")
+        : { data: [] },
+      releaseIds.length > 0
+        ? supabase
+            .from("release_time_entries")
+            .select("*")
+            .in("release_id", releaseIds)
+            .order("created_at")
+        : { data: [] },
     ]);
 
     /* -------------------------------------------------------------- */
@@ -233,10 +249,19 @@ export async function GET(req: NextRequest) {
           (r) => r.release_id === release.id && !r.track_id
         );
 
+        const relExpenses = (expensesRes.data ?? []).filter(
+          (e) => e.release_id === release.id
+        );
+        const relTimeEntries = (timeEntriesRes.data ?? []).filter(
+          (te) => te.release_id === release.id
+        );
+
         return {
           ...release,
           members: relMembers,
           globalReferences: globalRefs,
+          expenses: relExpenses,
+          timeEntries: relTimeEntries,
           briefShare: relBriefShare ?? null,
           portalSettings: relBriefShare
             ? portalSettings.filter(
@@ -328,6 +353,60 @@ export async function GET(req: NextRequest) {
     }
 
     /* -------------------------------------------------------------- */
+    /*  Build expenses CSV                                              */
+    /* -------------------------------------------------------------- */
+
+    let expensesCsv: string | null = null;
+    const allExpenses = expensesRes.data ?? [];
+    if (paymentsEnabled && allExpenses.length > 0) {
+      const rows: string[] = [
+        "Release,Description,Amount,Paid By,Owed By,Date",
+      ];
+      for (const expense of allExpenses) {
+        const release = (releases ?? []).find((r) => r.id === expense.release_id);
+        rows.push(
+          csvRow([
+            release?.title ?? "",
+            expense.description ?? "",
+            String(expense.amount ?? 0),
+            expense.paid_by ?? "",
+            expense.owed_by ?? "",
+            expense.created_at ? new Date(expense.created_at).toISOString().slice(0, 10) : "",
+          ])
+        );
+      }
+      expensesCsv = rows.join("\n");
+    }
+
+    /* -------------------------------------------------------------- */
+    /*  Build time entries CSV                                          */
+    /* -------------------------------------------------------------- */
+
+    let timeEntriesCsv: string | null = null;
+    const allTimeEntries = timeEntriesRes.data ?? [];
+    if (paymentsEnabled && allTimeEntries.length > 0) {
+      const rows: string[] = [
+        "Release,Hours,Rate,Total,Description,Type,Date",
+      ];
+      for (const entry of allTimeEntries) {
+        const release = (releases ?? []).find((r) => r.id === entry.release_id);
+        const total = entry.rate != null ? Number(entry.hours) * Number(entry.rate) : "";
+        rows.push(
+          csvRow([
+            release?.title ?? "",
+            String(entry.hours),
+            entry.rate != null ? String(entry.rate) : "",
+            total !== "" ? String(total) : "",
+            entry.description ?? "",
+            entry.entry_type ?? "manual",
+            entry.created_at ? new Date(entry.created_at).toISOString().slice(0, 10) : "",
+          ])
+        );
+      }
+      timeEntriesCsv = rows.join("\n");
+    }
+
+    /* -------------------------------------------------------------- */
     /*  Assemble zip via archiver                                      */
     /* -------------------------------------------------------------- */
 
@@ -340,6 +419,18 @@ export async function GET(req: NextRequest) {
     if (paymentsCsv) {
       archive.append(paymentsCsv, {
         name: "mix-architect-export/payments.csv",
+      });
+    }
+
+    if (expensesCsv) {
+      archive.append(expensesCsv, {
+        name: "mix-architect-export/expenses.csv",
+      });
+    }
+
+    if (timeEntriesCsv) {
+      archive.append(timeEntriesCsv, {
+        name: "mix-architect-export/time-entries.csv",
       });
     }
 
