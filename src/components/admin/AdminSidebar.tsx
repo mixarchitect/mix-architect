@@ -16,6 +16,7 @@ import {
   TrendingUp,
   Menu,
   X,
+  Megaphone,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -29,6 +30,7 @@ const adminNavItems = [
   { label: "Audit Log", href: "/admin/audit", icon: Shield },
   { label: "Attributions", href: "/admin/attributions", icon: TrendingUp },
   { label: "Featured Releases", href: "/admin/featured", icon: Star },
+  { label: "Changelog", href: "/admin/changelog", icon: Megaphone },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
