@@ -7,7 +7,7 @@ function formatShortDate(dateString: string): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-export function ChangelogEntryCard({ entry }: { entry: ChangelogEntryPublic }) {
+export function ChangelogEntryCard({ entry, basePath = "/changelog" }: { entry: ChangelogEntryPublic; basePath?: string }) {
   const hasDetailPage = entry.body.length > entry.summary.length;
 
   return (
@@ -40,7 +40,7 @@ export function ChangelogEntryCard({ entry }: { entry: ChangelogEntryPublic }) {
       <h3 className="mt-2 text-xl font-semibold text-text">
         {hasDetailPage ? (
           <Link
-            href={`/changelog/${entry.slug}`}
+            href={`${basePath}/${entry.slug}`}
             className="hover:text-signal transition-colors"
           >
             {entry.title}
@@ -54,7 +54,7 @@ export function ChangelogEntryCard({ entry }: { entry: ChangelogEntryPublic }) {
 
       {hasDetailPage && (
         <Link
-          href={`/changelog/${entry.slug}`}
+          href={`${basePath}/${entry.slug}`}
           className="mt-3 inline-block text-sm text-signal hover:text-teal-300 transition-colors"
         >
           Read →
