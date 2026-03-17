@@ -33,6 +33,12 @@ export function LandingFooter() {
             >
               Featured
             </Link>
+            <Link
+              href="/changelog"
+              className="hover:text-white/70 transition-colors"
+            >
+              Changelog
+            </Link>
             <span className="cursor-default">Help Center</span>
             <span className="cursor-default">Contact</span>
           </nav>

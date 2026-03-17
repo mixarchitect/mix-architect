@@ -16,6 +16,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Mix Architect",
   description: "Blueprints for stereo and immersive mixes",
+  alternates: {
+    types: {
+      "application/rss+xml": "/changelog/feed.xml",
+    },
+  },
 };
 
 export default function RootLayout({
