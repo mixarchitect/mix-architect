@@ -32,7 +32,7 @@ export function FeatureBoard() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(({ data: { user } }: { data: { user: any } }) => {
       setUserId(user?.id ?? null);
       setLoading(false);
     });
