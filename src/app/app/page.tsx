@@ -232,6 +232,7 @@ export default async function DashboardPage({ searchParams }: Props) {
               paymentsEnabled={paymentsEnabled}
               paymentStatus={r.payment_status as string | null}
               feeTotal={r.fee_total as number | null}
+              paidAmount={r.paid_amount as number | null}
               feeCurrency={r.fee_currency as string | null}
               coverArtUrl={r.cover_art_url as string | null}
               pinned={r.pinned as boolean}
@@ -401,6 +402,7 @@ export default async function DashboardPage({ searchParams }: Props) {
                   paymentsEnabled={paymentsEnabled}
                   paymentStatus={r.payment_status as string | null}
                   feeTotal={r.fee_total as number | null}
+                  paidAmount={r.paid_amount as number | null}
                   feeCurrency={r.fee_currency as string | null}
                   coverArtUrl={r.cover_art_url as string | null}
                   pinned={r.pinned as boolean}

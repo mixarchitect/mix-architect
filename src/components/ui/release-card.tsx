@@ -28,6 +28,7 @@ type Props = {
   updatedAt?: string | null;
   paymentStatus?: string | null;
   feeTotal?: number | null;
+  paidAmount?: number | null;
   feeCurrency?: string | null;
   paymentsEnabled?: boolean;
   coverArtUrl?: string | null;
@@ -58,7 +59,7 @@ function roleLabel(role: ReleaseRole): string | null {
 export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt,
-  paymentStatus, feeTotal, feeCurrency, paymentsEnabled,
+  paymentStatus, feeTotal, paidAmount, feeCurrency, paymentsEnabled,
   coverArtUrl, pinned, role, hasNotes, className,
 }: Props) {
   const locale = useLocale();
@@ -312,7 +313,11 @@ export function ReleaseCard({
                 paymentStatus === "unpaid" && "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
               )}>
                 {paymentStatus === "paid" ? tPayment("paid") : paymentStatus === "partial" ? tPayment("partial") : tPayment("unpaid")}
-                {feeTotal != null && ` \u2022 ${formatMoney(feeTotal, feeCurrency || "USD", locale)}`}
+                {feeTotal != null && (() => {
+                  const paid = paidAmount ?? 0;
+                  const balance = feeTotal - paid;
+                  return ` \u2022 ${formatMoney(balance, feeCurrency || "USD", locale)}`;
+                })()}
               </span>
             )}
             {updatedAt && <Timestamp date={updatedAt} />}
