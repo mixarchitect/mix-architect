@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
 import { Plus, Settings, ArrowLeft, ListMusic } from "lucide-react";
 import { PortalToggle } from "./portal-toggle";
-import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, PaymentEditor, ReleaseNotesEditor, ClientNotesEditor } from "./sidebar-editors";
+import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, ReleaseNotesEditor, ClientNotesEditor } from "./sidebar-editors";
 import { ExpensePanel } from "@/components/expenses/expense-panel";
 import { getExpensesByRelease } from "./expense-actions";
 import { ReleaseTimer } from "@/components/time-tracking/release-timer";
@@ -339,27 +339,17 @@ export default async function ReleasePage({ params, searchParams }: Props) {
             {/* Financials tab (only rendered when paymentsEnabled, matching tabs array) */}
             {paymentsEnabled && (
               <div className="space-y-6">
-                {/* Top row: Summary + Payment */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <FinancialSummary
-                    feeTotal={release.fee_total}
-                    paidAmount={release.paid_amount ?? 0}
-                    feeCurrency={release.fee_currency ?? "USD"}
-                    paymentStatus={release.payment_status ?? "no_fee"}
-                    expenses={expenses}
-                    timeEntries={timeEntries}
-                    locale={locale}
-                  />
-                  <PaymentEditor
-                    releaseId={releaseId}
-                    initialPaymentStatus={release.payment_status ?? "no_fee"}
-                    initialFeeTotal={release.fee_total}
-                    initialPaidAmount={release.paid_amount ?? 0}
-                    initialFeeCurrency={release.fee_currency ?? "USD"}
-                    initialPaymentNotes={release.payment_notes}
-                    role={role}
-                  />
-                </div>
+                {/* Financial Summary with inline editing */}
+                <FinancialSummary
+                  releaseId={releaseId}
+                  feeTotal={release.fee_total}
+                  paidAmount={release.paid_amount ?? 0}
+                  feeCurrency={release.fee_currency ?? "USD"}
+                  paymentStatus={release.payment_status ?? "no_fee"}
+                  expenses={expenses}
+                  timeEntries={timeEntries}
+                  locale={locale}
+                />
 
                 {/* Time Log */}
                 <TimeEntryList

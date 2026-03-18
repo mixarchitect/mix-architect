@@ -1,4 +1,11 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { Check, X, Pencil } from "lucide-react";
 import { Panel, PanelBody } from "@/components/ui/panel";
+import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import type { ReleaseExpense } from "@/app/app/releases/[releaseId]/expense-actions";
 import type { ReleaseTimeEntry } from "@/app/app/releases/[releaseId]/time-entry-actions";
 
@@ -7,6 +14,7 @@ function fmt(amount: number, currency: string, locale: string): string {
 }
 
 interface Props {
+  releaseId: string;
   feeTotal: number | null;
   paidAmount: number;
   feeCurrency: string;
@@ -15,6 +23,8 @@ interface Props {
   timeEntries: ReleaseTimeEntry[];
   locale: string;
 }
+
+const STATUS_ORDER = ["no_fee", "unpaid", "partial", "paid"] as const;
 
 const statusLabels: Record<string, string> = {
   no_fee: "No Fee",
@@ -30,7 +40,28 @@ const statusColors: Record<string, string> = {
   paid: "text-green-400",
 };
 
-export function FinancialSummary({ feeTotal, paidAmount, feeCurrency, paymentStatus, expenses, timeEntries, locale }: Props) {
+export function FinancialSummary({
+  releaseId,
+  feeTotal: initialFee,
+  paidAmount: initialPaid,
+  feeCurrency,
+  paymentStatus: initialStatus,
+  expenses,
+  timeEntries,
+  locale: localeProp,
+}: Props) {
+  const locale = useLocale() || localeProp;
+  const router = useRouter();
+  const supabase = createSupabaseBrowserClient();
+
+  const [fee, setFee] = useState(initialFee);
+  const [paid, setPaid] = useState(initialPaid);
+  const [status, setStatus] = useState(initialStatus);
+  const [editingFee, setEditingFee] = useState(false);
+  const [feeInput, setFeeInput] = useState(initialFee != null ? String(initialFee) : "");
+  const [editingPaid, setEditingPaid] = useState(false);
+  const [paidInput, setPaidInput] = useState(String(initialPaid));
+
   const totalHours = timeEntries.reduce((sum, e) => sum + Number(e.hours), 0);
   const timeBillable = timeEntries.reduce((sum, e) => {
     if (e.rate != null) return sum + Number(e.hours) * Number(e.rate);
@@ -38,24 +69,119 @@ export function FinancialSummary({ feeTotal, paidAmount, feeCurrency, paymentSta
   }, 0);
   const expensesTotal = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
-  const effectiveFee = paymentStatus === "no_fee" ? null : feeTotal;
-  const fee = effectiveFee ?? 0;
-  const totalBilled = fee + timeBillable + expensesTotal;
-  const balance = totalBilled - paidAmount;
+  const effectiveFee = status === "no_fee" ? null : fee;
+  const feeVal = effectiveFee ?? 0;
+  const totalBilled = feeVal + timeBillable + expensesTotal;
+  const balance = totalBilled - paid;
   const hasAnyData = effectiveFee != null || timeEntries.length > 0 || expenses.length > 0;
 
   if (!hasAnyData) return null;
+
+  function deriveStatus(paidAmt: number, total: number): string {
+    if (total <= 0) return status;
+    if (paidAmt >= total) return "paid";
+    if (paidAmt > 0) return "partial";
+    return "unpaid";
+  }
+
+  async function saveFee() {
+    const parsed = feeInput.trim() ? parseFloat(feeInput) : null;
+    if (feeInput.trim() && isNaN(parsed!)) return;
+    const prev = fee;
+    setFee(parsed);
+    setEditingFee(false);
+    try {
+      const newTotal = (parsed ?? 0) + timeBillable + expensesTotal;
+      const newStatus = deriveStatus(paid, newTotal);
+      const { error } = await supabase
+        .from("releases")
+        .update({ fee_total: parsed, payment_status: newStatus })
+        .eq("id", releaseId);
+      if (error) throw error;
+      setStatus(newStatus);
+      router.refresh();
+    } catch {
+      setFee(prev);
+    }
+  }
+
+  async function savePaid() {
+    const parsed = paidInput.trim() ? parseFloat(paidInput) : 0;
+    if (paidInput.trim() && isNaN(parsed)) return;
+    const prev = paid;
+    setPaid(parsed);
+    setEditingPaid(false);
+    const newStatus = deriveStatus(parsed, totalBilled);
+    try {
+      const { error } = await supabase
+        .from("releases")
+        .update({ paid_amount: parsed, payment_status: newStatus })
+        .eq("id", releaseId);
+      if (error) throw error;
+      setStatus(newStatus);
+      router.refresh();
+    } catch {
+      setPaid(prev);
+    }
+  }
+
+  async function cycleStatus() {
+    const idx = STATUS_ORDER.indexOf(status as any);
+    const next = STATUS_ORDER[(idx + 1) % STATUS_ORDER.length];
+    const prev = status;
+    setStatus(next);
+    try {
+      const { error } = await supabase
+        .from("releases")
+        .update({ payment_status: next })
+        .eq("id", releaseId);
+      if (error) throw error;
+      router.refresh();
+    } catch {
+      setStatus(prev);
+    }
+  }
 
   return (
     <Panel>
       <PanelBody className="py-5">
         <div className="label-sm text-muted mb-3">FINANCIAL SUMMARY</div>
         <div className="space-y-2 text-sm">
-          {/* Project fee */}
+          {/* Project fee — editable */}
           {effectiveFee != null && (
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
               <span className="text-muted">Project fee</span>
-              <span className="text-text">{fmt(effectiveFee, feeCurrency, locale)}</span>
+              {editingFee ? (
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={feeInput}
+                    onChange={(e) => setFeeInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") saveFee();
+                      if (e.key === "Escape") {
+                        setFeeInput(fee != null ? String(fee) : "");
+                        setEditingFee(false);
+                      }
+                    }}
+                    className="input text-xs h-7 w-24 py-0.5 px-2 text-right"
+                    autoFocus
+                    placeholder="0.00"
+                  />
+                  <button onClick={saveFee} className="text-signal"><Check size={14} /></button>
+                  <button onClick={() => { setFeeInput(fee != null ? String(fee) : ""); setEditingFee(false); }} className="text-muted hover:text-text"><X size={14} /></button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => { setFeeInput(fee != null ? String(fee) : ""); setEditingFee(true); }}
+                  className="text-text hover:opacity-80 transition-opacity flex items-center gap-1"
+                >
+                  {fmt(effectiveFee, feeCurrency, locale)}
+                  <Pencil size={10} className="text-faint" />
+                </button>
+              )}
             </div>
           )}
 
@@ -94,11 +220,41 @@ export function FinancialSummary({ feeTotal, paidAmount, feeCurrency, paymentSta
             </>
           )}
 
-          {/* Paid */}
-          {paidAmount > 0 && (
-            <div className="flex justify-between">
+          {/* Paid — editable */}
+          {status !== "no_fee" && (
+            <div className="flex justify-between items-center">
               <span className="text-muted">Paid</span>
-              <span className="text-red-400">−{fmt(paidAmount, feeCurrency, locale)}</span>
+              {editingPaid ? (
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={paidInput}
+                    onChange={(e) => setPaidInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") savePaid();
+                      if (e.key === "Escape") {
+                        setPaidInput(String(paid));
+                        setEditingPaid(false);
+                      }
+                    }}
+                    className="input text-xs h-7 w-24 py-0.5 px-2 text-right"
+                    autoFocus
+                    placeholder="0.00"
+                  />
+                  <button onClick={savePaid} className="text-signal"><Check size={14} /></button>
+                  <button onClick={() => { setPaidInput(String(paid)); setEditingPaid(false); }} className="text-muted hover:text-text"><X size={14} /></button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => { setPaidInput(String(paid)); setEditingPaid(true); }}
+                  className="text-red-400 hover:opacity-80 transition-opacity flex items-center gap-1"
+                >
+                  {paid > 0 ? `−${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}
+                  <Pencil size={10} className="text-faint" />
+                </button>
+              )}
             </div>
           )}
 
@@ -112,14 +268,17 @@ export function FinancialSummary({ feeTotal, paidAmount, feeCurrency, paymentSta
             </div>
           )}
 
-          {/* Payment status */}
-          {paymentStatus !== "no_fee" && (
-            <div className="flex justify-between items-center pt-1">
-              <span className="text-muted">Payment</span>
-              <span className={`text-xs font-medium ${statusColors[paymentStatus] ?? "text-faint"}`}>
-                {statusLabels[paymentStatus] ?? paymentStatus}
-                {paymentStatus === "paid" && " ✓"}
-              </span>
+          {/* Payment status — clickable to cycle */}
+          {status !== "no_fee" && (
+            <div className="flex justify-between items-center pt-1 border-t border-border/50">
+              <span className="text-muted">Status</span>
+              <button
+                onClick={cycleStatus}
+                className={`text-xs font-medium ${statusColors[status] ?? "text-faint"} hover:opacity-80 transition-opacity`}
+              >
+                {statusLabels[status] ?? status}
+                {status === "paid" && " ✓"}
+              </button>
             </div>
           )}
         </div>
