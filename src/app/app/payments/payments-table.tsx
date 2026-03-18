@@ -222,16 +222,16 @@ export function PaymentsTable({ releases, currency }: Props) {
                     ? formatMoney(r.expenseTotal, r.feeCurrency, locale)
                     : "—"}
                 </td>
-                <td className="px-3 py-4 text-right whitespace-nowrap font-medium text-green-400">
+                <td className="px-3 py-4 text-right whitespace-nowrap font-medium text-blue-400">
                   {formatMoney(r.feeTotal + r.timeBillable + r.expenseTotal, r.feeCurrency, locale)}
                 </td>
-                <td className="px-3 py-4 text-right whitespace-nowrap text-red-400">
+                <td className="px-3 py-4 text-right whitespace-nowrap text-green-400">
                   {r.paidAmount > 0
                     ? `−${formatMoney(r.paidAmount, r.feeCurrency, locale)}`
                     : "—"}
                 </td>
                 <td className="px-3 py-4 text-right whitespace-nowrap hidden sm:table-cell">
-                  <span className={balance > 0 ? "text-amber-400" : "text-muted"}>
+                  <span className={balance > 0 ? "text-amber-400" : balance === 0 ? "text-green-400" : "text-muted"}>
                     {formatMoney(balance, r.feeCurrency, locale)}
                   </span>
                 </td>
@@ -307,16 +307,16 @@ export function PaymentsTable({ releases, currency }: Props) {
                 ? formatMoney(totalExpenses, currency, locale)
                 : "—"}
             </td>
-            <td className="px-3 py-3 text-right whitespace-nowrap text-green-400">
+            <td className="px-3 py-3 text-right whitespace-nowrap text-blue-400">
               {formatMoney(totalBilled, currency, locale)}
             </td>
-            <td className="px-3 py-3 text-right whitespace-nowrap text-red-400">
+            <td className="px-3 py-3 text-right whitespace-nowrap text-green-400">
               {totalPaid > 0
                 ? `−${formatMoney(totalPaid, currency, locale)}`
                 : "—"}
             </td>
             <td className="px-3 py-3 text-right whitespace-nowrap hidden sm:table-cell">
-              <span className={totalBalance > 0 ? "text-amber-400" : "text-muted"}>
+              <span className={totalBalance > 0 ? "text-amber-400" : totalBalance === 0 ? "text-green-400" : "text-muted"}>
                 {formatMoney(totalBalance, currency, locale)}
               </span>
             </td>

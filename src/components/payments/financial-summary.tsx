@@ -224,7 +224,7 @@ export function FinancialSummary({
             <>
               <div className="border-t border-border my-1" />
               <Row label="Total billed" bold>
-                <span className="text-green-400">{fmt(totalBilled, feeCurrency, locale)}</span>
+                <span className="text-blue-400">{fmt(totalBilled, feeCurrency, locale)}</span>
                 <span className="w-[34px]" />
               </Row>
             </>
@@ -254,7 +254,7 @@ export function FinancialSummary({
                 </div>
               ) : (
                 <>
-                  <span className="text-red-400">{paid > 0 ? `−${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}</span>
+                  <span className="text-green-400">{paid > 0 ? `−${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}</span>
                   <ActionIcons
                     onEdit={() => { setPaidInput(String(paid)); setEditingPaid(true); }}
                     onClear={async () => {
