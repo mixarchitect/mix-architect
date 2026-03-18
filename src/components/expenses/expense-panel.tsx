@@ -208,7 +208,7 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
               ) : (
                 <div
                   key={expense.id}
-                  className="group relative flex items-center justify-between rounded-lg px-2 py-2.5 -mx-2 hover:bg-panel2 transition-colors"
+                  className="group flex items-center gap-2 rounded-lg px-2 py-2.5 -mx-2 hover:bg-panel2 transition-colors"
                   style={{ fontVariantNumeric: "tabular-nums" }}
                 >
                   <div className="min-w-0 flex-1">
@@ -221,34 +221,22 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
                       </div>
                     )}
                   </div>
-                  <span className="text-sm text-text font-medium shrink-0 ml-4">
+                  <span className="text-sm text-text font-medium shrink-0">
                     {fmt(Number(expense.amount), currency, locale)}
                   </span>
-                  {/* Edit/delete overlay */}
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-panel2 rounded pl-2">
-                    <button
-                      type="button"
-                      onClick={() => startEdit(expense)}
-                      className="text-muted hover:text-text transition-colors p-0.5"
-                    >
-                      <Pencil size={12} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(expense.id)}
-                      className="text-muted hover:text-red-400 transition-colors p-0.5"
-                    >
-                      <Trash2 size={12} />
-                    </button>
+                  <div className="flex items-center gap-0.5 shrink-0 w-[34px] justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button type="button" onClick={() => startEdit(expense)} className="text-faint hover:text-text transition-colors p-0.5"><Pencil size={10} /></button>
+                    <button type="button" onClick={() => handleDelete(expense.id)} className="text-faint hover:text-red-400 transition-colors p-0.5"><Trash2 size={10} /></button>
                   </div>
                 </div>
               ),
             )}
 
             {/* Total row */}
-            <div className="flex justify-between text-sm pt-2 border-t border-border mt-2">
-              <span className="text-muted">Total</span>
-              <span className="text-text font-medium">{fmt(total, currency, locale)}</span>
+            <div className="flex items-center gap-2 text-sm pt-2 border-t border-border mt-2" style={{ fontVariantNumeric: "tabular-nums" }}>
+              <span className="text-muted flex-1">Total</span>
+              <span className="text-text font-medium shrink-0">{fmt(total, currency, locale)}</span>
+              <span className="w-[34px] shrink-0" />
             </div>
           </div>
         )}

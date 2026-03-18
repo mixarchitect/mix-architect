@@ -308,70 +308,54 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
               ) : (
                 <div
                   key={entry.id}
-                  className="group relative flex items-center justify-between rounded-lg px-2 py-2.5 -mx-2 hover:bg-panel2 transition-colors"
+                  className="group flex items-center gap-2 rounded-lg px-2 py-2.5 -mx-2 hover:bg-panel2 transition-colors"
                   style={{ fontVariantNumeric: "tabular-nums" }}
                 >
-                  <div className="min-w-0 flex-1 flex items-center gap-2">
-                    <Clock size={14} className="text-faint shrink-0" />
-                    <div>
-                      <div className="flex items-center gap-1.5 text-sm">
-                        <span className="text-text">
-                          {Number(entry.hours).toFixed(2)} hrs
+                  <Clock size={14} className="text-faint shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <span className="text-text">
+                        {Number(entry.hours).toFixed(2)} hrs
+                      </span>
+                      {entry.rate != null && (
+                        <span className="text-faint">
+                          × {fmt(Number(entry.rate), currency, locale)}/hr
                         </span>
-                        {entry.rate != null && (
-                          <span className="text-faint">
-                            × {fmt(Number(entry.rate), currency, locale)}/hr
-                          </span>
-                        )}
-                      </div>
-                      {entry.description && (
-                        <p className="text-xs text-faint mt-0.5 truncate">
-                          {entry.description}
-                        </p>
                       )}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-xs text-muted">
-                      {formatShortDate(entry.created_at)}
-                    </span>
-                    {entry.rate != null && (
-                      <span className="text-sm text-text font-medium text-right">
-                        {fmt(Number(entry.hours) * Number(entry.rate), currency, locale)}
-                      </span>
+                    {entry.description && (
+                      <p className="text-xs text-faint mt-0.5 truncate">
+                        {entry.description}
+                      </p>
                     )}
                   </div>
-                  {/* Edit/delete overlay */}
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-panel2 rounded pl-2">
-                    <button
-                      type="button"
-                      onClick={() => startEdit(entry)}
-                      className="text-muted hover:text-text transition-colors p-0.5"
-                    >
-                      <Pencil size={12} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(entry.id)}
-                      className="text-muted hover:text-red-400 transition-colors p-0.5"
-                    >
-                      <Trash2 size={12} />
-                    </button>
+                  <span className="text-xs text-muted shrink-0">
+                    {formatShortDate(entry.created_at)}
+                  </span>
+                  <span className="text-sm text-text font-medium shrink-0">
+                    {entry.rate != null
+                      ? fmt(Number(entry.hours) * Number(entry.rate), currency, locale)
+                      : "—"}
+                  </span>
+                  <div className="flex items-center gap-0.5 shrink-0 w-[34px] justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button type="button" onClick={() => startEdit(entry)} className="text-faint hover:text-text transition-colors p-0.5"><Pencil size={10} /></button>
+                    <button type="button" onClick={() => handleDelete(entry.id)} className="text-faint hover:text-red-400 transition-colors p-0.5"><Trash2 size={10} /></button>
                   </div>
                 </div>
               ),
             )}
 
             {/* Total row */}
-            <div className="flex justify-between text-sm pt-2 border-t border-border mt-2" style={{ fontVariantNumeric: "tabular-nums" }}>
-              <span className="text-muted">
+            <div className="flex items-center gap-2 text-sm pt-2 border-t border-border mt-2" style={{ fontVariantNumeric: "tabular-nums" }}>
+              <span className="text-muted flex-1">
                 Total: {totalHours.toFixed(2)} hrs
               </span>
               {totalBillable > 0 && (
-                <span className="text-text font-medium">
+                <span className="text-text font-medium shrink-0">
                   {fmt(totalBillable, currency, locale)}
                 </span>
               )}
+              <span className="w-[34px] shrink-0" />
             </div>
           </div>
         )}

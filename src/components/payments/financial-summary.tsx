@@ -40,6 +40,17 @@ const statusColors: Record<string, string> = {
   paid: "text-green-400",
 };
 
+function Row({ label, bold, children }: { label: React.ReactNode; bold?: boolean; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`text-muted flex-1 ${bold ? "font-medium" : ""}`}>{label}</span>
+      <div className={`flex items-center gap-1.5 shrink-0 ${bold ? "font-medium" : ""}`}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function FinancialSummary({
   releaseId,
   feeTotal: initialFee,
@@ -149,8 +160,7 @@ export function FinancialSummary({
         <div className="space-y-2 text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
           {/* Project fee — editable */}
           {effectiveFee != null && (
-            <div className="flex justify-between items-center">
-              <span className="text-muted">Project fee</span>
+            <Row label="Project fee">
               {editingFee ? (
                 <div className="flex items-center gap-1">
                   <input
@@ -161,10 +171,7 @@ export function FinancialSummary({
                     onChange={(e) => setFeeInput(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") saveFee();
-                      if (e.key === "Escape") {
-                        setFeeInput(fee != null ? String(fee) : "");
-                        setEditingFee(false);
-                      }
+                      if (e.key === "Escape") { setFeeInput(fee != null ? String(fee) : ""); setEditingFee(false); }
                     }}
                     className="input text-xs h-7 w-24 py-0.5 px-2 text-right"
                     autoFocus
@@ -174,56 +181,51 @@ export function FinancialSummary({
                   <button onClick={() => { setFeeInput(fee != null ? String(fee) : ""); setEditingFee(false); }} className="text-muted hover:text-text"><X size={14} /></button>
                 </div>
               ) : (
-                <button
-                  onClick={() => { setFeeInput(fee != null ? String(fee) : ""); setEditingFee(true); }}
-                  className="text-text hover:opacity-80 transition-opacity group text-right relative"
-                >
-                  {fmt(effectiveFee, feeCurrency, locale)}
-                  <Pencil size={10} className="text-faint absolute -right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover:opacity-100 transition-opacity" />
-                </button>
+                <>
+                  <span className="text-text">{fmt(effectiveFee, feeCurrency, locale)}</span>
+                  <button
+                    onClick={() => { setFeeInput(fee != null ? String(fee) : ""); setEditingFee(true); }}
+                    className="text-faint hover:text-text transition-colors w-[34px] flex justify-center"
+                  >
+                    <Pencil size={10} />
+                  </button>
+                </>
               )}
-            </div>
+            </Row>
           )}
 
           {/* Time logged */}
           {timeEntries.length > 0 && (
-            <div className="flex justify-between">
-              <span className="text-muted">
-                Time logged
-                <span className="text-faint ml-1.5">{totalHours.toFixed(1)}h</span>
-              </span>
-              {timeBillable > 0 && (
-                <span className="text-text text-right">{fmt(timeBillable, feeCurrency, locale)}</span>
-              )}
-            </div>
+            <Row label={<>Time logged <span className="text-faint ml-1">{totalHours.toFixed(1)}h</span></>}>
+              {timeBillable > 0 ? (
+                <span className="text-text">{fmt(timeBillable, feeCurrency, locale)}</span>
+              ) : null}
+              <span className="w-[34px]" />
+            </Row>
           )}
 
           {/* Expenses */}
           {expenses.length > 0 && (
-            <div className="flex justify-between">
-              <span className="text-muted">
-                Expenses
-                <span className="text-faint ml-1.5">{expenses.length} item{expenses.length !== 1 ? "s" : ""}</span>
-              </span>
-              <span className="text-text text-right">{fmt(expensesTotal, feeCurrency, locale)}</span>
-            </div>
+            <Row label={<>Expenses <span className="text-faint ml-1">{expenses.length} item{expenses.length !== 1 ? "s" : ""}</span></>}>
+              <span className="text-text">{fmt(expensesTotal, feeCurrency, locale)}</span>
+              <span className="w-[34px]" />
+            </Row>
           )}
 
           {/* Total billed */}
           {totalBilled > 0 && (
             <>
               <div className="border-t border-border my-1" />
-              <div className="flex justify-between font-medium">
-                <span className="text-muted">Total billed</span>
+              <Row label="Total billed" bold>
                 <span className="text-green-400">{fmt(totalBilled, feeCurrency, locale)}</span>
-              </div>
+                <span className="w-[34px]" />
+              </Row>
             </>
           )}
 
           {/* Paid — editable */}
           {status !== "no_fee" && totalBilled > 0 && (
-            <div className="flex justify-between items-center">
-              <span className="text-muted">Paid</span>
+            <Row label="Paid">
               {editingPaid ? (
                 <div className="flex items-center gap-1">
                   <input
@@ -234,10 +236,7 @@ export function FinancialSummary({
                     onChange={(e) => setPaidInput(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") savePaid();
-                      if (e.key === "Escape") {
-                        setPaidInput(String(paid));
-                        setEditingPaid(false);
-                      }
+                      if (e.key === "Escape") { setPaidInput(String(paid)); setEditingPaid(false); }
                     }}
                     className="input text-xs h-7 w-24 py-0.5 px-2 text-right"
                     autoFocus
@@ -247,25 +246,27 @@ export function FinancialSummary({
                   <button onClick={() => { setPaidInput(String(paid)); setEditingPaid(false); }} className="text-muted hover:text-text"><X size={14} /></button>
                 </div>
               ) : (
-                <button
-                  onClick={() => { setPaidInput(String(paid)); setEditingPaid(true); }}
-                  className="text-red-400 hover:opacity-80 transition-opacity group text-right relative"
-                >
-                  {paid > 0 ? `−${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}
-                  <Pencil size={10} className="text-faint absolute -right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover:opacity-100 transition-opacity" />
-                </button>
+                <>
+                  <span className="text-red-400">{paid > 0 ? `−${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}</span>
+                  <button
+                    onClick={() => { setPaidInput(String(paid)); setEditingPaid(true); }}
+                    className="text-faint hover:text-text transition-colors w-[34px] flex justify-center"
+                  >
+                    <Pencil size={10} />
+                  </button>
+                </>
               )}
-            </div>
+            </Row>
           )}
 
           {/* Balance */}
           {totalBilled > 0 && (
-            <div className="flex justify-between font-medium">
-              <span className="text-muted">Balance</span>
+            <Row label="Balance" bold>
               <span className={balance > 0 ? "text-amber-400" : balance === 0 ? "text-green-400" : "text-muted"}>
                 {fmt(balance, feeCurrency, locale)}
               </span>
-            </div>
+              <span className="w-[34px]" />
+            </Row>
           )}
 
           {/* Payment status — always visible so user can recover */}
