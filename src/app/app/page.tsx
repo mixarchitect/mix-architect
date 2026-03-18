@@ -112,12 +112,15 @@ export default async function DashboardPage({ searchParams }: Props) {
         if (!feeReleaseCount) primaryCurrency = (r.fee_currency as string) || "USD";
         feeReleaseCount++;
         feeGrandTotal += fee;
+        const paid = (r.paid_amount as number) ?? 0;
         if (status === "paid") {
           earnedTotal += fee;
           earnedCount++;
         } else {
-          outstandingTotal += fee;
+          outstandingTotal += fee - paid;
+          earnedTotal += paid;
           outstandingCount++;
+          if (paid > 0) earnedCount++;
         }
       }
     }
