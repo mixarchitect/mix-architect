@@ -360,15 +360,18 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
             )}
 
             {/* Total row */}
-            <div className="flex justify-between text-sm pt-2 border-t border-border mt-2">
-              <span className="text-muted">
+            <div className="flex items-center gap-3 text-sm pt-2 border-t border-border mt-2" style={{ fontVariantNumeric: "tabular-nums" }}>
+              <div className="w-[14px] shrink-0" />
+              <span className="text-muted flex-1">
                 Total: {totalHours.toFixed(2)} hrs
               </span>
               {totalBillable > 0 && (
-                <span className="text-text font-medium">
+                <span className="text-text font-medium text-right w-20 shrink-0">
                   {fmt(totalBillable, currency, locale)}
                 </span>
               )}
+              {/* Spacer matching edit/delete buttons width */}
+              <div className="w-[52px] shrink-0" />
             </div>
           </div>
         )}
