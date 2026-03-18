@@ -24,7 +24,7 @@ interface Props {
   locale: string;
 }
 
-const STATUS_ORDER = ["no_fee", "unpaid", "partial", "paid"] as const;
+const STATUS_CYCLE = ["unpaid", "partial", "paid"] as const;
 
 const statusLabels: Record<string, string> = {
   no_fee: "No Fee",
@@ -126,8 +126,8 @@ export function FinancialSummary({
   }
 
   async function cycleStatus() {
-    const idx = STATUS_ORDER.indexOf(status as any);
-    const next = STATUS_ORDER[(idx + 1) % STATUS_ORDER.length];
+    const idx = STATUS_CYCLE.indexOf(status as any);
+    const next = STATUS_CYCLE[((idx === -1 ? 0 : idx) + 1) % STATUS_CYCLE.length];
     const prev = status;
     setStatus(next);
     try {
@@ -146,7 +146,7 @@ export function FinancialSummary({
     <Panel>
       <PanelBody className="py-5">
         <div className="label-sm text-muted mb-3">FINANCIAL SUMMARY</div>
-        <div className="space-y-2 text-sm">
+        <div className="space-y-2 text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
           {/* Project fee — editable */}
           {effectiveFee != null && (
             <div className="flex justify-between items-center">
@@ -176,10 +176,10 @@ export function FinancialSummary({
               ) : (
                 <button
                   onClick={() => { setFeeInput(fee != null ? String(fee) : ""); setEditingFee(true); }}
-                  className="text-text hover:opacity-80 transition-opacity flex items-center gap-1"
+                  className="text-text hover:opacity-80 transition-opacity group text-right"
                 >
                   {fmt(effectiveFee, feeCurrency, locale)}
-                  <Pencil size={10} className="text-faint" />
+                  <Pencil size={10} className="text-faint inline ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
               )}
             </div>
@@ -193,7 +193,7 @@ export function FinancialSummary({
                 <span className="text-faint ml-1.5">{totalHours.toFixed(1)}h</span>
               </span>
               {timeBillable > 0 && (
-                <span className="text-text">{fmt(timeBillable, feeCurrency, locale)}</span>
+                <span className="text-text text-right">{fmt(timeBillable, feeCurrency, locale)}</span>
               )}
             </div>
           )}
@@ -205,7 +205,7 @@ export function FinancialSummary({
                 Expenses
                 <span className="text-faint ml-1.5">{expenses.length} item{expenses.length !== 1 ? "s" : ""}</span>
               </span>
-              <span className="text-text">{fmt(expensesTotal, feeCurrency, locale)}</span>
+              <span className="text-text text-right">{fmt(expensesTotal, feeCurrency, locale)}</span>
             </div>
           )}
 
@@ -221,7 +221,7 @@ export function FinancialSummary({
           )}
 
           {/* Paid — editable */}
-          {status !== "no_fee" && (
+          {status !== "no_fee" && totalBilled > 0 && (
             <div className="flex justify-between items-center">
               <span className="text-muted">Paid</span>
               {editingPaid ? (
@@ -249,10 +249,10 @@ export function FinancialSummary({
               ) : (
                 <button
                   onClick={() => { setPaidInput(String(paid)); setEditingPaid(true); }}
-                  className="text-red-400 hover:opacity-80 transition-opacity flex items-center gap-1"
+                  className="text-red-400 hover:opacity-80 transition-opacity group text-right"
                 >
                   {paid > 0 ? `−${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}
-                  <Pencil size={10} className="text-faint" />
+                  <Pencil size={10} className="text-faint inline ml-1.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
               )}
             </div>
@@ -268,8 +268,8 @@ export function FinancialSummary({
             </div>
           )}
 
-          {/* Payment status — clickable to cycle */}
-          {status !== "no_fee" && (
+          {/* Payment status — always visible so user can recover */}
+          {(
             <div className="flex justify-between items-center pt-1 border-t border-border/50">
               <span className="text-muted">Status</span>
               <button
