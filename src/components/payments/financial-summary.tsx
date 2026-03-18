@@ -179,7 +179,7 @@ export function FinancialSummary({
                   className="text-text hover:opacity-80 transition-opacity group text-right relative"
                 >
                   {fmt(effectiveFee, feeCurrency, locale)}
-                  <Pencil size={10} className="text-faint absolute -right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Pencil size={10} className="text-faint absolute -right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover:opacity-100 transition-opacity" />
                 </button>
               )}
             </div>
@@ -252,7 +252,7 @@ export function FinancialSummary({
                   className="text-red-400 hover:opacity-80 transition-opacity group text-right relative"
                 >
                   {paid > 0 ? `−${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}
-                  <Pencil size={10} className="text-faint absolute -right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Pencil size={10} className="text-faint absolute -right-4 top-1/2 -translate-y-1/2 opacity-40 group-hover:opacity-100 transition-opacity" />
                 </button>
               )}
             </div>

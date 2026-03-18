@@ -208,15 +208,11 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
               ) : (
                 <div
                   key={expense.id}
-                  className="group flex items-start justify-between gap-2 rounded-lg px-2 py-1.5 -mx-2 hover:bg-panel2 transition-colors"
+                  className="group relative flex items-center justify-between rounded-lg px-2 py-2.5 -mx-2 hover:bg-panel2 transition-colors"
+                  style={{ fontVariantNumeric: "tabular-nums" }}
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-baseline gap-2 text-sm">
-                      <span className="text-text truncate">{expense.description}</span>
-                      <span className="text-xs text-faint shrink-0">
-                        {fmt(Number(expense.amount), currency, locale)}
-                      </span>
-                    </div>
+                    <span className="text-sm text-text truncate block">{expense.description}</span>
                     {(expense.paid_by || expense.owed_by) && (
                       <div className="text-xs text-faint mt-0.5">
                         {expense.paid_by && <span>Paid by {expense.paid_by}</span>}
@@ -225,7 +221,11 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                  <span className="text-sm text-text font-medium shrink-0 ml-4">
+                    {fmt(Number(expense.amount), currency, locale)}
+                  </span>
+                  {/* Edit/delete overlay */}
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-panel2 rounded pl-2">
                     <button
                       type="button"
                       onClick={() => startEdit(expense)}

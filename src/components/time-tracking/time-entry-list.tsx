@@ -308,38 +308,41 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
               ) : (
                 <div
                   key={entry.id}
-                  className="group flex items-center gap-3 rounded-lg px-2 py-2.5 -mx-2 hover:bg-panel2 transition-colors"
+                  className="group relative flex items-center justify-between rounded-lg px-2 py-2.5 -mx-2 hover:bg-panel2 transition-colors"
                   style={{ fontVariantNumeric: "tabular-nums" }}
                 >
-                  <Clock size={14} className="text-faint shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 text-sm">
-                      <span className="text-text">
-                        {Number(entry.hours).toFixed(2)} hrs
-                      </span>
-                      {entry.rate != null && (
-                        <span className="text-faint">
-                          × {fmt(Number(entry.rate), currency, locale)}/hr
+                  <div className="min-w-0 flex-1 flex items-center gap-2">
+                    <Clock size={14} className="text-faint shrink-0" />
+                    <div>
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <span className="text-text">
+                          {Number(entry.hours).toFixed(2)} hrs
                         </span>
+                        {entry.rate != null && (
+                          <span className="text-faint">
+                            × {fmt(Number(entry.rate), currency, locale)}/hr
+                          </span>
+                        )}
+                      </div>
+                      {entry.description && (
+                        <p className="text-xs text-faint mt-0.5 truncate">
+                          {entry.description}
+                        </p>
                       )}
                     </div>
-                    {entry.description && (
-                      <p className="text-xs text-faint mt-0.5 truncate">
-                        {entry.description}
-                      </p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-xs text-muted">
+                      {formatShortDate(entry.created_at)}
+                    </span>
+                    {entry.rate != null && (
+                      <span className="text-sm text-text font-medium text-right">
+                        {fmt(Number(entry.hours) * Number(entry.rate), currency, locale)}
+                      </span>
                     )}
                   </div>
-                  <span className="text-xs text-muted shrink-0">
-                    {formatShortDate(entry.created_at)}
-                  </span>
-                  {entry.rate != null ? (
-                    <span className="text-sm text-text font-medium text-right shrink-0 w-20">
-                      {fmt(Number(entry.hours) * Number(entry.rate), currency, locale)}
-                    </span>
-                  ) : (
-                    <span className="w-20 shrink-0" />
-                  )}
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                  {/* Edit/delete overlay */}
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-panel2 rounded pl-2">
                     <button
                       type="button"
                       onClick={() => startEdit(entry)}
@@ -360,18 +363,15 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
             )}
 
             {/* Total row */}
-            <div className="flex items-center gap-3 text-sm pt-2 border-t border-border mt-2" style={{ fontVariantNumeric: "tabular-nums" }}>
-              <div className="w-[14px] shrink-0" />
-              <span className="text-muted flex-1">
+            <div className="flex justify-between text-sm pt-2 border-t border-border mt-2" style={{ fontVariantNumeric: "tabular-nums" }}>
+              <span className="text-muted">
                 Total: {totalHours.toFixed(2)} hrs
               </span>
               {totalBillable > 0 && (
-                <span className="text-text font-medium text-right w-20 shrink-0">
+                <span className="text-text font-medium">
                   {fmt(totalBillable, currency, locale)}
                 </span>
               )}
-              {/* Spacer matching edit/delete buttons width */}
-              <div className="w-[52px] shrink-0" />
             </div>
           </div>
         )}
