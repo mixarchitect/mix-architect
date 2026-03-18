@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
-import { Check, X, Pencil } from "lucide-react";
+import { Check, X, Pencil, Trash2 } from "lucide-react";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import type { ReleaseExpense } from "@/app/app/releases/[releaseId]/expense-actions";
@@ -40,9 +40,18 @@ const statusColors: Record<string, string> = {
   paid: "text-green-400",
 };
 
+function ActionIcons({ onEdit, onClear }: { onEdit: () => void; onClear: () => void }) {
+  return (
+    <div className="flex items-center gap-0.5 shrink-0 w-[34px] justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+      <button type="button" onClick={onEdit} className="text-faint hover:text-text transition-colors p-0.5"><Pencil size={10} /></button>
+      <button type="button" onClick={onClear} className="text-faint hover:text-red-400 transition-colors p-0.5"><Trash2 size={10} /></button>
+    </div>
+  );
+}
+
 function Row({ label, bold, children }: { label: React.ReactNode; bold?: boolean; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="group flex items-center gap-2">
       <span className={`text-muted flex-1 ${bold ? "font-medium" : ""}`}>{label}</span>
       <div className={`flex items-center gap-1.5 shrink-0 ${bold ? "font-medium" : ""}`}>
         {children}
@@ -183,12 +192,10 @@ export function FinancialSummary({
               ) : (
                 <>
                   <span className="text-text">{fmt(effectiveFee, feeCurrency, locale)}</span>
-                  <button
-                    onClick={() => { setFeeInput(fee != null ? String(fee) : ""); setEditingFee(true); }}
-                    className="text-faint hover:text-text transition-colors w-[34px] flex justify-center"
-                  >
-                    <Pencil size={10} />
-                  </button>
+                  <ActionIcons
+                    onEdit={() => { setFeeInput(fee != null ? String(fee) : ""); setEditingFee(true); }}
+                    onClear={async () => { setFee(0); setFeeInput("0"); await supabase.from("releases").update({ fee_total: 0 }).eq("id", releaseId); router.refresh(); }}
+                  />
                 </>
               )}
             </Row>
@@ -248,12 +255,16 @@ export function FinancialSummary({
               ) : (
                 <>
                   <span className="text-red-400">{paid > 0 ? `−${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}</span>
-                  <button
-                    onClick={() => { setPaidInput(String(paid)); setEditingPaid(true); }}
-                    className="text-faint hover:text-text transition-colors w-[34px] flex justify-center"
-                  >
-                    <Pencil size={10} />
-                  </button>
+                  <ActionIcons
+                    onEdit={() => { setPaidInput(String(paid)); setEditingPaid(true); }}
+                    onClear={async () => {
+                      setPaid(0); setPaidInput("0");
+                      const newStatus = deriveStatus(0, totalBilled);
+                      setStatus(newStatus);
+                      await supabase.from("releases").update({ paid_amount: 0, payment_status: newStatus }).eq("id", releaseId);
+                      router.refresh();
+                    }}
+                  />
                 </>
               )}
             </Row>
