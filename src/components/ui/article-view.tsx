@@ -14,7 +14,7 @@ function HighlightText({ text, highlight }: { text: string; highlight?: string }
   return (
     <>
       {text.slice(0, idx)}
-      <mark className="bg-signal/20 text-text rounded-sm px-0.5">{text.slice(idx, idx + highlight.length)}</mark>
+      <mark className="bg-signal/20 text-text rounded-sm">{text.slice(idx, idx + highlight.length)}</mark>
       <HighlightText text={text.slice(idx + highlight.length)} highlight={highlight} />
     </>
   );

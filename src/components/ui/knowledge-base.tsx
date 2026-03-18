@@ -265,7 +265,7 @@ function MatchSnippet({ matches, query }: { matches: readonly FuseResultMatch[];
   return (
     <p className="text-xs text-muted mt-1 line-clamp-2">
       {before}
-      <mark className="bg-signal/20 text-text rounded-sm px-0.5">{matched}</mark>
+      <mark className="bg-signal/20 text-text rounded-sm">{matched}</mark>
       {after}
     </p>
   );
