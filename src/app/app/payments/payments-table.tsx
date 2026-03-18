@@ -129,7 +129,7 @@ export function PaymentsTable({ releases, currency }: Props) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full text-xs">
         <thead>
           <tr className="border-b border-border text-left text-xs text-faint uppercase tracking-wide">
             <th className="px-3 py-3 font-medium print:hidden w-8" />
