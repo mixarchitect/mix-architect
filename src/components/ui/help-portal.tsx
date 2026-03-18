@@ -63,7 +63,7 @@ export function HelpPortal() {
           <button
             key={tab.key}
             type="button"
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => { setActiveTab(tab.key); if (tab.key !== "articles") setQuery(""); }}
             className={cn(
               "pb-3 text-sm font-medium whitespace-nowrap transition-colors",
               activeTab === tab.key && !hasSearch
@@ -76,22 +76,24 @@ export function HelpPortal() {
         ))}
       </div>
 
-      {/* Persistent search bar */}
-      <div className="relative mb-6">
-        <Search
-          size={16}
-          strokeWidth={1.5}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-faint pointer-events-none"
-        />
-        <input
-          type="text"
-          className="input"
-          style={{ paddingLeft: 40 }}
-          placeholder={t("searchPlaceholder")}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </div>
+      {/* Search bar — only on Help Articles tab */}
+      {activeTab === "articles" && (
+        <div className="relative mb-6">
+          <Search
+            size={16}
+            strokeWidth={1.5}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-faint pointer-events-none"
+          />
+          <input
+            type="text"
+            className="input"
+            style={{ paddingLeft: 40 }}
+            placeholder={t("searchPlaceholder")}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+      )}
 
       {/* Tab content — search overrides to show articles */}
       {hasSearch || activeTab === "articles" ? (
