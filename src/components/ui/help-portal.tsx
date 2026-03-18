@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { Mail, Search, Megaphone, Activity, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
 import Link from "next/link";
@@ -36,6 +36,24 @@ export function HelpPortal() {
         : "articles",
   );
   const [query, setQuery] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const switchTab = useCallback((tab: Tab) => {
+    setActiveTab(tab);
+    if (tab !== "articles") setQuery("");
+    // Update URL search param
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("article");
+    params.delete("q");
+    if (tab === "articles") {
+      params.delete("tab");
+    } else {
+      params.set("tab", tab);
+    }
+    const qs = params.toString();
+    router.replace(`${pathname}${qs ? `?${qs}` : ""}`, { scroll: false });
+  }, [searchParams, router, pathname]);
 
   useEffect(() => {
     if (articleParam) {
@@ -63,7 +81,7 @@ export function HelpPortal() {
           <button
             key={tab.key}
             type="button"
-            onClick={() => { setActiveTab(tab.key); if (tab.key !== "articles") setQuery(""); }}
+            onClick={() => switchTab(tab.key)}
             className={cn(
               "pb-3 text-sm font-medium whitespace-nowrap transition-colors",
               activeTab === tab.key && !hasSearch
