@@ -17,6 +17,8 @@ type FeatureRequest = {
   category: string;
   vote_count: number;
   status: string;
+  admin_response: string | null;
+  merged_into_id: string | null;
 };
 
 const FILTER_CATEGORIES: { value: FeatureCategory | "all"; label: string }[] = [
@@ -32,17 +34,21 @@ const FILTER_CATEGORIES: { value: FeatureCategory | "all"; label: string }[] = [
 ];
 
 const STATUS_STYLES: Record<string, string> = {
+  new: "text-blue-300 bg-blue-900/50",
   under_review: "text-muted bg-panel2",
   planned: "text-signal bg-signal-muted",
   in_progress: "text-status-blue bg-status-blue/10",
   shipped: "text-status-green bg-status-green/10",
+  declined: "text-red-400/70 bg-red-900/20",
 };
 
 const STATUS_LABELS: Record<string, string> = {
+  new: "New",
   under_review: "Under Review",
   planned: "Planned",
   in_progress: "In Progress",
   shipped: "Shipped",
+  declined: "Declined",
 };
 
 export function FeatureBoard() {
@@ -61,7 +67,8 @@ export function FeatureBoard() {
       supabase
         .from("feature_requests")
         .select("*")
-        .in("status", ["under_review", "planned", "in_progress", "shipped"])
+        .is("merged_into_id", null)
+        .in("status", ["new", "under_review", "planned", "in_progress", "shipped", "declined"])
         .order("vote_count", { ascending: false }),
       supabase.auth.getUser(),
     ]);
@@ -175,6 +182,11 @@ export function FeatureBoard() {
         </Button>
       </div>
 
+      {/* Helper text */}
+      <p className="text-xs text-muted mb-4">
+        Your suggestion helps shape Mix Architect. Others can upvote ideas they want too.
+      </p>
+
       {/* Inline form */}
       {showForm && (
         <FeatureForm
@@ -195,16 +207,26 @@ export function FeatureBoard() {
         />
       ) : (
         <div className="space-y-3">
-          {filtered.map((req) => (
+          {/* Sort declined to the bottom */}
+          {[...filtered]
+            .sort((a, b) => {
+              if (a.status === "declined" && b.status !== "declined") return 1;
+              if (a.status !== "declined" && b.status === "declined") return -1;
+              return 0;
+            })
+            .map((req) => (
             <div
               key={req.id}
-              className="bg-panel border border-border rounded-lg p-4 flex items-start gap-4"
+              className={cn(
+                "bg-panel border border-border rounded-lg p-4 flex items-start gap-4",
+                req.status === "declined" && "opacity-60",
+              )}
             >
               {/* Upvote */}
               <button
                 type="button"
                 onClick={() => handleUpvote(req.id)}
-                disabled={userVotes.has(req.id)}
+                disabled={userVotes.has(req.id) || req.status === "declined"}
                 className={cn(
                   "flex flex-col items-center gap-0.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors shrink-0",
                   userVotes.has(req.id)
@@ -214,7 +236,9 @@ export function FeatureBoard() {
                 title={
                   userVotes.has(req.id)
                     ? "You have already upvoted this"
-                    : "Upvote"
+                    : req.status === "declined"
+                      ? "Voting disabled"
+                      : "Upvote"
                 }
               >
                 <ChevronUp size={14} strokeWidth={2} />
@@ -229,6 +253,17 @@ export function FeatureBoard() {
                 <p className="text-muted text-xs mt-1 line-clamp-2">
                   {req.description}
                 </p>
+
+                {/* Admin response */}
+                {req.admin_response && (
+                  <div className="mt-2 border-l-2 border-teal-600 pl-3 py-1">
+                    <p className="text-xs text-zinc-400">
+                      <span className="text-teal-400 font-medium">Mix Architect team:</span>{" "}
+                      {req.admin_response}
+                    </p>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2 mt-2">
                   <span className="pill text-[10px] py-0.5 px-2">
                     {FILTER_CATEGORIES.find((c) => c.value === req.category)

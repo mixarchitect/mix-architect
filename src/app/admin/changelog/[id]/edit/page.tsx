@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getEntryById } from "@/lib/services/changelog-admin";
 import { ChangelogEntryForm } from "../../changelog-entry-form";
 import { updateChangelogEntryAction } from "../../actions";
+import { LinkedFeatureRequests } from "../../linked-requests";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -23,6 +24,7 @@ export default async function EditChangelogEntryPage({ params }: Props) {
         Edit: {entry.title}
       </h1>
       <ChangelogEntryForm action={updateChangelogEntryAction} entry={entry} />
+      <LinkedFeatureRequests changelogEntryId={entry.id} />
     </div>
   );
 }

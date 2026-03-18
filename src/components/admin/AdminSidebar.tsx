@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   Megaphone,
+  Lightbulb,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -30,6 +31,7 @@ const adminNavItems = [
   { label: "Audit Log", href: "/admin/audit", icon: Shield },
   { label: "Attributions", href: "/admin/attributions", icon: TrendingUp },
   { label: "Featured Releases", href: "/admin/featured", icon: Star },
+  { label: "Feature Requests", href: "/admin/feature-requests", icon: Lightbulb },
   { label: "Changelog", href: "/admin/changelog", icon: Megaphone },
 ];
 
