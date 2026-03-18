@@ -141,17 +141,17 @@ export function PaymentsTable({ releases, currency }: Props) {
             <th className={cn(thClass, "text-right")} onClick={() => handleSort("fee")}>
               Fee <SortArrow column="fee" sortKey={sortKey} sortDir={sortDir} />
             </th>
-            <th className={cn(thClass, "text-right")} onClick={() => handleSort("paid")}>
-              Paid <SortArrow column="paid" sortKey={sortKey} sortDir={sortDir} />
-            </th>
-            <th className={cn(thClass, "text-right hidden sm:table-cell")} onClick={() => handleSort("balance")}>
-              Balance <SortArrow column="balance" sortKey={sortKey} sortDir={sortDir} />
-            </th>
             <th className={cn(thClass, "text-right hidden lg:table-cell")} onClick={() => handleSort("time")}>
               Time <SortArrow column="time" sortKey={sortKey} sortDir={sortDir} />
             </th>
             <th className={cn(thClass, "text-right hidden lg:table-cell")} onClick={() => handleSort("expenses")}>
               Expenses <SortArrow column="expenses" sortKey={sortKey} sortDir={sortDir} />
+            </th>
+            <th className={cn(thClass, "text-right")} onClick={() => handleSort("paid")}>
+              Paid <SortArrow column="paid" sortKey={sortKey} sortDir={sortDir} />
+            </th>
+            <th className={cn(thClass, "text-right hidden sm:table-cell")} onClick={() => handleSort("balance")}>
+              Balance <SortArrow column="balance" sortKey={sortKey} sortDir={sortDir} />
             </th>
             <th className={thClass} onClick={() => handleSort("status")}>
               Status <SortArrow column="status" sortKey={sortKey} sortDir={sortDir} />
@@ -188,14 +188,6 @@ export function PaymentsTable({ releases, currency }: Props) {
                 <td className="px-4 py-3 text-right text-text">
                   {formatMoney(r.feeTotal, r.feeCurrency, locale)}
                 </td>
-                <td className="px-4 py-3 text-right text-text">
-                  {formatMoney(r.paidAmount, r.feeCurrency, locale)}
-                </td>
-                <td className="px-4 py-3 text-right hidden sm:table-cell">
-                  <span className={balance > 0 ? "text-signal" : "text-muted"}>
-                    {formatMoney(balance, r.feeCurrency, locale)}
-                  </span>
-                </td>
                 <td className="px-4 py-3 text-right hidden lg:table-cell text-muted">
                   {r.timeHours > 0 ? (
                     <span>
@@ -212,6 +204,14 @@ export function PaymentsTable({ releases, currency }: Props) {
                   {r.expenseTotal > 0
                     ? formatMoney(r.expenseTotal, r.feeCurrency, locale)
                     : "—"}
+                </td>
+                <td className="px-4 py-3 text-right text-text">
+                  {formatMoney(r.paidAmount, r.feeCurrency, locale)}
+                </td>
+                <td className="px-4 py-3 text-right hidden sm:table-cell">
+                  <span className={balance > 0 ? "text-signal" : "text-muted"}>
+                    {formatMoney(balance, r.feeCurrency, locale)}
+                  </span>
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={r.paymentStatus} />
@@ -240,14 +240,14 @@ export function PaymentsTable({ releases, currency }: Props) {
                       <td className="px-4 py-2 text-right text-muted">
                         {formatMoney(t.fee!, r.feeCurrency, locale)}
                       </td>
+                      <td className="hidden lg:table-cell" />
+                      <td className="hidden lg:table-cell" />
                       <td className="px-4 py-2 text-right text-muted">
                         {t.feePaid ? formatMoney(t.fee!, r.feeCurrency, locale) : "—"}
                       </td>
                       <td className="px-4 py-2 text-right text-muted hidden sm:table-cell">
                         {t.feePaid ? "—" : formatMoney(t.fee!, r.feeCurrency, locale)}
                       </td>
-                      <td className="hidden lg:table-cell" />
-                      <td className="hidden lg:table-cell" />
                       <td className="px-4 py-2">
                         <StatusBadge status={t.feePaid ? "paid" : "unpaid"} />
                       </td>
@@ -265,14 +265,6 @@ export function PaymentsTable({ releases, currency }: Props) {
             <td className="px-4 py-3 text-right">
               {formatMoney(totalFee, currency, locale)}
             </td>
-            <td className="px-4 py-3 text-right">
-              {formatMoney(totalPaid, currency, locale)}
-            </td>
-            <td className="px-4 py-3 text-right hidden sm:table-cell">
-              <span className={totalBalance > 0 ? "text-signal" : "text-muted"}>
-                {formatMoney(totalBalance, currency, locale)}
-              </span>
-            </td>
             <td className="px-4 py-3 text-right hidden lg:table-cell">
               {totalTimeHours > 0 ? (
                 <span>
@@ -289,6 +281,14 @@ export function PaymentsTable({ releases, currency }: Props) {
               {totalExpenses > 0
                 ? formatMoney(totalExpenses, currency, locale)
                 : "—"}
+            </td>
+            <td className="px-4 py-3 text-right">
+              {formatMoney(totalPaid, currency, locale)}
+            </td>
+            <td className="px-4 py-3 text-right hidden sm:table-cell">
+              <span className={totalBalance > 0 ? "text-signal" : "text-muted"}>
+                {formatMoney(totalBalance, currency, locale)}
+              </span>
             </td>
             <td />
           </tr>
