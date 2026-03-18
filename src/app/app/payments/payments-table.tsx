@@ -125,14 +125,14 @@ export function PaymentsTable({ releases, currency }: Props) {
   }
 
   const thClass =
-    "px-4 py-3 font-medium cursor-pointer select-none hover:text-text transition-colors";
+    "px-3 py-3 font-medium cursor-pointer select-none hover:text-text transition-colors whitespace-nowrap";
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border text-left text-xs text-faint uppercase tracking-wide">
-            <th className="px-4 py-3 font-medium print:hidden w-8" />
+            <th className="px-3 py-3 font-medium print:hidden w-8" />
             <th className={thClass} onClick={() => handleSort("title")}>
               Release <SortArrow column="title" sortKey={sortKey} sortDir={sortDir} />
             </th>
@@ -180,14 +180,14 @@ export function PaymentsTable({ releases, currency }: Props) {
                   hasTracks && "cursor-pointer hover:bg-panel2",
                 )}
               >
-                <td className="px-4 py-4 print:hidden w-8">
+                <td className="px-3 py-4 print:hidden w-8">
                   {hasTracks && (
                     isExpanded
                       ? <ChevronDown size={14} className="text-muted" />
                       : <ChevronRight size={14} className="text-muted" />
                   )}
                 </td>
-                <td className="px-4 py-4 font-medium text-text">
+                <td className="px-3 py-4 font-medium text-text">
                   <Link
                     href={`/app/releases/${r.id}?tab=financials`}
                     onClick={(e) => e.stopPropagation()}
@@ -196,14 +196,14 @@ export function PaymentsTable({ releases, currency }: Props) {
                     {r.title}
                   </Link>
                 </td>
-                <td className="px-4 py-4 text-muted hidden sm:table-cell whitespace-nowrap">
+                <td className="px-3 py-4 text-muted hidden sm:table-cell whitespace-nowrap">
                   {formatShortDate(r.createdAt, locale)}
                 </td>
-                <td className="px-4 py-4 text-muted hidden sm:table-cell">{r.artist ?? "—"}</td>
-                <td className="px-4 py-4 text-right text-text">
+                <td className="px-3 py-4 text-muted hidden sm:table-cell">{r.artist ?? "—"}</td>
+                <td className="px-3 py-4 text-right whitespace-nowrap text-text">
                   {formatMoney(r.feeTotal, r.feeCurrency, locale)}
                 </td>
-                <td className="px-4 py-4 text-right hidden lg:table-cell text-text">
+                <td className="px-3 py-4 text-right whitespace-nowrap hidden lg:table-cell text-text">
                   {r.timeBillable > 0 ? (
                     <>
                       {formatMoney(r.timeBillable, r.feeCurrency, locale)}
@@ -217,25 +217,25 @@ export function PaymentsTable({ releases, currency }: Props) {
                     </span>
                   ) : <span className="text-muted">—</span>}
                 </td>
-                <td className="px-4 py-4 text-right hidden lg:table-cell text-muted">
+                <td className="px-3 py-4 text-right whitespace-nowrap hidden lg:table-cell text-muted">
                   {r.expenseTotal > 0
                     ? formatMoney(r.expenseTotal, r.feeCurrency, locale)
                     : "—"}
                 </td>
-                <td className="px-4 py-4 text-right font-medium text-green-400">
+                <td className="px-3 py-4 text-right whitespace-nowrap font-medium text-green-400">
                   {formatMoney(r.feeTotal + r.timeBillable + r.expenseTotal, r.feeCurrency, locale)}
                 </td>
-                <td className="px-4 py-4 text-right text-red-400">
+                <td className="px-3 py-4 text-right whitespace-nowrap text-red-400">
                   {r.paidAmount > 0
                     ? `−${formatMoney(r.paidAmount, r.feeCurrency, locale)}`
                     : "—"}
                 </td>
-                <td className="px-4 py-4 text-right hidden sm:table-cell">
+                <td className="px-3 py-4 text-right whitespace-nowrap hidden sm:table-cell">
                   <span className={balance > 0 ? "text-amber-400" : "text-muted"}>
                     {formatMoney(balance, r.feeCurrency, locale)}
                   </span>
                 </td>
-                <td className="px-4 py-4">
+                <td className="px-3 py-4">
                   <StatusBadge status={r.paymentStatus} />
                 </td>
               </tr>
@@ -253,25 +253,25 @@ export function PaymentsTable({ releases, currency }: Props) {
                       )}
                     >
                       <td className="print:hidden" />
-                      <td className="px-4 py-2 pl-8 text-muted" colSpan={3}>
+                      <td className="px-3 py-2 pl-8 text-muted" colSpan={3}>
                         <span className="mr-2">
                           {String(t.trackNumber).padStart(2, "0")}
                         </span>
                         {t.title}
                       </td>
-                      <td className="px-4 py-2 text-right text-muted">
+                      <td className="px-3 py-2 text-right text-muted">
                         {formatMoney(t.fee!, r.feeCurrency, locale)}
                       </td>
                       <td className="hidden lg:table-cell" />
                       <td className="hidden lg:table-cell" />
-                      <td className="px-4 py-2" />
-                      <td className="px-4 py-2 text-right text-muted">
+                      <td className="px-3 py-2" />
+                      <td className="px-3 py-2 text-right text-muted">
                         {t.feePaid ? `−${formatMoney(t.fee!, r.feeCurrency, locale)}` : "—"}
                       </td>
-                      <td className="px-4 py-2 text-right text-muted hidden sm:table-cell">
+                      <td className="px-3 py-2 text-right text-muted hidden sm:table-cell">
                         {t.feePaid ? "—" : formatMoney(t.fee!, r.feeCurrency, locale)}
                       </td>
-                      <td className="px-4 py-2">
+                      <td className="px-3 py-2">
                         <StatusBadge status={t.feePaid ? "paid" : "unpaid"} />
                       </td>
                     </tr>
@@ -282,13 +282,13 @@ export function PaymentsTable({ releases, currency }: Props) {
         <tfoot>
           <tr className="border-t-2 border-border font-semibold text-text">
             <td className="print:hidden" />
-            <td className="px-4 py-3">Total</td>
+            <td className="px-3 py-3">Total</td>
             <td className="hidden sm:table-cell" />
             <td className="hidden sm:table-cell" />
-            <td className="px-4 py-3 text-right">
+            <td className="px-3 py-3 text-right whitespace-nowrap">
               {formatMoney(totalFee, currency, locale)}
             </td>
-            <td className="px-4 py-3 text-right hidden lg:table-cell">
+            <td className="px-3 py-3 text-right whitespace-nowrap hidden lg:table-cell">
               {totalTimeBillable > 0 ? (
                 <>
                   {formatMoney(totalTimeBillable, currency, locale)}
@@ -302,20 +302,20 @@ export function PaymentsTable({ releases, currency }: Props) {
                 </span>
               ) : "—"}
             </td>
-            <td className="px-4 py-3 text-right hidden lg:table-cell">
+            <td className="px-3 py-3 text-right whitespace-nowrap hidden lg:table-cell">
               {totalExpenses > 0
                 ? formatMoney(totalExpenses, currency, locale)
                 : "—"}
             </td>
-            <td className="px-4 py-3 text-right text-green-400">
+            <td className="px-3 py-3 text-right whitespace-nowrap text-green-400">
               {formatMoney(totalBilled, currency, locale)}
             </td>
-            <td className="px-4 py-3 text-right text-red-400">
+            <td className="px-3 py-3 text-right whitespace-nowrap text-red-400">
               {totalPaid > 0
                 ? `−${formatMoney(totalPaid, currency, locale)}`
                 : "—"}
             </td>
-            <td className="px-4 py-3 text-right hidden sm:table-cell">
+            <td className="px-3 py-3 text-right whitespace-nowrap hidden sm:table-cell">
               <span className={totalBalance > 0 ? "text-amber-400" : "text-muted"}>
                 {formatMoney(totalBalance, currency, locale)}
               </span>
