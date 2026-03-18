@@ -47,28 +47,46 @@ export default async function PaymentsPage() {
     releaseIds.length > 0
       ? supabase
           .from("release_time_entries")
-          .select("hours, rate")
+          .select("release_id, hours, rate")
           .in("release_id", releaseIds)
-      : Promise.resolve({ data: [] as { hours: number; rate: number | null }[] }),
+      : Promise.resolve({ data: [] as { release_id: string; hours: number; rate: number | null }[] }),
     releaseIds.length > 0
       ? supabase
           .from("release_expenses")
-          .select("amount")
+          .select("release_id, amount")
           .in("release_id", releaseIds)
-      : Promise.resolve({ data: [] as { amount: number }[] }),
+      : Promise.resolve({ data: [] as { release_id: string; amount: number }[] }),
   ]);
 
   const rawTracks = tracksRes.data;
 
-  // Aggregate time & expenses
-  const timeEntries = (timeEntriesRes.data ?? []) as { hours: number; rate: number | null }[];
+  // Aggregate time & expenses (global + per-release)
+  const timeEntries = (timeEntriesRes.data ?? []) as { release_id: string; hours: number; rate: number | null }[];
   const totalHoursLogged = timeEntries.reduce((sum, e) => sum + Number(e.hours), 0);
   const totalTimeBillable = timeEntries.reduce((sum, e) => {
     if (e.rate != null) return sum + Number(e.hours) * Number(e.rate);
     return sum;
   }, 0);
-  const expenseItems = (expensesRes.data ?? []) as { amount: number }[];
+  const expenseItems = (expensesRes.data ?? []) as { release_id: string; amount: number }[];
   const totalExpenses = expenseItems.reduce((sum, e) => sum + Number(e.amount), 0);
+
+  // Per-release time/expense maps
+  const timeByRelease = new Map<string, { hours: number; billable: number }>();
+  for (const e of timeEntries) {
+    const rid = e.release_id;
+    const existing = timeByRelease.get(rid) ?? { hours: 0, billable: 0 };
+    existing.hours += Number(e.hours);
+    if (e.rate != null) existing.billable += Number(e.hours) * Number(e.rate);
+    timeByRelease.set(rid, existing);
+  }
+  const expensesByRelease = new Map<string, { total: number; count: number }>();
+  for (const e of expenseItems) {
+    const rid = e.release_id;
+    const existing = expensesByRelease.get(rid) ?? { total: 0, count: 0 };
+    existing.total += Number(e.amount);
+    existing.count++;
+    expensesByRelease.set(rid, existing);
+  }
 
   // Build typed data
   type RawTrack = { id: unknown; title: unknown; track_number: unknown; fee: unknown; fee_paid: unknown; release_id: unknown };
@@ -104,6 +122,8 @@ export default async function PaymentsPage() {
     }
 
     const relTracks = tracksByRelease.get(r.id as string) ?? [];
+    const relTime = timeByRelease.get(r.id as string) ?? { hours: 0, billable: 0 };
+    const relExpenses = expensesByRelease.get(r.id as string) ?? { total: 0, count: 0 };
 
     return {
       id: r.id as string,
@@ -123,6 +143,10 @@ export default async function PaymentsPage() {
         fee: (t.fee as number) ?? null,
         feePaid: (t.fee_paid as boolean) ?? false,
       })),
+      timeHours: relTime.hours,
+      timeBillable: relTime.billable,
+      expenseTotal: relExpenses.total,
+      expenseCount: relExpenses.count,
     };
   });
 

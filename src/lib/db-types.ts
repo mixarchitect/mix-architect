@@ -51,6 +51,10 @@ export type PaymentRelease = {
   createdAt: string;
   updatedAt: string;
   tracks: PaymentTrack[];
+  timeHours: number;
+  timeBillable: number;
+  expenseTotal: number;
+  expenseCount: number;
 };
 
 export type PaymentTrack = {

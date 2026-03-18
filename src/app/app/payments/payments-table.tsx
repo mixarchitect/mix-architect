@@ -13,7 +13,7 @@ type Props = {
   currency: string;
 };
 
-type SortKey = "title" | "date" | "artist" | "fee" | "paid" | "balance" | "status";
+type SortKey = "title" | "date" | "artist" | "fee" | "paid" | "balance" | "time" | "expenses" | "status";
 type SortDir = "asc" | "desc";
 
 function StatusBadge({ status }: { status: string }) {
@@ -87,6 +87,10 @@ export function PaymentsTable({ releases, currency }: Props) {
           return dir * (a.paidAmount - b.paidAmount);
         case "balance":
           return dir * ((a.feeTotal - a.paidAmount) - (b.feeTotal - b.paidAmount));
+        case "time":
+          return dir * (a.timeHours - b.timeHours);
+        case "expenses":
+          return dir * (a.expenseTotal - b.expenseTotal);
         case "status":
           return dir * a.paymentStatus.localeCompare(b.paymentStatus);
         default:
@@ -101,6 +105,9 @@ export function PaymentsTable({ releases, currency }: Props) {
   const totalFee = releases.reduce((sum, r) => sum + r.feeTotal, 0);
   const totalPaid = releases.reduce((sum, r) => sum + r.paidAmount, 0);
   const totalBalance = totalFee - totalPaid;
+  const totalTimeHours = releases.reduce((sum, r) => sum + r.timeHours, 0);
+  const totalTimeBillable = releases.reduce((sum, r) => sum + r.timeBillable, 0);
+  const totalExpenses = releases.reduce((sum, r) => sum + r.expenseTotal, 0);
 
   if (releases.length === 0) {
     return (
@@ -139,6 +146,12 @@ export function PaymentsTable({ releases, currency }: Props) {
             </th>
             <th className={cn(thClass, "text-right hidden sm:table-cell")} onClick={() => handleSort("balance")}>
               Balance <SortArrow column="balance" sortKey={sortKey} sortDir={sortDir} />
+            </th>
+            <th className={cn(thClass, "text-right hidden lg:table-cell")} onClick={() => handleSort("time")}>
+              Time <SortArrow column="time" sortKey={sortKey} sortDir={sortDir} />
+            </th>
+            <th className={cn(thClass, "text-right hidden lg:table-cell")} onClick={() => handleSort("expenses")}>
+              Expenses <SortArrow column="expenses" sortKey={sortKey} sortDir={sortDir} />
             </th>
             <th className={thClass} onClick={() => handleSort("status")}>
               Status <SortArrow column="status" sortKey={sortKey} sortDir={sortDir} />
@@ -183,6 +196,23 @@ export function PaymentsTable({ releases, currency }: Props) {
                     {formatMoney(balance, r.feeCurrency, locale)}
                   </span>
                 </td>
+                <td className="px-4 py-3 text-right hidden lg:table-cell text-muted">
+                  {r.timeHours > 0 ? (
+                    <span>
+                      {r.timeHours.toFixed(2)} hrs
+                      {r.timeBillable > 0 && (
+                        <span className="block text-[10px]">
+                          {formatMoney(r.timeBillable, r.feeCurrency, locale)}
+                        </span>
+                      )}
+                    </span>
+                  ) : "—"}
+                </td>
+                <td className="px-4 py-3 text-right hidden lg:table-cell text-muted">
+                  {r.expenseTotal > 0
+                    ? formatMoney(r.expenseTotal, r.feeCurrency, locale)
+                    : "—"}
+                </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={r.paymentStatus} />
                 </td>
@@ -216,6 +246,8 @@ export function PaymentsTable({ releases, currency }: Props) {
                       <td className="px-4 py-2 text-right text-muted hidden sm:table-cell">
                         {t.feePaid ? "—" : formatMoney(t.fee!, r.feeCurrency, locale)}
                       </td>
+                      <td className="hidden lg:table-cell" />
+                      <td className="hidden lg:table-cell" />
                       <td className="px-4 py-2">
                         <StatusBadge status={t.feePaid ? "paid" : "unpaid"} />
                       </td>
@@ -240,6 +272,23 @@ export function PaymentsTable({ releases, currency }: Props) {
               <span className={totalBalance > 0 ? "text-signal" : "text-muted"}>
                 {formatMoney(totalBalance, currency, locale)}
               </span>
+            </td>
+            <td className="px-4 py-3 text-right hidden lg:table-cell">
+              {totalTimeHours > 0 ? (
+                <span>
+                  {totalTimeHours.toFixed(2)} hrs
+                  {totalTimeBillable > 0 && (
+                    <span className="block text-xs font-normal text-muted">
+                      {formatMoney(totalTimeBillable, currency, locale)}
+                    </span>
+                  )}
+                </span>
+              ) : "—"}
+            </td>
+            <td className="px-4 py-3 text-right hidden lg:table-cell">
+              {totalExpenses > 0
+                ? formatMoney(totalExpenses, currency, locale)
+                : "—"}
             </td>
             <td />
           </tr>
