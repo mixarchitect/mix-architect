@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { formatMoney } from "@/lib/format-money";
 import { useLocale } from "next-intl";
@@ -180,7 +181,15 @@ export function PaymentsTable({ releases, currency }: Props) {
                       : <ChevronRight size={14} className="text-muted" />
                   )}
                 </td>
-                <td className="px-4 py-3 font-medium text-text">{r.title}</td>
+                <td className="px-4 py-3 font-medium text-text">
+                  <Link
+                    href={`/app/releases/${r.id}?tab=financials`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="hover:text-signal transition-colors"
+                  >
+                    {r.title}
+                  </Link>
+                </td>
                 <td className="px-4 py-3 text-muted hidden sm:table-cell whitespace-nowrap">
                   {formatShortDate(r.createdAt, locale)}
                 </td>
@@ -188,17 +197,19 @@ export function PaymentsTable({ releases, currency }: Props) {
                 <td className="px-4 py-3 text-right text-text">
                   {formatMoney(r.feeTotal, r.feeCurrency, locale)}
                 </td>
-                <td className="px-4 py-3 text-right hidden lg:table-cell text-muted">
-                  {r.timeHours > 0 ? (
-                    <span>
-                      {r.timeHours.toFixed(2)} hrs
-                      {r.timeBillable > 0 && (
-                        <span className="block text-[10px]">
-                          {formatMoney(r.timeBillable, r.feeCurrency, locale)}
-                        </span>
-                      )}
+                <td className="px-4 py-3 text-right hidden lg:table-cell">
+                  {r.timeBillable > 0 ? (
+                    <span className="text-text">
+                      {formatMoney(r.timeBillable, r.feeCurrency, locale)}
+                      <span className="block text-[10px] text-muted">
+                        {r.timeHours.toFixed(2)} hrs
+                      </span>
                     </span>
-                  ) : "—"}
+                  ) : r.timeHours > 0 ? (
+                    <span className="text-muted">
+                      {r.timeHours.toFixed(2)} hrs
+                    </span>
+                  ) : <span className="text-muted">—</span>}
                 </td>
                 <td className="px-4 py-3 text-right hidden lg:table-cell text-muted">
                   {r.expenseTotal > 0
@@ -266,14 +277,16 @@ export function PaymentsTable({ releases, currency }: Props) {
               {formatMoney(totalFee, currency, locale)}
             </td>
             <td className="px-4 py-3 text-right hidden lg:table-cell">
-              {totalTimeHours > 0 ? (
+              {totalTimeBillable > 0 ? (
                 <span>
+                  {formatMoney(totalTimeBillable, currency, locale)}
+                  <span className="block text-xs font-normal text-muted">
+                    {totalTimeHours.toFixed(2)} hrs
+                  </span>
+                </span>
+              ) : totalTimeHours > 0 ? (
+                <span className="font-normal text-muted">
                   {totalTimeHours.toFixed(2)} hrs
-                  {totalTimeBillable > 0 && (
-                    <span className="block text-xs font-normal text-muted">
-                      {formatMoney(totalTimeBillable, currency, locale)}
-                    </span>
-                  )}
                 </span>
               ) : "—"}
             </td>

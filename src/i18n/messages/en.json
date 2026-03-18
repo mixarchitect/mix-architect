@@ -306,8 +306,8 @@
     "summary": "Payment Summary",
     "generated": "Generated {date}",
     "outstanding": "Outstanding",
-    "earned": "Earned",
-    "totalFees": "Total Fees",
+    "earned": "Payments Received",
+    "totalFees": "Total Billed",
     "releaseCount": "{count, plural, one {# release} other {# releases}}",
     "timeLogged": "Time Logged",
     "totalExpenses": "Total Expenses"
