@@ -343,6 +343,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <FinancialSummary
                     feeTotal={release.fee_total}
+                    paidAmount={release.paid_amount ?? 0}
                     feeCurrency={release.fee_currency ?? "USD"}
                     paymentStatus={release.payment_status ?? "no_fee"}
                     expenses={expenses}

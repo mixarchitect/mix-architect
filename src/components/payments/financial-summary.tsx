@@ -8,6 +8,7 @@ function fmt(amount: number, currency: string, locale: string): string {
 
 interface Props {
   feeTotal: number | null;
+  paidAmount: number;
   feeCurrency: string;
   paymentStatus: string;
   expenses: ReleaseExpense[];
@@ -29,7 +30,7 @@ const statusColors: Record<string, string> = {
   paid: "text-green-400",
 };
 
-export function FinancialSummary({ feeTotal, feeCurrency, paymentStatus, expenses, timeEntries, locale }: Props) {
+export function FinancialSummary({ feeTotal, paidAmount, feeCurrency, paymentStatus, expenses, timeEntries, locale }: Props) {
   const totalHours = timeEntries.reduce((sum, e) => sum + Number(e.hours), 0);
   const timeBillable = timeEntries.reduce((sum, e) => {
     if (e.rate != null) return sum + Number(e.hours) * Number(e.rate);
@@ -37,11 +38,10 @@ export function FinancialSummary({ feeTotal, feeCurrency, paymentStatus, expense
   }, 0);
   const expensesTotal = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
-  // Respect payment status — if "no_fee", don't show fee even if a value exists in DB
   const effectiveFee = paymentStatus === "no_fee" ? null : feeTotal;
-  // If no fee set but time entries have rates, use time total as implied fee
-  const feeDisplay = effectiveFee ?? (timeBillable > 0 ? timeBillable : null);
-  const net = feeDisplay != null ? feeDisplay - expensesTotal : -expensesTotal;
+  const fee = effectiveFee ?? 0;
+  const totalBilled = fee + timeBillable + expensesTotal;
+  const balance = totalBilled - paidAmount;
   const hasAnyData = effectiveFee != null || timeEntries.length > 0 || expenses.length > 0;
 
   if (!hasAnyData) return null;
@@ -64,7 +64,7 @@ export function FinancialSummary({ feeTotal, feeCurrency, paymentStatus, expense
             <div className="flex justify-between">
               <span className="text-muted">
                 Time logged
-                <span className="text-faint ml-1.5">{totalHours.toFixed(2)} hrs</span>
+                <span className="text-faint ml-1.5">{totalHours.toFixed(1)}h</span>
               </span>
               {timeBillable > 0 && (
                 <span className="text-text">{fmt(timeBillable, feeCurrency, locale)}</span>
@@ -79,21 +79,37 @@ export function FinancialSummary({ feeTotal, feeCurrency, paymentStatus, expense
                 Expenses
                 <span className="text-faint ml-1.5">{expenses.length} item{expenses.length !== 1 ? "s" : ""}</span>
               </span>
-              <span className="text-text">({fmt(expensesTotal, feeCurrency, locale)})</span>
+              <span className="text-text">{fmt(expensesTotal, feeCurrency, locale)}</span>
             </div>
           )}
 
-          {/* Net */}
-          {(feeDisplay != null || expensesTotal > 0) && (
+          {/* Total billed */}
+          {totalBilled > 0 && (
             <>
               <div className="border-t border-border my-1" />
               <div className="flex justify-between font-medium">
-                <span className="text-muted">Net</span>
-                <span className={net < 0 ? "text-amber-400" : "text-text"}>
-                  {fmt(net, feeCurrency, locale)}
-                </span>
+                <span className="text-muted">Total billed</span>
+                <span className="text-green-400">{fmt(totalBilled, feeCurrency, locale)}</span>
               </div>
             </>
+          )}
+
+          {/* Paid */}
+          {paidAmount > 0 && (
+            <div className="flex justify-between">
+              <span className="text-muted">Paid</span>
+              <span className="text-red-400">−{fmt(paidAmount, feeCurrency, locale)}</span>
+            </div>
+          )}
+
+          {/* Balance */}
+          {totalBilled > 0 && (
+            <div className="flex justify-between font-medium">
+              <span className="text-muted">Balance</span>
+              <span className={balance > 0 ? "text-amber-400" : balance === 0 ? "text-green-400" : "text-muted"}>
+                {fmt(balance, feeCurrency, locale)}
+              </span>
+            </div>
           )}
 
           {/* Payment status */}
