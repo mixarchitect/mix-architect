@@ -110,20 +110,21 @@ export default async function PaymentsPage() {
     const status = r.payment_status as "unpaid" | "partial" | "paid";
     const cur = (r.fee_currency as string) || "USD";
 
-    if (idx === 0) primaryCurrency = cur;
-    grandTotal += fee;
-    if (status === "paid") {
-      earnedTotal += fee;
-      paidCount++;
-    } else {
-      outstandingTotal += fee - paid;
-      earnedTotal += paid;
-      outstandingCount++;
-    }
-
     const relTracks = tracksByRelease.get(r.id as string) ?? [];
     const relTime = timeByRelease.get(r.id as string) ?? { hours: 0, billable: 0 };
     const relExpenses = expensesByRelease.get(r.id as string) ?? { total: 0, count: 0 };
+    const releaseTotal = fee + relTime.billable + relExpenses.total;
+
+    if (idx === 0) primaryCurrency = cur;
+    grandTotal += releaseTotal;
+    if (status === "paid") {
+      earnedTotal += releaseTotal;
+      paidCount++;
+    } else {
+      outstandingTotal += releaseTotal - paid;
+      earnedTotal += paid;
+      outstandingCount++;
+    }
 
     return {
       id: r.id as string,

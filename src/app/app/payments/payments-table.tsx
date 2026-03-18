@@ -86,7 +86,7 @@ export function PaymentsTable({ releases, currency }: Props) {
         case "paid":
           return dir * (a.paidAmount - b.paidAmount);
         case "balance":
-          return dir * ((a.feeTotal - a.paidAmount) - (b.feeTotal - b.paidAmount));
+          return dir * ((a.feeTotal + a.timeBillable + a.expenseTotal - a.paidAmount) - (b.feeTotal + b.timeBillable + b.expenseTotal - b.paidAmount));
         case "time":
           return dir * (a.timeHours - b.timeHours);
         case "expenses":
@@ -104,10 +104,10 @@ export function PaymentsTable({ releases, currency }: Props) {
   // Totals
   const totalFee = releases.reduce((sum, r) => sum + r.feeTotal, 0);
   const totalPaid = releases.reduce((sum, r) => sum + r.paidAmount, 0);
-  const totalBalance = totalFee - totalPaid;
   const totalTimeHours = releases.reduce((sum, r) => sum + r.timeHours, 0);
   const totalTimeBillable = releases.reduce((sum, r) => sum + r.timeBillable, 0);
   const totalExpenses = releases.reduce((sum, r) => sum + r.expenseTotal, 0);
+  const totalBalance = totalFee + totalTimeBillable + totalExpenses - totalPaid;
 
   if (releases.length === 0) {
     return (
@@ -160,7 +160,7 @@ export function PaymentsTable({ releases, currency }: Props) {
         </thead>
         {sortedReleases.map((r) => {
           const isExpanded = expandedIds.has(r.id);
-          const balance = r.feeTotal - r.paidAmount;
+          const balance = r.feeTotal + r.timeBillable + r.expenseTotal - r.paidAmount;
           const hasTracks = r.tracks.some((t) => t.fee != null);
 
           return (
