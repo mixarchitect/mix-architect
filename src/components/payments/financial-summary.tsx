@@ -51,7 +51,7 @@ function ActionIcons({ onEdit, onClear }: { onEdit: () => void; onClear: () => v
 
 function Row({ label, bold, children }: { label: React.ReactNode; bold?: boolean; children: React.ReactNode }) {
   return (
-    <div className="group flex items-center gap-2">
+    <div className="group flex items-center gap-2 rounded-lg px-2 py-1.5 -mx-2 hover:bg-panel2 transition-colors">
       <span className={`text-muted flex-1 ${bold ? "font-medium" : ""}`}>{label}</span>
       <div className={`flex items-center gap-1.5 shrink-0 ${bold ? "font-medium" : ""}`}>
         {children}
@@ -280,10 +280,9 @@ export function FinancialSummary({
             </Row>
           )}
 
-          {/* Payment status — always visible so user can recover */}
+          {/* Payment status */}
           {(
-            <div className="flex justify-between items-center pt-1 border-t border-border/50">
-              <span className="text-muted">Status</span>
+            <Row label="Status">
               <button
                 onClick={cycleStatus}
                 className={`text-xs font-medium ${statusColors[status] ?? "text-faint"} hover:opacity-80 transition-opacity`}
@@ -291,7 +290,8 @@ export function FinancialSummary({
                 {statusLabels[status] ?? status}
                 {status === "paid" && " ✓"}
               </button>
-            </div>
+              <span className="w-[34px]" />
+            </Row>
           )}
         </div>
       </PanelBody>

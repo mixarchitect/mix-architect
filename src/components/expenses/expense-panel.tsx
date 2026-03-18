@@ -57,7 +57,7 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
 
   function handleAdd() {
     const amount = parseFloat(newAmount);
-    if (!newDesc.trim() || isNaN(amount) || amount <= 0) return;
+    if (!newDesc.trim() || isNaN(amount) || amount === 0) return;
 
     startTransition(async () => {
       const result = await createExpense({
@@ -92,7 +92,7 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
   function handleUpdate() {
     if (!editingId) return;
     const amount = parseFloat(editAmount);
-    if (!editDesc.trim() || isNaN(amount) || amount <= 0) return;
+    if (!editDesc.trim() || isNaN(amount) || amount === 0) return;
 
     startTransition(async () => {
       const result = await updateExpense({
@@ -166,7 +166,6 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
                     <input
                       type="number"
                       step="0.01"
-                      min="0"
                       value={editAmount}
                       onChange={(e) => setEditAmount(e.target.value)}
                       className="input text-xs h-7"
@@ -221,7 +220,7 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
                       </div>
                     )}
                   </div>
-                  <span className="text-sm text-text font-medium shrink-0">
+                  <span className={`text-sm font-medium shrink-0 ${Number(expense.amount) < 0 ? "text-green-400" : "text-text"}`}>
                     {fmt(Number(expense.amount), currency, locale)}
                   </span>
                   <div className="flex items-center gap-0.5 shrink-0 w-[34px] justify-end opacity-0 group-hover:opacity-100 transition-opacity">
@@ -259,7 +258,6 @@ export function ExpensePanel({ releaseId, expenses: initialExpenses, currency, l
               <input
                 type="number"
                 step="0.01"
-                min="0"
                 value={newAmount}
                 onChange={(e) => setNewAmount(e.target.value)}
                 className="input text-xs h-7"
