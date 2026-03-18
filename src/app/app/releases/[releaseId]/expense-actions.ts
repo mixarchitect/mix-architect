@@ -40,7 +40,7 @@ export async function createExpense(input: {
   owedBy?: string;
 }): Promise<{ error?: string }> {
   if (!input.description.trim()) return { error: "Description is required" };
-  if (!input.amount || input.amount <= 0) return { error: "Amount must be positive" };
+  if (!input.amount || input.amount === 0) return { error: "Amount is required" };
 
   const supabase = await createSupabaseServerClient();
   const {
@@ -79,7 +79,7 @@ export async function updateExpense(input: {
   const updates: Record<string, unknown> = {};
   if (input.description !== undefined) updates.description = input.description.trim();
   if (input.amount !== undefined) {
-    if (input.amount <= 0) return { error: "Amount must be positive" };
+    if (input.amount === 0) return { error: "Amount is required" };
     updates.amount = input.amount;
   }
   if (input.paidBy !== undefined) updates.paid_by = input.paidBy?.trim() || null;
