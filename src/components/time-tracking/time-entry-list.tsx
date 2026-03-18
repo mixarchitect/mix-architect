@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, Check, X, Timer, PenLine } from "lucide-react";
+import { Plus, Pencil, Trash2, Check, X, Clock } from "lucide-react";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { createTimeEntry, updateTimeEntry, deleteTimeEntry } from "@/app/app/releases/[releaseId]/time-entry-actions";
 import type { ReleaseTimeEntry } from "@/app/app/releases/[releaseId]/time-entry-actions";
@@ -308,57 +308,52 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
               ) : (
                 <div
                   key={entry.id}
-                  className="group flex items-start justify-between gap-2 rounded-lg px-2 py-1.5 -mx-2 hover:bg-panel2 transition-colors"
+                  className="group flex items-center gap-3 rounded-lg px-2 py-2.5 -mx-2 hover:bg-panel2 transition-colors"
+                  style={{ fontVariantNumeric: "tabular-nums" }}
                 >
+                  <Clock size={14} className="text-faint shrink-0" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 text-sm">
-                      {entry.entry_type === "timer" ? (
-                        <Timer size={12} className="text-faint shrink-0" />
-                      ) : (
-                        <PenLine size={12} className="text-faint shrink-0" />
-                      )}
                       <span className="text-text">
                         {Number(entry.hours).toFixed(2)} hrs
                       </span>
                       {entry.rate != null && (
-                        <>
-                          <span className="text-faint">×</span>
-                          <span className="text-faint">
-                            {fmt(Number(entry.rate), currency, locale)}/hr
-                          </span>
-                          <span className="text-faint">=</span>
-                          <span className="text-xs text-text font-medium">
-                            {fmt(Number(entry.hours) * Number(entry.rate), currency, locale)}
-                          </span>
-                        </>
+                        <span className="text-faint">
+                          × {fmt(Number(entry.rate), currency, locale)}/hr
+                        </span>
                       )}
                     </div>
                     {entry.description && (
-                      <p className="text-xs text-faint mt-0.5 ml-5 truncate">
+                      <p className="text-xs text-faint mt-0.5 truncate">
                         {entry.description}
                       </p>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[10px] text-faint">
-                      {formatShortDate(entry.created_at)}
+                  <span className="text-xs text-muted shrink-0">
+                    {formatShortDate(entry.created_at)}
+                  </span>
+                  {entry.rate != null ? (
+                    <span className="text-sm text-text font-medium text-right shrink-0 w-20">
+                      {fmt(Number(entry.hours) * Number(entry.rate), currency, locale)}
                     </span>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        type="button"
-                        onClick={() => startEdit(entry)}
-                        className="text-muted hover:text-text transition-colors p-0.5"
-                      >
-                        <Pencil size={12} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(entry.id)}
-                        className="text-muted hover:text-red-400 transition-colors p-0.5"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
+                  ) : (
+                    <span className="w-20 shrink-0" />
+                  )}
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => startEdit(entry)}
+                      className="text-muted hover:text-text transition-colors p-0.5"
+                    >
+                      <Pencil size={12} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(entry.id)}
+                      className="text-muted hover:text-red-400 transition-colors p-0.5"
+                    >
+                      <Trash2 size={12} />
+                    </button>
                   </div>
                 </div>
               ),
