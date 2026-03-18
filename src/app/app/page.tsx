@@ -95,6 +95,44 @@ export default async function DashboardPage({ searchParams }: Props) {
   const ownedReleaseCount = releases?.length ?? 0;
   const atFreeLimit = !isPro && ownedReleaseCount >= 1;
 
+  // Fetch time entries + expenses per release for balance calculation
+  const allReleaseIds = (allReleases ?? []).map((r) => r.id as string);
+  const balanceByRelease = new Map<string, number>();
+
+  if (paymentsEnabled && allReleaseIds.length > 0) {
+    const [timeRes, expRes] = await Promise.all([
+      supabase
+        .from("release_time_entries")
+        .select("release_id, hours, rate")
+        .in("release_id", allReleaseIds),
+      supabase
+        .from("release_expenses")
+        .select("release_id, amount")
+        .in("release_id", allReleaseIds),
+    ]);
+
+    const timeBillableByRelease = new Map<string, number>();
+    for (const e of (timeRes.data ?? []) as { release_id: string; hours: number; rate: number | null }[]) {
+      const prev = timeBillableByRelease.get(e.release_id) ?? 0;
+      timeBillableByRelease.set(e.release_id, prev + (e.rate != null ? Number(e.hours) * Number(e.rate) : 0));
+    }
+
+    const expenseByRelease = new Map<string, number>();
+    for (const e of (expRes.data ?? []) as { release_id: string; amount: number }[]) {
+      const prev = expenseByRelease.get(e.release_id) ?? 0;
+      expenseByRelease.set(e.release_id, prev + Number(e.amount));
+    }
+
+    for (const r of allReleases ?? []) {
+      const rid = r.id as string;
+      const fee = (r.fee_total as number) ?? 0;
+      const paid = (r.paid_amount as number) ?? 0;
+      const time = timeBillableByRelease.get(rid) ?? 0;
+      const exp = expenseByRelease.get(rid) ?? 0;
+      balanceByRelease.set(rid, fee + time + exp - paid);
+    }
+  }
+
   let outstandingTotal = 0;
   let outstandingCount = 0;
   let earnedTotal = 0;
@@ -233,6 +271,7 @@ export default async function DashboardPage({ searchParams }: Props) {
               paymentStatus={r.payment_status as string | null}
               feeTotal={r.fee_total as number | null}
               paidAmount={r.paid_amount as number | null}
+              balance={balanceByRelease.get(r.id as string) ?? null}
               feeCurrency={r.fee_currency as string | null}
               coverArtUrl={r.cover_art_url as string | null}
               pinned={r.pinned as boolean}
@@ -403,6 +442,7 @@ export default async function DashboardPage({ searchParams }: Props) {
                   paymentStatus={r.payment_status as string | null}
                   feeTotal={r.fee_total as number | null}
                   paidAmount={r.paid_amount as number | null}
+                  balance={balanceByRelease.get(r.id as string) ?? null}
                   feeCurrency={r.fee_currency as string | null}
                   coverArtUrl={r.cover_art_url as string | null}
                   pinned={r.pinned as boolean}
