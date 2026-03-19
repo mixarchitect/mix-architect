@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -9,6 +9,14 @@ import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
 import { logActivityClient } from "@/lib/activity-logger-client";
+
+export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInPageContent />
+    </Suspense>
+  );
+}
 
 function GoogleIcon() {
   return (
@@ -21,7 +29,7 @@ function GoogleIcon() {
   );
 }
 
-export default function SignInPage() {
+function SignInPageContent() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
