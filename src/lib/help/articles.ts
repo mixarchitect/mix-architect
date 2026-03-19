@@ -36,6 +36,31 @@ export const articles: HelpArticle[] = [
     ],
   },
   {
+    id: "signing-in",
+    title: "Signing In & Creating an Account",
+    category: "getting-started",
+    summary:
+      "Sign in with email and password or use Google for one-click access.",
+    tags: ["sign in", "login", "google", "oauth", "account", "create account", "register"],
+    updatedAt: "2026-03-18",
+    content: [
+      {
+        heading: "Sign In Options",
+        body: "Mix Architect supports two ways to sign in: email and password, or Google. Both options are available on the sign-in page. If you already have an account, enter your email and password and click \"Sign In\". To use Google instead, click \"Continue with Google\" below the form. You will be redirected to Google to select your account, then brought back to the app automatically.",
+        mockup: "sign-in-page",
+      },
+      {
+        heading: "Creating a New Account",
+        body: "If you do not have an account yet, click \"Create one\" at the bottom of the sign-in page to switch to sign-up mode. Enter your full name, email, and a password, then click \"Create Account\". You will receive a confirmation email — click the link in the email to activate your account. Alternatively, click \"Continue with Google\" to create your account instantly using your Google credentials. No confirmation email is needed when signing up with Google.",
+        tip: "If you sign up with email and later click \"Continue with Google\" using the same email address, your accounts are automatically linked. You can use either method to sign in going forward.",
+      },
+      {
+        heading: "After Signing In",
+        body: "New accounts are guided through a short onboarding flow where you set your persona (Artist, Engineer, or Both), preferred language, and default mix settings. After onboarding, you land on the [Dashboard](/app) where you can create your first release. Returning users go directly to the Dashboard.",
+      },
+    ],
+  },
+  {
     id: "create-first-release",
     title: "Creating Your First Release",
     category: "getting-started",
@@ -88,7 +113,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Accepting Invitations",
-        body: "When someone clicks the invite link and joins the release, they appear in the Team list with their role badge and \"Active\" status. You will receive an in-app notification letting you know they have joined. Invitees who do not have a Mix Architect account will be prompted to create one when they click the invite link.",
+        body: "When someone clicks the invite link and joins the release, they appear in the Team list with their role badge and \"Active\" status. You will receive an in-app notification letting you know they have joined. Invitees who do not have a Mix Architect account will be prompted to create one when they click the invite link — they can sign up with email and password or use Google for instant access.",
         tip: "You can remove a team member at any time by clicking the trash icon next to their name in the Team section of Release Settings.",
         mockup: "accept-invitation",
       },
