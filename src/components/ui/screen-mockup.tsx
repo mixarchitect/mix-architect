@@ -3281,11 +3281,11 @@ function SignInMockup() {
       <div className="space-y-3">
         <div>
           <span className="label-sm text-muted mb-1 block">EMAIL</span>
-          <MockInput text="you@email.com" className="text-xs h-8" placeholder />
+          <MockInput text="you@email.com" className="text-xs h-8 flex items-center" placeholder />
         </div>
         <div>
           <span className="label-sm text-muted mb-1 block">PASSWORD</span>
-          <MockInput text="••••••••" className="text-xs h-8" />
+          <MockInput text="••••••••" className="text-xs h-8 flex items-center" />
         </div>
         <div className="rounded-sm bg-signal text-signal-on text-xs font-semibold h-9 flex items-center justify-center">
           Sign In
