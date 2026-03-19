@@ -44,6 +44,6 @@ export async function GET(request: NextRequest) {
 
   // If no code or exchange failed, redirect to sign-in with error hint
   const signInUrl = new URL("/auth/sign-in", request.url);
-  signInUrl.searchParams.set("error", "confirmation_failed");
+  signInUrl.searchParams.set("error", "auth_failed");
   return NextResponse.redirect(signInUrl);
 }
