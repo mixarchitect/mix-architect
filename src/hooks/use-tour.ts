@@ -44,6 +44,11 @@ export type TourState = {
   setTrackId: (id: string) => void;
 };
 
+/* ── dedupe helper ── */
+function unique(arr: string[]): string[] {
+  return [...new Set(arr)];
+}
+
 export function useTour(persona: Persona | null): TourState {
   const router = useRouter();
   const pathname = usePathname();
@@ -56,6 +61,15 @@ export function useTour(persona: Persona | null): TourState {
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [releaseId, setReleaseId] = useState<string | null>(null);
   const [trackId, setTrackId] = useState<string | null>(null);
+
+  // Guard against advanceStep being called twice for the same step
+  const advancingRef = useRef(false);
+
+  // Keep IDs in refs so advanceStep always has current values
+  const releaseIdRef = useRef(releaseId);
+  const trackIdRef = useRef(trackId);
+  useEffect(() => { releaseIdRef.current = releaseId; }, [releaseId]);
+  useEffect(() => { trackIdRef.current = trackId; }, [trackId]);
 
   // Persist helper
   const persist = useCallback(
@@ -85,6 +99,7 @@ export function useTour(persona: Persona | null): TourState {
 
   // ── Helper: start a fresh tour ──
   const startFreshTour = useCallback(() => {
+    advancingRef.current = false;
     setPhaseIndex(0);
     setStepIndex(0);
     setCompletedPhases([]);
@@ -108,35 +123,27 @@ export function useTour(persona: Persona | null): TourState {
     if (initRef.current) return;
     initRef.current = true;
 
-    // Check URL param
     const params = new URLSearchParams(window.location.search);
     const tourParam = params.has("tour");
 
-    // Clean up URL param
     if (tourParam) {
       params.delete("tour");
       const qs = params.toString();
-      window.history.replaceState(
-        null,
-        "",
-        `${window.location.pathname}${qs ? `?${qs}` : ""}`,
-      );
+      window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
     }
 
-    // ?tour=true always starts fresh (even if previous tour was completed)
     if (tourParam) {
       clearTourProgress();
       startFreshTour();
       return;
     }
 
-    // Otherwise try restoring an in-progress tour from localStorage
     const saved = readTourProgress();
     if (saved && saved.status === "active") {
       setPhaseIndex(saved.currentPhaseIndex);
       setStepIndex(saved.currentStepIndex);
-      setCompletedPhases(saved.completedPhases);
-      setCompletedSteps(saved.completedSteps);
+      setCompletedPhases(unique(saved.completedPhases));
+      setCompletedSteps(unique(saved.completedSteps));
       if (saved.releaseId) setReleaseId(saved.releaseId);
       if (saved.trackId) setTrackId(saved.trackId);
       setIsActive(true);
@@ -145,42 +152,33 @@ export function useTour(persona: Persona | null): TourState {
   }, []);
 
   // ── Watch for ?tour=true on subsequent navigations ──
-  // (TourProvider stays mounted at Shell level, so we need to detect
-  //  the param on client-side navigations after initial mount)
   useEffect(() => {
-    if (!initRef.current) return; // wait for init first
+    if (!initRef.current) return;
 
     const params = new URLSearchParams(window.location.search);
     if (!params.has("tour")) return;
 
-    // Strip the param from URL
     params.delete("tour");
     const qs = params.toString();
-    window.history.replaceState(
-      null,
-      "",
-      `${window.location.pathname}${qs ? `?${qs}` : ""}`,
-    );
+    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
 
-    // Reset and start fresh
     clearTourProgress();
     startFreshTour();
   }, [pathname, startFreshTour]);
 
-  // Keep IDs in refs so advanceStep always has current values
-  const releaseIdRef = useRef(releaseId);
-  const trackIdRef = useRef(trackId);
-  useEffect(() => { releaseIdRef.current = releaseId; }, [releaseId]);
-  useEffect(() => { trackIdRef.current = trackId; }, [trackId]);
-
-  // ── Advance step ──
+  // ── Advance step (with double-call guard) ──
   const advanceStep = useCallback(() => {
+    if (advancingRef.current) return;
+    advancingRef.current = true;
+    // Release guard after React processes the state batch
+    setTimeout(() => { advancingRef.current = false; }, 100);
+
     const phase = TOUR_PHASES[phaseIndex];
     if (!phase) return;
 
     const currentStepId = phase.steps[stepIndex]?.id;
     const newCompleted = currentStepId
-      ? [...completedSteps, currentStepId]
+      ? unique([...completedSteps, currentStepId])
       : completedSteps;
 
     if (stepIndex < phase.steps.length - 1) {
@@ -191,7 +189,7 @@ export function useTour(persona: Persona | null): TourState {
       persist({ si: nextSI, cs: newCompleted });
     } else if (phaseIndex < TOUR_PHASES.length - 1) {
       // Move to next phase
-      const newCompletedPhases = [...completedPhases, phase.id];
+      const newCompletedPhases = unique([...completedPhases, phase.id]);
       const nextPI = phaseIndex + 1;
       setPhaseIndex(nextPI);
       setStepIndex(0);
@@ -213,13 +211,13 @@ export function useTour(persona: Persona | null): TourState {
       }
     } else {
       // Tour complete
-      const newCompletedPhases = [...completedPhases, phase.id];
+      const newCompletedPhases = unique([...completedPhases, phase.id]);
       setCompletedPhases(newCompletedPhases);
       setCompletedSteps(newCompleted);
       setIsActive(false);
       finishTour("completed");
     }
-  }, [phaseIndex, stepIndex, completedPhases, completedSteps, releaseId, trackId, persist, pathname, router]);
+  }, [phaseIndex, stepIndex, completedPhases, completedSteps, persist, router]);
 
   // ── Skip tour ──
   const skipTour = useCallback(() => {
@@ -237,18 +235,17 @@ export function useTour(persona: Persona | null): TourState {
       setStepIndex(0);
       persist({ pi: targetPhaseIndex, si: 0 });
 
-      // Navigate to the phase's route
       if (targetPhase.getRoute) {
         const route = targetPhase.getRoute({
-          releaseId: releaseId ?? undefined,
-          trackId: trackId ?? undefined,
+          releaseId: releaseIdRef.current ?? undefined,
+          trackId: trackIdRef.current ?? undefined,
         });
         if (route) {
           router.push(route);
         }
       }
     },
-    [releaseId, trackId, persist, router],
+    [persist, router],
   );
 
   // ── Set release/track IDs ──
@@ -279,25 +276,23 @@ export function useTour(persona: Persona | null): TourState {
     const step = phase?.steps[stepIndex];
     if (!step || step.advanceOn !== "navigate") return;
 
-    // Extract IDs from the new pathname before advancing, so the next
-    // phase's getRoute has them available (prevents navigating to /app
-    // when releaseId/trackId haven't been picked up yet)
+    // Extract IDs from the new pathname before advancing
     const releaseMatch = pathname.match(/\/app\/releases\/([a-f0-9-]+)/);
     const trackMatch = pathname.match(/\/tracks\/([a-f0-9-]+)/);
+    if (releaseMatch) releaseIdRef.current = releaseMatch[1];
+    if (trackMatch) trackIdRef.current = trackMatch[1];
     if (releaseMatch && releaseMatch[1] !== releaseId) {
-      handleSetReleaseId(releaseMatch[1]);
+      setReleaseId(releaseMatch[1]);
     }
     if (trackMatch && trackMatch[1] !== trackId) {
-      handleSetTrackId(trackMatch[1]);
+      setTrackId(trackMatch[1]);
     }
 
-    // Path changed and current step expects navigation → advance
-    // Longer delay so the new page renders its data-tour elements
     const timer = setTimeout(() => {
       advanceStep();
     }, 600);
     return () => clearTimeout(timer);
-  }, [pathname, isActive, phaseIndex, stepIndex, advanceStep, releaseId, trackId, handleSetReleaseId, handleSetTrackId]);
+  }, [pathname, isActive, phaseIndex, stepIndex, advanceStep, releaseId, trackId]);
 
   // ── Auto-advance on input/click ──
   useEffect(() => {
@@ -310,18 +305,6 @@ export function useTour(persona: Persona | null): TourState {
     if (step.advanceOn === "input") {
       const threshold = step.advanceThreshold ?? 2;
       let debounce: ReturnType<typeof setTimeout>;
-
-      const check = () => {
-        const target = document.querySelector(step.targetSelector);
-        if (!target) return;
-        const input = target.querySelector("input, textarea") as HTMLInputElement | HTMLTextAreaElement | null;
-        if (!input) return;
-        if (input.value.length >= threshold) {
-          debounce = setTimeout(() => advanceStep(), 600);
-        }
-      };
-
-      // Poll for element then attach listener
       let retries = 0;
       let retryTimer: ReturnType<typeof setTimeout>;
 
@@ -336,7 +319,6 @@ export function useTour(persona: Persona | null): TourState {
         const input = target.querySelector("input, textarea") as HTMLInputElement | HTMLTextAreaElement | null;
         if (!input) return;
 
-        // If already filled (demo content), don't auto-advance immediately — let user see tooltip
         const handler = () => {
           clearTimeout(debounce);
           if (input.value.length >= threshold) {
@@ -345,7 +327,6 @@ export function useTour(persona: Persona | null): TourState {
         };
         input.addEventListener("input", handler);
 
-        // Store cleanup
         (window as unknown as Record<string, () => void>).__tourCleanup = () => {
           input.removeEventListener("input", handler);
           clearTimeout(debounce);

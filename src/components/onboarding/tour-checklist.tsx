@@ -23,8 +23,10 @@ export function TourChecklist({
 }: Props) {
   const [expanded, setExpanded] = useState(false);
 
-  const completedCount = completedPhases.length;
+  // Deduplicate and cap to prevent "5/4" style bugs
+  const uniqueCompleted = [...new Set(completedPhases)];
   const totalPhases = TOUR_PHASES.length;
+  const completedCount = Math.min(uniqueCompleted.length, totalPhases);
 
   return (
     <div className="fixed bottom-20 md:bottom-6 right-20 md:right-24 z-[9997]" style={{ pointerEvents: "auto" }}>
@@ -117,7 +119,7 @@ export function TourChecklist({
 
           <div className="py-2">
             {TOUR_PHASES.map((phase, i) => {
-              const isCompleted = completedPhases.includes(phase.id);
+              const isCompleted = uniqueCompleted.includes(phase.id);
               const isCurrent = i === phaseIndex;
               const isClickable = i !== phaseIndex;
 

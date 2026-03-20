@@ -113,21 +113,34 @@ export function TourTooltip({
       const target = document.querySelector(targetSelector);
       if (target || targetSelector.includes("tour-complete")) {
         updatePosition();
-      } else if (retries < 40) {
+      } else if (retries < 20) {
         retries++;
-        retryTimer = setTimeout(tryPosition, 100);
+        retryTimer = setTimeout(tryPosition, 150);
+      } else {
+        // Target gone — hide tooltip gracefully
+        setOpacity(0);
       }
     }
 
-    // Small initial delay for DOM & spotlight to settle
     const initTimer = setTimeout(tryPosition, 150);
 
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition, true);
 
+    // Periodic check — hide tooltip if target disappears (tab switch)
+    const visCheck = setInterval(() => {
+      const target = document.querySelector(targetSelector);
+      if (!target && !targetSelector.includes("tour-complete")) {
+        setOpacity(0);
+      } else if (target) {
+        updatePosition();
+      }
+    }, 500);
+
     return () => {
       clearTimeout(initTimer);
       clearTimeout(retryTimer);
+      clearInterval(visCheck);
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
     };

@@ -22,7 +22,8 @@ export function TourSpotlight({ targetSelector, padding = 8, optional }: Props) 
   const updateRect = useCallback(() => {
     const el = document.querySelector(targetSelector);
     if (!el) {
-      if (optional) setVisible(false);
+      // Always hide when target is gone (e.g. user switched tabs)
+      setVisible(false);
       return;
     }
     const r = el.getBoundingClientRect();
@@ -33,7 +34,7 @@ export function TourSpotlight({ targetSelector, padding = 8, optional }: Props) 
       h: r.height + padding * 2,
     });
     setVisible(true);
-  }, [targetSelector, padding, optional]);
+  }, [targetSelector, padding]);
 
   // Scroll target into view when selector changes
   useEffect(() => {
@@ -44,25 +45,24 @@ export function TourSpotlight({ targetSelector, padding = 8, optional }: Props) 
       const el = document.querySelector(targetSelector);
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "center" });
-        // Small delay after scroll for accurate rect
         setTimeout(updateRect, 150);
-      } else if (retries < 40) {
+      } else if (retries < 20) {
         retries++;
-        retryTimer = setTimeout(tryScroll, 100);
-      } else if (optional) {
+        retryTimer = setTimeout(tryScroll, 150);
+      } else {
+        // Target not found after retries — hide gracefully
         setVisible(false);
       }
     }
 
     tryScroll();
     return () => clearTimeout(retryTimer);
-  }, [targetSelector, updateRect, optional]);
+  }, [targetSelector, updateRect]);
 
-  // Continuous position tracking
+  // Continuous position tracking — also re-checks visibility
   useEffect(() => {
     const el = document.querySelector(targetSelector);
 
-    // ResizeObserver on target
     if (el) {
       observerRef.current = new ResizeObserver(() => {
         cancelAnimationFrame(frameRef.current);
@@ -71,7 +71,7 @@ export function TourSpotlight({ targetSelector, padding = 8, optional }: Props) 
       observerRef.current.observe(el);
     }
 
-    // Scroll & resize listeners
+    // Throttled scroll/resize handler
     const handleScroll = () => {
       cancelAnimationFrame(frameRef.current);
       frameRef.current = requestAnimationFrame(updateRect);
@@ -80,17 +80,25 @@ export function TourSpotlight({ targetSelector, padding = 8, optional }: Props) 
     window.addEventListener("scroll", handleScroll, true);
     window.addEventListener("resize", handleScroll);
 
+    // Periodic check for target appearing/disappearing (e.g. tab switches)
+    const visCheck = setInterval(() => {
+      const exists = !!document.querySelector(targetSelector);
+      if (!exists && visible) setVisible(false);
+      if (exists && !visible) updateRect();
+    }, 500);
+
     return () => {
       observerRef.current?.disconnect();
       cancelAnimationFrame(frameRef.current);
       window.removeEventListener("scroll", handleScroll, true);
       window.removeEventListener("resize", handleScroll);
+      clearInterval(visCheck);
     };
-  }, [targetSelector, updateRect]);
+  }, [targetSelector, updateRect, visible]);
 
   if (!visible) return null;
 
-  const r = 10; // border-radius for cutout
+  const r = 10;
 
   return (
     <svg
@@ -100,9 +108,7 @@ export function TourSpotlight({ targetSelector, padding = 8, optional }: Props) 
     >
       <defs>
         <mask id="tour-spotlight-mask">
-          {/* White = visible overlay (dimmed area) */}
           <rect x="0" y="0" width="100%" height="100%" fill="white" />
-          {/* Black = cutout (transparent area) */}
           <rect
             x={rect.x}
             y={rect.y}
@@ -116,7 +122,6 @@ export function TourSpotlight({ targetSelector, padding = 8, optional }: Props) 
         </mask>
       </defs>
 
-      {/* Dimmed background with cutout */}
       <rect
         x="0"
         y="0"
@@ -127,7 +132,6 @@ export function TourSpotlight({ targetSelector, padding = 8, optional }: Props) 
         mask="url(#tour-spotlight-mask)"
       />
 
-      {/* Highlighted border around cutout */}
       <rect
         x={rect.x}
         y={rect.y}
