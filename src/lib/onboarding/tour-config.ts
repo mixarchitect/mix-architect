@@ -102,11 +102,11 @@ export const TOUR_TOPICS: TourTopic[] = [
     id: "release-overview",
     label: "Explore Your Release",
     description: "Navigate tabs and sidebar",
-    matchPage: (p) => {
-      // Match /app/releases/[uuid] but not /new, /tracks/, or /settings
-      if (!p.match(/\/app\/releases\/[a-f0-9-]{36}$/)) return false;
-      return true;
-    },
+    matchPage: (p) =>
+      p.startsWith("/app/releases/") &&
+      !p.includes("/new") &&
+      !p.includes("/tracks/") &&
+      !p.includes("/settings"),
     getRoute: (ctx) =>
       ctx.releaseId ? `/app/releases/${ctx.releaseId}` : null,
     steps: [
