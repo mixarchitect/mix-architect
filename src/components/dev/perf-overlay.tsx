@@ -90,7 +90,11 @@ export function PerfOverlay() {
 
   if (collapsed) {
     return (
-      <div
+      <aside
+        role="complementary"
+        aria-label="Performance monitor (collapsed)"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setCollapsed(false); } }}
         style={{
           position: "fixed",
           bottom: 16,
@@ -125,12 +129,14 @@ export function PerfOverlay() {
             {violations.length} violations
           </span>
         )}
-      </div>
+      </aside>
     );
   }
 
   return (
-    <div
+    <aside
+      role="complementary"
+      aria-label="Performance monitor"
       style={{
         position: "fixed",
         bottom: 16,
@@ -157,7 +163,7 @@ export function PerfOverlay() {
           alignItems: "center",
           padding: "8px 12px",
           borderBottom: "1px solid #333",
-          background: ACCENT,
+          background: "#0a7a70",
           color: "#fff",
           borderTopLeftRadius: 10,
           borderTopRightRadius: 10,
@@ -285,7 +291,7 @@ export function PerfOverlay() {
         {tab === "marks" && (
           <div style={{ padding: 8 }}>
             {marks.length === 0 && (
-              <div style={{ color: "#666", padding: 12, textAlign: "center" }}>
+              <div style={{ color: "#999", padding: 12, textAlign: "center" }}>
                 No marks recorded yet
               </div>
             )}
@@ -387,7 +393,7 @@ export function PerfOverlay() {
         {tab === "fps" && (
           <div style={{ padding: 8 }}>
             {fpsSnapshots.length === 0 && (
-              <div style={{ color: "#666", padding: 12, textAlign: "center" }}>
+              <div style={{ color: "#999", padding: 12, textAlign: "center" }}>
                 No FPS data yet — play audio to record
               </div>
             )}
@@ -473,13 +479,13 @@ export function PerfOverlay() {
           </div>
         )}
       </div>
-    </div>
+    </aside>
   );
 }
 
 const btnStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,0.15)",
-  border: "none",
+  background: "rgba(0,0,0,0.25)",
+  border: "1px solid rgba(255,255,255,0.2)",
   color: "#fff",
   padding: "2px 8px",
   borderRadius: 4,
