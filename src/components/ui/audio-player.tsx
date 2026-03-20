@@ -307,6 +307,7 @@ export function AudioPlayer({
   // WaveSurfer ref
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const resizeCleanupRef = useRef<(() => void) | null>(null);
 
   // Keep a ref to latest versions so ready/LUFS callbacks never use stale closures
   const versionsRef = useRef(versions);
@@ -370,6 +371,13 @@ export function AudioPlayer({
       if (cancelled || !container || !container.isConnected || !activeVersion) return;
 
       const colors = getWaveColors();
+      perf.setAudioFileInfo({
+        sampleRate: activeVersion.sample_rate,
+        bitDepth: activeVersion.bit_depth,
+        channels: activeVersion.channels,
+        format: activeVersion.file_format,
+        fileName: activeVersion.file_name,
+      });
       perf.start("wavesurfer:init", { trackId: activeVersion.id });
       ws = WaveSurfer.create({
         container,
@@ -548,6 +556,23 @@ export function AudioPlayer({
       });
 
       wavesurferRef.current = ws;
+
+      // Perf: measure waveform redraw time on window resize
+      if (perf.enabled) {
+        let resizeTimer: ReturnType<typeof setTimeout> | null = null;
+        const onResize = () => {
+          perf.start("waveform:resize", { trackId: activeVersion.id });
+          // WaveSurfer redraws asynchronously via ResizeObserver — measure on next frame
+          if (resizeTimer) clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => {
+            requestAnimationFrame(() => {
+              perf.end("waveform:resize");
+            });
+          }, 100);
+        };
+        window.addEventListener("resize", onResize);
+        resizeCleanupRef.current = () => window.removeEventListener("resize", onResize);
+      }
     }
 
     // Double-RAF: defer WaveSurfer creation by two frames so the container
@@ -569,6 +594,8 @@ export function AudioPlayer({
       if (ws) ws.destroy();
       wavesurferRef.current = null;
       measureAbortRef.current?.abort();
+      resizeCleanupRef.current?.();
+      resizeCleanupRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeVersion?.id, audioElement]);

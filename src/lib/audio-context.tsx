@@ -11,6 +11,7 @@ import {
 } from "react";
 import type { AudioVersionData } from "@/components/ui/audio-player";
 import { perf } from "@/lib/perf";
+import { FPSMonitor } from "@/lib/fps-monitor";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -80,18 +81,42 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   isLoopingRef.current = isLooping;
 
   /* ---- Native audio element event listeners ---- */
+  const fpsMonitorRef = useRef<FPSMonitor | null>(null);
+
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
 
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
+    const onPlay = () => {
+      setIsPlaying(true);
+      // Start FPS monitoring during playback (dev only)
+      if (perf.enabled && !fpsMonitorRef.current) {
+        const monitor = new FPSMonitor();
+        fpsMonitorRef.current = monitor;
+        monitor.start();
+      }
+    };
+    const onPause = () => {
+      setIsPlaying(false);
+      // Stop FPS monitoring and record snapshot
+      if (fpsMonitorRef.current) {
+        const report = fpsMonitorRef.current.stop();
+        perf.addFpsSnapshot("playback", report);
+        fpsMonitorRef.current = null;
+      }
+    };
     const onEnded = () => {
       if (isLoopingRef.current) {
         el.currentTime = 0;
         el.play().catch(() => {});
       } else {
         setIsPlaying(false);
+        // Stop FPS monitoring on track end
+        if (fpsMonitorRef.current) {
+          const report = fpsMonitorRef.current.stop();
+          perf.addFpsSnapshot("playback", report);
+          fpsMonitorRef.current = null;
+        }
       }
     };
     const onTimeUpdate = () => setCurrentTime(el.currentTime);
@@ -114,6 +139,11 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       el.removeEventListener("timeupdate", onTimeUpdate);
       el.removeEventListener("loadedmetadata", onLoadedMetadata);
       el.removeEventListener("durationchange", onDurationChange);
+      // Cleanup FPS monitor on unmount
+      if (fpsMonitorRef.current) {
+        fpsMonitorRef.current.stop();
+        fpsMonitorRef.current = null;
+      }
     };
   }, []);
 

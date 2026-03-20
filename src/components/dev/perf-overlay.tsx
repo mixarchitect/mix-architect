@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { perf, type PerfMark } from "@/lib/perf";
+import { perf, type PerfMark, type FPSSnapshot, type AudioFileInfo } from "@/lib/perf";
 import { PERF_BUDGETS, toBudgetArray } from "@/lib/perf-budgets";
 
 /* ------------------------------------------------------------------ */
@@ -29,7 +29,9 @@ export function PerfOverlay() {
   const [visible, setVisible] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [marks, setMarks] = useState<PerfMark[]>([]);
-  const [tab, setTab] = useState<"marks" | "budgets">("marks");
+  const [fpsSnapshots, setFpsSnapshots] = useState<FPSSnapshot[]>([]);
+  const [audioInfo, setAudioInfo] = useState<AudioFileInfo | null>(null);
+  const [tab, setTab] = useState<"marks" | "budgets" | "fps">("marks");
   const counterRef = useRef(0);
 
   // Only render if ?perf is in URL
@@ -43,11 +45,23 @@ export function PerfOverlay() {
       perf.setBudgets(toBudgetArray());
 
       // Subscribe to new marks
-      const unsub = perf.onMark(() => {
+      const unsubMarks = perf.onMark(() => {
         counterRef.current++;
         setMarks(perf.getReport());
       });
-      return unsub;
+      // Subscribe to FPS snapshots
+      const unsubFps = perf.onFps(() => {
+        setFpsSnapshots(perf.getFpsSnapshots());
+      });
+      // Subscribe to audio file info
+      const unsubAudio = perf.onAudioFileInfo((info) => {
+        setAudioInfo(info);
+      });
+      return () => {
+        unsubMarks();
+        unsubFps();
+        unsubAudio();
+      };
     }
   }, []);
 
@@ -55,6 +69,7 @@ export function PerfOverlay() {
     const data = {
       marks: perf.getReport(),
       budgets: perf.checkBudgets(),
+      fps: perf.getFpsSnapshots(),
       timestamp: new Date().toISOString(),
     };
     navigator.clipboard.writeText(JSON.stringify(data, null, 2));
@@ -63,6 +78,7 @@ export function PerfOverlay() {
   const handleClear = useCallback(() => {
     perf.clear();
     setMarks([]);
+    setFpsSnapshots([]);
   }, []);
 
   if (!visible) return null;
@@ -169,6 +185,47 @@ export function PerfOverlay() {
         </div>
       </div>
 
+      {/* Audio file info */}
+      {audioInfo && (
+        <div
+          style={{
+            display: "flex",
+            gap: 12,
+            padding: "5px 12px",
+            borderBottom: "1px solid #333",
+            fontSize: 10,
+            color: "#aaa",
+            background: "#1a1a2e",
+          }}
+        >
+          {audioInfo.fileName && (
+            <span
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                maxWidth: 140,
+              }}
+              title={audioInfo.fileName}
+            >
+              {audioInfo.fileName}
+            </span>
+          )}
+          {audioInfo.sampleRate != null && (
+            <span>{(audioInfo.sampleRate / 1000).toFixed(1)} kHz</span>
+          )}
+          {audioInfo.bitDepth != null && (
+            <span>{audioInfo.bitDepth}-bit</span>
+          )}
+          {audioInfo.channels != null && (
+            <span>{audioInfo.channels === 1 ? "mono" : audioInfo.channels === 2 ? "stereo" : `${audioInfo.channels}ch`}</span>
+          )}
+          {audioInfo.format && (
+            <span style={{ textTransform: "uppercase" }}>{audioInfo.format}</span>
+          )}
+        </div>
+      )}
+
       {/* Tabs */}
       <div
         style={{
@@ -176,7 +233,7 @@ export function PerfOverlay() {
           borderBottom: "1px solid #333",
         }}
       >
-        {(["marks", "budgets"] as const).map((t) => (
+        {(["marks", "budgets", "fps"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -190,7 +247,7 @@ export function PerfOverlay() {
               cursor: "pointer",
               fontFamily: "monospace",
               fontSize: 11,
-              textTransform: "capitalize",
+              textTransform: "uppercase",
             }}
           >
             {t}
@@ -206,6 +263,17 @@ export function PerfOverlay() {
                 }}
               >
                 {violations.length}
+              </span>
+            )}
+            {t === "fps" && fpsSnapshots.length > 0 && (
+              <span
+                style={{
+                  marginLeft: 6,
+                  color: "#888",
+                  fontSize: 9,
+                }}
+              >
+                {fpsSnapshots.length}
               </span>
             )}
           </button>
@@ -310,6 +378,95 @@ export function PerfOverlay() {
                       ? `${Math.round(worst * 10) / 10}ms`
                       : "—"}
                   </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {tab === "fps" && (
+          <div style={{ padding: 8 }}>
+            {fpsSnapshots.length === 0 && (
+              <div style={{ color: "#666", padding: 12, textAlign: "center" }}>
+                No FPS data yet — play audio to record
+              </div>
+            )}
+            {fpsSnapshots.map((snap, i) => {
+              const fpsColor =
+                snap.avgFps >= 55
+                  ? STATUS_COLORS.pass
+                  : snap.avgFps >= 30
+                    ? STATUS_COLORS.warn
+                    : STATUS_COLORS.fail;
+
+              return (
+                <div
+                  key={`${snap.label}-${i}`}
+                  style={{
+                    padding: "6px",
+                    borderBottom: "1px solid #222",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: 4,
+                    }}
+                  >
+                    <span style={{ fontWeight: 500 }}>{snap.label}</span>
+                    <span style={{ color: fpsColor, fontWeight: 600 }}>
+                      {snap.avgFps} fps
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(4, 1fr)",
+                      gap: 4,
+                      fontSize: 10,
+                      color: "#888",
+                    }}
+                  >
+                    <span>min: {snap.minFps}</span>
+                    <span>p5: {snap.p5Fps}</span>
+                    <span>
+                      dropped:{" "}
+                      <span
+                        style={{
+                          color:
+                            snap.droppedFrames > 0
+                              ? STATUS_COLORS.warn
+                              : "#888",
+                        }}
+                      >
+                        {snap.droppedFrames}
+                      </span>
+                    </span>
+                    <span>
+                      jank:{" "}
+                      <span
+                        style={{
+                          color:
+                            snap.jankFrames > 0
+                              ? STATUS_COLORS.fail
+                              : "#888",
+                        }}
+                      >
+                        {snap.jankFrames}
+                      </span>
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 9,
+                      color: "#555",
+                      marginTop: 2,
+                    }}
+                  >
+                    {snap.totalFrames} frames / {snap.durationSec}s
+                  </div>
                 </div>
               );
             })}

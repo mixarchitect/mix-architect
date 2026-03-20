@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "perf:smoke": "npx tsx scripts/perf-smoke-test.ts"
   },
   "dependencies": {
     "@stripe/stripe-js": "^8.8.0",

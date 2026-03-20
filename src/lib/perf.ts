@@ -31,12 +31,36 @@ export interface BudgetViolation {
   severity: "warn" | "error";
 }
 
+export interface AudioFileInfo {
+  sampleRate: number | null;
+  bitDepth: number | null;
+  channels: number | null;
+  format: string | null;
+  fileName: string | null;
+}
+
+export interface FPSSnapshot {
+  label: string;
+  timestamp: number;
+  avgFps: number;
+  minFps: number;
+  p5Fps: number;
+  droppedFrames: number;
+  jankFrames: number;
+  totalFrames: number;
+  durationSec: number;
+}
+
 class PerfProfiler {
   private marks = new Map<string, PerfMark>();
   private completed: PerfMark[] = [];
   private budgets: PerfBudget[] = [];
   private _enabled: boolean;
   private listeners: Array<(mark: PerfMark) => void> = [];
+  private fpsSnapshots: FPSSnapshot[] = [];
+  private fpsListeners: Array<(snap: FPSSnapshot) => void> = [];
+  private _audioFileInfo: AudioFileInfo | null = null;
+  private audioInfoListeners: Array<(info: AudioFileInfo | null) => void> = [];
 
   constructor() {
     this._enabled =
@@ -173,9 +197,51 @@ class PerfProfiler {
     return snapshot;
   }
 
+  /** Set info about the currently playing audio file. */
+  setAudioFileInfo(info: AudioFileInfo | null): void {
+    if (!this._enabled) return;
+    this._audioFileInfo = info;
+    for (const fn of this.audioInfoListeners) fn(info);
+  }
+
+  /** Get current audio file info. */
+  getAudioFileInfo(): AudioFileInfo | null {
+    return this._audioFileInfo;
+  }
+
+  /** Subscribe to audio file info changes. */
+  onAudioFileInfo(fn: (info: AudioFileInfo | null) => void): () => void {
+    this.audioInfoListeners.push(fn);
+    return () => {
+      this.audioInfoListeners = this.audioInfoListeners.filter((l) => l !== fn);
+    };
+  }
+
+  /** Store an FPS report snapshot with a label. */
+  addFpsSnapshot(label: string, report: Omit<FPSSnapshot, "label" | "timestamp">): void {
+    if (!this._enabled) return;
+    const snap: FPSSnapshot = { label, timestamp: Date.now(), ...report };
+    this.fpsSnapshots.push(snap);
+    for (const fn of this.fpsListeners) fn(snap);
+  }
+
+  /** Get all stored FPS snapshots. */
+  getFpsSnapshots(): FPSSnapshot[] {
+    return [...this.fpsSnapshots];
+  }
+
+  /** Subscribe to new FPS snapshots. */
+  onFps(fn: (snap: FPSSnapshot) => void): () => void {
+    this.fpsListeners.push(fn);
+    return () => {
+      this.fpsListeners = this.fpsListeners.filter((l) => l !== fn);
+    };
+  }
+
   clear(): void {
     this.marks.clear();
     this.completed = [];
+    this.fpsSnapshots = [];
   }
 }
 
