@@ -68,10 +68,40 @@ export function DateRangeSelector({
 }: Props) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const trigger = triggerStyles[variant];
   const preset = presetStyles[variant];
 
   const [open, setOpen] = useState(false);
+
+  // Compute fixed position for dropdown (avoids overflow clipping from scroll containers)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  useEffect(() => {
+    if (!open || !triggerRef.current) return;
+    const update = () => {
+      const rect = triggerRef.current!.getBoundingClientRect();
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        // Bottom sheet: inset handled by CSS classes
+        setDropdownStyle({});
+      } else {
+        // Desktop: position below the trigger, aligned right
+        setDropdownStyle({
+          top: rect.bottom + 8,
+          right: window.innerWidth - rect.right,
+          left: "auto",
+          bottom: "auto",
+        });
+      }
+    };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open]);
 
   // Draft state (not applied until "Apply")
   const [draftPreset, setDraftPreset] = useState<PresetKey | "custom">(
@@ -186,6 +216,7 @@ export function DateRangeSelector({
     <div ref={containerRef} className="relative">
       {/* Trigger */}
       <button
+        ref={triggerRef}
         onClick={() => (open ? setOpen(false) : handleOpen())}
         aria-label="Select date range"
         aria-haspopup="true"
@@ -205,109 +236,136 @@ export function DateRangeSelector({
 
       {/* Dropdown */}
       {open && (
-        <div
-          className="absolute right-0 top-full mt-2 z-50 rounded-lg border border-border shadow-xl"
-          style={{ background: "var(--panel)" }}
-        >
-          {/* Date inputs */}
-          <div className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-border">
-            <input
-              type="text"
-              readOnly
-              aria-label="Start date"
-              value={draftFrom ? formatDateShort(draftFrom) : "Start date"}
-              className="flex-1 px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
-            />
-            <span className="text-faint text-xs" aria-hidden="true">&#8594;</span>
-            <input
-              type="text"
-              readOnly
-              aria-label="End date"
-              value={draftTo ? formatDateShort(draftTo) : "End date"}
-              className="flex-1 px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
-            />
-          </div>
-
-          {/* Presets + Calendar */}
-          <div className="flex">
-            {/* Preset column */}
-            <div className="w-[160px] border-r border-border py-2">
-              {PRESET_OPTIONS.map((opt) => (
-                <button
-                  key={opt.key}
-                  onClick={() => handlePresetClick(opt.key)}
-                  className={cn(
-                    "w-full flex items-center justify-between px-4 py-2 text-xs transition-colors text-left",
-                    draftPreset === opt.key
-                      ? preset.active
-                      : "text-text hover:bg-panel2",
-                  )}
-                >
-                  {opt.label}
-                  {draftPreset === opt.key && (
-                    <Check size={14} className={preset.check} />
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* Calendar */}
-            <div className="p-4">
-              <DateRangeCalendar
-                from={draftFrom}
-                to={draftTo}
-                onChange={handleCalendarChange}
-                variant={variant}
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-40 bg-black/50 md:bg-transparent"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            className="fixed inset-x-3 bottom-3 top-auto md:inset-x-auto md:bottom-auto z-50 rounded-lg border border-border shadow-xl"
+            style={{ background: "var(--panel)", ...dropdownStyle }}
+          >
+            {/* Date inputs */}
+            <div className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-border">
+              <input
+                type="text"
+                readOnly
+                aria-label="Start date"
+                value={draftFrom ? formatDateShort(draftFrom) : "Start date"}
+                className="flex-1 px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
+              />
+              <span className="text-faint text-xs" aria-hidden="true">&#8594;</span>
+              <input
+                type="text"
+                readOnly
+                aria-label="End date"
+                value={draftTo ? formatDateShort(draftTo) : "End date"}
+                className="flex-1 px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
               />
             </div>
-          </div>
 
-          {/* Comparison + Actions */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-            {showCompare ? (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted">Compare:</span>
-                <select
-                  value={draftCompare}
-                  onChange={(e) =>
-                    setDraftCompare(e.target.value as CompareKey)
-                  }
-                  aria-label="Compare period"
-                  className="text-xs px-2 py-1 rounded-md border border-border bg-panel2 text-text outline-none"
-                >
-                  {COMPARE_OPTIONS.map((opt) => (
-                    <option key={opt.key} value={opt.key}>
+            {/* Presets + Calendar */}
+            <div className="flex flex-col md:flex-row">
+              {/* Preset row (mobile) / column (desktop) */}
+              <div className="md:w-[160px] md:border-r border-b md:border-b-0 border-border py-2">
+                {/* Mobile: horizontal scroll pills */}
+                <div className="flex md:hidden gap-1.5 px-4 overflow-x-auto no-scrollbar">
+                  {PRESET_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.key}
+                      onClick={() => handlePresetClick(opt.key)}
+                      className={cn(
+                        "shrink-0 px-3 py-1.5 text-xs rounded-full border transition-colors",
+                        draftPreset === opt.key
+                          ? cn("border-current", preset.active)
+                          : "border-border text-text hover:bg-panel2",
+                      )}
+                    >
                       {opt.label}
-                    </option>
+                    </button>
                   ))}
-                </select>
+                </div>
+                {/* Desktop: vertical list */}
+                <div className="hidden md:block">
+                  {PRESET_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.key}
+                      onClick={() => handlePresetClick(opt.key)}
+                      className={cn(
+                        "w-full flex items-center justify-between px-4 py-2 text-xs transition-colors text-left",
+                        draftPreset === opt.key
+                          ? preset.active
+                          : "text-text hover:bg-panel2",
+                      )}
+                    >
+                      {opt.label}
+                      {draftPreset === opt.key && (
+                        <Check size={14} className={preset.check} />
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
-            ) : (
-              <div />
-            )}
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setOpen(false)}
-                className="px-3 py-1.5 text-xs rounded-md text-muted hover:text-text hover:bg-panel2 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleApply}
-                disabled={!canApply}
-                className={cn(
-                  "px-3 py-1.5 text-xs rounded-md font-medium transition-colors",
-                  canApply
-                    ? applyStyles[variant]
-                    : "text-faint cursor-not-allowed",
-                )}
-              >
-                Apply
-              </button>
+              {/* Calendar */}
+              <div className="p-4 flex justify-center md:justify-start">
+                <DateRangeCalendar
+                  from={draftFrom}
+                  to={draftTo}
+                  onChange={handleCalendarChange}
+                  variant={variant}
+                />
+              </div>
+            </div>
+
+            {/* Comparison + Actions */}
+            <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+              {showCompare ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted">Compare:</span>
+                  <select
+                    value={draftCompare}
+                    onChange={(e) =>
+                      setDraftCompare(e.target.value as CompareKey)
+                    }
+                    aria-label="Compare period"
+                    className="text-xs px-2 py-1 rounded-md border border-border bg-panel2 text-text outline-none"
+                  >
+                    {COMPARE_OPTIONS.map((opt) => (
+                      <option key={opt.key} value={opt.key}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div />
+              )}
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setOpen(false)}
+                  className="px-3 py-1.5 text-xs rounded-md text-muted hover:text-text hover:bg-panel2 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleApply}
+                  disabled={!canApply}
+                  className={cn(
+                    "px-3 py-1.5 text-xs rounded-md font-medium transition-colors",
+                    canApply
+                      ? applyStyles[variant]
+                      : "text-faint cursor-not-allowed",
+                  )}
+                >
+                  Apply
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
