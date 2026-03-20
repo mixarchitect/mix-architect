@@ -319,10 +319,10 @@ export function ReleaseCard({
           <div className="flex items-center gap-2">
             {paymentsEnabled && paymentStatus && paymentStatus !== "no_fee" && (
               <span className={cn(
-                "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium",
-                paymentStatus === "paid" && "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-                paymentStatus === "partial" && "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-                paymentStatus === "unpaid" && "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
+                "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide",
+                paymentStatus === "paid" && "bg-green-500/10 text-green-400",
+                paymentStatus === "partial" && "bg-amber-500/10 text-amber-400",
+                paymentStatus === "unpaid" && "bg-zinc-500/10 text-zinc-400",
               )}>
                 {paymentStatus === "paid" ? tPayment("paid") : paymentStatus === "partial" ? tPayment("partial") : tPayment("unpaid")}
                 {balance != null && ` \u2022 ${formatMoney(balance, feeCurrency || "USD", locale)}`}
