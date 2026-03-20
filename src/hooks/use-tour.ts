@@ -231,11 +231,11 @@ export function useTour(persona: Persona | null): TourState {
       const targetPhase = TOUR_PHASES[targetPhaseIndex];
       if (!targetPhase) return;
 
-      advancingRef.current = false; // reset guard
+      advancingRef.current = false;
       setPhaseIndex(targetPhaseIndex);
       setStepIndex(0);
 
-      // Persist directly to localStorage to avoid stale closure in persist()
+      // Persist directly to localStorage to avoid stale closure
       const progress: TourProgress = {
         status: "active",
         currentPhaseIndex: targetPhaseIndex,
@@ -254,11 +254,12 @@ export function useTour(persona: Persona | null): TourState {
           trackId: trackIdRef.current ?? undefined,
         });
         if (route) {
-          router.push(route);
+          // Use hard navigation to guarantee page change
+          window.location.href = route;
         }
       }
     },
-    [completedPhases, completedSteps, router],
+    [completedPhases, completedSteps],
   );
 
   // ── Set release/track IDs ──
