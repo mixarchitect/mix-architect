@@ -1,7 +1,45 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
-import { Gauge, Clock, Zap, MonitorSpeaker, BarChart3 } from "lucide-react";
+import { Gauge, Clock, Zap, MonitorSpeaker, BarChart3, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+/** Budget thresholds per metric mark name (ms). */
+const METRIC_BUDGETS: Record<string, number> = {
+  "wavesurfer:init": 150,
+  "waveform:render": 500,
+  "waveform:seek": 50,
+  "waveform:resize": 100,
+  "playback:start": 100,
+};
+
+type BudgetStatus = "good" | "warn" | "bad" | "none";
+
+/** Compare a value against its budget. */
+function budgetStatus(metric: string, value: number): BudgetStatus {
+  const budget = METRIC_BUDGETS[metric];
+  if (budget == null) return "none";
+  if (value <= budget) return "good";
+  if (value <= budget * 1.5) return "warn";
+  return "bad";
+}
+
+function statusColor(status: BudgetStatus): string {
+  switch (status) {
+    case "good": return "text-emerald-400";
+    case "warn": return "text-amber-400";
+    case "bad": return "text-red-400";
+    default: return "text-text";
+  }
+}
+
+function StatusDot({ status }: { status: BudgetStatus }) {
+  switch (status) {
+    case "good": return <CheckCircle2 size={14} className="text-emerald-400" aria-label="Within budget" />;
+    case "warn": return <AlertTriangle size={14} className="text-amber-400" aria-label="Near budget limit" />;
+    case "bad": return <XCircle size={14} className="text-red-400" aria-label="Over budget" />;
+    default: return <span className="w-3.5" aria-hidden="true" />;
+  }
+}
 
 interface MetricAgg {
   metric: string;
@@ -10,6 +48,8 @@ interface MetricAgg {
   p95: number;
   avg: number;
   max: number;
+  status: BudgetStatus;
+  budget: number | null;
 }
 
 interface FormatBreakdown {
@@ -86,13 +126,16 @@ export default async function PerformancePage() {
   const aggregated: MetricAgg[] = [];
   for (const [metric, durations] of byMetric) {
     const sorted = [...durations].sort((a, b) => a - b);
+    const p95 = percentile(sorted, 95);
     aggregated.push({
       metric,
       count: sorted.length,
       p50: percentile(sorted, 50),
-      p95: percentile(sorted, 95),
+      p95,
       avg: Math.round((sorted.reduce((s, v) => s + v, 0) / sorted.length) * 10) / 10,
       max: sorted[sorted.length - 1],
+      status: budgetStatus(metric, p95),
+      budget: METRIC_BUDGETS[metric] ?? null,
     });
   }
   aggregated.sort((a, b) => b.count - a.count);
@@ -190,7 +233,9 @@ export default async function PerformancePage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-xs text-faint uppercase tracking-wider">
-                    <th className="text-left px-4 py-2">Metric</th>
+                    <th className="text-left px-4 py-2 w-8"><span className="sr-only">Status</span></th>
+                    <th className="text-left px-0 py-2">Metric</th>
+                    <th className="text-right px-4 py-2">Budget</th>
                     <th className="text-right px-4 py-2">Samples</th>
                     <th className="text-right px-4 py-2">P50</th>
                     <th className="text-right px-4 py-2">P95</th>
@@ -201,30 +246,35 @@ export default async function PerformancePage() {
                 <tbody className="divide-y divide-border">
                   {aggregated.map((m) => {
                     const Icon = METRIC_ICONS[m.metric] ?? Gauge;
+                    const p50Color = statusColor(budgetStatus(m.metric, m.p50));
+                    const p95Color = statusColor(m.status);
+                    const maxColor = statusColor(budgetStatus(m.metric, m.max));
                     return (
                       <tr key={m.metric}>
-                        <td className="px-4 py-2.5 flex items-center gap-2">
+                        <td className="pl-4 pr-1 py-2.5">
+                          <StatusDot status={m.status} />
+                        </td>
+                        <td className="px-0 py-2.5 flex items-center gap-2">
                           <Icon size={14} className="text-teal-500 shrink-0" />
                           <span className="text-text">
                             {METRIC_LABELS[m.metric] ?? m.metric}
                           </span>
                         </td>
+                        <td className="text-right px-4 py-2.5 text-faint font-mono text-xs">
+                          {m.budget != null ? formatMs(m.budget) : "—"}
+                        </td>
                         <td className="text-right px-4 py-2.5 text-muted">{m.count}</td>
-                        <td className="text-right px-4 py-2.5 text-text font-mono">
+                        <td className={`text-right px-4 py-2.5 font-mono ${p50Color}`}>
                           {formatMs(m.p50)}
                         </td>
-                        <td className="text-right px-4 py-2.5 text-text font-mono">
-                          <span className={m.p95 > 500 ? "text-amber-400" : ""}>
-                            {formatMs(m.p95)}
-                          </span>
+                        <td className={`text-right px-4 py-2.5 font-mono font-semibold ${p95Color}`}>
+                          {formatMs(m.p95)}
                         </td>
                         <td className="text-right px-4 py-2.5 text-muted font-mono">
                           {formatMs(m.avg)}
                         </td>
-                        <td className="text-right px-4 py-2.5 text-muted font-mono">
-                          <span className={m.max > 1000 ? "text-red-400" : ""}>
-                            {formatMs(m.max)}
-                          </span>
+                        <td className={`text-right px-4 py-2.5 font-mono ${maxColor}`}>
+                          {formatMs(m.max)}
                         </td>
                       </tr>
                     );
