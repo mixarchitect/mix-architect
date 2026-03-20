@@ -83,12 +83,32 @@ export function useTour(persona: Persona | null): TourState {
     [isActive, phaseIndex, stepIndex, completedPhases, completedSteps, releaseId, trackId],
   );
 
-  // ── Initialize from localStorage or ?tour=true ──
+  // ── Helper: start a fresh tour ──
+  const startFreshTour = useCallback(() => {
+    setPhaseIndex(0);
+    setStepIndex(0);
+    setCompletedPhases([]);
+    setCompletedSteps([]);
+    setReleaseId(null);
+    setTrackId(null);
+    setIsActive(true);
+    const progress: TourProgress = {
+      status: "active",
+      currentPhaseIndex: 0,
+      currentStepIndex: 0,
+      completedPhases: [],
+      completedSteps: [],
+    };
+    writeTourProgress(progress);
+    syncTourProgressToDB(progress);
+  }, []);
+
+  // ── Initialize from localStorage on first mount ──
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
 
-    // Check URL param first
+    // Check URL param
     const params = new URLSearchParams(window.location.search);
     const tourParam = params.has("tour");
 
@@ -103,9 +123,15 @@ export function useTour(persona: Persona | null): TourState {
       );
     }
 
-    // Try restoring from localStorage
-    const saved = readTourProgress();
+    // ?tour=true always starts fresh (even if previous tour was completed)
+    if (tourParam) {
+      clearTourProgress();
+      startFreshTour();
+      return;
+    }
 
+    // Otherwise try restoring an in-progress tour from localStorage
+    const saved = readTourProgress();
     if (saved && saved.status === "active") {
       setPhaseIndex(saved.currentPhaseIndex);
       setStepIndex(saved.currentStepIndex);
@@ -114,24 +140,32 @@ export function useTour(persona: Persona | null): TourState {
       if (saved.releaseId) setReleaseId(saved.releaseId);
       if (saved.trackId) setTrackId(saved.trackId);
       setIsActive(true);
-    } else if (tourParam) {
-      // Fresh tour
-      setPhaseIndex(0);
-      setStepIndex(0);
-      setCompletedPhases([]);
-      setCompletedSteps([]);
-      setIsActive(true);
-      const progress: TourProgress = {
-        status: "active",
-        currentPhaseIndex: 0,
-        currentStepIndex: 0,
-        completedPhases: [],
-        completedSteps: [],
-      };
-      writeTourProgress(progress);
-      syncTourProgressToDB(progress);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── Watch for ?tour=true on subsequent navigations ──
+  // (TourProvider stays mounted at Shell level, so we need to detect
+  //  the param on client-side navigations after initial mount)
+  useEffect(() => {
+    if (!initRef.current) return; // wait for init first
+
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("tour")) return;
+
+    // Strip the param from URL
+    params.delete("tour");
+    const qs = params.toString();
+    window.history.replaceState(
+      null,
+      "",
+      `${window.location.pathname}${qs ? `?${qs}` : ""}`,
+    );
+
+    // Reset and start fresh
+    clearTourProgress();
+    startFreshTour();
+  }, [pathname, startFreshTour]);
 
   // ── Advance step ──
   const advanceStep = useCallback(() => {
