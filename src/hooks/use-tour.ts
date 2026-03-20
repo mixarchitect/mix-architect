@@ -205,8 +205,12 @@ export function useTour(persona: Persona | null): TourState {
           releaseId: releaseIdRef.current ?? undefined,
           trackId: trackIdRef.current ?? undefined,
         });
-        if (route && !currentPath.startsWith(route.split("?")[0])) {
-          router.push(route);
+        const routePath = route?.split("?")[0];
+        // Only skip navigation if we're exactly on the target page
+        // (not just because /app/releases/x starts with /app)
+        const alreadyThere = routePath && currentPath === routePath;
+        if (route && !alreadyThere) {
+          window.location.href = route;
         }
       }
     } else {
