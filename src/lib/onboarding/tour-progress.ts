@@ -8,10 +8,9 @@ const LS_KEY = "ma-tour";
 
 export type TourProgress = {
   status: "active" | "completed" | "skipped";
-  currentPhaseIndex: number;
-  currentStepIndex: number;
-  completedPhases: string[];
-  completedSteps: string[];
+  /** Topic IDs the user has fully viewed */
+  seenTopics: string[];
+  /** IDs captured during the tour for navigation */
   releaseId?: string;
   trackId?: string;
 };
@@ -52,7 +51,6 @@ export function clearTourProgress(): void {
 let syncTimer: ReturnType<typeof setTimeout> | null = null;
 
 export function syncTourProgressToDB(progress: TourProgress): void {
-  // Debounce — only sync 500ms after the last call
   if (syncTimer) clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
     const supabase = createSupabaseBrowserClient();
@@ -70,19 +68,12 @@ export function syncTourProgressToDB(progress: TourProgress): void {
 }
 
 /** Mark tour as completed/skipped in both localStorage and DB */
-export function finishTour(status: "completed" | "skipped"): void {
-  const current = readTourProgress();
-  const final: TourProgress = {
-    ...(current ?? {
-      currentPhaseIndex: 0,
-      currentStepIndex: 0,
-      completedPhases: [],
-      completedSteps: [],
-    }),
-    status,
-  };
+export function finishTour(
+  status: "completed" | "skipped",
+  seenTopics: string[] = [],
+): void {
+  const final: TourProgress = { status, seenTopics };
   writeTourProgress(final);
-  // Sync immediately (no debounce)
   if (syncTimer) clearTimeout(syncTimer);
   const supabase = createSupabaseBrowserClient();
   supabase.auth

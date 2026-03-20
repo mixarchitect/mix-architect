@@ -2,21 +2,17 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X } from "lucide-react";
-import { TOUR_PHASES } from "@/lib/onboarding/tour-config";
-import type { Position, AdvanceOn } from "@/lib/onboarding/tour-config";
+import type { Position } from "@/lib/onboarding/tour-config";
 
 type Props = {
   targetSelector: string;
   title: string;
   description: string;
   position: Position;
-  advanceOn: AdvanceOn;
-  phaseLabel: string;
+  topicLabel: string;
   stepNumber: number;
-  totalStepsInPhase: number;
-  phaseIndex: number;
-  completedPhases: string[];
-  isLast: boolean;
+  totalStepsInTopic: number;
+  isLastStep: boolean;
   onNext: () => void;
   onSkip: () => void;
 };
@@ -26,13 +22,10 @@ export function TourTooltip({
   title,
   description,
   position,
-  advanceOn,
-  phaseLabel,
+  topicLabel,
   stepNumber,
-  totalStepsInPhase,
-  phaseIndex,
-  completedPhases,
-  isLast,
+  totalStepsInTopic,
+  isLastStep,
   onNext,
   onSkip,
 }: Props) {
@@ -46,22 +39,10 @@ export function TourTooltip({
   const updatePosition = useCallback(() => {
     const target = document.querySelector(targetSelector);
     const tooltip = tooltipRef.current;
-
-    // For tour-complete step, center in viewport
-    if (!target || targetSelector.includes("tour-complete")) {
-      if (tooltip) {
-        const tw = tooltip.getBoundingClientRect().width;
-        const th = tooltip.getBoundingClientRect().height;
-        setCoords({
-          top: window.innerHeight / 2 - th / 2,
-          left: window.innerWidth / 2 - tw / 2,
-        });
-        setOpacity(1);
-      }
+    if (!target || !tooltip) {
+      setOpacity(0);
       return;
     }
-
-    if (!tooltip) return;
 
     const rect = target.getBoundingClientRect();
     const tw = tooltip.getBoundingClientRect().width;
@@ -71,7 +52,6 @@ export function TourTooltip({
     let top = 0;
     let left = 0;
 
-    // On mobile, always position below
     const isMobile = window.innerWidth < 768;
     const pos = isMobile ? "bottom" : position;
 
@@ -94,7 +74,6 @@ export function TourTooltip({
         break;
     }
 
-    // Keep within viewport
     left = Math.max(12, Math.min(left, window.innerWidth - tw - 12));
     top = Math.max(12, Math.min(top, window.innerHeight - th - 12));
 
@@ -102,7 +81,6 @@ export function TourTooltip({
     setOpacity(1);
   }, [targetSelector, position]);
 
-  // Position on mount + track
   useEffect(() => {
     setOpacity(0);
 
@@ -111,14 +89,11 @@ export function TourTooltip({
 
     function tryPosition() {
       const target = document.querySelector(targetSelector);
-      if (target || targetSelector.includes("tour-complete")) {
+      if (target) {
         updatePosition();
       } else if (retries < 20) {
         retries++;
         retryTimer = setTimeout(tryPosition, 150);
-      } else {
-        // Target gone — hide tooltip gracefully
-        setOpacity(0);
       }
     }
 
@@ -127,14 +102,11 @@ export function TourTooltip({
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition, true);
 
-    // Periodic check — hide tooltip if target disappears (tab switch)
+    // Hide if target disappears (e.g. tab switch)
     const visCheck = setInterval(() => {
       const target = document.querySelector(targetSelector);
-      if (!target && !targetSelector.includes("tour-complete")) {
-        setOpacity(0);
-      } else if (target) {
-        updatePosition();
-      }
+      if (!target) setOpacity(0);
+      else updatePosition();
     }, 500);
 
     return () => {
@@ -145,9 +117,6 @@ export function TourTooltip({
       window.removeEventListener("scroll", updatePosition, true);
     };
   }, [targetSelector, updatePosition]);
-
-  const nextLabel =
-    isLast ? "Finish" : advanceOn === "input" ? "or Next" : "Next";
 
   return (
     <div
@@ -167,7 +136,7 @@ export function TourTooltip({
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-3 pb-2">
         <span className="text-[11px] font-medium uppercase tracking-wider text-signal">
-          {phaseLabel}
+          {topicLabel}
         </span>
         <button
           type="button"
@@ -191,7 +160,7 @@ export function TourTooltip({
         style={{ borderColor: "var(--border)" }}
       >
         <span className="text-[11px] text-faint">
-          Step {stepNumber} of {totalStepsInPhase}
+          {stepNumber} of {totalStepsInTopic}
         </span>
 
         <div className="flex items-center gap-2">
@@ -208,30 +177,9 @@ export function TourTooltip({
             className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
             style={{ background: "var(--signal)", color: "var(--signal-on)" }}
           >
-            {nextLabel}
+            {isLastStep ? "Done" : "Next"}
           </button>
         </div>
-      </div>
-
-      {/* Phase dots */}
-      <div className="flex items-center justify-center gap-1.5 py-2">
-        {TOUR_PHASES.map((p, i) => (
-          <div
-            key={p.id}
-            className="rounded-full transition-all duration-200"
-            style={{
-              width: i === phaseIndex ? 16 : 6,
-              height: 6,
-              background:
-                i === phaseIndex
-                  ? "var(--signal)"
-                  : completedPhases.includes(p.id)
-                    ? "var(--signal)"
-                    : "var(--border)",
-              opacity: i === phaseIndex ? 1 : completedPhases.includes(p.id) ? 0.5 : 0.3,
-            }}
-          />
-        ))}
       </div>
     </div>
   );

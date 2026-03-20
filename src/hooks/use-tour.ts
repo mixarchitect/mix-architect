@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
-  TOUR_PHASES,
+  TOUR_TOPICS,
   TOTAL_TOUR_STEPS,
+  type TourTopic,
   type TourStep,
-  type Phase,
-  type Persona,
 } from "@/lib/onboarding/tour-config";
 import {
   readTourProgress,
@@ -20,105 +19,54 @@ import {
 
 export type TourState = {
   isActive: boolean;
-  currentPhase: Phase | null;
-  currentStep: TourStep | null;
-  phaseIndex: number;
+  /** The topic currently being shown (if any matches this page & unseen) */
+  activeTopic: TourTopic | null;
+  /** Current step within the active topic */
+  activeStep: TourStep | null;
+  /** 0-based index of step within the active topic */
   stepIndex: number;
-  /** 1-based step number within current phase */
-  stepNumber: number;
-  totalStepsInPhase: number;
-  /** 1-based overall step number across all phases */
-  overallStepNumber: number;
+  /** Total steps in the active topic */
+  totalStepsInTopic: number;
+  /** Which topic IDs have been fully seen */
+  seenTopics: string[];
+  /** All topic definitions */
+  allTopics: TourTopic[];
+  /** Total steps across all topics */
   totalSteps: number;
-  completedPhases: string[];
-  isLastStep: boolean;
-  isLastPhase: boolean;
-  /** IDs stored during tour for cross-page nav */
+  /** IDs for cross-page navigation */
   releaseId: string | null;
   trackId: string | null;
   /* Actions */
-  advanceStep: () => void;
-  skipTour: () => void;
-  goToPhase: (phaseIndex: number) => void;
-  setReleaseId: (id: string) => void;
-  setTrackId: (id: string) => void;
+  nextStep: () => void;
+  dismissTour: () => void;
+  goToTopic: (topicId: string) => void;
 };
 
-/* ── dedupe helper ── */
-function unique(arr: string[]): string[] {
-  return [...new Set(arr)];
-}
-
-export function useTour(persona: Persona | null): TourState {
-  const router = useRouter();
+export function useTour(): TourState {
   const pathname = usePathname();
   const initRef = useRef(false);
 
   const [isActive, setIsActive] = useState(false);
-  const [phaseIndex, setPhaseIndex] = useState(0);
+  const [seenTopics, setSeenTopics] = useState<string[]>([]);
   const [stepIndex, setStepIndex] = useState(0);
-  const [completedPhases, setCompletedPhases] = useState<string[]>([]);
-  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [releaseId, setReleaseId] = useState<string | null>(null);
   const [trackId, setTrackId] = useState<string | null>(null);
+  // Track which topic is currently being shown (by ID)
+  const [showingTopicId, setShowingTopicId] = useState<string | null>(null);
 
-  // Guard against advanceStep being called twice for the same step
-  const advancingRef = useRef(false);
-
-  // Keep IDs in refs so advanceStep always has current values
-  const releaseIdRef = useRef(releaseId);
-  const trackIdRef = useRef(trackId);
-  useEffect(() => { releaseIdRef.current = releaseId; }, [releaseId]);
-  useEffect(() => { trackIdRef.current = trackId; }, [trackId]);
-
-  // Persist helper
-  const persist = useCallback(
-    (updates: Partial<{
-      active: boolean;
-      pi: number;
-      si: number;
-      cp: string[];
-      cs: string[];
-      rid: string | null;
-      tid: string | null;
-    }>) => {
-      const progress: TourProgress = {
-        status: updates.active ?? isActive ? "active" : "completed",
-        currentPhaseIndex: updates.pi ?? phaseIndex,
-        currentStepIndex: updates.si ?? stepIndex,
-        completedPhases: updates.cp ?? completedPhases,
-        completedSteps: updates.cs ?? completedSteps,
-        releaseId: updates.rid !== undefined ? (updates.rid ?? undefined) : (releaseId ?? undefined),
-        trackId: updates.tid !== undefined ? (updates.tid ?? undefined) : (trackId ?? undefined),
-      };
-      writeTourProgress(progress);
-      syncTourProgressToDB(progress);
-    },
-    [isActive, phaseIndex, stepIndex, completedPhases, completedSteps, releaseId, trackId],
-  );
-
-  // ── Helper: start a fresh tour ──
-  const startFreshTour = useCallback(() => {
-    advancingRef.current = false;
-    setPhaseIndex(0);
-    setStepIndex(0);
-    setCompletedPhases([]);
-    setCompletedSteps([]);
-    setReleaseId(null);
-    setTrackId(null);
-    setIsActive(true);
+  /* ── persist helper ── */
+  const persist = useCallback((seen: string[], rid?: string | null, tid?: string | null) => {
     const progress: TourProgress = {
       status: "active",
-      currentPhaseIndex: 0,
-      currentStepIndex: 0,
-      completedPhases: [],
-      completedSteps: [],
+      seenTopics: seen,
+      releaseId: rid ?? releaseId ?? undefined,
+      trackId: tid ?? trackId ?? undefined,
     };
     writeTourProgress(progress);
     syncTourProgressToDB(progress);
-  }, []);
+  }, [releaseId, trackId]);
 
-  // ── Initialize from localStorage on first mount ──
+  /* ── Initialize ── */
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
@@ -134,16 +82,19 @@ export function useTour(persona: Persona | null): TourState {
 
     if (tourParam) {
       clearTourProgress();
-      startFreshTour();
+      setSeenTopics([]);
+      setStepIndex(0);
+      setShowingTopicId(null);
+      setIsActive(true);
+      const progress: TourProgress = { status: "active", seenTopics: [] };
+      writeTourProgress(progress);
+      syncTourProgressToDB(progress);
       return;
     }
 
     const saved = readTourProgress();
     if (saved && saved.status === "active") {
-      setPhaseIndex(saved.currentPhaseIndex);
-      setStepIndex(saved.currentStepIndex);
-      setCompletedPhases(unique(saved.completedPhases));
-      setCompletedSteps(unique(saved.completedSteps));
+      setSeenTopics(saved.seenTopics ?? []);
       if (saved.releaseId) setReleaseId(saved.releaseId);
       if (saved.trackId) setTrackId(saved.trackId);
       setIsActive(true);
@@ -151,292 +102,135 @@ export function useTour(persona: Persona | null): TourState {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Watch for ?tour=true on subsequent navigations ──
+  /* ── Watch for ?tour=true on subsequent navigations ── */
   useEffect(() => {
     if (!initRef.current) return;
-
     const params = new URLSearchParams(window.location.search);
     if (!params.has("tour")) return;
-
     params.delete("tour");
     const qs = params.toString();
     window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
-
     clearTourProgress();
-    startFreshTour();
-  }, [pathname, startFreshTour]);
+    setSeenTopics([]);
+    setStepIndex(0);
+    setShowingTopicId(null);
+    setIsActive(true);
+    const progress: TourProgress = { status: "active", seenTopics: [] };
+    writeTourProgress(progress);
+    syncTourProgressToDB(progress);
+  }, [pathname]);
 
-  // ── Advance step (with double-call guard) ──
-  const advanceStep = useCallback(() => {
-    if (advancingRef.current) return;
-    advancingRef.current = true;
-    // Release guard after React processes the state batch
-    setTimeout(() => { advancingRef.current = false; }, 100);
-
-    const phase = TOUR_PHASES[phaseIndex];
-    if (!phase) return;
-
-    const currentStepId = phase.steps[stepIndex]?.id;
-    const newCompleted = currentStepId
-      ? unique([...completedSteps, currentStepId])
-      : completedSteps;
-
-    if (stepIndex < phase.steps.length - 1) {
-      // Next step in same phase
-      const nextSI = stepIndex + 1;
-      setStepIndex(nextSI);
-      setCompletedSteps(newCompleted);
-      persist({ si: nextSI, cs: newCompleted });
-    } else if (phaseIndex < TOUR_PHASES.length - 1) {
-      // Move to next phase
-      const newCompletedPhases = unique([...completedPhases, phase.id]);
-      const nextPI = phaseIndex + 1;
-      setPhaseIndex(nextPI);
-      setStepIndex(0);
-      setCompletedPhases(newCompletedPhases);
-      setCompletedSteps(newCompleted);
-      persist({ pi: nextPI, si: 0, cp: newCompletedPhases, cs: newCompleted });
-
-      // Navigate to next phase's route — use refs for current IDs
-      const nextPhase = TOUR_PHASES[nextPI];
-      if (nextPhase?.getRoute) {
-        const currentPath = window.location.pathname;
-        const route = nextPhase.getRoute({
-          releaseId: releaseIdRef.current ?? undefined,
-          trackId: trackIdRef.current ?? undefined,
-        });
-        const routePath = route?.split("?")[0];
-        // Only skip navigation if we're exactly on the target page
-        // (not just because /app/releases/x starts with /app)
-        const alreadyThere = routePath && currentPath === routePath;
-        if (route && !alreadyThere) {
-          window.location.href = route;
-        }
-      }
-    } else {
-      // Tour complete
-      const newCompletedPhases = unique([...completedPhases, phase.id]);
-      setCompletedPhases(newCompletedPhases);
-      setCompletedSteps(newCompleted);
-      setIsActive(false);
-      finishTour("completed");
-    }
-  }, [phaseIndex, stepIndex, completedPhases, completedSteps, persist, router]);
-
-  // ── Skip tour ──
-  const skipTour = useCallback(() => {
-    setIsActive(false);
-    finishTour("skipped");
-  }, []);
-
-  // ── Go to a specific phase (clicked from checklist) ──
-  const goToPhase = useCallback(
-    (targetPhaseIndex: number) => {
-      const targetPhase = TOUR_PHASES[targetPhaseIndex];
-      if (!targetPhase) return;
-
-      advancingRef.current = false;
-      setPhaseIndex(targetPhaseIndex);
-      setStepIndex(0);
-
-      // Persist directly to localStorage to avoid stale closure
-      const progress: TourProgress = {
-        status: "active",
-        currentPhaseIndex: targetPhaseIndex,
-        currentStepIndex: 0,
-        completedPhases: completedPhases,
-        completedSteps: completedSteps,
-        releaseId: releaseIdRef.current ?? undefined,
-        trackId: trackIdRef.current ?? undefined,
-      };
-      writeTourProgress(progress);
-      syncTourProgressToDB(progress);
-
-      if (targetPhase.getRoute) {
-        const route = targetPhase.getRoute({
-          releaseId: releaseIdRef.current ?? undefined,
-          trackId: trackIdRef.current ?? undefined,
-        });
-        if (route) {
-          // Use hard navigation to guarantee page change
-          window.location.href = route;
-        }
-      }
-    },
-    [completedPhases, completedSteps],
-  );
-
-  // ── Set release/track IDs ──
-  const handleSetReleaseId = useCallback(
-    (id: string) => {
-      setReleaseId(id);
-      persist({ rid: id });
-    },
-    [persist],
-  );
-
-  const handleSetTrackId = useCallback(
-    (id: string) => {
-      setTrackId(id);
-      persist({ tid: id });
-    },
-    [persist],
-  );
-
-  // ── Auto-advance on navigation (for "navigate" steps) ──
-  const prevPathRef = useRef(pathname);
+  /* ── Extract IDs from URL ── */
   useEffect(() => {
     if (!isActive) return;
-    if (pathname === prevPathRef.current) return;
-    prevPathRef.current = pathname;
-
-    const phase = TOUR_PHASES[phaseIndex];
-    const step = phase?.steps[stepIndex];
-    if (!step || step.advanceOn !== "navigate") return;
-
-    // Extract IDs from the new pathname before advancing
-    const releaseMatch = pathname.match(/\/app\/releases\/([a-f0-9-]+)/);
-    const trackMatch = pathname.match(/\/tracks\/([a-f0-9-]+)/);
-    if (releaseMatch) releaseIdRef.current = releaseMatch[1];
-    if (trackMatch) trackIdRef.current = trackMatch[1];
+    const releaseMatch = pathname.match(/\/app\/releases\/([a-f0-9-]{36})/);
     if (releaseMatch && releaseMatch[1] !== releaseId) {
       setReleaseId(releaseMatch[1]);
+      persist(seenTopics, releaseMatch[1], trackId);
     }
+    const trackMatch = pathname.match(/\/tracks\/([a-f0-9-]{36})/);
     if (trackMatch && trackMatch[1] !== trackId) {
       setTrackId(trackMatch[1]);
+      persist(seenTopics, releaseId, trackMatch[1]);
     }
+  }, [pathname, isActive, releaseId, trackId, seenTopics, persist]);
 
-    const timer = setTimeout(() => {
-      advanceStep();
-    }, 600);
-    return () => clearTimeout(timer);
-  }, [pathname, isActive, phaseIndex, stepIndex, advanceStep, releaseId, trackId]);
-
-  // ── Auto-advance on input/click ──
+  /* ── Determine which topic matches this page (first unseen one) ── */
   useEffect(() => {
     if (!isActive) return;
 
-    const phase = TOUR_PHASES[phaseIndex];
-    const step = phase?.steps[stepIndex];
-    if (!step) return;
+    const matchingUnseen = TOUR_TOPICS.find(
+      (t) => t.matchPage(pathname) && !seenTopics.includes(t.id),
+    );
 
-    if (step.advanceOn === "input") {
-      const threshold = step.advanceThreshold ?? 2;
-      let debounce: ReturnType<typeof setTimeout>;
-      let retries = 0;
-      let retryTimer: ReturnType<typeof setTimeout>;
-
-      function attach() {
-        const target = document.querySelector(step!.targetSelector);
-        if (!target) {
-          if (retries++ < 30) {
-            retryTimer = setTimeout(attach, 100);
-          }
-          return;
-        }
-        const input = target.querySelector("input, textarea") as HTMLInputElement | HTMLTextAreaElement | null;
-        if (!input) return;
-
-        const handler = () => {
-          clearTimeout(debounce);
-          if (input.value.length >= threshold) {
-            debounce = setTimeout(() => advanceStep(), 600);
-          }
-        };
-        input.addEventListener("input", handler);
-
-        (window as unknown as Record<string, () => void>).__tourCleanup = () => {
-          input.removeEventListener("input", handler);
-          clearTimeout(debounce);
-          clearTimeout(retryTimer);
-        };
+    if (matchingUnseen) {
+      // Only reset step if it's a different topic
+      if (showingTopicId !== matchingUnseen.id) {
+        setShowingTopicId(matchingUnseen.id);
+        setStepIndex(0);
       }
-
-      attach();
-      return () => {
-        const cleanup = (window as unknown as Record<string, () => void>).__tourCleanup;
-        if (cleanup) cleanup();
-        clearTimeout(retryTimer);
-      };
+    } else {
+      // No matching unseen topic on this page — hide tooltips
+      setShowingTopicId(null);
+      setStepIndex(0);
     }
+  }, [pathname, isActive, seenTopics, showingTopicId]);
 
-    if (step.advanceOn === "click") {
-      let retries = 0;
-      let retryTimer: ReturnType<typeof setTimeout>;
+  /* ── Derived ── */
+  const activeTopic = showingTopicId
+    ? TOUR_TOPICS.find((t) => t.id === showingTopicId) ?? null
+    : null;
+  const activeStep = activeTopic?.steps[stepIndex] ?? null;
 
-      function attach() {
-        const target = document.querySelector(step!.targetSelector);
-        if (!target) {
-          if (retries++ < 30) {
-            retryTimer = setTimeout(attach, 100);
-          }
-          return;
-        }
+  /* ── Next step / complete topic ── */
+  const nextStep = useCallback(() => {
+    if (!activeTopic) return;
 
-        const handler = () => {
-          setTimeout(() => advanceStep(), 300);
-        };
-        target.addEventListener("click", handler, { once: true });
+    if (stepIndex < activeTopic.steps.length - 1) {
+      setStepIndex(stepIndex + 1);
+    } else {
+      // Topic complete — mark as seen
+      const newSeen = [...new Set([...seenTopics, activeTopic.id])];
+      setSeenTopics(newSeen);
+      setShowingTopicId(null);
+      setStepIndex(0);
+      persist(newSeen);
 
-        (window as unknown as Record<string, () => void>).__tourCleanup = () => {
-          target.removeEventListener("click", handler);
-          clearTimeout(retryTimer);
-        };
+      // Check if ALL topics are now seen
+      if (newSeen.length >= TOUR_TOPICS.length) {
+        // Don't end yet — show completion on next render via activeTopic check
+        setIsActive(false);
+        finishTour("completed", newSeen);
       }
-
-      attach();
-      return () => {
-        const cleanup = (window as unknown as Record<string, () => void>).__tourCleanup;
-        if (cleanup) cleanup();
-        clearTimeout(retryTimer);
-      };
     }
-  }, [isActive, phaseIndex, stepIndex, advanceStep]);
+  }, [activeTopic, stepIndex, seenTopics, persist]);
 
-  // ── Detect releaseId / trackId from URL for cross-page nav ──
-  useEffect(() => {
-    if (!isActive) return;
-    const releaseMatch = pathname.match(/\/app\/releases\/([a-f0-9-]+)/);
-    if (releaseMatch && releaseMatch[1] !== releaseId) {
-      handleSetReleaseId(releaseMatch[1]);
-    }
-    const trackMatch = pathname.match(/\/tracks\/([a-f0-9-]+)/);
-    if (trackMatch && trackMatch[1] !== trackId) {
-      handleSetTrackId(trackMatch[1]);
-    }
-  }, [pathname, isActive, releaseId, trackId, handleSetReleaseId, handleSetTrackId]);
+  /* ── Dismiss tour permanently ── */
+  const dismissTour = useCallback(() => {
+    setIsActive(false);
+    setShowingTopicId(null);
+    finishTour("skipped", seenTopics);
+  }, [seenTopics]);
 
-  // ── Derived values ──
-  const currentPhase = TOUR_PHASES[phaseIndex] ?? null;
-  const currentStep = currentPhase?.steps[stepIndex] ?? null;
+  /* ── Go to a specific topic (from checklist click) ── */
+  const goToTopic = useCallback(
+    (topicId: string) => {
+      const topic = TOUR_TOPICS.find((t) => t.id === topicId);
+      if (!topic) return;
 
-  let overallStepNumber = 1;
-  for (let i = 0; i < phaseIndex; i++) {
-    overallStepNumber += TOUR_PHASES[i].steps.length;
-  }
-  overallStepNumber += stepIndex;
+      // If already seen, un-mark it so the tooltips show again
+      const newSeen = seenTopics.filter((id) => id !== topicId);
+      setSeenTopics(newSeen);
+      setShowingTopicId(null);
+      setStepIndex(0);
+      persist(newSeen);
+
+      const route = topic.getRoute({
+        releaseId: releaseId ?? undefined,
+        trackId: trackId ?? undefined,
+      });
+
+      if (route) {
+        // Hard navigation to guarantee page change + fresh render
+        window.location.href = route;
+      }
+    },
+    [seenTopics, releaseId, trackId, persist],
+  );
 
   return {
     isActive,
-    currentPhase,
-    currentStep,
-    phaseIndex,
+    activeTopic,
+    activeStep,
     stepIndex,
-    stepNumber: stepIndex + 1,
-    totalStepsInPhase: currentPhase?.steps.length ?? 0,
-    overallStepNumber,
+    totalStepsInTopic: activeTopic?.steps.length ?? 0,
+    seenTopics,
+    allTopics: TOUR_TOPICS,
     totalSteps: TOTAL_TOUR_STEPS,
-    completedPhases,
-    isLastStep:
-      phaseIndex === TOUR_PHASES.length - 1 &&
-      stepIndex === (TOUR_PHASES[TOUR_PHASES.length - 1]?.steps.length ?? 1) - 1,
-    isLastPhase: phaseIndex === TOUR_PHASES.length - 1,
     releaseId,
     trackId,
-    advanceStep,
-    skipTour,
-    goToPhase,
-    setReleaseId: handleSetReleaseId,
-    setTrackId: handleSetTrackId,
+    nextStep,
+    dismissTour,
+    goToTopic,
   };
 }
