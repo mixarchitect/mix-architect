@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/lib/theme-provider";
 import "./globals.css";
 import { PerfOverlayLoader } from "@/components/dev/perf-overlay-loader";
+import { PerfReporterInit } from "@/components/perf-reporter-init";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,6 +53,7 @@ export default function RootLayout({
             </a>
           </nav>
           {children}
+          <PerfReporterInit />
           <PerfOverlayLoader />
         </ThemeProvider>
       </body>

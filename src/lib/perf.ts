@@ -63,10 +63,10 @@ class PerfProfiler {
   private audioInfoListeners: Array<(info: AudioFileInfo | null) => void> = [];
 
   constructor() {
-    this._enabled =
-      typeof window !== "undefined" &&
-      (process.env.NODE_ENV === "development" ||
-        new URLSearchParams(window.location.search).has("perf"));
+    // Always enabled on the client — metrics are collected in production
+    // for the admin performance dashboard. The dev overlay additionally
+    // requires ?perf in the URL.
+    this._enabled = typeof window !== "undefined";
 
     // Expose report helpers on window for external access (smoke tests, devtools)
     if (this._enabled && typeof window !== "undefined") {

@@ -20,7 +20,6 @@ import { FPSMonitor, type FPSReport } from "@/lib/fps-monitor";
 type BenchState = "idle" | "running" | "done" | "error";
 
 export default function PerfPage() {
-  // Gate to dev only
   if (process.env.NODE_ENV !== "development") {
     return (
       <div className="flex items-center justify-center h-full">
@@ -30,7 +29,6 @@ export default function PerfPage() {
       </div>
     );
   }
-
   return <PerfPageContent />;
 }
 

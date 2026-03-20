@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import WaveSurfer from "wavesurfer.js";
 import { perf } from "@/lib/perf";
+import { perfReporter } from "@/lib/perf-reporter";
 import {
   getWaveColors,
   formatTime,
@@ -377,6 +378,16 @@ export function AudioPlayer({
         channels: activeVersion.channels,
         format: activeVersion.file_format,
         fileName: activeVersion.file_name,
+      });
+      perfReporter.setAudioContext({
+        trackId: activeVersion.track_id,
+        versionId: activeVersion.id,
+        fileFormat: activeVersion.file_format,
+        fileSizeMb: activeVersion.file_size ? activeVersion.file_size / (1024 * 1024) : null,
+        durationSec: activeVersion.duration_seconds,
+        sampleRate: activeVersion.sample_rate,
+        bitDepth: activeVersion.bit_depth,
+        channels: activeVersion.channels,
       });
       perf.start("wavesurfer:init", { trackId: activeVersion.id });
       ws = WaveSurfer.create({

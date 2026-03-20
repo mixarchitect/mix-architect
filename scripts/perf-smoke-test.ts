@@ -16,10 +16,7 @@ if (typeof g.performance === "undefined") {
     now: () => Date.now(),
   };
 }
-// Fake process.env for dev check
-if (!process.env.NODE_ENV) {
-  (process.env as Record<string, string>).NODE_ENV = "development";
-}
+// NODE_ENV is set by the runtime (tsx/node); no override needed.
 
 // --- Imports (after globals are set up) ---
 

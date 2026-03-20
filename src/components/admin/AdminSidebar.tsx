@@ -18,6 +18,7 @@ import {
   X,
   Megaphone,
   Lightbulb,
+  Gauge,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -33,6 +34,7 @@ const adminNavItems = [
   { label: "Featured Releases", href: "/admin/featured", icon: Star },
   { label: "Feature Requests", href: "/admin/feature-requests", icon: Lightbulb },
   { label: "Changelog", href: "/admin/changelog", icon: Megaphone },
+  { label: "Performance", href: "/admin/performance", icon: Gauge },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
