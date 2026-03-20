@@ -28,6 +28,7 @@ import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
 import { formatLabel } from "@/lib/format-labels";
 import { getLocale } from "next-intl/server";
+import { resolveVisibility } from "@/lib/features/feature-registry";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
@@ -95,15 +96,17 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   ]);
   const paymentsEnabled = defaultsRes2.data?.payments_enabled ?? false;
   const defaultHourlyRate = defaultsRes2.data?.default_hourly_rate ?? null;
+  const features = resolveVisibility(defaultsRes2.data?.feature_visibility ?? null);
 
   // Resolve current tab from search params
   const rawTab = typeof sp.tab === "string" ? sp.tab : "";
   const isValidTab = VALID_TABS.includes(rawTab as TabId);
-  // If financials tab requested but payments disabled, fall back to tracks
-  const currentTab: TabId =
-    isValidTab && (rawTab !== "financials" || paymentsEnabled)
-      ? (rawTab as TabId)
-      : "tracks";
+  // Fall back to tracks if the requested tab is hidden
+  const tabAvailable =
+    isValidTab &&
+    (rawTab !== "financials" || (paymentsEnabled && features.payment_tracking)) &&
+    (rawTab !== "distribution" || features.distribution_checklist);
+  const currentTab: TabId = tabAvailable ? (rawTab as TabId) : "tracks";
 
   // Fetch client notes if client email is present
   let clientNotes = "";
@@ -178,12 +181,14 @@ export default async function ReleasePage({ params, searchParams }: Props) {
     }
   }
 
-  // Build tab list
+  // Build tab list — conditionally include based on feature visibility
   const tabs = [
     { id: "tracks" as const, label: "Tracks", count: tracks?.length ?? 0 },
     { id: "globals" as const, label: "Globals" },
-    { id: "distribution" as const, label: "Distribution" },
-    ...(paymentsEnabled
+    ...(features.distribution_checklist
+      ? [{ id: "distribution" as const, label: "Distribution" }]
+      : []),
+    ...(paymentsEnabled && features.payment_tracking
       ? [{ id: "financials" as const, label: "Financials" }]
       : []),
   ];
@@ -209,7 +214,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           />
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
-          {canEdit(role) && (
+          {canEdit(role) && features.client_portal && (
             <PortalToggle
               releaseId={releaseId}
               initialShare={briefShareRes.data ? {
@@ -328,17 +333,19 @@ export default async function ReleasePage({ params, searchParams }: Props) {
               />
             </div>
 
-            {/* Distribution tab */}
-            <DistributionPanel
-              releaseId={releaseId}
-              initialEntries={distributionRes.data ?? []}
-              releaseTitle={release.title}
-              releaseArtist={release.artist ?? ""}
-              canEdit={canEdit(role)}
-            />
+            {/* Distribution tab (only rendered when distribution_checklist visible, matching tabs array) */}
+            {features.distribution_checklist && (
+              <DistributionPanel
+                releaseId={releaseId}
+                initialEntries={distributionRes.data ?? []}
+                releaseTitle={release.title}
+                releaseArtist={release.artist ?? ""}
+                canEdit={canEdit(role)}
+              />
+            )}
 
-            {/* Financials tab (only rendered when paymentsEnabled, matching tabs array) */}
-            {paymentsEnabled && (
+            {/* Financials tab (only rendered when paymentsEnabled + feature visible, matching tabs array) */}
+            {paymentsEnabled && features.payment_tracking && (
               <div className="space-y-6">
                 {/* Financial Summary with inline editing */}
                 <FinancialSummary
@@ -480,8 +487,8 @@ export default async function ReleasePage({ params, searchParams }: Props) {
       </div>
       </ReleaseFlowContent>
 
-      {/* Floating Timer — desktop only, renders at fixed position when payments enabled */}
-      {paymentsEnabled && (
+      {/* Floating Timer — desktop only, renders when time tracking is enabled */}
+      {paymentsEnabled && features.time_tracking && (
         <div className="hidden md:block">
           <ReleaseTimer
             releaseId={releaseId}

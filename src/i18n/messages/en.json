@@ -75,10 +75,13 @@
       "title": "How will you use Mix Architect?",
       "artist": "Artist",
       "artistDesc": "I'm releasing my own music",
+      "artistFeatures": "Release planning, audio review, distribution tracking, and more",
       "engineer": "Engineer / Producer",
       "engineerDesc": "I work on other people's projects",
+      "engineerFeatures": "Everything included: payments, client portal, invoicing, plus all release tools",
       "both": "Both",
       "bothDesc": "I release my own music and work on client projects",
+      "bothFeatures": "Full suite: client tools, payments, release planning, and distribution",
       "other": "Something else? Start with full access",
       "note": "This helps us tailor your experience. You can change this anytime in Settings."
     },
@@ -352,6 +355,12 @@
       "bothLabel": "Both, I release my own music and work on client work",
       "otherLabel": "Other, full access, no preset",
       "note": "This controls which features are shown by default. Switching doesn't delete any data."
+    },
+    "featureVisibility": {
+      "title": "Feature Visibility",
+      "description": "Control which features appear in your sidebar and release pages. Hidden features aren't deleted — you can re-enable them anytime.",
+      "clientBusiness": "Client & Business",
+      "releaseAudio": "Release & Audio"
     },
     "paymentTracking": {
       "title": "Payment Tracking",

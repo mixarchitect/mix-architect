@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { localeCurrencyMap, type Locale } from "@/i18n/config";
+import { getDefaultVisibility } from "@/lib/features/feature-registry";
 import { PersonaStep } from "./steps/persona-step";
 import { LocaleStep } from "./steps/locale-step";
 import { ConfirmationStep } from "./steps/confirmation-step";
@@ -43,8 +44,9 @@ export function OnboardingFlow({ userId }: Props) {
       setSaving(true);
       const supabase = createSupabaseBrowserClient();
 
-      // Determine payments_enabled based on persona
+      // Determine payments_enabled and feature visibility based on persona
       const paymentsEnabled = persona !== "artist";
+      const featureVisibility = getDefaultVisibility(persona);
 
       const { error } = await supabase
         .from("user_defaults")
@@ -53,6 +55,7 @@ export function OnboardingFlow({ userId }: Props) {
           locale,
           default_currency: defaultCurrency,
           payments_enabled: paymentsEnabled,
+          feature_visibility: featureVisibility,
           onboarding_completed: true,
         })
         .eq("user_id", userId);
@@ -65,6 +68,7 @@ export function OnboardingFlow({ userId }: Props) {
           locale,
           default_currency: defaultCurrency,
           payments_enabled: paymentsEnabled,
+          feature_visibility: featureVisibility,
           onboarding_completed: true,
         });
       }
@@ -72,7 +76,7 @@ export function OnboardingFlow({ userId }: Props) {
       // Set the locale cookie for next-intl
       document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;
 
-      router.push(destination === "release" ? "/app/releases/new" : "/app");
+      router.push(destination === "release" ? "/app/releases/new?tour=true" : "/app");
       router.refresh();
     },
     [persona, locale, defaultCurrency, userId, router],

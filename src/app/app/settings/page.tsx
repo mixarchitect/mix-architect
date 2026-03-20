@@ -13,6 +13,13 @@ import { TagInput } from "@/components/ui/tag-input";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { useSubscription } from "@/lib/subscription-context";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
+import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
+import {
+  FEATURE_GROUPS,
+  FEATURE_LABELS,
+  FEATURE_KEYS,
+  type FeatureKey,
+} from "@/lib/features/feature-registry";
 import {
   locales,
   localeDisplayNames,
@@ -31,6 +38,7 @@ export default function SettingsPage() {
   const tTheme = useTranslations("theme");
   const tFormat = useTranslations("formatLabels");
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
+  const { visibility, updateFeatureVisibility, setPersonaDefaults } = useFeatureVisibility();
 
   const formatOptions = useMemo(() => [
     { value: "stereo", label: tFormat("stereo") },
@@ -352,6 +360,7 @@ export default function SettingsPage() {
                   checked={persona === opt.id}
                   onChange={async () => {
                     setPersona(opt.id);
+                    setPersonaDefaults(opt.id);
                     const updateData: Record<string, unknown> = { persona: opt.id };
                     // Auto-toggle payments if not manually overridden
                     if (!paymentsManuallySet) {
@@ -378,6 +387,60 @@ export default function SettingsPage() {
             <p className="text-xs text-muted pt-1">
               {t("persona.note")}
             </p>
+          </PanelBody>
+        </Panel>
+
+        {/* Feature Visibility */}
+        <Panel>
+          <PanelHeader>
+            <h2 className="text-base font-semibold text-text">{t("featureVisibility.title")}</h2>
+            <p className="text-sm text-muted mt-1">
+              {t("featureVisibility.description")}
+            </p>
+          </PanelHeader>
+          <Rule />
+          <PanelBody className="pt-5 space-y-6">
+            {FEATURE_GROUPS.map((group) => (
+              <div key={group.heading}>
+                <h3 className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">
+                  {group.heading}
+                </h3>
+                <div className="space-y-2">
+                  {group.keys.map((key) => (
+                    <label
+                      key={key}
+                      className="flex items-center justify-between gap-3 py-2 cursor-pointer group"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-sm text-text">
+                          {FEATURE_LABELS[key].label}
+                        </div>
+                        <div className="text-xs text-muted">
+                          {FEATURE_LABELS[key].description}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={visibility[key]}
+                        onClick={() => updateFeatureVisibility(key, !visibility[key])}
+                        className={`relative shrink-0 h-5 w-9 rounded-full transition-colors ${
+                          visibility[key]
+                            ? "bg-signal"
+                            : "bg-border"
+                        }`}
+                      >
+                        <span
+                          className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+                            visibility[key] ? "translate-x-4" : ""
+                          }`}
+                        />
+                      </button>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
           </PanelBody>
         </Panel>
 

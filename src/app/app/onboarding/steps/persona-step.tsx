@@ -22,6 +22,12 @@ const descKeys: Record<"artist" | "engineer" | "both", string> = {
   both: "bothDesc",
 };
 
+const featureKeys: Record<"artist" | "engineer" | "both", string> = {
+  artist: "artistFeatures",
+  engineer: "engineerFeatures",
+  both: "bothFeatures",
+};
+
 export function PersonaStep({ selected, onSelect }: Props) {
   const t = useTranslations("onboarding.persona");
 
@@ -58,6 +64,7 @@ export function PersonaStep({ selected, onSelect }: Props) {
               <div>
                 <div className="font-medium text-text text-sm">{t(p.id)}</div>
                 <div className="text-xs text-muted mt-1">{t(descKeys[p.id])}</div>
+                <div className="text-[11px] text-faint mt-2">{t(featureKeys[p.id])}</div>
               </div>
             </button>
           );

@@ -12,7 +12,7 @@ import {
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
-import { usePaymentsEnabled } from "@/lib/payments-context";
+import { useFeatureVisible } from "@/hooks/use-feature-visible";
 import { NotificationBell } from "@/components/ui/notification-bell";
 
 type Props = {
@@ -24,7 +24,8 @@ type Props = {
 
 export function MobileNav({ userId, userEmail, onSearchClick, isAdmin }: Props) {
   const pathname = usePathname();
-  const paymentsEnabled = usePaymentsEnabled();
+  const showPayments = useFeatureVisible("payment_tracking");
+  const showTemplates = useFeatureVisible("templates");
   const t = useTranslations("nav");
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -57,10 +58,12 @@ export function MobileNav({ userId, userEmail, onSearchClick, isAdmin }: Props) 
           <span className="text-[10px] font-medium">{t("artists")}</span>
         </Link>
 
-        <Link href="/app/templates" className={itemClass(isTemplates)}>
-          <LayoutTemplate size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">{t("templates")}</span>
-        </Link>
+        {showTemplates && (
+          <Link href="/app/templates" className={itemClass(isTemplates)}>
+            <LayoutTemplate size={20} strokeWidth={1.5} />
+            <span className="text-[10px] font-medium">{t("templates")}</span>
+          </Link>
+        )}
 
         <button
           type="button"
@@ -88,7 +91,7 @@ export function MobileNav({ userId, userEmail, onSearchClick, isAdmin }: Props) 
       {drawerOpen && (
         <MobileDrawer
           onClose={() => setDrawerOpen(false)}
-          paymentsEnabled={paymentsEnabled}
+          paymentsEnabled={showPayments}
           userEmail={userEmail ?? null}
           pathname={pathname}
           isAdmin={isAdmin}

@@ -14,6 +14,9 @@ import { logActivityClient } from "@/lib/activity-logger-client";
 import { cn } from "@/lib/cn";
 import { useTranslations } from "next-intl";
 import type { ReleaseTemplate } from "@/types/template";
+import { useOnboardingTour } from "@/hooks/use-onboarding-tour";
+import { OnboardingTooltip } from "@/components/onboarding/onboarding-tooltip";
+import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -153,6 +156,8 @@ export default function NewReleasePage() {
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
   const sub = useSubscription();
+  const { persona } = useFeatureVisibility();
+  const tour = useOnboardingTour(persona as "artist" | "engineer" | "both" | "other" | null);
   const isFree = sub.plan !== "pro" || (sub.status !== "active" && sub.status !== "trialing");
 
   // Fetch templates on mount
@@ -438,7 +443,7 @@ export default function NewReleasePage() {
           <Rule />
           <PanelBody className="pt-5">
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-1.5">
+              <div className="space-y-1.5" data-onboarding="release-title">
                 <label className="label text-muted">{t("releaseTitle")}</label>
                 <input
                   type="text"
@@ -450,7 +455,7 @@ export default function NewReleasePage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5" data-onboarding="artist-name">
                 <label className="label text-muted">{t("artistClient")}</label>
                 <input
                   type="text"
@@ -461,7 +466,7 @@ export default function NewReleasePage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5" data-onboarding="release-type">
                 <label className="label text-muted">{t("releaseType")}</label>
                 <PillSelect
                   options={TYPE_OPTIONS}
@@ -470,7 +475,7 @@ export default function NewReleasePage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5" data-onboarding="format">
                 <label className="label text-muted">{t("format")}</label>
                 <PillSelect
                   options={FORMAT_OPTIONS}
@@ -479,7 +484,7 @@ export default function NewReleasePage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5" data-onboarding="genre-tags">
                 <label className="label text-muted">{t("genreTags")}</label>
                 <TagInput
                   value={genreTags}
@@ -526,6 +531,21 @@ export default function NewReleasePage() {
             </form>
           </PanelBody>
         </Panel>
+      )}
+
+      {/* Onboarding tooltip tour */}
+      {tour.isActive && tour.currentStep && (
+        <OnboardingTooltip
+          targetSelector={tour.currentStep.targetSelector}
+          title={tour.currentStep.title}
+          description={tour.currentStep.description}
+          step={tour.stepNumber}
+          totalSteps={tour.totalSteps}
+          position={tour.currentStep.position}
+          onNext={tour.next}
+          onSkip={tour.skip}
+          isLast={tour.isLast}
+        />
       )}
     </div>
   );

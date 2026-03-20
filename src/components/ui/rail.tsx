@@ -5,11 +5,12 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { Home, Users, DollarSign, LayoutTemplate, BarChart3 } from "lucide-react";
-import { usePaymentsEnabled } from "@/lib/payments-context";
+import { useFeatureVisible } from "@/hooks/use-feature-visible";
 
 export function Rail() {
   const pathname = usePathname();
-  const paymentsEnabled = usePaymentsEnabled();
+  const showPayments = useFeatureVisible("payment_tracking");
+  const showTemplates = useFeatureVisible("templates");
   const t = useTranslations("nav");
 
   const isHome = pathname === "/app" || pathname?.startsWith("/app/releases");
@@ -32,8 +33,10 @@ export function Rail() {
     >
       <NavItem href="/app" icon={Home} label={t("releases")} active={isHome} />
       <NavItem href="/app/artists" icon={Users} label={t("artists")} active={isArtists} />
-      <NavItem href="/app/templates" icon={LayoutTemplate} label={t("templates")} active={isTemplates} />
-      {paymentsEnabled && (
+      {showTemplates && (
+        <NavItem href="/app/templates" icon={LayoutTemplate} label={t("templates")} active={isTemplates} />
+      )}
+      {showPayments && (
         <NavItem href="/app/payments" icon={DollarSign} label={t("payments")} active={isPayments} />
       )}
       <NavItem href="/app/analytics" icon={BarChart3} label={t("analytics")} active={isAnalytics} />

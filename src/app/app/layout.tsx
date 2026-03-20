@@ -24,7 +24,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const [defaultsRes, subRes, profileRes] = await Promise.all([
     supabase
       .from("user_defaults")
-      .select("payments_enabled, theme, onboarding_completed")
+      .select("payments_enabled, theme, onboarding_completed, feature_visibility, persona")
       .eq("user_id", user.id)
       .maybeSingle(),
     supabase
@@ -43,6 +43,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const paymentsEnabled = defaultsRes.data?.payments_enabled ?? false;
   const theme = (defaultsRes.data?.theme as string) ?? "system";
   const onboardingCompleted = defaultsRes.data?.onboarding_completed ?? false;
+  const featureVisibility = defaultsRes.data?.feature_visibility ?? null;
+  const persona = (defaultsRes.data?.persona as string) ?? null;
 
   // Redirect to onboarding if not completed (but don't loop if already there)
   const headerList = await headers();
@@ -145,7 +147,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
       {isOnboarding ? (
         children
       ) : (
-        <Shell userId={user.id} userEmail={user.email ?? null} displayName={user.user_metadata?.display_name || user.user_metadata?.full_name || null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription} isAdmin={isAdmin}>
+        <Shell userId={user.id} userEmail={user.email ?? null} displayName={user.user_metadata?.display_name || user.user_metadata?.full_name || null} paymentsEnabled={paymentsEnabled} theme={theme} subscription={subscription} featureVisibility={featureVisibility} persona={persona} isAdmin={isAdmin}>
           {children}
         </Shell>
       )}

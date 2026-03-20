@@ -9,6 +9,8 @@ import { TopBar } from "@/components/ui/top-bar";
 import { CommandPalette } from "@/components/ui/command-palette";
 import { PaymentsProvider } from "@/lib/payments-context";
 import { SubscriptionProvider, type SubscriptionState } from "@/lib/subscription-context";
+import { FeatureVisibilityProvider } from "@/lib/features/feature-visibility-context";
+import { type FeatureVisibility } from "@/lib/features/feature-registry";
 import { AudioProvider, useAudio } from "@/lib/audio-context";
 import { TimestampProvider } from "@/lib/timestamp-context";
 import { MiniPlayer } from "@/components/ui/mini-player";
@@ -22,6 +24,8 @@ type ShellProps = {
   paymentsEnabled?: boolean;
   theme?: string;
   subscription?: SubscriptionState;
+  featureVisibility?: Partial<FeatureVisibility> | null;
+  persona?: string | null;
   isAdmin?: boolean;
   children: React.ReactNode;
 };
@@ -34,7 +38,7 @@ const DEFAULT_SUB: SubscriptionState = {
   grantedByAdmin: false,
 };
 
-export function Shell({ userId, userEmail, displayName, paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, isAdmin = false, children }: ShellProps) {
+export function Shell({ userId, userEmail, displayName, paymentsEnabled = false, theme = "system", subscription = DEFAULT_SUB, featureVisibility = null, persona = null, isAdmin = false, children }: ShellProps) {
   const { isOpen, open, close } = useCommandPalette();
   const { setTheme } = useTheme();
 
@@ -53,6 +57,7 @@ export function Shell({ userId, userEmail, displayName, paymentsEnabled = false,
     <TimestampProvider>
     <AudioProvider>
     <ToastProvider>
+      <FeatureVisibilityProvider initial={featureVisibility} persona={persona}>
       <PaymentsProvider enabled={paymentsEnabled}>
       <SubscriptionProvider initial={subscription}>
         <div className="flex flex-col h-dvh overflow-hidden">
@@ -72,6 +77,7 @@ export function Shell({ userId, userEmail, displayName, paymentsEnabled = false,
         <CommandPalette isOpen={isOpen} onClose={close} />
       </SubscriptionProvider>
       </PaymentsProvider>
+      </FeatureVisibilityProvider>
     </ToastProvider>
     </AudioProvider>
     </TimestampProvider>

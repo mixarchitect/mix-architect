@@ -27,8 +27,9 @@ import { sendNotification } from "@/lib/notifications/client";
 import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
 import { PortalTrackEditor } from "./portal-track-editor";
 import { MobileInspector } from "@/components/ui/mobile-inspector";
+import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
 
-const TABS = [
+const ALL_TABS = [
   { id: "intent", label: "Intent" },
   { id: "specs", label: "Specs" },
   { id: "audio", label: "Audio" },
@@ -162,6 +163,14 @@ export function TrackDetailClient({
   track, intent, specs, samplyUrl, audioVersions, notes, references, distribution, splits, role,
   currentUserName, portalShareId, portalApprovalStatus, portalApprovalEvents = [],
 }: Props) {
+  const { isFeatureVisible } = useFeatureVisibility();
+
+  const TABS = useMemo(() => ALL_TABS.filter((tab) => {
+    if (tab.id === "distribution" && !isFeatureVisible("distribution_checklist")) return false;
+    if (tab.id === "portal" && !isFeatureVisible("client_portal")) return false;
+    return true;
+  }), [isFeatureVisible]);
+
   const TAB_IDS = TABS.map((t) => t.id);
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window === "undefined") return "intent";
