@@ -880,9 +880,13 @@ function CalendarPanel() {
 
   async function handleCopy() {
     if (!feedUrl) return;
-    await navigator.clipboard.writeText(feedUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(feedUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API may fail without user gesture or in insecure contexts
+    }
   }
 
   if (loading) return null;

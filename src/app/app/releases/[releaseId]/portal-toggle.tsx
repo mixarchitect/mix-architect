@@ -85,9 +85,13 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
     e.stopPropagation();
     if (!share?.share_token) return;
     const url = `${window.location.origin}/portal/${share.share_token}`;
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API may fail without user gesture or in insecure contexts
+    }
   }
 
   async function updateField(field: string, value: unknown) {
