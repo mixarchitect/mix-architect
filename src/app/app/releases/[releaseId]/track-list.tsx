@@ -199,6 +199,7 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
             href={`/app/releases/${releaseId}/tracks/${t.id}`}
             className="group flex-1 flex items-center gap-4 min-w-0"
             draggable={false}
+            {...(idx === 0 ? { "data-tour": "track-link" } : {})}
           >
             <span className="w-8 text-right text-sm font-medium text-muted shrink-0">
               {String(t.track_number).padStart(2, "0")}

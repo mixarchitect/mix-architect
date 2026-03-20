@@ -260,6 +260,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
         {/* Main content with tabs */}
         <div>
+          <div data-tour="release-tabs">
           <TabbedContent tabs={tabs} initialTab={currentTab}>
             {/* Tracks tab */}
             <div className="space-y-3">
@@ -378,9 +379,11 @@ export default async function ReleasePage({ params, searchParams }: Props) {
               </div>
             )}
           </TabbedContent>
+          </div>
         </div>
 
         {/* Inspector sidebar — inline on desktop, bottom sheet on mobile */}
+        <div data-tour="release-sidebar">
         <MobileInspector title="Release Info">
           {/* Cover Art */}
           <CoverArtEditor releaseId={releaseId} initialUrl={release.cover_art_url} role={role} />
@@ -484,6 +487,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           )}
 
         </MobileInspector>
+        </div>
       </div>
       </ReleaseFlowContent>
 

@@ -16,6 +16,7 @@ import { TimestampProvider } from "@/lib/timestamp-context";
 import { MiniPlayer } from "@/components/ui/mini-player";
 import { useCommandPalette } from "@/hooks/use-command-palette";
 import { ToastProvider } from "@/components/ui/toast";
+import { TourProvider } from "@/components/onboarding/tour-provider";
 
 type ShellProps = {
   userId?: string;
@@ -60,6 +61,7 @@ export function Shell({ userId, userEmail, displayName, paymentsEnabled = false,
       <FeatureVisibilityProvider initial={featureVisibility} persona={persona}>
       <PaymentsProvider enabled={paymentsEnabled}>
       <SubscriptionProvider initial={subscription}>
+      <TourProvider persona={persona} displayName={displayName ?? null}>
         <div className="flex flex-col h-dvh overflow-hidden">
           {/* Full-width top bar (desktop) */}
           <TopBar userId={userId} userEmail={userEmail ?? null} displayName={displayName ?? null} onSearchClick={open} isAdmin={isAdmin} />
@@ -75,6 +77,7 @@ export function Shell({ userId, userEmail, displayName, paymentsEnabled = false,
         </div>
         <MiniPlayer />
         <CommandPalette isOpen={isOpen} onClose={close} />
+      </TourProvider>
       </SubscriptionProvider>
       </PaymentsProvider>
       </FeatureVisibilityProvider>

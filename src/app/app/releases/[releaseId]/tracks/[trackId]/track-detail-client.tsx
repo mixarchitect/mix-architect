@@ -575,14 +575,16 @@ export function TrackDetailClient({
         </div>
       </div>
 
+      <div data-tour="track-tabs">
       <TabBar tabs={TABS} activeTab={activeTab} onTabChange={handleTabChange} className="mb-6 md:mb-8" />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
         {/* ── Tab content ── */}
         <div>
           {/* Intent */}
           {activeTab === "intent" && (
-            <div className="space-y-4">
+            <div className="space-y-4" data-tour="track-intent">
               <Panel>
                 <PanelBody className="py-5">
                   <div className="flex items-center justify-between mb-3">

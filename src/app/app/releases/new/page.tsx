@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -14,9 +14,9 @@ import { logActivityClient } from "@/lib/activity-logger-client";
 import { cn } from "@/lib/cn";
 import { useTranslations } from "next-intl";
 import type { ReleaseTemplate } from "@/types/template";
-import { useOnboardingTour } from "@/hooks/use-onboarding-tour";
-import { OnboardingTooltip } from "@/components/onboarding/onboarding-tooltip";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
+import { useTourContext } from "@/components/onboarding/tour-provider";
+import { getDemoContent } from "@/lib/onboarding/tour-config";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -157,7 +157,7 @@ export default function NewReleasePage() {
   const supabase = createSupabaseBrowserClient();
   const sub = useSubscription();
   const { persona } = useFeatureVisibility();
-  const tour = useOnboardingTour(persona as "artist" | "engineer" | "both" | "other" | null);
+  const tour = useTourContext();
   const isFree = sub.plan !== "pro" || (sub.status !== "active" && sub.status !== "trialing");
 
   // Fetch templates on mount
@@ -199,6 +199,16 @@ export default function NewReleasePage() {
     loadTemplates();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Pre-fill demo content when tour is active
+  const demoFilledRef = useRef(false);
+  useEffect(() => {
+    if (!tour?.isActive || demoFilledRef.current) return;
+    demoFilledRef.current = true;
+    const demo = getDemoContent(persona as "artist" | "engineer" | "both" | "other" | null);
+    setTitle(demo.title);
+    setArtist(demo.artist ?? "");
+  }, [tour?.isActive, persona]);
 
   // Apply template to form state
   function applyTemplate(template: ReleaseTemplate) {
@@ -444,7 +454,7 @@ export default function NewReleasePage() {
           <Rule />
           <PanelBody className="pt-5">
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-1.5" data-onboarding="release-title">
+              <div className="space-y-1.5" data-tour="release-title">
                 <label className="label text-muted">{t("releaseTitle")}</label>
                 <input
                   type="text"
@@ -456,7 +466,7 @@ export default function NewReleasePage() {
                 />
               </div>
 
-              <div className="space-y-1.5" data-onboarding="artist-name">
+              <div className="space-y-1.5" data-tour="artist-name">
                 <label className="label text-muted">{t("artistClient")}</label>
                 <input
                   type="text"
@@ -467,7 +477,7 @@ export default function NewReleasePage() {
                 />
               </div>
 
-              <div className="space-y-1.5" data-onboarding="release-type">
+              <div className="space-y-1.5" data-tour="release-type">
                 <label className="label text-muted">{t("releaseType")}</label>
                 <PillSelect
                   options={TYPE_OPTIONS}
@@ -476,7 +486,7 @@ export default function NewReleasePage() {
                 />
               </div>
 
-              <div className="space-y-1.5" data-onboarding="format">
+              <div className="space-y-1.5" data-tour="format">
                 <label className="label text-muted">{t("format")}</label>
                 <PillSelect
                   options={FORMAT_OPTIONS}
@@ -485,7 +495,7 @@ export default function NewReleasePage() {
                 />
               </div>
 
-              <div className="space-y-1.5" data-onboarding="genre-tags">
+              <div className="space-y-1.5" data-tour="genre-tags">
                 <label className="label text-muted">{t("genreTags")}</label>
                 <TagInput
                   value={genreTags}
@@ -516,6 +526,7 @@ export default function NewReleasePage() {
                   type="submit"
                   variant="primary"
                   disabled={loading || !title.trim()}
+                  data-tour="create-submit"
                 >
                   {loading ? tCommon("creating") : t("createRelease")}
                 </Button>
@@ -534,20 +545,6 @@ export default function NewReleasePage() {
         </Panel>
       )}
 
-      {/* Onboarding tooltip tour */}
-      {tour.isActive && tour.currentStep && (
-        <OnboardingTooltip
-          targetSelector={tour.currentStep.targetSelector}
-          title={tour.currentStep.title}
-          description={tour.currentStep.description}
-          step={tour.stepNumber}
-          totalSteps={tour.totalSteps}
-          position={tour.currentStep.position}
-          onNext={tour.next}
-          onSkip={tour.skip}
-          isLast={tour.isLast}
-        />
-      )}
     </div>
   );
 }

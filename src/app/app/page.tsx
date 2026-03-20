@@ -251,13 +251,13 @@ export default async function DashboardPage({ searchParams }: Props) {
   const gridContent =
     displayReleases && displayReleases.length > 0 ? (
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {displayReleases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => {
+        {displayReleases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }, rIdx: number) => {
           const trackCount = r.tracks?.length ?? 0;
           const completedTracks =
             r.tracks?.filter((t) => t.status === "complete").length ?? 0;
           return (
+            <div key={r.id as string} {...(rIdx === 0 ? { "data-tour": "release-card" } : {})}>
             <ReleaseCard
-              key={r.id as string}
               id={r.id as string}
               title={r.title as string}
               artist={r.artist as string | null}
@@ -278,6 +278,7 @@ export default async function DashboardPage({ searchParams }: Props) {
               role="owner"
               hasNotes={!!r.internal_notes}
             />
+            </div>
           );
         })}
       </div>
