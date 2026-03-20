@@ -22,6 +22,7 @@ import {
   Repeat,
 } from "lucide-react";
 import WaveSurfer from "wavesurfer.js";
+import { perf } from "@/lib/perf";
 import {
   getWaveColors,
   formatTime,
@@ -369,6 +370,7 @@ export function AudioPlayer({
       if (cancelled || !container || !container.isConnected || !activeVersion) return;
 
       const colors = getWaveColors();
+      perf.start("wavesurfer:init", { trackId: activeVersion.id });
       ws = WaveSurfer.create({
         container,
         media: audioElement,
@@ -385,6 +387,8 @@ export function AudioPlayer({
         peaks: activeVersion.waveform_peaks ?? undefined,
         duration: activeVersion.duration_seconds ?? undefined,
       });
+      perf.end("wavesurfer:init");
+      perf.start("waveform:render", { trackId: activeVersion.id });
 
       // Error handling — retry once after a short delay.
       // Freshly uploaded files may not be available at the CDN immediately.
@@ -403,6 +407,8 @@ export function AudioPlayer({
 
       ws.on("ready", () => {
         if (cancelled) return;
+        perf.end("waveform:render");
+        perf.captureMemory("memory:after-waveform-load");
         setIsReady(true);
 
         // Sync context state (URL already matches so this is state-only)
@@ -531,6 +537,14 @@ export function AudioPlayer({
         const time = ws!.getCurrentTime();
         setCommentInput({ timecode: time });
         audioElement.pause();
+      });
+
+      // Perf: track seek interactions (waveform click → visual update)
+      ws.on("interaction", () => {
+        perf.start("waveform:seek", { trackId: activeVersion.id });
+      });
+      ws.on("seeking", () => {
+        perf.end("waveform:seek");
       });
 
       wavesurferRef.current = ws;

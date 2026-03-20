@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import type { AudioVersionData } from "@/components/ui/audio-player";
+import { perf } from "@/lib/perf";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -154,6 +155,12 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     const el = audioRef.current;
     if (!el || !el.src) return;
     if (el.paused) {
+      perf.start("playback:start");
+      const onPlay = () => {
+        perf.end("playback:start");
+        el.removeEventListener("playing", onPlay);
+      };
+      el.addEventListener("playing", onPlay);
       el.play();
     } else {
       el.pause();
