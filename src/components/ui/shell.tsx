@@ -88,7 +88,7 @@ function MainContent({ children }: { children: React.ReactNode }) {
       id="main-content"
       tabIndex={-1}
       className={cn(
-        "flex-1 min-w-0 overflow-y-auto no-scrollbar p-4 md:p-6 focus:outline-none",
+        "flex-1 min-w-0 overflow-y-auto overflow-x-hidden no-scrollbar p-4 md:p-6 focus:outline-none",
         miniPlayerActive ? "pb-36 md:pb-24" : "pb-20 md:pb-6",
       )}
     >

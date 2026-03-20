@@ -1544,8 +1544,8 @@ function SplitRow({
 
   return (
     <div className="rounded-md border border-border bg-panel">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <div ref={wrapperRef} className="relative flex-1" onBlur={handleBlur}>
+      <div className="flex items-center gap-2 md:gap-3 px-3 md:px-4 py-3 flex-wrap">
+        <div ref={wrapperRef} className="relative flex-1 min-w-[120px]" onBlur={handleBlur}>
           <input
             type="text"
             value={localName}
@@ -1570,7 +1570,7 @@ function SplitRow({
             <div
               id={`contact-list-${split.id}`}
               role="listbox"
-              className="absolute left-0 top-full mt-1 w-full min-w-[240px] z-20 surface-float max-h-48 overflow-y-auto"
+              className="absolute left-0 top-full mt-1 w-full md:min-w-[240px] z-20 surface-float max-h-48 overflow-y-auto"
             >
               {filtered.map((c, i) => (
                 <button
@@ -1609,7 +1609,7 @@ function SplitRow({
             min="0"
             max="100"
             step="0.01"
-            className="w-20 text-sm text-right text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal"
+            className="w-16 md:w-20 text-sm text-right text-text bg-transparent border border-border rounded px-2 py-1 outline-none focus:border-signal"
           />
           <span className="text-xs text-muted">%</span>
         </div>
@@ -1646,7 +1646,7 @@ function SplitRow({
         )}
       </div>
       {(splitType === "writing" || splitType === "publishing") && (
-        <div className="px-4 pb-3 grid grid-cols-3 gap-2 border-t border-border pt-3">
+        <div className="px-3 md:px-4 pb-3 grid grid-cols-1 sm:grid-cols-3 gap-2 border-t border-border pt-3">
           {splitType === "writing" && (
             <div className="space-y-1">
               <label className="text-[10px] text-faint">PRO (ASCAP/BMI)</label>
@@ -1689,7 +1689,7 @@ function SplitRow({
         </div>
       )}
       {splitType === "master" && (
-        <div className="px-4 pb-3 grid grid-cols-2 gap-2 border-t border-border pt-3">
+        <div className="px-3 md:px-4 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-2 border-t border-border pt-3">
           <div className="space-y-1">
             <label className="text-[10px] text-faint">SoundExchange ID</label>
             <input

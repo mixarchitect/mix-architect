@@ -480,14 +480,16 @@ export default async function ReleasePage({ params, searchParams }: Props) {
       </div>
       </ReleaseFlowContent>
 
-      {/* Floating Timer — renders at fixed position, only when payments enabled */}
+      {/* Floating Timer — desktop only, renders at fixed position when payments enabled */}
       {paymentsEnabled && (
-        <ReleaseTimer
-          releaseId={releaseId}
-          defaultRate={defaultHourlyRate}
-          currency={release.fee_currency ?? "USD"}
-          locale={locale}
-        />
+        <div className="hidden md:block">
+          <ReleaseTimer
+            releaseId={releaseId}
+            defaultRate={defaultHourlyRate}
+            currency={release.fee_currency ?? "USD"}
+            locale={locale}
+          />
+        </div>
       )}
     </div>
     </FlowProvider>

@@ -123,13 +123,13 @@ export function DeliveryFormatSelector({
 
       {/* ── Version selector (only when multiple versions exist) ── */}
       {hasVersions && audioVersions.length > 1 && (
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] text-muted">Export from:</span>
-          <div className="relative">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-[11px] text-muted shrink-0">Export from:</span>
+          <div className="relative min-w-0 flex-1">
             <select
               value={selectedVersion?.id ?? ""}
               onChange={(e) => setSelectedVersionId(e.target.value)}
-              className="appearance-none bg-panel-2 border border-border rounded-md pl-2.5 pr-7 py-1 text-[11px] text-text cursor-pointer hover:border-border-strong transition-colors focus:outline-none focus:border-signal"
+              className="appearance-none bg-panel-2 border border-border rounded-md pl-2.5 pr-7 py-1 text-[11px] text-text cursor-pointer hover:border-border-strong transition-colors focus:outline-none focus:border-signal w-full max-w-full truncate"
             >
               {[...audioVersions].reverse().map((v) => (
                 <option key={v.id} value={v.id}>

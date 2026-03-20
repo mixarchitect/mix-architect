@@ -147,7 +147,7 @@ export function DistributionPanel({
     <Panel>
       <PanelBody className="py-5">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <div className="label-sm text-muted">DISTRIBUTION TRACKER</div>
           {canEdit && entries.length > 0 && (
             <div className="flex items-center gap-2">
@@ -337,19 +337,19 @@ function PlatformRow({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center gap-3 py-2 px-1 rounded-md hover:bg-panel2/50 transition-colors group">
+      <div className="flex items-center gap-2 md:gap-3 py-2 px-1 rounded-md hover:bg-panel2/50 transition-colors group">
         {/* Platform icon + name */}
         <img
           src={getPlatformIcon(entry.platform)}
           alt=""
           className="w-4 h-4 shrink-0 object-contain"
         />
-        <span className="text-sm text-text w-[120px] shrink-0">
+        <span className="text-sm text-text w-[88px] md:w-[120px] shrink-0 truncate">
           {platform?.label ?? entry.platform}
         </span>
 
         {/* Status (clickable dropdown when editable) */}
-        <span className="w-[80px] shrink-0">
+        <span className="w-[85px] md:w-[80px] shrink-0">
           {canEdit ? (
             <button
               type="button"
@@ -373,7 +373,7 @@ function PlatformRow({
         </span>
 
         {/* Distributor pill */}
-        <span className="w-[90px] shrink-0">
+        <span className="shrink-0">
           {entry.distributor ? (
             <Pill className="text-[10px]">{entry.distributor}</Pill>
           ) : null}
@@ -390,7 +390,7 @@ function PlatformRow({
         )}
 
         {/* Spacer */}
-        <span className="flex-1" />
+        <span className="flex-1 hidden md:block" />
 
         {/* Link button: opens URL or shows input */}
         {canEdit ? (
@@ -422,7 +422,7 @@ function PlatformRow({
               title="Add link"
             >
               <ExternalLink size={12} />
-              <span>Add link</span>
+              <span className="hidden md:inline">Add link</span>
             </button>
           )
         ) : entry.external_url ? (
