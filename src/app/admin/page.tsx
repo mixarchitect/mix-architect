@@ -115,14 +115,25 @@ export default async function AdminDashboard({ searchParams }: Props) {
     return query.gte("created_at", s).lte("created_at", u);
   }
 
+  // Fetch test account IDs to exclude from metrics
+  const { data: testProfiles } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("is_test_account", true);
+  const testIds = (testProfiles ?? []).map((p) => p.id);
+
   // Run current period queries
   const [proRes, churnRes, activityRes, profilesRes, signupsRes, cancellationsRes] =
     await Promise.all([
-      supabase
-        .from("subscriptions")
-        .select("id", { count: "exact", head: true })
-        .eq("plan", "pro")
-        .eq("status", "active"),
+      (() => {
+        let q = supabase
+          .from("subscriptions")
+          .select("id", { count: "exact", head: true })
+          .eq("plan", "pro")
+          .eq("status", "active");
+        if (testIds.length > 0) q = q.not("user_id", "in", `(${testIds.join(",")})`);
+        return q;
+      })(),
       supabase
         .from("admin_churn_signals")
         .select("id", { count: "exact", head: true })
@@ -134,7 +145,7 @@ export default async function AdminDashboard({ searchParams }: Props) {
         since,
         until,
       ),
-      supabase.from("profiles").select("id", { count: "exact", head: true }),
+      supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_test_account", false),
       withRange(
         supabase
           .from("admin_activity_log")
