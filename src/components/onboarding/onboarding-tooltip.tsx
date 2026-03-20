@@ -86,16 +86,30 @@ export function OnboardingTooltip({
   }, [targetSelector, position]);
 
   useEffect(() => {
-    // Small delay for DOM to settle
-    const timer = setTimeout(updatePosition, 100);
+    // Retry until the target element exists in the DOM (form may load async)
+    let retries = 0;
+    let retryTimer: ReturnType<typeof setTimeout>;
+
+    function tryPosition() {
+      const target = document.querySelector(targetSelector);
+      if (target) {
+        updatePosition();
+      } else if (retries < 30) {
+        retries++;
+        retryTimer = setTimeout(tryPosition, 100);
+      }
+    }
+
+    const timer = setTimeout(tryPosition, 50);
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition, true);
     return () => {
       clearTimeout(timer);
+      clearTimeout(retryTimer);
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
     };
-  }, [updatePosition]);
+  }, [updatePosition, targetSelector]);
 
   return (
     <>
