@@ -510,7 +510,7 @@ export default function NewReleasePage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-1.5" data-tour="release-date">
                 <label className="label text-muted">{t("targetDate")}</label>
                 <input
                   type="date"

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { useTour, type TourState } from "@/hooks/use-tour";
 import { TourSpotlight } from "./tour-spotlight";
 import { TourTooltip } from "./tour-tooltip";
@@ -21,10 +22,32 @@ type Props = {
 
 export function TourProvider({ persona, displayName, children }: Props) {
   const tour = useTour((persona as Persona) ?? null);
+  const pathname = usePathname();
 
   const value = useMemo(() => tour, [tour]);
 
   const isComplete = tour.currentStep?.id === "tour-complete";
+
+  // Only show spotlight/tooltip when the current page matches
+  // the step's expected page pattern (if one is set)
+  const step = tour.currentStep;
+  const stepPagePattern = step?.pagePattern;
+  const isOnCorrectPage = (() => {
+    if (!stepPagePattern) return true;
+    const basePath = stepPagePattern.split("?")[0];
+    // Exact match mode (for dashboard "/app")
+    if (step?.pagePatternExact) {
+      if (pathname !== basePath) return false;
+    } else {
+      // Prefix match
+      if (!pathname.includes(basePath)) return false;
+    }
+    // Check exclusions (e.g. /settings, /tracks/)
+    if (step?.pagePatternExclude?.length) {
+      if (step.pagePatternExclude.some((ex) => pathname.includes(ex))) return false;
+    }
+    return true;
+  })();
 
   return (
     <TourContext.Provider value={value}>
@@ -34,7 +57,7 @@ export function TourProvider({ persona, displayName, children }: Props) {
       {tour.isActive && tour.currentStep && (
         <>
           {/* SVG spotlight with cutout — pointer-events: none so page stays interactive */}
-          {!isComplete && (
+          {!isComplete && isOnCorrectPage && (
             <TourSpotlight
               targetSelector={tour.currentStep.targetSelector}
               padding={tour.currentStep.highlightPadding ?? 8}
@@ -42,29 +65,33 @@ export function TourProvider({ persona, displayName, children }: Props) {
             />
           )}
 
-          {/* Tooltip with phase progress */}
-          <TourTooltip
-            targetSelector={tour.currentStep.targetSelector}
-            title={tour.currentStep.title}
-            description={tour.currentStep.description}
-            position={tour.currentStep.position}
-            advanceOn={tour.currentStep.advanceOn}
-            phaseLabel={tour.currentPhase?.label ?? ""}
-            stepNumber={tour.stepNumber}
-            totalStepsInPhase={tour.totalStepsInPhase}
-            phaseIndex={tour.phaseIndex}
-            completedPhases={tour.completedPhases}
-            isLast={tour.isLastStep}
-            onNext={tour.advanceStep}
-            onSkip={tour.skipTour}
-          />
+          {/* Tooltip with phase progress — only on correct page */}
+          {isOnCorrectPage && (
+            <TourTooltip
+              targetSelector={tour.currentStep.targetSelector}
+              title={tour.currentStep.title}
+              description={tour.currentStep.description}
+              position={tour.currentStep.position}
+              advanceOn={tour.currentStep.advanceOn}
+              phaseLabel={tour.currentPhase?.label ?? ""}
+              stepNumber={tour.stepNumber}
+              totalStepsInPhase={tour.totalStepsInPhase}
+              phaseIndex={tour.phaseIndex}
+              completedPhases={tour.completedPhases}
+              isLast={tour.isLastStep}
+              onNext={tour.advanceStep}
+              onSkip={tour.skipTour}
+            />
+          )}
 
-          {/* Floating checklist pill */}
+          {/* Floating checklist pill — always visible while tour is active */}
           <TourChecklist
             phaseIndex={tour.phaseIndex}
             completedPhases={tour.completedPhases}
             overallStep={tour.overallStepNumber}
             totalSteps={tour.totalSteps}
+            onGoToPhase={tour.goToPhase}
+            onDismiss={tour.skipTour}
           />
 
           {/* Invisible anchor for tour-complete step */}

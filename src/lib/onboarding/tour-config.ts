@@ -19,8 +19,12 @@ export type TourStep = {
   highlightPadding?: number;
   /** Restrict this step to specific personas (omit = show for all) */
   persona?: Persona[];
-  /** URL pattern this step expects — used for cross-page sync */
+  /** URL pattern this step expects — used for cross-page sync (prefix match) */
   pagePattern?: string;
+  /** URL substrings that must NOT appear (e.g. exclude /settings sub-route) */
+  pagePatternExclude?: string[];
+  /** If true, pagePattern must match exactly (not prefix) */
+  pagePatternExact?: boolean;
 };
 
 export type Phase = {
@@ -84,7 +88,17 @@ const createReleaseSteps: TourStep[] = [
     targetSelector: '[data-tour="genre-tags"]',
     title: "Genre tags",
     description:
-      "Tag your release with genres to help organize your catalog. This step is optional.",
+      "Tag your release with genres to help organize your catalog. You can pick from the suggestions or type in any genre you like to create your own. This step is optional.",
+    position: "bottom",
+    advanceOn: "manual",
+    pagePattern: "/app/releases/new",
+  },
+  {
+    id: "create-date",
+    targetSelector: '[data-tour="release-date"]',
+    title: "Target release date",
+    description:
+      "Set a target date for your release. This helps you track your timeline and keep things on schedule.",
     position: "bottom",
     advanceOn: "manual",
     pagePattern: "/app/releases/new",
@@ -116,6 +130,8 @@ const exploreReleaseSteps: TourStep[] = [
     position: "bottom",
     advanceOn: "manual",
     highlightPadding: 4,
+    pagePattern: "/app/releases/",
+    pagePatternExclude: ["/tracks/", "/settings", "/new"],
   },
   {
     id: "release-sidebar",
@@ -125,6 +141,8 @@ const exploreReleaseSteps: TourStep[] = [
       "Upload cover art, view release info, and add internal or client notes here.",
     position: "left",
     advanceOn: "manual",
+    pagePattern: "/app/releases/",
+    pagePatternExclude: ["/tracks/", "/settings", "/new"],
   },
   {
     id: "release-click-track",
@@ -135,6 +153,8 @@ const exploreReleaseSteps: TourStep[] = [
     position: "bottom",
     advanceOn: "navigate",
     highlightPadding: 4,
+    pagePattern: "/app/releases/",
+    pagePatternExclude: ["/tracks/", "/settings", "/new"],
   },
 ];
 
@@ -152,6 +172,7 @@ const trackDetailSteps: TourStep[] = [
     position: "bottom",
     advanceOn: "manual",
     highlightPadding: 4,
+    pagePattern: "/tracks/",
   },
   {
     id: "track-intent",
@@ -161,6 +182,7 @@ const trackDetailSteps: TourStep[] = [
       "Describe the vision for this mix \u2014 mood, references, and direction. This is the heart of your brief.",
     position: "bottom",
     advanceOn: "manual",
+    pagePattern: "/tracks/",
   },
 ];
 
@@ -178,6 +200,8 @@ const dashboardSteps: TourStep[] = [
     position: "bottom",
     advanceOn: "manual",
     highlightPadding: 4,
+    pagePattern: "/app",
+    pagePatternExact: true,
   },
   {
     id: "dashboard-nav",
@@ -188,6 +212,8 @@ const dashboardSteps: TourStep[] = [
     position: "right",
     advanceOn: "manual",
     highlightPadding: 4,
+    pagePattern: "/app",
+    pagePatternExact: true,
   },
   {
     id: "tour-complete",

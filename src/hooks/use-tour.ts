@@ -39,6 +39,7 @@ export type TourState = {
   /* Actions */
   advanceStep: () => void;
   skipTour: () => void;
+  goToPhase: (phaseIndex: number) => void;
   setReleaseId: (id: string) => void;
   setTrackId: (id: string) => void;
 };
@@ -181,6 +182,30 @@ export function useTour(persona: Persona | null): TourState {
     setIsActive(false);
     finishTour("skipped");
   }, []);
+
+  // ── Go to a specific phase (clicked from checklist) ──
+  const goToPhase = useCallback(
+    (targetPhaseIndex: number) => {
+      const targetPhase = TOUR_PHASES[targetPhaseIndex];
+      if (!targetPhase) return;
+
+      setPhaseIndex(targetPhaseIndex);
+      setStepIndex(0);
+      persist({ pi: targetPhaseIndex, si: 0 });
+
+      // Navigate to the phase's route
+      if (targetPhase.getRoute) {
+        const route = targetPhase.getRoute({
+          releaseId: releaseId ?? undefined,
+          trackId: trackId ?? undefined,
+        });
+        if (route) {
+          router.push(route);
+        }
+      }
+    },
+    [releaseId, trackId, persist, router],
+  );
 
   // ── Set release/track IDs ──
   const handleSetReleaseId = useCallback(
@@ -355,6 +380,7 @@ export function useTour(persona: Persona | null): TourState {
     trackId,
     advanceStep,
     skipTour,
+    goToPhase,
     setReleaseId: handleSetReleaseId,
     setTrackId: handleSetTrackId,
   };

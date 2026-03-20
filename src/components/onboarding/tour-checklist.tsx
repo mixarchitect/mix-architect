@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
 import { TOUR_PHASES } from "@/lib/onboarding/tour-config";
 
 type Props = {
@@ -9,6 +9,8 @@ type Props = {
   completedPhases: string[];
   overallStep: number;
   totalSteps: number;
+  onGoToPhase: (phaseIndex: number) => void;
+  onDismiss: () => void;
 };
 
 export function TourChecklist({
@@ -16,6 +18,8 @@ export function TourChecklist({
   completedPhases,
   overallStep,
   totalSteps,
+  onGoToPhase,
+  onDismiss,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
 
@@ -26,43 +30,57 @@ export function TourChecklist({
     <div className="fixed bottom-20 md:bottom-6 right-4 z-[9997]" style={{ pointerEvents: "auto" }}>
       {/* Collapsed pill */}
       {!expanded && (
-        <button
-          type="button"
-          onClick={() => setExpanded(true)}
-          className="flex items-center gap-2 px-3 py-2 rounded-full border shadow-lg text-xs font-medium transition-colors hover:border-signal/50"
-          style={{
-            background: "var(--panel)",
-            borderColor: "var(--border)",
-            color: "var(--text)",
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 18 18" className="shrink-0">
-            <circle
-              cx="9"
-              cy="9"
-              r="7"
-              fill="none"
-              stroke="var(--border)"
-              strokeWidth="2"
-            />
-            <circle
-              cx="9"
-              cy="9"
-              r="7"
-              fill="none"
-              stroke="var(--signal)"
-              strokeWidth="2"
-              strokeDasharray={`${(completedCount / totalPhases) * 44} 44`}
-              strokeLinecap="round"
-              transform="rotate(-90 9 9)"
-              style={{ transition: "stroke-dasharray 300ms ease-out" }}
-            />
-          </svg>
-          <span>
-            Tour {completedCount}/{totalPhases}
-          </span>
-          <ChevronUp size={12} className="text-muted" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-full border shadow-lg text-xs font-medium transition-colors hover:border-signal/50"
+            style={{
+              background: "var(--panel)",
+              borderColor: "var(--border)",
+              color: "var(--text)",
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" className="shrink-0">
+              <circle
+                cx="9"
+                cy="9"
+                r="7"
+                fill="none"
+                stroke="var(--border)"
+                strokeWidth="2"
+              />
+              <circle
+                cx="9"
+                cy="9"
+                r="7"
+                fill="none"
+                stroke="var(--signal)"
+                strokeWidth="2"
+                strokeDasharray={`${(completedCount / totalPhases) * 44} 44`}
+                strokeLinecap="round"
+                transform="rotate(-90 9 9)"
+                style={{ transition: "stroke-dasharray 300ms ease-out" }}
+              />
+            </svg>
+            <span>
+              Tour {completedCount}/{totalPhases}
+            </span>
+            <ChevronUp size={12} className="text-muted" />
+          </button>
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="flex items-center justify-center w-7 h-7 rounded-full border shadow-lg text-muted hover:text-text transition-colors"
+            style={{
+              background: "var(--panel)",
+              borderColor: "var(--border)",
+            }}
+            aria-label="End tour"
+          >
+            <X size={12} />
+          </button>
+        </div>
       )}
 
       {/* Expanded card */}
@@ -76,24 +94,49 @@ export function TourChecklist({
         >
           <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: "var(--border)" }}>
             <span className="text-sm font-semibold text-text">Guided Tour</span>
-            <button
-              type="button"
-              onClick={() => setExpanded(false)}
-              className="text-muted hover:text-text transition-colors"
-            >
-              <ChevronDown size={14} />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={onDismiss}
+                className="text-muted hover:text-text transition-colors p-0.5"
+                aria-label="End tour"
+                title="End tour"
+              >
+                <X size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setExpanded(false)}
+                className="text-muted hover:text-text transition-colors p-0.5"
+                aria-label="Collapse"
+              >
+                <ChevronDown size={14} />
+              </button>
+            </div>
           </div>
 
           <div className="py-2">
             {TOUR_PHASES.map((phase, i) => {
               const isCompleted = completedPhases.includes(phase.id);
               const isCurrent = i === phaseIndex;
+              const isClickable = i !== phaseIndex;
 
               return (
-                <div
+                <button
                   key={phase.id}
-                  className="flex items-center gap-3 px-4 py-2"
+                  type="button"
+                  onClick={() => {
+                    if (isClickable) {
+                      onGoToPhase(i);
+                      setExpanded(false);
+                    }
+                  }}
+                  disabled={!isClickable}
+                  className={`flex items-center gap-3 px-4 py-2 w-full text-left transition-colors ${
+                    isClickable
+                      ? "hover:bg-panel2 cursor-pointer"
+                      : "cursor-default"
+                  }`}
                 >
                   {/* Status icon */}
                   <div
@@ -131,7 +174,7 @@ export function TourChecklist({
                       {phase.description}
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
