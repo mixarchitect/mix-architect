@@ -247,21 +247,21 @@ export function DateRangeSelector({
             style={{ background: "var(--panel)", ...dropdownStyle }}
           >
             {/* Date inputs */}
-            <div className="flex items-center gap-2 px-4 pt-4 pb-3 border-b border-border">
+            <div className="flex items-center gap-2 px-3 md:px-4 pt-4 pb-3 border-b border-border">
               <input
                 type="text"
                 readOnly
                 aria-label="Start date"
                 value={draftFrom ? formatDateShort(draftFrom) : "Start date"}
-                className="flex-1 px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
+                className="flex-1 min-w-0 px-2 md:px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
               />
-              <span className="text-faint text-xs" aria-hidden="true">&#8594;</span>
+              <span className="text-faint text-xs shrink-0" aria-hidden="true">&#8594;</span>
               <input
                 type="text"
                 readOnly
                 aria-label="End date"
                 value={draftTo ? formatDateShort(draftTo) : "End date"}
-                className="flex-1 px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
+                className="flex-1 min-w-0 px-2 md:px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
               />
             </div>
 
