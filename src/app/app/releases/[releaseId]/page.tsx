@@ -21,6 +21,7 @@ import { FlowProvider, ReleaseFlowContent } from "@/components/flow-simulator/re
 import { FlowBreadcrumbTitle } from "@/components/flow-simulator/flow-breadcrumb-title";
 import { SaveAsTemplateButton } from "@/components/templates/save-as-template-button";
 import { CalendarExportButton } from "./calendar-export-button";
+import { MobileInspector } from "@/components/ui/mobile-inspector";
 import { DistributionPanel } from "./distribution-panel";
 import type { FlowTrack } from "@/components/flow-simulator/use-flow-audio";
 import { getReleaseRole } from "@/lib/get-release-role";
@@ -372,8 +373,8 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           </TabbedContent>
         </div>
 
-        {/* Inspector sidebar */}
-        <aside className="space-y-4">
+        {/* Inspector sidebar — inline on desktop, bottom sheet on mobile */}
+        <MobileInspector title="Release Info">
           {/* Cover Art */}
           <CoverArtEditor releaseId={releaseId} initialUrl={release.cover_art_url} role={role} />
 
@@ -475,7 +476,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
             />
           )}
 
-        </aside>
+        </MobileInspector>
       </div>
       </ReleaseFlowContent>
 

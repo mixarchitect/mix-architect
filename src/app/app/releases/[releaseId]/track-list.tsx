@@ -153,7 +153,7 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
           onDrop={canReorder ? () => { if (dragIdx !== null) handleDrop(dragIdx, idx); } : undefined}
           onDragEnd={() => { setDragIdx(null); setDragOverIdx(null); }}
           className={cn(
-            "group/row flex items-center gap-2 rounded-md border bg-panel px-4 py-2.5 transition-all duration-150",
+            "group/row flex items-center gap-2 rounded-md border bg-panel px-4 py-3 md:py-2.5 transition-all duration-150 active:bg-panel2 md:active:bg-panel",
             "border-border hover:border-border-strong",
             dragIdx === idx && "opacity-40",
             dragOverIdx === idx && dragIdx !== idx && "border-signal border-dashed",
@@ -173,24 +173,24 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
                   onClick={() => handleMove(t.id, -1)}
                   disabled={idx === 0}
                   className={cn(
-                    "p-0.5 rounded transition-colors",
+                    "p-2 rounded transition-colors",
                     idx === 0 ? "text-transparent" : "text-faint hover:text-text active:text-text",
                   )}
                   title="Move up"
                 >
-                  <ChevronUp size={14} />
+                  <ChevronUp size={16} />
                 </button>
                 <button
                   type="button"
                   onClick={() => handleMove(t.id, 1)}
                   disabled={idx === sorted.length - 1}
                   className={cn(
-                    "p-0.5 rounded transition-colors",
+                    "p-2 rounded transition-colors",
                     idx === sorted.length - 1 ? "text-transparent" : "text-faint hover:text-text active:text-text",
                   )}
                   title="Move down"
                 >
-                  <ChevronDown size={14} />
+                  <ChevronDown size={16} />
                 </button>
               </div>
             </>
@@ -218,7 +218,7 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
 
           {/* Delete track */}
           {canDelete && (
-            <div className={cn("relative shrink-0 transition-opacity duration-150", confirmDeleteId === t.id ? "opacity-100" : "opacity-0 group-hover/row:opacity-100 group-focus-within/row:opacity-100")} ref={confirmDeleteId === t.id ? confirmRef : undefined}>
+            <div className={cn("relative shrink-0 transition-opacity duration-150", confirmDeleteId === t.id ? "opacity-100" : "md:opacity-0 md:group-hover/row:opacity-100 md:group-focus-within/row:opacity-100")} ref={confirmDeleteId === t.id ? confirmRef : undefined}>
               <button
                 type="button"
                 onClick={(e) => {

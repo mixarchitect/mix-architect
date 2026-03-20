@@ -135,7 +135,7 @@ export function ReleaseCard({
   }
 
   return (
-    <div className={cn("relative card px-5 py-4 transition-opacity duration-150", navigating && "opacity-60 pointer-events-none", className)}>
+    <div className={cn("relative card px-5 py-4 transition-all duration-150 active:bg-panel2/50 md:active:bg-transparent", navigating && "opacity-60 pointer-events-none", className)}>
       <div className="flex items-start justify-between gap-2">
         <Link
           href={`/app/releases/${id}`}
@@ -174,7 +174,7 @@ export function ReleaseCard({
               }}
               disabled={pinning}
               className={cn(
-                "w-5 h-5 grid place-items-center rounded transition-colors disabled:opacity-50",
+                "w-9 h-9 grid place-items-center rounded transition-colors disabled:opacity-50",
                 pinned
                   ? "text-signal"
                   : "text-transparent hover:text-faint",

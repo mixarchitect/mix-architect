@@ -13,6 +13,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import type { Viewport } from "next";
+
 export const metadata: Metadata = {
   title: "Mix Architect",
   description: "Blueprints for stereo and immersive mixes",
@@ -21,6 +23,12 @@ export const metadata: Metadata = {
       "application/rss+xml": "/changelog/feed.xml",
     },
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

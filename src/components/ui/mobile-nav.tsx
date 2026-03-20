@@ -46,7 +46,7 @@ export function MobileNav({ userId, userEmail, onSearchClick, isAdmin }: Props) 
   return (
     <>
       {/* Bottom bar */}
-      <nav aria-label="App navigation" className="fixed bottom-0 left-0 right-0 md:hidden h-16 border-t border-border bg-panel flex items-center justify-around z-50">
+      <nav aria-label="App navigation" className="fixed bottom-0 left-0 right-0 md:hidden h-16 border-t border-border bg-panel flex items-center justify-around z-50 safe-bottom">
         <Link href="/app" className={itemClass(isHome)}>
           <Home size={20} strokeWidth={1.5} />
           <span className="text-[10px] font-medium">{t("releases")}</span>
@@ -129,6 +129,14 @@ function MobileDrawer({
     return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   function cycleTheme() {
     const next = theme === "system" ? "light" : theme === "light" ? "dark" : "system";
     setTheme(next);
@@ -162,7 +170,7 @@ function MobileDrawer({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-50 md:hidden"
+        className="fixed inset-0 bg-black/50 z-50 md:hidden drawer-backdrop"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -171,7 +179,7 @@ function MobileDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
-        className="fixed right-0 top-0 bottom-0 w-64 bg-panel border-l border-border z-50 md:hidden flex flex-col"
+        className="fixed right-0 top-0 bottom-0 w-64 max-w-[calc(100vw-3rem)] bg-panel border-l border-border z-50 md:hidden flex flex-col drawer-panel safe-bottom"
         style={{ background: "var(--panel)" }}
       >
         {/* Header */}

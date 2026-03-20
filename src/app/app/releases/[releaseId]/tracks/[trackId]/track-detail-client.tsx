@@ -26,6 +26,7 @@ import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
 import { sendNotification } from "@/lib/notifications/client";
 import { useSavedContacts, type SavedContact } from "@/hooks/use-saved-contacts";
 import { PortalTrackEditor } from "./portal-track-editor";
+import { MobileInspector } from "@/components/ui/mobile-inspector";
 
 const TABS = [
   { id: "intent", label: "Intent" },
@@ -499,48 +500,48 @@ export function TrackDetailClient({
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
-        <div className="flex items-center gap-3 min-w-0">
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-6 md:mb-8">
+        <div className="flex items-center gap-2 md:gap-3 min-w-0">
           {releaseCoverArt && (
             <img
               src={releaseCoverArt}
               alt=""
-              className="w-8 h-8 rounded object-cover flex-shrink-0"
+              className="w-8 h-8 rounded object-cover flex-shrink-0 hidden md:block"
             />
           )}
           {artistName && (
             <>
               <Link
                 href={`/app?artist=${encodeURIComponent(artistName)}`}
-                className="text-sm text-muted hover:text-signal transition-colors shrink-0"
+                className="text-sm text-muted hover:text-signal transition-colors shrink-0 hidden md:inline"
               >
                 {artistName}
               </Link>
-              <span className="text-faint">·</span>
+              <span className="text-faint hidden md:inline">·</span>
             </>
           )}
           <Link
             href={`/app/releases/${releaseId}`}
-            className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1"
+            className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1 shrink-0"
           >
             <ArrowLeft size={14} />
-            {releaseTitle}
+            <span className="hidden md:inline">{releaseTitle}</span>
           </Link>
-          <span className="text-faint">/</span>
+          <span className="text-faint hidden md:inline">/</span>
           {canEdit(role) ? (
             <EditableTitle
               value={track.title}
               table="tracks"
               id={track.id}
-              className="text-2xl font-semibold h2 text-text"
+              className="text-lg md:text-2xl font-semibold h2 text-text"
               prefix={
-                <span className="text-muted text-2xl font-semibold">
+                <span className="text-muted text-lg md:text-2xl font-semibold">
                   {String(track.track_number).padStart(2, "0")}
                 </span>
               }
             />
           ) : (
-            <h1 className="text-2xl font-semibold h2 text-text">
+            <h1 className="text-lg md:text-2xl font-semibold h2 text-text truncate">
               <span className="text-muted mr-2">
                 {String(track.track_number).padStart(2, "0")}
               </span>
@@ -565,7 +566,7 @@ export function TrackDetailClient({
         </div>
       </div>
 
-      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={handleTabChange} className="mb-8" />
+      <TabBar tabs={TABS} activeTab={activeTab} onTabChange={handleTabChange} className="mb-6 md:mb-8" />
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
         {/* ── Tab content ── */}
@@ -1132,8 +1133,8 @@ export function TrackDetailClient({
           )}
         </div>
 
-        {/* ── Inspector sidebar ── */}
-        <aside className="space-y-4">
+        {/* ── Inspector sidebar — inline on desktop, bottom sheet on mobile ── */}
+        <MobileInspector title="Track Info">
           <Panel>
             <PanelBody className="py-5 space-y-3">
               <div className="label-sm text-muted mb-1">QUICK VIEW</div>
@@ -1314,7 +1315,7 @@ export function TrackDetailClient({
             </PanelBody>
           </Panel>
 
-        </aside>
+        </MobileInspector>
       </div>
     </div>
   );

@@ -182,7 +182,7 @@ export default async function PaymentsPage() {
       </div>
 
       {/* KPI cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 print:grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 print:grid-cols-3">
         <div className="px-4 py-3 rounded-lg border border-border bg-panel">
           <div className="text-[10px] uppercase tracking-wide text-faint font-medium mb-1">
             {t("outstanding")}

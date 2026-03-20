@@ -169,6 +169,7 @@ html {
 
 html, body {
   height: 100dvh;
+  overscroll-behavior: none;
 }
 
 body {
@@ -893,4 +894,52 @@ select.input {
 }
 .timeline-today-line {
   animation: timeline-today-pulse 2s ease-out;
+}
+
+/* ─────────────────────────────────────────────────────
+   MOBILE DRAWER ANIMATIONS
+───────────────────────────────────────────────────── */
+@keyframes drawer-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes drawer-slide-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.drawer-backdrop {
+  animation: drawer-backdrop-in 150ms ease-out;
+}
+.drawer-panel {
+  animation: drawer-slide-in 200ms ease-out;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* ─────────────────────────────────────────────────────
+   MOBILE: PREVENT IOS AUTO-ZOOM ON INPUT FOCUS
+───────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   SAFE AREA INSETS (notched devices)
+───────────────────────────────────────────────────── */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Smooth touch scrolling for scroll containers */
+.overflow-y-auto, .overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
 }
