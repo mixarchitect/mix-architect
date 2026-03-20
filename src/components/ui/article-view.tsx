@@ -71,7 +71,7 @@ export function ArticleView({ article, onBack, highlight }: Props) {
   return (
     <div className="max-w-2xl" ref={containerRef}>
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm mb-6 flex-wrap">
+      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm mb-6 flex-wrap">
         <button
           type="button"
           onClick={() => onBack()}

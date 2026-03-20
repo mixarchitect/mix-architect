@@ -55,7 +55,7 @@ export function PortalClient({
     (share.show_references && globalRefs.length > 0);
 
   return (
-    <main className="portal-page min-h-screen bg-bg py-12 px-4 md:px-6 pb-24">
+    <main id="main-content" tabIndex={-1} className="portal-page min-h-screen bg-bg py-12 px-4 md:px-6 pb-24 focus:outline-none">
       <div className="max-w-3xl mx-auto">
         {/* ═══ Zone 1: Release Header ═══ */}
         <PortalHeader

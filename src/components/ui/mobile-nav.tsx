@@ -46,7 +46,7 @@ export function MobileNav({ userId, userEmail, onSearchClick, isAdmin }: Props) 
   return (
     <>
       {/* Bottom bar */}
-      <nav className="fixed bottom-0 left-0 right-0 md:hidden h-16 border-t border-border bg-panel flex items-center justify-around z-50">
+      <nav aria-label="App navigation" className="fixed bottom-0 left-0 right-0 md:hidden h-16 border-t border-border bg-panel flex items-center justify-around z-50">
         <Link href="/app" className={itemClass(isHome)}>
           <Home size={20} strokeWidth={1.5} />
           <span className="text-[10px] font-medium">{t("releases")}</span>
@@ -120,6 +120,15 @@ function MobileDrawer({
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  // Close on Escape
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
   function cycleTheme() {
     const next = theme === "system" ? "light" : theme === "light" ? "dark" : "system";
     setTheme(next);
@@ -155,9 +164,13 @@ function MobileDrawer({
       <div
         className="fixed inset-0 bg-black/50 z-50 md:hidden"
         onClick={onClose}
+        aria-hidden="true"
       />
       {/* Drawer panel */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
         className="fixed right-0 top-0 bottom-0 w-64 bg-panel border-l border-border z-50 md:hidden flex flex-col"
         style={{ background: "var(--panel)" }}
       >
@@ -169,6 +182,7 @@ function MobileDrawer({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close menu"
             className="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text transition-colors shrink-0"
           >
             <X size={18} strokeWidth={1.5} />

@@ -27,7 +27,7 @@ export default async function HomePage() {
   const featuredRelease = await getActiveFeaturedRelease();
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A]">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-[#0A0A0A] focus:outline-none">
       <LandingNav />
       <Hero />
       <FeatureShowcase />

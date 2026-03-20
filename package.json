@@ -30,6 +30,7 @@
     "wavesurfer.js": "^7.12.1"
   },
   "devDependencies": {
+    "@axe-core/react": "^4.11.1",
     "@tailwindcss/postcss": "^4",
     "@types/archiver": "^7.0.0",
     "@types/node": "^20",
@@ -37,6 +38,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -14,7 +14,7 @@ export function LandingFooter() {
             className="h-6 w-auto opacity-50"
           />
 
-          <nav className="flex flex-wrap justify-center gap-6 text-sm text-white/40">
+          <nav aria-label="Footer" className="flex flex-wrap justify-center gap-6 text-sm text-white/40">
             <a
               href="#features"
               className="hover:text-white/70 transition-colors"

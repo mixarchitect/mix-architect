@@ -131,11 +131,14 @@ export function AdminSidebar() {
       {open && (
         <div className="md:hidden fixed inset-0 z-50">
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
 
           {/* Drawer */}
           <div
             ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Admin navigation menu"
             className="absolute inset-y-0 left-0 w-64 bg-panel border-r border-border p-4 space-y-1 overflow-y-auto"
             style={{ background: "var(--panel)" }}
           >

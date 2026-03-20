@@ -27,14 +27,14 @@ export function FeaturedReleaseSection({
   };
 
   return (
-    <section id="featured" className="px-6 py-20">
+    <section id="featured" aria-labelledby="featured-heading" className="px-6 py-20">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
       <div className="mx-auto max-w-4xl">
-        <h2 className="text-center text-3xl md:text-4xl font-bold text-white mb-2">
+        <h2 id="featured-heading" className="text-center text-3xl md:text-4xl font-bold text-white mb-2">
           Featured Release
         </h2>
         <p className="text-center mt-4 text-white/50 mb-8">

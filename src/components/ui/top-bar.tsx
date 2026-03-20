@@ -87,7 +87,7 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
         >
           <Search size={16} strokeWidth={1.5} />
           <span className="flex-1 text-left">Search...</span>
-          <kbd className="text-[10px] font-medium text-faint bg-panel border border-border rounded px-1.5 py-0.5">⌘K</kbd>
+          <kbd className="text-[10px] font-medium text-muted bg-panel border border-border rounded px-1.5 py-0.5">⌘K</kbd>
         </button>
 
         {/* Featured releases */}

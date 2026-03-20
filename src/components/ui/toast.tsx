@@ -162,6 +162,7 @@ function ToastItem({
 
       <button
         onClick={() => onDismiss(t.id)}
+        aria-label="Dismiss notification"
         className="text-faint hover:text-muted transition-colors shrink-0 mt-0.5"
       >
         <X size={14} />

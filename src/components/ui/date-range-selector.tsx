@@ -187,6 +187,9 @@ export function DateRangeSelector({
       {/* Trigger */}
       <button
         onClick={() => (open ? setOpen(false) : handleOpen())}
+        aria-label="Select date range"
+        aria-haspopup="true"
+        aria-expanded={open}
         className={cn(
           "flex items-center gap-2 px-3 py-1.5 text-xs rounded-md border transition-colors",
           open ? trigger.open : trigger.closed,
@@ -211,13 +214,15 @@ export function DateRangeSelector({
             <input
               type="text"
               readOnly
+              aria-label="Start date"
               value={draftFrom ? formatDateShort(draftFrom) : "Start date"}
               className="flex-1 px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
             />
-            <span className="text-faint text-xs">&#8594;</span>
+            <span className="text-faint text-xs" aria-hidden="true">&#8594;</span>
             <input
               type="text"
               readOnly
+              aria-label="End date"
               value={draftTo ? formatDateShort(draftTo) : "End date"}
               className="flex-1 px-3 py-1.5 text-xs rounded-md border border-border bg-panel2 text-text outline-none"
             />
@@ -267,6 +272,7 @@ export function DateRangeSelector({
                   onChange={(e) =>
                     setDraftCompare(e.target.value as CompareKey)
                   }
+                  aria-label="Compare period"
                   className="text-xs px-2 py-1 rounded-md border border-border bg-panel2 text-text outline-none"
                 >
                   {COMPARE_OPTIONS.map((opt) => (

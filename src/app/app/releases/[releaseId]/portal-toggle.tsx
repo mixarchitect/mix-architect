@@ -102,21 +102,22 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
 
   return (
     <div ref={wrapperRef} className="relative">
-      {/* Main button */}
-      <button
-        type="button"
+      {/* Portal toolbar */}
+      <div
+        className="btn-secondary !px-2.5 !gap-1.5 !h-8 !min-h-0 !text-xs cursor-pointer"
         onClick={() => active && setOpen((v) => !v)}
-        disabled={toggling}
-        className="btn-secondary !px-2.5 !gap-1.5 !h-8 !min-h-0 !text-xs"
       >
         <Globe size={14} />
         <span className="text-xs font-semibold">Portal</span>
 
         {/* Toggle switch */}
-        <span
+        <button
+          type="button"
           role="switch"
           aria-checked={active}
-          onClick={handleToggle}
+          aria-label="Toggle client portal"
+          disabled={toggling}
+          onClick={(e) => { e.stopPropagation(); handleToggle(e); }}
           className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors cursor-pointer ${
             active ? "bg-signal" : "bg-black/20 dark:bg-white/20"
           }`}
@@ -126,31 +127,32 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
               active ? "translate-x-[13px]" : "translate-x-[2px]"
             }`}
           />
-        </span>
+        </button>
 
         {/* Actions (only when active) */}
         {active && (
           <>
-            <span
-              onClick={handleShare}
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); handleShare(e); }}
+              aria-label={copied ? "Copied!" : "Copy portal link"}
               className="inline-flex items-center cursor-pointer text-muted hover:text-text transition-colors"
-              title={copied ? "Copied!" : "Copy portal link"}
             >
               {copied ? <Check size={14} /> : <Share2 size={14} />}
-            </span>
+            </button>
             <a
               href={`${typeof window !== "undefined" ? window.location.origin : ""}/portal/${share!.share_token}`}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Open portal"
               onClick={(e) => e.stopPropagation()}
               className="inline-flex items-center text-muted hover:text-text transition-colors"
-              title="Open portal"
             >
               <ExternalLink size={14} />
             </a>
           </>
         )}
-      </button>
+      </div>
 
       {/* Dropdown */}
       {open && active && (
@@ -219,6 +221,7 @@ function ToggleRow({
         type="button"
         role="switch"
         aria-checked={checked}
+        aria-label={label}
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors ${
           checked ? "bg-signal" : "bg-black/20 dark:bg-white/20"

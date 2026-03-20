@@ -70,6 +70,9 @@ export function NotificationBell({ userId, variant }: Props) {
           ref={buttonRef}
           type="button"
           onClick={() => setOpen((v) => !v)}
+          aria-label="Notifications"
+          aria-haspopup="true"
+          aria-expanded={open}
           className="relative flex flex-col items-center gap-1 px-4 py-2 transition-colors text-muted"
         >
           <Bell size={20} strokeWidth={1.5} />
@@ -101,6 +104,8 @@ export function NotificationBell({ userId, variant }: Props) {
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-label="Notifications"
+          aria-haspopup="true"
+          aria-expanded={open}
           title="Notifications"
           className="relative w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
         >
@@ -130,6 +135,9 @@ export function NotificationBell({ userId, variant }: Props) {
         ref={buttonRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
+        aria-label="Notifications"
+        aria-haspopup="true"
+        aria-expanded={open}
         className={cn(
           "relative flex items-center gap-3 w-full px-3 h-10 rounded-md",
           "text-muted transition-all duration-150",
@@ -220,6 +228,8 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
     return (
       <div
         ref={ref}
+        role="dialog"
+        aria-label="Notifications"
         style={{ background: "var(--panel)" }}
         className={cn(
           "z-50 border border-border rounded-xl shadow-xl overflow-hidden",
@@ -255,6 +265,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
             <button
               type="button"
               onClick={onClose}
+              aria-label="Close notifications"
               className="text-muted hover:text-text transition-colors"
             >
               <X size={14} strokeWidth={2} />
@@ -281,6 +292,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
                 <button
                   type="button"
                   onClick={() => onItemClick(n)}
+                  aria-label={`View: ${n.title}`}
                   className="mt-0.5 shrink-0"
                 >
                   <NotificationIcon type={n.type} />
@@ -288,6 +300,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
                 <button
                   type="button"
                   onClick={() => onItemClick(n)}
+                  aria-label={n.title}
                   className="flex-1 min-w-0 text-left"
                 >
                   <p className={cn("text-sm leading-snug", !n.read ? "text-text font-medium" : "text-muted")}>
@@ -308,6 +321,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
                     onDismiss(n.id);
                   }}
                   className="shrink-0 mt-0.5 text-muted/0 group-hover/notif:text-muted hover:!text-text transition-colors"
+                  aria-label={t("dismiss")}
                   title={t("dismiss")}
                 >
                   <X size={14} strokeWidth={2} />

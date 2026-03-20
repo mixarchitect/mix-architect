@@ -71,6 +71,8 @@ export function PostActionPrompt({
 
   return (
     <div
+      role="complementary"
+      aria-label={headline}
       className={`
         fixed z-50 transition-transform duration-300 ease-out
         ${visible && !exiting ? "translate-y-0" : "translate-y-full"}

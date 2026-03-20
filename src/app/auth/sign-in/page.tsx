@@ -127,7 +127,7 @@ function SignInPageContent() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-12">
+    <main id="main-content" tabIndex={-1} className="min-h-screen flex items-center justify-center px-6 py-12 focus:outline-none">
       <div className="w-full max-w-md">
         <Panel>
           <PanelHeader className="text-center">

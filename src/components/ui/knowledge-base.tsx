@@ -133,7 +133,7 @@ export function KnowledgeBase({ query = "" }: { query?: string }) {
       <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6">
         {/* Category sidebar (desktop) */}
         <aside className="hidden md:block">
-          <nav className="space-y-1">
+          <nav aria-label="Help categories" className="space-y-1">
             <button
               type="button"
               onClick={() => setSelectedCategory(null)}

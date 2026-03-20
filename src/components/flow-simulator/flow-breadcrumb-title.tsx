@@ -19,24 +19,28 @@ export function FlowBreadcrumbTitle({ title, releaseId, canEdit }: Props) {
 
   if (isFlowOpen) {
     return (
-      <button
-        type="button"
-        onClick={closeFlow}
-        className="text-sm text-muted hover:text-text transition-colors truncate"
-      >
-        {title}
-      </button>
+      <h1 className="text-sm text-muted truncate">
+        <button
+          type="button"
+          onClick={closeFlow}
+          className="hover:text-text transition-colors"
+        >
+          {title}
+        </button>
+      </h1>
     );
   }
 
   if (canEdit) {
     return (
-      <EditableTitle
-        value={title}
-        table="releases"
-        id={releaseId}
-        className="text-2xl font-semibold h2 text-text"
-      />
+      <h1>
+        <EditableTitle
+          value={title}
+          table="releases"
+          id={releaseId}
+          className="text-2xl font-semibold h2 text-text"
+        />
+      </h1>
     );
   }
 

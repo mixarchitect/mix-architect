@@ -26,7 +26,7 @@ export default async function ChangelogPage() {
   const { entries, totalCount } = await getPublishedEntries(1, 15);
 
   return (
-    <main className="min-h-screen bg-bg">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-bg focus:outline-none">
       <LandingNav />
       <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
         <h1 className="text-3xl font-bold text-text">What&apos;s New</h1>

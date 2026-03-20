@@ -96,7 +96,7 @@ export default async function ChangelogEntryPage({ params }: Props) {
     : null;
 
   return (
-    <main className="min-h-screen bg-bg">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-bg focus:outline-none">
       <LandingNav />
 
       <script

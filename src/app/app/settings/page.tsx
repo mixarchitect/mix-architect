@@ -194,8 +194,9 @@ export default function SettingsPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="label text-muted">{t("profile.email")}</label>
+              <label htmlFor="settings-email" className="label text-muted">{t("profile.email")}</label>
               <input
+                id="settings-email"
                 type="email"
                 value={email}
                 disabled
@@ -219,8 +220,9 @@ export default function SettingsPage() {
           <Rule />
           <PanelBody className="pt-5 space-y-4">
             <div className="space-y-1.5">
-              <label className="label text-muted">{t("regionCurrency.locale")}</label>
+              <label htmlFor="settings-locale" className="label text-muted">{t("regionCurrency.locale")}</label>
               <select
+                id="settings-locale"
                 value={locale}
                 onChange={async (e) => {
                   const newLocale = e.target.value as Locale;
@@ -251,8 +253,9 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-muted">{t("regionCurrency.defaultCurrency")}</label>
+              <label htmlFor="settings-currency" className="label text-muted">{t("regionCurrency.defaultCurrency")}</label>
               <select
+                id="settings-currency"
                 value={defaultCurrency}
                 onChange={async (e) => {
                   const newCurrency = e.target.value;
@@ -413,6 +416,9 @@ export default function SettingsPage() {
                     setPaymentsEnabled(prev);
                   }
                 }}
+                role="switch"
+                aria-checked={paymentsEnabled}
+                aria-label="Enable payments"
                 className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
                   paymentsEnabled ? "bg-signal" : "bg-black/20 dark:bg-white/20"
                 }`}
@@ -496,8 +502,9 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-muted">{t("mixDefaults.sampleRate")}</label>
+              <label htmlFor="settings-sample-rate" className="label text-muted">{t("mixDefaults.sampleRate")}</label>
               <select
+                id="settings-sample-rate"
                 value={sampleRate}
                 onChange={(e) => setSampleRate(e.target.value)}
                 className="input"
@@ -509,8 +516,9 @@ export default function SettingsPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="label text-muted">{t("mixDefaults.bitDepth")}</label>
+              <label htmlFor="settings-bit-depth" className="label text-muted">{t("mixDefaults.bitDepth")}</label>
               <select
+                id="settings-bit-depth"
                 value={bitDepth}
                 onChange={(e) => setBitDepth(e.target.value)}
                 className="input"
@@ -669,6 +677,9 @@ function EmailPreferencesPanel() {
             </div>
             <button
               type="button"
+              role="switch"
+              aria-checked={prefs[item.key]}
+              aria-label={t(item.labelKey)}
               onClick={() => handleToggle(item.key)}
               className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
                 prefs[item.key] ? "bg-signal" : "bg-black/20 dark:bg-white/20"
@@ -892,6 +903,7 @@ function CalendarPanel() {
                 <input
                   type="text"
                   readOnly
+                  aria-label="Calendar feed URL"
                   value={feedUrl}
                   className="input flex-1 text-xs"
                   onClick={(e) => (e.target as HTMLInputElement).select()}

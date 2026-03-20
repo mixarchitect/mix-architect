@@ -123,7 +123,7 @@ export default async function FeaturedReleasePage({ params }: Props) {
   const bodyAfter = bodyLines.slice(splitIndex).join("\n\n");
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A]">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-[#0A0A0A] focus:outline-none">
       <LandingNav />
       <script
         type="application/ld+json"

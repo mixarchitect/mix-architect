@@ -24,7 +24,7 @@ export default async function FeaturedArchivePage() {
   const { releases, total } = await getFeaturedReleases(1, 12);
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A]">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-[#0A0A0A] focus:outline-none">
       <LandingNav />
 
       <div className="pt-32 pb-20 px-6">

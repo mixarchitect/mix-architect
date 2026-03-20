@@ -66,9 +66,9 @@ function FeatureSection({
             {badge}
           </span>
         )}
-        <h3 className="text-2xl md:text-3xl font-bold text-white leading-tight">
+        <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
           {headline}
-        </h3>
+        </h2>
         <p className="mt-4 text-white/50 leading-relaxed max-w-lg">{body}</p>
       </div>
       <div className={reverse ? "lg:[direction:ltr]" : ""}>{visual}</div>
@@ -541,13 +541,13 @@ function FlowSimulatorMock() {
 
       {/* Transport controls */}
       <div className="flex items-center justify-center gap-4 mb-4 py-2">
-        <button className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
+        <button aria-label="Previous track" className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
           <SkipForward size={12} className="text-white/50 rotate-180" />
         </button>
-        <button className="w-9 h-9 rounded-full bg-[#0D9488] flex items-center justify-center">
+        <button aria-label="Play" className="w-9 h-9 rounded-full bg-[#0D9488] flex items-center justify-center">
           <Play size={14} className="text-[#1a1a1a] ml-0.5" />
         </button>
-        <button className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
+        <button aria-label="Next track" className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
           <SkipForward size={12} className="text-white/50" />
         </button>
       </div>
@@ -791,7 +791,7 @@ function AnalyticsMock() {
 
 export function FeatureShowcase() {
   return (
-    <section id="features" className="px-6">
+    <section id="features" aria-label="Features" className="px-6">
       <div className="mx-auto max-w-6xl">
         <FeatureSection
           headline="Every release, organized from day one"

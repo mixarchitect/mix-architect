@@ -215,8 +215,24 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 /*  Hook                                                               */
 /* ------------------------------------------------------------------ */
 
+const SSR_FALLBACK: AudioContextValue = {
+  audioElement: null as unknown as HTMLAudioElement,
+  activeVersion: null,
+  trackMeta: null,
+  isPlaying: false,
+  currentTime: 0,
+  duration: 0,
+  isLooping: false,
+  loadVersion: () => {},
+  togglePlayPause: () => {},
+  seekTo: () => {},
+  stop: () => {},
+  toggleLoop: () => {},
+};
+
 export function useAudio() {
   const ctx = useContext(AudioContext);
-  if (!ctx) throw new Error("useAudio must be used within AudioProvider");
+  // During SSR the provider hasn't mounted yet — return a safe no-op fallback.
+  if (!ctx) return SSR_FALLBACK;
   return ctx;
 }

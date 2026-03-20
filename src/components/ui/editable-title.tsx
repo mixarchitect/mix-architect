@@ -80,6 +80,7 @@ export function EditableTitle({
           onBlur={save}
           onKeyDown={handleKeyDown}
           disabled={saving}
+          aria-label={`Edit ${column}`}
           className={`bg-transparent border-b-2 border-signal outline-none ${className}`}
         />
       </span>
@@ -87,10 +88,11 @@ export function EditableTitle({
   }
 
   return (
-    <span
-      className="inline-flex items-center gap-2 group cursor-pointer"
+    <button
+      type="button"
+      className="inline-flex items-center gap-2 group cursor-pointer bg-transparent border-none p-0"
       onClick={() => setEditing(true)}
-      title="Click to edit"
+      aria-label={`Edit ${value}`}
     >
       {prefix}
       <span className={className}>{value}</span>
@@ -98,6 +100,6 @@ export function EditableTitle({
         size={14}
         className="text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
       />
-    </span>
+    </button>
   );
 }

@@ -55,6 +55,7 @@ export function TagInput({ value, onChange, suggestions = [], placeholder, disab
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
+                aria-label={`Remove ${tag}`}
                 className="text-muted hover:text-text transition-colors"
               >
                 <X size={12} />
@@ -69,6 +70,7 @@ export function TagInput({ value, onChange, suggestions = [], placeholder, disab
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={value.length === 0 ? placeholder : ""}
+            aria-label={placeholder ?? "Add tag"}
             className="flex-1 min-w-[100px] bg-transparent border-none outline-none text-sm text-text placeholder:text-faint p-1"
           />
         )}

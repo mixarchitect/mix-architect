@@ -190,6 +190,9 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
 
       {/* Dialog */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="save-template-title"
         className="fixed inset-0 z-50 flex items-start justify-center pt-[min(20vh,160px)] px-4"
         onClick={(e) => {
           if (e.target === e.currentTarget) onClose();
@@ -203,13 +206,14 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <div className="flex items-center gap-2">
               <LayoutTemplate size={18} className="text-signal" />
-              <h2 className="text-base font-semibold text-text">
+              <h2 id="save-template-title" className="text-base font-semibold text-text">
                 Save as Template
               </h2>
             </div>
             <button
               type="button"
               onClick={onClose}
+              aria-label="Close dialog"
               className="w-7 h-7 grid place-items-center rounded-md text-faint hover:text-text hover:bg-panel2 transition-colors"
             >
               <X size={16} />
@@ -220,8 +224,9 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
           <div className="px-5 py-4 space-y-4">
             {/* Name */}
             <div className="space-y-1.5">
-              <label className="label text-muted text-xs">Template name *</label>
+              <label htmlFor="template-name" className="label text-muted text-xs">Template name *</label>
               <input
+                id="template-name"
                 ref={inputRef}
                 type="text"
                 required
@@ -234,8 +239,9 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
 
             {/* Description */}
             <div className="space-y-1.5">
-              <label className="label text-muted text-xs">Description</label>
+              <label htmlFor="template-description" className="label text-muted text-xs">Description</label>
               <input
+                id="template-description"
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
