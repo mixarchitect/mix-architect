@@ -152,6 +152,12 @@ export default function NewReleasePage() {
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  // Capture tour param at render time before hooks clean it up
+  const [hadTourParam] = useState(() =>
+    typeof window !== "undefined" &&
+    (new URLSearchParams(window.location.search).has("tour") ||
+     localStorage.getItem("ma-tour") !== null),
+  );
 
   const router = useRouter();
   const supabase = createSupabaseBrowserClient();
@@ -184,8 +190,7 @@ export default function NewReleasePage() {
       setTemplatesLoading(false);
 
       // Skip straight to form if no templates or if tour is active
-      const tourActive = new URLSearchParams(window.location.search).has("tour");
-      if (tpls.length === 0 || tourActive) {
+      if (tpls.length === 0 || hadTourParam) {
         setShowForm(true);
         return;
       }
