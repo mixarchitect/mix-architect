@@ -231,9 +231,22 @@ export function useTour(persona: Persona | null): TourState {
       const targetPhase = TOUR_PHASES[targetPhaseIndex];
       if (!targetPhase) return;
 
+      advancingRef.current = false; // reset guard
       setPhaseIndex(targetPhaseIndex);
       setStepIndex(0);
-      persist({ pi: targetPhaseIndex, si: 0 });
+
+      // Persist directly to localStorage to avoid stale closure in persist()
+      const progress: TourProgress = {
+        status: "active",
+        currentPhaseIndex: targetPhaseIndex,
+        currentStepIndex: 0,
+        completedPhases: completedPhases,
+        completedSteps: completedSteps,
+        releaseId: releaseIdRef.current ?? undefined,
+        trackId: trackIdRef.current ?? undefined,
+      };
+      writeTourProgress(progress);
+      syncTourProgressToDB(progress);
 
       if (targetPhase.getRoute) {
         const route = targetPhase.getRoute({
@@ -245,7 +258,7 @@ export function useTour(persona: Persona | null): TourState {
         }
       }
     },
-    [persist, router],
+    [completedPhases, completedSteps, router],
   );
 
   // ── Set release/track IDs ──

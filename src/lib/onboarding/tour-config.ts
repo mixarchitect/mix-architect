@@ -201,7 +201,7 @@ const dashboardSteps: TourStep[] = [
     advanceOn: "manual",
     highlightPadding: 4,
     pagePattern: "/app",
-    pagePatternExact: true,
+    pagePatternExclude: ["/releases/", "/settings", "/payments", "/analytics", "/templates", "/artists"],
   },
   {
     id: "dashboard-nav",
@@ -213,7 +213,7 @@ const dashboardSteps: TourStep[] = [
     advanceOn: "manual",
     highlightPadding: 4,
     pagePattern: "/app",
-    pagePatternExact: true,
+    pagePatternExclude: ["/releases/", "/settings", "/payments", "/analytics", "/templates", "/artists"],
   },
   {
     id: "tour-complete",
