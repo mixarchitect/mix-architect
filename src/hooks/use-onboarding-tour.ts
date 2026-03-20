@@ -11,13 +11,13 @@ export function useOnboardingTour(persona: Persona | null) {
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
-    if (!persona) return;
     // Only activate if the tour query param is present
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     if (!params.has("tour")) return;
 
-    const tourSteps = getTourSteps(persona);
+    // Default to "engineer" (all steps) if persona hasn't been set yet
+    const tourSteps = getTourSteps(persona ?? "engineer");
     setSteps(tourSteps);
     setIsActive(true);
     setCurrentIndex(0);

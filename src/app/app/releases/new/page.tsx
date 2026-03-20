@@ -183,8 +183,9 @@ export default function NewReleasePage() {
       setTemplates(tpls);
       setTemplatesLoading(false);
 
-      // If no templates, skip straight to form
-      if (tpls.length === 0) {
+      // Skip straight to form if no templates or if tour is active
+      const tourActive = new URLSearchParams(window.location.search).has("tour");
+      if (tpls.length === 0 || tourActive) {
         setShowForm(true);
         return;
       }
