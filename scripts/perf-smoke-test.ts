@@ -18,7 +18,7 @@ if (typeof g.performance === "undefined") {
 }
 // Fake process.env for dev check
 if (!process.env.NODE_ENV) {
-  process.env.NODE_ENV = "development";
+  (process.env as Record<string, string>).NODE_ENV = "development";
 }
 
 // --- Imports (after globals are set up) ---
