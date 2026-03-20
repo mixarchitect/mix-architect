@@ -167,6 +167,12 @@ export function useTour(persona: Persona | null): TourState {
     startFreshTour();
   }, [pathname, startFreshTour]);
 
+  // Keep IDs in refs so advanceStep always has current values
+  const releaseIdRef = useRef(releaseId);
+  const trackIdRef = useRef(trackId);
+  useEffect(() => { releaseIdRef.current = releaseId; }, [releaseId]);
+  useEffect(() => { trackIdRef.current = trackId; }, [trackId]);
+
   // ── Advance step ──
   const advanceStep = useCallback(() => {
     const phase = TOUR_PHASES[phaseIndex];
@@ -193,11 +199,15 @@ export function useTour(persona: Persona | null): TourState {
       setCompletedSteps(newCompleted);
       persist({ pi: nextPI, si: 0, cp: newCompletedPhases, cs: newCompleted });
 
-      // Navigate to next phase's route
+      // Navigate to next phase's route — use refs for current IDs
       const nextPhase = TOUR_PHASES[nextPI];
       if (nextPhase?.getRoute) {
-        const route = nextPhase.getRoute({ releaseId: releaseId ?? undefined, trackId: trackId ?? undefined });
-        if (route && !pathname.startsWith(route.split("?")[0])) {
+        const currentPath = window.location.pathname;
+        const route = nextPhase.getRoute({
+          releaseId: releaseIdRef.current ?? undefined,
+          trackId: trackIdRef.current ?? undefined,
+        });
+        if (route && !currentPath.startsWith(route.split("?")[0])) {
           router.push(route);
         }
       }
@@ -269,13 +279,25 @@ export function useTour(persona: Persona | null): TourState {
     const step = phase?.steps[stepIndex];
     if (!step || step.advanceOn !== "navigate") return;
 
+    // Extract IDs from the new pathname before advancing, so the next
+    // phase's getRoute has them available (prevents navigating to /app
+    // when releaseId/trackId haven't been picked up yet)
+    const releaseMatch = pathname.match(/\/app\/releases\/([a-f0-9-]+)/);
+    const trackMatch = pathname.match(/\/tracks\/([a-f0-9-]+)/);
+    if (releaseMatch && releaseMatch[1] !== releaseId) {
+      handleSetReleaseId(releaseMatch[1]);
+    }
+    if (trackMatch && trackMatch[1] !== trackId) {
+      handleSetTrackId(trackMatch[1]);
+    }
+
     // Path changed and current step expects navigation → advance
-    // Small delay so the new page renders its data-tour elements
+    // Longer delay so the new page renders its data-tour elements
     const timer = setTimeout(() => {
       advanceStep();
-    }, 300);
+    }, 600);
     return () => clearTimeout(timer);
-  }, [pathname, isActive, phaseIndex, stepIndex, advanceStep]);
+  }, [pathname, isActive, phaseIndex, stepIndex, advanceStep, releaseId, trackId, handleSetReleaseId, handleSetTrackId]);
 
   // ── Auto-advance on input/click ──
   useEffect(() => {

@@ -27,7 +27,7 @@ export function TourChecklist({
   const totalPhases = TOUR_PHASES.length;
 
   return (
-    <div className="fixed bottom-20 md:bottom-6 right-4 z-[9997]" style={{ pointerEvents: "auto" }}>
+    <div className="fixed bottom-20 md:bottom-6 right-20 md:right-24 z-[9997]" style={{ pointerEvents: "auto" }}>
       {/* Collapsed pill */}
       {!expanded && (
         <div className="flex items-center gap-1">
