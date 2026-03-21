@@ -50,7 +50,7 @@ function FormatConversion() {
           <span
             className={`text-[10px] font-semibold px-2 py-1 rounded ${
               i === 0
-                ? "bg-[#0D9488]/15 text-[#0D9488]"
+                ? "bg-[#0D9488]/15 text-[#2dd4bf]"
                 : "bg-white/6 text-white/60"
             }`}
           >
@@ -218,7 +218,7 @@ export async function AudioToolsGrid() {
               key={tool.title}
               className="rounded-xl bg-[#1a1a1a] border border-white/8 p-6 hover:border-white/15 transition-colors"
             >
-              <div className="w-11 h-11 rounded-lg bg-[#0D9488]/12 flex items-center justify-center text-[#0D9488] mb-4">
+              <div className="w-11 h-11 rounded-lg bg-[#0D9488]/12 flex items-center justify-center text-[#0D9488] mb-4" aria-hidden="true">
                 {tool.icon}
               </div>
               <h3 className="text-base font-semibold text-white mb-2">
@@ -227,7 +227,7 @@ export async function AudioToolsGrid() {
               <p className="text-sm text-white/60 leading-relaxed">
                 {tool.description}
               </p>
-              {tool.visual}
+              <div aria-hidden="true">{tool.visual}</div>
             </div>
           ))}
         </div>

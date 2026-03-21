@@ -16,7 +16,7 @@ function PersonaCard({
   return (
     <div className="rounded-2xl bg-[#1a1a1a] border border-white/8 p-8 flex flex-col">
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center" aria-hidden="true">
           {icon}
         </div>
         <h3 className="text-xl font-bold text-white">{title}</h3>

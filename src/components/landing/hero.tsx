@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Music, Headphones } from "lucide-react";
+import { Music, Headphones, Check } from "lucide-react";
 import { FilledArrowRight } from "@/components/ui/filled-icon";
 import { getTranslations } from "next-intl/server";
 
@@ -49,32 +49,48 @@ export async function Hero() {
 
         {/* Persona callouts */}
         <div className="mt-14 grid gap-5 sm:grid-cols-2 max-w-2xl mx-auto">
-          <div className="flex items-start gap-4 rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
-            <div className="shrink-0 w-12 h-12 rounded-xl bg-[#0D9488]/15 flex items-center justify-center">
-              <Music size={24} className="text-[#0D9488]" />
-            </div>
-            <div>
+          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center" aria-hidden="true">
+                <Music size={20} className="text-[#0D9488]" />
+              </div>
               <div className="text-sm font-semibold text-white">
                 {t("forArtists")}
               </div>
-              <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
-                {t("forArtistsDesc")}
-              </p>
             </div>
+            <p className="text-sm text-zinc-400 leading-relaxed mb-4">
+              {t("forArtistsDesc")}
+            </p>
+            <ul className="space-y-2">
+              {(["artistFeature1", "artistFeature2", "artistFeature3"] as const).map((key) => (
+                <li key={key} className="flex items-center gap-2 text-xs text-zinc-300">
+                  <Check size={12} className="text-[#0D9488] shrink-0" aria-hidden="true" />
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="flex items-start gap-4 rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
-            <div className="shrink-0 w-12 h-12 rounded-xl bg-[#0D9488]/15 flex items-center justify-center">
-              <Headphones size={24} className="text-[#0D9488]" />
-            </div>
-            <div>
+          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center" aria-hidden="true">
+                <Headphones size={20} className="text-[#0D9488]" />
+              </div>
               <div className="text-sm font-semibold text-white">
                 {t("forEngineers")}
               </div>
-              <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
-                {t("forEngineersDesc")}
-              </p>
             </div>
+            <p className="text-sm text-zinc-400 leading-relaxed mb-4">
+              {t("forEngineersDesc")}
+            </p>
+            <ul className="space-y-2">
+              {(["engineerFeature1", "engineerFeature2", "engineerFeature3"] as const).map((key) => (
+                <li key={key} className="flex items-center gap-2 text-xs text-zinc-300">
+                  <Check size={12} className="text-[#0D9488] shrink-0" aria-hidden="true" />
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 

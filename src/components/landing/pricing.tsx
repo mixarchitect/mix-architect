@@ -108,7 +108,7 @@ function PriceCard({
             <CheckCircle2
               size={16}
               className={`shrink-0 mt-0.5 ${
-                highlighted ? "text-[#0D9488]" : "text-zinc-500"
+                highlighted ? "text-[#0D9488]" : "text-zinc-400"
               }`}
             />
             <span className="text-sm text-white/70">{f}</span>

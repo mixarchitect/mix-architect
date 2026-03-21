@@ -45,13 +45,13 @@ export async function LandingFooter() {
             <span className="cursor-default">{t("navContact")}</span>
           </nav>
 
-          <div className="flex items-center gap-4 text-xs text-zinc-500">
+          <div className="flex items-center gap-4 text-xs text-zinc-400">
             <span className="cursor-default">{t("navTerms")}</span>
             <span className="cursor-default">{t("navPrivacy")}</span>
           </div>
         </div>
 
-        <div className="mt-8 text-center text-xs text-zinc-500">
+        <div className="mt-8 text-center text-xs text-zinc-400">
           &copy; {new Date().getFullYear()} Mix Architect
         </div>
       </div>

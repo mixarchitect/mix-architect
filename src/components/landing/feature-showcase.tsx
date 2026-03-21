@@ -47,7 +47,7 @@ function FeatureSection({
   reverse?: boolean;
 }) {
   const badgeColors = {
-    teal: "bg-[#0D9488]/15 text-[#0D9488] border-[#0D9488]/20",
+    teal: "bg-[#0D9488]/15 text-[#2dd4bf] border-[#0D9488]/20",
     blue: "bg-[#3B82F6]/15 text-[#60A5FA] border-[#3B82F6]/20",
     orange: "bg-[#FE5E0E]/15 text-[#FF6D22] border-[#FE5E0E]/20",
   };
@@ -72,7 +72,7 @@ function FeatureSection({
         </h2>
         <p className="mt-4 text-white/60 leading-relaxed max-w-lg">{body}</p>
       </div>
-      <div className={reverse ? "lg:[direction:ltr]" : ""}>{visual}</div>
+      <div className={reverse ? "lg:[direction:ltr]" : ""} aria-hidden="true">{visual}</div>
     </div>
   );
 }
@@ -382,7 +382,7 @@ function TemplatesMock() {
         <div className="text-sm font-semibold text-white">
           Saved Templates
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0D9488]/15 text-[#0D9488]">
+        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0D9488]/15 text-[#2dd4bf]">
           PRO
         </span>
       </div>
