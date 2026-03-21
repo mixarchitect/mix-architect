@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ function SignInPageContent() {
   const searchParams = useSearchParams();
   const supabase = createSupabaseBrowserClient();
   const { resolvedTheme } = useTheme();
+  const t = useTranslations("auth");
 
   useEffect(() => setMounted(true), []);
 
@@ -58,7 +60,7 @@ function SignInPageContent() {
   useEffect(() => {
     const error = searchParams.get("error");
     if (error === "auth_failed") {
-      setErrorMsg("Sign in failed. Please try again.");
+      setErrorMsg(t("signInFailed"));
     }
   }, [searchParams]);
 
@@ -128,7 +130,7 @@ function SignInPageContent() {
       if (err instanceof Error) {
         setErrorMsg(err.message);
       } else {
-        setErrorMsg("Something went wrong");
+        setErrorMsg(t("somethingWrong"));
       }
     }
   }
@@ -145,8 +147,8 @@ function SignInPageContent() {
             />
             <h1 className="mt-3 text-2xl font-semibold h1 text-text">
               {mode === "signin"
-                ? "Sign In"
-                : "Create Account"}
+                ? t("signIn")
+                : t("createAccount")}
             </h1>
           </PanelHeader>
           <Rule />
@@ -154,9 +156,12 @@ function SignInPageContent() {
             {confirmationSent ? (
               <div className="text-center space-y-3 py-4">
                 <div className="text-3xl">✉️</div>
-                <h2 className="text-lg font-semibold text-text">Check your email</h2>
+                <h2 className="text-lg font-semibold text-text">{t("checkEmail")}</h2>
                 <p className="text-sm text-muted">
-                  We sent a confirmation link to <strong className="text-text">{email}</strong>. Click the link to activate your account.
+                  {t.rich("confirmationSent", {
+                    email,
+                    b: (chunks) => <strong className="text-text">{chunks}</strong>,
+                  })}
                 </p>
                 <button
                   type="button"
@@ -166,7 +171,7 @@ function SignInPageContent() {
                   }}
                   className="text-sm text-text underline underline-offset-2 hover:text-signal transition-colors mt-2"
                 >
-                  Back to sign in
+                  {t("backToSignIn")}
                 </button>
               </div>
             ) : (
@@ -174,31 +179,31 @@ function SignInPageContent() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {mode === "signup" && (
                 <div className="space-y-1.5">
-                  <label className="label text-muted">Name</label>
+                  <label className="label text-muted">{t("name")}</label>
                   <input
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="input"
-                    placeholder="Your name"
+                    placeholder={t("namePlaceholder")}
                   />
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label className="label text-muted">Email</label>
+                <label className="label text-muted">{t("email")}</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input"
-                  placeholder="you@example.com"
+                  placeholder={t("emailPlaceholder")}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="label text-muted">Password</label>
+                <label className="label text-muted">{t("password")}</label>
                 <input
                   type="password"
                   required
@@ -224,12 +229,12 @@ function SignInPageContent() {
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    {mode === "signin" ? "Signing in..." : "Creating account..."}
+                    {mode === "signin" ? t("signingIn") : t("creatingAccount")}
                   </span>
                 ) : mode === "signin" ? (
-                  "Sign in"
+                  t("signInButton")
                 ) : (
-                  "Sign up"
+                  t("signUpButton")
                 )}
               </Button>
             </form>
@@ -240,7 +245,7 @@ function SignInPageContent() {
                 <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-panel px-4 text-faint">or</span>
+                <span className="bg-panel px-4 text-faint">{t("or")}</span>
               </div>
             </div>
 
@@ -253,12 +258,12 @@ function SignInPageContent() {
               {googleLoading ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-zinc-400/40 border-t-zinc-600 rounded-full animate-spin" />
-                  Redirecting...
+                  {t("redirecting")}
                 </span>
               ) : (
                 <>
                   <GoogleIcon />
-                  Continue with Google
+                  {t("continueWithGoogle")}
                 </>
               )}
             </button>
@@ -268,24 +273,24 @@ function SignInPageContent() {
             <p className="text-center text-sm text-muted">
               {mode === "signin" ? (
                 <>
-                  Need an account?{" "}
+                  {t("needAccount")}{" "}
                   <button
                     type="button"
                     onClick={() => setMode("signup")}
                     className="text-text underline underline-offset-2 hover:text-signal transition-colors"
                   >
-                    Sign up
+                    {t("signUpButton")}
                   </button>
                 </>
               ) : (
                 <>
-                  Already have an account?{" "}
+                  {t("alreadyHaveAccount")}{" "}
                   <button
                     type="button"
                     onClick={() => setMode("signin")}
                     className="text-text underline underline-offset-2 hover:text-signal transition-colors"
                   >
-                    Sign in
+                    {t("signInButton")}
                   </button>
                 </>
               )}
@@ -296,7 +301,7 @@ function SignInPageContent() {
                 href="/"
                 className="text-xs text-faint hover:text-muted transition-colors"
               >
-                ← Back to home
+                ← {t("backToHome")}
               </Link>
             </div>
             </>

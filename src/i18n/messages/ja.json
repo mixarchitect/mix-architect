@@ -681,5 +681,29 @@
     "navContact": "お問い合わせ",
     "navTerms": "利用規約",
     "navPrivacy": "プライバシー"
+  },
+  "auth": {
+    "signIn": "サインイン",
+    "createAccount": "アカウント作成",
+    "name": "名前",
+    "namePlaceholder": "あなたの名前",
+    "email": "メール",
+    "emailPlaceholder": "you@example.com",
+    "password": "パスワード",
+    "signingIn": "サインイン中...",
+    "creatingAccount": "アカウント作成中...",
+    "signInButton": "サインイン",
+    "signUpButton": "サインアップ",
+    "or": "または",
+    "continueWithGoogle": "Googleで続ける",
+    "redirecting": "リダイレクト中...",
+    "needAccount": "アカウントが必要ですか？",
+    "alreadyHaveAccount": "すでにアカウントをお持ちですか？",
+    "backToHome": "ホームに戻る",
+    "checkEmail": "メールを確認してください",
+    "confirmationSent": "<b>{email}</b>に確認リンクを送信しました。リンクをクリックしてアカウントを有効化してください。",
+    "backToSignIn": "サインインに戻る",
+    "signInFailed": "サインインに失敗しました。もう一度お試しください。",
+    "somethingWrong": "問題が発生しました"
   }
 }

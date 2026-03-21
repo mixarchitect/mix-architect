@@ -681,5 +681,29 @@
     "navContact": "Kontakt",
     "navTerms": "Villkor",
     "navPrivacy": "Integritet"
+  },
+  "auth": {
+    "signIn": "Logga in",
+    "createAccount": "Skapa konto",
+    "name": "Namn",
+    "namePlaceholder": "Ditt namn",
+    "email": "E-post",
+    "emailPlaceholder": "you@example.com",
+    "password": "Lösenord",
+    "signingIn": "Loggar in...",
+    "creatingAccount": "Skapar konto...",
+    "signInButton": "Logga in",
+    "signUpButton": "Registrera dig",
+    "or": "eller",
+    "continueWithGoogle": "Fortsätt med Google",
+    "redirecting": "Omdirigerar...",
+    "needAccount": "Behöver du ett konto?",
+    "alreadyHaveAccount": "Har du redan ett konto?",
+    "backToHome": "Tillbaka till startsidan",
+    "checkEmail": "Kolla din e-post",
+    "confirmationSent": "Vi har skickat en bekräftelselänk till <b>{email}</b>. Klicka på länken för att aktivera ditt konto.",
+    "backToSignIn": "Tillbaka till inloggning",
+    "signInFailed": "Inloggningen misslyckades. Försök igen.",
+    "somethingWrong": "Något gick fel"
   }
 }

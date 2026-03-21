@@ -682,5 +682,29 @@
     "navContact": "Contact",
     "navTerms": "Conditions",
     "navPrivacy": "Confidentialité"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte",
+    "name": "Nom",
+    "namePlaceholder": "Votre nom",
+    "email": "E-mail",
+    "emailPlaceholder": "you@example.com",
+    "password": "Mot de passe",
+    "signingIn": "Connexion en cours...",
+    "creatingAccount": "Création du compte...",
+    "signInButton": "Se connecter",
+    "signUpButton": "S'inscrire",
+    "or": "ou",
+    "continueWithGoogle": "Continuer avec Google",
+    "redirecting": "Redirection...",
+    "needAccount": "Besoin d'un compte ?",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "backToHome": "Retour à l'accueil",
+    "checkEmail": "Vérifiez votre e-mail",
+    "confirmationSent": "Nous avons envoyé un lien de confirmation à <b>{email}</b>. Cliquez sur le lien pour activer votre compte.",
+    "backToSignIn": "Retour à la connexion",
+    "signInFailed": "Échec de la connexion. Veuillez réessayer.",
+    "somethingWrong": "Une erreur s'est produite"
   }
 }

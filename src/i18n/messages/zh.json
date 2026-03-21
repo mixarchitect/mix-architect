@@ -681,5 +681,29 @@
     "navContact": "联系我们",
     "navTerms": "服务条款",
     "navPrivacy": "隐私政策"
+  },
+  "auth": {
+    "signIn": "登录",
+    "createAccount": "创建账户",
+    "name": "姓名",
+    "namePlaceholder": "您的姓名",
+    "email": "邮箱",
+    "emailPlaceholder": "you@example.com",
+    "password": "密码",
+    "signingIn": "登录中...",
+    "creatingAccount": "创建账户中...",
+    "signInButton": "登录",
+    "signUpButton": "注册",
+    "or": "或",
+    "continueWithGoogle": "使用 Google 继续",
+    "redirecting": "跳转中...",
+    "needAccount": "需要一个账户？",
+    "alreadyHaveAccount": "已有账户？",
+    "backToHome": "返回首页",
+    "checkEmail": "请检查您的邮箱",
+    "confirmationSent": "我们已向 <b>{email}</b> 发送了确认链接。请点击链接激活您的账户。",
+    "backToSignIn": "返回登录",
+    "signInFailed": "登录失败，请重试。",
+    "somethingWrong": "出现了一些问题"
   }
 }

@@ -681,5 +681,29 @@
     "navContact": "संपर्क",
     "navTerms": "शर्तें",
     "navPrivacy": "गोपनीयता"
+  },
+  "auth": {
+    "signIn": "साइन इन",
+    "createAccount": "अकाउंट बनाएं",
+    "name": "नाम",
+    "namePlaceholder": "आपका नाम",
+    "email": "ईमेल",
+    "emailPlaceholder": "you@example.com",
+    "password": "पासवर्ड",
+    "signingIn": "साइन इन हो रहा है...",
+    "creatingAccount": "अकाउंट बनाया जा रहा है...",
+    "signInButton": "साइन इन करें",
+    "signUpButton": "साइन अप करें",
+    "or": "या",
+    "continueWithGoogle": "Google से जारी रखें",
+    "redirecting": "रीडायरेक्ट हो रहा है...",
+    "needAccount": "अकाउंट चाहिए?",
+    "alreadyHaveAccount": "पहले से अकाउंट है?",
+    "backToHome": "होम पर वापस जाएं",
+    "checkEmail": "अपना ईमेल चेक करें",
+    "confirmationSent": "हमने <b>{email}</b> पर एक कन्फर्मेशन लिंक भेजा है। अपना अकाउंट एक्टिवेट करने के लिए लिंक पर क्लिक करें।",
+    "backToSignIn": "साइन इन पर वापस जाएं",
+    "signInFailed": "साइन इन विफल हुआ। कृपया पुनः प्रयास करें।",
+    "somethingWrong": "कुछ गड़बड़ी हुई है"
   }
 }

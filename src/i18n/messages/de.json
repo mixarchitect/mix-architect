@@ -682,5 +682,29 @@
     "navContact": "Kontakt",
     "navTerms": "Nutzungsbedingungen",
     "navPrivacy": "Datenschutz"
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "createAccount": "Konto erstellen",
+    "name": "Name",
+    "namePlaceholder": "Dein Name",
+    "email": "E-Mail",
+    "emailPlaceholder": "you@example.com",
+    "password": "Passwort",
+    "signingIn": "Anmeldung läuft...",
+    "creatingAccount": "Konto wird erstellt...",
+    "signInButton": "Anmelden",
+    "signUpButton": "Registrieren",
+    "or": "oder",
+    "continueWithGoogle": "Weiter mit Google",
+    "redirecting": "Weiterleitung...",
+    "needAccount": "Noch kein Konto?",
+    "alreadyHaveAccount": "Bereits ein Konto?",
+    "backToHome": "Zurück zur Startseite",
+    "checkEmail": "Überprüfe deine E-Mail",
+    "confirmationSent": "Wir haben einen Bestätigungslink an <b>{email}</b> gesendet. Klicke auf den Link, um dein Konto zu aktivieren.",
+    "backToSignIn": "Zurück zur Anmeldung",
+    "signInFailed": "Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
+    "somethingWrong": "Etwas ist schiefgelaufen"
   }
 }
