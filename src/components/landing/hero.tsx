@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Music, Headphones, Check } from "lucide-react";
 import { FilledArrowRight } from "@/components/ui/filled-icon";
 import { getTranslations } from "next-intl/server";
 
@@ -48,49 +47,37 @@ export async function Hero() {
         </p>
 
         {/* Persona callouts */}
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 max-w-2xl mx-auto">
-          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center" aria-hidden="true">
-                <Music size={20} className="text-[#0D9488]" />
+        <div className="mt-14 flex flex-col gap-4 max-w-2xl mx-auto">
+          {/* Artists */}
+          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/[0.06] p-6 text-left">
+            <div className="grid grid-cols-1 md:grid-cols-[200px_1px_1fr] gap-4 md:gap-6">
+              <div>
+                <div className="text-lg font-medium text-[#0D9488]">{t("forArtists")}</div>
+                <p className="text-sm text-zinc-500 mt-1.5 leading-relaxed">{t("forArtistsDesc")}</p>
               </div>
-              <div className="text-sm font-semibold text-white">
-                {t("forArtists")}
+              <div className="h-px w-full bg-[#0D9488]/40 md:h-auto md:w-px" />
+              <div className="flex flex-col gap-2">
+                {(["artistFeature1", "artistFeature2", "artistFeature3"] as const).map((key) => (
+                  <span key={key} className="text-sm text-zinc-400">{t(key)}</span>
+                ))}
               </div>
             </div>
-            <p className="text-sm text-zinc-400 leading-relaxed mb-4">
-              {t("forArtistsDesc")}
-            </p>
-            <ul className="space-y-2">
-              {(["artistFeature1", "artistFeature2", "artistFeature3"] as const).map((key) => (
-                <li key={key} className="flex items-center gap-2 text-xs text-zinc-300">
-                  <Check size={12} className="text-[#0D9488] shrink-0" aria-hidden="true" />
-                  {t(key)}
-                </li>
-              ))}
-            </ul>
           </div>
 
-          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center" aria-hidden="true">
-                <Headphones size={20} className="text-[#0D9488]" />
+          {/* Engineers & Producers */}
+          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/[0.06] p-6 text-left">
+            <div className="grid grid-cols-1 md:grid-cols-[200px_1px_1fr] gap-4 md:gap-6">
+              <div>
+                <div className="text-lg font-medium text-[#0D9488]">{t("forEngineers")}</div>
+                <p className="text-sm text-zinc-500 mt-1.5 leading-relaxed">{t("forEngineersDesc")}</p>
               </div>
-              <div className="text-sm font-semibold text-white">
-                {t("forEngineers")}
+              <div className="h-px w-full bg-[#0D9488]/40 md:h-auto md:w-px" />
+              <div className="flex flex-col gap-2">
+                {(["engineerFeature1", "engineerFeature2", "engineerFeature3"] as const).map((key) => (
+                  <span key={key} className="text-sm text-zinc-400">{t(key)}</span>
+                ))}
               </div>
             </div>
-            <p className="text-sm text-zinc-400 leading-relaxed mb-4">
-              {t("forEngineersDesc")}
-            </p>
-            <ul className="space-y-2">
-              {(["engineerFeature1", "engineerFeature2", "engineerFeature3"] as const).map((key) => (
-                <li key={key} className="flex items-center gap-2 text-xs text-zinc-300">
-                  <Check size={12} className="text-[#0D9488] shrink-0" aria-hidden="true" />
-                  {t(key)}
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
 
