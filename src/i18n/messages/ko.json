@@ -79,6 +79,9 @@
       "engineerDesc": "다른 사람의 프로젝트를 작업합니다",
       "both": "둘 다",
       "bothDesc": "내 음악을 발표하고 클라이언트 프로젝트도 작업합니다",
+      "artistFeatures": "릴리스 계획, 오디오 리뷰, 배급 추적 등",
+      "engineerFeatures": "모두 포함: 결제, 클라이언트 포털, 인보이스, 그리고 모든 릴리스 도구",
+      "bothFeatures": "전체 스위트: 클라이언트 도구, 결제, 릴리스 계획, 배급 관리",
       "other": "다른 용도? 전체 액세스로 시작하기",
       "note": "이 설정은 사용자 경험을 맞춤화하는 데 도움이 됩니다. 언제든지 설정에서 변경할 수 있습니다."
     },
@@ -367,7 +370,9 @@
     "outstanding": "미결제",
     "earned": "수익",
     "totalFees": "총 수수료",
-    "releaseCount": "{count, plural, one {릴리스 #개} other {릴리스 #개}}"
+    "releaseCount": "{count, plural, one {릴리스 #개} other {릴리스 #개}}",
+    "timeLogged": "기록된 시간",
+    "totalExpenses": "총 경비"
   },
   "settings": {
     "title": "사용자 설정",
@@ -409,6 +414,12 @@
       "bothLabel": "둘 다, 내 음악 발표와 클라이언트 작업 모두",
       "otherLabel": "기타, 전체 액세스, 프리셋 없음",
       "note": "이는 기본적으로 표시되는 기능을 제어합니다. 전환해도 데이터가 삭제되지 않습니다."
+    },
+    "featureVisibility": {
+      "title": "기능 표시",
+      "description": "사이드바 및 릴리스 페이지에 표시되는 기능을 제어합니다. 숨긴 기능은 삭제되지 않으며 언제든 다시 활성화할 수 있습니다.",
+      "clientBusiness": "클라이언트 및 비즈니스",
+      "releaseAudio": "릴리스 및 오디오"
     },
     "paymentTracking": {
       "title": "결제 추적",
@@ -501,6 +512,16 @@
     "getInTouchDesc": "직접적인 지원, 질문, 파트너십 문의는 이메일로 연락주세요.",
     "allCategories": "전체",
     "noResults": "\"{query}\"에 대한 문서를 찾을 수 없습니다",
+    "whatsNew": "새로운 소식",
+    "whatsNewDesc": "Mix Architect의 최신 업데이트 및 개선 사항.",
+    "noChangelog": "아직 업데이트가 없습니다. 나중에 다시 확인해 주세요!",
+    "viewAllChangelog": "모든 업데이트 보기",
+    "systemStatus": "시스템 상태",
+    "systemStatusTitle": "시스템 상태",
+    "allSystemsOperational": "모든 시스템 정상 운영 중",
+    "someSystemsDegraded": "일부 시스템에 문제가 발생했습니다",
+    "systemOutage": "시스템 장애가 감지되었습니다",
+    "lastChecked": "마지막 확인",
     "categories": {
       "getting-started": "시작하기",
       "releases": "릴리스",

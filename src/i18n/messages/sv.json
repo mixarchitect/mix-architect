@@ -79,6 +79,9 @@
       "engineerDesc": "Jag jobbar med andras projekt",
       "both": "Båda",
       "bothDesc": "Jag släpper egen musik och jobbar med klientprojekt",
+      "artistFeatures": "Releaseplanering, ljudgranskning, distributionsspårning och mer",
+      "engineerFeatures": "Allt inkluderat: betalningar, klientportal, fakturering, plus alla releaseverktyg",
+      "bothFeatures": "Komplett svit: klientverktyg, betalningar, releaseplanering och distribution",
       "other": "Något annat? Börja med full åtkomst",
       "note": "Detta hjälper oss att anpassa din upplevelse. Du kan ändra detta när som helst i Inställningar."
     },
@@ -367,7 +370,9 @@
     "outstanding": "Utestående",
     "earned": "Tjänat",
     "totalFees": "Totala avgifter",
-    "releaseCount": "{count, plural, one {# release} other {# releaser}}"
+    "releaseCount": "{count, plural, one {# release} other {# releaser}}",
+    "timeLogged": "Loggad tid",
+    "totalExpenses": "Totala utgifter"
   },
   "settings": {
     "title": "Användarinställningar",
@@ -409,6 +414,12 @@
       "bothLabel": "Båda, jag släpper egen musik och jobbar med klientarbeten",
       "otherLabel": "Annat, full åtkomst, ingen förinställning",
       "note": "Detta styr vilka funktioner som visas som standard. Att byta tar inte bort någon data."
+    },
+    "featureVisibility": {
+      "title": "Funktionssynlighet",
+      "description": "Styr vilka funktioner som visas i sidopanelen och releasesidorna. Dolda funktioner tas inte bort — du kan aktivera dem igen när som helst.",
+      "clientBusiness": "Klient och affär",
+      "releaseAudio": "Release och ljud"
     },
     "paymentTracking": {
       "title": "Betalningsspårning",
@@ -501,6 +512,16 @@
     "getInTouchDesc": "För direkt support, frågor eller partnerförfrågningar, hör av dig via e-post.",
     "allCategories": "Alla",
     "noResults": "Inga artiklar hittades för \"{query}\"",
+    "whatsNew": "Nyheter",
+    "whatsNewDesc": "Senaste uppdateringar och förbättringar av Mix Architect.",
+    "noChangelog": "Inga uppdateringar ännu — kom tillbaka snart!",
+    "viewAllChangelog": "Visa alla uppdateringar",
+    "systemStatus": "Systemstatus",
+    "systemStatusTitle": "Systemstatus",
+    "allSystemsOperational": "Alla system fungerar normalt",
+    "someSystemsDegraded": "Vissa system upplever problem",
+    "systemOutage": "Systemavbrott upptäckt",
+    "lastChecked": "Senast kontrollerad",
     "categories": {
       "getting-started": "Kom igång",
       "releases": "Releaser",

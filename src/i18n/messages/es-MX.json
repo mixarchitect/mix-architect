@@ -75,10 +75,13 @@
       "title": "¿Cómo usarás Mix Architect?",
       "artist": "Artista",
       "artistDesc": "Lanzo mi propia música",
+      "artistFeatures": "Planeación de lanzamientos, revisión de audio, rastreo de distribución y más",
       "engineer": "Ingeniero / Productor",
       "engineerDesc": "Trabajo en proyectos de otras personas",
+      "engineerFeatures": "Todo incluido: pagos, portal de clientes, facturación, más todas las herramientas de lanzamiento",
       "both": "Ambas",
       "bothDesc": "Lanzo mi propia música y trabajo en proyectos de clientes",
+      "bothFeatures": "Paquete completo: herramientas de clientes, pagos, planeación de lanzamientos y distribución",
       "other": "¿Algo más? Empieza con acceso completo",
       "note": "Esto nos ayuda a personalizar tu experiencia. Puedes cambiar esto en cualquier momento en Configuración."
     },
@@ -367,7 +370,9 @@
     "outstanding": "Pendiente",
     "earned": "Ganado",
     "totalFees": "Tarifas Totales",
-    "releaseCount": "{count, plural, one {# lanzamiento} other {# lanzamientos}}"
+    "releaseCount": "{count, plural, one {# lanzamiento} other {# lanzamientos}}",
+    "timeLogged": "Tiempo registrado",
+    "totalExpenses": "Gastos totales"
   },
   "settings": {
     "title": "Configuración de usuario",
@@ -409,6 +414,12 @@
       "bothLabel": "Ambos, lanzo mi propia música y trabajo con clientes",
       "otherLabel": "Otro, acceso completo, sin preajustes",
       "note": "Esto controla qué características se muestran por defecto. Cambiar no elimina ningún dato."
+    },
+    "featureVisibility": {
+      "title": "Visibilidad de características",
+      "description": "Controla qué características aparecen en tu barra lateral y páginas de lanzamiento. Las características ocultas no se borran — puedes reactivarlas cuando quieras.",
+      "clientBusiness": "Clientes y negocios",
+      "releaseAudio": "Lanzamiento y audio"
     },
     "paymentTracking": {
       "title": "Seguimiento de Pagos",
@@ -497,6 +508,16 @@
     "suggestFeature": "Sugerir una Característica",
     "contact": "Contacto",
     "searchPlaceholder": "Buscar artículos...",
+    "whatsNew": "Novedades",
+    "whatsNewDesc": "Últimas actualizaciones y mejoras en Mix Architect.",
+    "noChangelog": "Todavía no hay actualizaciones — ¡regresa pronto!",
+    "viewAllChangelog": "Ver todas las actualizaciones",
+    "systemStatus": "Estado del sistema",
+    "systemStatusTitle": "Estado del sistema",
+    "allSystemsOperational": "Todos los sistemas funcionando correctamente",
+    "someSystemsDegraded": "Algunos sistemas están presentando fallas",
+    "systemOutage": "Se detectó una caída del sistema",
+    "lastChecked": "Última revisión",
     "getInTouch": "Ponte en Contacto",
     "getInTouchDesc": "Para soporte directo, preguntas o consultas de asociación, contáctanos por email.",
     "allCategories": "Todos",

@@ -75,10 +75,13 @@
       "title": "Wie wirst du Mix Architect verwenden?",
       "artist": "Künstler",
       "artistDesc": "Ich veröffentliche meine eigene Musik",
+      "artistFeatures": "Release-Planung, Audio-Review, Vertriebsverfolgung und mehr",
       "engineer": "Tontechniker / Produzent",
       "engineerDesc": "Ich arbeite an Projekten anderer Leute",
+      "engineerFeatures": "Alles inklusive: Zahlungen, Kundenportal, Rechnungsstellung, plus alle Release-Tools",
       "both": "Beides",
       "bothDesc": "Ich veröffentliche meine eigene Musik und arbeite an Kundenprojekten",
+      "bothFeatures": "Komplettpaket: Kunden-Tools, Zahlungen, Release-Planung und Vertrieb",
       "other": "Etwas anderes? Mit vollständigem Zugriff starten",
       "note": "Dies hilft uns, dein Erlebnis anzupassen. Du kannst dies jederzeit in den Einstellungen ändern."
     },
@@ -367,7 +370,9 @@
     "outstanding": "Ausstehend",
     "earned": "Verdient",
     "totalFees": "Gesamthonorare",
-    "releaseCount": "{count, plural, one {# Release} other {# Releases}}"
+    "releaseCount": "{count, plural, one {# Release} other {# Releases}}",
+    "timeLogged": "Erfasste Zeit",
+    "totalExpenses": "Gesamtausgaben"
   },
   "settings": {
     "title": "Benutzereinstellungen",
@@ -409,6 +414,12 @@
       "bothLabel": "Beides, ich veröffentliche meine eigene Musik und arbeite an Kundenprojekten",
       "otherLabel": "Andere, vollständiger Zugriff, keine Voreinstellung",
       "note": "Dies steuert, welche Funktionen standardmäßig angezeigt werden. Das Wechseln löscht keine Daten."
+    },
+    "featureVisibility": {
+      "title": "Funktionssichtbarkeit",
+      "description": "Steuere, welche Funktionen in deiner Seitenleiste und auf Release-Seiten angezeigt werden. Ausgeblendete Funktionen werden nicht gelöscht — du kannst sie jederzeit wieder aktivieren.",
+      "clientBusiness": "Kunden & Geschäft",
+      "releaseAudio": "Release & Audio"
     },
     "paymentTracking": {
       "title": "Zahlungsverfolgung",
@@ -497,6 +508,16 @@
     "suggestFeature": "Feature vorschlagen",
     "contact": "Kontakt",
     "searchPlaceholder": "Artikel durchsuchen...",
+    "whatsNew": "Neuigkeiten",
+    "whatsNewDesc": "Neueste Updates und Verbesserungen für Mix Architect.",
+    "noChangelog": "Noch keine Updates — schau bald wieder vorbei!",
+    "viewAllChangelog": "Alle Updates anzeigen",
+    "systemStatus": "Systemstatus",
+    "systemStatusTitle": "Systemstatus",
+    "allSystemsOperational": "Alle Systeme sind betriebsbereit",
+    "someSystemsDegraded": "Einige Systeme haben Probleme",
+    "systemOutage": "Systemausfall erkannt",
+    "lastChecked": "Zuletzt geprüft",
     "getInTouch": "Kontakt aufnehmen",
     "getInTouchDesc": "Für direkten Support, Fragen oder Partnerschaftsanfragen erreiche uns per E-Mail.",
     "allCategories": "Alle",

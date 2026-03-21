@@ -75,10 +75,13 @@
       "title": "Como você usará o Mix Architect?",
       "artist": "Artista",
       "artistDesc": "Estou lançando minha própria música",
+      "artistFeatures": "Planejamento de lançamento, revisão de áudio, acompanhamento de distribuição e mais",
       "engineer": "Engenheiro / Produtor",
       "engineerDesc": "Trabalho em projetos de outras pessoas",
+      "engineerFeatures": "Tudo incluído: pagamentos, portal do cliente, faturamento, além de todas as ferramentas de lançamento",
       "both": "Ambos",
       "bothDesc": "Lanço minha própria música e trabalho em projetos de clientes",
+      "bothFeatures": "Pacote completo: ferramentas para clientes, pagamentos, planejamento de lançamento e distribuição",
       "other": "Algo diferente? Comece com acesso completo",
       "note": "Isso nos ajuda a personalizar sua experiência. Você pode mudar isso a qualquer momento nas Configurações."
     },
@@ -367,7 +370,9 @@
     "outstanding": "Pendente",
     "earned": "Recebido",
     "totalFees": "Taxas Totais",
-    "releaseCount": "{count, plural, one {# lançamento} other {# lançamentos}}"
+    "releaseCount": "{count, plural, one {# lançamento} other {# lançamentos}}",
+    "timeLogged": "Tempo registrado",
+    "totalExpenses": "Despesas totais"
   },
   "settings": {
     "title": "Configurações do usuário",
@@ -409,6 +414,12 @@
       "bothLabel": "Ambos, lanço minha própria música e trabalho para clientes",
       "otherLabel": "Outro, acesso completo, sem preset",
       "note": "Isso controla quais funcionalidades são mostradas por padrão. Trocar não exclui nenhum dado."
+    },
+    "featureVisibility": {
+      "title": "Visibilidade de funcionalidades",
+      "description": "Controle quais funcionalidades aparecem na sua barra lateral e nas páginas de lançamento. Funcionalidades ocultas não são excluídas — você pode reativá-las a qualquer momento.",
+      "clientBusiness": "Clientes e negócios",
+      "releaseAudio": "Lançamento e áudio"
     },
     "paymentTracking": {
       "title": "Rastreamento de Pagamentos",
@@ -497,6 +508,16 @@
     "suggestFeature": "Sugerir Funcionalidade",
     "contact": "Contato",
     "searchPlaceholder": "Pesquisar artigos...",
+    "whatsNew": "Novidades",
+    "whatsNewDesc": "Últimas atualizações e melhorias do Mix Architect.",
+    "noChangelog": "Nenhuma atualização ainda — volte em breve!",
+    "viewAllChangelog": "Ver todas as atualizações",
+    "systemStatus": "Status do sistema",
+    "systemStatusTitle": "Status do sistema",
+    "allSystemsOperational": "Todos os sistemas operacionais",
+    "someSystemsDegraded": "Alguns sistemas com problemas",
+    "systemOutage": "Falha no sistema detectada",
+    "lastChecked": "Última verificação",
     "getInTouch": "Entre em Contato",
     "getInTouchDesc": "Para suporte direto, dúvidas ou consultas sobre parcerias, entre em contato por email.",
     "allCategories": "Todos",

@@ -79,6 +79,9 @@
       "engineerDesc": "他の人のプロジェクトを手がけています",
       "both": "両方",
       "bothDesc": "自分の音楽をリリースし、クライアントワークも行っています",
+      "artistFeatures": "リリース計画、オーディオレビュー、配信トラッキングなど",
+      "engineerFeatures": "すべて含む：支払い、クライアントポータル、請求書、さらにすべてのリリースツール",
+      "bothFeatures": "フルスイート：クライアントツール、支払い、リリース計画、配信管理",
       "other": "その他の場合はフルアクセスから開始",
       "note": "これによりあなたの体験をカスタマイズします。設定でいつでも変更できます。"
     },
@@ -367,7 +370,9 @@
     "outstanding": "未払い",
     "earned": "獲得済み",
     "totalFees": "総料金",
-    "releaseCount": "{count, plural, one {#リリース} other {#リリース}}"
+    "releaseCount": "{count, plural, one {#リリース} other {#リリース}}",
+    "timeLogged": "記録された時間",
+    "totalExpenses": "総経費"
   },
   "settings": {
     "title": "ユーザー設定",
@@ -409,6 +414,12 @@
       "bothLabel": "両方、自分の音楽をリリースしクライアントワークも行う",
       "otherLabel": "その他、フルアクセス、プリセットなし",
       "note": "これにより表示されるデフォルト機能を制御します。切り替えによりデータが削除されることはありません。"
+    },
+    "featureVisibility": {
+      "title": "機能の表示",
+      "description": "サイドバーやリリースページに表示される機能を管理します。非表示にした機能は削除されません。いつでも再度有効にできます。",
+      "clientBusiness": "クライアント＆ビジネス",
+      "releaseAudio": "リリース＆オーディオ"
     },
     "paymentTracking": {
       "title": "支払い追跡",
@@ -501,6 +512,16 @@
     "getInTouchDesc": "直接サポート、質問、パートナーシップに関するお問い合わせは、メールでご連絡ください。",
     "allCategories": "すべて",
     "noResults": "「{query}」に一致する記事が見つかりません",
+    "whatsNew": "新着情報",
+    "whatsNewDesc": "Mix Architectの最新のアップデートと改善。",
+    "noChangelog": "まだ更新はありません。後でまたご確認ください！",
+    "viewAllChangelog": "すべての更新を見る",
+    "systemStatus": "システムステータス",
+    "systemStatusTitle": "システムステータス",
+    "allSystemsOperational": "すべてのシステムが正常に稼働中",
+    "someSystemsDegraded": "一部のシステムに問題が発生しています",
+    "systemOutage": "システム障害が検出されました",
+    "lastChecked": "最終確認",
     "categories": {
       "getting-started": "始め方",
       "releases": "リリース",

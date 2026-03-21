@@ -75,10 +75,13 @@
       "title": "Comment utiliserez-vous Mix Architect ?",
       "artist": "Artiste",
       "artistDesc": "Je sors ma propre musique",
+      "artistFeatures": "Planification de sortie, révision audio, suivi de distribution et plus encore",
       "engineer": "Ingénieur / Producteur",
       "engineerDesc": "Je travaille sur les projets d'autres personnes",
+      "engineerFeatures": "Tout inclus : paiements, portail client, facturation, plus tous les outils de sortie",
       "both": "Les deux",
       "bothDesc": "Je sors ma propre musique et je travaille sur des projets clients",
+      "bothFeatures": "Suite complète : outils clients, paiements, planification de sortie et distribution",
       "other": "Autre chose ? Commencez avec un accès complet",
       "note": "Cela nous aide à adapter votre expérience. Vous pouvez changer cela à tout moment dans les Paramètres."
     },
@@ -367,7 +370,9 @@
     "outstanding": "En attente",
     "earned": "Gagné",
     "totalFees": "Tarifs totaux",
-    "releaseCount": "{count, plural, one {# sortie} other {# sorties}}"
+    "releaseCount": "{count, plural, one {# sortie} other {# sorties}}",
+    "timeLogged": "Temps enregistré",
+    "totalExpenses": "Dépenses totales"
   },
   "settings": {
     "title": "Paramètres utilisateur",
@@ -409,6 +414,12 @@
       "bothLabel": "Les deux, je sors ma propre musique et travaille sur des projets clients",
       "otherLabel": "Autre, accès complet, aucun préréglage",
       "note": "Cela contrôle quelles fonctionnalités sont affichées par défaut. Changer ne supprime aucune donnée."
+    },
+    "featureVisibility": {
+      "title": "Visibilité des fonctionnalités",
+      "description": "Contrôlez quelles fonctionnalités apparaissent dans votre barre latérale et vos pages de sortie. Les fonctionnalités masquées ne sont pas supprimées — vous pouvez les réactiver à tout moment.",
+      "clientBusiness": "Client et affaires",
+      "releaseAudio": "Sortie et audio"
     },
     "paymentTracking": {
       "title": "Suivi des paiements",
@@ -497,6 +508,16 @@
     "suggestFeature": "Suggérer une fonctionnalité",
     "contact": "Contact",
     "searchPlaceholder": "Rechercher des articles...",
+    "whatsNew": "Nouveautés",
+    "whatsNewDesc": "Dernières mises à jour et améliorations de Mix Architect.",
+    "noChangelog": "Pas encore de mises à jour — revenez bientôt !",
+    "viewAllChangelog": "Voir toutes les mises à jour",
+    "systemStatus": "État du système",
+    "systemStatusTitle": "État du système",
+    "allSystemsOperational": "Tous les systèmes sont opérationnels",
+    "someSystemsDegraded": "Certains systèmes rencontrent des problèmes",
+    "systemOutage": "Panne système détectée",
+    "lastChecked": "Dernière vérification",
     "getInTouch": "Nous contacter",
     "getInTouchDesc": "Pour un support direct, des questions ou des demandes de partenariat, contactez-nous par email.",
     "allCategories": "Tout",

@@ -79,6 +79,9 @@
       "engineerDesc": "我为他人的项目工作",
       "both": "两者都是",
       "bothDesc": "我既发行自己的音乐，也承接客户项目",
+      "artistFeatures": "发行规划、音频审核、发行跟踪等",
+      "engineerFeatures": "全部包含：付款、客户门户、发票，以及所有发行工具",
+      "bothFeatures": "完整套件：客户工具、付款、发行规划和发行管理",
       "other": "其他选项？开始使用完整功能",
       "note": "这有助于我们为您定制体验。您可以随时在设置中更改。"
     },
@@ -367,7 +370,9 @@
     "outstanding": "未付款",
     "earned": "已收入",
     "totalFees": "总费用",
-    "releaseCount": "{count, plural, one {# 个发行} other {# 个发行}}"
+    "releaseCount": "{count, plural, one {# 个发行} other {# 个发行}}",
+    "timeLogged": "记录时间",
+    "totalExpenses": "总支出"
   },
   "settings": {
     "title": "用户设置",
@@ -409,6 +414,12 @@
       "bothLabel": "两者都是，我既发行自己的音乐也承接客户工作",
       "otherLabel": "其他，完整访问权限，无预设",
       "note": "这控制默认显示哪些功能。切换不会删除任何数据。"
+    },
+    "featureVisibility": {
+      "title": "功能可见性",
+      "description": "控制哪些功能显示在侧边栏和发行页面中。隐藏的功能不会被删除，您可以随时重新启用。",
+      "clientBusiness": "客户与业务",
+      "releaseAudio": "发行与音频"
     },
     "paymentTracking": {
       "title": "付款跟踪",
@@ -501,6 +512,16 @@
     "getInTouchDesc": "如需直接支持、问询或合作咨询，请通过邮件联系我们。",
     "allCategories": "全部",
     "noResults": "未找到\"{query}\"相关文章",
+    "whatsNew": "最新动态",
+    "whatsNewDesc": "Mix Architect 的最新更新和改进。",
+    "noChangelog": "暂无更新，请稍后再来查看！",
+    "viewAllChangelog": "查看所有更新",
+    "systemStatus": "系统状态",
+    "systemStatusTitle": "系统状态",
+    "allSystemsOperational": "所有系统正常运行",
+    "someSystemsDegraded": "部分系统出现问题",
+    "systemOutage": "检测到系统故障",
+    "lastChecked": "最后检查",
     "categories": {
       "getting-started": "入门指南",
       "releases": "发行",
