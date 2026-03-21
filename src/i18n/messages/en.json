@@ -657,6 +657,8 @@
     "subheadline": "Mix Architect is the release management platform built for independent artists and audio professionals.",
     "forArtists": "For Artists",
     "forArtistsDesc": "Releasing your own music? Organize every step from mix brief to distribution.",
+    "forArtistsShort": "From mix brief to distribution.",
+    "forEngineersShort": "Clients, reviews, and payments.",
     "artistFeature1": "Plan releases with target dates and milestones",
     "artistFeature2": "Review mixes and leave timestamped notes",
     "artistFeature3": "Track distribution across platforms",

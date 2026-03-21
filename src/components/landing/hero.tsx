@@ -46,8 +46,22 @@ export async function Hero() {
           {t("subheadline")}
         </p>
 
+        {/* Persona labels */}
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 py-2 mb-7">
+          <div className="text-center">
+            <p className="text-[15px] font-medium text-[#0D9488] mb-1">{t("forArtists")}</p>
+            <p className="text-[13px] text-zinc-400">{t("forArtistsShort")}</p>
+          </div>
+          <div className="hidden sm:block w-px self-stretch bg-[#0D9488]/30" />
+          <div className="block sm:hidden h-px w-12 bg-[#0D9488]/30 mx-auto" />
+          <div className="text-center">
+            <p className="text-[15px] font-medium text-[#0D9488] mb-1">{t("forEngineers")}</p>
+            <p className="text-[13px] text-zinc-400">{t("forEngineersShort")}</p>
+          </div>
+        </div>
+
         {/* CTAs */}
-        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/auth/sign-in?mode=signup"
             className="h-14 w-full sm:w-64 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D9488] text-white hover:bg-[#0fb9ab] transition-colors whitespace-nowrap"
@@ -66,39 +80,6 @@ export async function Hero() {
         <p className="mt-8 text-sm text-zinc-400">
           {t("freeToTry")}
         </p>
-
-        {/* Persona callouts */}
-        <div className="mt-14 flex flex-col gap-4 max-w-2xl mx-auto">
-          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/[0.06] p-6 text-left">
-            <div className="grid grid-cols-1 md:grid-cols-[200px_1px_1fr] gap-4 md:gap-6">
-              <div>
-                <div className="text-lg font-medium text-[#0D9488]">{t("forArtists")}</div>
-                <p className="text-sm text-zinc-500 mt-1.5 leading-relaxed">{t("forArtistsDesc")}</p>
-              </div>
-              <div className="h-px w-full bg-[#0D9488]/40 md:h-auto md:w-px" />
-              <div className="flex flex-col gap-2">
-                {(["artistFeature1", "artistFeature2", "artistFeature3"] as const).map((key) => (
-                  <span key={key} className="text-sm text-zinc-400">{t(key)}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/[0.06] p-6 text-left">
-            <div className="grid grid-cols-1 md:grid-cols-[200px_1px_1fr] gap-4 md:gap-6">
-              <div>
-                <div className="text-lg font-medium text-[#0D9488]">{t("forEngineers")}</div>
-                <p className="text-sm text-zinc-500 mt-1.5 leading-relaxed">{t("forEngineersDesc")}</p>
-              </div>
-              <div className="h-px w-full bg-[#0D9488]/40 md:h-auto md:w-px" />
-              <div className="flex flex-col gap-2">
-                {(["engineerFeature1", "engineerFeature2", "engineerFeature3"] as const).map((key) => (
-                  <span key={key} className="text-sm text-zinc-400">{t(key)}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

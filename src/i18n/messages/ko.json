@@ -657,6 +657,8 @@
     "subheadline": "Mix Architect는 독립 아티스트와 오디오 전문가를 위해 만들어진 릴리스 관리 플랫폼입니다.",
     "forArtists": "아티스트를 위한",
     "forArtistsDesc": "본인의 음악을 발표하시나요? 믹스 브리프부터 배급까지 모든 단계를 정리하세요.",
+    "forArtistsShort": "믹스 브리프부터 유통까지.",
+    "forEngineersShort": "클라이언트, 리뷰, 결제.",
     "artistFeature1": "목표일과 마일스톤으로 릴리스 계획",
     "artistFeature2": "믹스를 리뷰하고 타임스탬프 메모 남기기",
     "artistFeature3": "플랫폼 전체의 유통 현황 추적",

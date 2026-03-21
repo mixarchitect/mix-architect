@@ -657,6 +657,8 @@
     "subheadline": "Mix Architect är releashanteringsplattformen byggd för oberoende artister och ljudproffs.",
     "forArtists": "För artister",
     "forArtistsDesc": "Släpper du din egen musik? Organisera varje steg från mixinstruktion till distribution.",
+    "forArtistsShort": "Från mixbrief till distribution.",
+    "forEngineersShort": "Kunder, granskningar och betalningar.",
     "artistFeature1": "Planera releaser med måldatum och milstolpar",
     "artistFeature2": "Granska mixar och lämna tidsstämplade anteckningar",
     "artistFeature3": "Följ distributionen över plattformar",

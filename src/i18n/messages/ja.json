@@ -657,6 +657,8 @@
     "subheadline": "Mix Architectは、インディペンデントアーティストとオーディオプロフェッショナルのために構築されたリリース管理プラットフォームです。",
     "forArtists": "アーティスト向け",
     "forArtistsDesc": "自分の音楽をリリースしていますか？ミックス概要から配信まで、すべてのステップを整理しましょう。",
+    "forArtistsShort": "ミックスブリーフから配信まで。",
+    "forEngineersShort": "クライアント、レビュー、支払い。",
     "artistFeature1": "目標日とマイルストーンでリリースを計画",
     "artistFeature2": "ミックスをレビューしてタイムスタンプ付きメモを残す",
     "artistFeature3": "プラットフォーム全体の配信を追跡",
