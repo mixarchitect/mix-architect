@@ -39,7 +39,7 @@ export async function FeaturedReleaseSection({
         <h2 id="featured-heading" className="text-center text-3xl md:text-4xl font-bold text-white mb-2">
           {t("featuredReleaseHeading")}
         </h2>
-        <p className="text-center mt-4 text-white/50 mb-8">
+        <p className="text-center mt-4 text-zinc-400 mb-8">
           {t("featuredReleaseDesc")}
         </p>
 

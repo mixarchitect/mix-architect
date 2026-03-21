@@ -15,7 +15,7 @@ import { getTranslations } from "next-intl/server";
 function LufsMeter() {
   return (
     <div className="mt-4 rounded-lg bg-white/4 p-3">
-      <div className="flex items-center justify-between text-[10px] text-white/30 mb-2">
+      <div className="flex items-center justify-between text-[10px] text-white/60 mb-2">
         <span>-24</span>
         <span>-14</span>
         <span>-6</span>
@@ -36,7 +36,7 @@ function LufsMeter() {
       </div>
       <div className="flex items-center justify-between mt-2">
         <span className="text-[10px] text-[#0D9488] font-semibold">-14.2 LUFS</span>
-        <span className="text-[10px] text-white/30">Spotify target</span>
+        <span className="text-[10px] text-white/60">Spotify target</span>
       </div>
     </div>
   );
@@ -51,13 +51,13 @@ function FormatConversion() {
             className={`text-[10px] font-semibold px-2 py-1 rounded ${
               i === 0
                 ? "bg-[#0D9488]/15 text-[#0D9488]"
-                : "bg-white/6 text-white/40"
+                : "bg-white/6 text-white/60"
             }`}
           >
             {fmt}
           </span>
           {i < 3 && (
-            <span className="text-white/20 text-[10px]">&rarr;</span>
+            <span className="text-white/60 text-[10px]">&rarr;</span>
           )}
         </div>
       ))}
@@ -135,13 +135,13 @@ function VersionTabs() {
           className={`text-[10px] px-2.5 py-1 rounded-full font-medium ${
             i === 2
               ? "bg-[#0D9488] text-[#1a1a1a] font-semibold"
-              : "bg-white/8 text-white/40"
+              : "bg-white/8 text-white/60"
           }`}
         >
           {v}
         </span>
       ))}
-      <span className="ml-auto text-[10px] text-white/30">Latest</span>
+      <span className="ml-auto text-[10px] text-white/60">Latest</span>
     </div>
   );
 }
@@ -207,7 +207,7 @@ export async function AudioToolsGrid() {
           <h2 className="text-3xl md:text-4xl font-bold text-white">
             {t("audioToolsHeadline")}
           </h2>
-          <p className="mt-4 text-white/50 max-w-xl mx-auto">
+          <p className="mt-4 text-white/60 max-w-xl mx-auto">
             {t("audioToolsDesc")}
           </p>
         </div>
@@ -224,7 +224,7 @@ export async function AudioToolsGrid() {
               <h3 className="text-base font-semibold text-white mb-2">
                 {tool.title}
               </h3>
-              <p className="text-sm text-white/50 leading-relaxed">
+              <p className="text-sm text-white/60 leading-relaxed">
                 {tool.description}
               </p>
               {tool.visual}

@@ -16,7 +16,7 @@ export async function LandingFooter() {
             className="h-6 w-auto opacity-50"
           />
 
-          <nav aria-label="Footer" className="flex flex-wrap justify-center gap-6 text-sm text-white/40">
+          <nav aria-label="Footer" className="flex flex-wrap justify-center gap-6 text-sm text-zinc-400">
             <a
               href="#features"
               className="hover:text-white/70 transition-colors"
@@ -45,13 +45,13 @@ export async function LandingFooter() {
             <span className="cursor-default">{t("navContact")}</span>
           </nav>
 
-          <div className="flex items-center gap-4 text-xs text-white/30">
+          <div className="flex items-center gap-4 text-xs text-zinc-500">
             <span className="cursor-default">{t("navTerms")}</span>
             <span className="cursor-default">{t("navPrivacy")}</span>
           </div>
         </div>
 
-        <div className="mt-8 text-center text-xs text-white/25">
+        <div className="mt-8 text-center text-xs text-zinc-500">
           &copy; {new Date().getFullYear()} Mix Architect
         </div>
       </div>

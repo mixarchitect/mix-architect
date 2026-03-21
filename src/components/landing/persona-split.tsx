@@ -21,7 +21,7 @@ function PersonaCard({
         </div>
         <h3 className="text-xl font-bold text-white">{title}</h3>
       </div>
-      <p className="text-white/50 text-sm leading-relaxed mb-6">{subtitle}</p>
+      <p className="text-zinc-400 text-sm leading-relaxed mb-6">{subtitle}</p>
 
       <ul className="space-y-3 mb-8 flex-1">
         {features.map((f) => (
@@ -54,7 +54,7 @@ export function PersonaSplit() {
           <h2 className="text-3xl md:text-4xl font-bold text-white">
             Built for how you work
           </h2>
-          <p className="mt-4 text-white/50 max-w-xl mx-auto">
+          <p className="mt-4 text-zinc-400 max-w-xl mx-auto">
             Whether you&apos;re releasing your own music or managing client
             projects, Mix Architect adapts to your workflow.
           </p>

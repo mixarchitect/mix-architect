@@ -70,7 +70,7 @@ function FeatureSection({
         <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
           {headline}
         </h2>
-        <p className="mt-4 text-white/50 leading-relaxed max-w-lg">{body}</p>
+        <p className="mt-4 text-white/60 leading-relaxed max-w-lg">{body}</p>
       </div>
       <div className={reverse ? "lg:[direction:ltr]" : ""}>{visual}</div>
     </div>
@@ -93,15 +93,15 @@ function ReleasePlanningMock() {
     <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <div className="text-xs text-white/40 mb-1">EP &middot; Stereo</div>
+          <div className="text-xs text-white/60 mb-1">EP &middot; Stereo</div>
           <div className="text-lg font-semibold text-white">
             Late Night Drive
           </div>
-          <div className="text-sm text-white/50">Aria Voss</div>
+          <div className="text-sm text-white/60">Aria Voss</div>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <Calendar size={14} className="text-[#0D9488]" />
-          <span className="text-white/50">Jun 15, 2026</span>
+          <span className="text-white/60">Jun 15, 2026</span>
         </div>
       </div>
       <div className="space-y-2">
@@ -111,7 +111,7 @@ function ReleasePlanningMock() {
             className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-white/4"
           >
             <div className="flex items-center gap-3">
-              <Music size={14} className="text-white/30" />
+              <Music size={14} className="text-white/60" />
               <span className="text-sm text-white/80">{t.title}</span>
             </div>
             <span
@@ -148,7 +148,7 @@ function WebPortalMock() {
           <div className="text-lg font-semibold text-white">
             Late Night Drive
           </div>
-          <div className="text-sm text-white/50">
+          <div className="text-sm text-white/60">
             Shared by Marcus Chen Audio
           </div>
         </div>
@@ -164,13 +164,13 @@ function WebPortalMock() {
               {t.approved ? (
                 <CheckCircle2 size={16} className="text-[#22C55E]" />
               ) : (
-                <Clock size={16} className="text-white/30" />
+                <Clock size={16} className="text-white/60" />
               )}
               <span className="text-sm text-white/80">{t.title}</span>
             </div>
             <span
               className={`text-xs font-medium ${
-                t.approved ? "text-[#22C55E]" : "text-white/40"
+                t.approved ? "text-[#22C55E]" : "text-white/60"
               }`}
             >
               {t.approved ? "Approved" : "Pending review"}
@@ -187,7 +187,7 @@ function WebPortalMock() {
       </div>
       {/* Footer */}
       <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#0D9488]/8 border border-[#0D9488]/15">
-        <span className="text-xs text-white/50">
+        <span className="text-xs text-white/60">
           Powered by Mix Architect
         </span>
         <Share2 size={12} className="text-[#0D9488]" />
@@ -210,7 +210,7 @@ function AudioReviewMock() {
               className={`text-xs px-2 py-0.5 rounded-full ${
                 i === 2
                   ? "bg-[#0D9488] text-[#1a1a1a] font-semibold"
-                  : "bg-white/8 text-white/40"
+                  : "bg-white/8 text-white/60"
               }`}
             >
               {v}
@@ -255,7 +255,7 @@ function AudioReviewMock() {
         <div className="flex items-start gap-3 py-2 px-3 rounded-lg bg-white/4">
           <MessageSquare size={14} className="text-[#FE5E0E] shrink-0 mt-0.5" />
           <div>
-            <div className="text-xs text-white/40">
+            <div className="text-xs text-white/60">
               0:47 &middot; Aria Voss
             </div>
             <div className="text-sm text-white/70">
@@ -266,7 +266,7 @@ function AudioReviewMock() {
         <div className="flex items-start gap-3 py-2 px-3 rounded-lg bg-white/4">
           <MessageSquare size={14} className="text-[#3B82F6] shrink-0 mt-0.5" />
           <div>
-            <div className="text-xs text-white/40">
+            <div className="text-xs text-white/60">
               1:32 &middot; Marcus Chen
             </div>
             <div className="text-sm text-white/70">
@@ -309,15 +309,15 @@ function PaymentsMock() {
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-3 mb-5">
         <div className="rounded-lg bg-white/4 p-3 text-center">
-          <div className="text-xs text-white/40 mb-1">Outstanding</div>
+          <div className="text-xs text-white/60 mb-1">Outstanding</div>
           <div className="text-lg font-bold text-[#FE5E0E]">$1,400</div>
         </div>
         <div className="rounded-lg bg-white/4 p-3 text-center">
-          <div className="text-xs text-white/40 mb-1">Earned</div>
+          <div className="text-xs text-white/60 mb-1">Earned</div>
           <div className="text-lg font-bold text-[#22C55E]">$1,200</div>
         </div>
         <div className="rounded-lg bg-white/4 p-3 text-center">
-          <div className="text-xs text-white/40 mb-1">Total</div>
+          <div className="text-xs text-white/60 mb-1">Total</div>
           <div className="text-lg font-bold text-white">$2,600</div>
         </div>
       </div>
@@ -330,7 +330,7 @@ function PaymentsMock() {
           >
             <div>
               <div className="text-sm text-white/80">{r.title}</div>
-              <div className="text-xs text-white/40">{r.client}</div>
+              <div className="text-xs text-white/60">{r.client}</div>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-sm text-white/70">{r.amount}</span>
@@ -399,19 +399,19 @@ function TemplatesMock() {
                 </div>
                 <div>
                   <div className="text-sm text-white/80 font-medium">{t.name}</div>
-                  <div className="text-xs text-white/40">{t.artist}</div>
+                  <div className="text-xs text-white/60">{t.artist}</div>
                 </div>
               </div>
-              <button className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/50 hover:bg-white/12 transition-colors flex items-center gap-1">
+              <button className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/60 hover:bg-white/12 transition-colors flex items-center gap-1">
                 <Copy size={10} />
                 Apply
               </button>
             </div>
             <div className="flex gap-2 ml-[42px]">
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/40">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/60">
                 {t.tracks} {t.tracks === 1 ? "track" : "tracks"}
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/40">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/60">
                 {t.specs}
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#0D9488]/12 text-[#0D9488]">
@@ -438,7 +438,7 @@ function DataExportMock() {
             <div className="text-sm font-semibold text-white">
               mix-architect-export.zip
             </div>
-            <div className="text-xs text-white/40">24.8 MB</div>
+            <div className="text-xs text-white/60">24.8 MB</div>
           </div>
         </div>
         <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#22C55E]/15 text-[#22C55E]">
@@ -455,29 +455,29 @@ function DataExportMock() {
           <FileText size={12} className="text-[#60A5FA] shrink-0" />
           payments.csv
         </div>
-        <div className="flex items-center gap-2 text-white/50 mt-1">
+        <div className="flex items-center gap-2 text-white/60 mt-1">
           <FolderOpen size={12} className="text-[#0D9488] shrink-0" />
           releases/
         </div>
         <div className="ml-5 space-y-1.5">
-          <div className="flex items-center gap-2 text-white/50">
-            <FolderOpen size={12} className="text-white/30 shrink-0" />
+          <div className="flex items-center gap-2 text-white/60">
+            <FolderOpen size={12} className="text-white/60 shrink-0" />
             Late Night Drive/
           </div>
           <div className="ml-5 space-y-1">
-            <div className="flex items-center gap-2 text-white/40">
-              <Music size={10} className="text-white/25 shrink-0" />
+            <div className="flex items-center gap-2 text-white/60">
+              <Music size={10} className="text-white/60 shrink-0" />
               01-Midnight Drive/
-              <span className="text-white/25">v1.wav, v2.wav</span>
+              <span className="text-white/60">v1.wav, v2.wav</span>
             </div>
-            <div className="flex items-center gap-2 text-white/40">
-              <Music size={10} className="text-white/25 shrink-0" />
+            <div className="flex items-center gap-2 text-white/60">
+              <Music size={10} className="text-white/60 shrink-0" />
               02-Neon Bloom/
-              <span className="text-white/25">v1.wav</span>
+              <span className="text-white/60">v1.wav</span>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-white/50">
-            <FolderOpen size={12} className="text-white/30 shrink-0" />
+          <div className="flex items-center gap-2 text-white/60">
+            <FolderOpen size={12} className="text-white/60 shrink-0" />
             Concrete Jungle/
           </div>
         </div>
@@ -509,7 +509,7 @@ function FlowSimulatorMock() {
               className={`text-[10px] px-2 py-0.5 rounded-full ${
                 i === 0
                   ? "bg-[#0D9488] text-[#1a1a1a] font-semibold"
-                  : "bg-white/8 text-white/40"
+                  : "bg-white/8 text-white/60"
               }`}
             >
               {m}
@@ -543,13 +543,13 @@ function FlowSimulatorMock() {
       {/* Transport controls */}
       <div className="flex items-center justify-center gap-4 mb-4 py-2">
         <button aria-label="Previous track" className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
-          <SkipForward size={12} className="text-white/50 rotate-180" />
+          <SkipForward size={12} className="text-white/60 rotate-180" />
         </button>
         <button aria-label="Play" className="w-9 h-9 rounded-full bg-[#0D9488] flex items-center justify-center">
           <Play size={14} className="text-[#1a1a1a] ml-0.5" />
         </button>
         <button aria-label="Next track" className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
-          <SkipForward size={12} className="text-white/50" />
+          <SkipForward size={12} className="text-white/60" />
         </button>
       </div>
 
@@ -562,7 +562,7 @@ function FlowSimulatorMock() {
               i === 0 ? "bg-white/8 border border-white/10" : "bg-white/4"
             }`}
           >
-            <GripVertical size={12} className="text-white/20 shrink-0" />
+            <GripVertical size={12} className="text-white/60 shrink-0" />
             <div
               className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold shrink-0"
               style={{ background: `${t.color}20`, color: t.color }}
@@ -572,7 +572,7 @@ function FlowSimulatorMock() {
             <span className={`text-sm flex-1 ${i === 0 ? "text-white" : "text-white/60"}`}>
               {t.title}
             </span>
-            <span className="text-xs text-white/30">{t.duration}</span>
+            <span className="text-xs text-white/60">{t.duration}</span>
           </div>
         ))}
       </div>
@@ -615,7 +615,7 @@ function DistributionTrackerMock() {
       name: "YouTube Music",
       icon: "/icons/streaming/youtube-music.svg",
       status: "NOT SUBMITTED",
-      color: "rgba(255,255,255,0.35)",
+      color: "rgba(255,255,255,0.60)",
     },
   ];
 
@@ -628,7 +628,7 @@ function DistributionTrackerMock() {
             Distribution Tracker
           </span>
         </div>
-        <button className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/50">
+        <button className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/60">
           + Add Platform
         </button>
       </div>
@@ -656,7 +656,7 @@ function DistributionTrackerMock() {
             </div>
             <div className="flex items-center gap-2">
               {p.distributor && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/40">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/60">
                   {p.distributor}
                 </span>
               )}
@@ -670,7 +670,7 @@ function DistributionTrackerMock() {
                 {p.status}
               </span>
               {p.status === "LIVE" && (
-                <ExternalLink size={10} className="text-white/30" />
+                <ExternalLink size={10} className="text-white/60" />
               )}
             </div>
           </div>
@@ -727,7 +727,7 @@ function AnalyticsMock() {
               style={{ color: kpi.color }}
             />
             <div className="text-lg font-bold text-white">{kpi.value}</div>
-            <div className="text-[10px] text-white/40">{kpi.label}</div>
+            <div className="text-[10px] text-white/60">{kpi.label}</div>
           </div>
         ))}
       </div>
@@ -735,7 +735,7 @@ function AnalyticsMock() {
       <div className="mb-4">
         <div className="flex items-center gap-1.5 mb-3">
           <TrendingUp size={12} className="text-[#0D9488]" />
-          <span className="text-xs text-white/50 font-medium">
+          <span className="text-xs text-white/60 font-medium">
             Release Velocity
           </span>
         </div>
@@ -752,7 +752,7 @@ function AnalyticsMock() {
                       : "rgba(13,148,136,0.3)",
                 }}
               />
-              <span className="text-[9px] text-white/30 mt-1.5">
+              <span className="text-[9px] text-white/60 mt-1.5">
                 {m.label}
               </span>
             </div>
@@ -772,7 +772,7 @@ function AnalyticsMock() {
           >
             <span className="text-xs text-white/70">{c.name}</span>
             <div className="flex items-center gap-3">
-              <span className="text-[10px] text-white/40">
+              <span className="text-[10px] text-white/60">
                 {c.releases} releases
               </span>
               <span className="text-xs font-medium text-[#22C55E]">

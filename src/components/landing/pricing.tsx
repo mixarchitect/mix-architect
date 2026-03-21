@@ -30,7 +30,7 @@ function BillingToggle({
             className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors ${
               interval === "monthly"
                 ? "bg-[#0D9488] text-[#1a1a1a]"
-                : "text-white/50 hover:text-white/70"
+                : "text-zinc-400 hover:text-white"
             }`}
           >
             {labels.monthly}
@@ -41,7 +41,7 @@ function BillingToggle({
             className={`px-5 py-1.5 text-sm font-medium rounded-full transition-colors ${
               interval === "annual"
                 ? "bg-[#0D9488] text-[#1a1a1a]"
-                : "text-white/50 hover:text-white/70"
+                : "text-zinc-400 hover:text-white"
             }`}
           >
             {labels.annual}
@@ -93,11 +93,11 @@ function PriceCard({
         <div className="flex items-baseline gap-1">
           <span className="text-4xl font-bold text-white">{price}</span>
           {period && (
-            <span className="text-base text-white/40">{period}</span>
+            <span className="text-base text-zinc-400">{period}</span>
           )}
         </div>
         {annualNote && (
-          <p className="mt-1 text-xs text-white/40">{annualNote}</p>
+          <p className="mt-1 text-xs text-zinc-400">{annualNote}</p>
         )}
         <p className="mt-2 text-sm text-white/50">{subtitle}</p>
       </div>
@@ -108,7 +108,7 @@ function PriceCard({
             <CheckCircle2
               size={16}
               className={`shrink-0 mt-0.5 ${
-                highlighted ? "text-[#0D9488]" : "text-white/30"
+                highlighted ? "text-[#0D9488]" : "text-zinc-500"
               }`}
             />
             <span className="text-sm text-white/70">{f}</span>
@@ -201,7 +201,7 @@ export function Pricing() {
           />
         </div>
 
-        <p className="mt-6 text-center text-sm text-white/40">
+        <p className="mt-6 text-center text-sm text-zinc-400">
           {t("pricingNote")}
         </p>
       </div>

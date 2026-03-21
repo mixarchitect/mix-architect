@@ -43,35 +43,35 @@ export async function Hero() {
           })()}
         </h1>
 
-        <p className="mt-8 text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
+        <p className="mt-8 text-lg md:text-xl text-zinc-300 max-w-2xl mx-auto leading-relaxed">
           {t("subheadline")}
         </p>
 
         {/* Persona callouts */}
         <div className="mt-14 grid gap-5 sm:grid-cols-2 max-w-2xl mx-auto">
           <div className="flex items-start gap-4 rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
-            <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center">
-              <Music size={20} className="text-[#0D9488]" />
+            <div className="shrink-0 w-12 h-12 rounded-xl bg-[#0D9488]/15 flex items-center justify-center">
+              <Music size={24} className="text-[#0D9488]" />
             </div>
             <div>
               <div className="text-sm font-semibold text-white">
                 {t("forArtists")}
               </div>
-              <p className="mt-1.5 text-sm text-white/60 leading-relaxed">
+              <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
                 {t("forArtistsDesc")}
               </p>
             </div>
           </div>
 
           <div className="flex items-start gap-4 rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/10 p-6 text-left">
-            <div className="shrink-0 w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center">
-              <Headphones size={20} className="text-[#0D9488]" />
+            <div className="shrink-0 w-12 h-12 rounded-xl bg-[#0D9488]/15 flex items-center justify-center">
+              <Headphones size={24} className="text-[#0D9488]" />
             </div>
             <div>
               <div className="text-sm font-semibold text-white">
                 {t("forEngineers")}
               </div>
-              <p className="mt-1.5 text-sm text-white/60 leading-relaxed">
+              <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">
                 {t("forEngineersDesc")}
               </p>
             </div>
@@ -89,13 +89,13 @@ export async function Hero() {
           </Link>
           <a
             href="#features"
-            className="h-14 w-full sm:w-64 text-base font-medium inline-flex items-center justify-center gap-2 rounded-xl bg-[#1a1a1a] border border-white/20 text-white/80 hover:border-white/40 hover:text-white transition-colors whitespace-nowrap"
+            className="h-14 w-full sm:w-64 text-base font-medium inline-flex items-center justify-center gap-2 rounded-xl bg-[#1a1a1a] border border-white/20 text-zinc-200 hover:border-white/40 hover:text-white transition-colors whitespace-nowrap"
           >
             {t("seeHowItWorks")}
           </a>
         </div>
 
-        <p className="mt-8 text-sm text-white/40">
+        <p className="mt-8 text-sm text-zinc-400">
           {t("freeToTry")}
         </p>
       </div>

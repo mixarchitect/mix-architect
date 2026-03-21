@@ -40,7 +40,7 @@ export async function FounderNote() {
                 <div className="text-sm font-semibold text-white">
                   {item.name}
                 </div>
-                <div className="text-xs text-white/40">{item.role}</div>
+                <div className="text-xs text-zinc-400">{item.role}</div>
               </div>
             </div>
           ))}

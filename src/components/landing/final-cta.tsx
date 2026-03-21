@@ -10,7 +10,7 @@ export async function FinalCTA() {
         <h2 className="text-3xl md:text-4xl font-bold text-white">
           {t("finalCtaHeadline")}
         </h2>
-        <p className="mt-4 text-white/50 text-lg">
+        <p className="mt-4 text-zinc-400 text-lg">
           {t("finalCtaDesc")}
         </p>
         <div className="mt-8">
