@@ -549,6 +549,7 @@
     "searchPlaceholder": "문서 검색...",
     "getInTouch": "연락하기",
     "getInTouchDesc": "직접적인 지원, 질문, 파트너십 문의는 이메일로 연락주세요.",
+    "supportLanguageNote": "지원은 영어로 제공됩니다.",
     "allCategories": "전체",
     "noResults": "\"{query}\"에 대한 문서를 찾을 수 없습니다",
     "whatsNew": "새로운 소식",

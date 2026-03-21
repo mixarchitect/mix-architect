@@ -549,6 +549,7 @@
     "searchPlaceholder": "搜索文章...",
     "getInTouch": "联系我们",
     "getInTouchDesc": "如需直接支持、问询或合作咨询，请通过邮件联系我们。",
+    "supportLanguageNote": "支持服务以英语提供。",
     "allCategories": "全部",
     "noResults": "未找到\"{query}\"相关文章",
     "whatsNew": "最新动态",

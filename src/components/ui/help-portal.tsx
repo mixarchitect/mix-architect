@@ -377,6 +377,9 @@ function ContactSection() {
           <Mail size={16} strokeWidth={1.5} />
           support@mixarchitect.com
         </a>
+        <p className="text-faint text-xs mt-4">
+          {t("supportLanguageNote")}
+        </p>
       </PanelBody>
     </Panel>
   );
