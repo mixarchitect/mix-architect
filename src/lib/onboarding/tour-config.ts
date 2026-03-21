@@ -146,7 +146,9 @@ export const TOUR_TOPICS: TourTopic[] = [
     getRoute: (ctx) =>
       ctx.releaseId && ctx.trackId
         ? `/app/releases/${ctx.releaseId}/tracks/${ctx.trackId}`
-        : null,
+        : ctx.releaseId
+          ? `/app/releases/${ctx.releaseId}`
+          : null,
     steps: [
       {
         id: "track-tabs",

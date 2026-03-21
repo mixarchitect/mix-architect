@@ -135,6 +135,42 @@ export function useTour(): TourState {
     }
   }, [pathname, isActive, releaseId, trackId, seenTopics, persist]);
 
+  /* ── Auto-complete topic when navigating away on the last step ── */
+  const prevPathRef = useRef(pathname);
+  const showingTopicRef = useRef(showingTopicId);
+  const stepIndexRef = useRef(stepIndex);
+  showingTopicRef.current = showingTopicId;
+  stepIndexRef.current = stepIndex;
+
+  useEffect(() => {
+    if (!isActive) return;
+    if (pathname === prevPathRef.current) return;
+    prevPathRef.current = pathname;
+
+    // If we were showing a topic and the user navigated away,
+    // auto-complete it if they were on the last step (e.g. clicked
+    // the actual "Create Release" button instead of the tooltip's "Done")
+    const prevTopicId = showingTopicRef.current;
+    if (prevTopicId) {
+      const prevTopic = TOUR_TOPICS.find((t) => t.id === prevTopicId);
+      if (prevTopic) {
+        const wasLastStep = stepIndexRef.current >= prevTopic.steps.length - 1;
+        if (wasLastStep && !seenTopics.includes(prevTopicId)) {
+          const newSeen = [...new Set([...seenTopics, prevTopicId])];
+          setSeenTopics(newSeen);
+          persist(newSeen);
+
+          if (newSeen.length >= TOUR_TOPICS.length) {
+            setIsActive(false);
+            finishTour("completed", newSeen);
+            return;
+          }
+        }
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
   /* ── Determine which topic matches this page (first unseen one) ── */
   useEffect(() => {
     if (!isActive) return;
