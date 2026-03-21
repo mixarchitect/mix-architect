@@ -9,6 +9,8 @@ import { LandingFooter } from "@/components/landing/footer";
 import { Music } from "lucide-react";
 import { FeaturedArchiveLoadMore } from "./load-more";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Featured Releases — Mix Architect",
   description:

@@ -12,6 +12,8 @@ import { LandingFooter } from "@/components/landing/footer";
 import { FeaturedReleaseSection } from "@/components/landing/featured-release-section";
 import { getActiveFeaturedRelease } from "@/lib/services/featured-releases";
 
+export const revalidate = 3600; // ISR: regenerate landing page at most once per hour
+
 export const metadata: Metadata = {
   title: "Mix Architect | Release Management for Artists & Audio Professionals",
   description:

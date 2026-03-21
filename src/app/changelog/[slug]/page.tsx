@@ -9,6 +9,8 @@ import { LandingFooter } from "@/components/landing/footer";
 import { ChangelogCategoryBadge } from "@/components/changelog/ChangelogCategoryBadge";
 import { ChangelogBody } from "./changelog-body";
 
+export const revalidate = 3600;
+
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

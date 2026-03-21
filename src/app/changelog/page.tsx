@@ -6,6 +6,8 @@ import { LandingNav } from "@/components/landing/nav";
 import { LandingFooter } from "@/components/landing/footer";
 import { ChangelogFeed } from "./changelog-feed";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "What's New — Mix Architect",
   description:
