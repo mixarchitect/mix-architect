@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 import { LandingNav } from "@/components/landing/nav";
 import { Hero } from "@/components/landing/hero";
 import { FeatureShowcase } from "@/components/landing/feature-showcase";
@@ -24,19 +26,25 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const featuredRelease = await getActiveFeaturedRelease();
+  const [featuredRelease, locale, messages] = await Promise.all([
+    getActiveFeaturedRelease(),
+    getLocale(),
+    getMessages(),
+  ]);
 
   return (
-    <main id="main-content" tabIndex={-1} className="min-h-screen bg-[#0A0A0A] focus:outline-none">
-      <LandingNav />
-      <Hero />
-      <FeatureShowcase />
-      <AudioToolsGrid />
-      {featuredRelease && <FeaturedReleaseSection release={featuredRelease} />}
-      <Pricing />
-      <FounderNote />
-      <FinalCTA />
-      <LandingFooter />
-    </main>
+    <NextIntlClientProvider locale={locale} messages={{ landing: (messages as Record<string, unknown>).landing }}>
+      <main id="main-content" tabIndex={-1} className="min-h-screen bg-[#0A0A0A] focus:outline-none">
+        <LandingNav locale={locale} />
+        <Hero />
+        <FeatureShowcase />
+        <AudioToolsGrid />
+        {featuredRelease && <FeaturedReleaseSection release={featuredRelease} />}
+        <Pricing />
+        <FounderNote />
+        <FinalCTA />
+        <LandingFooter />
+      </main>
+    </NextIntlClientProvider>
   );
 }

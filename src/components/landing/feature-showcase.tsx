@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import {
   Calendar,
   FileText,
@@ -789,77 +790,78 @@ function AnalyticsMock() {
 /*  Main export                                                        */
 /* ------------------------------------------------------------------ */
 
-export function FeatureShowcase() {
+export async function FeatureShowcase() {
+  const t = await getTranslations("landing");
   return (
     <section id="features" aria-label="Features" className="px-6">
       <div className="mx-auto max-w-6xl">
         <FeatureSection
-          headline="Every release, organized from day one"
-          body="Create a release, add your tracks, set your timeline. Mix Architect tracks everything from first rough mix to final delivery so nothing falls through the cracks."
+          headline={t("featureReleasePlanning")}
+          body={t("featureReleasePlanningDesc")}
           visual={<ReleasePlanningMock />}
         />
 
         <FeatureSection
-          headline="Share work that looks as professional as it sounds"
-          body="Give clients a web portal to review mixes, approve tracks, and download deliverables. Optionally gate downloads until payment is confirmed. Every shared link is a calling card for your business."
-          badge="Client delivery, simplified"
+          headline={t("featureClientDelivery")}
+          body={t("featureClientDeliveryDesc")}
+          badge={t("featureClientDeliveryBadge")}
           visual={<WebPortalMock />}
           reverse
         />
 
         <FeatureSection
-          headline="Review mixes with precision, not paragraphs"
-          body="Upload audio, see the waveform, drop timestamped comments exactly where you hear the issue. Switch between versions instantly. No more 'around the 2-minute mark' emails."
+          headline={t("featureAudioReview")}
+          body={t("featureAudioReviewDesc")}
           visual={<AudioReviewMock />}
         />
 
         <FeatureSection
-          headline="Hear your tracklist before you commit"
-          body="Audition your album flow with the built-in simulator. Preview transitions between tracks in full-length or condensed mode, drag to reorder, then apply your final sequence to the release."
-          badge="Flow Simulator"
+          headline={t("featureFlowSim")}
+          body={t("featureFlowSimDesc")}
+          badge={t("featureFlowSimBadge")}
           badgeColor="blue"
           visual={<FlowSimulatorMock />}
           reverse
         />
 
         <FeatureSection
-          headline="Know who owes what, at a glance"
-          body="Track project fees, partial payments, and outstanding balances across every release. See your total revenue and what's still pending. Export for invoicing and tax time."
-          badge="Built for freelance engineers and producers"
+          headline={t("featurePayments")}
+          body={t("featurePaymentsDesc")}
+          badge={t("featurePaymentsBadge")}
           badgeColor="orange"
           visual={<PaymentsMock />}
         />
 
         <FeatureSection
-          headline="See where every release stands, across every platform"
-          body="Track submission status for Spotify, Apple Music, Amazon, Tidal, YouTube Music, and more. Spotify auto-detects when your release goes live. One dashboard instead of six."
-          badge="Distribution Tracker"
+          headline={t("featureDistribution")}
+          body={t("featureDistributionDesc")}
+          badge={t("featureDistributionBadge")}
           badgeColor="teal"
           visual={<DistributionTrackerMock />}
           reverse
         />
 
         <FeatureSection
-          headline="Know your numbers without a spreadsheet"
-          body="Release velocity, turnaround time, revenue by month, and a per-client breakdown. See which clients drive your business and where your time goes."
-          badge="Analytics"
+          headline={t("featureAnalytics")}
+          body={t("featureAnalyticsDesc")}
+          badge={t("featureAnalyticsBadge")}
           badgeColor="blue"
           visual={<AnalyticsMock />}
         />
 
         <FeatureSection
-          headline="Save your setup, skip the busywork"
-          body="Create templates from your existing releases and apply them to new projects in one click. Pre-fill track counts, specs, and references for the artists you work with regularly."
-          badge="Templates"
+          headline={t("featureTemplates")}
+          body={t("featureTemplatesDesc")}
+          badge={t("featureTemplatesBadge")}
           badgeColor="blue"
           visual={<TemplatesMock />}
           reverse
         />
 
         <FeatureSection
-          headline="Export everything, anytime"
-          body="Download a complete copy of your account. Metadata, payment records, and every audio file, neatly organized in a single zip. Your work is always yours."
-          badge="Your data, your way"
+          headline={t("featureExport")}
+          body={t("featureExportDesc")}
+          badge={t("featureExportBadge")}
           visual={<DataExportMock />}
         />
       </div>

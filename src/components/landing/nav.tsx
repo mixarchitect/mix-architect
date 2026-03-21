@@ -4,8 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { LocaleSwitcher } from "./locale-switcher";
 
-export function LandingNav() {
+export function LandingNav({ locale }: { locale: string }) {
+  const t = useTranslations("landing");
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -23,8 +26,8 @@ export function LandingNav() {
 
   return (
     <nav aria-label="Main" className="fixed top-6 left-1/2 -translate-x-1/2 z-50" ref={navRef}>
-      <div className="w-[calc(100vw-24px)] sm:w-[92vw] md:w-[78vw] lg:w-[1100px] max-w-6xl flex items-center gap-3 bg-[#1a1a1a] border border-white/10 rounded-full px-3 py-3 shadow-float">
-        <Link href="/" className="flex items-center shrink-0 pl-2 pr-2 sm:pr-4">
+      <div className="w-[calc(100vw-24px)] sm:w-[92vw] md:w-[78vw] lg:w-[1100px] max-w-6xl flex items-center gap-1.5 sm:gap-2 bg-[#1a1a1a] border border-white/10 rounded-full px-3 py-3 shadow-float">
+        <Link href="/" className="flex items-center shrink-0 pl-2 pr-1 sm:pr-3">
           <Image
             src="/mix-architect-logo-white.svg"
             alt="Mix Architect"
@@ -35,82 +38,84 @@ export function LandingNav() {
           />
         </Link>
 
-        <div className="hidden md:flex flex-1 items-center justify-center gap-1 text-sm">
+        {/* Desktop nav links — hidden below lg to prevent crowding with long translations */}
+        <div className="hidden lg:flex flex-1 items-center justify-center gap-0.5 min-w-0">
           <a
             href="#features"
-            className="px-4 py-2 rounded-full text-white/60 hover:text-white hover:bg-white/8 transition-colors"
+            className="px-2.5 py-2 rounded-full text-[13px] text-white/60 hover:text-white hover:bg-white/8 transition-colors whitespace-nowrap"
           >
-            Features
+            {t("navFeatures")}
           </a>
           <a
             href="#pricing"
-            className="px-4 py-2 rounded-full text-white/60 hover:text-white hover:bg-white/8 transition-colors"
+            className="px-2.5 py-2 rounded-full text-[13px] text-white/60 hover:text-white hover:bg-white/8 transition-colors whitespace-nowrap"
           >
-            Pricing
+            {t("navPricing")}
           </a>
           <a
             href="#featured"
-            className="px-4 py-2 rounded-full text-white/60 hover:text-white hover:bg-white/8 transition-colors"
+            className="px-2.5 py-2 rounded-full text-[13px] text-white/60 hover:text-white hover:bg-white/8 transition-colors whitespace-nowrap"
           >
-            Featured
+            {t("navFeatured")}
           </a>
         </div>
 
-        <div className="flex items-center gap-2 ml-auto md:ml-0">
-          {/* Mobile menu toggle */}
+        <div className="flex items-center gap-1 sm:gap-1.5 ml-auto lg:ml-0 shrink-0">
+          {/* Mobile/tablet menu toggle — visible below lg */}
           <button
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/8 transition-colors"
+            className="lg:hidden w-9 h-9 flex items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/8 transition-colors"
             aria-label="Toggle menu"
           >
             {menuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
 
+          <LocaleSwitcher locale={locale} />
           <Link
             href="/auth/sign-in"
-            className="hidden sm:inline-flex px-4 py-2 text-sm text-white/60 hover:text-white transition-colors whitespace-nowrap"
+            className="hidden sm:inline-flex px-2.5 py-2 text-[13px] text-white/60 hover:text-white transition-colors whitespace-nowrap"
           >
-            Sign in
+            {t("signIn")}
           </Link>
           <Link
             href="/auth/sign-in?mode=signup"
-            className="px-5 py-2 text-sm font-semibold text-white bg-[#0D9488] rounded-full hover:bg-[#0fb9ab] transition-colors whitespace-nowrap"
+            className="px-3 sm:px-4 py-2 text-xs sm:text-[13px] font-semibold text-white bg-[#0D9488] rounded-full hover:bg-[#0fb9ab] transition-colors whitespace-nowrap"
           >
-            Start Free
+            {t("startFree")}
           </Link>
         </div>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Dropdown menu — visible below lg */}
       {menuOpen && (
-        <div className="md:hidden mt-2 mx-3 rounded-xl bg-[#1a1a1a] border border-white/10 p-2 shadow-float">
+        <div className="lg:hidden mt-2 mx-3 rounded-xl bg-[#1a1a1a] border border-white/10 p-2 shadow-float">
           <a
             href="#features"
             onClick={() => setMenuOpen(false)}
             className="block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
           >
-            Features
+            {t("navFeatures")}
           </a>
           <a
             href="#pricing"
             onClick={() => setMenuOpen(false)}
             className="block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
           >
-            Pricing
+            {t("navPricing")}
           </a>
           <a
             href="#featured"
             onClick={() => setMenuOpen(false)}
             className="block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
           >
-            Featured
+            {t("navFeatured")}
           </a>
           <Link
             href="/auth/sign-in"
             onClick={() => setMenuOpen(false)}
             className="sm:hidden block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
           >
-            Sign in
+            {t("signIn")}
           </Link>
         </div>
       )}

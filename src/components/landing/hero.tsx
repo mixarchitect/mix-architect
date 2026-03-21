@@ -28,10 +28,19 @@ export async function Hero() {
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-4xl text-center px-6 pt-32 pb-24">
         <h1 className="text-[28px] sm:text-[40px] md:text-[56px] font-bold leading-[1.05] tracking-tight text-white">
-          Plan releases. Review mixes.
-          <br />
-          Track payments.{" "}
-          <span className="text-[#0D9488]">All in one place.</span>
+          {(() => {
+            const full = t("headline");
+            const lastDot = full.lastIndexOf(". ");
+            if (lastDot === -1) return full;
+            const main = full.slice(0, lastDot + 2);
+            const accent = full.slice(lastDot + 2);
+            return (
+              <>
+                {main}
+                <span className="text-[#0D9488]">{accent}</span>
+              </>
+            );
+          })()}
         </h1>
 
         <p className="mt-8 text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
@@ -73,14 +82,14 @@ export async function Hero() {
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/auth/sign-in?mode=signup"
-            className="h-14 w-full sm:w-56 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D9488] text-white hover:bg-[#0fb9ab] transition-colors"
+            className="h-14 w-full sm:w-64 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D9488] text-white hover:bg-[#0fb9ab] transition-colors whitespace-nowrap"
           >
             {t("startFree")}
             <FilledArrowRight size={18} />
           </Link>
           <a
             href="#features"
-            className="h-14 w-full sm:w-56 text-base font-medium inline-flex items-center justify-center gap-2 rounded-xl bg-[#1a1a1a] border border-white/20 text-white/80 hover:border-white/40 hover:text-white transition-colors"
+            className="h-14 w-full sm:w-64 text-base font-medium inline-flex items-center justify-center gap-2 rounded-xl bg-[#1a1a1a] border border-white/20 text-white/80 hover:border-white/40 hover:text-white transition-colors whitespace-nowrap"
           >
             {t("seeHowItWorks")}
           </a>

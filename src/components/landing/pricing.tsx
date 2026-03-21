@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { FilledArrowRight } from "@/components/ui/filled-icon";
 import { PRICING, type BillingInterval } from "@/lib/pricing";
+import { useTranslations } from "next-intl";
 
 /* ------------------------------------------------------------------ */
 /*  Billing toggle                                                     */
@@ -13,9 +14,11 @@ import { PRICING, type BillingInterval } from "@/lib/pricing";
 function BillingToggle({
   interval,
   onChange,
+  labels,
 }: {
   interval: BillingInterval;
   onChange: (i: BillingInterval) => void;
+  labels: { monthly: string; annual: string; savePercent: string };
 }) {
   return (
     <div className="flex justify-center mb-12">
@@ -30,7 +33,7 @@ function BillingToggle({
                 : "text-white/50 hover:text-white/70"
             }`}
           >
-            Monthly
+            {labels.monthly}
           </button>
           <button
             type="button"
@@ -41,12 +44,12 @@ function BillingToggle({
                 : "text-white/50 hover:text-white/70"
             }`}
           >
-            Annual
+            {labels.annual}
           </button>
         </div>
         {interval === "annual" && (
           <span className="absolute left-full ml-2 text-xs font-semibold text-[#0D9488] bg-[#0D9488]/10 border border-[#0D9488]/20 px-2.5 py-0.5 rounded-full whitespace-nowrap">
-            Save {PRICING.PRO.annualSavingsPercent}%
+            {labels.savePercent}
           </span>
         )}
       </div>
@@ -79,7 +82,7 @@ function PriceCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border p-8 flex flex-col ${
+      className={`rounded-2xl border p-8 flex flex-col min-h-[480px] ${
         highlighted
           ? "bg-[#0D9488]/8 border-[#0D9488]/25"
           : "bg-[#1a1a1a] border-white/8"
@@ -133,6 +136,7 @@ function PriceCard({
 /* ------------------------------------------------------------------ */
 
 export function Pricing() {
+  const t = useTranslations("landing");
   const [interval, setInterval] = useState<BillingInterval>("monthly");
 
   const proPrice =
@@ -142,46 +146,63 @@ export function Pricing() {
 
   const annualNote =
     interval === "annual"
-      ? `Billed annually at $${PRICING.PRO.annualPrice}/year`
+      ? t("billedAnnually", { price: PRICING.PRO.annualPrice })
       : undefined;
+
+  const freeFeatures = [
+    t("pricingFreeF1"), t("pricingFreeF2"), t("pricingFreeF3"),
+    t("pricingFreeF4"), t("pricingFreeF5"), t("pricingFreeF6"),
+  ];
+  const proFeatures = [
+    t("pricingProF1"), t("pricingProF2"), t("pricingProF3"),
+    t("pricingProF4"), t("pricingProF5"), t("pricingProF6"),
+    t("pricingProF7"), t("pricingProF8"),
+  ];
 
   return (
     <section id="pricing" aria-labelledby="pricing-heading" className="px-6 py-20 md:py-28">
       <div className="mx-auto max-w-4xl">
         <div className="text-center mb-12">
           <h2 id="pricing-heading" className="text-3xl md:text-4xl font-bold text-white">
-            Simple pricing
+            {t("pricingHeadline")}
           </h2>
           <p className="mt-4 text-white/50 max-w-xl mx-auto">
-            Start free. Upgrade when you&apos;re ready.
+            {t("pricingSubheadline")}
           </p>
         </div>
 
-        <BillingToggle interval={interval} onChange={setInterval} />
+        <BillingToggle
+          interval={interval}
+          onChange={setInterval}
+          labels={{
+            monthly: t("monthly"),
+            annual: t("annual"),
+            savePercent: t("savePercent", { percent: PRICING.PRO.annualSavingsPercent }),
+          }}
+        />
 
         <div className="grid gap-6 md:grid-cols-2">
           <PriceCard
             title="FREE"
             price={`$${PRICING.FREE.monthlyPrice}`}
-            subtitle={PRICING.FREE.description}
-            features={[...PRICING.FREE.features]}
-            ctaLabel="Start Free"
+            subtitle={t("pricingFreeDesc")}
+            features={freeFeatures}
+            ctaLabel={t("startFree")}
           />
           <PriceCard
             title="PRO"
             price={proPrice}
-            period="/month"
-            subtitle={PRICING.PRO.description}
-            features={[...PRICING.PRO.features]}
-            ctaLabel="Start Pro"
+            period={t("perMonth")}
+            subtitle={t("pricingProDesc")}
+            features={proFeatures}
+            ctaLabel={t("startPro")}
             highlighted
             annualNote={annualNote}
           />
         </div>
 
         <p className="mt-6 text-center text-sm text-white/40">
-          No credit card required for the free tier. Cancel Pro anytime in two
-          clicks.
+          {t("pricingNote")}
         </p>
       </div>
     </section>

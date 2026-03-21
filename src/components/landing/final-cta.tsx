@@ -1,24 +1,24 @@
 import Link from "next/link";
 import { FilledArrowRight } from "@/components/ui/filled-icon";
+import { getTranslations } from "next-intl/server";
 
-export function FinalCTA() {
+export async function FinalCTA() {
+  const t = await getTranslations("landing");
   return (
     <section className="px-6 py-20 md:py-28">
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white">
-          Your next release deserves better{" "}
-          <br className="hidden sm:block" />
-          than a spreadsheet
+          {t("finalCtaHeadline")}
         </h2>
         <p className="mt-4 text-white/50 text-lg">
-          Start planning for free. Upgrade when you&apos;re ready.
+          {t("finalCtaDesc")}
         </p>
         <div className="mt-8">
           <Link
             href="/auth/sign-in?mode=signup"
-            className="btn-primary h-14 px-10 text-base inline-flex items-center gap-2"
+            className="btn-primary h-14 px-10 text-base inline-flex items-center gap-2 whitespace-nowrap"
           >
-            Get Started Free
+            {t("getStartedFree")}
             <FilledArrowRight size={18} />
           </Link>
         </div>

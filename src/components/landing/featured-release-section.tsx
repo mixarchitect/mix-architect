@@ -2,14 +2,16 @@ import Link from "next/link";
 import { getCoverArtUrl } from "@/types/featured-release";
 import type { FeaturedRelease } from "@/types/featured-release";
 import { FeaturedReleaseCard } from "@/components/featured/FeaturedReleaseCard";
+import { getTranslations } from "next-intl/server";
 
 interface FeaturedReleaseSectionProps {
   release: FeaturedRelease;
 }
 
-export function FeaturedReleaseSection({
+export async function FeaturedReleaseSection({
   release,
 }: FeaturedReleaseSectionProps) {
+  const t = await getTranslations("landing");
   const coverUrl = getCoverArtUrl(release.cover_art_path);
 
   const jsonLd = {
@@ -35,10 +37,10 @@ export function FeaturedReleaseSection({
 
       <div className="mx-auto max-w-4xl">
         <h2 id="featured-heading" className="text-center text-3xl md:text-4xl font-bold text-white mb-2">
-          Featured Release
+          {t("featuredReleaseHeading")}
         </h2>
         <p className="text-center mt-4 text-white/50 mb-8">
-          Spotlighting great releases and the people behind the sound.
+          {t("featuredReleaseDesc")}
         </p>
 
         <FeaturedReleaseCard release={release} variant="spotlight" />
@@ -48,7 +50,7 @@ export function FeaturedReleaseSection({
             href="/featured"
             className="text-sm text-teal-500 hover:text-teal-400 transition-colors"
           >
-            View all featured releases &rarr;
+            {t("viewAllFeatured")}
           </Link>
         </div>
       </div>

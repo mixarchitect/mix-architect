@@ -6,6 +6,7 @@ import {
   FileText,
   GitBranch,
 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 /* ------------------------------------------------------------------ */
 /*  Mini visual elements for each tool card                            */
@@ -149,69 +150,65 @@ function VersionTabs() {
 /*  Tool definitions                                                    */
 /* ------------------------------------------------------------------ */
 
-const tools: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  visual: React.ReactNode;
-}[] = [
-  {
-    icon: <Activity size={22} />,
-    title: "LUFS Measurement",
-    description:
-      "Automatically checks loudness against Spotify, Apple Music, YouTube, and 8 other platform targets.",
-    visual: <LufsMeter />,
-  },
-  {
-    icon: <RefreshCw size={22} />,
-    title: "Audio Format Conversion",
-    description:
-      "Convert between WAV, AIFF, FLAC, and MP3 with full metadata embedding: artist, title, cover art, ISRC, lyrics, and ReplayGain, all written into the file.",
-    visual: <FormatConversion />,
-  },
-  {
-    icon: <AudioWaveform size={22} />,
-    title: "Waveform Visualization",
-    description:
-      "See your audio, not just hear it. WaveSurfer-powered waveforms with zoom and seeking.",
-    visual: <MiniWaveform />,
-  },
-  {
-    icon: <MessageSquare size={22} />,
-    title: "Timestamped Comments",
-    description:
-      "Drop feedback at the exact moment in the track. Color-coded markers on the timeline.",
-    visual: <CommentTimeline />,
-  },
-  {
-    icon: <FileText size={22} />,
-    title: "Mix Brief Export",
-    description:
-      "Generate a shareable brief document from your intent, specs, and references.",
-    visual: <BriefPreview />,
-  },
-  {
-    icon: <GitBranch size={22} />,
-    title: "Version Control",
-    description:
-      "Upload new versions, compare side by side, keep every revision accessible.",
-    visual: <VersionTabs />,
-  },
-];
+export async function AudioToolsGrid() {
+  const t = await getTranslations("landing");
 
-export function AudioToolsGrid() {
+  const tools: {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+    visual: React.ReactNode;
+  }[] = [
+    {
+      icon: <Activity size={22} />,
+      title: t("toolLufs"),
+      description: t("toolLufsDesc"),
+      visual: <LufsMeter />,
+    },
+    {
+      icon: <RefreshCw size={22} />,
+      title: t("toolFormatConversion"),
+      description: t("toolFormatConversionDesc"),
+      visual: <FormatConversion />,
+    },
+    {
+      icon: <AudioWaveform size={22} />,
+      title: t("toolWaveform"),
+      description: t("toolWaveformDesc"),
+      visual: <MiniWaveform />,
+    },
+    {
+      icon: <MessageSquare size={22} />,
+      title: t("toolComments"),
+      description: t("toolCommentsDesc"),
+      visual: <CommentTimeline />,
+    },
+    {
+      icon: <FileText size={22} />,
+      title: t("toolMixBrief"),
+      description: t("toolMixBriefDesc"),
+      visual: <BriefPreview />,
+    },
+    {
+      icon: <GitBranch size={22} />,
+      title: t("toolVersionControl"),
+      description: t("toolVersionControlDesc"),
+      visual: <VersionTabs />,
+    },
+  ];
+
   return (
     <section className="px-6 py-20 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-12">
           <div className="text-xs font-semibold uppercase tracking-widest text-[#0D9488] mb-3">
-            Audio Tools
+            {t("audioToolsLabel")}
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white">
-            Professional tools, built in
+            {t("audioToolsHeadline")}
           </h2>
           <p className="mt-4 text-white/50 max-w-xl mx-auto">
-            Everything you need to manage audio, without switching apps.
+            {t("audioToolsDesc")}
           </p>
         </div>
 
