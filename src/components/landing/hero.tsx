@@ -52,8 +52,8 @@ export async function Hero() {
             <p className="text-[15px] font-medium text-[#0D9488] mb-1">{t("forArtists")}</p>
             <p className="text-[13px] text-zinc-400">{t("forArtistsShort")}</p>
           </div>
-          <div className="hidden sm:block w-px self-stretch bg-[#0D9488]/30" />
-          <div className="block sm:hidden h-px w-12 bg-[#0D9488]/30 mx-auto" />
+          <div className="hidden sm:block w-[2px] self-stretch bg-[#0D9488]/40" />
+          <div className="block sm:hidden h-[2px] w-12 bg-[#0D9488]/40 mx-auto" />
           <div className="text-center">
             <p className="text-[15px] font-medium text-[#0D9488] mb-1">{t("forEngineers")}</p>
             <p className="text-[13px] text-zinc-400">{t("forEngineersShort")}</p>
