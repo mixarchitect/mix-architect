@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CalendarDays } from "lucide-react";
 import { IconButton } from "@/components/ui/button";
 
 export function CalendarExportButton({ releaseId }: { releaseId: string }) {
+  const t = useTranslations("releaseDetail");
   const [loading, setLoading] = useState(false);
 
   async function handleExport() {
@@ -37,7 +39,7 @@ export function CalendarExportButton({ releaseId }: { releaseId: string }) {
       size="sm"
       onClick={handleExport}
       disabled={loading}
-      title="Export to calendar"
+      title={t("exportToCalendar")}
     >
       <CalendarDays size={14} />
     </IconButton>

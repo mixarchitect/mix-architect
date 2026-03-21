@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Radio,
   Plus,
@@ -24,11 +25,19 @@ import {
   PLATFORMS,
   DISTRIBUTORS,
   DISTRIBUTOR_PLATFORMS,
-  statusLabel,
   getPlatformIcon,
   type DistributionEntry,
   type PlatformId,
 } from "@/lib/distribution/platforms";
+
+const statusKeyMap: Record<string, string> = {
+  not_submitted: "statusNotSubmitted",
+  submitted: "statusSubmitted",
+  processing: "statusProcessing",
+  live: "statusLive",
+  rejected: "statusRejected",
+  taken_down: "statusTakenDown",
+};
 
 type StatusColor = "blue" | "green" | "orange";
 
@@ -54,6 +63,8 @@ export function DistributionPanel({
   canEdit,
 }: Props) {
   const router = useRouter();
+  const t = useTranslations("distribution");
+  const tc = useTranslations("common");
   const [entries, setEntries] = useState<DistributionEntry[]>(initialEntries);
   const [showBulkForm, setShowBulkForm] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -94,19 +105,20 @@ export function DistributionPanel({
           (r: { found: boolean }) => r.found,
         );
         if (found.length > 0) {
+          const foundPlatforms = found.map((r: { platform: string }) => r.platform === "apple_music" ? "Apple Music" : "Spotify");
           setCheckResult(
-            `Found on ${found.map((r: { platform: string }) => r.platform === "apple_music" ? "Apple Music" : "Spotify").join(", ")}!`,
+            t("foundOn", { platforms: foundPlatforms.join(", ") }),
           );
           await refresh();
           router.refresh();
         } else {
-          setCheckResult("Not found yet. We'll keep checking daily.");
+          setCheckResult(t("notFoundYetDaily"));
         }
       } else {
-        setCheckResult(data.error ?? "Check failed");
+        setCheckResult(data.error ?? t("checkFailed"));
       }
     } catch {
-      setCheckResult("Check failed");
+      setCheckResult(t("checkFailed"));
     } finally {
       setChecking(false);
     }
@@ -148,7 +160,7 @@ export function DistributionPanel({
       <PanelBody className="py-5">
         {/* Header */}
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-          <div className="label-sm text-muted">DISTRIBUTION TRACKER</div>
+          <div className="label-sm text-muted">{t("title")}</div>
           {canEdit && entries.length > 0 && (
             <div className="flex items-center gap-2">
               <button
@@ -160,7 +172,7 @@ export function DistributionPanel({
                 className="flex items-center gap-1 text-[11px] text-muted hover:text-signal transition-colors"
               >
                 <Send size={12} />
-                Mark as Submitted
+                {t("markAsSubmitted")}
               </button>
               <button
                 type="button"
@@ -171,7 +183,7 @@ export function DistributionPanel({
                 className="flex items-center gap-1 text-[11px] text-muted hover:text-signal transition-colors"
               >
                 <Plus size={12} />
-                Add Platform
+                {t("addPlatform")}
               </button>
             </div>
           )}
@@ -207,13 +219,13 @@ export function DistributionPanel({
         {entries.length === 0 && !showBulkForm && !showAddForm ? (
           <EmptyState
             icon={Radio}
-            title="No platforms tracked"
-            description="Track your release on Spotify."
+            title={t("emptyTitle")}
+            description={t("emptyDescription")}
             size="sm"
             action={
               canEdit
                 ? {
-                    label: "Get Started",
+                    label: t("getStarted"),
                     onClick: () => setShowBulkForm(true),
                   }
                 : undefined
@@ -227,7 +239,7 @@ export function DistributionPanel({
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5 text-[11px] text-muted">
                     <Sparkles size={11} className="text-signal" />
-                    Updates automatically
+                    {t("updatesAutomatically")}
                   </div>
                   {hasSpotifySubmitted && (
                     <button
@@ -241,7 +253,7 @@ export function DistributionPanel({
                       ) : (
                         <Search size={12} />
                       )}
-                      Check Now
+                      {t("checkNow")}
                     </button>
                   )}
                 </div>
@@ -277,7 +289,7 @@ export function DistributionPanel({
               <div>
                 {spotifyEntry && (
                   <div className="flex items-center gap-1.5 text-[11px] text-muted mb-2">
-                    Manually updated
+                    {t("manuallyUpdated")}
                   </div>
                 )}
                 <div className="space-y-0.5">
@@ -329,6 +341,8 @@ function PlatformRow({
   onStatusChange: (status: string) => void;
   onSetUrl: (url: string) => void;
 }) {
+  const t = useTranslations("distribution");
+  const tc = useTranslations("common");
   const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlValue, setUrlValue] = useState(entry.external_url ?? "");
@@ -358,7 +372,7 @@ function PlatformRow({
             >
               <StatusIndicator
                 color={getStatusColor(entry.status)}
-                label={statusLabel(entry.status)}
+                label={t(statusKeyMap[entry.status] ?? "statusNotSubmitted")}
                 className="text-xs"
               />
               <ChevronDown size={10} className="text-faint" />
@@ -366,7 +380,7 @@ function PlatformRow({
           ) : (
             <StatusIndicator
               color={getStatusColor(entry.status)}
-              label={statusLabel(entry.status)}
+              label={t(statusKeyMap[entry.status] ?? "statusNotSubmitted")}
               className="text-xs"
             />
           )}
@@ -401,7 +415,7 @@ function PlatformRow({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted hover:text-signal transition-colors"
-                title="Open on platform"
+                title={t("openOnPlatform")}
               >
                 <ExternalLink size={13} />
               </a>
@@ -409,9 +423,9 @@ function PlatformRow({
                 type="button"
                 onClick={() => setShowUrlInput(!showUrlInput)}
                 className="text-[10px] text-muted hover:text-signal transition-colors opacity-0 group-hover:opacity-100"
-                title="Edit URL"
+                title={t("editUrl")}
               >
-                Edit
+                {t("editAction")}
               </button>
             </div>
           ) : (
@@ -419,10 +433,10 @@ function PlatformRow({
               type="button"
               onClick={() => setShowUrlInput(!showUrlInput)}
               className="flex items-center gap-1 text-[11px] text-muted hover:text-signal transition-colors"
-              title="Add link"
+              title={t("addLink")}
             >
               <ExternalLink size={12} />
-              <span className="hidden md:inline">Add link</span>
+              <span className="hidden md:inline">{t("addLink")}</span>
             </button>
           )
         ) : entry.external_url ? (
@@ -431,7 +445,7 @@ function PlatformRow({
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted hover:text-signal transition-colors"
-            title="Open on platform"
+            title={t("openOnPlatform")}
           >
             <ExternalLink size={13} />
           </a>
@@ -443,7 +457,7 @@ function PlatformRow({
             type="button"
             onClick={onDelete}
             className="text-[10px] text-muted hover:text-red-400 transition-colors px-1 opacity-0 group-hover:opacity-100"
-            title="Remove"
+            title={t("remove")}
           >
             <Trash2 size={12} />
           </button>
@@ -470,7 +484,7 @@ function PlatformRow({
             >
               <StatusIndicator
                 color={getStatusColor(s)}
-                label={statusLabel(s)}
+                label={t(statusKeyMap[s] ?? "statusNotSubmitted")}
                 className="text-[10px]"
               />
             </button>
@@ -504,14 +518,14 @@ function PlatformRow({
             className="inline-flex items-center justify-center rounded-sm text-[11px] font-semibold text-white"
             style={{ height: 28, padding: "0 10px", background: "var(--signal)" }}
           >
-            Save
+            {t("save")}
           </button>
           <button
             type="button"
             onClick={() => setShowUrlInput(false)}
             className="text-[11px] text-muted hover:text-text transition-colors"
           >
-            Cancel
+            {tc("cancel")}
           </button>
         </form>
       )}
@@ -534,6 +548,8 @@ function BulkSubmitForm({
   onDone: () => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations("distribution");
+  const tc = useTranslations("common");
   const [distributor, setDistributor] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<Set<string>>(
     new Set(),
@@ -589,18 +605,18 @@ function BulkSubmitForm({
 
   return (
     <div className="mb-4 border border-border rounded-lg p-3 space-y-3">
-      <div className="text-xs font-medium text-text">Mark as Submitted</div>
+      <div className="text-xs font-medium text-text">{t("markAsSubmitted")}</div>
 
       {/* Distributor select */}
       <div className="space-y-1">
-        <label className="text-[11px] text-muted">Distributor</label>
+        <label className="text-[11px] text-muted">{t("distributor")}</label>
         <select
           value={distributor}
           onChange={(e) => handleDistributorChange(e.target.value)}
           className="input text-xs w-full"
           style={{ height: "32px", padding: "4px 36px 4px 10px" }}
         >
-          <option value="">Select distributor...</option>
+          <option value="">{t("selectDistributor")}</option>
           {DISTRIBUTORS.map((d) => (
             <option key={d} value={d}>
               {d}
@@ -612,7 +628,7 @@ function BulkSubmitForm({
       {/* Platform checkboxes */}
       {distributor && (
         <div className="space-y-1">
-          <label className="text-[11px] text-muted">Platforms</label>
+          <label className="text-[11px] text-muted">{t("platforms")}</label>
           <div className="grid grid-cols-2 gap-1">
             {PLATFORMS.map((p) => {
               const alreadyExists = existingSet.has(p.id);
@@ -638,7 +654,7 @@ function BulkSubmitForm({
                   />
                   <span className="text-text">
                     {p.label}
-                    {alreadyExists && " (tracked)"}
+                    {alreadyExists && ` (${t("tracked")})`}
                   </span>
                 </label>
               );
@@ -658,14 +674,14 @@ function BulkSubmitForm({
           disabled={!distributor || selectedPlatforms.size === 0 || submitting}
           onClick={handleSubmit}
         >
-          {submitting ? "Submitting..." : `Submit ${selectedPlatforms.size} Platforms`}
+          {submitting ? t("submitting") : t("submitPlatforms", { count: selectedPlatforms.size })}
         </Button>
         <button
           type="button"
           onClick={onCancel}
           className="text-xs text-muted hover:text-text transition-colors"
         >
-          Cancel
+          {tc("cancel")}
         </button>
       </div>
     </div>
@@ -687,6 +703,8 @@ function AddPlatformForm({
   onDone: () => void;
   onCancel: () => void;
 }) {
+  const t = useTranslations("distribution");
+  const tc = useTranslations("common");
   const existingSet = new Set(existingPlatforms);
   const available = PLATFORMS.filter((p) => !existingSet.has(p.id));
 
@@ -715,7 +733,7 @@ function AddPlatformForm({
   if (available.length === 0) {
     return (
       <div className="mb-4 text-xs text-muted">
-        All platforms are already being tracked.
+        {t("allPlatformsTracked")}
       </div>
     );
   }
@@ -740,14 +758,14 @@ function AddPlatformForm({
         disabled={!platform || submitting}
         onClick={handleSubmit}
       >
-        {submitting ? "Adding..." : "Add"}
+        {submitting ? t("adding") : t("add")}
       </Button>
       <button
         type="button"
         onClick={onCancel}
         className="text-xs text-muted hover:text-text transition-colors"
       >
-        Cancel
+        {tc("cancel")}
       </button>
     </div>
   );

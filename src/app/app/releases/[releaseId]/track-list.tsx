@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { GripVertical, ChevronUp, ChevronDown, Trash2, Check, MessageCircle, Package } from "lucide-react";
 import { StatusDot } from "@/components/ui/status-dot";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -30,14 +31,20 @@ function statusColor(s: string): "green" | "orange" | "blue" {
   return "blue";
 }
 
-function statusLabel(s: string): string {
-  if (s === "complete") return "Approved";
-  if (s === "in_progress") return "In progress";
-  if (s === "not_started") return "Not started";
-  return s.replace(/_/g, " ");
-}
+const statusKeys: Record<string, string> = {
+  complete: "trackApproved",
+  in_progress: "trackInProgress",
+  not_started: "trackNotStarted",
+};
 
 export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDelete }: Props) {
+  const t = useTranslations("releaseDetail");
+  const tc = useTranslations("common");
+
+  function statusLabel(s: string): string {
+    return t(statusKeys[s] ?? "trackNotStarted");
+  }
+
   const [localTracks, setLocalTracks] = useState(initialTracks);
 
   // Sync local state when server data changes (e.g. after Flow Simulator applies new order)
@@ -144,9 +151,9 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
 
   return (
     <div className="space-y-2">
-      {sorted.map((t, idx) => (
+      {sorted.map((track, idx) => (
         <div
-          key={t.id}
+          key={track.id}
           draggable={canReorder}
           onDragStart={canReorder ? () => setDragIdx(idx) : undefined}
           onDragOver={canReorder ? (e) => { e.preventDefault(); setDragOverIdx(idx); } : undefined}
@@ -170,25 +177,25 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
               <div className="flex flex-col md:hidden shrink-0 -my-1">
                 <button
                   type="button"
-                  onClick={() => handleMove(t.id, -1)}
+                  onClick={() => handleMove(track.id, -1)}
                   disabled={idx === 0}
                   className={cn(
                     "p-2 rounded transition-colors",
                     idx === 0 ? "text-transparent" : "text-faint hover:text-text active:text-text",
                   )}
-                  title="Move up"
+                  title={t("moveUp")}
                 >
                   <ChevronUp size={16} />
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleMove(t.id, 1)}
+                  onClick={() => handleMove(track.id, 1)}
                   disabled={idx === sorted.length - 1}
                   className={cn(
                     "p-2 rounded transition-colors",
                     idx === sorted.length - 1 ? "text-transparent" : "text-faint hover:text-text active:text-text",
                   )}
-                  title="Move down"
+                  title={t("moveDown")}
                 >
                   <ChevronDown size={16} />
                 </button>
@@ -196,47 +203,47 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
             </>
           )}
           <Link
-            href={`/app/releases/${releaseId}/tracks/${t.id}`}
+            href={`/app/releases/${releaseId}/tracks/${track.id}`}
             className="group flex-1 flex items-center gap-4 min-w-0"
             draggable={false}
             {...(idx === 0 ? { "data-tour": "track-link" } : {})}
           >
             <span className="w-8 text-right text-sm font-medium text-muted shrink-0">
-              {String(t.track_number).padStart(2, "0")}
+              {String(track.track_number).padStart(2, "0")}
             </span>
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-text text-sm group-hover:text-signal transition-colors truncate">
-                {t.title}
+                {track.title}
               </div>
             </div>
-            {t.portalApprovalStatus && t.portalApprovalStatus !== "awaiting_review" && (
-              <PortalApprovalBadge status={t.portalApprovalStatus} />
+            {track.portalApprovalStatus && track.portalApprovalStatus !== "awaiting_review" && (
+              <PortalApprovalBadge status={track.portalApprovalStatus} />
             )}
-            <span title={statusLabel(t.status)}>
-              <StatusDot color={statusColor(t.status)} />
+            <span title={statusLabel(track.status)}>
+              <StatusDot color={statusColor(track.status)} />
             </span>
           </Link>
 
           {/* Delete track */}
           {canDelete && (
-            <div className={cn("relative shrink-0 transition-opacity duration-150", confirmDeleteId === t.id ? "opacity-100" : "md:opacity-0 md:group-hover/row:opacity-100 md:group-focus-within/row:opacity-100")} ref={confirmDeleteId === t.id ? confirmRef : undefined}>
+            <div className={cn("relative shrink-0 transition-opacity duration-150", confirmDeleteId === track.id ? "opacity-100" : "md:opacity-0 md:group-hover/row:opacity-100 md:group-focus-within/row:opacity-100")} ref={confirmDeleteId === track.id ? confirmRef : undefined}>
               <button
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setConfirmDeleteId(confirmDeleteId === t.id ? null : t.id);
+                  setConfirmDeleteId(confirmDeleteId === track.id ? null : track.id);
                 }}
                 className="p-1.5 rounded text-faint hover:text-red-500 transition-colors"
-                title="Delete track"
+                title={t("deleteTrack")}
               >
                 <Trash2 size={14} />
               </button>
 
-              {confirmDeleteId === t.id && (
+              {confirmDeleteId === track.id && (
                 <div className="absolute right-0 top-full mt-1 w-52 rounded-md border border-border bg-panel shadow-lg p-3 z-20 space-y-2">
                   <p className="text-xs text-muted">
-                    Delete <strong className="text-text">{t.title}</strong>? This cannot be undone.
+                    {t("deleteTrackConfirm", { title: track.title })}
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -244,12 +251,12 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleDeleteTrack(t.id);
+                        handleDeleteTrack(track.id);
                       }}
-                      disabled={deletingId === t.id}
+                      disabled={deletingId === track.id}
                       className="flex-1 px-2 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded transition-colors disabled:opacity-50"
                     >
-                      {deletingId === t.id ? "Deleting\u2026" : "Confirm"}
+                      {deletingId === track.id ? tc("deleting") : tc("confirm")}
                     </button>
                     <button
                       type="button"
@@ -260,7 +267,7 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
                       }}
                       className="flex-1 px-2 py-1.5 text-xs font-medium text-muted hover:text-text border border-border rounded transition-colors"
                     >
-                      Cancel
+                      {tc("cancel")}
                     </button>
                   </div>
                 </div>
@@ -275,13 +282,14 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
 
 /* ── Portal Approval Badge ───────────────────────────────────────── */
 
-const APPROVAL_CONFIG: Record<string, { label: string; icon: typeof Check; color: string }> = {
-  approved: { label: "Approved", icon: Check, color: "text-status-green bg-status-green/10" },
-  delivered: { label: "Delivered", icon: Package, color: "text-status-blue bg-status-blue/10" },
-  changes_requested: { label: "Changes", icon: MessageCircle, color: "text-signal bg-signal-muted" },
+const APPROVAL_CONFIG: Record<string, { labelKey: string; icon: typeof Check; color: string }> = {
+  approved: { labelKey: "trackApproved", icon: Check, color: "text-status-green bg-status-green/10" },
+  delivered: { labelKey: "trackDelivered", icon: Package, color: "text-status-blue bg-status-blue/10" },
+  changes_requested: { labelKey: "trackChanges", icon: MessageCircle, color: "text-signal bg-signal-muted" },
 };
 
 function PortalApprovalBadge({ status }: { status: string }) {
+  const t = useTranslations("releaseDetail");
   const config = APPROVAL_CONFIG[status];
   if (!config) return null;
   const Icon = config.icon;
@@ -293,7 +301,7 @@ function PortalApprovalBadge({ status }: { status: string }) {
       )}
     >
       <Icon size={10} />
-      {config.label}
+      {t(config.labelKey)}
     </span>
   );
 }

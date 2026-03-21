@@ -27,7 +27,7 @@ import type { FlowTrack } from "@/components/flow-simulator/use-flow-audio";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
 import { formatLabel } from "@/lib/format-labels";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { resolveVisibility } from "@/lib/features/feature-registry";
 
 type Props = {
@@ -83,7 +83,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   if (!user) notFound();
 
   // Fetch role + user defaults + expenses + time entries + locale in parallel
-  const [role, defaultsRes2, expenses, timeEntries, locale] = await Promise.all([
+  const [role, defaultsRes2, expenses, timeEntries, locale, t] = await Promise.all([
     getReleaseRole(supabase, releaseId, user.id),
     supabase
       .from("user_defaults")
@@ -93,6 +93,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
     getExpensesByRelease(releaseId),
     getTimeEntriesByRelease(releaseId),
     getLocale(),
+    getTranslations("releaseDetail"),
   ]);
   const paymentsEnabled = defaultsRes2.data?.payments_enabled ?? false;
   const defaultHourlyRate = defaultsRes2.data?.default_hourly_rate ?? null;
@@ -183,13 +184,13 @@ export default async function ReleasePage({ params, searchParams }: Props) {
 
   // Build tab list — conditionally include based on feature visibility
   const tabs = [
-    { id: "tracks" as const, label: "Tracks", count: tracks?.length ?? 0 },
-    { id: "globals" as const, label: "Globals" },
+    { id: "tracks" as const, label: t("tabTracks"), count: tracks?.length ?? 0 },
+    { id: "globals" as const, label: t("tabGlobals") },
     ...(features.distribution_checklist
-      ? [{ id: "distribution" as const, label: "Distribution" }]
+      ? [{ id: "distribution" as const, label: t("tabDistribution") }]
       : []),
     ...(paymentsEnabled && features.payment_tracking
-      ? [{ id: "financials" as const, label: "Financials" }]
+      ? [{ id: "financials" as const, label: t("tabFinancials") }]
       : []),
   ];
 
@@ -204,7 +205,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
             className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1 shrink-0"
           >
             <ArrowLeft size={14} />
-            Releases
+            {t("breadcrumbReleases")}
           </Link>
           <span className="text-faint">/</span>
           <FlowBreadcrumbTitle
@@ -242,7 +243,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           )}
           {canEdit(role) && (
             <Link href={`/app/releases/${releaseId}/settings`}>
-              <IconButton size="sm" title="Release settings">
+              <IconButton size="sm" title={t("releaseSettings")}>
                 <Settings size={14} />
               </IconButton>
             </Link>
@@ -274,7 +275,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                   <Link href={`/app/releases/${releaseId}/tracks/new`}>
                     <Button variant="secondary" className="h-9 text-xs">
                       <Plus size={14} />
-                      Add Track
+                      {t("addTrack")}
                     </Button>
                   </Link>
                 )}
@@ -303,9 +304,9 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                 <EmptyState
                   icon={ListMusic}
                   size="md"
-                  title="No tracks added"
-                  description={canEdit(role) ? "Add tracks to start building out this release." : "No tracks have been added yet."}
-                  action={canEdit(role) ? { label: "Add a track", href: `/app/releases/${releaseId}/tracks/new`, variant: "primary" } : undefined}
+                  title={t("noTracksTitle")}
+                  description={canEdit(role) ? t("noTracksDescEdit") : t("noTracksDescView")}
+                  action={canEdit(role) ? { label: t("addATrack"), href: `/app/releases/${releaseId}/tracks/new`, variant: "primary" } : undefined}
                 />
               )}
             </div>
@@ -384,17 +385,17 @@ export default async function ReleasePage({ params, searchParams }: Props) {
 
         {/* Inspector sidebar — inline on desktop, bottom sheet on mobile */}
         <div data-tour="release-sidebar">
-        <MobileInspector title="Release Info">
+        <MobileInspector title={t("releaseInfo")}>
           {/* Cover Art */}
           <CoverArtEditor releaseId={releaseId} initialUrl={release.cover_art_url} role={role} />
 
           {/* Release Info */}
           <Panel>
             <PanelBody className="py-5 space-y-3">
-              <div className="label-sm text-muted mb-1">RELEASE INFO</div>
+              <div className="label-sm text-muted mb-1">{t("releaseInfo")}</div>
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted">Artist</span>
+                  <span className="text-muted">{t("artist")}</span>
                   {release.artist ? (
                     <Link
                       href={`/app?artist=${encodeURIComponent(release.artist)}`}
@@ -407,20 +408,20 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                   )}
                 </div>
                 <div className="flex justify-between text-sm items-center">
-                  <span className="text-muted">Type</span>
+                  <span className="text-muted">{t("type")}</span>
                   <Pill>{typeLabel(release.release_type)}</Pill>
                 </div>
                 <div className="flex justify-between text-sm items-center">
-                  <span className="text-muted">Format</span>
+                  <span className="text-muted">{t("format")}</span>
                   <Pill>{formatLabel(release.format)}</Pill>
                 </div>
                 <div className="flex justify-between text-sm items-center">
-                  <span className="text-muted">Status</span>
+                  <span className="text-muted">{t("statusLabel")}</span>
                   <StatusEditor releaseId={releaseId} initialStatus={release.status} role={role} />
                 </div>
                 {release.target_date && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted">Target Date</span>
+                    <span className="text-muted">{t("targetDate")}</span>
                     <span className="text-text text-xs">
                       {new Date(release.target_date).toLocaleDateString()}
                     </span>
@@ -428,7 +429,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                 )}
                 {Array.isArray(release.genre_tags) && release.genre_tags.length > 0 && (
                   <div className="flex justify-between text-sm items-start">
-                    <span className="text-muted shrink-0 mr-3">Genre</span>
+                    <span className="text-muted shrink-0 mr-3">{t("genre")}</span>
                     <div className="flex flex-wrap gap-1 justify-end">
                       {(release.genre_tags as string[]).map((g: string) => (
                         <Pill key={g} className="text-[10px]">{g}</Pill>
@@ -444,17 +445,17 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           {(release.client_name || release.client_email || release.client_phone) && (
             <Panel>
               <PanelBody className="py-5">
-                <div className="label-sm text-muted mb-2">CLIENT INFO</div>
+                <div className="label-sm text-muted mb-2">{t("clientInfo")}</div>
                 <div className="space-y-2 text-sm">
                   {release.client_name && (
                     <div className="flex justify-between">
-                      <span className="text-muted">Name</span>
+                      <span className="text-muted">{t("name")}</span>
                       <span className="text-text">{release.client_name}</span>
                     </div>
                   )}
                   {release.client_email && (
                     <div className="flex justify-between">
-                      <span className="text-muted">Email</span>
+                      <span className="text-muted">{t("email")}</span>
                       <a href={`mailto:${release.client_email}`} className="text-signal text-xs hover:underline">
                         {release.client_email}
                       </a>
@@ -462,7 +463,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                   )}
                   {release.client_phone && (
                     <div className="flex justify-between">
-                      <span className="text-muted">Phone</span>
+                      <span className="text-muted">{t("phone")}</span>
                       <a href={`tel:${release.client_phone}`} className="text-signal text-xs hover:underline">
                         {release.client_phone}
                       </a>

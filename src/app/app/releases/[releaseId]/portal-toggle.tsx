@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Globe, Share2, Check, ExternalLink } from "lucide-react";
 
@@ -24,6 +25,7 @@ type PortalToggleProps = {
 };
 
 export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
+  const t = useTranslations("releaseDetail");
   const supabase = createSupabaseBrowserClient();
   const router = useRouter();
 
@@ -112,14 +114,14 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
         onClick={() => active && setOpen((v) => !v)}
       >
         <Globe size={14} />
-        <span className="text-xs font-semibold">Portal</span>
+        <span className="text-xs font-semibold">{t("portal")}</span>
 
         {/* Toggle switch */}
         <button
           type="button"
           role="switch"
           aria-checked={active}
-          aria-label="Toggle client portal"
+          aria-label={t("togglePortal")}
           disabled={toggling}
           onClick={(e) => { e.stopPropagation(); handleToggle(e); }}
           className={`relative inline-flex h-4 w-7 items-center rounded-full transition-colors cursor-pointer ${
@@ -139,7 +141,7 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handleShare(e); }}
-              aria-label={copied ? "Copied!" : "Copy portal link"}
+              aria-label={copied ? t("copied") : t("copyPortalLink")}
               className="inline-flex items-center cursor-pointer text-muted hover:text-text transition-colors"
             >
               {copied ? <Check size={14} /> : <Share2 size={14} />}
@@ -148,7 +150,7 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
               href={`${typeof window !== "undefined" ? window.location.origin : ""}/portal/${share!.share_token}`}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Open portal"
+              aria-label={t("openPortal")}
               onClick={(e) => e.stopPropagation()}
               className="inline-flex items-center text-muted hover:text-text transition-colors"
             >
@@ -165,37 +167,37 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
           style={{ background: "var(--panel)" }}
         >
           <ToggleRow
-            label="Mix direction"
+            label={t("portalDirection")}
             checked={share!.show_direction}
             onChange={(v) => updateField("show_direction", v)}
           />
           <ToggleRow
-            label="Specs"
+            label={t("portalSpecs")}
             checked={share!.show_specs}
             onChange={(v) => updateField("show_specs", v)}
           />
           <ToggleRow
-            label="References"
+            label={t("portalReferences")}
             checked={share!.show_references}
             onChange={(v) => updateField("show_references", v)}
           />
           <ToggleRow
-            label="Payment status"
+            label={t("portalPaymentStatus")}
             checked={share!.show_payment_status}
             onChange={(v) => updateField("show_payment_status", v)}
           />
           <ToggleRow
-            label="Distribution"
+            label={t("portalDistribution")}
             checked={share!.show_distribution}
             onChange={(v) => updateField("show_distribution", v)}
           />
           <ToggleRow
-            label="Lyrics"
+            label={t("portalLyrics")}
             checked={share!.show_lyrics}
             onChange={(v) => updateField("show_lyrics", v)}
           />
           <ToggleRow
-            label="Require payment"
+            label={t("portalRequirePayment")}
             checked={share!.require_payment_for_download}
             onChange={(v) => updateField("require_payment_for_download", v)}
           />
