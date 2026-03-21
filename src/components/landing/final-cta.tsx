@@ -15,7 +15,7 @@ export function FinalCTA() {
         </p>
         <div className="mt-8">
           <Link
-            href="/auth/sign-in"
+            href="/auth/sign-in?mode=signup"
             className="btn-primary h-14 px-10 text-base inline-flex items-center gap-2"
           >
             Get Started Free

@@ -114,7 +114,7 @@ function PriceCard({
       </ul>
 
       <Link
-        href="/auth/sign-in"
+        href="/auth/sign-in?mode=signup"
         className={`h-12 px-6 text-sm font-semibold inline-flex items-center justify-center gap-2 rounded-xl transition-colors w-full ${
           highlighted
             ? "bg-[#0D9488] text-[#1a1a1a] hover:bg-[#0fb9ab]"

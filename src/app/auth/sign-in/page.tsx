@@ -47,6 +47,13 @@ function SignInPageContent() {
 
   useEffect(() => setMounted(true), []);
 
+  // Default to signup mode when linked from landing CTAs
+  useEffect(() => {
+    if (searchParams.get("mode") === "signup") {
+      setMode("signup");
+    }
+  }, [searchParams]);
+
   // Show error from OAuth callback failure
   useEffect(() => {
     const error = searchParams.get("error");

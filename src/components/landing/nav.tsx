@@ -73,7 +73,7 @@ export function LandingNav() {
             Sign in
           </Link>
           <Link
-            href="/auth/sign-in"
+            href="/auth/sign-in?mode=signup"
             className="px-5 py-2 text-sm font-semibold text-white bg-[#0D9488] rounded-full hover:bg-[#0fb9ab] transition-colors whitespace-nowrap"
           >
             Start Free

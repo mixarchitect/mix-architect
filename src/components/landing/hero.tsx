@@ -72,7 +72,7 @@ export async function Hero() {
         {/* CTAs */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            href="/auth/sign-in"
+            href="/auth/sign-in?mode=signup"
             className="h-14 w-full sm:w-56 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D9488] text-white hover:bg-[#0fb9ab] transition-colors"
           >
             {t("startFree")}
