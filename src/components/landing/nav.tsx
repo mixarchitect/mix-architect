@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { LocaleSwitcher } from "./locale-switcher";
 
-export function LandingNav({ locale }: { locale: string }) {
+export function LandingNav({ locale = "en-US" }: { locale?: string }) {
   const t = useTranslations("landing");
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);

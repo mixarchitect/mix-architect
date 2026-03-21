@@ -13,6 +13,8 @@ import { CoverArt } from "@/components/featured/CoverArt";
 import { StreamingLinks } from "@/components/featured/StreamingLinks";
 import { FeaturedReleaseCard } from "@/components/featured/FeaturedReleaseCard";
 import { BandcampEmbed } from "@/components/featured/BandcampEmbed";
+import { getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 import { LandingNav } from "@/components/landing/nav";
 import { LandingFooter } from "@/components/landing/footer";
 
@@ -64,7 +66,11 @@ export default async function FeaturedReleasePage({ params }: Props) {
   const release = await getFeaturedReleaseBySlug(slug);
   if (!release) notFound();
 
-  const moreReleases = await getRecentFeaturedReleases(slug, 3);
+  const [moreReleases, locale, messages] = await Promise.all([
+    getRecentFeaturedReleases(slug, 3),
+    getLocale(),
+    getMessages(),
+  ]);
   const coverUrl = getCoverArtUrl(release.cover_art_path);
 
   const featuredDateFormatted = new Date(release.featured_date).toLocaleDateString(
@@ -123,8 +129,9 @@ export default async function FeaturedReleasePage({ params }: Props) {
   const bodyAfter = bodyLines.slice(splitIndex).join("\n\n");
 
   return (
+    <NextIntlClientProvider locale={locale} messages={{ landing: (messages as Record<string, unknown>).landing }}>
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-[#0A0A0A] focus:outline-none">
-      <LandingNav />
+      <LandingNav locale={locale} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -272,5 +279,6 @@ export default async function FeaturedReleasePage({ params }: Props) {
 
       <LandingFooter />
     </main>
+    </NextIntlClientProvider>
   );
 }

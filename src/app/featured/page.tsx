@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 import { getFeaturedReleases } from "@/lib/services/featured-releases";
 import { FeaturedReleaseCard } from "@/components/featured/FeaturedReleaseCard";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -21,11 +23,16 @@ export const metadata: Metadata = {
 };
 
 export default async function FeaturedArchivePage() {
-  const { releases, total } = await getFeaturedReleases(1, 12);
+  const [{ releases, total }, locale, messages] = await Promise.all([
+    getFeaturedReleases(1, 12),
+    getLocale(),
+    getMessages(),
+  ]);
 
   return (
+    <NextIntlClientProvider locale={locale} messages={{ landing: (messages as Record<string, unknown>).landing }}>
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-[#0A0A0A] focus:outline-none">
-      <LandingNav />
+      <LandingNav locale={locale} />
 
       <div className="pt-32 pb-20 px-6">
         <div className="mx-auto max-w-6xl">
@@ -72,5 +79,6 @@ export default async function FeaturedArchivePage() {
 
       <LandingFooter />
     </main>
+    </NextIntlClientProvider>
   );
 }

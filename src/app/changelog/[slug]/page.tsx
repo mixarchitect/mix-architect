@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 import { getEntryBySlug, getAdjacentEntries } from "@/lib/services/changelog";
 import { LandingNav } from "@/components/landing/nav";
 import { LandingFooter } from "@/components/landing/footer";
@@ -71,7 +73,11 @@ export default async function ChangelogEntryPage({ params }: Props) {
   const entry = await getEntryBySlug(slug);
   if (!entry) notFound();
 
-  const adjacent = await getAdjacentEntries(entry.published_at);
+  const [adjacent, locale, messages] = await Promise.all([
+    getAdjacentEntries(entry.published_at),
+    getLocale(),
+    getMessages(),
+  ]);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -96,8 +102,9 @@ export default async function ChangelogEntryPage({ params }: Props) {
     : null;
 
   return (
+    <NextIntlClientProvider locale={locale} messages={{ landing: (messages as Record<string, unknown>).landing }}>
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-bg focus:outline-none">
-      <LandingNav />
+      <LandingNav locale={locale} />
 
       <script
         type="application/ld+json"
@@ -196,5 +203,6 @@ export default async function ChangelogEntryPage({ params }: Props) {
 
       <LandingFooter />
     </main>
+    </NextIntlClientProvider>
   );
 }
