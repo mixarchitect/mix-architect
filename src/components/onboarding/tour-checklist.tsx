@@ -8,16 +8,20 @@ type Props = {
   topics: TourTopic[];
   seenTopics: string[];
   activeTopicId: string | null;
+  hint: string | null;
   onGoToTopic: (topicId: string) => void;
   onDismiss: () => void;
+  onClearHint: () => void;
 };
 
 export function TourChecklist({
   topics,
   seenTopics,
   activeTopicId,
+  hint,
   onGoToTopic,
   onDismiss,
+  onClearHint,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
 
@@ -112,7 +116,6 @@ export function TourChecklist({
                   type="button"
                   onClick={() => {
                     onGoToTopic(topic.id);
-                    setExpanded(false);
                   }}
                   className="flex items-center gap-3 px-4 py-2 w-full text-left transition-colors hover:bg-panel2 cursor-pointer"
                 >
@@ -156,6 +159,25 @@ export function TourChecklist({
               );
             })}
           </div>
+
+          {/* Hint banner */}
+          {hint && (
+            <div
+              className="mx-3 mb-2 px-3 py-2 rounded-lg text-[11px] leading-snug flex items-start gap-2"
+              style={{ background: "var(--signal)", color: "var(--signal-on)" }}
+            >
+              <span className="shrink-0 mt-px">💡</span>
+              <span className="flex-1">{hint}</span>
+              <button
+                type="button"
+                onClick={onClearHint}
+                className="shrink-0 mt-px opacity-70 hover:opacity-100"
+                aria-label="Dismiss hint"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          )}
 
           {/* Footer */}
           <div className="px-4 py-2.5 border-t text-center" style={{ borderColor: "var(--border)" }}>

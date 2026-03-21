@@ -54,8 +54,10 @@ export function TourProvider({ children }: Props) {
             topics={tour.allTopics}
             seenTopics={tour.seenTopics}
             activeTopicId={tour.activeTopic?.id ?? null}
+            hint={tour.hint}
             onGoToTopic={tour.goToTopic}
             onDismiss={tour.dismissTour}
+            onClearHint={tour.clearHint}
           />
         </>
       )}

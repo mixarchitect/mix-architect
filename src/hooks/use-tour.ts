@@ -36,10 +36,13 @@ export type TourState = {
   /** IDs for cross-page navigation */
   releaseId: string | null;
   trackId: string | null;
+  /** Temporary hint message (e.g. prerequisite not met) */
+  hint: string | null;
   /* Actions */
   nextStep: () => void;
   dismissTour: () => void;
   goToTopic: (topicId: string) => void;
+  clearHint: () => void;
 };
 
 export function useTour(): TourState {
@@ -53,6 +56,7 @@ export function useTour(): TourState {
   const [trackId, setTrackId] = useState<string | null>(null);
   // Track which topic is currently being shown (by ID)
   const [showingTopicId, setShowingTopicId] = useState<string | null>(null);
+  const [hint, setHint] = useState<string | null>(null);
 
   /* ── persist helper ── */
   const persist = useCallback((seen: string[], rid?: string | null, tid?: string | null) => {
@@ -234,6 +238,14 @@ export function useTour(): TourState {
       const topic = TOUR_TOPICS.find((t) => t.id === topicId);
       if (!topic) return;
 
+      // Track Details requires a track — show hint if none exists yet
+      if (topicId === "track-detail" && !trackId) {
+        setHint("Add a track to your release first, then click into it to start this step.");
+        return;
+      }
+
+      setHint(null);
+
       // If already seen, un-mark it so the tooltips show again
       const newSeen = seenTopics.filter((id) => id !== topicId);
       setSeenTopics(newSeen);
@@ -254,6 +266,8 @@ export function useTour(): TourState {
     [seenTopics, releaseId, trackId, persist],
   );
 
+  const clearHint = useCallback(() => setHint(null), []);
+
   return {
     isActive,
     activeTopic,
@@ -265,8 +279,10 @@ export function useTour(): TourState {
     totalSteps: TOTAL_TOUR_STEPS,
     releaseId,
     trackId,
+    hint,
     nextStep,
     dismissTour,
     goToTopic,
+    clearHint,
   };
 }
