@@ -92,7 +92,66 @@
       "summary": "워크스페이스가 다음과 같이 구성되었습니다:",
       "createRelease": "첫 번째 릴리스 만들기",
       "goToDashboard": "대시보드로 이동",
-      "changeNote": "이 모든 설정은 설정에서 변경할 수 있습니다."
+      "changeNote": "이 모든 설정은 설정에서 변경할 수 있습니다.",
+      "labelArtist": "아티스트",
+      "labelEngineer": "엔지니어 / 프로듀서",
+      "labelBoth": "아티스트 & 엔지니어",
+      "labelOther": "전체 액세스"
+    }
+  },
+  "tour": {
+    "skipTour": "투어 건너뛰기",
+    "next": "다음",
+    "done": "완료",
+    "guidedTour": "가이드 투어",
+    "tourCount": "투어 {seen}/{total}",
+    "completedCount": "{seen}/{total} 완료",
+    "endTour": "투어 종료",
+    "collapse": "접기",
+    "closeTour": "투어 닫기",
+    "topicLabel": {
+      "create-release": "릴리스 만들기",
+      "release-overview": "릴리스 살펴보기",
+      "track-detail": "트랙 상세",
+      "dashboard": "대시보드"
+    },
+    "topicDesc": {
+      "create-release": "첫 프로젝트 설정하기",
+      "release-overview": "탭과 사이드바 둘러보기",
+      "track-detail": "의도, 스펙, 오디오",
+      "dashboard": "개요 및 내비게이션"
+    },
+    "stepTitle": {
+      "create-title": "릴리스 이름 짓기",
+      "create-artist": "아티스트 / 클라이언트 이름",
+      "create-type": "릴리스 유형",
+      "create-format": "오디오 포맷",
+      "create-genres": "장르 태그",
+      "create-date": "목표 릴리스 날짜",
+      "create-submit": "릴리스 만들기",
+      "release-tabs": "릴리스 탭",
+      "release-sidebar": "릴리스 상세",
+      "release-track-link": "트랙 살펴보기",
+      "track-tabs": "트랙 탭",
+      "track-intent": "믹스 비전",
+      "dashboard-card": "릴리스 카드",
+      "dashboard-nav": "내비게이션"
+    },
+    "stepDesc": {
+      "create-title": "프로젝트에 작업 제목을 지어주세요. 나중에 언제든 변경할 수 있습니다.",
+      "create-artist": "공연 아티스트 또는 밴드입니다. 릴리스에 표시되며 클라이언트 포털에 연결할 수 있습니다.",
+      "create-type": "싱글은 자동으로 트랙 하나가 생성됩니다. EP와 앨범은 나중에 여러 트랙을 추가할 수 있습니다.",
+      "create-format": "스테레오, Dolby Atmos 또는 둘 다를 선택하세요. 모든 트랙의 목표 포맷이 설정됩니다.",
+      "create-genres": "릴리스에 장르 태그를 추가하여 카탈로그를 정리하세요. 추천에서 선택하거나 원하는 장르를 직접 입력할 수 있습니다. 이 단계는 선택 사항입니다.",
+      "create-date": "릴리스 목표 날짜를 설정하세요. 타임라인을 추적하고 일정을 관리하는 데 도움이 됩니다.",
+      "create-submit": "버튼을 눌러 릴리스를 만드세요. 바로 살펴볼 수 있습니다.",
+      "release-tabs": "이 탭들이 릴리스를 정리합니다: 트랙, 글로벌, 배포, 재무. 각 섹션은 프로젝트의 다른 측면을 관리합니다.",
+      "release-sidebar": "커버 아트 업로드, 릴리스 정보 확인, 내부 또는 클라이언트 메모를 추가할 수 있습니다.",
+      "release-track-link": "트랙을 클릭하여 상세 정보를 확인하세요 — 믹스 의도, 스펙, 오디오 버전 등.",
+      "track-tabs": "각 탭은 다른 측면을 기록합니다: 의도(비전), 스펙(기술 요구사항), 오디오(업로드 및 버전) 등.",
+      "track-intent": "이 믹스의 비전을 설명하세요 — 분위기, 레퍼런스, 방향성. 브리프의 핵심입니다.",
+      "dashboard-card": "각 릴리스의 상태, 트랙 진행률, 주요 정보를 한눈에 볼 수 있습니다. 클릭하여 상세 확인.",
+      "dashboard-nav": "사이드바에서 모든 섹션에 빠르게 접근할 수 있습니다 — 릴리스, 아티스트, 템플릿, 결제, 분석."
     }
   },
   "dashboard": {

@@ -92,7 +92,66 @@
       "summary": "您的工作空间已配置为：",
       "createRelease": "创建您的首个发行",
       "goToDashboard": "前往仪表板",
-      "changeNote": "您可以在设置中修改任何这些选项。"
+      "changeNote": "您可以在设置中修改任何这些选项。",
+      "labelArtist": "艺人",
+      "labelEngineer": "录音师 / 制作人",
+      "labelBoth": "艺人 & 录音师",
+      "labelOther": "完整访问"
+    }
+  },
+  "tour": {
+    "skipTour": "跳过导览",
+    "next": "下一步",
+    "done": "完成",
+    "guidedTour": "导览教程",
+    "tourCount": "导览 {seen}/{total}",
+    "completedCount": "已完成 {seen}/{total}",
+    "endTour": "结束导览",
+    "collapse": "折叠",
+    "closeTour": "关闭导览",
+    "topicLabel": {
+      "create-release": "创建发行",
+      "release-overview": "探索您的发行",
+      "track-detail": "歌曲详情",
+      "dashboard": "您的仪表板"
+    },
+    "topicDesc": {
+      "create-release": "设置您的第一个项目",
+      "release-overview": "浏览选项卡和侧边栏",
+      "track-detail": "意图、规格和音频",
+      "dashboard": "概览与导航"
+    },
+    "stepTitle": {
+      "create-title": "为您的发行命名",
+      "create-artist": "艺人 / 客户名称",
+      "create-type": "发行类型",
+      "create-format": "音频格式",
+      "create-genres": "风格标签",
+      "create-date": "目标发行日期",
+      "create-submit": "创建您的发行",
+      "release-tabs": "发行选项卡",
+      "release-sidebar": "发行详情",
+      "release-track-link": "探索歌曲",
+      "track-tabs": "歌曲选项卡",
+      "track-intent": "混音愿景",
+      "dashboard-card": "您的发行卡片",
+      "dashboard-nav": "导航"
+    },
+    "stepDesc": {
+      "create-title": "为您的项目取一个工作标题。之后随时可以更改。",
+      "create-artist": "表演艺人或乐队。这将显示在您的发行上，并可连接到客户门户。",
+      "create-type": "单曲会自动创建一首歌曲。EP和专辑可以稍后添加多首歌曲。",
+      "create-format": "选择立体声、Dolby Atmos或两者。这将为所有歌曲设置目标格式。",
+      "create-genres": "为您的发行添加风格标签，以帮助整理您的目录。您可以从建议中选择，也可以输入任何自定义风格。此步骤为可选。",
+      "create-date": "为您的发行设置目标日期。这有助于您跟踪时间线并按计划推进。",
+      "create-submit": "点击按钮创建您的发行。您可以立即开始探索。",
+      "release-tabs": "这些选项卡用于整理您的发行：歌曲、全局、发行和财务。每个部分帮助管理项目的不同方面。",
+      "release-sidebar": "在这里上传封面艺术、查看发行信息，并添加内部或客户备注。",
+      "release-track-link": "点击进入歌曲查看详情——混音意图、规格、音频版本等。",
+      "track-tabs": "每个选项卡记录不同方面：意图（您的愿景）、规格（技术要求）、音频（上传和版本）等。",
+      "track-intent": "描述此混音的愿景——情绪、参考和方向。这是您简报的核心。",
+      "dashboard-card": "每个发行一目了然地显示状态、歌曲进度和关键信息。点击可深入查看。",
+      "dashboard-nav": "侧边栏让您快速访问所有部分——发行、艺人、模板、付款和分析。"
     }
   },
   "dashboard": {

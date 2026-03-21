@@ -92,7 +92,66 @@
       "summary": "ワークスペースが次のように設定されました:",
       "createRelease": "最初のリリースを作成",
       "goToDashboard": "ダッシュボードに移動",
-      "changeNote": "これらの設定はいつでも設定で変更できます。"
+      "changeNote": "これらの設定はいつでも設定で変更できます。",
+      "labelArtist": "アーティスト",
+      "labelEngineer": "エンジニア／プロデューサー",
+      "labelBoth": "アーティスト＆エンジニア",
+      "labelOther": "フルアクセス"
+    }
+  },
+  "tour": {
+    "skipTour": "ツアーをスキップ",
+    "next": "次へ",
+    "done": "完了",
+    "guidedTour": "ガイドツアー",
+    "tourCount": "ツアー {seen}/{total}",
+    "completedCount": "{seen}/{total} 完了",
+    "endTour": "ツアーを終了",
+    "collapse": "折りたたむ",
+    "closeTour": "ツアーを閉じる",
+    "topicLabel": {
+      "create-release": "リリースを作成",
+      "release-overview": "リリースを探索",
+      "track-detail": "トラック詳細",
+      "dashboard": "ダッシュボード"
+    },
+    "topicDesc": {
+      "create-release": "最初のプロジェクトをセットアップ",
+      "release-overview": "タブとサイドバーを操作",
+      "track-detail": "意図、仕様、オーディオ",
+      "dashboard": "概要とナビゲーション"
+    },
+    "stepTitle": {
+      "create-title": "リリースに名前を付ける",
+      "create-artist": "アーティスト／クライアント名",
+      "create-type": "リリースタイプ",
+      "create-format": "オーディオフォーマット",
+      "create-genres": "ジャンルタグ",
+      "create-date": "目標リリース日",
+      "create-submit": "リリースを作成",
+      "release-tabs": "リリースタブ",
+      "release-sidebar": "リリース詳細",
+      "release-track-link": "トラックを探索",
+      "track-tabs": "トラックタブ",
+      "track-intent": "ミックスビジョン",
+      "dashboard-card": "リリースカード",
+      "dashboard-nav": "ナビゲーション"
+    },
+    "stepDesc": {
+      "create-title": "プロジェクトに仮のタイトルを付けましょう。後からいつでも変更できます。",
+      "create-artist": "パフォーマンスするアーティストまたはバンド名です。リリースに表示され、クライアントポータルに接続できます。",
+      "create-type": "シングルは自動的に1トラック作成されます。EPやアルバムでは後から複数のトラックを追加できます。",
+      "create-format": "ステレオ、Dolby Atmos、またはその両方を選択します。すべてのトラックのターゲットフォーマットが設定されます。",
+      "create-genres": "リリースにジャンルタグを付けてカタログを整理しましょう。候補から選ぶか、好きなジャンルを入力して作成できます。このステップは任意です。",
+      "create-date": "リリースの目標日を設定します。タイムラインを把握し、スケジュール通りに進めるのに役立ちます。",
+      "create-submit": "ボタンを押してリリースを作成しましょう。すぐに確認できます。",
+      "release-tabs": "これらのタブでリリースを整理します：トラック、グローバル、ディストリビューション、ファイナンシャル。各セクションがプロジェクトの異なる側面を管理します。",
+      "release-sidebar": "カバーアートのアップロード、リリース情報の確認、内部メモやクライアントメモの追加ができます。",
+      "release-track-link": "トラックをクリックして詳細を確認——ミックス意図、仕様、オーディオバージョンなど。",
+      "track-tabs": "各タブは異なる側面を記録します：意図（ビジョン）、仕様（技術要件）、オーディオ（アップロード＆バージョン）など。",
+      "track-intent": "このミックスのビジョンを記述します——ムード、リファレンス、方向性。ブリーフの核心です。",
+      "dashboard-card": "各リリースのステータス、トラック進捗、主要情報が一目で確認できます。クリックで詳細へ。",
+      "dashboard-nav": "サイドバーからすべてのセクションにすばやくアクセス——リリース、アーティスト、テンプレート、支払い、アナリティクス。"
     }
   },
   "dashboard": {

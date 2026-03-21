@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { TourTopic } from "@/lib/onboarding/tour-config";
 
 type Props = {
@@ -23,6 +24,7 @@ export function TourChecklist({
   onDismiss,
   onClearHint,
 }: Props) {
+  const t = useTranslations("tour");
   const [expanded, setExpanded] = useState(false);
 
   const seenCount = seenTopics.length;
@@ -58,7 +60,7 @@ export function TourChecklist({
                 style={{ transition: "stroke-dasharray 300ms ease-out" }}
               />
             </svg>
-            <span>Tour {seenCount}/{totalTopics}</span>
+            <span>{t("tourCount", { seen: seenCount, total: totalTopics })}</span>
             <ChevronUp size={12} className="text-muted" />
           </button>
           <button
@@ -69,7 +71,7 @@ export function TourChecklist({
               background: "var(--panel)",
               borderColor: "var(--border)",
             }}
-            aria-label="End tour"
+            aria-label={t("endTour")}
           >
             <X size={12} />
           </button>
@@ -83,14 +85,14 @@ export function TourChecklist({
           style={{ background: "var(--panel)", borderColor: "var(--border)" }}
         >
           <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: "var(--border)" }}>
-            <span className="text-sm font-semibold text-text">Guided Tour</span>
+            <span className="text-sm font-semibold text-text">{t("guidedTour")}</span>
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={onDismiss}
                 className="text-muted hover:text-text transition-colors p-0.5"
-                aria-label="End tour"
-                title="End tour"
+                aria-label={t("endTour")}
+                title={t("endTour")}
               >
                 <X size={14} />
               </button>
@@ -98,7 +100,7 @@ export function TourChecklist({
                 type="button"
                 onClick={() => setExpanded(false)}
                 className="text-muted hover:text-text transition-colors p-0.5"
-                aria-label="Collapse"
+                aria-label={t("collapse")}
               >
                 <ChevronDown size={14} />
               </button>
@@ -182,7 +184,7 @@ export function TourChecklist({
           {/* Footer */}
           <div className="px-4 py-2.5 border-t text-center" style={{ borderColor: "var(--border)" }}>
             <span className="text-[10px] text-faint">
-              {seenCount} of {totalTopics} completed
+              {t("completedCount", { seen: seenCount, total: totalTopics })}
             </span>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { Position } from "@/lib/onboarding/tour-config";
 
 type Props = {
@@ -29,6 +30,7 @@ export function TourTooltip({
   onNext,
   onSkip,
 }: Props) {
+  const t = useTranslations("tour");
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [opacity, setOpacity] = useState(0);
   const [coords, setCoords] = useState<{ top: number; left: number }>({
@@ -142,7 +144,7 @@ export function TourTooltip({
           type="button"
           onClick={onSkip}
           className="text-muted hover:text-text transition-colors -mr-1"
-          aria-label="Close tour"
+          aria-label={t("closeTour")}
         >
           <X size={14} />
         </button>
@@ -160,7 +162,7 @@ export function TourTooltip({
         style={{ borderColor: "var(--border)" }}
       >
         <span className="text-[11px] text-faint">
-          {stepNumber} of {totalStepsInTopic}
+          {t("completedCount", { seen: stepNumber, total: totalStepsInTopic })}
         </span>
 
         <div className="flex items-center gap-2">
@@ -169,7 +171,7 @@ export function TourTooltip({
             onClick={onSkip}
             className="text-xs text-muted hover:text-text transition-colors"
           >
-            Skip tour
+            {t("skipTour")}
           </button>
           <button
             type="button"
@@ -177,7 +179,7 @@ export function TourTooltip({
             className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
             style={{ background: "var(--signal)", color: "var(--signal-on)" }}
           >
-            {isLastStep ? "Done" : "Next"}
+            {isLastStep ? t("done") : t("next")}
           </button>
         </div>
       </div>

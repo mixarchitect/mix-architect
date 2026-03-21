@@ -92,7 +92,66 @@
       "summary": "Din arbetsyta är konfigurerad för:",
       "createRelease": "Skapa din första release",
       "goToDashboard": "Gå till instrumentpanelen",
-      "changeNote": "Du kan ändra alla dessa i Inställningar."
+      "changeNote": "Du kan ändra alla dessa i Inställningar.",
+      "labelArtist": "Artist",
+      "labelEngineer": "Ljudtekniker / Producent",
+      "labelBoth": "Artist & Ljudtekniker",
+      "labelOther": "Full åtkomst"
+    }
+  },
+  "tour": {
+    "skipTour": "Hoppa över guiden",
+    "next": "Nästa",
+    "done": "Klar",
+    "guidedTour": "Guidad tur",
+    "tourCount": "Guide {seen}/{total}",
+    "completedCount": "{seen} av {total} slutförda",
+    "endTour": "Avsluta guiden",
+    "collapse": "Fäll ihop",
+    "closeTour": "Stäng guiden",
+    "topicLabel": {
+      "create-release": "Skapa en release",
+      "release-overview": "Utforska din release",
+      "track-detail": "Spårdetaljer",
+      "dashboard": "Din instrumentpanel"
+    },
+    "topicDesc": {
+      "create-release": "Konfigurera ditt första projekt",
+      "release-overview": "Navigera flikar och sidofält",
+      "track-detail": "Intention, specifikationer och ljud",
+      "dashboard": "Översikt och navigering"
+    },
+    "stepTitle": {
+      "create-title": "Namnge din release",
+      "create-artist": "Artist / klientnamn",
+      "create-type": "Releasetyp",
+      "create-format": "Ljudformat",
+      "create-genres": "Genretaggar",
+      "create-date": "Måldatum för release",
+      "create-submit": "Skapa din release",
+      "release-tabs": "Releaseflikar",
+      "release-sidebar": "Releasedetaljer",
+      "release-track-link": "Utforska ett spår",
+      "track-tabs": "Spårflikar",
+      "track-intent": "Mixvision",
+      "dashboard-card": "Ditt releasekort",
+      "dashboard-nav": "Navigering"
+    },
+    "stepDesc": {
+      "create-title": "Ge ditt projekt en arbetstitel. Du kan alltid ändra den senare.",
+      "create-artist": "Den framträdande artisten eller bandet. Detta visas på din release och kan kopplas till klientportalen.",
+      "create-type": "Singlar skapar automatiskt ett spår. EP:ar och album låter dig lägga till flera spår senare.",
+      "create-format": "Välj stereo, Dolby Atmos eller båda. Detta anger målformatet för alla spår.",
+      "create-genres": "Tagga din release med genrer för att organisera din katalog. Du kan välja från förslagen eller skriva in vilken genre du vill för att skapa din egen. Detta steg är valfritt.",
+      "create-date": "Ange ett måldatum för din release. Det hjälper dig att följa din tidslinje och hålla dig på schema.",
+      "create-submit": "Tryck på knappen för att skapa din release. Du kan utforska den direkt.",
+      "release-tabs": "Dessa flikar organiserar din release: Spår, Globalt, Distribution och Ekonomi. Varje avsnitt hjälper till att hantera en annan aspekt av ditt projekt.",
+      "release-sidebar": "Ladda upp omslagskonst, visa releaseinformation och lägg till interna eller klientanteckningar här.",
+      "release-track-link": "Klicka på ett spår för att se dess detaljer — mixintention, specifikationer, ljudversioner och mer.",
+      "track-tabs": "Varje flik fångar en annan aspekt: Intention (din vision), Specifikationer (tekniska krav), Ljud (uppladdningar och versioner) och mer.",
+      "track-intent": "Beskriv visionen för denna mix — stämning, referenser och riktning. Detta är kärnan i ditt uppdrag.",
+      "dashboard-card": "Varje release visar status, spårframsteg och viktig information i en överblick. Klicka för att dyka in.",
+      "dashboard-nav": "Sidofältet ger dig snabb åtkomst till alla sektioner — Releaser, Artister, Mallar, Betalningar och Analys."
     }
   },
   "dashboard": {

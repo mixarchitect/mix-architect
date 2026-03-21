@@ -95,7 +95,66 @@
       "summary": "Your workspace is configured for:",
       "createRelease": "Create your first release",
       "goToDashboard": "Go to dashboard",
-      "changeNote": "You can change any of these in Settings."
+      "changeNote": "You can change any of these in Settings.",
+      "labelArtist": "Artist",
+      "labelEngineer": "Engineer / Producer",
+      "labelBoth": "Artist & Engineer",
+      "labelOther": "Full Access"
+    }
+  },
+  "tour": {
+    "skipTour": "Skip tour",
+    "next": "Next",
+    "done": "Done",
+    "guidedTour": "Guided Tour",
+    "tourCount": "Tour {seen}/{total}",
+    "completedCount": "{seen} of {total} completed",
+    "endTour": "End tour",
+    "collapse": "Collapse",
+    "closeTour": "Close tour",
+    "topicLabel": {
+      "create-release": "Create a Release",
+      "release-overview": "Explore Your Release",
+      "track-detail": "Track Details",
+      "dashboard": "Your Dashboard"
+    },
+    "topicDesc": {
+      "create-release": "Set up your first project",
+      "release-overview": "Navigate tabs and sidebar",
+      "track-detail": "Intent, specs, and audio",
+      "dashboard": "Overview and navigation"
+    },
+    "stepTitle": {
+      "create-title": "Name your release",
+      "create-artist": "Artist / client name",
+      "create-type": "Release type",
+      "create-format": "Audio format",
+      "create-genres": "Genre tags",
+      "create-date": "Target release date",
+      "create-submit": "Create your release",
+      "release-tabs": "Release tabs",
+      "release-sidebar": "Release details",
+      "release-track-link": "Explore a track",
+      "track-tabs": "Track tabs",
+      "track-intent": "Mix vision",
+      "dashboard-card": "Your release card",
+      "dashboard-nav": "Navigation"
+    },
+    "stepDesc": {
+      "create-title": "Give your project a working title. You can always change it later.",
+      "create-artist": "The performing artist or band. This appears on your release and can connect to the client portal.",
+      "create-type": "Singles auto-create one track. EPs and albums let you add multiple tracks later.",
+      "create-format": "Choose Stereo, Dolby Atmos, or both. This sets the target format for all tracks.",
+      "create-genres": "Tag your release with genres to help organize your catalog. You can pick from the suggestions or type in any genre you like to create your own. This step is optional.",
+      "create-date": "Set a target date for your release. This helps you track your timeline and keep things on schedule.",
+      "create-submit": "Hit the button to create your release. You\u2019ll be able to explore it right away.",
+      "release-tabs": "These tabs organize your release: Tracks, Globals, Distribution, and Financials. Each section helps manage a different aspect of your project.",
+      "release-sidebar": "Upload cover art, view release info, and add internal or client notes here.",
+      "release-track-link": "Click into a track to see its details \u2014 mix intent, specs, audio versions, and more.",
+      "track-tabs": "Each tab captures a different aspect: Intent (your vision), Specs (technical requirements), Audio (uploads & versions), and more.",
+      "track-intent": "Describe the vision for this mix \u2014 mood, references, and direction. This is the heart of your brief.",
+      "dashboard-card": "Each release shows its status, track progress, and key info at a glance. Click to dive back in.",
+      "dashboard-nav": "The sidebar gives you quick access to all sections \u2014 Releases, Artists, Templates, Payments, and Analytics."
     }
   },
   "dashboard": {

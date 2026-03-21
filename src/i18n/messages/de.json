@@ -92,7 +92,66 @@
       "summary": "Dein Arbeitsbereich ist konfiguriert für:",
       "createRelease": "Dein erstes Release erstellen",
       "goToDashboard": "Zum Dashboard",
-      "changeNote": "Du kannst dies alles in den Einstellungen ändern."
+      "changeNote": "Du kannst dies alles in den Einstellungen ändern.",
+      "labelArtist": "Künstler",
+      "labelEngineer": "Tontechniker / Produzent",
+      "labelBoth": "Künstler & Tontechniker",
+      "labelOther": "Vollzugriff"
+    }
+  },
+  "tour": {
+    "skipTour": "Tour überspringen",
+    "next": "Weiter",
+    "done": "Fertig",
+    "guidedTour": "Geführte Tour",
+    "tourCount": "Tour {seen}/{total}",
+    "completedCount": "{seen} von {total} abgeschlossen",
+    "endTour": "Tour beenden",
+    "collapse": "Einklappen",
+    "closeTour": "Tour schließen",
+    "topicLabel": {
+      "create-release": "Release erstellen",
+      "release-overview": "Dein Release erkunden",
+      "track-detail": "Track-Details",
+      "dashboard": "Dein Dashboard"
+    },
+    "topicDesc": {
+      "create-release": "Richte dein erstes Projekt ein",
+      "release-overview": "Tabs und Seitenleiste navigieren",
+      "track-detail": "Intention, Spezifikationen und Audio",
+      "dashboard": "Übersicht und Navigation"
+    },
+    "stepTitle": {
+      "create-title": "Benenne dein Release",
+      "create-artist": "Künstler- / Kundenname",
+      "create-type": "Release-Typ",
+      "create-format": "Audioformat",
+      "create-genres": "Genre-Tags",
+      "create-date": "Ziel-Veröffentlichungsdatum",
+      "create-submit": "Release erstellen",
+      "release-tabs": "Release-Tabs",
+      "release-sidebar": "Release-Details",
+      "release-track-link": "Einen Track erkunden",
+      "track-tabs": "Track-Tabs",
+      "track-intent": "Mix-Vision",
+      "dashboard-card": "Deine Release-Karte",
+      "dashboard-nav": "Navigation"
+    },
+    "stepDesc": {
+      "create-title": "Gib deinem Projekt einen Arbeitstitel. Du kannst ihn später jederzeit ändern.",
+      "create-artist": "Der auftretende Künstler oder die Band. Dies erscheint auf deinem Release und kann mit dem Kundenportal verbunden werden.",
+      "create-type": "Singles erstellen automatisch einen Track. EPs und Alben ermöglichen es dir, später mehrere Tracks hinzuzufügen.",
+      "create-format": "Wähle Stereo, Dolby Atmos oder beides. Dies legt das Zielformat für alle Tracks fest.",
+      "create-genres": "Tagge dein Release mit Genres, um deinen Katalog zu organisieren. Du kannst aus den Vorschlägen wählen oder ein beliebiges Genre eingeben, um dein eigenes zu erstellen. Dieser Schritt ist optional.",
+      "create-date": "Lege ein Zieldatum für dein Release fest. Das hilft dir, deinen Zeitplan zu verfolgen und alles im Zeitrahmen zu halten.",
+      "create-submit": "Drücke den Button, um dein Release zu erstellen. Du kannst es sofort erkunden.",
+      "release-tabs": "Diese Tabs organisieren dein Release: Tracks, Globales, Distribution und Finanzen. Jeder Bereich hilft, einen anderen Aspekt deines Projekts zu verwalten.",
+      "release-sidebar": "Lade Cover-Art hoch, sieh Release-Infos ein und füge hier interne oder Kunden-Notizen hinzu.",
+      "release-track-link": "Klicke auf einen Track, um seine Details zu sehen — Mix-Intention, Spezifikationen, Audio-Versionen und mehr.",
+      "track-tabs": "Jeder Tab erfasst einen anderen Aspekt: Intention (deine Vision), Spezifikationen (technische Anforderungen), Audio (Uploads & Versionen) und mehr.",
+      "track-intent": "Beschreibe die Vision für diesen Mix — Stimmung, Referenzen und Richtung. Das ist das Herzstück deines Briefings.",
+      "dashboard-card": "Jedes Release zeigt seinen Status, Track-Fortschritt und wichtige Infos auf einen Blick. Klicke, um wieder einzutauchen.",
+      "dashboard-nav": "Die Seitenleiste bietet dir schnellen Zugriff auf alle Bereiche — Releases, Künstler, Vorlagen, Zahlungen und Analysen."
     }
   },
   "dashboard": {

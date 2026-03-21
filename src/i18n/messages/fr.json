@@ -92,7 +92,66 @@
       "summary": "Votre espace de travail est configuré pour :",
       "createRelease": "Créer votre première sortie",
       "goToDashboard": "Aller au tableau de bord",
-      "changeNote": "Vous pouvez modifier tout cela dans les Paramètres."
+      "changeNote": "Vous pouvez modifier tout cela dans les Paramètres.",
+      "labelArtist": "Artiste",
+      "labelEngineer": "Ingénieur / Producteur",
+      "labelBoth": "Artiste & Ingénieur",
+      "labelOther": "Accès complet"
+    }
+  },
+  "tour": {
+    "skipTour": "Passer la visite",
+    "next": "Suivant",
+    "done": "Terminé",
+    "guidedTour": "Visite guidée",
+    "tourCount": "Visite {seen}/{total}",
+    "completedCount": "{seen} sur {total} terminé(s)",
+    "endTour": "Terminer la visite",
+    "collapse": "Réduire",
+    "closeTour": "Fermer la visite",
+    "topicLabel": {
+      "create-release": "Créer une sortie",
+      "release-overview": "Explorer votre sortie",
+      "track-detail": "Détails du morceau",
+      "dashboard": "Votre tableau de bord"
+    },
+    "topicDesc": {
+      "create-release": "Configurez votre premier projet",
+      "release-overview": "Naviguez entre les onglets et la barre latérale",
+      "track-detail": "Intention, spécifications et audio",
+      "dashboard": "Vue d'ensemble et navigation"
+    },
+    "stepTitle": {
+      "create-title": "Nommez votre sortie",
+      "create-artist": "Nom de l'artiste / client",
+      "create-type": "Type de sortie",
+      "create-format": "Format audio",
+      "create-genres": "Tags de genre",
+      "create-date": "Date de sortie cible",
+      "create-submit": "Créez votre sortie",
+      "release-tabs": "Onglets de la sortie",
+      "release-sidebar": "Détails de la sortie",
+      "release-track-link": "Explorer un morceau",
+      "track-tabs": "Onglets du morceau",
+      "track-intent": "Vision du mix",
+      "dashboard-card": "Votre carte de sortie",
+      "dashboard-nav": "Navigation"
+    },
+    "stepDesc": {
+      "create-title": "Donnez un titre de travail à votre projet. Vous pouvez toujours le modifier plus tard.",
+      "create-artist": "L'artiste ou le groupe interprète. Cela apparaît sur votre sortie et peut être connecté au portail client.",
+      "create-type": "Les singles créent automatiquement un morceau. Les EP et albums vous permettent d'ajouter plusieurs morceaux par la suite.",
+      "create-format": "Choisissez Stéréo, Dolby Atmos, ou les deux. Cela définit le format cible pour tous les morceaux.",
+      "create-genres": "Taguez votre sortie avec des genres pour organiser votre catalogue. Vous pouvez choisir parmi les suggestions ou saisir n'importe quel genre pour créer le vôtre. Cette étape est facultative.",
+      "create-date": "Définissez une date cible pour votre sortie. Cela vous aide à suivre votre calendrier et à respecter les délais.",
+      "create-submit": "Appuyez sur le bouton pour créer votre sortie. Vous pourrez l'explorer immédiatement.",
+      "release-tabs": "Ces onglets organisent votre sortie : Morceaux, Globaux, Distribution et Finances. Chaque section aide à gérer un aspect différent de votre projet.",
+      "release-sidebar": "Téléchargez la pochette, consultez les informations de la sortie et ajoutez des notes internes ou client ici.",
+      "release-track-link": "Cliquez sur un morceau pour voir ses détails — intention du mix, spécifications, versions audio, et plus encore.",
+      "track-tabs": "Chaque onglet capture un aspect différent : Intention (votre vision), Spécifications (exigences techniques), Audio (téléchargements & versions), et plus encore.",
+      "track-intent": "Décrivez la vision de ce mix — ambiance, références et direction. C'est le cœur de votre brief.",
+      "dashboard-card": "Chaque sortie affiche son statut, la progression des morceaux et les informations clés en un coup d'œil. Cliquez pour y replonger.",
+      "dashboard-nav": "La barre latérale vous donne un accès rapide à toutes les sections — Sorties, Artistes, Modèles, Paiements et Analytiques."
     }
   },
   "dashboard": {

@@ -92,7 +92,66 @@
       "summary": "Tu espacio de trabajo está configurado para:",
       "createRelease": "Crear tu primer lanzamiento",
       "goToDashboard": "Ir al panel principal",
-      "changeNote": "Puedes cambiar cualquiera de estos en Ajustes."
+      "changeNote": "Puedes cambiar cualquiera de estos en Ajustes.",
+      "labelArtist": "Artista",
+      "labelEngineer": "Ingeniero / Productor",
+      "labelBoth": "Artista e Ingeniero",
+      "labelOther": "Acceso completo"
+    }
+  },
+  "tour": {
+    "skipTour": "Saltar tour",
+    "next": "Siguiente",
+    "done": "Hecho",
+    "guidedTour": "Tour guiado",
+    "tourCount": "Tour {seen}/{total}",
+    "completedCount": "{seen} de {total} completados",
+    "endTour": "Finalizar tour",
+    "collapse": "Contraer",
+    "closeTour": "Cerrar tour",
+    "topicLabel": {
+      "create-release": "Crear un lanzamiento",
+      "release-overview": "Explorar tu lanzamiento",
+      "track-detail": "Detalles del tema",
+      "dashboard": "Tu panel de control"
+    },
+    "topicDesc": {
+      "create-release": "Configura tu primer proyecto",
+      "release-overview": "Navega por pestañas y barra lateral",
+      "track-detail": "Intención, especificaciones y audio",
+      "dashboard": "Vista general y navegación"
+    },
+    "stepTitle": {
+      "create-title": "Nombra tu lanzamiento",
+      "create-artist": "Nombre del artista / cliente",
+      "create-type": "Tipo de lanzamiento",
+      "create-format": "Formato de audio",
+      "create-genres": "Etiquetas de género",
+      "create-date": "Fecha de lanzamiento objetivo",
+      "create-submit": "Crea tu lanzamiento",
+      "release-tabs": "Pestañas del lanzamiento",
+      "release-sidebar": "Detalles del lanzamiento",
+      "release-track-link": "Explorar un tema",
+      "track-tabs": "Pestañas del tema",
+      "track-intent": "Visión de la mezcla",
+      "dashboard-card": "Tu tarjeta de lanzamiento",
+      "dashboard-nav": "Navegación"
+    },
+    "stepDesc": {
+      "create-title": "Dale a tu proyecto un título provisional. Siempre puedes cambiarlo más tarde.",
+      "create-artist": "El artista o banda intérprete. Esto aparece en tu lanzamiento y puede conectarse al portal del cliente.",
+      "create-type": "Los singles crean automáticamente un tema. Los EP y álbumes te permiten añadir varios temas después.",
+      "create-format": "Elige Estéreo, Dolby Atmos o ambos. Esto establece el formato objetivo para todos los temas.",
+      "create-genres": "Etiqueta tu lanzamiento con géneros para organizar tu catálogo. Puedes elegir entre las sugerencias o escribir cualquier género que desees para crear el tuyo propio. Este paso es opcional.",
+      "create-date": "Establece una fecha objetivo para tu lanzamiento. Esto te ayuda a seguir tu cronograma y mantener todo según lo previsto.",
+      "create-submit": "Pulsa el botón para crear tu lanzamiento. Podrás explorarlo de inmediato.",
+      "release-tabs": "Estas pestañas organizan tu lanzamiento: Temas, Globales, Distribución y Finanzas. Cada sección ayuda a gestionar un aspecto diferente de tu proyecto.",
+      "release-sidebar": "Sube la portada, consulta la información del lanzamiento y añade notas internas o del cliente aquí.",
+      "release-track-link": "Haz clic en un tema para ver sus detalles — intención de la mezcla, especificaciones, versiones de audio y más.",
+      "track-tabs": "Cada pestaña captura un aspecto diferente: Intención (tu visión), Especificaciones (requisitos técnicos), Audio (subidas y versiones) y más.",
+      "track-intent": "Describe la visión para esta mezcla — ambiente, referencias y dirección. Este es el corazón de tu brief.",
+      "dashboard-card": "Cada lanzamiento muestra su estado, progreso de temas e información clave de un vistazo. Haz clic para volver a explorarlo.",
+      "dashboard-nav": "La barra lateral te da acceso rápido a todas las secciones — Lanzamientos, Artistas, Plantillas, Pagos y Analíticas."
     }
   },
   "dashboard": {
