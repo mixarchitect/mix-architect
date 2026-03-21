@@ -27,7 +27,6 @@ export function UserDetailHeader({ userId, name, email, persona, isTestAccount }
       <EditableField userId={userId} field="email" label="Email" value={email ?? ""} />
       <EditablePersona userId={userId} value={persona} />
       <div className="flex items-center gap-2 text-[10px] text-faint">{userId}</div>
-      <TestAccountToggle userId={userId} initial={isTestAccount} />
     </div>
   );
 }
@@ -173,7 +172,7 @@ function EditablePersona({ userId, value }: { userId: string; value: string | nu
   );
 }
 
-function TestAccountToggle({ userId, initial }: { userId: string; initial: boolean }) {
+export function TestAccountToggle({ userId, initial }: { userId: string; initial: boolean }) {
   const router = useRouter();
   const [isTest, setIsTest] = useState(initial);
   const [saving, setSaving] = useState(false);

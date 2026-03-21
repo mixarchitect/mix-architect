@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { AdminToggleButton } from "@/components/admin/AdminToggleButton";
+import { TestAccountToggle } from "@/components/admin/UserDetailHeader";
+import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
 
 export const dynamic = "force-dynamic";
 
@@ -190,7 +192,13 @@ export default async function UserDetailPage({ params }: Props) {
             </a>
           )}
 
+        </div>
+
+        {/* Action buttons row */}
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          <TestAccountToggle userId={userId} initial={isTestAccount} />
           <AdminToggleButton userId={userId} isAdmin={profile.is_admin === true} />
+          <DeleteUserButton userId={userId} />
         </div>
 
         {subscription?.current_period_end && (
