@@ -24,7 +24,7 @@ export function OpenPanelAnalytics() {
         trackAttributes: true,
       });
 
-      (window as Record<string, unknown>).__op = op;
+      (window as unknown as Record<string, unknown>).__op = op;
       opInitialized = true;
     });
   }, []);
