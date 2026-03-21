@@ -48,29 +48,32 @@ export function OnboardingFlow({ userId }: Props) {
       const paymentsEnabled = persona !== "artist";
       const featureVisibility = getDefaultVisibility(persona);
 
+      const payload = {
+        user_id: userId,
+        persona,
+        locale,
+        default_currency: defaultCurrency,
+        payments_enabled: paymentsEnabled,
+        feature_visibility: featureVisibility,
+        onboarding_completed: true,
+      };
+
       const { error } = await supabase
         .from("user_defaults")
-        .update({
-          persona,
-          locale,
-          default_currency: defaultCurrency,
-          payments_enabled: paymentsEnabled,
-          feature_visibility: featureVisibility,
-          onboarding_completed: true,
-        })
+        .update(payload)
         .eq("user_id", userId);
 
       if (error) {
         // If no row exists yet, insert
-        await supabase.from("user_defaults").upsert({
-          user_id: userId,
-          persona,
-          locale,
-          default_currency: defaultCurrency,
-          payments_enabled: paymentsEnabled,
-          feature_visibility: featureVisibility,
-          onboarding_completed: true,
-        });
+        const { error: upsertError } = await supabase
+          .from("user_defaults")
+          .upsert(payload);
+
+        if (upsertError) {
+          console.error("Onboarding save failed:", upsertError.message);
+          setSaving(false);
+          return;
+        }
       }
 
       // Set the locale cookie for next-intl
