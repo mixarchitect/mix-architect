@@ -46,41 +46,6 @@ export async function Hero() {
           {t("subheadline")}
         </p>
 
-        {/* Persona callouts */}
-        <div className="mt-14 flex flex-col gap-4 max-w-2xl mx-auto">
-          {/* Artists */}
-          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/[0.06] p-6 text-left">
-            <div className="grid grid-cols-1 md:grid-cols-[200px_1px_1fr] gap-4 md:gap-6">
-              <div>
-                <div className="text-lg font-medium text-[#0D9488]">{t("forArtists")}</div>
-                <p className="text-sm text-zinc-500 mt-1.5 leading-relaxed">{t("forArtistsDesc")}</p>
-              </div>
-              <div className="h-px w-full bg-[#0D9488]/40 md:h-auto md:w-px" />
-              <div className="flex flex-col gap-2">
-                {(["artistFeature1", "artistFeature2", "artistFeature3"] as const).map((key) => (
-                  <span key={key} className="text-sm text-zinc-400">{t(key)}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Engineers & Producers */}
-          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/[0.06] p-6 text-left">
-            <div className="grid grid-cols-1 md:grid-cols-[200px_1px_1fr] gap-4 md:gap-6">
-              <div>
-                <div className="text-lg font-medium text-[#0D9488]">{t("forEngineers")}</div>
-                <p className="text-sm text-zinc-500 mt-1.5 leading-relaxed">{t("forEngineersDesc")}</p>
-              </div>
-              <div className="h-px w-full bg-[#0D9488]/40 md:h-auto md:w-px" />
-              <div className="flex flex-col gap-2">
-                {(["engineerFeature1", "engineerFeature2", "engineerFeature3"] as const).map((key) => (
-                  <span key={key} className="text-sm text-zinc-400">{t(key)}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* CTAs */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
@@ -101,6 +66,39 @@ export async function Hero() {
         <p className="mt-8 text-sm text-zinc-400">
           {t("freeToTry")}
         </p>
+
+        {/* Persona callouts */}
+        <div className="mt-14 flex flex-col gap-4 max-w-2xl mx-auto">
+          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/[0.06] p-6 text-left">
+            <div className="grid grid-cols-1 md:grid-cols-[200px_1px_1fr] gap-4 md:gap-6">
+              <div>
+                <div className="text-lg font-medium text-[#0D9488]">{t("forArtists")}</div>
+                <p className="text-sm text-zinc-500 mt-1.5 leading-relaxed">{t("forArtistsDesc")}</p>
+              </div>
+              <div className="h-px w-full bg-[#0D9488]/40 md:h-auto md:w-px" />
+              <div className="flex flex-col gap-2">
+                {(["artistFeature1", "artistFeature2", "artistFeature3"] as const).map((key) => (
+                  <span key={key} className="text-sm text-zinc-400">{t(key)}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-[#1a1a1a]/80 backdrop-blur-sm border border-white/[0.06] p-6 text-left">
+            <div className="grid grid-cols-1 md:grid-cols-[200px_1px_1fr] gap-4 md:gap-6">
+              <div>
+                <div className="text-lg font-medium text-[#0D9488]">{t("forEngineers")}</div>
+                <p className="text-sm text-zinc-500 mt-1.5 leading-relaxed">{t("forEngineersDesc")}</p>
+              </div>
+              <div className="h-px w-full bg-[#0D9488]/40 md:h-auto md:w-px" />
+              <div className="flex flex-col gap-2">
+                {(["engineerFeature1", "engineerFeature2", "engineerFeature3"] as const).map((key) => (
+                  <span key={key} className="text-sm text-zinc-400">{t(key)}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
