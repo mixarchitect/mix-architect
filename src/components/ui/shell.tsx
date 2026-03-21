@@ -13,6 +13,7 @@ import { FeatureVisibilityProvider } from "@/lib/features/feature-visibility-con
 import { type FeatureVisibility } from "@/lib/features/feature-registry";
 import { AudioProvider, useAudio } from "@/lib/audio-context";
 import { TimestampProvider } from "@/lib/timestamp-context";
+import { identifyUser } from "@/lib/openpanel-track";
 import { MiniPlayer } from "@/components/ui/mini-player";
 import { useCommandPalette } from "@/hooks/use-command-palette";
 import { ToastProvider } from "@/components/ui/toast";
@@ -51,8 +52,16 @@ export function Shell({ userId, userEmail, displayName, paymentsEnabled = false,
       if (theme !== "system") {
         setTheme(theme);
       }
+      // Identify user for OpenPanel analytics
+      if (userId) {
+        identifyUser({
+          profileId: userId,
+          email: userEmail ?? undefined,
+          firstName: displayName?.split(" ")[0],
+        });
+      }
     }
-  }, [theme, setTheme]);
+  }, [theme, setTheme, userId, userEmail, displayName]);
 
   return (
     <TimestampProvider>

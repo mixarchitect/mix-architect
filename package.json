@@ -10,6 +10,7 @@
     "perf:smoke": "npx tsx scripts/perf-smoke-test.ts"
   },
   "dependencies": {
+    "@openpanel/web": "^1.3.0",
     "@stripe/stripe-js": "^8.8.0",
     "@supabase/ssr": "^0.8.0",
     "@tailwindcss/typography": "^0.5.19",

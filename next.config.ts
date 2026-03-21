@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      { source: "/stats/op.js", destination: "https://openpanel.dev/op1.js" },
+      { source: "/stats/api/:path*", destination: "https://api.openpanel.dev/:path*" },
+    ];
+  },
   async headers() {
     return [
       {

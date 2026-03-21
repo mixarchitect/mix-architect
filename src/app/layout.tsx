@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/lib/theme-provider";
 import "./globals.css";
 import { PerfOverlayLoader } from "@/components/dev/perf-overlay-loader";
 import { PerfReporterInit } from "@/components/perf-reporter-init";
+import { OpenPanelAnalytics } from "@/components/analytics/OpenPanelAnalytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,6 +54,7 @@ export default function RootLayout({
             </a>
           </nav>
           {children}
+          <OpenPanelAnalytics />
           <PerfReporterInit />
           <PerfOverlayLoader />
         </ThemeProvider>
