@@ -243,23 +243,6 @@ function TrafficDashboard({
         />
       </div>
 
-      {/* Two-column: Top Pages + Referrers */}
-      <div className="grid lg:grid-cols-2 gap-4">
-        <BreakdownTable
-          title="Top Pages"
-          icon={Globe}
-          rows={data.topPages}
-          emptyMessage="No page data yet"
-          formatName={formatPath}
-        />
-        <BreakdownTable
-          title="Referrers"
-          icon={ExternalLink}
-          rows={data.referrers}
-          emptyMessage="No referrer data yet"
-        />
-      </div>
-
       {/* Three-column: Browsers, Devices, Countries */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         <BreakdownTable
@@ -280,6 +263,23 @@ function TrafficDashboard({
           icon={Globe}
           rows={data.countries}
           emptyMessage="No country data yet"
+        />
+      </div>
+
+      {/* Two-column: Top Pages + Referrers */}
+      <div className="grid lg:grid-cols-2 gap-4">
+        <BreakdownTable
+          title="Top Pages"
+          icon={Globe}
+          rows={data.topPages}
+          emptyMessage="No page data yet"
+          formatName={formatPath}
+        />
+        <BreakdownTable
+          title="Referrers"
+          icon={ExternalLink}
+          rows={data.referrers}
+          emptyMessage="No referrer data yet"
         />
       </div>
     </div>

@@ -124,10 +124,13 @@ export async function getMetrics(
   range: RangeKey | DateRange,
 ): Promise<Omit<OverviewMetrics, "current_visitors">> {
   try {
-    const data = await insightsGet<Record<string, unknown>>(
+    const raw = await insightsGet<Record<string, unknown>>(
       "/metrics",
       resolveRange(range),
     );
+
+    // API returns { metrics: { ... }, series: [...] }
+    const data = (raw.metrics ?? raw) as Record<string, unknown>;
 
     return {
       pageviews: num(data.total_screen_views ?? data.pageviews),
