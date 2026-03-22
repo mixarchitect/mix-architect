@@ -36,6 +36,7 @@ export async function uploadConvertedFile(
   storagePath: string,
   contentType: string,
 ): Promise<string> {
+  if (filePath.includes('..') || path.isAbsolute(filePath)) throw new Error('Invalid file path');
   const fileBuffer = await fs.readFile(filePath);
 
   const { error } = await supabase.storage
@@ -274,7 +275,12 @@ export async function downloadArtwork(
     if (contentType.includes("png")) ext = "png";
     else if (contentType.includes("webp")) ext = "webp";
 
-    const artworkPath = path.join(tempDir, `cover.${ext}`);
+    const base = path.resolve(tempDir);
+    const artworkPath = path.resolve(base, `cover.${ext}`);
+    const relPath = path.relative(base, artworkPath);
+    if (relPath.startsWith("..") || path.isAbsolute(relPath)) {
+      return null;
+    }
     const buffer = Buffer.from(await response.arrayBuffer());
     await fs.writeFile(artworkPath, buffer);
 
@@ -284,7 +290,11 @@ export async function downloadArtwork(
       const { promisify } = await import("node:util");
       const execFileAsync = promisify(execFileCb);
 
-      const jpegPath = path.join(tempDir, "cover.jpg");
+      const jpegPath = path.resolve(base, "cover.jpg");
+      const relJpegPath = path.relative(base, jpegPath);
+      if (relJpegPath.startsWith("..") || path.isAbsolute(relJpegPath)) {
+        return null;
+      }
       await execFileAsync("ffmpeg", [
         "-i", artworkPath, "-q:v", "2", jpegPath,
       ]);
