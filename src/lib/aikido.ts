@@ -65,12 +65,18 @@ async function aikidoFetch<T>(
     },
   });
 
+  const text = await res.text();
+
   if (!res.ok) {
-    const text = await res.text();
     throw new Error(`Aikido API ${path} failed (${res.status}): ${text}`);
   }
 
-  return res.json();
+  // Some endpoints return empty bodies (e.g. scan trigger)
+  if (!text || text.trim().length === 0) {
+    return undefined as T;
+  }
+
+  return JSON.parse(text) as T;
 }
 
 // ── Types ──
@@ -133,13 +139,23 @@ export async function getOpenIssueGroups(
   params.set("page", String(page));
   params.set("per_page", "20");
   if (repoName) params.set("filter_code_repo_name", repoName);
-  return aikidoFetch<AikidoIssueGroup[]>(
-    `/open-issue-groups?${params.toString()}`,
-  );
+  const data = await aikidoFetch<
+    AikidoIssueGroup[] | { groups: AikidoIssueGroup[] }
+  >(`/open-issue-groups?${params.toString()}`);
+  // API may return a wrapper object or a raw array
+  if (Array.isArray(data)) return data;
+  if (data && "groups" in data) return data.groups;
+  return [];
 }
 
 export async function listCodeRepos(): Promise<AikidoCodeRepo[]> {
-  return aikidoFetch<AikidoCodeRepo[]>("/repositories/code");
+  const data = await aikidoFetch<AikidoCodeRepo[] | { repos: AikidoCodeRepo[] }>(
+    "/repositories/code",
+  );
+  // API may return { repos: [...] } or a raw array
+  if (Array.isArray(data)) return data;
+  if (data && "repos" in data) return data.repos;
+  return [];
 }
 
 export async function triggerScan(codeRepoId: number): Promise<void> {
