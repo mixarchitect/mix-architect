@@ -146,15 +146,14 @@ function AikidoTab() {
   }, []);
 
   function startPolling(baseline: AikidoFindingsResponse | null) {
-    // Snapshot current issue count as baseline to detect changes
     baselineRef.current = baseline
       ? JSON.stringify(baseline.counts)
       : null;
     setPolling(true);
-    setScanMessage("Scan triggered. Polling for updated results...");
+    setScanMessage("Scan triggered. Checking for updated results every 30s...");
 
     let attempts = 0;
-    const maxAttempts = 20; // 20 × 30s = 10 min max
+    const maxAttempts = 6; // 6 × 30s = 3 min then auto-stop
 
     pollRef.current = setInterval(async () => {
       attempts++;
@@ -163,7 +162,6 @@ function AikidoTab() {
       if (data && baselineRef.current) {
         const current = JSON.stringify(data.counts);
         if (current !== baselineRef.current) {
-          // Results changed — scan completed
           stopPolling();
           setScanMessage("Scan complete — results updated.");
           return;
@@ -172,7 +170,11 @@ function AikidoTab() {
 
       if (attempts >= maxAttempts) {
         stopPolling();
-        setScanMessage("Polling timed out after 10 minutes. Click Refresh to check manually.");
+        // Final refresh so they see the latest
+        await fetchFindings(true);
+        setScanMessage(
+          "Scan may still be processing on Aikido's side. Click Refresh to check for updates.",
+        );
       }
     }, 30_000);
   }
@@ -291,12 +293,26 @@ function AikidoTab() {
       {scanMessage && (
         <Panel>
           <PanelBody>
-            <div className="flex items-center gap-3">
-              {polling && <Loader2 size={16} className="animate-spin text-amber-500 shrink-0" />}
-              {!polling && scanMessage.includes("complete") && (
-                <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {polling && <Loader2 size={16} className="animate-spin text-amber-500 shrink-0" />}
+                {!polling && scanMessage.includes("complete") && (
+                  <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+                )}
+                <p className="text-sm text-muted">{scanMessage}</p>
+              </div>
+              {polling && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    stopPolling();
+                    setScanMessage("Polling stopped. Click Refresh to check manually.");
+                  }}
+                  className="text-xs text-faint hover:text-muted transition-colors shrink-0"
+                >
+                  Stop
+                </button>
               )}
-              <p className="text-sm text-muted">{scanMessage}</p>
             </div>
           </PanelBody>
         </Panel>
