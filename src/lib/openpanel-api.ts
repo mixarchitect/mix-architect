@@ -87,7 +87,13 @@ export interface TrafficData {
 
 type RangeKey = "24h" | "7d" | "30d" | "90d";
 
-function rangeToDates(range: RangeKey): { start: string; end: string } {
+/** Explicit date range with YYYY-MM-DD strings */
+export interface DateRange {
+  start: string; // YYYY-MM-DD
+  end: string;   // YYYY-MM-DD
+}
+
+function rangeToDates(range: RangeKey): DateRange {
   const now = new Date();
   const end = now.toISOString().slice(0, 10); // YYYY-MM-DD
 
@@ -129,6 +135,30 @@ function rangeToInterval(range: RangeKey): string {
     default:
       return "day";
   }
+}
+
+/** Pick a sensible interval based on the span of a date range. */
+function datesToInterval(dr: DateRange): string {
+  const msPerDay = 86_400_000;
+  const span = Math.round(
+    (new Date(dr.end).getTime() - new Date(dr.start).getTime()) / msPerDay,
+  );
+  if (span <= 1) return "hour";
+  if (span <= 60) return "day";
+  return "month";
+}
+
+/** Resolve either a RangeKey or an explicit DateRange into { start, end, interval }. */
+function resolveDates(rangeOrDates: RangeKey | DateRange): {
+  start: string;
+  end: string;
+  interval: string;
+} {
+  if (typeof rangeOrDates === "string") {
+    const dr = rangeToDates(rangeOrDates);
+    return { ...dr, interval: rangeToInterval(rangeOrDates) };
+  }
+  return { ...rangeOrDates, interval: datesToInterval(rangeOrDates) };
 }
 
 // ---------------------------------------------------------------------------
@@ -189,9 +219,9 @@ export async function getActiveVisitors(): Promise<number> {
  * Fetch summary overview metrics (pageviews, visitors, sessions, bounce rate, etc.)
  */
 export async function getOverviewMetrics(
-  range: RangeKey,
+  range: RangeKey | DateRange,
 ): Promise<Omit<OverviewMetrics, "current_visitors">> {
-  const { start, end } = rangeToDates(range);
+  const { start, end, interval } = resolveDates(range);
 
   try {
     // The OpenPanel chart API returns series data for the overview
@@ -200,7 +230,7 @@ export async function getOverviewMetrics(
       {
         event: "screen_view",
         type: "linear",
-        interval: rangeToInterval(range),
+        interval,
         start,
         end,
         projectId: PROJECT_ID,
@@ -239,10 +269,10 @@ export async function getOverviewMetrics(
  * Fetch top pages by pageview count.
  */
 export async function getTopPages(
-  range: RangeKey,
+  range: RangeKey | DateRange,
   limit = 10,
 ): Promise<TopPage[]> {
-  const { start, end } = rangeToDates(range);
+  const { start, end, interval } = resolveDates(range);
 
   try {
     const data = await opFetch<unknown[]>(
@@ -250,7 +280,7 @@ export async function getTopPages(
       {
         event: "screen_view",
         type: "bar",
-        interval: rangeToInterval(range),
+        interval,
         start,
         end,
         projectId: PROJECT_ID,
@@ -269,10 +299,10 @@ export async function getTopPages(
  * Fetch referrer sources.
  */
 export async function getReferrers(
-  range: RangeKey,
+  range: RangeKey | DateRange,
   limit = 10,
 ): Promise<Referrer[]> {
-  const { start, end } = rangeToDates(range);
+  const { start, end, interval } = resolveDates(range);
 
   try {
     const data = await opFetch<unknown[]>(
@@ -280,7 +310,7 @@ export async function getReferrers(
       {
         event: "screen_view",
         type: "bar",
-        interval: rangeToInterval(range),
+        interval,
         start,
         end,
         projectId: PROJECT_ID,
@@ -299,10 +329,10 @@ export async function getReferrers(
  * Fetch geographic (country) breakdown.
  */
 export async function getCountries(
-  range: RangeKey,
+  range: RangeKey | DateRange,
   limit = 10,
 ): Promise<GeoEntry[]> {
-  const { start, end } = rangeToDates(range);
+  const { start, end, interval } = resolveDates(range);
 
   try {
     const data = await opFetch<unknown[]>(
@@ -310,7 +340,7 @@ export async function getCountries(
       {
         event: "screen_view",
         type: "bar",
-        interval: rangeToInterval(range),
+        interval,
         start,
         end,
         projectId: PROJECT_ID,
@@ -329,10 +359,10 @@ export async function getCountries(
  * Fetch device type breakdown (mobile, desktop, tablet).
  */
 export async function getDevices(
-  range: RangeKey,
+  range: RangeKey | DateRange,
   limit = 10,
 ): Promise<DeviceEntry[]> {
-  const { start, end } = rangeToDates(range);
+  const { start, end, interval } = resolveDates(range);
 
   try {
     const data = await opFetch<unknown[]>(
@@ -340,7 +370,7 @@ export async function getDevices(
       {
         event: "screen_view",
         type: "bar",
-        interval: rangeToInterval(range),
+        interval,
         start,
         end,
         projectId: PROJECT_ID,
@@ -359,10 +389,10 @@ export async function getDevices(
  * Fetch browser breakdown.
  */
 export async function getBrowsers(
-  range: RangeKey,
+  range: RangeKey | DateRange,
   limit = 10,
 ): Promise<BrowserEntry[]> {
-  const { start, end } = rangeToDates(range);
+  const { start, end, interval } = resolveDates(range);
 
   try {
     const data = await opFetch<unknown[]>(
@@ -370,7 +400,7 @@ export async function getBrowsers(
       {
         event: "screen_view",
         type: "bar",
-        interval: rangeToInterval(range),
+        interval,
         start,
         end,
         projectId: PROJECT_ID,
@@ -389,10 +419,10 @@ export async function getBrowsers(
  * Fetch OS breakdown.
  */
 export async function getOsList(
-  range: RangeKey,
+  range: RangeKey | DateRange,
   limit = 10,
 ): Promise<OsEntry[]> {
-  const { start, end } = rangeToDates(range);
+  const { start, end, interval } = resolveDates(range);
 
   try {
     const data = await opFetch<unknown[]>(
@@ -400,7 +430,7 @@ export async function getOsList(
       {
         event: "screen_view",
         type: "bar",
-        interval: rangeToInterval(range),
+        interval,
         start,
         end,
         projectId: PROJECT_ID,
@@ -417,9 +447,11 @@ export async function getOsList(
 
 /**
  * Fetch all traffic data in parallel for a given range.
+ * Accepts either a preset RangeKey ("7d", "30d", etc.) or an explicit
+ * DateRange with { start, end } as YYYY-MM-DD strings.
  */
 export async function getAllTrafficData(
-  range: RangeKey,
+  range: RangeKey | DateRange,
 ): Promise<TrafficData> {
   const [
     activeVisitors,
@@ -452,6 +484,20 @@ export async function getAllTrafficData(
     devices,
     browsers,
     os,
+  };
+}
+
+/**
+ * Fetch only overview metrics for a date range (used for comparison periods).
+ * Skips breakdown tables since comparison only applies to stat cards.
+ */
+export async function getOverviewOnly(
+  range: RangeKey | DateRange,
+): Promise<OverviewMetrics> {
+  const overviewMetrics = await getOverviewMetrics(range);
+  return {
+    current_visitors: 0, // not meaningful for comparison periods
+    ...overviewMetrics,
   };
 }
 

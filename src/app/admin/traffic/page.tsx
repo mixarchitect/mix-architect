@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Users,
   Eye,
@@ -14,30 +14,66 @@ import {
   ExternalLink,
   RefreshCw,
   Loader2,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
-import type { TrafficData } from "@/lib/openpanel-api";
+import type { TrafficData, OverviewMetrics } from "@/lib/openpanel-api";
+import { DateRangeSelector } from "@/components/ui/date-range-selector";
+import {
+  type PresetKey,
+  type CompareKey,
+  resolvePreset,
+  resolveComparison,
+  formatDateISO,
+  parseDateISO,
+} from "@/lib/admin-date-utils";
 
-const RANGES = [
-  { key: "24h", label: "24h" },
-  { key: "7d", label: "7 days" },
-  { key: "30d", label: "30 days" },
-  { key: "90d", label: "90 days" },
-] as const;
-
-type RangeKey = (typeof RANGES)[number]["key"];
+const PRESET_KEYS = ["today", "yesterday", "7d", "30d", "90d", "365d"];
+const COMPARE_KEYS = ["none", "previous_period", "previous_year"];
 
 export default function SiteTrafficPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
-  const rangeParam = searchParams.get("range") ?? "7d";
-  const range: RangeKey = (["24h", "7d", "30d", "90d"] as const).includes(
-    rangeParam as RangeKey,
-  )
-    ? (rangeParam as RangeKey)
-    : "7d";
+  // Read URL search params (same pattern as admin dashboard)
+  const rawRange = searchParams.get("range") ?? "7d";
+  const rawFrom = searchParams.get("from") ?? undefined;
+  const rawTo = searchParams.get("to") ?? undefined;
+  const rawCompare = searchParams.get("compare") ?? undefined;
+
+  // Resolve date boundaries client-side
+  const { periodFrom, periodTo, compareFrom, compareTo } = useMemo(() => {
+    let pFrom: Date;
+    let pTo: Date;
+
+    const isCustom = rawRange === "custom" && rawFrom && rawTo;
+
+    if (isCustom) {
+      pFrom = parseDateISO(rawFrom) ?? new Date();
+      pTo = parseDateISO(rawTo) ?? new Date();
+    } else {
+      const presetKey: PresetKey = PRESET_KEYS.includes(rawRange)
+        ? (rawRange as PresetKey)
+        : "7d";
+      const preset = resolvePreset(presetKey);
+      pFrom = preset.from;
+      pTo = preset.to;
+    }
+
+    const compareKey: CompareKey = COMPARE_KEYS.includes(rawCompare ?? "")
+      ? (rawCompare as CompareKey)
+      : "none";
+    const compPeriod = resolveComparison(pFrom, pTo, compareKey);
+
+    return {
+      periodFrom: pFrom,
+      periodTo: pTo,
+      compareFrom: compPeriod?.from ?? null,
+      compareTo: compPeriod?.to ?? null,
+    };
+  }, [rawRange, rawFrom, rawTo, rawCompare]);
 
   const [data, setData] = useState<TrafficData | null>(null);
+  const [comparison, setComparison] = useState<OverviewMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,27 +81,37 @@ export default function SiteTrafficPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/analytics?range=${range}`);
+      const params = new URLSearchParams();
+      params.set("from", formatDateISO(periodFrom));
+      params.set("to", formatDateISO(periodTo));
+
+      if (compareFrom && compareTo) {
+        params.set("compare_from", formatDateISO(compareFrom));
+        params.set("compare_to", formatDateISO(compareTo));
+      }
+
+      const res = await fetch(`/api/admin/analytics?${params.toString()}`);
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error ?? `HTTP ${res.status}`);
       }
       const json = await res.json();
       setData(json.data as TrafficData);
+      setComparison(json.comparison as OverviewMetrics | null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load analytics");
     } finally {
       setLoading(false);
     }
-  }, [range]);
+  }, [periodFrom, periodTo, compareFrom, compareTo]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  function setRange(newRange: RangeKey) {
-    router.push(`/admin/traffic?range=${newRange}`);
-  }
+  // Build range props for DateRangeSelector
+  const isCustom = rawRange === "custom";
+  const currentRange = isCustom ? "custom" : (rawRange ?? "7d");
 
   return (
     <div className="space-y-6">
@@ -79,22 +125,15 @@ export default function SiteTrafficPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Range selector pills */}
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-panel p-0.5">
-            {RANGES.map((r) => (
-              <button
-                key={r.key}
-                onClick={() => setRange(r.key)}
-                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                  range === r.key
-                    ? "bg-amber-600/15 text-amber-500 font-medium"
-                    : "text-muted hover:text-text hover:bg-panel2"
-                }`}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
+          {/* Date range selector (calendar picker with comparison) */}
+          <DateRangeSelector
+            range={currentRange}
+            from={isCustom ? rawFrom : undefined}
+            to={isCustom ? rawTo : undefined}
+            compare={rawCompare}
+            basePath="/admin/traffic"
+            variant="admin"
+          />
 
           {/* Refresh */}
           <button
@@ -114,7 +153,7 @@ export default function SiteTrafficPage() {
       ) : error ? (
         <ErrorState message={error} onRetry={fetchData} />
       ) : data ? (
-        <TrafficDashboard data={data} loading={loading} />
+        <TrafficDashboard data={data} comparison={comparison} loading={loading} />
       ) : null}
 
       {/* OpenPanel link */}
@@ -139,9 +178,11 @@ export default function SiteTrafficPage() {
 
 function TrafficDashboard({
   data,
+  comparison,
   loading,
 }: {
   data: TrafficData;
+  comparison: OverviewMetrics | null;
   loading: boolean;
 }) {
   const { overview } = data;
@@ -155,12 +196,16 @@ function TrafficDashboard({
           value={overview.visitors.toLocaleString()}
           icon={Users}
           color="text-blue-400"
+          currentRaw={overview.visitors}
+          previousRaw={comparison?.visitors}
         />
         <StatCard
           label="Pageviews"
           value={overview.pageviews.toLocaleString()}
           icon={Eye}
           color="text-purple-400"
+          currentRaw={overview.pageviews}
+          previousRaw={comparison?.pageviews}
         />
         <StatCard
           label="Bounce Rate"
@@ -173,12 +218,17 @@ function TrafficDashboard({
                 ? "text-amber-400"
                 : "text-emerald-400"
           }
+          currentRaw={overview.bounce_rate}
+          previousRaw={comparison?.bounce_rate}
+          invertDelta
         />
         <StatCard
           label="Avg Duration"
           value={formatDuration(overview.session_duration)}
           icon={Timer}
           color="text-teal-400"
+          currentRaw={overview.session_duration}
+          previousRaw={comparison?.session_duration}
         />
         <StatCard
           label="Active Now"
@@ -233,7 +283,7 @@ function TrafficDashboard({
 }
 
 // ---------------------------------------------------------------------------
-// Stat card component
+// Stat card component with optional comparison delta
 // ---------------------------------------------------------------------------
 
 function StatCard({
@@ -242,13 +292,57 @@ function StatCard({
   icon: Icon,
   color,
   dot,
+  currentRaw,
+  previousRaw,
+  invertDelta,
 }: {
   label: string;
   value: string;
   icon: typeof Users;
   color: string;
   dot?: boolean;
+  /** Raw numeric value for the current period (for delta calculation) */
+  currentRaw?: number;
+  /** Raw numeric value for the comparison period (for delta calculation) */
+  previousRaw?: number;
+  /** If true, invert delta colors (lower is better, e.g. bounce rate) */
+  invertDelta?: boolean;
 }) {
+  // Compute delta indicator
+  const hasDelta =
+    currentRaw !== undefined && previousRaw !== undefined;
+
+  let deltaEl: React.ReactNode = null;
+
+  if (hasDelta) {
+    const curr = currentRaw!;
+    const prev = previousRaw!;
+
+    if (prev === 0 && curr > 0) {
+      deltaEl = (
+        <span className="text-[10px] text-emerald-400 flex items-center gap-0.5 mt-1">
+          <ArrowUp size={10} /> New
+        </span>
+      );
+    } else if (prev > 0) {
+      const pctChange = ((curr - prev) / prev) * 100;
+      if (Math.abs(pctChange) >= 0.5) {
+        const isUp = pctChange > 0;
+        // For inverted metrics (like bounce rate), up is bad and down is good
+        const isPositive = invertDelta ? !isUp : isUp;
+        deltaEl = (
+          <span
+            className={`text-[10px] flex items-center gap-0.5 mt-1 ${isPositive ? "text-emerald-400" : "text-red-400"}`}
+          >
+            {isUp ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
+            {isUp ? "+" : ""}
+            {pctChange.toFixed(1)}%
+          </span>
+        );
+      }
+    }
+  }
+
   return (
     <div className="rounded-lg border border-border bg-panel p-4">
       <div className="flex items-center gap-2 mb-2">
@@ -266,6 +360,7 @@ function StatCard({
         )}
       </div>
       <div className="text-xl font-bold text-text">{value}</div>
+      {deltaEl}
     </div>
   );
 }
