@@ -1,28 +1,44 @@
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { requireAdmin } from "@/lib/admin";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { AdminTopBar } from "@/components/admin/AdminTopBar";
+
+async function AdminTopBarData() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const displayName =
+    user?.user_metadata?.display_name ||
+    user?.user_metadata?.full_name ||
+    null;
+
+  return (
+    <AdminTopBar
+      userId={user?.id ?? ""}
+      userEmail={user?.email ?? null}
+      displayName={displayName}
+    />
+  );
+}
 
 export default async function AdminLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const userId = await requireAdmin();
-
-  // Fetch user metadata for the top bar
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || null;
+  await requireAdmin();
 
   return (
     <div className="flex flex-col min-h-dvh">
-      <AdminTopBar
-        userId={userId}
-        userEmail={user?.email ?? null}
-        displayName={displayName}
-      />
+      <Suspense
+        fallback={
+          <header className="hidden md:flex h-14 shrink-0 items-center justify-between px-6 border-b border-border bg-panel" />
+        }
+      >
+        <AdminTopBarData />
+      </Suspense>
       <div className="flex flex-1 overflow-hidden">
         <AdminSidebar />
         <main id="main-content" tabIndex={-1} className="flex-1 px-4 py-4 pt-16 md:pt-6 md:px-6 md:py-6 overflow-y-auto overflow-x-hidden focus:outline-none">
