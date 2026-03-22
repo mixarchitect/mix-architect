@@ -8,10 +8,10 @@
  *   npm run rls-audit
  */
 
-import { setup, cleanup, getResults, clearResults, type TestResult } from "./setup.js";
-import { runIsolationTests } from "./test-isolation.js";
-import { runAnonTests } from "./test-anon.js";
-import { runStorageTests } from "./test-storage.js";
+import { setup, cleanup, getResults, clearResults, type TestResult } from "./setup";
+import { runIsolationTests } from "./test-isolation";
+import { runAnonTests } from "./test-anon";
+import { runStorageTests } from "./test-storage";
 
 async function main() {
   console.log("========================================");

@@ -5,8 +5,8 @@
  * in the cover-art storage bucket.
  */
 
-import type { TestContext } from "./setup.js";
-import { getResults } from "./setup.js";
+import type { TestContext } from "./setup";
+import { getResults } from "./setup";
 
 function recordResult(name: string, passed: boolean, detail?: string) {
   getResults().push({ name, passed, detail });

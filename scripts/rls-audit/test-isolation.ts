@@ -5,12 +5,12 @@
  * User A's data across every table with RLS policies.
  */
 
-import type { TestContext } from "./setup.js";
+import type { TestContext } from "./setup";
 import {
   expectEmpty,
   expectBlocked,
   expectUnchanged,
-} from "./setup.js";
+} from "./setup";
 
 export async function runIsolationTests(ctx: TestContext): Promise<void> {
   const { userA, userB, seedA, serviceClient } = ctx;
@@ -288,7 +288,7 @@ export async function runIsolationTests(ctx: TestContext): Promise<void> {
   if (orBypass && orBypass.length > 0) {
     const hasAData = orBypass.some((r: Record<string, unknown>) => r.user_id === userA.id);
     const passed = !hasAData;
-    const { getResults } = await import("./setup.js");
+    const { getResults } = await import("./setup");
     getResults().push({
       name: "releases: .or() filter does not bypass RLS",
       passed,
@@ -300,7 +300,7 @@ export async function runIsolationTests(ctx: TestContext): Promise<void> {
         : "  FAIL  releases: .or() filter leaks A's data",
     );
   } else {
-    const { getResults } = await import("./setup.js");
+    const { getResults } = await import("./setup");
     getResults().push({
       name: "releases: .or() filter does not bypass RLS",
       passed: true,

@@ -5,13 +5,13 @@
  * and tests privilege escalation edge cases.
  */
 
-import type { TestContext } from "./setup.js";
+import type { TestContext } from "./setup";
 import {
   expectEmpty,
   expectBlocked,
   expectUnchanged,
   getResults,
-} from "./setup.js";
+} from "./setup";
 
 export async function runAnonTests(ctx: TestContext): Promise<void> {
   const { userA, userB, seedA, anonClient, serviceClient } = ctx;
