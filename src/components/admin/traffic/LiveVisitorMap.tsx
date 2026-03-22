@@ -5,19 +5,25 @@ import type { VisitorLocation } from "@/lib/openpanel-api";
 
 const POLL_INTERVAL_MS = 30_000;
 
-// Map dimensions (2:1 equirectangular projection)
-const MAP_W = 800;
-const MAP_H = 400;
+/**
+ * The real-world SVG map uses a Robinson-like projection.
+ * viewBox: 30.767 241.591 784.077 458.627
+ * We use these to convert lat/lng → SVG coords.
+ */
+const VB_X = 30.767;
+const VB_Y = 241.591;
+const VB_W = 784.077;
+const VB_H = 458.627;
 
-/** Convert lat/lng to SVG x/y using equirectangular projection */
-function geoToXY(lat: number, lng: number): { x: number; y: number } {
-  return {
-    x: ((lng + 180) / 360) * MAP_W,
-    y: ((90 - lat) / 180) * MAP_H,
-  };
+/** Convert lat/lng to percentage position on the map container */
+function geoToPercent(lat: number, lng: number): { x: number; y: number } {
+  // Equirectangular → percentage of viewBox
+  // Longitude: -180 to 180 → 0% to 100%
+  const x = ((lng + 180) / 360) * 100;
+  // Latitude: 90 to -90 → 0% to 100%  (note: SVG y is inverted)
+  const y = ((90 - lat) / 180) * 100;
+  return { x, y };
 }
-
-import { WORLD_PATH } from "./world-map-path";
 
 export default function LiveVisitorMap() {
   const [locations, setLocations] = useState<VisitorLocation[]>([]);
@@ -34,7 +40,7 @@ export default function LiveVisitorMap() {
         setLocations(json.locations);
       }
     } catch {
-      // Silently fail — the map just shows no dots
+      // Silently fail
     } finally {
       setLoading(false);
     }
@@ -66,132 +72,64 @@ export default function LiveVisitorMap() {
         )}
       </div>
 
-      {/* Map */}
-      <div className="relative bg-[#0a0f1a]">
-        <svg
-          viewBox={`0 0 ${MAP_W} ${MAP_H}`}
-          className="w-full h-auto"
-          style={{ aspectRatio: "2 / 1" }}
-          aria-label="World map showing live visitor locations"
-        >
-          {/* Grid lines for visual reference */}
-          <defs>
-            <pattern
-              id="map-grid"
-              width={MAP_W / 12}
-              height={MAP_H / 6}
-              patternUnits="userSpaceOnUse"
+      {/* Map container */}
+      <div className="relative bg-[#0a0f1a]" style={{ aspectRatio: "2 / 1" }}>
+        {/* Real world map SVG as background */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url(/world-map.svg)",
+            backgroundSize: "100% 100%",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}
+        />
+
+        {/* Visitor dots overlaid on the map */}
+        {locations.map((loc, i) => {
+          const { x, y } = geoToPercent(loc.lat, loc.lng);
+          const isHovered = hoveredIdx === i;
+          return (
+            <div
+              key={`${loc.lat}-${loc.lng}-${i}`}
+              className="absolute"
+              style={{ left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)" }}
+              onMouseEnter={() => setHoveredIdx(i)}
+              onMouseLeave={() => setHoveredIdx(null)}
             >
-              <path
-                d={`M ${MAP_W / 12} 0 L 0 0 0 ${MAP_H / 6}`}
-                fill="none"
-                stroke="rgba(255,255,255,0.04)"
-                strokeWidth="0.5"
+              {/* Pulse ring */}
+              <span
+                className="absolute rounded-full bg-emerald-400/30 animate-ping"
+                style={{
+                  width: 20,
+                  height: 20,
+                  left: -10,
+                  top: -10,
+                  animationDelay: `${(i * 300) % 2000}ms`,
+                  animationDuration: "2s",
+                }}
               />
-            </pattern>
-          </defs>
-          <rect width={MAP_W} height={MAP_H} fill="url(#map-grid)" />
-
-          {/* Equator line */}
-          <line
-            x1="0"
-            y1={MAP_H / 2}
-            x2={MAP_W}
-            y2={MAP_H / 2}
-            stroke="rgba(255,255,255,0.06)"
-            strokeWidth="0.5"
-            strokeDasharray="4,4"
-          />
-
-          {/* World land outlines */}
-          <path
-            d={WORLD_PATH}
-            fill="rgba(255,255,255,0.06)"
-            stroke="rgba(255,255,255,0.12)"
-            strokeWidth="0.5"
-            strokeLinejoin="round"
-          />
-
-          {/* Visitor dots */}
-          {locations.map((loc, i) => {
-            const { x, y } = geoToXY(loc.lat, loc.lng);
-            const isHovered = hoveredIdx === i;
-            return (
-              <g
-                key={`${loc.lat}-${loc.lng}-${i}`}
-                onMouseEnter={() => setHoveredIdx(i)}
-                onMouseLeave={() => setHoveredIdx(null)}
-                className="cursor-pointer"
-              >
-                {/* Pulse ring */}
-                <circle cx={x} cy={y} r="8" fill="none">
-                  <animate
-                    attributeName="r"
-                    values="4;10;4"
-                    dur="2s"
-                    begin={`${(i * 0.3) % 2}s`}
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="opacity"
-                    values="0.6;0;0.6"
-                    dur="2s"
-                    begin={`${(i * 0.3) % 2}s`}
-                    repeatCount="indefinite"
-                  />
-                  <animate
-                    attributeName="stroke"
-                    values="rgba(52,211,153,0.6);rgba(52,211,153,0);rgba(52,211,153,0.6)"
-                    dur="2s"
-                    begin={`${(i * 0.3) % 2}s`}
-                    repeatCount="indefinite"
-                  />
-                  <set attributeName="stroke" to="rgba(52,211,153,0.6)" />
-                  <set attributeName="stroke-width" to="1" />
-                </circle>
-
-                {/* Core dot */}
-                <circle
-                  cx={x}
-                  cy={y}
-                  r={isHovered ? 4 : 3}
-                  fill="rgba(52,211,153,0.9)"
-                  stroke="rgba(52,211,153,0.3)"
-                  strokeWidth="1"
-                  className="transition-all duration-150"
-                />
-
-                {/* Tooltip label */}
-                {isHovered && (
-                  <g>
-                    {/* Background rect */}
-                    <rect
-                      x={x + 8}
-                      y={y - 12}
-                      width={Math.max((loc.city || loc.country).length * 6.5 + 12, 50)}
-                      height={20}
-                      rx="4"
-                      fill="rgba(0,0,0,0.85)"
-                      stroke="rgba(255,255,255,0.15)"
-                      strokeWidth="0.5"
-                    />
-                    <text
-                      x={x + 14}
-                      y={y + 2}
-                      fill="white"
-                      fontSize="10"
-                      fontFamily="system-ui, sans-serif"
-                    >
-                      {loc.city
-                        ? `${loc.city}, ${loc.country}`
-                        : loc.country || "Unknown"}
-                    </text>
-                  </g>
-                )}
-              </g>
-            );
-          })}
-        </svg>
+              {/* Core dot */}
+              <span
+                className={`relative block rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] transition-all duration-150 cursor-pointer ${
+                  isHovered ? "w-3 h-3" : "w-2.5 h-2.5"
+                }`}
+              />
+              {/* Tooltip */}
+              {isHovered && (
+                <div
+                  className="absolute left-4 top-1/2 -translate-y-1/2 whitespace-nowrap z-10
+                    bg-black/90 border border-white/15 text-white text-[11px] px-2.5 py-1 rounded-md
+                    pointer-events-none"
+                >
+                  {loc.city
+                    ? `${loc.city}, ${loc.country}`
+                    : loc.country || "Unknown"}
+                </div>
+              )}
+            </div>
+          );
+        })}
 
         {/* Loading overlay */}
         {loading && (
