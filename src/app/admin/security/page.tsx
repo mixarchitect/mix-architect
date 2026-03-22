@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -110,9 +110,12 @@ function AikidoTab() {
   const [error, setError] = useState<string | null>(null);
   const [scanMessage, setScanMessage] = useState<string | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
+  const [polling, setPolling] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const baselineRef = useRef<string | null>(null);
 
-  const fetchFindings = useCallback(async () => {
-    setLoading(true);
+  const fetchFindings = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/admin/aikido");
@@ -122,16 +125,65 @@ function AikidoTab() {
       }
       const data: AikidoFindingsResponse = await res.json();
       setFindings(data);
+      return data;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load findings");
+      if (!silent) setError(err instanceof Error ? err.message : "Failed to load findings");
+      return null;
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchFindings();
   }, [fetchFindings]);
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
+
+  function startPolling(baseline: AikidoFindingsResponse | null) {
+    // Snapshot current issue count as baseline to detect changes
+    baselineRef.current = baseline
+      ? JSON.stringify(baseline.counts)
+      : null;
+    setPolling(true);
+    setScanMessage("Scan triggered. Polling for updated results...");
+
+    let attempts = 0;
+    const maxAttempts = 20; // 20 × 30s = 10 min max
+
+    pollRef.current = setInterval(async () => {
+      attempts++;
+      const data = await fetchFindings(true);
+
+      if (data && baselineRef.current) {
+        const current = JSON.stringify(data.counts);
+        if (current !== baselineRef.current) {
+          // Results changed — scan completed
+          stopPolling();
+          setScanMessage("Scan complete — results updated.");
+          return;
+        }
+      }
+
+      if (attempts >= maxAttempts) {
+        stopPolling();
+        setScanMessage("Polling timed out after 10 minutes. Click Refresh to check manually.");
+      }
+    }, 30_000);
+  }
+
+  function stopPolling() {
+    if (pollRef.current) {
+      clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+    setPolling(false);
+  }
 
   async function triggerScan() {
     setScanning(true);
@@ -140,7 +192,7 @@ function AikidoTab() {
       const res = await fetch("/api/admin/aikido/scan", { method: "POST" });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
-      setScanMessage(body.message);
+      startPolling(findings);
     } catch (err) {
       setScanMessage(
         err instanceof Error ? err.message : "Failed to trigger scan",
@@ -194,13 +246,18 @@ function AikidoTab() {
           <Button
             variant="primary"
             onClick={triggerScan}
-            disabled={scanning}
+            disabled={scanning || polling}
             className="gap-2"
           >
             {scanning ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
                 Triggering...
+              </>
+            ) : polling ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Scanning...
               </>
             ) : (
               <>
@@ -211,7 +268,7 @@ function AikidoTab() {
           </Button>
           <Button
             variant="secondary"
-            onClick={fetchFindings}
+            onClick={() => fetchFindings()}
             disabled={loading}
             className="gap-2"
           >
@@ -234,7 +291,13 @@ function AikidoTab() {
       {scanMessage && (
         <Panel>
           <PanelBody>
-            <p className="text-sm text-muted">{scanMessage}</p>
+            <div className="flex items-center gap-3">
+              {polling && <Loader2 size={16} className="animate-spin text-amber-500 shrink-0" />}
+              {!polling && scanMessage.includes("complete") && (
+                <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+              )}
+              <p className="text-sm text-muted">{scanMessage}</p>
+            </div>
           </PanelBody>
         </Panel>
       )}
