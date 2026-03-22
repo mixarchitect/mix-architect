@@ -302,7 +302,9 @@ export async function getRecentVisitorLocations(): Promise<VisitorLocation[]> {
       throw new Error(`OpenPanel Export API ${res.status}: ${text}`);
     }
 
-    const events = (await res.json()) as Array<Record<string, unknown>>;
+    const json = await res.json();
+    // Export API returns { meta: {...}, data: [...] }
+    const events = (Array.isArray(json) ? json : json.data ?? []) as Array<Record<string, unknown>>;
     if (!Array.isArray(events)) return [];
 
     const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000;

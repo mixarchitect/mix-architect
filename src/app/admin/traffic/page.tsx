@@ -244,9 +244,6 @@ function TrafficDashboard({
         />
       </div>
 
-      {/* Live visitor map */}
-      <LiveVisitorMap />
-
       {/* Three-column: Browsers, Devices, Countries */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         <BreakdownTable
@@ -269,6 +266,9 @@ function TrafficDashboard({
           emptyMessage="No country data yet"
         />
       </div>
+
+      {/* Live visitor map */}
+      <LiveVisitorMap />
 
       {/* Two-column: Top Pages + Referrers */}
       <div className="grid lg:grid-cols-2 gap-4">
