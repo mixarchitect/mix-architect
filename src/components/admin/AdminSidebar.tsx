@@ -20,6 +20,7 @@ import {
   Lightbulb,
   Gauge,
   BarChart3,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -37,6 +38,7 @@ const adminNavItems = [
   { label: "Changelog", href: "/admin/changelog", icon: Megaphone },
   { label: "Site Traffic", href: "/admin/traffic", icon: BarChart3 },
   { label: "Performance", href: "/admin/performance", icon: Gauge },
+  { label: "RLS Audit", href: "/admin/rls-audit", icon: ShieldCheck },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
