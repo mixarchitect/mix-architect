@@ -36,15 +36,27 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    // Parse current period dates
+    // Parse range — prefer preset key (OpenPanel handles these better), fall back to dates
+    const rangePreset = req.nextUrl.searchParams.get("range");
     const from = req.nextUrl.searchParams.get("from");
     const to = req.nextUrl.searchParams.get("to");
 
-    if (!from || !to || !/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
-      return NextResponse.json(
-        { error: "Missing or invalid 'from' and 'to' date params (YYYY-MM-DD)" },
-        { status: 400 },
-      );
+    // Map admin date picker presets to OpenPanel range keys
+    const presetMap: Record<string, string> = {
+      "today": "24h", "yesterday": "24h", "24h": "24h",
+      "7d": "7d", "30d": "30d", "90d": "90d", "365d": "90d",
+    };
+    const mappedPreset = rangePreset ? presetMap[rangePreset] : null;
+    const isValidPreset = !!mappedPreset;
+
+    // Build the range argument for OpenPanel
+    let rangeArg: string | { start: string; end: string };
+    if (isValidPreset) {
+      rangeArg = mappedPreset;
+    } else if (from && to && /^\d{4}-\d{2}-\d{2}$/.test(from) && /^\d{4}-\d{2}-\d{2}$/.test(to)) {
+      rangeArg = { start: from, end: to };
+    } else {
+      rangeArg = "7d"; // safe default
     }
 
     // Parse comparison period dates (optional)
@@ -57,7 +69,7 @@ export async function GET(req: NextRequest) {
       /^\d{4}-\d{2}-\d{2}$/.test(compareTo);
 
     // Fetch current period data
-    const data = await getAllTrafficData({ start: from, end: to });
+    const data = await getAllTrafficData(rangeArg as Parameters<typeof getAllTrafficData>[0]);
 
     // Fetch comparison period overview (only stat-card metrics, not breakdowns)
     let comparison: OverviewMetrics | null = null;

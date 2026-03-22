@@ -84,6 +84,10 @@ export default function SiteTrafficPage() {
       const params = new URLSearchParams();
       params.set("from", formatDateISO(periodFrom));
       params.set("to", formatDateISO(periodTo));
+      // Pass the preset range key if using a preset (OpenPanel handles these better)
+      if (!rawFrom && !rawTo && rawRange) {
+        params.set("range", rawRange);
+      }
 
       if (compareFrom && compareTo) {
         params.set("compare_from", formatDateISO(compareFrom));
