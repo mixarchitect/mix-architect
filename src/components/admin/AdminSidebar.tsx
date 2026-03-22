@@ -38,7 +38,7 @@ const adminNavItems = [
   { label: "Changelog", href: "/admin/changelog", icon: Megaphone },
   { label: "Site Traffic", href: "/admin/traffic", icon: BarChart3 },
   { label: "Performance", href: "/admin/performance", icon: Gauge },
-  { label: "RLS Audit", href: "/admin/rls-audit", icon: ShieldCheck },
+  { label: "Security", href: "/admin/security", icon: ShieldCheck },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
