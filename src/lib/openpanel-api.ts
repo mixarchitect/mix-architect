@@ -1,29 +1,27 @@
 /**
  * OpenPanel Insights API client.
  *
- * Fetches analytics data from the OpenPanel Cloud export/chart API.
- * Uses server-side credentials (OPENPANEL_API_CLIENT_ID / OPENPANEL_API_CLIENT_SECRET)
- * which must never be exposed to the browser.
- *
- * Docs: https://openpanel.dev/docs/api
+ * Uses the Insights API at /insights/{projectId}/...
+ * Docs: https://openpanel.dev/docs/api/insights
  */
 
 const API_BASE = "https://api.openpanel.dev";
 
+function getProjectId(): string {
+  const id = process.env.OPENPANEL_PROJECT_ID;
+  if (!id) throw new Error("Missing OPENPANEL_PROJECT_ID env var");
+  return id;
+}
+
 function getHeaders(): Record<string, string> {
   const clientId = process.env.OPENPANEL_API_CLIENT_ID;
   const clientSecret = process.env.OPENPANEL_API_CLIENT_SECRET;
-
   if (!clientId || !clientSecret) {
-    throw new Error(
-      "Missing OPENPANEL_API_CLIENT_ID or OPENPANEL_API_CLIENT_SECRET env vars",
-    );
+    throw new Error("Missing OPENPANEL_API_CLIENT_ID or OPENPANEL_API_CLIENT_SECRET");
   }
-
   return {
     "openpanel-client-id": clientId,
     "openpanel-client-secret": clientSecret,
-    "Content-Type": "application/json",
   };
 }
 
@@ -41,35 +39,17 @@ export interface OverviewMetrics {
   views_per_session: number;
 }
 
-export interface TopPage {
+export interface BreakdownEntry {
   name: string;
   count: number;
 }
 
-export interface Referrer {
-  name: string;
-  count: number;
-}
-
-export interface GeoEntry {
-  name: string;
-  count: number;
-}
-
-export interface DeviceEntry {
-  name: string;
-  count: number;
-}
-
-export interface BrowserEntry {
-  name: string;
-  count: number;
-}
-
-export interface OsEntry {
-  name: string;
-  count: number;
-}
+export type TopPage = BreakdownEntry;
+export type Referrer = BreakdownEntry;
+export type GeoEntry = BreakdownEntry;
+export type DeviceEntry = BreakdownEntry;
+export type BrowserEntry = BreakdownEntry;
+export type OsEntry = BreakdownEntry;
 
 export interface TrafficData {
   overview: OverviewMetrics;
@@ -81,403 +61,194 @@ export interface TrafficData {
   os: OsEntry[];
 }
 
-// ---------------------------------------------------------------------------
-// Date range helpers
-// ---------------------------------------------------------------------------
+/** Explicit date range with YYYY-MM-DD strings */
+export interface DateRange {
+  start: string;
+  end: string;
+}
 
 type RangeKey = "24h" | "7d" | "30d" | "90d";
 
-/** Explicit date range with YYYY-MM-DD strings */
-export interface DateRange {
-  start: string; // YYYY-MM-DD
-  end: string;   // YYYY-MM-DD
-}
-
-function rangeToDates(range: RangeKey): DateRange {
-  const now = new Date();
-  const end = now.toISOString().slice(0, 10); // YYYY-MM-DD
-
-  const msPerDay = 86_400_000;
-  let daysBack: number;
-  switch (range) {
-    case "24h":
-      daysBack = 1;
-      break;
-    case "7d":
-      daysBack = 7;
-      break;
-    case "30d":
-      daysBack = 30;
-      break;
-    case "90d":
-      daysBack = 90;
-      break;
-    default:
-      daysBack = 30;
-  }
-
-  const start = new Date(now.getTime() - daysBack * msPerDay)
-    .toISOString()
-    .slice(0, 10);
-
-  return { start, end };
-}
-
-function rangeToInterval(range: RangeKey): string {
-  switch (range) {
-    case "24h":
-      return "hour";
-    case "7d":
-    case "30d":
-      return "day";
-    case "90d":
-      return "month";
-    default:
-      return "day";
-  }
-}
-
-/** Pick a sensible interval based on the span of a date range. */
-function datesToInterval(dr: DateRange): string {
-  const msPerDay = 86_400_000;
-  const span = Math.round(
-    (new Date(dr.end).getTime() - new Date(dr.start).getTime()) / msPerDay,
-  );
-  if (span <= 1) return "hour";
-  if (span <= 60) return "day";
-  return "month";
-}
-
-/** Resolve either a RangeKey or an explicit DateRange into { start, end, interval }. */
-function resolveDates(rangeOrDates: RangeKey | DateRange): {
-  start: string;
-  end: string;
-  interval: string;
-} {
-  if (typeof rangeOrDates === "string") {
-    const dr = rangeToDates(rangeOrDates);
-    return { ...dr, interval: rangeToInterval(rangeOrDates) };
-  }
-  return { ...rangeOrDates, interval: datesToInterval(rangeOrDates) };
-}
-
 // ---------------------------------------------------------------------------
-// Fetch helpers
+// Fetch helper
 // ---------------------------------------------------------------------------
 
-const PROJECT_ID = process.env.OPENPANEL_API_CLIENT_ID ?? "";
-
-/**
- * Generic fetch wrapper for the OpenPanel chart/export API.
- * Uses Next.js `revalidate` for 5-minute ISR caching.
- */
-async function opFetch<T>(
-  path: string,
+async function insightsGet<T>(
+  endpoint: string,
   params: Record<string, string> = {},
 ): Promise<T> {
-  const url = new URL(`${API_BASE}${path}`);
+  const projectId = getProjectId();
+  const url = new URL(`${API_BASE}/insights/${projectId}${endpoint}`);
   for (const [k, v] of Object.entries(params)) {
     url.searchParams.set(k, v);
   }
 
   const res = await fetch(url.toString(), {
-    method: "GET",
     headers: getHeaders(),
     next: { revalidate: 300 },
   });
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(
-      `OpenPanel API error ${res.status} on ${path}: ${text}`,
-    );
+    throw new Error(`OpenPanel API ${res.status} on ${endpoint}: ${text}`);
   }
 
   return res.json() as Promise<T>;
 }
 
 // ---------------------------------------------------------------------------
+// Date helpers
+// ---------------------------------------------------------------------------
+
+function resolveRange(range: RangeKey | DateRange): Record<string, string> {
+  if (typeof range === "string") {
+    return { range };
+  }
+  return { startDate: range.start, endDate: range.end };
+}
+
+// ---------------------------------------------------------------------------
 // Public API functions
 // ---------------------------------------------------------------------------
 
-/**
- * Fetch the real-time active visitor count.
- */
 export async function getActiveVisitors(): Promise<number> {
   try {
-    const data = await opFetch<{ count?: number; visitors?: number }>(
-      "/live/visitors",
-      { projectId: PROJECT_ID },
-    );
-    return data.count ?? data.visitors ?? 0;
+    const data = await insightsGet<{ visitors?: number; count?: number }>("/live");
+    return data.visitors ?? data.count ?? 0;
   } catch {
     return 0;
   }
 }
 
-/**
- * Fetch summary overview metrics (pageviews, visitors, sessions, bounce rate, etc.)
- */
-export async function getOverviewMetrics(
+export async function getMetrics(
   range: RangeKey | DateRange,
 ): Promise<Omit<OverviewMetrics, "current_visitors">> {
-  const { start, end, interval } = resolveDates(range);
-
   try {
-    // The OpenPanel chart API returns series data for the overview
-    const data = await opFetch<Record<string, unknown>>(
-      "/chart/events",
-      {
-        event: "screen_view",
-        type: "linear",
-        interval,
-        start,
-        end,
-        projectId: PROJECT_ID,
-        name: "overview",
-        breakdowns: "",
-      },
+    const data = await insightsGet<Record<string, unknown>>(
+      "/metrics",
+      resolveRange(range),
     );
 
-    // Parse the response - OpenPanel may return data in different shapes
-    // depending on version. We handle both summary and series formats.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const obj = data as Record<string, any>;
-    const s = obj.summary ?? obj.current ?? obj;
-
     return {
-      pageviews: num(s.pageviews),
-      visitors: num(s.visitors),
-      sessions: num(s.sessions),
-      bounce_rate: num(s.bounce_rate ?? s.bounceRate),
-      session_duration: num(s.session_duration ?? s.sessionDuration ?? s.duration),
-      views_per_session: num(s.views_per_session ?? s.viewsPerSession),
+      pageviews: num(data.total_screen_views ?? data.pageviews),
+      visitors: num(data.unique_visitors ?? data.visitors),
+      sessions: num(data.total_sessions ?? data.sessions),
+      bounce_rate: num(data.bounce_rate ?? data.bounceRate),
+      session_duration: num(data.avg_session_duration ?? data.session_duration),
+      views_per_session: num(data.views_per_session ?? data.viewsPerSession),
     };
   } catch {
-    return {
-      pageviews: 0,
-      visitors: 0,
-      sessions: 0,
-      bounce_rate: 0,
-      session_duration: 0,
-      views_per_session: 0,
-    };
+    return { pageviews: 0, visitors: 0, sessions: 0, bounce_rate: 0, session_duration: 0, views_per_session: 0 };
   }
 }
 
-/**
- * Fetch top pages by pageview count.
- */
 export async function getTopPages(
   range: RangeKey | DateRange,
   limit = 10,
 ): Promise<TopPage[]> {
-  const { start, end, interval } = resolveDates(range);
-
   try {
-    const data = await opFetch<unknown[]>(
-      "/chart/events",
-      {
-        event: "screen_view",
-        type: "bar",
-        interval,
-        start,
-        end,
-        projectId: PROJECT_ID,
-        breakdowns: JSON.stringify([{ name: "path" }]),
-        limit: String(limit),
-      },
+    const data = await insightsGet<unknown[]>(
+      "/pages",
+      { ...resolveRange(range), limit: String(limit) },
     );
-
-    return normalizeBreakdown(data);
+    return normalizeInsightsRows(data, "path");
   } catch {
     return [];
   }
 }
 
-/**
- * Fetch referrer sources.
- */
 export async function getReferrers(
   range: RangeKey | DateRange,
   limit = 10,
 ): Promise<Referrer[]> {
-  const { start, end, interval } = resolveDates(range);
-
   try {
-    const data = await opFetch<unknown[]>(
-      "/chart/events",
-      {
-        event: "screen_view",
-        type: "bar",
-        interval,
-        start,
-        end,
-        projectId: PROJECT_ID,
-        breakdowns: JSON.stringify([{ name: "referrer" }]),
-        limit: String(limit),
-      },
+    const data = await insightsGet<unknown[]>(
+      "/referrer_name",
+      { ...resolveRange(range), limit: String(limit) },
     );
-
-    return normalizeBreakdown(data);
+    return normalizeInsightsRows(data, "name");
   } catch {
     return [];
   }
 }
 
-/**
- * Fetch geographic (country) breakdown.
- */
 export async function getCountries(
   range: RangeKey | DateRange,
   limit = 10,
 ): Promise<GeoEntry[]> {
-  const { start, end, interval } = resolveDates(range);
-
   try {
-    const data = await opFetch<unknown[]>(
-      "/chart/events",
-      {
-        event: "screen_view",
-        type: "bar",
-        interval,
-        start,
-        end,
-        projectId: PROJECT_ID,
-        breakdowns: JSON.stringify([{ name: "country" }]),
-        limit: String(limit),
-      },
+    const data = await insightsGet<unknown[]>(
+      "/country",
+      { ...resolveRange(range), limit: String(limit) },
     );
-
-    return normalizeBreakdown(data);
+    return normalizeInsightsRows(data, "name");
   } catch {
     return [];
   }
 }
 
-/**
- * Fetch device type breakdown (mobile, desktop, tablet).
- */
 export async function getDevices(
   range: RangeKey | DateRange,
   limit = 10,
 ): Promise<DeviceEntry[]> {
-  const { start, end, interval } = resolveDates(range);
-
   try {
-    const data = await opFetch<unknown[]>(
-      "/chart/events",
-      {
-        event: "screen_view",
-        type: "bar",
-        interval,
-        start,
-        end,
-        projectId: PROJECT_ID,
-        breakdowns: JSON.stringify([{ name: "device" }]),
-        limit: String(limit),
-      },
+    const data = await insightsGet<unknown[]>(
+      "/device",
+      { ...resolveRange(range), limit: String(limit) },
     );
-
-    return normalizeBreakdown(data);
+    return normalizeInsightsRows(data, "name");
   } catch {
     return [];
   }
 }
 
-/**
- * Fetch browser breakdown.
- */
 export async function getBrowsers(
   range: RangeKey | DateRange,
   limit = 10,
 ): Promise<BrowserEntry[]> {
-  const { start, end, interval } = resolveDates(range);
-
   try {
-    const data = await opFetch<unknown[]>(
-      "/chart/events",
-      {
-        event: "screen_view",
-        type: "bar",
-        interval,
-        start,
-        end,
-        projectId: PROJECT_ID,
-        breakdowns: JSON.stringify([{ name: "browser" }]),
-        limit: String(limit),
-      },
+    const data = await insightsGet<unknown[]>(
+      "/browser",
+      { ...resolveRange(range), limit: String(limit) },
     );
-
-    return normalizeBreakdown(data);
+    return normalizeInsightsRows(data, "name");
   } catch {
     return [];
   }
 }
 
-/**
- * Fetch OS breakdown.
- */
 export async function getOsList(
   range: RangeKey | DateRange,
   limit = 10,
 ): Promise<OsEntry[]> {
-  const { start, end, interval } = resolveDates(range);
-
   try {
-    const data = await opFetch<unknown[]>(
-      "/chart/events",
-      {
-        event: "screen_view",
-        type: "bar",
-        interval,
-        start,
-        end,
-        projectId: PROJECT_ID,
-        breakdowns: JSON.stringify([{ name: "os" }]),
-        limit: String(limit),
-      },
+    const data = await insightsGet<unknown[]>(
+      "/os",
+      { ...resolveRange(range), limit: String(limit) },
     );
-
-    return normalizeBreakdown(data);
+    return normalizeInsightsRows(data, "name");
   } catch {
     return [];
   }
 }
 
-/**
- * Fetch all traffic data in parallel for a given range.
- * Accepts either a preset RangeKey ("7d", "30d", etc.) or an explicit
- * DateRange with { start, end } as YYYY-MM-DD strings.
- */
 export async function getAllTrafficData(
   range: RangeKey | DateRange,
 ): Promise<TrafficData> {
-  const [
-    activeVisitors,
-    overviewMetrics,
-    topPages,
-    referrers,
-    countries,
-    devices,
-    browsers,
-    os,
-  ] = await Promise.all([
-    getActiveVisitors(),
-    getOverviewMetrics(range),
-    getTopPages(range),
-    getReferrers(range),
-    getCountries(range),
-    getDevices(range),
-    getBrowsers(range),
-    getOsList(range),
-  ]);
+  const [activeVisitors, metrics, topPages, referrers, countries, devices, browsers, os] =
+    await Promise.all([
+      getActiveVisitors(),
+      getMetrics(range),
+      getTopPages(range),
+      getReferrers(range),
+      getCountries(range),
+      getDevices(range),
+      getBrowsers(range),
+      getOsList(range),
+    ]);
 
   return {
-    overview: {
-      current_visitors: activeVisitors,
-      ...overviewMetrics,
-    },
+    overview: { current_visitors: activeVisitors, ...metrics },
     topPages,
     referrers,
     countries,
@@ -487,96 +258,41 @@ export async function getAllTrafficData(
   };
 }
 
-/**
- * Fetch only overview metrics for a date range (used for comparison periods).
- * Skips breakdown tables since comparison only applies to stat cards.
- */
 export async function getOverviewOnly(
   range: RangeKey | DateRange,
 ): Promise<OverviewMetrics> {
-  const overviewMetrics = await getOverviewMetrics(range);
-  return {
-    current_visitors: 0, // not meaningful for comparison periods
-    ...overviewMetrics,
-  };
+  const metrics = await getMetrics(range);
+  return { current_visitors: 0, ...metrics };
 }
 
 // ---------------------------------------------------------------------------
-// Primitive helpers
+// Helpers
 // ---------------------------------------------------------------------------
 
-/** Safely coerce a value to a number, defaulting to 0. */
 function num(v: unknown): number {
-  if (typeof v === "number" && !Number.isNaN(v)) return v;
-  if (typeof v === "string") {
-    const n = Number(v);
-    return Number.isNaN(n) ? 0 : n;
-  }
+  if (typeof v === "number") return v;
+  if (typeof v === "string") return parseFloat(v) || 0;
   return 0;
 }
 
-// ---------------------------------------------------------------------------
-// Normalizers
-// ---------------------------------------------------------------------------
-
 /**
- * Normalize OpenPanel breakdown responses into a { name, count } array.
- * OpenPanel may return data in various shapes:
- *   - Array of { name, count }
- *   - Array of { label, value }
- *   - Object with series data keyed by breakdown value
- *   - Nested { data: [...] } wrapper
+ * Normalize Insights API rows into { name, count } entries.
+ * The API returns objects with varying field names — handle common shapes.
  */
-function normalizeBreakdown(raw: unknown): { name: string; count: number }[] {
-  // Handle null/undefined
-  if (!raw) return [];
-
-  // Unwrap { data: [...] } wrapper
-  if (typeof raw === "object" && !Array.isArray(raw) && raw !== null) {
-    const obj = raw as Record<string, unknown>;
-    if (Array.isArray(obj.data)) {
-      return normalizeBreakdown(obj.data);
-    }
-    // Object keyed by breakdown value -> { [name]: count }
-    if (obj.series || obj.metrics) {
-      const series = (obj.series ?? obj.metrics) as Record<string, unknown>;
-      return Object.entries(series)
-        .map(([name, val]) => ({
-          name,
-          count: typeof val === "number" ? val : Number(val) || 0,
-        }))
-        .sort((a, b) => b.count - a.count);
-    }
-    // Plain object keyed by name
-    return Object.entries(obj)
-      .filter(([, v]) => typeof v === "number")
-      .map(([name, count]) => ({ name, count: count as number }))
-      .sort((a, b) => b.count - a.count);
-  }
-
-  if (!Array.isArray(raw)) return [];
-
-  return raw
+function normalizeInsightsRows(
+  data: unknown,
+  nameField: string,
+): BreakdownEntry[] {
+  if (!Array.isArray(data)) return [];
+  return data
     .map((item: unknown) => {
       if (!item || typeof item !== "object") return null;
-      const i = item as Record<string, unknown>;
-      const name =
-        (i.name as string) ??
-        (i.label as string) ??
-        (i.key as string) ??
-        (i.value as string) ??
-        "Unknown";
-      const count =
-        typeof i.count === "number"
-          ? i.count
-          : typeof i.value === "number"
-            ? i.value
-            : typeof i.total === "number"
-              ? i.total
-              : typeof i.events === "number"
-                ? i.events
-                : 0;
-      return { name: String(name), count };
+      const obj = item as Record<string, unknown>;
+      const name = String(obj[nameField] ?? obj.name ?? obj.title ?? "");
+      const count = num(obj.sessions ?? obj.count ?? obj.views ?? obj.pageviews ?? 0);
+      if (!name) return null;
+      return { name, count };
     })
-    .filter(Boolean) as { name: string; count: number }[];
+    .filter((x): x is BreakdownEntry => x !== null)
+    .sort((a, b) => b.count - a.count);
 }
