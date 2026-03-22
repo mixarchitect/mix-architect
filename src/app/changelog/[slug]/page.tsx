@@ -108,9 +108,10 @@ export default async function ChangelogEntryPage({ params }: Props) {
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-bg focus:outline-none">
       <LandingNav locale={locale} />
 
+      {/* Safe: JSON.stringify escapes; u003c encoding prevents script breakout */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
 
       <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">

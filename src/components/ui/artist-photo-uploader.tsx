@@ -54,7 +54,8 @@ export function ArtistPhotoUploader({
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
-      const ext = file.type.split("/")[1] === "jpeg" ? "jpg" : file.type.split("/")[1];
+      const rawExt = file.type.split("/")[1];
+      const ext = (rawExt === "jpeg" ? "jpg" : rawExt ?? "").replace(/[^a-zA-Z0-9]/g, "") || "bin";
       const path = `${user.id}/artist-${sanitizeName(artistName)}.${ext}`;
       const { error: uploadErr } = await supabase.storage
         .from("cover-art")

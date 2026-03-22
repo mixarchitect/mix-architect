@@ -21,10 +21,21 @@ export async function downloadSourceAudio(
   audioUrl: string,
   destPath: string,
 ): Promise<void> {
+  // Validate URL is from our Supabase storage to prevent SSRF
+  const supabaseHost = new URL(supabaseUrl).hostname;
+  const parsedUrl = new URL(audioUrl);
+  if (parsedUrl.hostname !== supabaseHost) {
+    throw new Error(`Invalid audio URL host: ${parsedUrl.hostname}`);
+  }
+  // Prevent path traversal in destPath
+  const resolved = path.resolve(destPath);
+  if (resolved.includes("..")) {
+    throw new Error("Invalid destination path");
+  }
   const res = await fetch(audioUrl);
   if (!res.ok) throw new Error(`Download failed: ${res.status} ${res.statusText}`);
   const buffer = Buffer.from(await res.arrayBuffer());
-  await fs.writeFile(destPath, buffer);
+  await fs.writeFile(resolved, buffer);
 }
 
 /* ------------------------------------------------------------------ */
@@ -323,6 +334,8 @@ export function getContentType(format: string): string {
     m4a: "audio/mp4",
     ogg: "audio/ogg",
   };
-  const ext = path.extname(format).replace(".", "") || format;
+  // Sanitize: strip path separators and extract only alphanumeric extension
+  const clean = format.replace(/[/\\]/g, "");
+  const ext = (path.extname(clean).replace(".", "") || clean).replace(/[^a-zA-Z0-9]/g, "");
   return map[ext] ?? "application/octet-stream";
 }

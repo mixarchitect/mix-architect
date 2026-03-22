@@ -677,12 +677,14 @@ export async function cleanup(ctx: TestContext): Promise<void> {
     await serviceClient.from("releases").delete().eq("id", seed.releaseId);
   }
 
-  // Delete storage test files if any
+  // Delete storage test files if any (sanitize UUIDs to prevent path traversal)
+  const safeA = userA.id.replace(/[^a-f0-9\-]/gi, "");
+  const safeB = userB.id.replace(/[^a-f0-9\-]/gi, "");
   await serviceClient.storage
     .from("cover-art")
     .remove([
-      `${userA.id}/rls-test-file.txt`,
-      `${userB.id}/rls-test-file.txt`,
+      `${safeA}/rls-test-file.txt`,
+      `${safeB}/rls-test-file.txt`,
     ]);
 
   // Delete test auth users

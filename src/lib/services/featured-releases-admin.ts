@@ -96,8 +96,10 @@ export async function uploadCoverArt(
   slug: string,
 ): Promise<string> {
   const supabase = createSupabaseServiceClient();
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const path = `covers/${slug}/cover.${ext}`;
+  const rawExt = file.name.split(".").pop() ?? "jpg";
+  const ext = rawExt.replace(/[^a-zA-Z0-9]/g, "") || "jpg";
+  const safeSlug = slug.replace(/[^a-zA-Z0-9\-_]/g, "");
+  const path = `covers/${safeSlug}/cover.${ext}`;
 
   const { error } = await supabase.storage
     .from("featured-releases")

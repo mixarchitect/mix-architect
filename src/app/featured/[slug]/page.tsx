@@ -132,9 +132,10 @@ export default async function FeaturedReleasePage({ params }: Props) {
     <NextIntlClientProvider locale={locale} messages={{ landing: (messages as Record<string, unknown>).landing }}>
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-[#0A0A0A] focus:outline-none">
       <LandingNav locale={locale} />
+      {/* Safe: JSON.stringify escapes HTML; \u003c prevents script breakout */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
 
       <div className="pt-28 pb-20 px-6">

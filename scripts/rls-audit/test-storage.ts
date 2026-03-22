@@ -19,7 +19,9 @@ export async function runStorageTests(ctx: TestContext): Promise<void> {
   console.log("\n── Storage Isolation Tests ───────────────────────\n");
 
   const bucket = "cover-art";
-  const testFilePath = `${userA.id}/rls-test-file.txt`;
+  // Validate UUID format to prevent path traversal
+  const safeUserId = userA.id.replace(/[^a-f0-9\-]/gi, "");
+  const testFilePath = `${safeUserId}/rls-test-file.txt`;
   const testContent = Buffer.from("RLS audit test file content");
 
   // Upload a test file as User A via service client
@@ -60,7 +62,7 @@ export async function runStorageTests(ctx: TestContext): Promise<void> {
   // Test: User B cannot upload into User A's directory
   const { error: uploadAsB } = await userB.client.storage
     .from(bucket)
-    .upload(`${userA.id}/injected-by-b.txt`, Buffer.from("malicious"), {
+    .upload(`${safeUserId}/injected-by-b.txt`, Buffer.from("malicious"), {
       upsert: false,
     });
   const uploadBlocked = !!uploadAsB;
@@ -73,7 +75,7 @@ export async function runStorageTests(ctx: TestContext): Promise<void> {
   if (!uploadBlocked) {
     await serviceClient.storage
       .from(bucket)
-      .remove([`${userA.id}/injected-by-b.txt`]);
+      .remove([`${safeUserId}/injected-by-b.txt`]);
   }
 
   // Test: User B cannot overwrite User A's file
