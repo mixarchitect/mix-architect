@@ -5,24 +5,17 @@ import type { VisitorLocation } from "@/lib/openpanel-api";
 
 const POLL_INTERVAL_MS = 30_000;
 
-/**
- * The real-world SVG map uses a Robinson-like projection.
- * viewBox: 30.767 241.591 784.077 458.627
- * We use these to convert lat/lng → SVG coords.
- */
-const VB_X = 30.767;
-const VB_Y = 241.591;
-const VB_W = 784.077;
-const VB_H = 458.627;
+/** SVG viewBox: equirectangular projection, 720×360 */
+const VB = "0 0 720 360";
+const VB_W = 720;
+const VB_H = 360;
 
-/** Convert lat/lng to percentage position on the map container */
-function geoToPercent(lat: number, lng: number): { x: number; y: number } {
-  // Equirectangular → percentage of viewBox
-  // Longitude: -180 to 180 → 0% to 100%
-  const x = ((lng + 180) / 360) * 100;
-  // Latitude: 90 to -90 → 0% to 100%  (note: SVG y is inverted)
-  const y = ((90 - lat) / 180) * 100;
-  return { x, y };
+/** Convert lat/lng → SVG coordinates (equirectangular = trivial linear mapping) */
+function geoToSVG(lat: number, lng: number): { x: number; y: number } {
+  return {
+    x: ((lng + 180) / 360) * VB_W,
+    y: ((90 - lat) / 180) * VB_H,
+  };
 }
 
 export default function LiveVisitorMap() {
@@ -40,7 +33,7 @@ export default function LiveVisitorMap() {
         setLocations(json.locations);
       }
     } catch {
-      // Silently fail
+      // Silently fail — map just shows no dots
     } finally {
       setLoading(false);
     }
@@ -72,71 +65,69 @@ export default function LiveVisitorMap() {
         )}
       </div>
 
-      {/* Map container */}
-      <div className="relative bg-[#0a0f1a]" style={{ aspectRatio: "2 / 1" }}>
-        {/* Real world map SVG as background */}
+      {/* Map: background SVG + dot overlay sharing the same coordinate space */}
+      <div className="relative bg-[#0a0f1a]" style={{ aspectRatio: `${VB_W} / ${VB_H}` }}>
+        {/* World map background */}
         <div
           className="absolute inset-0"
           style={{
             backgroundImage: "url(/world-map.svg)",
             backgroundSize: "100% 100%",
-            backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
           }}
         />
 
-        {/* Visitor dots overlaid on the map */}
-        {locations.map((loc, i) => {
-          const { x, y } = geoToPercent(loc.lat, loc.lng);
-          const isHovered = hoveredIdx === i;
-          return (
-            <div
-              key={`${loc.lat}-${loc.lng}-${i}`}
-              className="absolute"
-              style={{ left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)" }}
-              onMouseEnter={() => setHoveredIdx(i)}
-              onMouseLeave={() => setHoveredIdx(null)}
-            >
-              {/* Pulse ring */}
-              <span
-                className="absolute rounded-full bg-emerald-400/30 animate-ping"
-                style={{
-                  width: 20,
-                  height: 20,
-                  left: -10,
-                  top: -10,
-                  animationDelay: `${(i * 300) % 2000}ms`,
-                  animationDuration: "2s",
-                }}
-              />
-              {/* Core dot */}
-              <span
-                className={`relative block rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)] transition-all duration-150 cursor-pointer ${
-                  isHovered ? "w-3 h-3" : "w-2.5 h-2.5"
-                }`}
-              />
-              {/* Tooltip */}
-              {isHovered && (
-                <div
-                  className="absolute left-4 top-1/2 -translate-y-1/2 whitespace-nowrap z-10
-                    bg-black/90 border border-white/15 text-white text-[11px] px-2.5 py-1 rounded-md
-                    pointer-events-none"
-                >
-                  {loc.city
-                    ? `${loc.city}, ${loc.country}`
-                    : loc.country || "Unknown"}
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {/* SVG overlay for dots */}
+        <svg viewBox={VB} className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+          {/* Visitor dots */}
+          {locations.map((loc, i) => {
+            const { x, y } = geoToSVG(loc.lat, loc.lng);
+            const isHovered = hoveredIdx === i;
+            return (
+              <g
+                key={`${loc.lat}-${loc.lng}-${i}`}
+                onMouseEnter={() => setHoveredIdx(i)}
+                onMouseLeave={() => setHoveredIdx(null)}
+                className="cursor-pointer"
+              >
+                {/* Pulse ring */}
+                <circle cx={x} cy={y} r="6" fill="none" stroke="rgba(52,211,153,0.5)" strokeWidth="1">
+                  <animate attributeName="r" values="3;10;3" dur="2s" begin={`${(i * 0.3) % 2}s`} repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.6;0;0.6" dur="2s" begin={`${(i * 0.3) % 2}s`} repeatCount="indefinite" />
+                </circle>
+
+                {/* Core dot */}
+                <circle
+                  cx={x} cy={y}
+                  r={isHovered ? 4 : 3}
+                  fill="rgba(52,211,153,0.9)"
+                  stroke="rgba(52,211,153,0.3)"
+                  strokeWidth="1"
+                />
+
+                {/* Tooltip */}
+                {isHovered && (
+                  <g>
+                    <rect
+                      x={x + 6} y={y - 9}
+                      width={Math.max((loc.city || loc.country || "Unknown").length * 4.5 + 10, 40)}
+                      height={14} rx="3"
+                      fill="rgba(0,0,0,0.9)" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5"
+                    />
+                    <text x={x + 11} y={y + 1} fill="white" fontSize="8" fontFamily="system-ui, sans-serif">
+                      {loc.city ? `${loc.city}, ${loc.country}` : loc.country || "Unknown"}
+                    </text>
+                  </g>
+                )}
+              </g>
+            );
+          })}
+        </svg>
 
         {/* Loading overlay */}
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#0a0f1a]/80">
-            <div className="text-xs text-muted animate-pulse">
-              Loading visitor data...
-            </div>
+            <div className="text-xs text-muted animate-pulse">Loading visitor data...</div>
           </div>
         )}
       </div>
