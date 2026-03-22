@@ -18,6 +18,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 import type { TrafficData, OverviewMetrics } from "@/lib/openpanel-api";
+import LiveVisitorMap from "@/components/admin/traffic/LiveVisitorMap";
 import { DateRangeSelector } from "@/components/ui/date-range-selector";
 import {
   type PresetKey,
@@ -242,6 +243,9 @@ function TrafficDashboard({
           dot
         />
       </div>
+
+      {/* Live visitor map */}
+      <LiveVisitorMap />
 
       {/* Three-column: Browsers, Devices, Countries */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">

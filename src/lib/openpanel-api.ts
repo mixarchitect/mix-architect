@@ -269,6 +269,78 @@ export async function getOverviewOnly(
 }
 
 // ---------------------------------------------------------------------------
+// Export API — Live visitor locations
+// ---------------------------------------------------------------------------
+
+export interface VisitorLocation {
+  city: string;
+  country: string;
+  lat: number;
+  lng: number;
+}
+
+/**
+ * Fetch recent screen_view events with geo data from the Export API,
+ * deduplicate by deviceId, and return only events from the last 30 minutes.
+ */
+export async function getRecentVisitorLocations(): Promise<VisitorLocation[]> {
+  try {
+    const projectId = getProjectId();
+    const url = new URL(`${API_BASE}/export/events`);
+    url.searchParams.set("projectId", projectId);
+    url.searchParams.set("event", "screen_view");
+    url.searchParams.set("limit", "50");
+    url.searchParams.set("includes", "city,country,longitude,latitude");
+
+    const res = await fetch(url.toString(), {
+      headers: getHeaders(),
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`OpenPanel Export API ${res.status}: ${text}`);
+    }
+
+    const events = (await res.json()) as Array<Record<string, unknown>>;
+    if (!Array.isArray(events)) return [];
+
+    const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000;
+    const seen = new Set<string>();
+    const locations: VisitorLocation[] = [];
+
+    for (const event of events) {
+      // Filter to recent events
+      const createdAt = event.createdAt as string | undefined;
+      if (createdAt && new Date(createdAt).getTime() < thirtyMinutesAgo) {
+        continue;
+      }
+
+      // Deduplicate by deviceId
+      const deviceId = (event.deviceId ?? event.device_id ?? "") as string;
+      if (deviceId && seen.has(deviceId)) continue;
+      if (deviceId) seen.add(deviceId);
+
+      const lat = num(event.latitude);
+      const lng = num(event.longitude);
+      if (lat === 0 && lng === 0) continue; // Skip events without geo data
+
+      locations.push({
+        city: String(event.city ?? ""),
+        country: String(event.country ?? ""),
+        lat,
+        lng,
+      });
+    }
+
+    return locations;
+  } catch (err) {
+    console.error("[openpanel] getRecentVisitorLocations error:", err);
+    return [];
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
