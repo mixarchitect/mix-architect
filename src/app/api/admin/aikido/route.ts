@@ -18,6 +18,10 @@ export type AikidoFindingsResponse = {
 
 const REPO_NAME = "mix-architect";
 
+// Server-side cache to avoid hitting Aikido's 20 req/min limit
+let cachedResponse: { data: AikidoFindingsResponse; expiresAt: number } | null = null;
+const CACHE_TTL = 30_000; // 30 seconds
+
 export async function GET(req: NextRequest) {
   const ip = getClientIp(req);
   const { success } = rateLimit(`admin-aikido:${ip}`, 10, 60_000);
@@ -45,6 +49,11 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  // Return cached response if still fresh
+  if (cachedResponse && cachedResponse.expiresAt > Date.now()) {
+    return NextResponse.json(cachedResponse.data);
+  }
+
   try {
     const [counts, issues] = await Promise.all([
       getIssueCounts(REPO_NAME),
@@ -56,6 +65,8 @@ export async function GET(req: NextRequest) {
       issues,
       fetchedAt: new Date().toISOString(),
     };
+
+    cachedResponse = { data: response, expiresAt: Date.now() + CACHE_TTL };
 
     return NextResponse.json(response);
   } catch (err) {

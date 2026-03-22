@@ -150,10 +150,10 @@ function AikidoTab() {
       ? JSON.stringify(baseline.counts)
       : null;
     setPolling(true);
-    setScanMessage("Scan triggered. Checking for updated results every 30s...");
+    setScanMessage("Scan triggered. Checking for updated results every 60s...");
 
     let attempts = 0;
-    const maxAttempts = 6; // 6 × 30s = 3 min then auto-stop
+    const maxAttempts = 5; // 5 × 60s = 5 min then auto-stop
 
     pollRef.current = setInterval(async () => {
       attempts++;
@@ -176,7 +176,7 @@ function AikidoTab() {
           "Scan may still be processing on Aikido's side. Click Refresh to check for updates.",
         );
       }
-    }, 30_000);
+    }, 60_000);
   }
 
   function stopPolling() {
