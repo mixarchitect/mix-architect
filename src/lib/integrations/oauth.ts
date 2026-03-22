@@ -43,7 +43,12 @@ export function decodeOAuthState(encoded: string): OAuthState | null {
       .createHmac("sha256", hmacKey())
       .update(payload)
       .digest("base64url");
-    if (hmac !== expected) return null;
+    if (
+      hmac.length !== expected.length ||
+      !crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(expected))
+    ) {
+      return null;
+    }
     return JSON.parse(payload) as OAuthState;
   } catch {
     return null;

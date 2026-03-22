@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { getSafeRedirectUrl } from "@/lib/safe-redirect";
 
 /**
  * Dev-only auto-login route.
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-  const redirectTo = url.searchParams.get("next") ?? "/app";
+  const redirectTo = getSafeRedirectUrl(url.searchParams.get("next"));
   const response = NextResponse.redirect(new URL(redirectTo, request.url));
 
   const supabase = createServerClient(

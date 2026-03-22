@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { getSafeRedirectUrl } from "@/lib/safe-redirect";
 
 /**
  * Supabase Auth callback handler.
@@ -13,7 +14,7 @@ import { createServerClient } from "@supabase/ssr";
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/app";
+  const next = getSafeRedirectUrl(searchParams.get("next"));
 
   if (code) {
     const response = NextResponse.redirect(new URL(next, request.url));

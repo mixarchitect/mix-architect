@@ -19,4 +19,9 @@ RUN npm run build
 # Remove devDependencies after build
 RUN npm prune --production
 
+# Run as non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin appuser \
+    && chown -R appuser:appuser /app
+USER appuser
+
 CMD ["node", "dist/index.js"]
