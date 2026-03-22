@@ -31,7 +31,7 @@ export default async function AdminLayout({
   await requireAdmin();
 
   return (
-    <div className="flex flex-col min-h-dvh">
+    <div className="flex flex-col h-dvh">
       <Suspense
         fallback={
           <header className="hidden md:flex h-14 shrink-0 items-center justify-between px-6 border-b border-border bg-panel" />
