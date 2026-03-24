@@ -781,6 +781,23 @@
     "confirmationSent": "Enviamos um link de confirmação para <b>{email}</b>. Clique no link para ativar sua conta.",
     "backToSignIn": "Voltar para o login",
     "signInFailed": "Falha ao entrar. Por favor, tente novamente.",
-    "somethingWrong": "Algo deu errado"
+    "somethingWrong": "Algo deu errado",
+    "forgotPassword": "Esqueceu a senha?",
+    "forgotPasswordTitle": "Redefinir senha",
+    "forgotPasswordDescription": "Digite seu e-mail e enviaremos um link para redefinir sua senha.",
+    "sendResetLink": "Enviar link de redefinição",
+    "sendingResetLink": "Enviando...",
+    "resetLinkSent": "Verifique seu e-mail",
+    "resetLinkSentDescription": "Enviamos um link de redefinição de senha para <b>{email}</b>. Clique no link para definir uma nova senha.",
+    "resetPasswordTitle": "Definir nova senha",
+    "newPassword": "Nova senha",
+    "confirmPassword": "Confirmar senha",
+    "passwordMinLength": "A senha deve ter pelo menos 6 caracteres",
+    "passwordsDoNotMatch": "As senhas não coincidem",
+    "updatePassword": "Atualizar senha",
+    "updatingPassword": "Atualizando...",
+    "passwordUpdated": "Senha atualizada com sucesso. Redirecionando...",
+    "resetPasswordNoSession": "Link inválido ou expirado. Por favor, solicite um novo.",
+    "resetPasswordFailed": "Falha ao atualizar a senha. Por favor, tente novamente."
   }
 }

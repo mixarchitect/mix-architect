@@ -780,6 +780,23 @@
     "confirmationSent": "<b>{email}</b>に確認リンクを送信しました。リンクをクリックしてアカウントを有効化してください。",
     "backToSignIn": "サインインに戻る",
     "signInFailed": "サインインに失敗しました。もう一度お試しください。",
-    "somethingWrong": "問題が発生しました"
+    "somethingWrong": "問題が発生しました",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "forgotPasswordTitle": "パスワードをリセット",
+    "forgotPasswordDescription": "メールアドレスを入力してください。パスワードリセット用のリンクをお送りします。",
+    "sendResetLink": "リセットリンクを送信",
+    "sendingResetLink": "送信中...",
+    "resetLinkSent": "メールを確認してください",
+    "resetLinkSentDescription": "<b>{email}</b> にパスワードリセットリンクを送信しました。リンクをクリックして新しいパスワードを設定してください。",
+    "resetPasswordTitle": "新しいパスワードを設定",
+    "newPassword": "新しいパスワード",
+    "confirmPassword": "パスワードの確認",
+    "passwordMinLength": "パスワードは6文字以上である必要があります",
+    "passwordsDoNotMatch": "パスワードが一致しません",
+    "updatePassword": "パスワードを更新",
+    "updatingPassword": "更新中...",
+    "passwordUpdated": "パスワードが正常に更新されました。リダイレクトしています...",
+    "resetPasswordNoSession": "無効または期限切れのリンクです。新しいリンクをリクエストしてください。",
+    "resetPasswordFailed": "パスワードの更新に失敗しました。もう一度お試しください。"
   }
 }

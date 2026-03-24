@@ -780,6 +780,23 @@
     "confirmationSent": "हमने <b>{email}</b> पर एक कन्फर्मेशन लिंक भेजा है। अपना अकाउंट एक्टिवेट करने के लिए लिंक पर क्लिक करें।",
     "backToSignIn": "साइन इन पर वापस जाएं",
     "signInFailed": "साइन इन विफल हुआ। कृपया पुनः प्रयास करें।",
-    "somethingWrong": "कुछ गड़बड़ी हुई है"
+    "somethingWrong": "कुछ गड़बड़ी हुई है",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "forgotPasswordTitle": "पासवर्ड रीसेट करें",
+    "forgotPasswordDescription": "अपना ईमेल दर्ज करें और हम आपको पासवर्ड रीसेट करने के लिए एक लिंक भेजेंगे।",
+    "sendResetLink": "रीसेट लिंक भेजें",
+    "sendingResetLink": "भेजा जा रहा है...",
+    "resetLinkSent": "अपना ईमेल देखें",
+    "resetLinkSentDescription": "हमने <b>{email}</b> पर पासवर्ड रीसेट लिंक भेजा है। नया पासवर्ड सेट करने के लिए लिंक पर क्लिक करें।",
+    "resetPasswordTitle": "नया पासवर्ड सेट करें",
+    "newPassword": "नया पासवर्ड",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "passwordMinLength": "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
+    "passwordsDoNotMatch": "पासवर्ड मेल नहीं खाते",
+    "updatePassword": "पासवर्ड अपडेट करें",
+    "updatingPassword": "अपडेट हो रहा है...",
+    "passwordUpdated": "पासवर्ड सफलतापूर्वक अपडेट किया गया। रीडायरेक्ट हो रहा है...",
+    "resetPasswordNoSession": "अमान्य या समय-सीमा समाप्त लिंक। कृपया एक नया अनुरोध करें।",
+    "resetPasswordFailed": "पासवर्ड अपडेट करने में विफल। कृपया पुनः प्रयास करें।"
   }
 }

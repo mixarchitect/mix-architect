@@ -780,6 +780,23 @@
     "confirmationSent": "Vi har skickat en bekräftelselänk till <b>{email}</b>. Klicka på länken för att aktivera ditt konto.",
     "backToSignIn": "Tillbaka till inloggning",
     "signInFailed": "Inloggningen misslyckades. Försök igen.",
-    "somethingWrong": "Något gick fel"
+    "somethingWrong": "Något gick fel",
+    "forgotPassword": "Glömt lösenordet?",
+    "forgotPasswordTitle": "Återställ lösenord",
+    "forgotPasswordDescription": "Ange din e-postadress så skickar vi en länk för att återställa ditt lösenord.",
+    "sendResetLink": "Skicka återställningslänk",
+    "sendingResetLink": "Skickar...",
+    "resetLinkSent": "Kontrollera din e-post",
+    "resetLinkSentDescription": "Vi har skickat en länk för att återställa lösenordet till <b>{email}</b>. Klicka på länken för att ange ett nytt lösenord.",
+    "resetPasswordTitle": "Ange nytt lösenord",
+    "newPassword": "Nytt lösenord",
+    "confirmPassword": "Bekräfta lösenord",
+    "passwordMinLength": "Lösenordet måste vara minst 6 tecken",
+    "passwordsDoNotMatch": "Lösenorden matchar inte",
+    "updatePassword": "Uppdatera lösenord",
+    "updatingPassword": "Uppdaterar...",
+    "passwordUpdated": "Lösenordet har uppdaterats. Omdirigerar...",
+    "resetPasswordNoSession": "Ogiltig eller utgången länk. Vänligen begär en ny.",
+    "resetPasswordFailed": "Det gick inte att uppdatera lösenordet. Försök igen."
   }
 }

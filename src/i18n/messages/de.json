@@ -781,6 +781,23 @@
     "confirmationSent": "Wir haben einen Bestätigungslink an <b>{email}</b> gesendet. Klicke auf den Link, um dein Konto zu aktivieren.",
     "backToSignIn": "Zurück zur Anmeldung",
     "signInFailed": "Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
-    "somethingWrong": "Etwas ist schiefgelaufen"
+    "somethingWrong": "Etwas ist schiefgelaufen",
+    "forgotPassword": "Passwort vergessen?",
+    "forgotPasswordTitle": "Passwort zurücksetzen",
+    "forgotPasswordDescription": "Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen deines Passworts.",
+    "sendResetLink": "Link senden",
+    "sendingResetLink": "Wird gesendet...",
+    "resetLinkSent": "E-Mail prüfen",
+    "resetLinkSentDescription": "Wir haben einen Link zum Zurücksetzen des Passworts an <b>{email}</b> gesendet. Klicke auf den Link, um ein neues Passwort festzulegen.",
+    "resetPasswordTitle": "Neues Passwort festlegen",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "passwordMinLength": "Das Passwort muss mindestens 6 Zeichen lang sein",
+    "passwordsDoNotMatch": "Passwörter stimmen nicht überein",
+    "updatePassword": "Passwort aktualisieren",
+    "updatingPassword": "Wird aktualisiert...",
+    "passwordUpdated": "Passwort erfolgreich aktualisiert. Weiterleitung...",
+    "resetPasswordNoSession": "Ungültiger oder abgelaufener Link. Bitte fordere einen neuen an.",
+    "resetPasswordFailed": "Passwort konnte nicht aktualisiert werden. Bitte versuche es erneut."
   }
 }

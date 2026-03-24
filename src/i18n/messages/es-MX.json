@@ -781,6 +781,23 @@
     "confirmationSent": "Enviamos un enlace de confirmación a <b>{email}</b>. Haz clic en el enlace para activar tu cuenta.",
     "backToSignIn": "Regresar a iniciar sesión",
     "signInFailed": "Error al iniciar sesión. Por favor intenta de nuevo.",
-    "somethingWrong": "Algo salió mal"
+    "somethingWrong": "Algo salió mal",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "forgotPasswordTitle": "Restablecer contraseña",
+    "forgotPasswordDescription": "Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.",
+    "sendResetLink": "Enviar enlace",
+    "sendingResetLink": "Enviando...",
+    "resetLinkSent": "Revisa tu correo",
+    "resetLinkSentDescription": "Enviamos un enlace para restablecer la contraseña a <b>{email}</b>. Haz clic en el enlace para establecer una nueva contraseña.",
+    "resetPasswordTitle": "Establecer nueva contraseña",
+    "newPassword": "Nueva contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
+    "updatePassword": "Actualizar contraseña",
+    "updatingPassword": "Actualizando...",
+    "passwordUpdated": "Contraseña actualizada correctamente. Redirigiendo...",
+    "resetPasswordNoSession": "Enlace no válido o expirado. Por favor solicita uno nuevo.",
+    "resetPasswordFailed": "No se pudo actualizar la contraseña. Por favor intenta de nuevo."
   }
 }

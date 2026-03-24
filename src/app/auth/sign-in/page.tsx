@@ -214,6 +214,17 @@ function SignInPageContent() {
                 />
               </div>
 
+              {mode === "signin" && (
+                <div className="flex justify-end -mt-2">
+                  <Link
+                    href="/auth/forgot-password"
+                    className="text-xs text-muted hover:text-signal transition-colors"
+                  >
+                    {t("forgotPassword")}
+                  </Link>
+                </div>
+              )}
+
               {errorMsg && (
                 <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
                   {errorMsg}
