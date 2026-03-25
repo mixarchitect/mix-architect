@@ -389,11 +389,19 @@ export function AudioPlayer({
         bitDepth: activeVersion.bit_depth,
         channels: activeVersion.channels,
       });
+      // If the audio element already has audio loaded (reconnecting after
+      // navigation), skip the url param entirely. Passing url causes
+      // WaveSurfer to call audioElement.src = url which reloads the
+      // source and creates a playback skip. Without url, WaveSurfer
+      // attaches to the live media element and renders from peaks/buffer.
+      const audioHasSource = !!(audioElement.currentSrc || audioElement.src);
+      const isReconnecting = audioHasSource && !audioElement.paused;
+
       perf.start("wavesurfer:init", { trackId: activeVersion.id });
       ws = WaveSurfer.create({
         container,
         media: audioElement,
-        url: activeVersion.audio_url,
+        url: isReconnecting ? undefined : activeVersion.audio_url,
         barWidth: 3,
         barGap: 1,
         barRadius: 1,
@@ -602,7 +610,13 @@ export function AudioPlayer({
       cancelled = true;
       cancelAnimationFrame(raf);
       if (retryTimeout) clearTimeout(retryTimeout);
+      // Preserve audio playback across WaveSurfer destroy.
+      // Some WaveSurfer versions pause the media element on destroy.
+      const wasPlaying = !audioElement.paused;
       if (ws) ws.destroy();
+      if (wasPlaying && audioElement.paused) {
+        audioElement.play().catch(() => {});
+      }
       wavesurferRef.current = null;
       measureAbortRef.current?.abort();
       resizeCleanupRef.current?.();
