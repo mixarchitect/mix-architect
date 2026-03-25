@@ -4,7 +4,10 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
-import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download, CalendarDays, Copy, Check, RefreshCw, HardDrive, Cloud, Unplug, Mail } from "lucide-react";
+import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download, CalendarDays, Copy, Check, RefreshCw, HardDrive, Cloud, Unplug, Mail, ExternalLink, Zap, Trash2, Plus } from "lucide-react";
+import { getConnectedAccount, checkAccountStatus } from "@/actions/stripe-connect";
+import { getWorkflowTriggers, toggleWorkflowTrigger, createWorkflowTrigger, deleteWorkflowTrigger, getWorkflowLog } from "@/actions/workflows";
+import type { StripeConnectedAccount, WorkflowTrigger } from "@/types/payments";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -527,6 +530,12 @@ export default function SettingsPage() {
           </PanelBody>
         </Panel>
 
+        {/* Payment Collection (Stripe Connect) */}
+        <StripeConnectPanel />
+
+        {/* Workflow Automations */}
+        <WorkflowsPanel />
+
         {/* Email Notifications */}
         <EmailPreferencesPanel />
 
@@ -1001,6 +1010,392 @@ function CalendarPanel() {
             <CalendarDays size={16} />
             {generating ? tc("saving") : t("enableFeed")}
           </Button>
+        )}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Workflows Panel                                                     */
+/* ------------------------------------------------------------------ */
+
+const TRIGGER_LABELS: Record<string, string> = {
+  release_delivered: "Release is delivered",
+  all_tracks_approved: "All tracks are approved",
+  payment_received: "Payment is received",
+  quote_accepted: "Quote is accepted",
+  release_closed: "Release is closed",
+};
+
+const ACTION_LABELS: Record<string, string> = {
+  send_invoice: "Send quote to client",
+  unlock_downloads: "Unlock file downloads",
+  send_email_thank_you: "Send thank-you email",
+  send_email_testimonial_request: "Send testimonial request",
+  send_payment_reminder: "Send payment reminder",
+  update_release_status: "Update release status",
+};
+
+function WorkflowsPanel() {
+  const t = useTranslations("settings.workflows");
+  const [triggers, setTriggers] = useState<WorkflowTrigger[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
+  const [newEvent, setNewEvent] = useState("");
+  const [newAction, setNewAction] = useState("");
+
+  useEffect(() => {
+    getWorkflowTriggers()
+      .then(({ triggers }) => setTriggers(triggers))
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function handleToggle(id: string, enabled: boolean) {
+    setTriggers((prev) =>
+      prev.map((tr) => (tr.id === id ? { ...tr, enabled } : tr)),
+    );
+    await toggleWorkflowTrigger(id, enabled);
+  }
+
+  async function handleDelete(id: string) {
+    setTriggers((prev) => prev.filter((tr) => tr.id !== id));
+    await deleteWorkflowTrigger(id);
+  }
+
+  async function handleAdd() {
+    if (!newEvent || !newAction) return;
+    const result = await createWorkflowTrigger({
+      trigger_event: newEvent,
+      action_type: newAction,
+    });
+    if (result.trigger) {
+      setTriggers((prev) => [...prev, result.trigger!]);
+    }
+    setAdding(false);
+    setNewEvent("");
+    setNewAction("");
+  }
+
+  if (loading) return null;
+
+  return (
+    <Panel>
+      <PanelHeader>
+        <div className="flex items-center gap-2">
+          <Zap size={16} className="text-signal" />
+          <h2 className="text-base font-semibold text-text">{t("title")}</h2>
+        </div>
+        <p className="text-sm text-muted mt-1">{t("description")}</p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-5">
+        {triggers.length === 0 && !adding ? (
+          <div className="text-sm text-muted text-center py-4">
+            {t("noAutomations")}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {triggers.map((tr) => (
+              <div
+                key={tr.id}
+                className="flex items-center gap-3 rounded-lg border border-border p-3"
+                style={{ background: "var(--panel-2)" }}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs text-muted">
+                    {t("when")} <span className="text-text font-medium">{TRIGGER_LABELS[tr.trigger_event] ?? tr.trigger_event}</span>
+                  </div>
+                  <div className="text-xs text-muted mt-0.5">
+                    {t("then")} <span className="text-text font-medium">{ACTION_LABELS[tr.action_type] ?? tr.action_type}</span>
+                  </div>
+                  {tr.last_triggered_at && (
+                    <div className="text-[10px] text-muted mt-1">
+                      {t("lastRun")}: {new Date(tr.last_triggered_at).toLocaleDateString()}
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleToggle(tr.id, !tr.enabled)}
+                  role="switch"
+                  aria-checked={tr.enabled}
+                  className={`relative inline-flex h-6 w-10 items-center rounded-full transition-colors shrink-0 ${
+                    tr.enabled ? "bg-signal" : "bg-black/20 dark:bg-white/20"
+                  }`}
+                >
+                  <span
+                    className="inline-block h-4 w-4 rounded-full bg-white shadow transition-transform"
+                    style={{ transform: tr.enabled ? "translateX(20px)" : "translateX(3px)" }}
+                  />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(tr.id)}
+                  className="p-1 text-muted hover:text-red-400 transition-colors shrink-0"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {adding ? (
+          <div className="mt-3 rounded-lg border border-border p-3 space-y-3" style={{ background: "var(--panel-2)" }}>
+            <div className="space-y-1.5">
+              <label className="text-xs text-muted">{t("when")}</label>
+              <select
+                value={newEvent}
+                onChange={(e) => setNewEvent(e.target.value)}
+                className="input text-sm"
+              >
+                <option value="">{t("selectTrigger")}</option>
+                {Object.entries(TRIGGER_LABELS).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs text-muted">{t("then")}</label>
+              <select
+                value={newAction}
+                onChange={(e) => setNewAction(e.target.value)}
+                className="input text-sm"
+              >
+                <option value="">{t("selectAction")}</option>
+                {Object.entries(ACTION_LABELS).map(([key, label]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="primary" className="text-xs h-8" onClick={handleAdd} disabled={!newEvent || !newAction}>
+                {t("add")}
+              </Button>
+              <button
+                type="button"
+                onClick={() => { setAdding(false); setNewEvent(""); setNewAction(""); }}
+                className="text-xs text-muted hover:text-text"
+              >
+                {t("cancelAdd")}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setAdding(true)}
+            className="flex items-center gap-1.5 text-xs text-signal hover:underline mt-3"
+          >
+            <Plus size={12} />
+            {t("addAutomation")}
+          </button>
+        )}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Stripe Connect Panel                                                */
+/* ------------------------------------------------------------------ */
+
+function StripeConnectPanel() {
+  const t = useTranslations("settings.stripeConnect");
+  const [account, setAccount] = useState<StripeConnectedAccount | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [connecting, setConnecting] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const result = await getConnectedAccount();
+        if (result.account) setAccount(result.account);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  // Handle redirect params from OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const result = params.get("stripe_connect");
+    if (result === "connected") {
+      // Refresh account data
+      getConnectedAccount().then((r) => {
+        if (r.account) setAccount(r.account);
+      });
+      const url = new URL(window.location.href);
+      url.searchParams.delete("stripe_connect");
+      window.history.replaceState({}, "", url.toString());
+    } else if (result === "error") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("stripe_connect");
+      url.searchParams.delete("message");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, []);
+
+  async function handleConnect() {
+    setConnecting(true);
+    try {
+      const res = await fetch("/api/stripe/connect/authorize", {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (data.authUrl) {
+        window.location.href = data.authUrl;
+      }
+    } finally {
+      setConnecting(false);
+    }
+  }
+
+  async function handleDisconnect() {
+    if (!confirm(t("disconnectConfirm"))) return;
+    setDisconnecting(true);
+    try {
+      const res = await fetch("/api/stripe/connect/disconnect", {
+        method: "POST",
+      });
+      if (res.ok) {
+        setAccount(null);
+      }
+    } finally {
+      setDisconnecting(false);
+    }
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    try {
+      const result = await checkAccountStatus();
+      if (!result.error && account) {
+        setAccount({
+          ...account,
+          charges_enabled: result.chargesEnabled ?? account.charges_enabled,
+          payouts_enabled: result.payoutsEnabled ?? account.payouts_enabled,
+          details_submitted: result.detailsSubmitted ?? account.details_submitted,
+          business_name: result.businessName !== undefined ? result.businessName : account.business_name,
+        });
+      }
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
+  if (loading) return null;
+
+  const isActive = account?.charges_enabled && account?.payouts_enabled;
+
+  return (
+    <Panel>
+      <PanelHeader>
+        <h2 className="text-base font-semibold text-text">{t("title")}</h2>
+        <p className="text-sm text-muted mt-1">
+          {account ? t("descriptionConnected") : t("description")}
+        </p>
+      </PanelHeader>
+      <Rule />
+      <PanelBody className="pt-5">
+        {!account ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: "var(--panel-2)" }}
+              >
+                <CreditCard size={18} className="text-muted" />
+              </div>
+              <div>
+                <div className="text-sm font-medium text-text">{t("notConnected")}</div>
+                <div className="text-xs text-muted mt-0.5">{t("notConnectedHelp")}</div>
+              </div>
+            </div>
+            <Button
+              variant="primary"
+              onClick={handleConnect}
+              disabled={connecting}
+            >
+              {connecting ? t("connecting") : t("connect")}
+            </Button>
+            <p className="text-xs text-muted">{t("platformFee")}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="space-y-3">
+              {account.business_name && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted">{t("businessName")}</span>
+                  <span className="text-sm font-medium text-text">{account.business_name}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted">{t("status")}</span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`w-2 h-2 rounded-full ${isActive ? "bg-green-500" : "bg-amber-500"}`}
+                  />
+                  <span className="text-sm text-text">
+                    {isActive ? t("statusActive") : t("statusPending")}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted">{t("mode")}</span>
+                <span className="text-sm text-text">
+                  {account.livemode ? t("modeLive") : t("modeTest")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted">{t("connectedDate")}</span>
+                <span className="text-sm text-text">
+                  {new Date(account.connected_at).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+
+            {!account.details_submitted && (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+                <p className="text-xs text-amber-500">{t("statusPendingHelp")}</p>
+                <a
+                  href="https://dashboard.stripe.com/account/onboarding"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-signal hover:underline mt-2"
+                >
+                  {t("completeSetup")}
+                  <ExternalLink size={11} />
+                </a>
+              </div>
+            )}
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-text transition-colors"
+              >
+                <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
+                {t("refreshStatus")}
+              </button>
+              <button
+                type="button"
+                onClick={handleDisconnect}
+                disabled={disconnecting}
+                className="flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-400 transition-colors"
+              >
+                <Unplug size={12} />
+                {disconnecting ? t("disconnecting") : t("disconnect")}
+              </button>
+            </div>
+          </div>
         )}
       </PanelBody>
     </Panel>

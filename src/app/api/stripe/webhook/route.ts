@@ -17,6 +17,9 @@ import {
   buildPaymentReminderEmail,
   buildPaymentReceivedEmail,
 } from "@/lib/email-templates/transactional";
+import { buildPaymentConfirmationEmail } from "@/lib/email-templates/quote-emails";
+import { syncPaymentStatus } from "@/lib/payment-sync";
+import { fireTrigger } from "@/lib/workflow-engine";
 
 /**
  * In Stripe API v2025+, current_period_end lives on the subscription
@@ -67,6 +70,115 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
+
+        // ── Quote payment (Connect destination charge) ──
+        const quoteId = session.metadata?.quote_id;
+        if (quoteId) {
+          const quoteUserId = session.metadata?.user_id;
+          const releaseId = session.metadata?.release_id;
+          const paymentIntentId =
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : session.payment_intent?.id ?? null;
+
+          // Idempotency: check if already paid
+          const { data: existingQuote } = await supabase
+            .from("quotes")
+            .select("id, status, client_name, client_email, quote_number, total, currency, release_id")
+            .eq("id", quoteId)
+            .maybeSingle();
+
+          if (!existingQuote) {
+            console.error("[stripe/webhook] quote not found:", quoteId);
+            break;
+          }
+          if (existingQuote.status === "paid") {
+            console.log("[stripe/webhook] quote already paid, skipping:", quoteId);
+            break;
+          }
+
+          // Mark quote as paid
+          await supabase
+            .from("quotes")
+            .update({
+              status: "paid",
+              paid_at: new Date().toISOString(),
+              stripe_payment_intent_id: paymentIntentId,
+              payment_method: "stripe",
+            })
+            .eq("id", quoteId);
+
+          console.log("[stripe/webhook] quote paid:", quoteId);
+
+          // Sync release payment status
+          const effectiveReleaseId = releaseId || existingQuote.release_id;
+          if (effectiveReleaseId) {
+            await syncPaymentStatus(effectiveReleaseId);
+          }
+
+          // Fire workflow triggers (fire-and-forget)
+          if (quoteUserId && effectiveReleaseId) {
+            fireTrigger("payment_received", {
+              userId: quoteUserId,
+              releaseId: effectiveReleaseId,
+              quoteId,
+            }).catch(console.error);
+          }
+
+          // Send payment confirmation email to engineer (fire-and-forget)
+          if (quoteUserId) {
+            (async () => {
+              try {
+                const email = await getUserEmail(quoteUserId);
+                if (!email) return;
+                const displayName = await getUserDisplayName(quoteUserId);
+
+                const { data: prefs } = await supabase
+                  .from("email_preferences")
+                  .select("unsubscribe_token")
+                  .eq("user_id", quoteUserId)
+                  .maybeSingle();
+                const unsubscribeUrl = prefs?.unsubscribe_token
+                  ? buildUnsubscribeUrl(prefs.unsubscribe_token, "payment_received")
+                  : undefined;
+
+                let relTitle: string | undefined;
+                if (effectiveReleaseId) {
+                  const { data: rel } = await supabase
+                    .from("releases")
+                    .select("title")
+                    .eq("id", effectiveReleaseId)
+                    .maybeSingle();
+                  relTitle = rel?.title;
+                }
+
+                const { subject, html } = buildPaymentConfirmationEmail({
+                  clientName: existingQuote.client_name || "Client",
+                  engineerName: displayName,
+                  quoteNumber: existingQuote.quote_number,
+                  total: Number(existingQuote.total),
+                  currency: existingQuote.currency,
+                  releaseTitle: relTitle,
+                  unsubscribeUrl,
+                });
+
+                await sendTransactionalEmail({
+                  userId: quoteUserId,
+                  to: email,
+                  category: "payment_received",
+                  subject,
+                  html,
+                });
+              } catch (err) {
+                console.error("[stripe/webhook] quote payment email error:", err);
+              }
+            })();
+          }
+
+          break;
+        }
+
+        // ── Subscription checkout ──
         const userId = session.metadata?.supabase_user_id;
         const customerId =
           typeof session.customer === "string"
@@ -329,6 +441,60 @@ export async function POST(req: NextRequest) {
             console.error("[stripe/webhook] payment received email error:", err);
           }
         })();
+        break;
+      }
+
+      case "charge.refunded": {
+        // Handle refunds — update quote status and re-sync release
+        const charge = event.data.object as Stripe.Charge;
+        const paymentIntentId =
+          typeof charge.payment_intent === "string"
+            ? charge.payment_intent
+            : charge.payment_intent?.id;
+
+        if (paymentIntentId) {
+          const { data: refundedQuote } = await supabase
+            .from("quotes")
+            .select("id, release_id, user_id")
+            .eq("stripe_payment_intent_id", paymentIntentId)
+            .maybeSingle();
+
+          if (refundedQuote) {
+            // Full refund: revert to 'sent'; partial refund: keep 'paid' (handled in Stripe Dashboard)
+            if (charge.refunded) {
+              await supabase
+                .from("quotes")
+                .update({ status: "sent", paid_at: null, payment_method: null })
+                .eq("id", refundedQuote.id);
+
+              if (refundedQuote.release_id) {
+                await syncPaymentStatus(refundedQuote.release_id);
+              }
+              console.log("[stripe/webhook] quote refunded:", refundedQuote.id);
+            }
+          }
+        }
+        break;
+      }
+
+      case "account.updated": {
+        // Connect account status update — keep charges_enabled/payouts_enabled fresh
+        const account = event.data.object as Stripe.Account;
+        if (account.id) {
+          await supabase
+            .from("stripe_connected_accounts")
+            .update({
+              charges_enabled: account.charges_enabled ?? false,
+              payouts_enabled: account.payouts_enabled ?? false,
+              details_submitted: account.details_submitted ?? false,
+              business_name:
+                account.business_profile?.name ||
+                account.settings?.dashboard?.display_name ||
+                null,
+            })
+            .eq("stripe_account_id", account.id);
+          console.log("[stripe/webhook] account.updated:", account.id);
+        }
         break;
       }
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
-import { Home, Users, DollarSign, LayoutTemplate, BarChart3 } from "lucide-react";
+import { Home, Users, DollarSign, LayoutTemplate, BarChart3, FileText } from "lucide-react";
 import { useFeatureVisible } from "@/hooks/use-feature-visible";
 
 export function Rail() {
@@ -17,6 +17,7 @@ export function Rail() {
   const isArtists = pathname?.startsWith("/app/artists");
   const isTemplates = pathname?.startsWith("/app/templates");
   const isPayments = pathname?.startsWith("/app/payments");
+  const isQuotes = pathname?.startsWith("/app/quotes");
   const isAnalytics = pathname?.startsWith("/app/analytics");
 
   return (
@@ -38,6 +39,9 @@ export function Rail() {
       )}
       {showPayments && (
         <NavItem href="/app/payments" icon={DollarSign} label={t("payments")} active={isPayments} />
+      )}
+      {showPayments && (
+        <NavItem href="/app/quotes" icon={FileText} label={t("quotes")} active={isQuotes} />
       )}
       <NavItem href="/app/analytics" icon={BarChart3} label={t("analytics")} active={isAnalytics} />
     </nav>

@@ -300,7 +300,43 @@ export default async function PortalPage({ params }: Props) {
     distribution: releaseDistribution,
   };
 
-  /* ── 8. Render ──────────────────────────────────────────────────── */
+  /* ── 8. Fetch quotes for payment section ───────────────────────── */
+
+  let portalQuotes: {
+    id: string;
+    quote_number: string;
+    status: string;
+    total: number;
+    currency: string;
+    portal_token: string;
+    paid_at: string | null;
+    schedule_group_id: string | null;
+    schedule_label: string | null;
+    schedule_order: number | null;
+  }[] = [];
+
+  // Check if engineer has Stripe connected
+  let hasStripeConnected = false;
+  if (portalShare.show_payment_status || portalShare.require_payment_for_download) {
+    const [quotesRes, connectedRes] = await Promise.all([
+      supabase
+        .from("quotes")
+        .select("id, quote_number, status, total, currency, portal_token, paid_at, schedule_group_id, schedule_label, schedule_order")
+        .eq("release_id", release.id)
+        .eq("user_id", release.user_id)
+        .in("status", ["sent", "viewed", "accepted", "paid"])
+        .order("created_at"),
+      supabase
+        .from("stripe_connected_accounts")
+        .select("charges_enabled")
+        .eq("user_id", release.user_id)
+        .maybeSingle(),
+    ]);
+    portalQuotes = (quotesRes.data ?? []) as typeof portalQuotes;
+    hasStripeConnected = connectedRes.data?.charges_enabled === true;
+  }
+
+  /* ── 9. Render ──────────────────────────────────────────────────── */
 
   return (
     <PortalClient
@@ -310,6 +346,8 @@ export default async function PortalPage({ params }: Props) {
       tracks={portalTracks}
       globalDirection={portalShare.show_direction ? release.global_direction : null}
       globalRefs={portalShare.show_references ? globalRefs : []}
+      quotes={portalQuotes}
+      hasStripeConnected={hasStripeConnected}
     />
   );
 }
