@@ -389,19 +389,19 @@ export function AudioPlayer({
         bitDepth: activeVersion.bit_depth,
         channels: activeVersion.channels,
       });
-      // If the audio element already has audio loaded (reconnecting after
-      // navigation), skip the url param entirely. Passing url causes
-      // WaveSurfer to call audioElement.src = url which reloads the
-      // source and creates a playback skip. Without url, WaveSurfer
-      // attaches to the live media element and renders from peaks/buffer.
+      // If the audio element already has a source loaded (reconnecting
+      // after navigation), skip the url param entirely. Passing url
+      // causes WaveSurfer to set audioElement.src which reloads the
+      // source and creates a playback skip. We check for any loaded
+      // source rather than play state, because ws.destroy() on the
+      // previous unmount may have briefly paused the element.
       const audioHasSource = !!(audioElement.currentSrc || audioElement.src);
-      const isReconnecting = audioHasSource && !audioElement.paused;
 
       perf.start("wavesurfer:init", { trackId: activeVersion.id });
       ws = WaveSurfer.create({
         container,
         media: audioElement,
-        url: isReconnecting ? undefined : activeVersion.audio_url,
+        url: audioHasSource ? undefined : activeVersion.audio_url,
         barWidth: 3,
         barGap: 1,
         barRadius: 1,
@@ -441,16 +441,20 @@ export function AudioPlayer({
         // Sync context state (URL already matches so this is state-only)
         audio.loadVersion(activeVersion, trackMeta);
 
-        // Restore playback position and play/pause state
+        // Restore playback position and play/pause state.
+        // Skip if audio is already at the right position and play state
+        // to avoid a seek-triggered skip on reconnect after navigation.
         const restore = pendingRestoreRef.current;
         pendingRestoreRef.current = null;
         if (restore) {
           const maxDur =
             activeVersion.duration_seconds || audioElement.duration || Infinity;
-          if (restore.seekTime > 0 && restore.seekTime <= maxDur) {
+          const alreadyNearPosition =
+            Math.abs(audioElement.currentTime - restore.seekTime) < 0.5;
+          if (!alreadyNearPosition && restore.seekTime > 0 && restore.seekTime <= maxDur) {
             audioElement.currentTime = restore.seekTime;
           }
-          if (restore.shouldPlay) {
+          if (restore.shouldPlay && audioElement.paused) {
             audioElement.play().catch(() => {});
           }
         }
