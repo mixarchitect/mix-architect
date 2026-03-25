@@ -23,6 +23,7 @@ import { SaveAsTemplateButton } from "@/components/templates/save-as-template-bu
 import { CalendarExportButton } from "./calendar-export-button";
 import { MobileInspector } from "@/components/ui/mobile-inspector";
 import { DistributionPanel } from "./distribution-panel";
+import { ReleaseQuotesTab } from "./release-quotes-tab";
 import type { FlowTrack } from "@/components/flow-simulator/use-flow-audio";
 import { getReleaseRole } from "@/lib/get-release-role";
 import { canEdit } from "@/lib/permissions";
@@ -35,7 +36,7 @@ type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-const VALID_TABS = ["tracks", "globals", "distribution", "financials"] as const;
+const VALID_TABS = ["tracks", "globals", "distribution", "financials", "quotes"] as const;
 type TabId = (typeof VALID_TABS)[number];
 
 function typeLabel(t: string | undefined | null): string {
@@ -99,6 +100,17 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   const defaultHourlyRate = defaultsRes2.data?.default_hourly_rate ?? null;
   const features = resolveVisibility(defaultsRes2.data?.feature_visibility ?? null);
 
+  // Fetch quote count for tab badge
+  let releaseQuoteCount = 0;
+  if (paymentsEnabled && features.payment_tracking) {
+    const { count } = await supabase
+      .from("quotes")
+      .select("id", { count: "exact", head: true })
+      .eq("release_id", releaseId)
+      .eq("user_id", user.id);
+    releaseQuoteCount = count ?? 0;
+  }
+
   // Resolve current tab from search params
   const rawTab = typeof sp.tab === "string" ? sp.tab : "";
   const isValidTab = VALID_TABS.includes(rawTab as TabId);
@@ -106,7 +118,8 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   const tabAvailable =
     isValidTab &&
     (rawTab !== "financials" || (paymentsEnabled && features.payment_tracking)) &&
-    (rawTab !== "distribution" || features.distribution_checklist);
+    (rawTab !== "distribution" || features.distribution_checklist) &&
+    (rawTab !== "quotes" || (paymentsEnabled && features.payment_tracking));
   const currentTab: TabId = tabAvailable ? (rawTab as TabId) : "tracks";
 
   // Fetch client notes if client email is present
@@ -191,6 +204,9 @@ export default async function ReleasePage({ params, searchParams }: Props) {
       : []),
     ...(paymentsEnabled && features.payment_tracking
       ? [{ id: "financials" as const, label: t("tabFinancials") }]
+      : []),
+    ...(paymentsEnabled && features.payment_tracking
+      ? [{ id: "quotes" as const, label: t("tabQuotes"), count: releaseQuoteCount }]
       : []),
   ];
 
@@ -378,6 +394,11 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                   locale={locale}
                 />
               </div>
+            )}
+
+            {/* Quotes tab (only rendered when paymentsEnabled + feature visible, matching tabs array) */}
+            {paymentsEnabled && features.payment_tracking && (
+              <ReleaseQuotesTab releaseId={releaseId} locale={locale} />
             )}
           </TabbedContent>
           </div>

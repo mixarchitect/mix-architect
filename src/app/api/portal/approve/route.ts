@@ -4,6 +4,7 @@ import { notifyReleaseMembers } from "@/lib/notifications/service";
 import { emailReleaseMembers } from "@/lib/email/release-email";
 import { buildClientFeedbackEmail } from "@/lib/email-templates/transactional";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { fireTrigger } from "@/lib/workflow-engine";
 
 /**
  * POST /api/portal/approve
@@ -167,6 +168,25 @@ export async function POST(req: NextRequest) {
 
     if (statusErr) {
       console.error("[portal/approve] brief_shares status update failed:", statusErr);
+    }
+
+    // Fire workflow triggers based on new portal status
+    if (portalStatus === "delivered" || portalStatus === "approved") {
+      const { data: release } = await supabase
+        .from("releases")
+        .select("user_id")
+        .eq("id", share.release_id)
+        .maybeSingle();
+
+      if (release?.user_id) {
+        const triggerCtx = { userId: release.user_id, releaseId: share.release_id };
+        if (portalStatus === "delivered") {
+          fireTrigger("release_delivered", triggerCtx).catch(console.error);
+        }
+        if (portalStatus === "approved") {
+          fireTrigger("all_tracks_approved", triggerCtx).catch(console.error);
+        }
+      }
     }
 
     console.log("[portal/approve] success:", { action, newStatus, portalStatus });
