@@ -389,11 +389,21 @@ export function AudioPlayer({
         bitDepth: activeVersion.bit_depth,
         channels: activeVersion.channels,
       });
+      // If the audio element already has this URL loaded (e.g. reconnecting
+      // after a navigation), skip the url param so WaveSurfer attaches to
+      // the live media without reloading the source — avoids playback skip.
+      const currentSrc = audioElement.currentSrc || audioElement.src || "";
+      const alreadyLoaded = currentSrc === activeVersion.audio_url;
+      const hasPeaks = !!activeVersion.waveform_peaks;
+
       perf.start("wavesurfer:init", { trackId: activeVersion.id });
       ws = WaveSurfer.create({
         container,
         media: audioElement,
-        url: activeVersion.audio_url,
+        // Only pass url when we need WaveSurfer to load new audio.
+        // When reconnecting to already-playing audio with cached peaks,
+        // omit url to prevent the audio element from reloading.
+        url: alreadyLoaded && hasPeaks ? undefined : activeVersion.audio_url,
         barWidth: 3,
         barGap: 1,
         barRadius: 1,

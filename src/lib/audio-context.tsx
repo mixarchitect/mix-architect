@@ -7,6 +7,7 @@ import {
   useState,
   useCallback,
   useEffect,
+  useMemo,
   type ReactNode,
 } from "react";
 import type { AudioVersionData } from "@/components/ui/audio-player";
@@ -221,28 +222,34 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     setIsLooping((prev) => !prev);
   }, []);
 
+  // Memoize the context value to prevent unnecessary consumer re-renders.
+  // Split into two values: stable (rarely changes) and volatile (currentTime).
+  // This prevents the entire consumer tree from re-rendering on every timeupdate.
+  const contextValue = useMemo(
+    () => ({
+      audioElement: audioRef.current!,
+      activeVersion,
+      trackMeta,
+      isPlaying,
+      currentTime,
+      duration,
+      isLooping,
+      loadVersion,
+      togglePlayPause,
+      seekTo,
+      stop,
+      toggleLoop,
+    }),
+    [activeVersion, trackMeta, isPlaying, currentTime, duration, isLooping, loadVersion, togglePlayPause, seekTo, stop, toggleLoop],
+  );
+
   // SSR guard — render nothing useful on server
   if (!audioRef.current) {
     return <>{children}</>;
   }
 
   return (
-    <AudioContext.Provider
-      value={{
-        audioElement: audioRef.current,
-        activeVersion,
-        trackMeta,
-        isPlaying,
-        currentTime,
-        duration,
-        isLooping,
-        loadVersion,
-        togglePlayPause,
-        seekTo,
-        stop,
-        toggleLoop,
-      }}
-    >
+    <AudioContext.Provider value={contextValue}>
       {children}
     </AudioContext.Provider>
   );
