@@ -65,7 +65,7 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
           <>
             <div className="h-4 w-px bg-border" />
             <span className="text-sm text-muted">
-              {getGreeting()}, <span className="text-text font-medium">{displayName.split(" ")[0]}</span>
+              {mounted ? getGreeting() : ""}, <span className="text-text font-medium">{displayName.split(" ")[0]}</span>
             </span>
           </>
         )}
