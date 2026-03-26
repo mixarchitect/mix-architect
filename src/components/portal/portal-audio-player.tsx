@@ -628,7 +628,7 @@ export function PortalAudioPlayer({
                     key={i}
                     className="flex-1 min-w-[2px] rounded-sm bg-muted/25"
                     style={{
-                      height: `${20 + Math.abs(Math.sin(i * 0.3)) * 55}%`,
+                      height: `${Math.round(20 + Math.abs(Math.sin(i * 0.3)) * 55)}%`,
                     }}
                   />
                 ))}
