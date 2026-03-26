@@ -437,7 +437,12 @@
       "duplicate": "Duplicate",
       "markPaid": "Mark as Paid",
       "delete": "Delete",
-      "cancel": "Cancel Quote"
+      "cancel": "Cancel Quote",
+      "confirmDelete": "Delete this quote? This cannot be undone.",
+      "confirmCancel": "Cancel this quote? The client will no longer be able to pay.",
+      "confirm": "Confirm",
+      "dismiss": "Dismiss",
+      "deleting": "Deleting..."
     },
     "builder": {
       "back": "Back",

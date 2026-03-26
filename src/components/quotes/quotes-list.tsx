@@ -39,6 +39,8 @@ export function QuotesList({
   const [quotes, setQuotes] = useState(initialQuotes);
   const [expandedSchedules, setExpandedSchedules] = useState<Set<string>>(new Set());
   const [actionMenu, setActionMenu] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Group quotes: standalone + schedule groups
   const scheduleGroups = new Map<string, Quote[]>();
@@ -117,8 +119,8 @@ export function QuotesList({
         setQuotes((prev) => [result.quote!, ...prev]);
       }
     } else if (action === "delete") {
-      await deleteQuote(quoteId);
-      setQuotes((prev) => prev.filter((q) => q.id !== quoteId));
+      setConfirmDeleteId(quoteId);
+      return;
     } else if (action === "mark_paid") {
       await markQuotePaid(quoteId);
       setQuotes((prev) =>
@@ -129,6 +131,15 @@ export function QuotesList({
         ),
       );
     }
+  }
+
+  async function handleConfirmDelete() {
+    if (!confirmDeleteId) return;
+    setDeletingId(confirmDeleteId);
+    await deleteQuote(confirmDeleteId);
+    setQuotes((prev) => prev.filter((q) => q.id !== confirmDeleteId));
+    setConfirmDeleteId(null);
+    setDeletingId(null);
   }
 
   function toggleSchedule(groupId: string) {
@@ -165,6 +176,10 @@ export function QuotesList({
               actionMenu={actionMenu}
               onActionMenu={setActionMenu}
               onAction={handleAction}
+              confirmDeleteId={confirmDeleteId}
+              deletingId={deletingId}
+              onConfirmDelete={handleConfirmDelete}
+              onCancelDelete={() => setConfirmDeleteId(null)}
             />
           );
         }
@@ -210,6 +225,10 @@ export function QuotesList({
                     actionMenu={actionMenu}
                     onActionMenu={setActionMenu}
                     onAction={handleAction}
+                    confirmDeleteId={confirmDeleteId}
+                    deletingId={deletingId}
+                    onConfirmDelete={handleConfirmDelete}
+                    onCancelDelete={() => setConfirmDeleteId(null)}
                     isScheduleItem
                   />
                 ))}
@@ -233,6 +252,10 @@ function QuoteRow({
   actionMenu,
   onActionMenu,
   onAction,
+  confirmDeleteId,
+  deletingId,
+  onConfirmDelete,
+  onCancelDelete,
   isScheduleItem = false,
 }: {
   quote: Quote;
@@ -243,10 +266,17 @@ function QuoteRow({
   actionMenu: string | null;
   onActionMenu: (id: string | null) => void;
   onAction: (action: string, quoteId: string) => void;
+  confirmDeleteId: string | null;
+  deletingId: string | null;
+  onConfirmDelete: () => void;
+  onCancelDelete: () => void;
   isScheduleItem?: boolean;
 }) {
   const t = useTranslations("quotes");
   const isOpen = actionMenu === quote.id;
+  const isConfirming = confirmDeleteId === quote.id;
+  const isDeleting = deletingId === quote.id;
+  const isDraft = quote.status === "draft";
 
   return (
     <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-panel2 transition-colors group">
@@ -325,11 +355,43 @@ function QuoteRow({
               {(quote.status === "draft" || quote.status === "sent") && (
                 <MenuBtn
                   icon={Ban}
-                  label={quote.status === "draft" ? t("actions.delete") : t("actions.cancel")}
+                  label={isDraft ? t("actions.delete") : t("actions.cancel")}
                   onClick={() => onAction("delete", quote.id)}
                   destructive
                 />
               )}
+            </div>
+          </>
+        )}
+
+        {/* Delete confirmation popover */}
+        {isConfirming && (
+          <>
+            <div
+              className="fixed inset-0 z-10"
+              onClick={onCancelDelete}
+            />
+            <div className="absolute right-0 top-8 z-20 w-56 rounded-lg border border-border bg-panel shadow-lg p-3">
+              <p className="text-xs text-text mb-3">
+                {isDraft ? t("actions.confirmDelete") : t("actions.confirmCancel")}
+              </p>
+              <div className="flex items-center gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={onCancelDelete}
+                  className="text-xs text-muted hover:text-text transition-colors px-2 py-1"
+                >
+                  {t("actions.dismiss")}
+                </button>
+                <button
+                  type="button"
+                  onClick={onConfirmDelete}
+                  disabled={isDeleting}
+                  className="text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 rounded-md transition-colors disabled:opacity-50"
+                >
+                  {isDeleting ? t("actions.deleting") : t("actions.confirm")}
+                </button>
+              </div>
             </div>
           </>
         )}
