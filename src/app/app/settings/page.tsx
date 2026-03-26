@@ -55,6 +55,10 @@ export default function SettingsPage() {
     { value: "system", label: tTheme("system"), Icon: Monitor },
   ] as const, [tTheme]);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const resolvedTheme = mounted ? currentTheme : undefined;
+
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<
     "idle" | "saving" | "saved" | "error"
@@ -311,7 +315,7 @@ export default function SettingsPage() {
           <PanelBody className="pt-5">
             <div className="flex gap-2">
               {themeOptions.map((opt) => {
-                const active = currentTheme === opt.value;
+                const active = resolvedTheme === opt.value;
                 return (
                   <button
                     key={opt.value}
@@ -1247,10 +1251,19 @@ function StripeConnectPanel() {
       const res = await fetch("/api/stripe/connect/authorize", {
         method: "POST",
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error("Stripe connect error:", data.error || res.statusText);
+        alert(t("connectError"));
+        return;
+      }
       const data = await res.json();
       if (data.authUrl) {
         window.location.href = data.authUrl;
       }
+    } catch (err) {
+      console.error("Stripe connect error:", err);
+      alert(t("connectError"));
     } finally {
       setConnecting(false);
     }
