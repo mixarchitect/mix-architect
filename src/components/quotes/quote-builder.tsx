@@ -9,7 +9,7 @@ import { Panel, PanelBody } from "@/components/ui/panel";
 import { Rule } from "@/components/ui/rule";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/currency";
-import { createQuote, updateQuote, sendQuote, createPaymentSchedule } from "@/actions/quotes";
+import { createQuote, updateQuote, sendQuote, deleteQuote, createPaymentSchedule } from "@/actions/quotes";
 import type { Quote, QuoteLineItem } from "@/types/payments";
 
 type LineItemDraft = {
@@ -93,6 +93,8 @@ export function QuoteBuilder({
 
   const [saving, setSaving] = useState(false);
   const [sending, setSending] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // ── Derived ──
   const selectedRelease = releases.find((r) => r.id === releaseId);
@@ -318,9 +320,18 @@ export function QuoteBuilder({
     }
   }
 
+  async function handleDelete() {
+    if (!existingQuote) return;
+    setDeleting(true);
+    await deleteQuote(existingQuote.id);
+    router.push(releaseId ? `/app/releases/${releaseId}?tab=quotes` : "/app/quotes");
+  }
+
   const backHref = releaseId ? `/app/releases/${releaseId}?tab=quotes` : "/app/quotes";
   const hasTrackFees = releaseTracks.some((t) => t.fee && t.fee > 0);
   const isReadonly = existingQuote && existingQuote.status !== "draft";
+  const canDelete = existingQuote && ["draft", "sent", "viewed"].includes(existingQuote.status);
+  const isDraft = existingQuote?.status === "draft";
 
   return (
     <div>
@@ -689,14 +700,50 @@ export function QuoteBuilder({
         </Panel>
 
         {/* Action Bar */}
-        {!isReadonly && (
-          <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center gap-3">
             <Link
               href={backHref}
               className="text-sm text-muted hover:text-text transition-colors"
             >
-              {t("builder.cancel")}
+              {isReadonly ? t("builder.back") : t("builder.cancel")}
             </Link>
+            {canDelete && (
+              <div className="relative">
+                {!confirmDelete ? (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(true)}
+                    className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    {isDraft ? t("actions.delete") : t("actions.cancel")}
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted">
+                      {isDraft ? t("actions.confirmDelete") : t("actions.confirmCancel")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      className="text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 px-3 py-1 rounded-md transition-colors disabled:opacity-50"
+                    >
+                      {deleting ? t("actions.deleting") : t("actions.confirm")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(false)}
+                      className="text-xs text-muted hover:text-text transition-colors"
+                    >
+                      {t("actions.dismiss")}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {!isReadonly && (
             <div className="flex items-center gap-3">
               <Button
                 variant="secondary"
@@ -719,8 +766,8 @@ export function QuoteBuilder({
                 </Button>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

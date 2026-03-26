@@ -352,7 +352,7 @@ function QuoteRow({
                   onClick={() => onAction("mark_paid", quote.id)}
                 />
               )}
-              {(quote.status === "draft" || quote.status === "sent") && (
+              {(quote.status === "draft" || quote.status === "sent" || quote.status === "viewed") && (
                 <MenuBtn
                   icon={Ban}
                   label={isDraft ? t("actions.delete") : t("actions.cancel")}
