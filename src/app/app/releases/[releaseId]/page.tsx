@@ -6,7 +6,7 @@ import { Panel, PanelBody } from "@/components/ui/panel";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
-import { Plus, Settings, ArrowLeft, ListMusic } from "lucide-react";
+import { Plus, Settings, ArrowLeft, ListMusic, DollarSign } from "lucide-react";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, ReleaseNotesEditor, ClientNotesEditor } from "./sidebar-editors";
 import { ExpensePanel } from "@/components/expenses/expense-panel";
@@ -362,42 +362,60 @@ export default async function ReleasePage({ params, searchParams }: Props) {
             )}
 
             {/* Financials tab — unified Money view with quotes merged in */}
-            {paymentsEnabled && features.payment_tracking && (
-              <div className="space-y-6">
-                {/* Financial Summary with inline editing + quote-derived mode */}
-                <FinancialSummary
-                  releaseId={releaseId}
-                  feeTotal={release.fee_total}
-                  paidAmount={release.paid_amount ?? 0}
-                  feeCurrency={release.fee_currency ?? "USD"}
-                  paymentStatus={release.payment_status ?? "no_fee"}
-                  expenses={expenses}
-                  timeEntries={timeEntries}
-                  locale={locale}
-                  quotes={activeQuotes}
-                />
+            {paymentsEnabled && features.payment_tracking && (() => {
+              const noFee = !release.fee_total || release.payment_status === "no_fee";
+              const hasNoFinancialData = activeQuotes.length === 0 && noFee && timeEntries.length === 0 && expenses.length === 0;
 
-                {/* Quotes section (merged from former Quotes tab) */}
-                <ReleaseQuotesTab releaseId={releaseId} locale={locale} />
+              if (hasNoFinancialData) {
+                return (
+                  <EmptyState
+                    icon={DollarSign}
+                    size="md"
+                    title={t("noFinancialDataTitle")}
+                    description={t("noFinancialDataDesc")}
+                    action={{ label: t("newQuote"), href: `/app/releases/${releaseId}/quotes/new`, variant: "primary" }}
+                    secondaryAction={{ label: t("logTime"), href: `/app/releases/${releaseId}?tab=financials` }}
+                  />
+                );
+              }
 
-                {/* Time Log */}
-                <TimeEntryList
-                  releaseId={releaseId}
-                  timeEntries={timeEntries}
-                  currency={release.fee_currency ?? "USD"}
-                  locale={locale}
-                  defaultRate={defaultHourlyRate}
-                />
+              return (
+                <div className="space-y-6">
+                  {/* Financial Summary with inline editing + quote-derived mode */}
+                  <FinancialSummary
+                    releaseId={releaseId}
+                    feeTotal={release.fee_total}
+                    paidAmount={release.paid_amount ?? 0}
+                    feeCurrency={release.fee_currency ?? "USD"}
+                    paymentStatus={release.payment_status ?? "no_fee"}
+                    expenses={expenses}
+                    timeEntries={timeEntries}
+                    locale={locale}
+                    quotes={activeQuotes}
+                  />
 
-                {/* Expenses */}
-                <ExpensePanel
-                  releaseId={releaseId}
-                  expenses={expenses}
-                  currency={release.fee_currency ?? "USD"}
-                  locale={locale}
-                />
-              </div>
-            )}
+                  {/* Quotes section (merged from former Quotes tab) */}
+                  <ReleaseQuotesTab releaseId={releaseId} locale={locale} />
+
+                  {/* Time Log */}
+                  <TimeEntryList
+                    releaseId={releaseId}
+                    timeEntries={timeEntries}
+                    currency={release.fee_currency ?? "USD"}
+                    locale={locale}
+                    defaultRate={defaultHourlyRate}
+                  />
+
+                  {/* Expenses */}
+                  <ExpensePanel
+                    releaseId={releaseId}
+                    expenses={expenses}
+                    currency={release.fee_currency ?? "USD"}
+                    locale={locale}
+                  />
+                </div>
+              );
+            })()}
           </TabbedContent>
           </div>
         </div>

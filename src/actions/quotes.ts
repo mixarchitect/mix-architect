@@ -244,6 +244,7 @@ export async function createQuote(
   }
 
   if (data.release_id) {
+    await syncPaymentStatus(data.release_id);
     revalidatePath(`/app/releases/${data.release_id}`);
   }
   revalidatePath("/app/quotes");
@@ -338,10 +339,11 @@ export async function updateQuote(
 
   if (error) return { quote: null, error: error.message };
 
-  revalidatePath(`/app/quotes`);
   if (existing.release_id) {
+    await syncPaymentStatus(existing.release_id);
     revalidatePath(`/app/releases/${existing.release_id}`);
   }
+  revalidatePath(`/app/quotes`);
 
   return { quote: quote as Quote };
 }
@@ -380,10 +382,11 @@ export async function deleteQuote(
     if (error) return { error: error.message };
   }
 
-  revalidatePath("/app/quotes");
   if (quote.release_id) {
+    await syncPaymentStatus(quote.release_id);
     revalidatePath(`/app/releases/${quote.release_id}`);
   }
+  revalidatePath("/app/quotes");
 
   return {};
 }

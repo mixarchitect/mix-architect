@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { Check, X, Pencil, Trash2, Info } from "lucide-react";
@@ -103,6 +103,14 @@ export function FinancialSummary({
   // ── MODE A: Quote-derived (when non-cancelled quotes exist) ──
   const hasQuotes = quotes.length > 0;
 
+  // Transition banner: shown when engineer had a manual fee and now has quotes
+  const transitionKey = `money_banner_dismissed_${releaseId}`;
+  const [bannerDismissed, setBannerDismissed] = useState(true); // default hidden to avoid flash
+  useEffect(() => {
+    setBannerDismissed(localStorage.getItem(transitionKey) === "1");
+  }, [transitionKey]);
+  const showTransitionBanner = hasQuotes && initialFee != null && initialFee > 0 && !bannerDismissed;
+
   if (hasQuotes) {
     const totalQuoted = quotes.reduce((sum, q) => sum + Number(q.total), 0);
     const totalPaid = quotes
@@ -120,12 +128,33 @@ export function FinancialSummary({
           : "unpaid";
 
     return (
-      <Panel>
-        <PanelBody className="py-5">
-          <div className="label-sm text-muted mb-3">FINANCIAL SUMMARY</div>
-          <div className="space-y-2 text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
-            {/* Revenue section */}
-            <Row label="Total Quoted">
+      <div className="space-y-3">
+        {showTransitionBanner && (
+          <div className="flex items-start gap-3 rounded-lg border border-border bg-panel2 px-4 py-3 text-xs text-muted">
+            <Info size={14} className="text-faint shrink-0 mt-0.5" />
+            <span className="flex-1">
+              Billing is now tracked through quotes. Your previous project fee of{" "}
+              <span className="text-text font-medium">{fmt(initialFee!, feeCurrency, locale)}</span>{" "}
+              is saved as an estimate in release settings.
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.setItem(transitionKey, "1");
+                setBannerDismissed(true);
+              }}
+              className="text-faint hover:text-text transition-colors shrink-0"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
+        <Panel>
+          <PanelBody className="py-5">
+            <div className="label-sm text-muted mb-3">FINANCIAL SUMMARY</div>
+            <div className="space-y-2 text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
+              {/* Revenue section */}
+              <Row label="Total Quoted">
               <span className="text-text">{fmt(totalQuoted, feeCurrency, locale)}</span>
               <span className="w-[34px]" />
             </Row>
@@ -196,9 +225,10 @@ export function FinancialSummary({
               </span>
               <span className="w-[34px]" />
             </Row>
-          </div>
-        </PanelBody>
-      </Panel>
+            </div>
+          </PanelBody>
+        </Panel>
+      </div>
     );
   }
 
