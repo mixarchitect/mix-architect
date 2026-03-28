@@ -108,7 +108,7 @@ export function QuotePortalClient({
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-xl font-bold text-[#1a1a1a]">
-                  Quote {quote.quote_number}
+                  {quote.document_type === "invoice" ? "Invoice" : "Quote"} {quote.quote_number}
                 </h1>
                 {releaseTitle && (
                   <div className="text-sm text-[#666] mt-1">{releaseTitle}</div>

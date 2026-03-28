@@ -33,14 +33,23 @@ export default async function QuotesPage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold text-text">{t("title")}</h1>
-        <Link
-          href="/app/quotes/new"
-          className="btn-primary inline-flex items-center gap-1.5 h-9 px-4 text-sm font-semibold rounded-sm"
-        >
-          <Plus size={14} />
-          {t("createQuote")}
-        </Link>
+        <h1 className="text-2xl font-semibold text-text">{t("quotesAndInvoicesTitle")}</h1>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/app/quotes/new"
+            className="btn-primary inline-flex items-center gap-1.5 h-9 px-4 text-sm font-semibold rounded-sm"
+          >
+            <Plus size={14} />
+            {t("createQuote")}
+          </Link>
+          <Link
+            href="/app/quotes/new?type=invoice"
+            className="btn-secondary inline-flex items-center gap-1.5 h-9 px-4 text-sm font-semibold rounded-sm"
+          >
+            <Plus size={14} />
+            {t("createInvoice")}
+          </Link>
+        </div>
       </div>
 
       <QuotesList

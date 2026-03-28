@@ -43,6 +43,7 @@ type Props = {
   defaultCurrency: string;
   locale: string;
   existingQuote?: Quote;
+  defaultDocumentType?: "quote" | "invoice";
 };
 
 type Mode = "single" | "schedule";
@@ -54,12 +55,15 @@ export function QuoteBuilder({
   defaultCurrency,
   locale,
   existingQuote,
+  defaultDocumentType,
 }: Props) {
   const router = useRouter();
   const t = useTranslations("quotes");
   const isEditing = !!existingQuote;
 
   // ── Form State ──
+  const [documentType, setDocumentType] = useState<"quote" | "invoice">(existingQuote?.document_type ?? defaultDocumentType ?? "quote");
+  const isInvoice = documentType === "invoice";
   const [mode, setMode] = useState<Mode>("single");
   const [releaseId, setReleaseId] = useState(existingQuote?.release_id ?? prefilledReleaseId ?? "");
   const [title, setTitle] = useState(existingQuote?.title ?? "");
@@ -214,7 +218,7 @@ export function QuoteBuilder({
           alert(result.error);
           return;
         }
-        router.push(releaseId ? `/app/releases/${releaseId}?tab=quotes` : "/app/quotes");
+        router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
       } else if (isEditing && existingQuote) {
         const result = await updateQuote(existingQuote.id, {
           release_id: releaseId || null,
@@ -242,10 +246,11 @@ export function QuoteBuilder({
           alert(result.error);
           return;
         }
-        router.push(releaseId ? `/app/releases/${releaseId}?tab=quotes` : "/app/quotes");
+        router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
       } else {
         const result = await createQuote({
           release_id: releaseId || null,
+          document_type: documentType,
           title: title || null,
           client_name: clientName || null,
           client_email: clientEmail || null,
@@ -269,7 +274,7 @@ export function QuoteBuilder({
           alert(result.error);
           return;
         }
-        router.push(releaseId ? `/app/releases/${releaseId}?tab=quotes` : "/app/quotes");
+        router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
       }
     } finally {
       setSaving(false);
@@ -287,6 +292,7 @@ export function QuoteBuilder({
       if (!isEditing) {
         const result = await createQuote({
           release_id: releaseId || null,
+          document_type: documentType,
           title: title || null,
           client_name: clientName || null,
           client_email: clientEmail || null,
@@ -314,7 +320,7 @@ export function QuoteBuilder({
       } else if (existingQuote) {
         await sendQuote(existingQuote.id);
       }
-      router.push(releaseId ? `/app/releases/${releaseId}?tab=quotes` : "/app/quotes");
+      router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
     } finally {
       setSending(false);
     }
@@ -324,10 +330,10 @@ export function QuoteBuilder({
     if (!existingQuote) return;
     setDeleting(true);
     await deleteQuote(existingQuote.id);
-    router.push(releaseId ? `/app/releases/${releaseId}?tab=quotes` : "/app/quotes");
+    router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
   }
 
-  const backHref = releaseId ? `/app/releases/${releaseId}?tab=quotes` : "/app/quotes";
+  const backHref = releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes";
   const hasTrackFees = releaseTracks.some((t) => t.fee && t.fee > 0);
   const isReadonly = existingQuote && existingQuote.status !== "draft";
   const canDelete = existingQuote && ["draft", "sent", "viewed"].includes(existingQuote.status);
@@ -345,12 +351,42 @@ export function QuoteBuilder({
           {t("builder.back")}
         </Link>
         <h1 className="text-xl font-semibold text-text">
-          {isEditing ? `${t("builder.editTitle")} ${existingQuote.quote_number}` : t("builder.newTitle")}
+          {isEditing
+            ? `${isInvoice ? t("builder.editInvoiceTitle") : t("builder.editTitle")} ${existingQuote.quote_number}`
+            : isInvoice ? t("builder.newInvoiceTitle") : t("builder.newTitle")}
         </h1>
       </div>
 
-      {/* Mode toggle (only for new quotes) */}
+      {/* Document type selector */}
       {!isEditing && (
+        <div className="flex gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setDocumentType("quote")}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              documentType === "quote"
+                ? "bg-signal text-white"
+                : "bg-panel2 text-muted hover:text-text"
+            }`}
+          >
+            {t("builder.typeQuote")}
+          </button>
+          <button
+            type="button"
+            onClick={() => setDocumentType("invoice")}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              documentType === "invoice"
+                ? "bg-signal text-white"
+                : "bg-panel2 text-muted hover:text-text"
+            }`}
+          >
+            {t("builder.typeInvoice")}
+          </button>
+        </div>
+      )}
+
+      {/* Mode toggle (only for new quotes) */}
+      {!isEditing && documentType === "quote" && (
         <div className="flex gap-2 mb-6">
           <button
             type="button"
@@ -673,27 +709,15 @@ export function QuoteBuilder({
               <p className="text-[10px] text-muted">{t("builder.internalNotesHelp")}</p>
             </div>
             {mode === "single" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="label text-muted">{t("builder.dueDate")}</label>
-                  <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    className="input text-sm"
-                    disabled={isReadonly}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="label text-muted">{t("builder.expiresAt")}</label>
-                  <input
-                    type="date"
-                    value={expiresAt}
-                    onChange={(e) => setExpiresAt(e.target.value)}
-                    className="input text-sm"
-                    disabled={isReadonly}
-                  />
-                </div>
+              <div className="space-y-1.5 max-w-xs">
+                <label className="label text-muted">{t("builder.dueDate")}</label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="input text-sm"
+                  disabled={isReadonly}
+                />
               </div>
             )}
           </PanelBody>

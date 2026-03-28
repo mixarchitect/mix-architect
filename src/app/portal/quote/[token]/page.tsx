@@ -14,11 +14,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: quote } = await supabase
     .from("quotes")
-    .select("quote_number, client_name, user_id")
+    .select("quote_number, client_name, user_id, document_type")
     .eq("portal_token", token)
     .maybeSingle();
 
-  if (!quote) return { title: "Quote Not Found" };
+  if (!quote) return { title: "Document Not Found" };
 
   // Get engineer name
   const { data: defaults } = await supabase
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     || "Mix Architect";
 
   return {
-    title: `Quote ${quote.quote_number} — ${engineerName}`,
+    title: `${quote.document_type === "invoice" ? "Invoice" : "Quote"} ${quote.quote_number} — ${engineerName}`,
     robots: { index: false, follow: false },
   };
 }

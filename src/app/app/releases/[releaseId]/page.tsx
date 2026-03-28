@@ -101,11 +101,11 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   const features = resolveVisibility(defaultsRes2.data?.feature_visibility ?? null);
 
   // Fetch quotes for the merged Money tab (count badge + financial summary)
-  let releaseQuotes: { id: string; total: number | string; status: string }[] = [];
+  let releaseQuotes: { id: string; total: number | string; status: string; document_type?: string }[] = [];
   if (paymentsEnabled && features.payment_tracking) {
     const { data: quotesData } = await supabase
       .from("quotes")
-      .select("id, total, status")
+      .select("id, total, status, document_type")
       .eq("release_id", releaseId)
       .eq("user_id", user.id);
     releaseQuotes = quotesData ?? [];
@@ -407,6 +407,9 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                   />
 
                   {/* Expenses */}
+                  {/* TODO: Add "Invoice Expenses" button when expense ownership model
+                      supports reliably identifying client-owed expenses (paid_by/owed_by
+                      are free-text fields currently). */}
                   <ExpensePanel
                     releaseId={releaseId}
                     expenses={expenses}

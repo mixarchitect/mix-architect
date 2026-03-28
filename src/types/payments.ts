@@ -21,6 +21,7 @@ export interface Quote {
   user_id: string;
   release_id: string | null;
   quote_number: string;
+  document_type: "quote" | "invoice";
   title: string | null;
   status:
     | "draft"

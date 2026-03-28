@@ -18,6 +18,7 @@ interface QuoteSummary {
   id: string;
   total: number | string;
   status: string;
+  document_type?: string;
 }
 
 interface Props {
@@ -118,6 +119,11 @@ export function FinancialSummary({
       .reduce((sum, q) => sum + Number(q.total), 0);
     const outstanding = totalQuoted - totalPaid;
     const totalCosts = timeBillable + expensesTotal;
+
+    // Adaptive label based on document types present
+    const hasOnlyInvoices = quotes.every((q) => q.document_type === "invoice");
+    const hasBoth = quotes.some((q) => q.document_type === "invoice") && quotes.some((q) => q.document_type !== "invoice");
+    const totalLabel = hasBoth ? "Total Billed" : hasOnlyInvoices ? "Total Invoiced" : "Total Quoted";
     const profit = totalPaid - totalCosts;
 
     const derivedStatus =
@@ -154,7 +160,7 @@ export function FinancialSummary({
             <div className="label-sm text-muted mb-3">FINANCIAL SUMMARY</div>
             <div className="space-y-2 text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
               {/* Revenue section */}
-              <Row label="Total Quoted">
+              <Row label={totalLabel}>
               <span className="text-text">{fmt(totalQuoted, feeCurrency, locale)}</span>
               <span className="w-[34px]" />
             </Row>

@@ -5,10 +5,13 @@ import { QuoteBuilder } from "@/components/quotes/quote-builder";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-export default async function NewReleaseQuotePage({ params }: Props) {
+export default async function NewReleaseQuotePage({ params, searchParams }: Props) {
   const { releaseId } = await params;
+  const sp = await searchParams;
+  const defaultDocumentType = sp.type === "invoice" ? "invoice" as const : undefined;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -46,6 +49,7 @@ export default async function NewReleaseQuotePage({ params }: Props) {
         releaseTracks={(tracks ?? []) as { id: string; title: string; fee: number | null }[]}
         defaultCurrency={defaults?.default_currency ?? "USD"}
         locale={locale}
+        defaultDocumentType={defaultDocumentType}
       />
     </div>
   );

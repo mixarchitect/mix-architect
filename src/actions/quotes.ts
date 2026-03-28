@@ -25,6 +25,7 @@ type CreateLineItemInput = {
 
 type CreateQuoteInput = {
   release_id?: string | null;
+  document_type?: "quote" | "invoice";
   title?: string | null;
   client_name?: string | null;
   client_email?: string | null;
@@ -60,25 +61,31 @@ type CreateScheduleInput = {
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-async function getNextQuoteNumber(
+async function getNextDocumentNumber(
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
   userId: string,
+  documentType: "quote" | "invoice" = "quote",
 ): Promise<string> {
+  const prefix = documentType === "invoice" ? "INV" : "Q";
+  const pattern = `${prefix}-`;
+
   const { data } = await supabase
     .from("quotes")
     .select("quote_number")
     .eq("user_id", userId)
+    .eq("document_type", documentType)
+    .like("quote_number", `${pattern}%`)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (!data?.quote_number) return "Q-001";
+  if (!data?.quote_number) return `${prefix}-001`;
 
-  const match = data.quote_number.match(/Q-(\d+)/);
-  if (!match) return "Q-001";
+  const match = data.quote_number.match(new RegExp(`${prefix}-(\\d+)`));
+  if (!match) return `${prefix}-001`;
 
   const next = parseInt(match[1], 10) + 1;
-  return `Q-${String(next).padStart(3, "0")}`;
+  return `${prefix}-${String(next).padStart(3, "0")}`;
 }
 
 function computeTotals(
@@ -195,7 +202,8 @@ export async function createQuote(
     return { quote: null, error: "Invalid email address" };
   }
 
-  const quoteNumber = await getNextQuoteNumber(supabase, user.id);
+  const docType = data.document_type ?? "quote";
+  const quoteNumber = await getNextDocumentNumber(supabase, user.id, docType);
   const { subtotal, total } = computeTotals(
     data.line_items,
     data.discount_amount,
@@ -207,6 +215,7 @@ export async function createQuote(
     .insert({
       user_id: user.id,
       release_id: data.release_id ?? null,
+      document_type: docType,
       quote_number: quoteNumber,
       title: data.title ?? null,
       status: "draft",
@@ -455,6 +464,7 @@ export async function sendQuote(
     releaseTitle,
     portalUrl,
     unsubscribeUrl,
+    documentType: quote.document_type ?? "quote",
   });
 
   // Send directly via Resend (client email, not engineer's preference system)
@@ -596,7 +606,7 @@ export async function createPaymentSchedule(
 
   for (let i = 0; i < data.installments.length; i++) {
     const inst = data.installments[i];
-    const quoteNumber = await getNextQuoteNumber(supabase, user.id);
+    const quoteNumber = await getNextDocumentNumber(supabase, user.id, "quote");
 
     const lineItems = inst.line_items?.length
       ? inst.line_items

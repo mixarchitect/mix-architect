@@ -60,6 +60,7 @@ export function buildQuoteReceivedEmail({
   releaseTitle,
   portalUrl,
   unsubscribeUrl,
+  documentType = "quote",
 }: {
   engineerName: string;
   quoteNumber: string;
@@ -68,6 +69,7 @@ export function buildQuoteReceivedEmail({
   releaseTitle?: string;
   portalUrl: string;
   unsubscribeUrl?: string;
+  documentType?: "quote" | "invoice";
 }) {
   const formattedTotal = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -78,18 +80,21 @@ export function buildQuoteReceivedEmail({
     ? ` for <strong>${escapeHtml(releaseTitle)}</strong>`
     : "";
 
+  const docLabel = documentType === "invoice" ? "Invoice" : "Quote";
+  const docLabelLower = documentType === "invoice" ? "an invoice" : "a quote";
+
   return {
-    subject: `Quote ${quoteNumber} from ${engineerName}`,
+    subject: `${docLabel} ${quoteNumber} from ${engineerName}`,
     html: wrap(
       `
-      ${heading(`Quote ${escapeHtml(quoteNumber)}`)}
-      ${paragraph(`${escapeHtml(engineerName)} has sent you a quote${projectLine}.`)}
+      ${heading(`${docLabel} ${escapeHtml(quoteNumber)}`)}
+      ${paragraph(`${escapeHtml(engineerName)} has sent you ${docLabelLower}${projectLine}.`)}
       <div style="margin:16px 0;padding:16px;background:#f9f9f9;border-radius:6px;border:1px solid #eee">
         <div style="font-size:24px;font-weight:700;color:#1a1a1a">${formattedTotal}</div>
         <div style="font-size:12px;color:#999;margin-top:4px">${escapeHtml(currency)}</div>
       </div>
-      ${paragraph("View the full quote details and pay online:")}
-      ${cta("View Quote", portalUrl)}
+      ${paragraph(`View the full ${docLabel.toLowerCase()} details and pay online:`)}
+      ${cta(`View ${docLabel}`, portalUrl)}
     `,
       unsubscribeUrl,
     ),

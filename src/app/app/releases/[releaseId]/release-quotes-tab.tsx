@@ -29,15 +29,35 @@ export function ReleaseQuotesTab({ releaseId, locale }: Props) {
     return <div className="text-sm text-muted py-8 text-center">Loading...</div>;
   }
 
+  // Determine section header based on document types present
+  const hasQuotes = quotes.some((q) => q.document_type !== "invoice");
+  const hasInvoices = quotes.some((q) => q.document_type === "invoice");
+  const sectionLabel = hasQuotes && hasInvoices
+    ? t("quotesAndInvoices")
+    : hasInvoices
+      ? t("invoicesLabel")
+      : t("quotesLabel");
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-end">
-        <Link href={`/app/releases/${releaseId}/quotes/new`}>
-          <Button variant="secondary" className="h-9 text-xs">
-            <Plus size={14} />
-            {t("createQuote")}
-          </Button>
-        </Link>
+      <div className="flex items-center justify-between">
+        {quotes.length > 0 && (
+          <div className="label-sm text-muted">{sectionLabel}</div>
+        )}
+        <div className="flex items-center gap-2 ml-auto">
+          <Link href={`/app/releases/${releaseId}/quotes/new`}>
+            <Button variant="secondary" className="h-9 text-xs">
+              <Plus size={14} />
+              {t("createQuote")}
+            </Button>
+          </Link>
+          <Link href={`/app/releases/${releaseId}/quotes/new?type=invoice`}>
+            <Button variant="secondary" className="h-9 text-xs">
+              <Plus size={14} />
+              {t("createInvoice")}
+            </Button>
+          </Link>
+        </div>
       </div>
       <QuotesList
         quotes={quotes}

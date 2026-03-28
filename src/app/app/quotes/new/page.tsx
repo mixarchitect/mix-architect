@@ -34,8 +34,9 @@ export default async function NewQuotePage({
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
-  // Pre-fill release_id if provided in query params
+  // Pre-fill release_id and document type if provided in query params
   const prefilledReleaseId = typeof sp.release_id === "string" ? sp.release_id : undefined;
+  const defaultDocumentType = sp.type === "invoice" ? "invoice" as const : undefined;
 
   // If a release is pre-selected, fetch its tracks for auto-populate
   let releaseTracks: { id: string; title: string; fee: number | null }[] = [];
@@ -56,6 +57,7 @@ export default async function NewQuotePage({
         releaseTracks={releaseTracks}
         defaultCurrency={defaults?.default_currency ?? "USD"}
         locale={locale}
+        defaultDocumentType={defaultDocumentType}
       />
     </div>
   );
