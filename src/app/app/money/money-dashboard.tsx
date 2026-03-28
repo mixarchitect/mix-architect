@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { DollarSign, TrendingUp, Calendar, FileText, ChevronRight, Plus } from "lucide-react";
+import { DollarSign, TrendingUp, Calendar, FileText, Plus } from "lucide-react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -14,12 +14,17 @@ import {
   CartesianGrid,
   Tooltip as ReTooltip,
 } from "recharts";
+import { DateRangeSelector } from "@/components/ui/date-range-selector";
+import { resolvePreset, parseDateISO, type PresetKey } from "@/lib/admin-date-utils";
 import type { QuoteRow } from "./page";
 
 type Props = {
   quotes: QuoteRow[];
   releases: { id: string; title: string }[];
   currency: string;
+  range: string;
+  from?: string;
+  to?: string;
 };
 
 function getCSSVar(name: string): string {
@@ -36,7 +41,9 @@ function fmt(amount: number, currency: string): string {
   }).format(amount);
 }
 
-export function MoneyDashboard({ quotes, releases, currency }: Props) {
+const PRESET_KEYS = ["today", "yesterday", "7d", "30d", "90d", "365d"] as const;
+
+export function MoneyDashboard({ quotes, releases, currency, range, from, to }: Props) {
   const { resolvedTheme } = useTheme();
   const [colors, setColors] = useState({
     signal: "#0D9488",
@@ -59,6 +66,22 @@ export function MoneyDashboard({ quotes, releases, currency }: Props) {
     return () => cancelAnimationFrame(id);
   }, [resolvedTheme]);
 
+  // ── Date range ──
+  const isAllTime = range === "all";
+  const dateRange = useMemo(() => {
+    if (isAllTime) return null;
+    if (PRESET_KEYS.includes(range as PresetKey)) {
+      const p = resolvePreset(range as PresetKey);
+      return { from: p.from, to: p.to };
+    }
+    if (from && to) {
+      const f = parseDateISO(from);
+      const t = parseDateISO(to);
+      if (f && t) return { from: f, to: t };
+    }
+    return null;
+  }, [range, from, to, isAllTime]);
+
   // ── Filter state ──
   const [typeFilter, setTypeFilter] = useState<"all" | "quote" | "invoice">("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -68,6 +91,15 @@ export function MoneyDashboard({ quotes, releases, currency }: Props) {
   const nonCancelled = quotes.filter((q) => q.status !== "cancelled");
   const paidQuotes = nonCancelled.filter((q) => q.status === "paid");
   const unpaidQuotes = nonCancelled.filter((q) => !["paid", "draft"].includes(q.status));
+
+  // Paid quotes within the selected date range (for cards + charts)
+  const rangedPaidQuotes = dateRange
+    ? paidQuotes.filter((q) => {
+        if (!q.paid_at) return false;
+        const d = new Date(q.paid_at);
+        return d >= dateRange.from && d <= dateRange.to;
+      })
+    : paidQuotes;
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -94,7 +126,11 @@ export function MoneyDashboard({ quotes, releases, currency }: Props) {
   const totalBilled = nonCancelled.reduce((s, q) => s + Number(q.total), 0);
   const sentCount = nonCancelled.filter((q) => q.status !== "draft").length;
 
-  // Month-over-month comparison
+  // Ranged totals
+  const receivedInRange = rangedPaidQuotes.reduce((s, q) => s + Number(q.total), 0);
+  const rangedPaymentCount = rangedPaidQuotes.length;
+
+  // Month-over-month comparison (only used in all-time mode)
   let monthCompare = "";
   if (receivedLastMonth > 0) {
     const pct = Math.round(((receivedThisMonth - receivedLastMonth) / receivedLastMonth) * 100);
@@ -112,7 +148,7 @@ export function MoneyDashboard({ quotes, releases, currency }: Props) {
       const label = d.toLocaleDateString("en-US", { month: "short" });
       months.push({ label, key, amount: 0, count: 0 });
     }
-    for (const q of paidQuotes) {
+    for (const q of rangedPaidQuotes) {
       if (!q.paid_at) continue;
       const pd = new Date(q.paid_at);
       const key = `${pd.getFullYear()}-${String(pd.getMonth() + 1).padStart(2, "0")}`;
@@ -124,12 +160,12 @@ export function MoneyDashboard({ quotes, releases, currency }: Props) {
     }
     return months;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quotes]);
+  }, [quotes, rangedPaidQuotes]);
 
   // ── Client breakdown ──
   const clientData = useMemo(() => {
     const byClient: Record<string, { amount: number; count: number }> = {};
-    for (const q of paidQuotes) {
+    for (const q of rangedPaidQuotes) {
       const name = q.client_name || "Unknown";
       if (!byClient[name]) byClient[name] = { amount: 0, count: 0 };
       byClient[name].amount += Number(q.total);
@@ -145,7 +181,7 @@ export function MoneyDashboard({ quotes, releases, currency }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quotes]);
 
-  const totalPaidAll = paidQuotes.reduce((s, q) => s + Number(q.total), 0);
+  const totalPaidAll = rangedPaidQuotes.reduce((s, q) => s + Number(q.total), 0);
 
   // ── Filtered document list ──
   const releaseMap = new Map(releases.map((r) => [r.id, r.title]));
@@ -172,6 +208,14 @@ export function MoneyDashboard({ quotes, releases, currency }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold text-text">Money</h1>
+        <DateRangeSelector
+          range={range === "all" ? "365d" : range}
+          from={from}
+          to={to}
+          basePath="/app/money"
+          variant="app"
+          showCompare={false}
+        />
       </div>
 
       {/* Summary Cards */}
@@ -185,9 +229,9 @@ export function MoneyDashboard({ quotes, releases, currency }: Props) {
         />
         <StatCard
           icon={TrendingUp}
-          label="Received This Month"
-          value={fmt(receivedThisMonth, currency)}
-          sub={monthCompare || "No payments yet"}
+          label={dateRange ? "Received in Range" : "Received This Month"}
+          value={fmt(dateRange ? receivedInRange : receivedThisMonth, currency)}
+          sub={dateRange ? `${rangedPaymentCount} payment${rangedPaymentCount !== 1 ? "s" : ""}` : (monthCompare || "No payments yet")}
           color="text-teal-400"
         />
         <StatCard

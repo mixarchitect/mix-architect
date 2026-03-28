@@ -2,7 +2,12 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { redirect } from "next/navigation";
 import { MoneyDashboard } from "./money-dashboard";
 
-export default async function MoneyPage() {
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function MoneyPage({ searchParams }: PageProps) {
+  const sp = await searchParams;
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },
@@ -37,11 +42,19 @@ export default async function MoneyPage() {
     releases = (data ?? []) as { id: string; title: string }[];
   }
 
+  // Pass date range params for the DateRangeSelector
+  const range = typeof sp.range === "string" ? sp.range : "all";
+  const from = typeof sp.from === "string" ? sp.from : undefined;
+  const to = typeof sp.to === "string" ? sp.to : undefined;
+
   return (
     <MoneyDashboard
       quotes={allQuotes}
       releases={releases}
       currency={currency}
+      range={range}
+      from={from}
+      to={to}
     />
   );
 }
