@@ -359,6 +359,8 @@
     "payment": "付款",
     "paymentStatus": "付款状态",
     "projectFee": "项目费用",
+    "estimatedFee": "预估费用",
+    "estimatedFeeHint": "此发行有报价。财务摘要使用报价总额进行计费。",
     "currency": "货币",
     "paidAmount": "已付金额",
     "balanceDue": "应付余额",

@@ -29,6 +29,7 @@ type Props = {
   releaseId: string;
   role: ReleaseRole;
   initialMembers: MemberRow[];
+  hasQuotes?: boolean;
 };
 
 const TYPE_OPTIONS = [
@@ -97,7 +98,7 @@ function PillSelect({
   );
 }
 
-export function SettingsForm({ releaseId, role, initialMembers }: Props) {
+export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = false }: Props) {
   const locale = useLocale();
   const t = useTranslations("releaseSettings");
   const tCommon = useTranslations("common");
@@ -750,7 +751,7 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="label text-muted">{t("projectFee")}</label>
+                      <label className="label text-muted">{hasQuotes ? t("estimatedFee") : t("projectFee")}</label>
                       <input
                         type="number"
                         step="0.01"
@@ -761,6 +762,9 @@ export function SettingsForm({ releaseId, role, initialMembers }: Props) {
                         className="input"
                         placeholder="0.00"
                       />
+                      {hasQuotes && (
+                        <p className="text-xs text-faint">{t("estimatedFeeHint")}</p>
+                      )}
                     </div>
                     <div className="space-y-1.5">
                       <label className="label text-muted">{t("currency")}</label>

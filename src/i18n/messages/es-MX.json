@@ -359,6 +359,8 @@
     "payment": "PAGO",
     "paymentStatus": "Estado de pago",
     "projectFee": "Tarifa del proyecto",
+    "estimatedFee": "Tarifa estimada",
+    "estimatedFeeHint": "Esta publicación tiene cotizaciones. El resumen financiero usa los totales de cotizaciones para la facturación.",
     "currency": "Moneda",
     "paidAmount": "Cantidad pagada",
     "balanceDue": "Saldo pendiente",

@@ -36,7 +36,7 @@ type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-const VALID_TABS = ["tracks", "globals", "distribution", "financials", "quotes"] as const;
+const VALID_TABS = ["tracks", "globals", "distribution", "financials"] as const;
 type TabId = (typeof VALID_TABS)[number];
 
 function typeLabel(t: string | undefined | null): string {
@@ -100,26 +100,28 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   const defaultHourlyRate = defaultsRes2.data?.default_hourly_rate ?? null;
   const features = resolveVisibility(defaultsRes2.data?.feature_visibility ?? null);
 
-  // Fetch quote count for tab badge
-  let releaseQuoteCount = 0;
+  // Fetch quotes for the merged Money tab (count badge + financial summary)
+  let releaseQuotes: { id: string; total: number | string; status: string }[] = [];
   if (paymentsEnabled && features.payment_tracking) {
-    const { count } = await supabase
+    const { data: quotesData } = await supabase
       .from("quotes")
-      .select("id", { count: "exact", head: true })
+      .select("id, total, status")
       .eq("release_id", releaseId)
       .eq("user_id", user.id);
-    releaseQuoteCount = count ?? 0;
+    releaseQuotes = quotesData ?? [];
   }
+  const activeQuotes = releaseQuotes.filter((q) => q.status !== "cancelled");
+  const releaseQuoteCount = releaseQuotes.length;
 
-  // Resolve current tab from search params
-  const rawTab = typeof sp.tab === "string" ? sp.tab : "";
+  // Resolve current tab from search params (map legacy "quotes" → "financials")
+  const rawTabInput = typeof sp.tab === "string" ? sp.tab : "";
+  const rawTab = rawTabInput === "quotes" ? "financials" : rawTabInput;
   const isValidTab = VALID_TABS.includes(rawTab as TabId);
   // Fall back to tracks if the requested tab is hidden
   const tabAvailable =
     isValidTab &&
     (rawTab !== "financials" || (paymentsEnabled && features.payment_tracking)) &&
-    (rawTab !== "distribution" || features.distribution_checklist) &&
-    (rawTab !== "quotes" || (paymentsEnabled && features.payment_tracking));
+    (rawTab !== "distribution" || features.distribution_checklist);
   const currentTab: TabId = tabAvailable ? (rawTab as TabId) : "tracks";
 
   // Fetch client notes if client email is present
@@ -203,10 +205,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
       ? [{ id: "distribution" as const, label: t("tabDistribution") }]
       : []),
     ...(paymentsEnabled && features.payment_tracking
-      ? [{ id: "financials" as const, label: t("tabFinancials") }]
-      : []),
-    ...(paymentsEnabled && features.payment_tracking
-      ? [{ id: "quotes" as const, label: t("tabQuotes"), count: releaseQuoteCount }]
+      ? [{ id: "financials" as const, label: t("tabFinancials"), count: releaseQuoteCount || undefined, moneyEasterEgg: true }]
       : []),
   ];
 
@@ -362,10 +361,10 @@ export default async function ReleasePage({ params, searchParams }: Props) {
               />
             )}
 
-            {/* Financials tab (only rendered when paymentsEnabled + feature visible, matching tabs array) */}
+            {/* Financials tab — unified Money view with quotes merged in */}
             {paymentsEnabled && features.payment_tracking && (
               <div className="space-y-6">
-                {/* Financial Summary with inline editing */}
+                {/* Financial Summary with inline editing + quote-derived mode */}
                 <FinancialSummary
                   releaseId={releaseId}
                   feeTotal={release.fee_total}
@@ -375,7 +374,11 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                   expenses={expenses}
                   timeEntries={timeEntries}
                   locale={locale}
+                  quotes={activeQuotes}
                 />
+
+                {/* Quotes section (merged from former Quotes tab) */}
+                <ReleaseQuotesTab releaseId={releaseId} locale={locale} />
 
                 {/* Time Log */}
                 <TimeEntryList
@@ -394,11 +397,6 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                   locale={locale}
                 />
               </div>
-            )}
-
-            {/* Quotes tab (only rendered when paymentsEnabled + feature visible, matching tabs array) */}
-            {paymentsEnabled && features.payment_tracking && (
-              <ReleaseQuotesTab releaseId={releaseId} locale={locale} />
             )}
           </TabbedContent>
           </div>

@@ -359,6 +359,8 @@
     "payment": "결제",
     "paymentStatus": "결제 상태",
     "projectFee": "프로젝트 수수료",
+    "estimatedFee": "예상 수수료",
+    "estimatedFeeHint": "이 릴리스에 견적서가 있습니다. 재무 요약은 청구에 견적 합계를 사용합니다.",
     "currency": "통화",
     "paidAmount": "결제 금액",
     "balanceDue": "미결제 잔액",

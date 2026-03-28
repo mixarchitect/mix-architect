@@ -359,6 +359,8 @@
     "payment": "支払い",
     "paymentStatus": "支払い状況",
     "projectFee": "プロジェクト料金",
+    "estimatedFee": "見積もり料金",
+    "estimatedFeeHint": "このリリースには見積もりがあります。財務サマリーは請求に見積もり合計を使用します。",
     "currency": "通貨",
     "paidAmount": "支払い済み金額",
     "balanceDue": "残高",

@@ -359,6 +359,8 @@
     "payment": "PAIEMENT",
     "paymentStatus": "Statut du paiement",
     "projectFee": "Tarif du projet",
+    "estimatedFee": "Tarif estimé",
+    "estimatedFeeHint": "Cette sortie a des devis. Le résumé financier utilise les totaux des devis pour la facturation.",
     "currency": "Devise",
     "paidAmount": "Montant payé",
     "balanceDue": "Solde dû",

@@ -3,14 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
-import { Check, X, Pencil, Trash2 } from "lucide-react";
+import { Check, X, Pencil, Trash2, Info } from "lucide-react";
 import { Panel, PanelBody } from "@/components/ui/panel";
+import { Tooltip } from "@/components/ui/tooltip";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import type { ReleaseExpense } from "@/app/app/releases/[releaseId]/expense-actions";
 import type { ReleaseTimeEntry } from "@/app/app/releases/[releaseId]/time-entry-actions";
 
 function fmt(amount: number, currency: string, locale: string): string {
   return new Intl.NumberFormat(locale, { style: "currency", currency }).format(amount);
+}
+
+interface QuoteSummary {
+  id: string;
+  total: number | string;
+  status: string;
 }
 
 interface Props {
@@ -22,6 +29,8 @@ interface Props {
   expenses: ReleaseExpense[];
   timeEntries: ReleaseTimeEntry[];
   locale: string;
+  /** Non-cancelled quotes for this release — drives Mode A when present */
+  quotes?: QuoteSummary[];
 }
 
 const STATUS_CYCLE = ["unpaid", "partial", "paid"] as const;
@@ -69,6 +78,7 @@ export function FinancialSummary({
   expenses,
   timeEntries,
   locale: localeProp,
+  quotes = [],
 }: Props) {
   const locale = useLocale() || localeProp;
   const router = useRouter();
@@ -82,6 +92,7 @@ export function FinancialSummary({
   const [editingPaid, setEditingPaid] = useState(false);
   const [paidInput, setPaidInput] = useState(String(initialPaid));
 
+  // Cost calculations (shared between both modes)
   const totalHours = timeEntries.reduce((sum, e) => sum + Number(e.hours), 0);
   const timeBillable = timeEntries.reduce((sum, e) => {
     if (e.rate != null) return sum + Number(e.hours) * Number(e.rate);
@@ -89,6 +100,109 @@ export function FinancialSummary({
   }, 0);
   const expensesTotal = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
 
+  // ── MODE A: Quote-derived (when non-cancelled quotes exist) ──
+  const hasQuotes = quotes.length > 0;
+
+  if (hasQuotes) {
+    const totalQuoted = quotes.reduce((sum, q) => sum + Number(q.total), 0);
+    const totalPaid = quotes
+      .filter((q) => q.status === "paid")
+      .reduce((sum, q) => sum + Number(q.total), 0);
+    const outstanding = totalQuoted - totalPaid;
+    const totalCosts = timeBillable + expensesTotal;
+    const profit = totalPaid - totalCosts;
+
+    const derivedStatus =
+      totalPaid >= totalQuoted && totalQuoted > 0
+        ? "paid"
+        : totalPaid > 0
+          ? "partial"
+          : "unpaid";
+
+    return (
+      <Panel>
+        <PanelBody className="py-5">
+          <div className="label-sm text-muted mb-3">FINANCIAL SUMMARY</div>
+          <div className="space-y-2 text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
+            {/* Revenue section */}
+            <Row label="Total Quoted">
+              <span className="text-text">{fmt(totalQuoted, feeCurrency, locale)}</span>
+              <span className="w-[34px]" />
+            </Row>
+            <Row label="Paid">
+              <span className="text-green-400">{fmt(totalPaid, feeCurrency, locale)}</span>
+              <span className="w-[34px]" />
+            </Row>
+            {outstanding > 0 && (
+              <Row label="Outstanding">
+                <span className="text-amber-400">{fmt(outstanding, feeCurrency, locale)}</span>
+                <span className="w-[34px]" />
+              </Row>
+            )}
+            <Row label="Status">
+              <span className={`text-xs font-medium ${statusColors[derivedStatus] ?? "text-faint"}`}>
+                {statusLabels[derivedStatus] ?? derivedStatus}
+                {derivedStatus === "paid" && " \u2713"}
+              </span>
+              <span className="w-[34px]" />
+            </Row>
+
+            {/* Divider */}
+            {(timeEntries.length > 0 || expenses.length > 0) && (
+              <div className="border-t border-border my-1" />
+            )}
+
+            {/* Cost section */}
+            {timeEntries.length > 0 && (
+              <Row label={<>Time logged <span className="text-faint ml-1">{totalHours.toFixed(1)}h</span></>}>
+                {timeBillable > 0 ? (
+                  <span className="text-text">{fmt(timeBillable, feeCurrency, locale)}</span>
+                ) : null}
+                <span className="w-[34px]" />
+              </Row>
+            )}
+            {expenses.length > 0 && (
+              <Row label={<>Expenses <span className="text-faint ml-1">{expenses.length} item{expenses.length !== 1 ? "s" : ""}</span></>}>
+                <span className="text-text">{fmt(expensesTotal, feeCurrency, locale)}</span>
+                <span className="w-[34px]" />
+              </Row>
+            )}
+
+            {/* Profit */}
+            <div className="border-t border-border my-1" />
+            <Row
+              label={
+                <span className="flex items-center gap-1.5">
+                  Profit
+                  <Tooltip label="Revenue collected minus your tracked time and expenses" side="bottom">
+                    <Info size={12} className="text-faint" />
+                  </Tooltip>
+                </span>
+              }
+              bold
+            >
+              <span
+                className={
+                  totalPaid === 0
+                    ? "text-muted"
+                    : profit > 0
+                      ? "text-teal-400"
+                      : profit < 0
+                        ? "text-amber-400"
+                        : "text-text"
+                }
+              >
+                {totalPaid === 0 ? "\u2014" : fmt(profit, feeCurrency, locale)}
+              </span>
+              <span className="w-[34px]" />
+            </Row>
+          </div>
+        </PanelBody>
+      </Panel>
+    );
+  }
+
+  // ── MODE B: Manual tracking (no quotes) ──
   const effectiveFee = status === "no_fee" ? null : fee;
   const feeVal = effectiveFee ?? 0;
   const totalBilled = feeVal + timeBillable + expensesTotal;
@@ -161,6 +275,10 @@ export function FinancialSummary({
       setStatus(prev);
     }
   }
+
+  // Profit for Mode B
+  const manualPaid = status === "paid" ? feeVal : paid;
+  const manualProfit = manualPaid - (timeBillable + expensesTotal);
 
   return (
     <Panel>
@@ -254,7 +372,7 @@ export function FinancialSummary({
                 </div>
               ) : (
                 <>
-                  <span className="text-green-400">{paid > 0 ? `−${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}</span>
+                  <span className="text-green-400">{paid > 0 ? `\u2212${fmt(paid, feeCurrency, locale)}` : fmt(0, feeCurrency, locale)}</span>
                   <ActionIcons
                     onEdit={() => { setPaidInput(String(paid)); setEditingPaid(true); }}
                     onClear={async () => {
@@ -288,10 +406,43 @@ export function FinancialSummary({
                 className={`text-xs font-medium ${statusColors[status] ?? "text-faint"} hover:opacity-80 transition-opacity`}
               >
                 {statusLabels[status] ?? status}
-                {status === "paid" && " ✓"}
+                {status === "paid" && " \u2713"}
               </button>
               <span className="w-[34px]" />
             </Row>
+          )}
+
+          {/* Profit (Mode B) */}
+          {totalBilled > 0 && (
+            <>
+              <div className="border-t border-border my-1" />
+              <Row
+                label={
+                  <span className="flex items-center gap-1.5">
+                    Profit
+                    <Tooltip label="Revenue collected minus your tracked time and expenses" side="bottom">
+                      <Info size={12} className="text-faint" />
+                    </Tooltip>
+                  </span>
+                }
+                bold
+              >
+                <span
+                  className={
+                    paid === 0 && status !== "paid"
+                      ? "text-muted"
+                      : manualProfit > 0
+                        ? "text-teal-400"
+                        : manualProfit < 0
+                          ? "text-amber-400"
+                          : "text-text"
+                  }
+                >
+                  {paid === 0 && status !== "paid" ? "\u2014" : fmt(manualProfit, feeCurrency, locale)}
+                </span>
+                <span className="w-[34px]" />
+              </Row>
+            </>
           )}
         </div>
       </PanelBody>

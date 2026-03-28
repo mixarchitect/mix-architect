@@ -359,6 +359,8 @@
     "payment": "PAGAMENTO",
     "paymentStatus": "Status do pagamento",
     "projectFee": "Taxa do projeto",
+    "estimatedFee": "Taxa estimada",
+    "estimatedFeeHint": "Este lançamento tem orçamentos. O resumo financeiro usa os totais dos orçamentos para faturamento.",
     "currency": "Moeda",
     "paidAmount": "Valor pago",
     "balanceDue": "Saldo devedor",

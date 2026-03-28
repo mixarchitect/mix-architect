@@ -359,6 +359,8 @@
     "payment": "PAYMENT",
     "paymentStatus": "Payment status",
     "projectFee": "Project fee",
+    "estimatedFee": "Estimated fee",
+    "estimatedFeeHint": "This release has quotes. The Financial Summary uses quote totals for billing.",
     "currency": "Currency",
     "paidAmount": "Paid amount",
     "balanceDue": "Balance due",

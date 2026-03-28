@@ -359,6 +359,8 @@
     "payment": "BETALNING",
     "paymentStatus": "Betalningsstatus",
     "projectFee": "Projektavgift",
+    "estimatedFee": "Uppskattad avgift",
+    "estimatedFeeHint": "Denna release har offerter. Ekonomisk sammanfattning använder offertsummor för fakturering.",
     "currency": "Valuta",
     "paidAmount": "Betald summa",
     "balanceDue": "Återstående saldo",

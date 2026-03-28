@@ -359,6 +359,8 @@
     "payment": "ZAHLUNG",
     "paymentStatus": "Zahlungsstatus",
     "projectFee": "Projekthonorar",
+    "estimatedFee": "Geschätzte Gebühr",
+    "estimatedFeeHint": "Dieses Release hat Angebote. Die Finanzübersicht verwendet Angebotsbeträge für die Abrechnung.",
     "currency": "Währung",
     "paidAmount": "Bezahlter Betrag",
     "balanceDue": "Ausstehender Saldo",
