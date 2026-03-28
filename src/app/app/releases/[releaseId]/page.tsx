@@ -381,6 +381,9 @@ export default async function ReleasePage({ params, searchParams }: Props) {
 
               return (
                 <div className="space-y-6">
+                  {/* Quotes & Invoices section (top of Money tab) */}
+                  <ReleaseQuotesTab releaseId={releaseId} locale={locale} />
+
                   {/* Financial Summary with inline editing + quote-derived mode */}
                   <FinancialSummary
                     releaseId={releaseId}
@@ -393,9 +396,6 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                     locale={locale}
                     quotes={activeQuotes}
                   />
-
-                  {/* Quotes section (merged from former Quotes tab) */}
-                  <ReleaseQuotesTab releaseId={releaseId} locale={locale} />
 
                   {/* Time Log */}
                   <TimeEntryList
