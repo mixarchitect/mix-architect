@@ -824,7 +824,7 @@
     "toolVersionControl": "Version Control",
     "toolVersionControlDesc": "Upload new versions, compare side by side, keep every revision accessible.",
 
-    "featuredReleaseHeading": "Featured Release",
+    "featuredReleaseHeading": "What we're spinning",
     "featuredReleaseDesc": "Spotlighting great releases and the people behind the sound.",
     "viewAllFeatured": "View all featured releases →",
 
@@ -868,7 +868,7 @@
 
     "navFeatures": "Features",
     "navPricing": "Pricing",
-    "navFeatured": "Featured",
+    "navFeatured": "Spinning",
     "signIn": "Sign in",
     "navChangelog": "Changelog",
     "navHelpCenter": "Help Center",

@@ -41,8 +41,8 @@ export default async function HomePage() {
         <Hero />
         <FeatureShowcase />
         <AudioToolsGrid />
-        {featuredRelease && <FeaturedReleaseSection release={featuredRelease} />}
         <Pricing />
+        {featuredRelease && <FeaturedReleaseSection release={featuredRelease} />}
         <FounderNote />
         <FinalCTA />
         <LandingFooter />

@@ -90,11 +90,11 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
           <kbd className="text-[10px] font-medium text-muted bg-panel border border-border rounded px-1.5 py-0.5">⌘K</kbd>
         </button>
 
-        {/* Featured releases */}
-        <Tooltip label="Featured Releases" align="right">
+        {/* What we're spinning */}
+        <Tooltip label="What we're spinning" align="right">
           <Link
             href="/app/featured"
-            aria-label="Featured Releases"
+            aria-label="What we're spinning"
             className="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
           >
             <Sparkles size={18} strokeWidth={1.5} />
