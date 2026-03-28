@@ -38,6 +38,7 @@ export function TabbedContent({ tabs, initialTab, className, children }: Props) 
   // Easter egg tooltip state for the Money tab
   const [easterEgg, setEasterEgg] = useState<string | null>(null);
   const easterEggTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const moneyTabRef = useRef<HTMLDivElement>(null);
 
   const handleTabChange = useCallback(
     (tabId: string) => {
@@ -54,6 +55,18 @@ export function TabbedContent({ tabs, initialTab, className, children }: Props) 
     [pathname, searchParams, tabs],
   );
 
+  // Compute tooltip position from the Money tab button
+  const tooltipStyle = (() => {
+    if (!easterEgg || !moneyTabRef.current) return undefined;
+    const rect = moneyTabRef.current.getBoundingClientRect();
+    return {
+      position: "fixed" as const,
+      top: rect.top - 8,
+      left: rect.left + rect.width / 2,
+      transform: "translate(-50%, -100%)",
+    };
+  })();
+
   return (
     <div>
       <div
@@ -66,6 +79,7 @@ export function TabbedContent({ tabs, initialTab, className, children }: Props) 
         {tabs.map((tab) => (
           <div
             key={tab.id}
+            ref={tab.moneyEasterEgg ? moneyTabRef : undefined}
             className="relative inline-flex"
             onMouseEnter={
               tab.moneyEasterEgg
@@ -104,17 +118,20 @@ export function TabbedContent({ tabs, initialTab, className, children }: Props) 
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-signal" />
               )}
             </button>
-            {tab.moneyEasterEgg && easterEgg && (
-              <span
-                className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 px-2 py-1 rounded-md text-[11px] whitespace-nowrap pointer-events-none bg-text text-panel italic"
-                role="tooltip"
-              >
-                {easterEgg}
-              </span>
-            )}
           </div>
         ))}
       </div>
+
+      {/* Easter egg tooltip — rendered outside the overflow container */}
+      {easterEgg && tooltipStyle && (
+        <span
+          className="z-50 px-2 py-1 rounded-md text-[11px] whitespace-nowrap pointer-events-none bg-text text-panel italic"
+          role="tooltip"
+          style={tooltipStyle}
+        >
+          {easterEgg}
+        </span>
+      )}
 
       {tabs.map((tab, i) => (
         <div key={tab.id} role="tabpanel" hidden={currentTab !== tab.id}>
