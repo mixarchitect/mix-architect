@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
   detectSpotifyRelease,
@@ -22,7 +23,12 @@ const MAX_ERRORS = 5; // circuit breaker
  */
 export async function GET(request: NextRequest) {
   const secret = request.headers.get("authorization");
-  if (secret !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!secret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const actual = crypto.createHash('sha256').update(secret).digest();
+  const expected = crypto.createHash('sha256').update(`Bearer ${process.env.CRON_SECRET}`).digest();
+  if (!crypto.timingSafeEqual(actual, expected)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
