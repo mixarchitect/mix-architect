@@ -17,6 +17,11 @@ const MONEY_QUOTES = [
   "That\u2019s what I want",
   "Get away",
   "Mo money, mo problems",
+  "Cash rules everything around me",
+  "Money for nothing",
+  "Money can\u2019t buy me love",
+  "For the love of money",
+  "Bills, Bills, Bills",
 ];
 
 /**
