@@ -26,7 +26,7 @@ export default async function MoneyPage({ searchParams }: PageProps) {
   // Fetch all quotes for this user
   const { data: quotes } = await supabase
     .from("quotes")
-    .select("id, quote_number, document_type, title, status, total, currency, client_name, client_email, release_id, due_date, paid_at, created_at")
+    .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 

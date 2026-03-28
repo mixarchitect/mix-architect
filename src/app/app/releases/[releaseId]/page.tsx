@@ -101,11 +101,11 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   const features = resolveVisibility(defaultsRes2.data?.feature_visibility ?? null);
 
   // Fetch quotes for the merged Money tab (count badge + financial summary)
-  let releaseQuotes: { id: string; total: number | string; status: string; document_type?: string }[] = [];
+  let releaseQuotes: { id: string; total: number | string; status: string }[] = [];
   if (paymentsEnabled && features.payment_tracking) {
     const { data: quotesData } = await supabase
       .from("quotes")
-      .select("id, total, status, document_type")
+      .select("id, total, status")
       .eq("release_id", releaseId)
       .eq("user_id", user.id);
     releaseQuotes = quotesData ?? [];
