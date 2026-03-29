@@ -15,7 +15,6 @@ import {
   reorderServices,
 } from "@/actions/services";
 import type { Service, ServiceUnit } from "@/types/payments";
-import { formatCurrency } from "@/lib/currency";
 
 const UNIT_OPTIONS: { value: ServiceUnit; labelKey: string }[] = [
   { value: "flat", labelKey: "flat" },
@@ -180,11 +179,6 @@ export function ServicesCatalog({ currency, locale }: Props) {
     setDragOverIdx(null);
   }
 
-  const unitLabel = (unit: ServiceUnit) => {
-    const opt = UNIT_OPTIONS.find((o) => o.value === unit);
-    return opt ? t(`services.units.${opt.labelKey}`) : unit;
-  };
-
   if (loading) return null;
 
   return (
@@ -216,30 +210,30 @@ export function ServicesCatalog({ currency, locale }: Props) {
         ) : (
           <>
             {/* Column headers */}
-            <div className="flex items-center gap-2 mb-2 px-1">
-              <div className="w-5 shrink-0" />
-              <span className="flex-1 text-xs text-muted uppercase tracking-wide">
+            <div className="grid grid-cols-[20px_1fr_112px_132px_32px] gap-x-2 items-center mb-1">
+              <div /> {/* grip spacer */}
+              <span className="text-[11px] text-muted uppercase tracking-wider font-medium">
                 {t("services.name")}
               </span>
-              <span className="w-28 text-xs text-muted uppercase tracking-wide text-right">
+              <span className="text-[11px] text-muted uppercase tracking-wider font-medium text-right">
                 {t("services.rate")}
               </span>
-              <span className="w-32 text-xs text-muted uppercase tracking-wide">
+              <span className="text-[11px] text-muted uppercase tracking-wider font-medium">
                 {t("services.unit")}
               </span>
-              <div className="w-8 shrink-0" />
+              <div />
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {services.map((svc, idx) => (
                 <div
                   key={svc.id}
-                  className={`group flex items-center gap-2 rounded-md px-1 py-1.5 transition-all ${
+                  className={`group grid grid-cols-[20px_1fr_112px_132px_32px] gap-x-2 items-center rounded-md py-0.5 transition-all ${
                     dragIdx === idx ? "opacity-40" : ""
                   } ${
                     dragOverIdx === idx && dragIdx !== idx
-                      ? "border border-signal border-dashed"
-                      : "border border-transparent"
+                      ? "outline outline-1 outline-signal outline-dashed"
+                      : ""
                   }`}
                   draggable
                   onDragStart={() => handleDragStart(idx)}
@@ -247,17 +241,19 @@ export function ServicesCatalog({ currency, locale }: Props) {
                   onDrop={() => handleDrop(idx)}
                   onDragEnd={handleDragEnd}
                 >
-                  <GripVertical
-                    size={14}
-                    className="text-muted shrink-0 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
-                  />
+                  <div className="flex items-center justify-center">
+                    <GripVertical
+                      size={14}
+                      className="text-zinc-600 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+                    />
+                  </div>
                   <input
                     type="text"
                     value={svc.name}
                     onChange={(e) =>
                       handleFieldChange(svc.id, "name", e.target.value)
                     }
-                    className="input text-sm flex-1"
+                    className="input-table text-sm"
                     placeholder={t("services.namePlaceholder")}
                   />
                   <input
@@ -270,7 +266,7 @@ export function ServicesCatalog({ currency, locale }: Props) {
                         parseFloat(e.target.value) || 0,
                       )
                     }
-                    className="input text-sm w-28 text-right"
+                    className="input-table text-sm text-right"
                     min="0"
                     step="0.01"
                     placeholder="0.00"
@@ -284,7 +280,7 @@ export function ServicesCatalog({ currency, locale }: Props) {
                         e.target.value as ServiceUnit,
                       )
                     }
-                    className="input text-sm w-32"
+                    className="input-table text-sm"
                   >
                     {UNIT_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -292,13 +288,15 @@ export function ServicesCatalog({ currency, locale }: Props) {
                       </option>
                     ))}
                   </select>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteService(svc.id)}
-                    className="p-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  <div className="flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteService(svc.id)}
+                      className="p-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -309,7 +307,7 @@ export function ServicesCatalog({ currency, locale }: Props) {
           <button
             type="button"
             onClick={handleAddService}
-            className="flex items-center gap-1 text-xs text-signal hover:underline mt-3"
+            className="flex items-center gap-1 text-xs text-signal hover:underline mt-3 pl-[28px]"
           >
             <Plus size={12} />
             {t("services.addService")}

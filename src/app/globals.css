@@ -410,6 +410,45 @@ select.input {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23e8e8e8' stroke-opacity='0.5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 }
 
+/* Compact inline-edit input for table rows (transparent until hover/focus) */
+.input-table {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+.input-table:hover {
+  border-color: var(--border);
+}
+.input-table:focus {
+  outline: none;
+  background: var(--panel);
+  border-color: var(--signal);
+  box-shadow: 0 0 0 3px var(--signal-muted);
+}
+.input-table::placeholder {
+  color: var(--faint);
+}
+.input-table:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+select.input-table {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23141414' stroke-opacity='0.5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+}
+[data-theme="dark"] select.input-table {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23e8e8e8' stroke-opacity='0.5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
 /* ─────────────────────────────────────────────────────
    DATA GRID (Petronex 2-column layout)
 ───────────────────────────────────────────────────── */

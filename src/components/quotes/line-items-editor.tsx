@@ -39,6 +39,10 @@ const UNIT_LABELS: Record<ServiceUnit, string> = {
   custom: "",
 };
 
+// Grid column template (shared between header and rows)
+const GRID_COLS = "grid-cols-[20px_1fr_72px_112px_96px_32px]";
+const GRID_COLS_READONLY = "grid-cols-[20px_1fr_72px_112px_96px]";
+
 // ── Component ────────────────────────────────────────────────────
 
 export function LineItemsEditor({
@@ -52,6 +56,7 @@ export function LineItemsEditor({
   onImportTrackFees,
 }: Props) {
   const t = useTranslations("quotes");
+  const gridCols = isReadonly ? GRID_COLS_READONLY : GRID_COLS;
 
   // DnD state
   const [dragIdx, setDragIdx] = useState<number | null>(null);
@@ -105,7 +110,6 @@ export function LineItemsEditor({
       ...lineItems,
       { description: "", quantity: 1, unit_price: 0, sort_order: lineItems.length },
     ]);
-    // Focus new description after render
     requestAnimationFrame(() => {
       descRefs.current.get(lineItems.length)?.focus();
     });
@@ -182,7 +186,6 @@ export function LineItemsEditor({
     setActiveAutoIdx(null);
     setAutoResults([]);
     setAutoFocused(-1);
-    // Focus rate field after selection
     requestAnimationFrame(() => {
       qtyRefs.current.get(idx)?.focus();
     });
@@ -213,7 +216,6 @@ export function LineItemsEditor({
     idx: number,
     field: "description" | "quantity" | "rate",
   ) {
-    // Let autocomplete handle its own keys
     if (field === "description" && activeAutoIdx === idx && autoResults.length > 0) {
       if (["ArrowDown", "ArrowUp", "Escape"].includes(e.key)) return;
       if (e.key === "Enter" && autoFocused >= 0) return;
@@ -221,11 +223,9 @@ export function LineItemsEditor({
 
     if (e.key === "Enter" && field === "rate") {
       e.preventDefault();
-      // If last row, add new line item
       if (idx === lineItems.length - 1) {
         addLineItem();
       } else {
-        // Focus next row's description
         descRefs.current.get(idx + 1)?.focus();
       }
     }
@@ -278,35 +278,35 @@ export function LineItemsEditor({
 
       {/* Column headers */}
       {lineItems.length > 0 && (
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-5 shrink-0" /> {/* grip spacer */}
-          <span className="flex-1 text-xs text-muted uppercase tracking-wide">
+        <div className={`grid ${gridCols} gap-x-2 items-center mb-1 px-0.5`}>
+          <div /> {/* grip spacer */}
+          <span className="text-[11px] text-muted uppercase tracking-wider font-medium">
             {t("builder.colDescription")}
           </span>
-          <span className="w-16 text-xs text-muted uppercase tracking-wide text-center">
+          <span className="text-[11px] text-muted uppercase tracking-wider font-medium text-center">
             {t("builder.colQty")}
           </span>
-          <span className="w-28 text-xs text-muted uppercase tracking-wide text-right">
+          <span className="text-[11px] text-muted uppercase tracking-wider font-medium text-right">
             {t("builder.colRate")}
           </span>
-          <span className="w-24 text-xs text-muted uppercase tracking-wide text-right">
+          <span className="text-[11px] text-muted uppercase tracking-wider font-medium text-right">
             {t("builder.colAmount")}
           </span>
-          {!isReadonly && <div className="w-8 shrink-0" />} {/* delete spacer */}
+          {!isReadonly && <div />}
         </div>
       )}
 
       {/* Line items */}
-      <div className="space-y-1">
+      <div className="space-y-0.5">
         {lineItems.map((li, idx) => (
           <div
             key={li.id ?? `new-${idx}`}
-            className={`group/row flex items-start gap-2 rounded-md transition-all ${
+            className={`group/row grid ${gridCols} gap-x-2 items-center rounded-md py-0.5 transition-all ${
               dragIdx === idx ? "opacity-40" : ""
             } ${
               dragOverIdx === idx && dragIdx !== idx
-                ? "border border-signal border-dashed"
-                : "border border-transparent"
+                ? "outline outline-1 outline-signal outline-dashed"
+                : ""
             }`}
             draggable={!isReadonly}
             onDragStart={() => handleDragStart(idx)}
@@ -315,17 +315,19 @@ export function LineItemsEditor({
             onDragEnd={handleDragEnd}
           >
             {/* Drag handle */}
-            <GripVertical
-              size={14}
-              className={`text-muted mt-2.5 shrink-0 cursor-grab active:cursor-grabbing transition-opacity ${
-                isReadonly
-                  ? "invisible"
-                  : "opacity-0 group-hover/row:opacity-100 max-sm:opacity-100"
-              }`}
-            />
+            <div className="flex items-center justify-center">
+              <GripVertical
+                size={14}
+                className={`text-zinc-600 cursor-grab active:cursor-grabbing transition-opacity ${
+                  isReadonly
+                    ? "invisible"
+                    : "opacity-0 group-hover/row:opacity-100 max-sm:opacity-100"
+                }`}
+              />
+            </div>
 
             {/* Description with autocomplete */}
-            <div className="relative flex-1" ref={activeAutoIdx === idx ? autoRef : undefined}>
+            <div className="relative" ref={activeAutoIdx === idx ? autoRef : undefined}>
               <input
                 ref={(el) => {
                   if (el) descRefs.current.set(idx, el);
@@ -334,7 +336,6 @@ export function LineItemsEditor({
                 value={li.description}
                 onChange={(e) => handleDescriptionChange(idx, e.target.value)}
                 onFocus={() => {
-                  // Show autocomplete on focus if there's a value
                   if (li.description.length >= 1 && services.length > 0) {
                     handleDescriptionChange(idx, li.description);
                   }
@@ -343,7 +344,7 @@ export function LineItemsEditor({
                   handleAutoKeyDown(e, idx);
                   handleKeyDown(e, idx, "description");
                 }}
-                className="input text-sm w-full"
+                className="input-table text-sm"
                 placeholder={t("builder.descriptionPlaceholder")}
                 disabled={isReadonly}
               />
@@ -361,7 +362,7 @@ export function LineItemsEditor({
                           : "text-text hover:bg-panel2"
                       }`}
                       onMouseDown={(e) => {
-                        e.preventDefault(); // prevent blur
+                        e.preventDefault();
                         selectAutoResult(idx, svc);
                       }}
                       onMouseEnter={() => setAutoFocused(i)}
@@ -392,7 +393,7 @@ export function LineItemsEditor({
                 updateLineItem(idx, "quantity", parseFloat(e.target.value) || 0)
               }
               onKeyDown={(e) => handleKeyDown(e, idx, "quantity")}
-              className="input text-sm w-16 text-center"
+              className="input-table text-sm text-center"
               min="0"
               step="1"
               disabled={isReadonly}
@@ -413,7 +414,7 @@ export function LineItemsEditor({
                 )
               }
               onKeyDown={(e) => handleKeyDown(e, idx, "rate")}
-              className="input text-sm w-28 text-right"
+              className="input-table text-sm text-right"
               min="0"
               step="0.01"
               placeholder="0.00"
@@ -422,21 +423,27 @@ export function LineItemsEditor({
 
             {/* Amount */}
             <div
-              className="w-24 text-sm text-right text-muted pt-2 shrink-0 font-medium"
+              className="text-sm text-right text-text font-medium py-2 pr-2.5"
               style={{ fontVariantNumeric: "tabular-nums" }}
             >
               {formatCurrency(li.quantity * li.unit_price, currency, locale)}
             </div>
 
             {/* Delete */}
-            {!isReadonly && lineItems.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeLineItem(idx)}
-                className="p-1.5 text-muted hover:text-red-400 transition-colors mt-1 opacity-0 group-hover/row:opacity-100 max-sm:opacity-100 shrink-0"
-              >
-                <Trash2 size={14} />
-              </button>
+            {!isReadonly && (
+              <div className="flex items-center justify-center">
+                {lineItems.length > 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => removeLineItem(idx)}
+                    className="p-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover/row:opacity-100 max-sm:opacity-100"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                ) : (
+                  <div />
+                )}
+              </div>
             )}
           </div>
         ))}
@@ -444,7 +451,7 @@ export function LineItemsEditor({
 
       {/* Add buttons */}
       {!isReadonly && (
-        <div className="flex items-center gap-4 mt-3">
+        <div className="flex items-center gap-4 mt-3 pl-[28px]">
           <button
             type="button"
             onClick={addLineItem}
