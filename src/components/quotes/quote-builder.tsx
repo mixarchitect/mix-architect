@@ -527,18 +527,18 @@ export function QuoteBuilder({
               />
 
               {/* Totals — same grid template as line items so Amount column aligns */}
-              <div className={`grid ${isReadonly ? "grid-cols-[20px_1fr_72px_112px_96px]" : "grid-cols-[20px_1fr_72px_112px_96px_32px]"} gap-x-2 items-center mt-3 border-t border-border pt-3`}>
+              <div className={`grid ${isReadonly ? "grid-cols-[20px_1fr_72px_112px_96px]" : "grid-cols-[20px_1fr_72px_112px_96px_32px]"} gap-x-2 gap-y-1 items-center mt-3 border-t border-border pt-3`}>
                 {/* Subtotal */}
-                <div className="col-span-4 text-sm text-muted text-right">
+                <div className="col-span-4 text-sm text-muted text-right py-2">
                   {t("builder.subtotal")}
                 </div>
-                <div className="text-sm text-text text-right font-medium pr-2.5" style={{ fontVariantNumeric: "tabular-nums" }}>
+                <div className="text-sm text-text text-right font-medium py-2 pr-2.5" style={{ fontVariantNumeric: "tabular-nums" }}>
                   {formatCurrency(subtotal, currency, locale)}
                 </div>
                 {!isReadonly && <div />}
 
                 {/* Discount */}
-                <div className="col-span-4 text-sm text-muted text-right">
+                <div className="col-span-4 text-sm text-muted text-right py-2">
                   {t("builder.discount")}
                 </div>
                 <input
@@ -554,7 +554,7 @@ export function QuoteBuilder({
                 {!isReadonly && <div />}
 
                 {/* Tax */}
-                <div className="col-span-4 text-sm text-muted text-right">
+                <div className="col-span-4 text-sm text-muted text-right py-2">
                   {t("builder.tax")}
                 </div>
                 <input
@@ -569,14 +569,17 @@ export function QuoteBuilder({
                 />
                 {!isReadonly && <div />}
 
+                {/* Total divider */}
+                <div className="col-span-full border-t border-border" />
+
                 {/* Total */}
-                <div className="col-span-4 text-sm text-text text-right font-semibold pt-2 mt-1 border-t border-border">
+                <div className="col-span-4 text-sm text-text text-right font-semibold py-2">
                   {t("builder.total")}
                 </div>
-                <div className="text-sm text-text text-right font-semibold pr-2.5 pt-2 mt-1 border-t border-border" style={{ fontVariantNumeric: "tabular-nums" }}>
+                <div className="text-sm text-text text-right font-semibold py-2 pr-2.5" style={{ fontVariantNumeric: "tabular-nums" }}>
                   {formatCurrency(total, currency, locale)}
                 </div>
-                {!isReadonly && <div className="pt-2 mt-1 border-t border-border" />}
+                {!isReadonly && <div />}
               </div>
             </PanelBody>
           </Panel>
