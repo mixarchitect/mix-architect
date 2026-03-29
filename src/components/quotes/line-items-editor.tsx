@@ -278,7 +278,7 @@ export function LineItemsEditor({
 
       {/* Column headers */}
       {lineItems.length > 0 && (
-        <div className={`grid ${gridCols} gap-x-2 items-center mb-1 px-0.5`}>
+        <div className={`grid ${gridCols} gap-x-2 items-center mb-1`}>
           <div /> {/* grip spacer */}
           <span className="text-[11px] text-muted uppercase tracking-wider font-medium">
             {t("builder.colDescription")}

@@ -526,19 +526,19 @@ export function QuoteBuilder({
                 onImportTrackFees={importFromTrackFees}
               />
 
-              {/* Totals — same grid as line items so Amount column aligns */}
-              <div className="grid grid-cols-[20px_1fr_72px_112px_96px_32px] gap-x-2 items-center mt-4 border-t border-border pt-4">
+              {/* Totals — same grid template as line items so Amount column aligns */}
+              <div className={`grid ${isReadonly ? "grid-cols-[20px_1fr_72px_112px_96px]" : "grid-cols-[20px_1fr_72px_112px_96px_32px]"} gap-x-2 items-center mt-4 border-t border-border pt-4`}>
                 {/* Subtotal */}
-                <div className="col-start-3 col-span-2 text-sm text-muted text-right py-1">
+                <div className="col-span-4 text-sm text-muted text-right py-1">
                   {t("builder.subtotal")}
                 </div>
-                <div className="text-sm text-text text-right font-medium py-1" style={{ fontVariantNumeric: "tabular-nums" }}>
+                <div className="text-sm text-text text-right font-medium py-1 pr-2.5" style={{ fontVariantNumeric: "tabular-nums" }}>
                   {formatCurrency(subtotal, currency, locale)}
                 </div>
-                <div />
+                {!isReadonly && <div />}
 
                 {/* Discount */}
-                <div className="col-start-3 col-span-2 text-sm text-muted text-right py-1">
+                <div className="col-span-4 text-sm text-muted text-right py-1">
                   {t("builder.discount")}
                 </div>
                 <input
@@ -551,10 +551,10 @@ export function QuoteBuilder({
                   placeholder="0.00"
                   disabled={isReadonly}
                 />
-                <div />
+                {!isReadonly && <div />}
 
                 {/* Tax */}
-                <div className="col-start-3 col-span-2 text-sm text-muted text-right py-1">
+                <div className="col-span-4 text-sm text-muted text-right py-1">
                   {t("builder.tax")}
                 </div>
                 <input
@@ -567,7 +567,7 @@ export function QuoteBuilder({
                   placeholder="0.00"
                   disabled={isReadonly}
                 />
-                <div />
+                {!isReadonly && <div />}
 
                 {/* Divider */}
                 <div className="col-span-full">
@@ -575,13 +575,13 @@ export function QuoteBuilder({
                 </div>
 
                 {/* Total */}
-                <div className="col-start-3 col-span-2 text-sm text-text text-right font-semibold py-1">
+                <div className="col-span-4 text-sm text-text text-right font-semibold py-1">
                   {t("builder.total")}
                 </div>
-                <div className="text-sm text-text text-right font-semibold py-1" style={{ fontVariantNumeric: "tabular-nums" }}>
+                <div className="text-sm text-text text-right font-semibold py-1 pr-2.5" style={{ fontVariantNumeric: "tabular-nums" }}>
                   {formatCurrency(total, currency, locale)}
                 </div>
-                <div />
+                {!isReadonly && <div />}
               </div>
             </PanelBody>
           </Panel>
