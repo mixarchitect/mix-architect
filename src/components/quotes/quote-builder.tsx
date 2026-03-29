@@ -526,49 +526,62 @@ export function QuoteBuilder({
                 onImportTrackFees={importFromTrackFees}
               />
 
-              <Rule className="my-4" />
+              {/* Totals — same grid as line items so Amount column aligns */}
+              <div className="grid grid-cols-[20px_1fr_72px_112px_96px_32px] gap-x-2 items-center mt-4 border-t border-border pt-4">
+                {/* Subtotal */}
+                <div className="col-start-3 col-span-2 text-sm text-muted text-right py-1">
+                  {t("builder.subtotal")}
+                </div>
+                <div className="text-sm text-text text-right font-medium py-1" style={{ fontVariantNumeric: "tabular-nums" }}>
+                  {formatCurrency(subtotal, currency, locale)}
+                </div>
+                <div />
 
-              {/* Totals */}
-              <div className="space-y-2 max-w-xs ml-auto">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted">{t("builder.subtotal")}</span>
-                  <span className="text-text" style={{ fontVariantNumeric: "tabular-nums" }}>
-                    {formatCurrency(subtotal, currency, locale)}
-                  </span>
+                {/* Discount */}
+                <div className="col-start-3 col-span-2 text-sm text-muted text-right py-1">
+                  {t("builder.discount")}
                 </div>
-                <div className="flex justify-between text-sm items-center gap-2">
-                  <span className="text-muted">{t("builder.discount")}</span>
-                  <input
-                    type="number"
-                    value={discountAmount || ""}
-                    onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
-                    className="input text-sm w-28 text-right"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    disabled={isReadonly}
-                  />
+                <input
+                  type="number"
+                  value={discountAmount || ""}
+                  onChange={(e) => setDiscountAmount(parseFloat(e.target.value) || 0)}
+                  className="input-table text-sm text-right"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  disabled={isReadonly}
+                />
+                <div />
+
+                {/* Tax */}
+                <div className="col-start-3 col-span-2 text-sm text-muted text-right py-1">
+                  {t("builder.tax")}
                 </div>
-                <div className="flex justify-between text-sm items-center gap-2">
-                  <span className="text-muted">{t("builder.tax")}</span>
-                  <input
-                    type="number"
-                    value={taxAmount || ""}
-                    onChange={(e) => setTaxAmount(parseFloat(e.target.value) || 0)}
-                    className="input text-sm w-28 text-right"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    disabled={isReadonly}
-                  />
+                <input
+                  type="number"
+                  value={taxAmount || ""}
+                  onChange={(e) => setTaxAmount(parseFloat(e.target.value) || 0)}
+                  className="input-table text-sm text-right"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                  disabled={isReadonly}
+                />
+                <div />
+
+                {/* Divider */}
+                <div className="col-span-full">
+                  <Rule />
                 </div>
-                <Rule />
-                <div className="flex justify-between text-sm font-semibold">
-                  <span className="text-text">{t("builder.total")}</span>
-                  <span className="text-text" style={{ fontVariantNumeric: "tabular-nums" }}>
-                    {formatCurrency(total, currency, locale)}
-                  </span>
+
+                {/* Total */}
+                <div className="col-start-3 col-span-2 text-sm text-text text-right font-semibold py-1">
+                  {t("builder.total")}
                 </div>
+                <div className="text-sm text-text text-right font-semibold py-1" style={{ fontVariantNumeric: "tabular-nums" }}>
+                  {formatCurrency(total, currency, locale)}
+                </div>
+                <div />
               </div>
             </PanelBody>
           </Panel>
