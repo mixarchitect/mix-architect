@@ -101,10 +101,28 @@ export function QuotePortalClient({
 
         {/* Header */}
         <div className="bg-white rounded-lg border border-[#e5e5e5] overflow-hidden">
+          {/* From / To block */}
           <div className="px-8 py-6 border-b border-[#e5e5e5]">
-            <div className="text-sm font-semibold text-[#0D9488] tracking-wide uppercase mb-3">
-              {engineerName}
+            <div className="grid grid-cols-2 gap-6 mb-5">
+              <div>
+                <div className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1">From</div>
+                <div className="text-sm font-semibold text-[#0D9488] tracking-wide uppercase">
+                  {engineerName}
+                </div>
+              </div>
+              {(quote.client_name || quote.client_email) && (
+                <div>
+                  <div className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1">To</div>
+                  {quote.client_name && (
+                    <div className="text-sm font-semibold text-[#1a1a1a]">{quote.client_name}</div>
+                  )}
+                  {quote.client_email && (
+                    <div className="text-xs text-[#666] mt-0.5">{quote.client_email}</div>
+                  )}
+                </div>
+              )}
             </div>
+
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-xl font-bold text-[#1a1a1a]">
@@ -131,7 +149,6 @@ export function QuotePortalClient({
               {quote.due_date && (
                 <span>Due {new Date(quote.due_date).toLocaleDateString()}</span>
               )}
-              {quote.client_name && <span>To: {quote.client_name}</span>}
             </div>
           </div>
 
