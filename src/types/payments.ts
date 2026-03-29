@@ -107,3 +107,26 @@ export interface WorkflowTrigger {
   release_id: string | null;
   last_triggered_at: string | null;
 }
+
+// ── Services Catalog ────────────────────────────────────────
+
+export type ServiceUnit =
+  | "flat"
+  | "hourly"
+  | "per_track"
+  | "per_song"
+  | "per_stem"
+  | "custom";
+
+export interface Service {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string | null;
+  default_rate: number;
+  unit: ServiceUnit;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}

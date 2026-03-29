@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { redirect, notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { getQuote } from "@/actions/quotes";
+import { getServices } from "@/actions/services";
 import { QuoteBuilder } from "@/components/quotes/quote-builder";
 
 type Props = {
@@ -16,9 +17,10 @@ export default async function QuoteDetailPage({ params }: Props) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/auth/sign-in");
 
-  const [{ quote, error }, locale] = await Promise.all([
+  const [{ quote, error }, locale, { services }] = await Promise.all([
     getQuote(quoteId),
     getLocale(),
+    getServices(),
   ]);
 
   if (error || !quote) notFound();
@@ -45,6 +47,7 @@ export default async function QuoteDetailPage({ params }: Props) {
         defaultCurrency={defaults?.default_currency ?? "USD"}
         locale={locale}
         existingQuote={quote}
+        services={services}
       />
     </div>
   );

@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { redirect } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { QuoteBuilder } from "@/components/quotes/quote-builder";
+import { getServices } from "@/actions/services";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
@@ -34,12 +35,15 @@ export default async function NewReleaseQuotePage({ params, searchParams }: Prop
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
-  // Fetch tracks for auto-populate
-  const { data: tracks } = await supabase
-    .from("tracks")
-    .select("id, title, fee")
-    .eq("release_id", releaseId)
-    .order("track_number");
+  // Fetch tracks for auto-populate and services for autocomplete
+  const [{ data: tracks }, { services }] = await Promise.all([
+    supabase
+      .from("tracks")
+      .select("id, title, fee")
+      .eq("release_id", releaseId)
+      .order("track_number"),
+    getServices(),
+  ]);
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -50,6 +54,7 @@ export default async function NewReleaseQuotePage({ params, searchParams }: Prop
         defaultCurrency={defaults?.default_currency ?? "USD"}
         locale={locale}
         defaultDocumentType={defaultDocumentType}
+        services={services}
       />
     </div>
   );

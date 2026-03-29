@@ -495,7 +495,13 @@
       "sendToClient": "Send to Client",
       "saving": "Saving...",
       "sending": "Sending...",
-      "emailRequired": "Client email is required to send a quote."
+      "emailRequired": "Client email is required to send a quote.",
+      "preview": "Preview",
+      "colDescription": "Description",
+      "colQty": "Qty",
+      "colRate": "Rate",
+      "colAmount": "Amount",
+      "addFromServices": "Add from services"
     }
   },
   "settings": {
@@ -550,6 +556,26 @@
       "description": "릴리스와 트랙에서 수수료와 결제 상태를 추적합니다. 본인의 프로젝트를 믹싱하는 경우 이 기능을 끄세요.",
       "enable": "결제 추적 활성화",
       "enableHelp": "릴리스와 트랙에서 수수료 및 결제/미결제 상태를 표시합니다"
+    },
+    "services": {
+      "title": "Services Catalog",
+      "description": "Define your standard services. These appear as autocomplete options when adding line items to quotes.",
+      "name": "Service",
+      "namePlaceholder": "e.g. Full Mix",
+      "rate": "Rate",
+      "unit": "Unit",
+      "addService": "Add service",
+      "noServices": "No services yet. Add your first service to speed up quote creation.",
+      "addSuggested": "Add suggested services",
+      "addingSuggested": "Adding...",
+      "units": {
+        "flat": "Flat fee",
+        "hourly": "Per hour",
+        "perTrack": "Per track",
+        "perSong": "Per song",
+        "perStem": "Per stem",
+        "custom": "Custom"
+      }
     },
     "data": {
       "title": "데이터",

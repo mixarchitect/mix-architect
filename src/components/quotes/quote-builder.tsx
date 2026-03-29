@@ -1,25 +1,18 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, Plus, Trash2, GripVertical, Import } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Eye } from "lucide-react";
 import Link from "next/link";
 import { Panel, PanelBody } from "@/components/ui/panel";
 import { Rule } from "@/components/ui/rule";
 import { Button } from "@/components/ui/button";
+import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { formatCurrency } from "@/lib/currency";
 import { createQuote, updateQuote, sendQuote, deleteQuote, createPaymentSchedule } from "@/actions/quotes";
-import type { Quote, QuoteLineItem } from "@/types/payments";
-
-type LineItemDraft = {
-  id?: string;
-  description: string;
-  quantity: number;
-  unit_price: number;
-  track_id?: string | null;
-  sort_order: number;
-};
+import { LineItemsEditor, type LineItemDraft } from "./line-items-editor";
+import type { Quote, QuoteLineItem, Service } from "@/types/payments";
 
 type Release = {
   id: string;
@@ -44,6 +37,7 @@ type Props = {
   locale: string;
   existingQuote?: Quote;
   defaultDocumentType?: "quote" | "invoice";
+  services?: Service[];
 };
 
 type Mode = "single" | "schedule";
@@ -56,6 +50,7 @@ export function QuoteBuilder({
   locale,
   existingQuote,
   defaultDocumentType,
+  services = [],
 }: Props) {
   const router = useRouter();
   const t = useTranslations("quotes");
@@ -100,6 +95,13 @@ export function QuoteBuilder({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // ── Auto-save state ──
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dirtyRef = useRef(false);
+  const initialSnapshotRef = useRef<string>("");
+  const latestFormRef = useRef<Record<string, unknown>>({});
+
   // ── Derived ──
   const selectedRelease = releases.find((r) => r.id === releaseId);
 
@@ -124,24 +126,6 @@ export function QuoteBuilder({
     () => installments.reduce((sum, inst) => sum + inst.amount, 0),
     [installments],
   );
-
-  // ── Line Item Handlers ──
-  function addLineItem() {
-    setLineItems((prev) => [
-      ...prev,
-      { description: "", quantity: 1, unit_price: 0, sort_order: prev.length },
-    ]);
-  }
-
-  function removeLineItem(idx: number) {
-    setLineItems((prev) => prev.filter((_, i) => i !== idx).map((li, i) => ({ ...li, sort_order: i })));
-  }
-
-  function updateLineItem(idx: number, field: keyof LineItemDraft, value: string | number) {
-    setLineItems((prev) =>
-      prev.map((li, i) => (i === idx ? { ...li, [field]: value } : li)),
-    );
-  }
 
   function importFromTrackFees() {
     const items = releaseTracks
@@ -196,6 +180,85 @@ export function QuoteBuilder({
     }
   }
 
+  // ── Auto-save ──
+  const isReadonly = !!(existingQuote && existingQuote.status !== "draft");
+  const canAutoSave = isEditing && !isReadonly;
+
+  const getFormData = useCallback(() => ({
+    release_id: releaseId || null,
+    title: title || null,
+    client_name: clientName || null,
+    client_email: clientEmail || null,
+    currency,
+    discount_amount: discountAmount,
+    tax_amount: taxAmount,
+    notes: notes || null,
+    internal_notes: internalNotes || null,
+    terms: terms || null,
+    due_date: dueDate || null,
+    expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
+    line_items: lineItems.map((li) => ({
+      id: li.id,
+      description: li.description,
+      quantity: li.quantity,
+      unit_price: li.unit_price,
+      track_id: li.track_id ?? null,
+      sort_order: li.sort_order,
+    })),
+  }), [releaseId, title, clientName, clientEmail, currency, discountAmount, taxAmount, notes, internalNotes, terms, dueDate, expiresAt, lineItems]);
+
+  // Capture initial snapshot
+  useEffect(() => {
+    if (isEditing) {
+      initialSnapshotRef.current = JSON.stringify(getFormData());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount
+
+  // Track latest form data for unmount save
+  useEffect(() => {
+    latestFormRef.current = getFormData();
+  }, [getFormData]);
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!canAutoSave || !existingQuote) return;
+
+    const snapshot = JSON.stringify(getFormData());
+    if (snapshot === initialSnapshotRef.current) return;
+
+    dirtyRef.current = true;
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      setAutoSaveStatus("saving");
+      try {
+        const result = await updateQuote(existingQuote.id, getFormData());
+        if (result.error) throw new Error(result.error);
+        dirtyRef.current = false;
+        setAutoSaveStatus("saved");
+        setTimeout(() => setAutoSaveStatus((prev) => prev === "saved" ? "idle" : prev), 2000);
+      } catch {
+        setAutoSaveStatus("error");
+      }
+    }, 1000);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [canAutoSave, existingQuote, getFormData]);
+
+  // Save on unmount if dirty
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (dirtyRef.current && canAutoSave && existingQuote) {
+        updateQuote(existingQuote.id, latestFormRef.current as Parameters<typeof updateQuote>[1]);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── Save / Send ──
   async function handleSave() {
     setSaving(true);
@@ -220,48 +283,18 @@ export function QuoteBuilder({
         }
         router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
       } else if (isEditing && existingQuote) {
-        const result = await updateQuote(existingQuote.id, {
-          release_id: releaseId || null,
-          title: title || null,
-          client_name: clientName || null,
-          client_email: clientEmail || null,
-          currency,
-          discount_amount: discountAmount,
-          tax_amount: taxAmount,
-          notes: notes || null,
-          internal_notes: internalNotes || null,
-          terms: terms || null,
-          due_date: dueDate || null,
-          expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
-          line_items: lineItems.map((li) => ({
-            id: li.id,
-            description: li.description,
-            quantity: li.quantity,
-            unit_price: li.unit_price,
-            track_id: li.track_id ?? null,
-            sort_order: li.sort_order,
-          })),
-        });
+        const result = await updateQuote(existingQuote.id, getFormData());
         if (result.error) {
           alert(result.error);
           return;
         }
+        dirtyRef.current = false;
         router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
       } else {
+        const formData = getFormData();
         const result = await createQuote({
-          release_id: releaseId || null,
+          ...formData,
           document_type: documentType,
-          title: title || null,
-          client_name: clientName || null,
-          client_email: clientEmail || null,
-          currency,
-          discount_amount: discountAmount,
-          tax_amount: taxAmount,
-          notes: notes || null,
-          internal_notes: internalNotes || null,
-          terms: terms || null,
-          due_date: dueDate || null,
-          expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
           line_items: lineItems.map((li) => ({
             description: li.description,
             quantity: li.quantity,
@@ -288,22 +321,11 @@ export function QuoteBuilder({
     }
     setSending(true);
     try {
-      // Save first, then send
       if (!isEditing) {
+        const formData = getFormData();
         const result = await createQuote({
-          release_id: releaseId || null,
+          ...formData,
           document_type: documentType,
-          title: title || null,
-          client_name: clientName || null,
-          client_email: clientEmail || null,
-          currency,
-          discount_amount: discountAmount,
-          tax_amount: taxAmount,
-          notes: notes || null,
-          internal_notes: internalNotes || null,
-          terms: terms || null,
-          due_date: dueDate || null,
-          expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
           line_items: lineItems.map((li) => ({
             description: li.description,
             quantity: li.quantity,
@@ -318,6 +340,15 @@ export function QuoteBuilder({
         }
         await sendQuote(result.quote.id);
       } else if (existingQuote) {
+        // Auto-save first, then send
+        if (dirtyRef.current) {
+          const saveResult = await updateQuote(existingQuote.id, getFormData());
+          if (saveResult.error) {
+            alert(saveResult.error);
+            return;
+          }
+          dirtyRef.current = false;
+        }
         await sendQuote(existingQuote.id);
       }
       router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
@@ -329,18 +360,24 @@ export function QuoteBuilder({
   async function handleDelete() {
     if (!existingQuote) return;
     setDeleting(true);
+    dirtyRef.current = false; // Prevent unmount save
     await deleteQuote(existingQuote.id);
     router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
   }
 
+  function handlePreview() {
+    if (existingQuote?.portal_token) {
+      window.open(`/portal/quote/${existingQuote.portal_token}`, "_blank");
+    }
+  }
+
   const backHref = releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes";
   const hasTrackFees = releaseTracks.some((t) => t.fee && t.fee > 0);
-  const isReadonly = existingQuote && existingQuote.status !== "draft";
   const canDelete = existingQuote && ["draft", "sent", "viewed"].includes(existingQuote.status);
   const isDraft = existingQuote?.status === "draft";
 
   return (
-    <div>
+    <div className="pb-20">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Link
@@ -355,6 +392,7 @@ export function QuoteBuilder({
             ? `${isInvoice ? t("builder.editInvoiceTitle") : t("builder.editTitle")} ${existingQuote.quote_number}`
             : isInvoice ? t("builder.newInvoiceTitle") : t("builder.newTitle")}
         </h1>
+        {isEditing && <AutoSaveIndicator status={autoSaveStatus} />}
       </div>
 
       {/* Document type selector */}
@@ -477,79 +515,16 @@ export function QuoteBuilder({
         {mode === "single" && (
           <Panel>
             <PanelBody className="py-5">
-              <div className="flex items-center justify-between mb-4">
-                <span className="label text-muted">{t("builder.lineItems")}</span>
-                <div className="flex items-center gap-2">
-                  {hasTrackFees && !isReadonly && (
-                    <button
-                      type="button"
-                      onClick={importFromTrackFees}
-                      className="flex items-center gap-1 text-xs text-signal hover:underline"
-                    >
-                      <Import size={12} />
-                      {t("builder.importFees")}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                {lineItems.map((li, idx) => (
-                  <div key={idx} className="flex items-start gap-2">
-                    <GripVertical size={14} className="text-muted mt-2.5 shrink-0 cursor-grab" />
-                    <input
-                      type="text"
-                      value={li.description}
-                      onChange={(e) => updateLineItem(idx, "description", e.target.value)}
-                      className="input text-sm flex-1"
-                      placeholder={t("builder.descriptionPlaceholder")}
-                      disabled={isReadonly}
-                    />
-                    <input
-                      type="number"
-                      value={li.quantity}
-                      onChange={(e) => updateLineItem(idx, "quantity", parseFloat(e.target.value) || 0)}
-                      className="input text-sm w-16 text-center"
-                      min="0"
-                      step="1"
-                      disabled={isReadonly}
-                    />
-                    <input
-                      type="number"
-                      value={li.unit_price || ""}
-                      onChange={(e) => updateLineItem(idx, "unit_price", parseFloat(e.target.value) || 0)}
-                      className="input text-sm w-28 text-right"
-                      min="0"
-                      step="0.01"
-                      placeholder="0.00"
-                      disabled={isReadonly}
-                    />
-                    <div className="w-24 text-sm text-right text-muted pt-2 shrink-0">
-                      {formatCurrency(li.quantity * li.unit_price, currency, locale)}
-                    </div>
-                    {!isReadonly && lineItems.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeLineItem(idx)}
-                        className="p-1.5 text-muted hover:text-red-400 transition-colors mt-1"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {!isReadonly && (
-                <button
-                  type="button"
-                  onClick={addLineItem}
-                  className="flex items-center gap-1 text-xs text-signal hover:underline mt-3"
-                >
-                  <Plus size={12} />
-                  {t("builder.addLineItem")}
-                </button>
-              )}
+              <LineItemsEditor
+                lineItems={lineItems}
+                onChange={setLineItems}
+                services={services}
+                currency={currency}
+                locale={locale}
+                isReadonly={!!isReadonly}
+                hasTrackFees={hasTrackFees}
+                onImportTrackFees={importFromTrackFees}
+              />
 
               <Rule className="my-4" />
 
@@ -557,7 +532,9 @@ export function QuoteBuilder({
               <div className="space-y-2 max-w-xs ml-auto">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted">{t("builder.subtotal")}</span>
-                  <span className="text-text">{formatCurrency(subtotal, currency, locale)}</span>
+                  <span className="text-text" style={{ fontVariantNumeric: "tabular-nums" }}>
+                    {formatCurrency(subtotal, currency, locale)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm items-center gap-2">
                   <span className="text-muted">{t("builder.discount")}</span>
@@ -588,7 +565,9 @@ export function QuoteBuilder({
                 <Rule />
                 <div className="flex justify-between text-sm font-semibold">
                   <span className="text-text">{t("builder.total")}</span>
-                  <span className="text-text">{formatCurrency(total, currency, locale)}</span>
+                  <span className="text-text" style={{ fontVariantNumeric: "tabular-nums" }}>
+                    {formatCurrency(total, currency, locale)}
+                  </span>
                 </div>
               </div>
             </PanelBody>
@@ -722,9 +701,11 @@ export function QuoteBuilder({
             )}
           </PanelBody>
         </Panel>
+      </div>
 
-        {/* Action Bar */}
-        <div className="flex items-center justify-between pt-2">
+      {/* Sticky Action Bar */}
+      <div className="sticky bottom-0 z-10 -mx-0 mt-6 px-6 py-3 bg-panel/95 backdrop-blur-sm border-t border-border rounded-b-lg">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link
               href={backHref}
@@ -769,6 +750,15 @@ export function QuoteBuilder({
           </div>
           {!isReadonly && (
             <div className="flex items-center gap-3">
+              {isEditing && existingQuote?.portal_token && (
+                <Button
+                  variant="secondary"
+                  onClick={handlePreview}
+                >
+                  <Eye size={14} />
+                  {t("builder.preview")}
+                </Button>
+              )}
               <Button
                 variant="secondary"
                 onClick={handleSave}

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download, CalendarDays, Copy, Check, RefreshCw, HardDrive, Cloud, Unplug, Mail, ExternalLink, Zap, Trash2, Plus } from "lucide-react";
+import { ServicesCatalog } from "@/components/settings/services-catalog";
 import { getConnectedAccount, checkAccountStatus } from "@/actions/stripe-connect";
 import { getWorkflowTriggers, toggleWorkflowTrigger, createWorkflowTrigger, deleteWorkflowTrigger, getWorkflowLog } from "@/actions/workflows";
 import type { StripeConnectedAccount, WorkflowTrigger } from "@/types/payments";
@@ -536,6 +537,11 @@ export default function SettingsPage() {
 
         {/* Payment Collection (Stripe Connect) */}
         <StripeConnectPanel />
+
+        {/* Services Catalog */}
+        {paymentsEnabled && (
+          <ServicesCatalog currency={defaultCurrency} locale={locale} />
+        )}
 
         {/* Workflow Automations */}
         <WorkflowsPanel />

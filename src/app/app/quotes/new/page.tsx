@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { QuoteBuilder } from "@/components/quotes/quote-builder";
+import { getServices } from "@/actions/services";
 
 export default async function NewQuotePage({
   searchParams,
@@ -49,6 +50,9 @@ export default async function NewQuotePage({
     releaseTracks = (tracks ?? []) as { id: string; title: string; fee: number | null }[];
   }
 
+  // Fetch services for autocomplete
+  const { services } = await getServices();
+
   return (
     <div className="max-w-2xl mx-auto">
       <QuoteBuilder
@@ -58,6 +62,7 @@ export default async function NewQuotePage({
         defaultCurrency={defaults?.default_currency ?? "USD"}
         locale={locale}
         defaultDocumentType={defaultDocumentType}
+        services={services}
       />
     </div>
   );
