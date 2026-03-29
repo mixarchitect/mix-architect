@@ -117,6 +117,8 @@ export function QuotesList({
       const result = await duplicateQuote(quoteId);
       if (result.quote) {
         setQuotes((prev) => [result.quote!, ...prev]);
+      } else if (result.error) {
+        alert(result.error);
       }
     } else if (action === "delete") {
       setConfirmDeleteId(quoteId);

@@ -517,7 +517,30 @@ export async function duplicateQuote(
     .eq("quote_id", quoteId)
     .order("sort_order");
 
+  // Filter out invalid line items so createQuote validation doesn't reject drafts
+  const validLineItems = (sourceLineItems ?? [])
+    .filter((item: { description?: string }) => item.description?.trim())
+    .map((item: { description: string; quantity: number; unit_price: number; track_id?: string | null; sort_order: number }) => ({
+      description: item.description,
+      quantity: item.quantity > 0 ? item.quantity : 1,
+      unit_price: item.unit_price,
+      track_id: item.track_id,
+      sort_order: item.sort_order,
+    }));
+
+  // Ensure at least one line item exists
+  if (validLineItems.length === 0) {
+    validLineItems.push({
+      description: source.title || "Line item",
+      quantity: 1,
+      unit_price: 0,
+      track_id: null,
+      sort_order: 0,
+    });
+  }
+
   return createQuote({
+    document_type: source.document_type,
     release_id: source.release_id,
     title: source.title ? `${source.title} (copy)` : null,
     client_name: source.client_name,
@@ -530,13 +553,7 @@ export async function duplicateQuote(
     terms: source.terms,
     due_date: source.due_date,
     expires_at: null,
-    line_items: (sourceLineItems ?? []).map((item) => ({
-      description: item.description,
-      quantity: item.quantity,
-      unit_price: item.unit_price,
-      track_id: item.track_id,
-      sort_order: item.sort_order,
-    })),
+    line_items: validLineItems,
   });
 }
 
