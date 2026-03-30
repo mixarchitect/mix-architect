@@ -158,24 +158,25 @@ export function QuoteBuilder({
 
   function applyPreset(type: "5050" | "deposit_balance" | "three") {
     const base = selectedRelease?.fee_total ?? 1000;
+    const round2 = (n: number) => Math.round(n * 100) / 100;
     if (type === "5050") {
-      const half = Math.round(base / 2 * 100) / 100;
+      const half = round2(base / 2);
       setInstallments([
         { label: "First payment", amount: half, due_date: "" },
-        { label: "Final payment", amount: base - half, due_date: "" },
+        { label: "Final payment", amount: round2(base - half), due_date: "" },
       ]);
     } else if (type === "deposit_balance") {
-      const deposit = Math.round(base * 0.5 * 100) / 100;
+      const deposit = round2(base * 0.5);
       setInstallments([
         { label: "Deposit", amount: deposit, due_date: "" },
-        { label: "Balance", amount: base - deposit, due_date: "" },
+        { label: "Balance", amount: round2(base - deposit), due_date: "" },
       ]);
     } else {
-      const third = Math.round(base / 3 * 100) / 100;
+      const third = round2(base / 3);
       setInstallments([
         { label: "Deposit", amount: third, due_date: "" },
         { label: "Midpoint", amount: third, due_date: "" },
-        { label: "Final delivery", amount: base - third * 2, due_date: "" },
+        { label: "Final delivery", amount: round2(base - third * 2), due_date: "" },
       ]);
     }
   }
