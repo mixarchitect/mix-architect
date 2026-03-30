@@ -619,20 +619,27 @@ export function QuoteBuilder({
 
               <div className="space-y-3">
                 {installments.map((inst, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <span className="text-xs text-muted w-5 shrink-0">{idx + 1}.</span>
+                  <div
+                    key={idx}
+                    className={`grid items-center gap-2 ${
+                      installments.length > 2
+                        ? "grid-cols-[20px_1fr_140px_160px_32px]"
+                        : "grid-cols-[20px_1fr_140px_160px]"
+                    }`}
+                  >
+                    <span className="text-xs text-muted">{idx + 1}.</span>
                     <input
                       type="text"
                       value={inst.label}
                       onChange={(e) => updateInstallment(idx, "label", e.target.value)}
-                      className="input text-sm flex-1"
+                      className="input text-sm"
                       placeholder={t("builder.installmentLabel")}
                     />
                     <input
                       type="number"
                       value={inst.amount || ""}
                       onChange={(e) => updateInstallment(idx, "amount", parseFloat(e.target.value) || 0)}
-                      className="input text-sm w-28 text-right"
+                      className="input text-sm text-right"
                       min="0"
                       step="0.01"
                       placeholder="0.00"
@@ -641,13 +648,13 @@ export function QuoteBuilder({
                       type="date"
                       value={inst.due_date}
                       onChange={(e) => updateInstallment(idx, "due_date", e.target.value)}
-                      className="input text-sm w-36"
+                      className="input text-sm"
                     />
                     {installments.length > 2 && (
                       <button
                         type="button"
                         onClick={() => removeInstallment(idx)}
-                        className="p-1.5 text-muted hover:text-red-400 transition-colors"
+                        className="p-1.5 text-muted hover:text-red-400 transition-colors justify-self-center"
                       >
                         <Trash2 size={14} />
                       </button>
