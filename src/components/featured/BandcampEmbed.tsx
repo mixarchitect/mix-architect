@@ -3,10 +3,12 @@ interface BandcampEmbedProps {
   embedCode?: string | null;
 }
 
-/** Extract and validate the src from a pasted Bandcamp <iframe> embed code. */
-function extractBandcampSrc(embedCode: string): string | null {
-  const match = embedCode.match(/src="(https:\/\/bandcamp\.com\/EmbeddedPlayer\/[^"]+)"/);
-  return match ? match[1] : null;
+/** Extract src and height from a pasted Bandcamp <iframe> embed code. */
+function extractBandcampEmbed(embedCode: string): { src: string; height: number } | null {
+  const srcMatch = embedCode.match(/src="(https:\/\/bandcamp\.com\/EmbeddedPlayer\/[^"]+)"/);
+  if (!srcMatch) return null;
+  const heightMatch = embedCode.match(/height:\s*(\d+)px/);
+  return { src: srcMatch[1], height: heightMatch ? parseInt(heightMatch[1], 10) : 472 };
 }
 
 async function fetchBandcampAlbumId(url: string): Promise<string | null> {
@@ -23,9 +25,14 @@ async function fetchBandcampAlbumId(url: string): Promise<string | null> {
 
 export async function BandcampEmbed({ url, embedCode }: BandcampEmbedProps) {
   let embedSrc: string | null = null;
+  let height = 472;
 
   if (embedCode) {
-    embedSrc = extractBandcampSrc(embedCode);
+    const parsed = extractBandcampEmbed(embedCode);
+    if (parsed) {
+      embedSrc = parsed.src;
+      height = parsed.height;
+    }
   } else if (url) {
     const albumId = await fetchBandcampAlbumId(url);
     if (albumId) {
@@ -42,7 +49,7 @@ export async function BandcampEmbed({ url, embedCode }: BandcampEmbedProps) {
       </p>
       <div>
         <iframe
-          style={{ border: 0, width: 350, height: 472 }}
+          style={{ border: 0, width: "100%", maxWidth: 700, height }}
           src={embedSrc}
           seamless
           loading="lazy"
