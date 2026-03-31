@@ -12,7 +12,7 @@ const cspPolicy = [
   "img-src 'self' blob: data: sjdodeauawmuzredpxwa.supabase.co",
   "connect-src 'self' sjdodeauawmuzredpxwa.supabase.co *.supabase.co api.stripe.com",
   "font-src 'self'",
-  "frame-src js.stripe.com",
+  "frame-src js.stripe.com bandcamp.com *.bandcamp.com",
   "media-src 'self' blob: sjdodeauawmuzredpxwa.supabase.co",
   "worker-src 'self' blob:",
   "object-src 'none'",
