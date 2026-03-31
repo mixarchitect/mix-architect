@@ -1,7 +1,11 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { Gauge, Clock, Zap, MonitorSpeaker, BarChart3, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
+import { resolvePreset, parseDateISO, formatDateISO, type PresetKey } from "@/lib/admin-date-utils";
+import { PerformanceHeader } from "./performance-header";
 
 export const dynamic = "force-dynamic";
+
+const PRESET_KEYS = ["today", "yesterday", "7d", "30d", "90d", "365d"] as const;
 
 /** Budget thresholds per metric mark name (ms). */
 const METRIC_BUDGETS: Record<string, number> = {
@@ -83,17 +87,43 @@ const METRIC_ICONS: Record<string, typeof Gauge> = {
   "fps:playback": Gauge,
 };
 
-export default async function PerformancePage() {
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function PerformancePage({ searchParams }: PageProps) {
+  const sp = await searchParams;
   const supabase = createSupabaseServiceClient();
 
-  // Fetch last 30 days of metrics
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  // Resolve date range from URL params
+  const rawRange = typeof sp.range === "string" ? sp.range : "";
+  const rawFrom = typeof sp.from === "string" ? sp.from : undefined;
+  const rawTo = typeof sp.to === "string" ? sp.to : undefined;
+
+  let periodFrom: Date;
+  let periodTo: Date;
+
+  if (rawFrom && rawTo) {
+    periodFrom = parseDateISO(rawFrom) ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    periodTo = parseDateISO(rawTo) ?? new Date();
+  } else {
+    const presetKey: PresetKey = PRESET_KEYS.includes(rawRange as PresetKey)
+      ? (rawRange as PresetKey)
+      : "30d";
+    const preset = resolvePreset(presetKey);
+    periodFrom = preset.from;
+    periodTo = preset.to;
+  }
+
+  const currentRange = rawFrom && rawTo ? "custom" : (PRESET_KEYS.includes(rawRange as PresetKey) ? rawRange : "30d");
+  const isCustom = currentRange === "custom";
 
   // Fetch raw metrics for aggregation
   const { data: rawMetrics, error } = await supabase
     .from("perf_metrics")
     .select("metric, duration_ms, file_format, file_size_mb, duration_sec, sample_rate, bit_depth, channels, device_type, avg_fps, min_fps, p5_fps, dropped_frames, jank_frames, created_at")
-    .gte("created_at", thirtyDaysAgo)
+    .gte("created_at", periodFrom.toISOString())
+    .lte("created_at", periodTo.toISOString())
     .order("created_at", { ascending: false })
     .limit(5000);
 
@@ -191,12 +221,33 @@ export default async function PerformancePage() {
   // Unique sessions
   const uniqueSessions = new Set(metrics.map((m) => m.metric)).size; // approximation via metric variety
 
+  // Build header data for client component
+  const headerMetrics = aggregated.map((m) => ({
+    metric: m.metric,
+    label: METRIC_LABELS[m.metric] ?? m.metric,
+    count: m.count,
+    p50: m.p50,
+    p95: m.p95,
+    avg: m.avg,
+    max: m.max,
+    budget: m.budget,
+    status: m.status,
+  }));
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-text mb-2">Audio Performance</h1>
-      <p className="text-sm text-muted mb-6">
-        Real-world audio playback metrics from user sessions (last 30 days)
-      </p>
+      <PerformanceHeader
+        range={currentRange}
+        from={isCustom ? rawFrom : undefined}
+        to={isCustom ? rawTo : undefined}
+        metrics={headerMetrics}
+        formats={formatBreakdown}
+        devices={deviceBreakdown}
+        avgFps={avgFps}
+        totalJank={totalJank}
+        totalDropped={totalDropped}
+        totalSamples={totalSamples}
+      />
 
       {totalSamples === 0 ? (
         <div className="rounded-lg border border-border bg-panel p-8 text-center">
