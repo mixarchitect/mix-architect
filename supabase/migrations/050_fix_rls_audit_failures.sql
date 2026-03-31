@@ -20,6 +20,15 @@ CREATE POLICY releases_update ON releases
 -- The cover-art bucket has no RLS policies, allowing any authenticated
 -- user to read/write any file. Files are stored as {user_id}/filename.
 
+-- Make cover-art bucket private (public=true bypasses RLS for reads)
+UPDATE storage.buckets SET public = false WHERE id = 'cover-art';
+
+-- Drop dashboard-generated blanket policies that override bucket-specific ones
+DROP POLICY IF EXISTS "Allow authenticated updates wpzl8t_0" ON storage.objects;
+DROP POLICY IF EXISTS "Allow authenticated updates wpzl8t_1" ON storage.objects;
+DROP POLICY IF EXISTS "Allow authenticated uploads wpzl8t_0" ON storage.objects;
+DROP POLICY IF EXISTS "Allow public reads wpzl8t_0" ON storage.objects;
+
 -- Users can only download their own cover art
 CREATE POLICY "cover_art_select_own"
   ON storage.objects FOR SELECT
