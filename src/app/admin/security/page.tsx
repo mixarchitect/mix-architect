@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   AlertCircle,
   Info,
+  Download,
 } from "lucide-react";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
@@ -504,6 +505,43 @@ function RlsAuditTab() {
 
   const allPassed = result && result.failures.length === 0;
 
+  function downloadReport() {
+    if (!result) return;
+    const lines: string[] = [];
+    lines.push("RLS AUDIT REPORT");
+    lines.push(`Date,${new Date(result.date).toLocaleString()}`);
+    lines.push(`Result,${result.totalPassed}/${result.totalTests} passed`);
+    lines.push(`Failures,${result.failures.length}`);
+    lines.push("");
+
+    for (const cat of result.categories) {
+      lines.push(`${cat.name.toUpperCase()} (${cat.passed}/${cat.total})`);
+      lines.push("Test,Status,Detail");
+      for (const r of cat.results) {
+        const detail = r.detail ? `"${r.detail.replace(/"/g, '""')}"` : "";
+        lines.push(`"${r.name.replace(/"/g, '""')}",${r.passed ? "PASS" : "FAIL"},${detail}`);
+      }
+      lines.push("");
+    }
+
+    if (result.failures.length > 0) {
+      lines.push("FAILURES SUMMARY");
+      lines.push("Test,Detail");
+      for (const f of result.failures) {
+        const detail = f.detail ? `"${f.detail.replace(/"/g, '""')}"` : "";
+        lines.push(`"${f.name.replace(/"/g, '""')}",${detail}`);
+      }
+    }
+
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `rls-audit-${new Date(result.date).toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -511,24 +549,36 @@ function RlsAuditTab() {
           Creates temporary test users, seeds data, runs cross-user access
           tests, then cleans up. Takes ~30 seconds.
         </p>
-        <Button
-          variant="primary"
-          onClick={runAudit}
-          disabled={loading}
-          className="gap-2 shrink-0"
-        >
-          {loading ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Running...
-            </>
-          ) : (
-            <>
-              <ShieldCheck size={16} />
-              Run Audit
-            </>
+        <div className="flex items-center gap-2 shrink-0">
+          {result && (
+            <Button
+              variant="secondary"
+              onClick={downloadReport}
+              className="gap-2"
+            >
+              <Download size={16} />
+              Download Report
+            </Button>
           )}
-        </Button>
+          <Button
+            variant="primary"
+            onClick={runAudit}
+            disabled={loading}
+            className="gap-2"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Running...
+              </>
+            ) : (
+              <>
+                <ShieldCheck size={16} />
+                Run Audit
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {error && (
