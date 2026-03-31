@@ -125,7 +125,15 @@ export default function SiteTrafficPage() {
         <div>
           <h1 className="text-xl font-bold text-text">Site Traffic</h1>
           <p className="text-sm text-muted mt-0.5">
-            Analytics powered by OpenPanel
+            Analytics powered by{" "}
+            <a
+              href="https://dashboard.openpanel.dev/mix-architect/mix-architect"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-signal hover:underline"
+            >
+              OpenPanel
+            </a>
           </p>
         </div>
 
