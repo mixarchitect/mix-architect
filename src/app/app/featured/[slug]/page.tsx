@@ -90,12 +90,13 @@ export default async function AppFeaturedReleasePage({ params }: Props) {
                   {release.release_type}
                 </span>
                 {release.genre_tags.map((tag) => (
-                  <span
+                  <Link
                     key={tag}
-                    className="text-xs px-2 py-0.5 rounded-full border border-border text-muted"
+                    href={`/app/featured?genre=${encodeURIComponent(tag)}`}
+                    className="text-xs px-2 py-0.5 rounded-full border border-border text-muted hover:text-signal hover:border-signal/30 transition-colors"
                   >
                     {tag}
-                  </span>
+                  </Link>
                 ))}
                 {release.source === "platform" && (
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-signal/10 text-signal border border-signal/20">

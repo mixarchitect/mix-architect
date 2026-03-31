@@ -8,9 +8,10 @@ import { loadMoreFeaturedReleases } from "./actions";
 interface Props {
   initialCount: number;
   total: number;
+  genre?: string;
 }
 
-export function FeaturedArchiveLoadMore({ initialCount, total }: Props) {
+export function FeaturedArchiveLoadMore({ initialCount, total, genre }: Props) {
   const [extra, setExtra] = useState<FeaturedRelease[]>([]);
   const [isPending, startTransition] = useTransition();
   const loaded = initialCount + extra.length;
@@ -19,7 +20,7 @@ export function FeaturedArchiveLoadMore({ initialCount, total }: Props) {
   function handleLoadMore() {
     const nextPage = Math.floor(loaded / 12) + 1;
     startTransition(async () => {
-      const more = await loadMoreFeaturedReleases(nextPage);
+      const more = await loadMoreFeaturedReleases(nextPage, genre);
       setExtra((prev) => [...prev, ...more]);
     });
   }

@@ -173,12 +173,13 @@ export default async function FeaturedReleasePage({ params }: Props) {
                   {release.release_type}
                 </span>
                 {release.genre_tags.map((tag) => (
-                  <span
+                  <Link
                     key={tag}
-                    className="text-xs px-2 py-0.5 rounded-full border border-white/10 text-zinc-500"
+                    href={`/featured?genre=${encodeURIComponent(tag)}`}
+                    className="text-xs px-2 py-0.5 rounded-full border border-white/10 text-zinc-500 hover:text-teal-400 hover:border-teal-500/30 transition-colors"
                   >
                     {tag}
-                  </span>
+                  </Link>
                 ))}
                 {release.source === "platform" && (
                   <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">

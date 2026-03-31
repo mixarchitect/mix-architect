@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { getFeaturedReleases } from "@/lib/services/featured-releases";
+import { getFeaturedReleases, getAllGenres } from "@/lib/services/featured-releases";
 import { FeaturedReleaseCard } from "@/components/featured/FeaturedReleaseCard";
+import { GenreFilter } from "@/components/featured/GenreFilter";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Music } from "lucide-react";
 import { FeaturedArchiveLoadMore } from "./load-more";
@@ -9,8 +10,14 @@ export const metadata: Metadata = {
   title: "Featured Releases — Mix Architect",
 };
 
-export default async function AppFeaturedPage() {
-  const { releases, total } = await getFeaturedReleases(1, 12);
+type Props = { searchParams: Promise<{ genre?: string }> };
+
+export default async function AppFeaturedPage({ searchParams }: Props) {
+  const { genre } = await searchParams;
+  const [{ releases, total }, genres] = await Promise.all([
+    getFeaturedReleases(1, 12, genre),
+    getAllGenres(),
+  ]);
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -21,6 +28,8 @@ export default async function AppFeaturedPage() {
             Spotlighting great releases and the people behind the sound, from
             indie to major, emerging to established.
           </p>
+
+          <GenreFilter genres={genres} active={genre} basePath="/app/featured" />
 
           {releases.length === 0 ? (
             <div className="mt-16">
@@ -49,6 +58,7 @@ export default async function AppFeaturedPage() {
                 <FeaturedArchiveLoadMore
                   initialCount={releases.length}
                   total={total}
+                  genre={genre}
                 />
               )}
             </>
