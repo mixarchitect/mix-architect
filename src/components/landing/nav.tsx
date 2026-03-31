@@ -41,19 +41,19 @@ export function LandingNav({ locale = "en-US" }: { locale?: string }) {
         {/* Desktop nav links — hidden below lg to prevent crowding with long translations */}
         <div className="hidden lg:flex flex-1 items-center justify-center gap-0.5 min-w-0">
           <a
-            href="#features"
+            href="/#features"
             className="px-2.5 py-2 rounded-full text-[13px] text-white/60 hover:text-white hover:bg-white/8 transition-colors whitespace-nowrap"
           >
             {t("navFeatures")}
           </a>
           <a
-            href="#pricing"
+            href="/#pricing"
             className="px-2.5 py-2 rounded-full text-[13px] text-white/60 hover:text-white hover:bg-white/8 transition-colors whitespace-nowrap"
           >
             {t("navPricing")}
           </a>
           <a
-            href="#featured"
+            href="/#featured"
             className="px-2.5 py-2 rounded-full text-[13px] text-white/60 hover:text-white hover:bg-white/8 transition-colors whitespace-nowrap"
           >
             {t("navFeatured")}
@@ -90,21 +90,21 @@ export function LandingNav({ locale = "en-US" }: { locale?: string }) {
       {menuOpen && (
         <div className="lg:hidden mt-2 mx-3 rounded-xl bg-[#1a1a1a] border border-white/10 p-2 shadow-float">
           <a
-            href="#features"
+            href="/#features"
             onClick={() => setMenuOpen(false)}
             className="block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
           >
             {t("navFeatures")}
           </a>
           <a
-            href="#pricing"
+            href="/#pricing"
             onClick={() => setMenuOpen(false)}
             className="block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
           >
             {t("navPricing")}
           </a>
           <a
-            href="#featured"
+            href="/#featured"
             onClick={() => setMenuOpen(false)}
             className="block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
           >
