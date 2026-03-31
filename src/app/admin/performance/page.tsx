@@ -146,9 +146,10 @@ export default async function PerformancePage({ searchParams }: PageProps) {
   const metrics = rawMetrics ?? [];
   const totalSamples = metrics.length;
 
-  // Aggregate by metric name
+  // Aggregate by metric name (exclude FPS — it uses avg_fps, not duration_ms)
   const byMetric = new Map<string, number[]>();
   for (const m of metrics) {
+    if (m.metric.startsWith("fps:")) continue;
     if (!byMetric.has(m.metric)) byMetric.set(m.metric, []);
     byMetric.get(m.metric)!.push(m.duration_ms);
   }
