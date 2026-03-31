@@ -15,21 +15,44 @@ export async function getActiveFeaturedRelease(): Promise<FeaturedRelease | null
 export async function getFeaturedReleases(
   page = 1,
   pageSize = 12,
+  genre?: string,
 ): Promise<{ releases: FeaturedRelease[]; total: number }> {
   const supabase = createSupabasePublicClient();
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const { data, count } = await supabase
+  let query = supabase
     .from("featured_releases")
     .select("*", { count: "exact" })
-    .order("featured_date", { ascending: false })
-    .range(from, to);
+    .order("featured_date", { ascending: false });
+
+  if (genre) {
+    query = query.contains("genre_tags", [genre]);
+  }
+
+  const { data, count } = await query.range(from, to);
 
   return {
     releases: (data as FeaturedRelease[]) ?? [],
     total: count ?? 0,
   };
+}
+
+export async function getAllGenres(): Promise<string[]> {
+  const supabase = createSupabasePublicClient();
+  const { data } = await supabase
+    .from("featured_releases")
+    .select("genre_tags");
+
+  if (!data) return [];
+
+  const genres = new Set<string>();
+  for (const row of data) {
+    for (const tag of (row as { genre_tags: string[] }).genre_tags ?? []) {
+      genres.add(tag);
+    }
+  }
+  return Array.from(genres).sort();
 }
 
 export async function getFeaturedReleaseBySlug(

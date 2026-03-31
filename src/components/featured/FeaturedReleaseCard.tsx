@@ -143,6 +143,18 @@ function ArchiveCard({
         <p className="text-xs text-zinc-500 italic line-clamp-2 mt-1">
           {release.headline}
         </p>
+        {release.genre_tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {release.genre_tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="text-[10px] px-1.5 py-0.5 rounded-full border border-white/8 text-zinc-500"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
         {isGuest && (
           <p className="text-[10px] text-zinc-600 mt-1">
             By {release.author_name}

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import { getFeaturedReleases } from "@/lib/services/featured-releases";
+import { getFeaturedReleases, getAllGenres } from "@/lib/services/featured-releases";
 import { FeaturedReleaseCard } from "@/components/featured/FeaturedReleaseCard";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LandingNav } from "@/components/landing/nav";
 import { LandingFooter } from "@/components/landing/footer";
 import { Music } from "lucide-react";
+import { GenreFilter } from "@/components/featured/GenreFilter";
 import { FeaturedArchiveLoadMore } from "./load-more";
 
 export const revalidate = 3600;
@@ -24,9 +25,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function FeaturedArchivePage() {
-  const [{ releases, total }, locale, messages] = await Promise.all([
-    getFeaturedReleases(1, 12),
+type Props = { searchParams: Promise<{ genre?: string }> };
+
+export default async function FeaturedArchivePage({ searchParams }: Props) {
+  const { genre } = await searchParams;
+  const [{ releases, total }, genres, locale, messages] = await Promise.all([
+    getFeaturedReleases(1, 12, genre),
+    getAllGenres(),
     getLocale(),
     getMessages(),
   ]);
@@ -45,6 +50,10 @@ export default async function FeaturedArchivePage() {
             Spotlighting great releases and the people behind the sound, from
             indie to major, emerging to established.
           </p>
+
+          <div className="flex justify-center">
+            <GenreFilter genres={genres} active={genre} basePath="/featured" />
+          </div>
 
           {releases.length === 0 ? (
             <div className="mt-16">
@@ -72,6 +81,7 @@ export default async function FeaturedArchivePage() {
                 <FeaturedArchiveLoadMore
                   initialCount={releases.length}
                   total={total}
+                  genre={genre}
                 />
               )}
             </>
