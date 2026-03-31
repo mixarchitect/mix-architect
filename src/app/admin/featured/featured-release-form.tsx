@@ -266,6 +266,26 @@ export function FeaturedReleaseForm({ action, release }: Props) {
         ))}
       </fieldset>
 
+      {/* ── Bandcamp Embed ── */}
+      <fieldset className="space-y-4">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+          Bandcamp Embed
+        </legend>
+        <Field label="Embed Code">
+          <textarea
+            name="bandcamp_embed"
+            defaultValue={release?.bandcamp_embed ?? ""}
+            rows={4}
+            placeholder={'Paste the <iframe> embed code from Bandcamp\'s share dialog'}
+            className="input resize-y font-mono text-xs"
+            onKeyDown={handleTabInTextarea}
+          />
+          <p className="text-[10px] text-zinc-600 mt-1">
+            On Bandcamp, go to Share / Embed → copy the iframe code. When present, this replaces the auto-detected embed.
+          </p>
+        </Field>
+      </fieldset>
+
       {/* ── Metadata ── */}
       <fieldset className="space-y-4">
         <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">

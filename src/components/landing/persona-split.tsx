@@ -16,7 +16,7 @@ function PersonaCard({
   return (
     <div className="rounded-2xl bg-[#1a1a1a] border border-white/8 p-8 flex flex-col">
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-lg bg-[#0D9488]/15 flex items-center justify-center" aria-hidden="true">
+        <div className="w-10 h-10 rounded-lg bg-[#14B8A6]/15 flex items-center justify-center" aria-hidden="true">
           {icon}
         </div>
         <h3 className="text-xl font-bold text-white">{title}</h3>
@@ -28,7 +28,7 @@ function PersonaCard({
           <li key={f} className="flex items-start gap-3">
             <CheckCircle2
               size={16}
-              className="text-[#0D9488] shrink-0 mt-0.5"
+              className="text-[#14B8A6] shrink-0 mt-0.5"
             />
             <span className="text-sm text-white/70">{f}</span>
           </li>
@@ -48,7 +48,7 @@ function PersonaCard({
 
 export function PersonaSplit() {
   return (
-    <section className="px-6 py-20 md:py-28">
+    <section className="px-6 py-12 md:py-20">
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white">
@@ -62,7 +62,7 @@ export function PersonaSplit() {
 
         <div className="grid gap-6 md:grid-cols-2">
           <PersonaCard
-            icon={<Music size={20} className="text-[#0D9488]" />}
+            icon={<Music size={20} className="text-[#14B8A6]" />}
             title="For Artists"
             subtitle="You're releasing your own music and want to get it right."
             features={[
@@ -76,7 +76,7 @@ export function PersonaSplit() {
           />
 
           <PersonaCard
-            icon={<Headphones size={20} className="text-[#0D9488]" />}
+            icon={<Headphones size={20} className="text-[#14B8A6]" />}
             title="For Engineers & Producers"
             subtitle="You're running a business and need to manage client projects professionally."
             features={[

@@ -16,38 +16,38 @@ export async function LandingFooter() {
             className="h-6 w-auto opacity-50"
           />
 
-          <nav aria-label="Footer" className="flex flex-wrap justify-center gap-6 text-sm text-zinc-400">
+          <nav aria-label="Footer" className="flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm text-zinc-400">
             <a
               href="#features"
-              className="hover:text-white/70 transition-colors"
+              className="min-h-[44px] inline-flex items-center hover:text-white/70 transition-colors"
             >
               {t("navFeatures")}
             </a>
             <a
               href="#pricing"
-              className="hover:text-white/70 transition-colors"
+              className="min-h-[44px] inline-flex items-center hover:text-white/70 transition-colors"
             >
               {t("navPricing")}
             </a>
             <Link
               href="/featured"
-              className="hover:text-white/70 transition-colors"
+              className="min-h-[44px] inline-flex items-center hover:text-white/70 transition-colors"
             >
               {t("navFeatured")}
             </Link>
             <Link
               href="/changelog"
-              className="hover:text-white/70 transition-colors"
+              className="min-h-[44px] inline-flex items-center hover:text-white/70 transition-colors"
             >
               {t("navChangelog")}
             </Link>
-            <span className="cursor-default">{t("navHelpCenter")}</span>
-            <span className="cursor-default">{t("navContact")}</span>
+            <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navHelpCenter")}</span>
+            <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navContact")}</span>
           </nav>
 
           <div className="flex items-center gap-4 text-xs text-zinc-400">
-            <span className="cursor-default">{t("navTerms")}</span>
-            <span className="cursor-default">{t("navPrivacy")}</span>
+            <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navTerms")}</span>
+            <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navPrivacy")}</span>
           </div>
         </div>
 

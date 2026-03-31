@@ -25,7 +25,7 @@ function LufsMeter() {
           className="absolute inset-y-0 left-0 rounded-full"
           style={{
             width: "62%",
-            background: "linear-gradient(90deg, #0D9488 0%, #22C55E 80%, #FE5E0E 100%)",
+            background: "linear-gradient(90deg, #14B8A6 0%, #22C55E 80%, #FE5E0E 100%)",
           }}
         />
         {/* Target line */}
@@ -35,7 +35,7 @@ function LufsMeter() {
         />
       </div>
       <div className="flex items-center justify-between mt-2">
-        <span className="text-[10px] text-[#0D9488] font-semibold">-14.2 LUFS</span>
+        <span className="text-[10px] text-[#14B8A6] font-semibold">-14.2 LUFS</span>
         <span className="text-[10px] text-white/60">Spotify target</span>
       </div>
     </div>
@@ -50,7 +50,7 @@ function FormatConversion() {
           <span
             className={`text-[10px] font-semibold px-2 py-1 rounded ${
               i === 0
-                ? "bg-[#0D9488]/15 text-[#2dd4bf]"
+                ? "bg-[#14B8A6]/15 text-[#5eead4]"
                 : "bg-white/6 text-white/60"
             }`}
           >
@@ -78,7 +78,7 @@ function MiniWaveform() {
             style={{
               height: `${h * 100}%`,
               background: isPast
-                ? "rgba(13,148,136,0.5)"
+                ? "rgba(20,184,166,0.5)"
                 : "rgba(255,255,255,0.12)",
             }}
           />
@@ -95,7 +95,7 @@ function CommentTimeline() {
       {[
         { pos: "22%", color: "#FE5E0E" },
         { pos: "45%", color: "#3B82F6" },
-        { pos: "72%", color: "#0D9488" },
+        { pos: "72%", color: "#14B8A6" },
       ].map((m) => (
         <div
           key={m.pos}
@@ -117,7 +117,7 @@ function BriefPreview() {
       <div className="h-1.5 w-3/4 rounded-full bg-white/6" />
       <div className="flex gap-1.5 mt-1">
         {["Warm", "Punchy"].map((t) => (
-          <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#0D9488]/12 text-[#0D9488]">
+          <span key={t} className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#14B8A6]/12 text-[#14B8A6]">
             {t}
           </span>
         ))}
@@ -134,7 +134,7 @@ function VersionTabs() {
           key={v}
           className={`text-[10px] px-2.5 py-1 rounded-full font-medium ${
             i === 2
-              ? "bg-[#0D9488] text-[#1a1a1a] font-semibold"
+              ? "bg-[#14B8A6] text-[#1a1a1a] font-semibold"
               : "bg-white/8 text-white/60"
           }`}
         >
@@ -198,12 +198,12 @@ export async function AudioToolsGrid() {
   ];
 
   return (
-    <section className="px-6 py-20 md:py-28">
+    <section className="px-6 py-12 md:py-20">
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-12">
-          <div className="text-xs font-semibold uppercase tracking-widest text-[#0D9488] mb-3">
+          <span className="inline-block mb-4 px-3 py-1 text-xs font-semibold rounded-full border bg-[#14B8A6]/15 text-[#5eead4] border-[#14B8A6]/20">
             {t("audioToolsLabel")}
-          </div>
+          </span>
           <h2 className="text-3xl md:text-4xl font-bold text-white">
             {t("audioToolsHeadline")}
           </h2>
@@ -216,9 +216,9 @@ export async function AudioToolsGrid() {
           {tools.map((tool) => (
             <div
               key={tool.title}
-              className="rounded-xl bg-[#1a1a1a] border border-white/8 p-6 hover:border-white/15 transition-colors"
+              className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg"
             >
-              <div className="w-11 h-11 rounded-lg bg-[#0D9488]/12 flex items-center justify-center text-[#0D9488] mb-4" aria-hidden="true">
+              <div className="w-11 h-11 rounded-lg bg-[#14B8A6]/12 flex items-center justify-center text-[#14B8A6] mb-4" aria-hidden="true">
                 {tool.icon}
               </div>
               <h3 className="text-base font-semibold text-white mb-2">

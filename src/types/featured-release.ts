@@ -23,6 +23,7 @@ export interface FeaturedRelease {
   link_deezer: string | null;
   link_qobuz: string | null;
   link_website: string | null;
+  bandcamp_embed: string | null;
   genre_tags: string[];
   credits: string | null;
   release_date: string | null;

@@ -115,8 +115,8 @@ export default async function AppFeaturedReleasePage({ params }: Props) {
           </div>
 
           {/* Bandcamp embed */}
-          {release.link_bandcamp && (
-            <BandcampEmbed url={release.link_bandcamp} />
+          {(release.bandcamp_embed || release.link_bandcamp) && (
+            <BandcampEmbed embedCode={release.bandcamp_embed} url={release.link_bandcamp} />
           )}
 
           {/* Author byline */}

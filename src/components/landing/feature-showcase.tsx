@@ -23,6 +23,9 @@ import {
   Users,
   ExternalLink,
   TrendingUp,
+  Receipt,
+  CreditCard,
+  ArrowRight,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -47,7 +50,7 @@ function FeatureSection({
   reverse?: boolean;
 }) {
   const badgeColors = {
-    teal: "bg-[#0D9488]/15 text-[#2dd4bf] border-[#0D9488]/20",
+    teal: "bg-[#14B8A6]/15 text-[#5eead4] border-[#14B8A6]/20",
     blue: "bg-[#3B82F6]/15 text-[#60A5FA] border-[#3B82F6]/20",
     orange: "bg-[#FE5E0E]/15 text-[#FF6D22] border-[#FE5E0E]/20",
   };
@@ -55,7 +58,7 @@ function FeatureSection({
   return (
     <div
       id={id}
-      className={`grid gap-8 lg:gap-16 lg:grid-cols-2 items-center py-20 md:py-28 ${
+      className={`grid gap-8 lg:gap-16 lg:grid-cols-2 items-center py-12 md:py-20 ${
         reverse ? "lg:[direction:rtl]" : ""
       }`}
     >
@@ -100,7 +103,7 @@ function ReleasePlanningMock() {
           <div className="text-sm text-white/60">Aria Voss</div>
         </div>
         <div className="flex items-center gap-2 text-xs">
-          <Calendar size={14} className="text-[#0D9488]" />
+          <Calendar size={14} className="text-[#14B8A6]" />
           <span className="text-white/60">Jun 15, 2026</span>
         </div>
       </div>
@@ -141,8 +144,8 @@ function WebPortalMock() {
     <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
       {/* Header */}
       <div className="flex items-center gap-4 mb-5">
-        <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-[#0D9488]/30 to-[#3B82F6]/20 flex items-center justify-center">
-          <Music size={24} className="text-[#0D9488]" />
+        <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-[#14B8A6]/30 to-[#3B82F6]/20 flex items-center justify-center">
+          <Music size={24} className="text-[#14B8A6]" />
         </div>
         <div>
           <div className="text-lg font-semibold text-white">
@@ -186,11 +189,11 @@ function WebPortalMock() {
         <DollarSign size={12} className="text-[#FE5E0E]" />
       </div>
       {/* Footer */}
-      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#0D9488]/8 border border-[#0D9488]/15">
+      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#14B8A6]/8 border border-[#14B8A6]/15">
         <span className="text-xs text-white/60">
           Powered by Mix Architect
         </span>
-        <Share2 size={12} className="text-[#0D9488]" />
+        <Share2 size={12} className="text-[#14B8A6]" />
       </div>
     </div>
   );
@@ -209,7 +212,7 @@ function AudioReviewMock() {
               key={v}
               className={`text-xs px-2 py-0.5 rounded-full ${
                 i === 2
-                  ? "bg-[#0D9488] text-[#1a1a1a] font-semibold"
+                  ? "bg-[#14B8A6] text-[#1a1a1a] font-semibold"
                   : "bg-white/8 text-white/60"
               }`}
             >
@@ -230,7 +233,7 @@ function AudioReviewMock() {
               style={{
                 height: `${h * 100}%`,
                 background: isPast
-                  ? "rgba(13,148,136,0.6)"
+                  ? "rgba(20,184,166,0.6)"
                   : "rgba(255,255,255,0.15)",
               }}
             />
@@ -280,72 +283,70 @@ function AudioReviewMock() {
 }
 
 function PaymentsMock() {
-  const rows = [
+  const steps = [
     {
-      title: "Late Night Drive",
-      client: "Aria Voss",
+      icon: FileText,
+      label: "Quote Sent",
+      detail: "Late Night Drive EP",
       amount: "$1,200",
-      status: "PAID",
-      color: "#22C55E",
+      color: "#14B8A6",
     },
     {
-      title: "Concrete Jungle",
-      client: "Jay Park",
-      amount: "$800",
-      status: "PARTIAL",
-      color: "#FE5E0E",
-    },
-    {
-      title: "Ocean Eyes",
-      client: "Luna Ray",
-      amount: "$600",
-      status: "UNPAID",
+      icon: Receipt,
+      label: "Invoice Created",
+      detail: "INV-2024-047",
+      amount: "$1,200",
       color: "#3B82F6",
+    },
+    {
+      icon: CreditCard,
+      label: "Payment Collected",
+      detail: "Visa ending 4242",
+      amount: "$1,200",
+      color: "#22C55E",
     },
   ];
 
   return (
     <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
-      {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        <div className="rounded-lg bg-white/4 p-3 text-center">
-          <div className="text-xs text-white/60 mb-1">Outstanding</div>
-          <div className="text-lg font-bold text-[#FE5E0E]">$1,400</div>
-        </div>
-        <div className="rounded-lg bg-white/4 p-3 text-center">
-          <div className="text-xs text-white/60 mb-1">Earned</div>
-          <div className="text-lg font-bold text-[#22C55E]">$1,200</div>
-        </div>
-        <div className="rounded-lg bg-white/4 p-3 text-center">
-          <div className="text-xs text-white/60 mb-1">Total</div>
-          <div className="text-lg font-bold text-white">$2,600</div>
-        </div>
-      </div>
-      {/* Table */}
-      <div className="space-y-2">
-        {rows.map((r) => (
-          <div
-            key={r.title}
-            className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-white/4"
-          >
-            <div>
-              <div className="text-sm text-white/80">{r.title}</div>
-              <div className="text-xs text-white/60">{r.client}</div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-white/70">{r.amount}</span>
-              <span
-                className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                style={{
-                  color: r.color,
-                  background: `${r.color}15`,
-                }}
+      {/* Flow steps */}
+      <div className="space-y-3">
+        {steps.map((s, i) => (
+          <div key={s.label}>
+            <div className="flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/4">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: `${s.color}15` }}
               >
-                {r.status}
-              </span>
+                <s.icon size={16} style={{ color: s.color }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm text-white/80 font-medium">{s.label}</div>
+                <div className="text-xs text-white/60">{s.detail}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-white/70">{s.amount}</span>
+                <CheckCircle2 size={14} style={{ color: s.color }} />
+              </div>
             </div>
+            {i < steps.length - 1 && (
+              <div className="flex justify-center py-1">
+                <ArrowRight size={14} className="text-white/20 rotate-90" />
+              </div>
+            )}
           </div>
         ))}
+      </div>
+      {/* Stripe Connect badge */}
+      <div className="mt-4 flex items-center justify-between py-2.5 px-3 rounded-lg bg-[#635BFF]/8 border border-[#635BFF]/15">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-white/60">Powered by</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/stripe-wordmark-white.png" alt="Stripe" className="h-5 w-auto opacity-70" />
+        </div>
+        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#635BFF]/15 text-[#a5a0ff]">
+          Connect
+        </span>
       </div>
     </div>
   );
@@ -382,7 +383,7 @@ function TemplatesMock() {
         <div className="text-sm font-semibold text-white">
           Saved Templates
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0D9488]/15 text-[#2dd4bf]">
+        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#14B8A6]/15 text-[#5eead4]">
           PRO
         </span>
       </div>
@@ -394,8 +395,8 @@ function TemplatesMock() {
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#0D9488]/12 flex items-center justify-center">
-                  <Layers size={14} className="text-[#0D9488]" />
+                <div className="w-8 h-8 rounded-lg bg-[#14B8A6]/12 flex items-center justify-center">
+                  <Layers size={14} className="text-[#14B8A6]" />
                 </div>
                 <div>
                   <div className="text-sm text-white/80 font-medium">{t.name}</div>
@@ -414,7 +415,7 @@ function TemplatesMock() {
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/60">
                 {t.specs}
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#0D9488]/12 text-[#0D9488]">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#14B8A6]/12 text-[#14B8A6]">
                 {t.tier}
               </span>
             </div>
@@ -431,8 +432,8 @@ function DataExportMock() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#0D9488]/12 flex items-center justify-center">
-            <Download size={18} className="text-[#0D9488]" />
+          <div className="w-10 h-10 rounded-lg bg-[#14B8A6]/12 flex items-center justify-center">
+            <Download size={18} className="text-[#14B8A6]" />
           </div>
           <div>
             <div className="text-sm font-semibold text-white">
@@ -448,7 +449,7 @@ function DataExportMock() {
       {/* File tree */}
       <div className="rounded-lg bg-white/4 p-3 space-y-1.5 text-[11px]">
         <div className="flex items-center gap-2 text-white/70">
-          <FileJson size={12} className="text-[#0D9488] shrink-0" />
+          <FileJson size={12} className="text-[#14B8A6] shrink-0" />
           metadata.json
         </div>
         <div className="flex items-center gap-2 text-white/70">
@@ -456,7 +457,7 @@ function DataExportMock() {
           payments.csv
         </div>
         <div className="flex items-center gap-2 text-white/60 mt-1">
-          <FolderOpen size={12} className="text-[#0D9488] shrink-0" />
+          <FolderOpen size={12} className="text-[#14B8A6] shrink-0" />
           releases/
         </div>
         <div className="ml-5 space-y-1.5">
@@ -488,7 +489,7 @@ function DataExportMock() {
 
 function FlowSimulatorMock() {
   const tracks = [
-    { title: "Midnight Drive", duration: "3:42", color: "#0D9488", width: "28%" },
+    { title: "Midnight Drive", duration: "3:42", color: "#14B8A6", width: "28%" },
     { title: "Neon Bloom", duration: "4:15", color: "#3B82F6", width: "32%" },
     { title: "Golden Hour", duration: "3:18", color: "#FE5E0E", width: "24%" },
     { title: "Afterglow", duration: "2:08", color: "#22C55E", width: "16%" },
@@ -499,7 +500,7 @@ function FlowSimulatorMock() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Shuffle size={14} className="text-[#0D9488]" />
+          <Shuffle size={14} className="text-[#14B8A6]" />
           <span className="text-sm font-semibold text-white">Flow Simulator</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -508,7 +509,7 @@ function FlowSimulatorMock() {
               key={m}
               className={`text-[10px] px-2 py-0.5 rounded-full ${
                 i === 0
-                  ? "bg-[#0D9488] text-[#1a1a1a] font-semibold"
+                  ? "bg-[#14B8A6] text-[#1a1a1a] font-semibold"
                   : "bg-white/8 text-white/60"
               }`}
             >
@@ -545,7 +546,7 @@ function FlowSimulatorMock() {
         <button aria-label="Previous track" className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
           <SkipForward size={12} className="text-white/60 rotate-180" />
         </button>
-        <button aria-label="Play" className="w-9 h-9 rounded-full bg-[#0D9488] flex items-center justify-center">
+        <button aria-label="Play" className="w-9 h-9 rounded-full bg-[#14B8A6] flex items-center justify-center">
           <Play size={14} className="text-[#1a1a1a] ml-0.5" />
         </button>
         <button aria-label="Next track" className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center">
@@ -623,7 +624,7 @@ function DistributionTrackerMock() {
     <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <Radio size={14} className="text-[#0D9488]" />
+          <Radio size={14} className="text-[#14B8A6]" />
           <span className="text-sm font-semibold text-white">
             Distribution Tracker
           </span>
@@ -649,7 +650,7 @@ function DistributionTrackerMock() {
               />
               <span className="text-sm text-white/80">{p.name}</span>
               {p.auto && (
-                <span className="text-[9px] text-[#0D9488]/70 ml-0.5">
+                <span className="text-[9px] text-[#14B8A6]/70 ml-0.5">
                   Auto
                 </span>
               )}
@@ -701,7 +702,7 @@ function AnalyticsMock() {
             label: "Releases",
             value: "24",
             icon: BarChart3,
-            color: "#0D9488",
+            color: "#14B8A6",
           },
           {
             label: "Avg Turnaround",
@@ -734,7 +735,7 @@ function AnalyticsMock() {
       {/* Release velocity bar chart */}
       <div className="mb-4">
         <div className="flex items-center gap-1.5 mb-3">
-          <TrendingUp size={12} className="text-[#0D9488]" />
+          <TrendingUp size={12} className="text-[#14B8A6]" />
           <span className="text-xs text-white/60 font-medium">
             Release Velocity
           </span>
@@ -748,8 +749,8 @@ function AnalyticsMock() {
                   height: `${(m.velocity / maxV) * 100}%`,
                   background:
                     m.label === "Feb"
-                      ? "#0D9488"
-                      : "rgba(13,148,136,0.3)",
+                      ? "#14B8A6"
+                      : "rgba(20,184,166,0.3)",
                 }}
               />
               <span className="text-[9px] text-white/60 mt-1.5">
@@ -804,7 +805,6 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featureClientDelivery")}
           body={t("featureClientDeliveryDesc")}
-          badge={t("featureClientDeliveryBadge")}
           visual={<WebPortalMock />}
           reverse
         />
@@ -818,8 +818,6 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featureFlowSim")}
           body={t("featureFlowSimDesc")}
-          badge={t("featureFlowSimBadge")}
-          badgeColor="blue"
           visual={<FlowSimulatorMock />}
           reverse
         />
@@ -827,16 +825,12 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featurePayments")}
           body={t("featurePaymentsDesc")}
-          badge={t("featurePaymentsBadge")}
-          badgeColor="orange"
           visual={<PaymentsMock />}
         />
 
         <FeatureSection
           headline={t("featureDistribution")}
           body={t("featureDistributionDesc")}
-          badge={t("featureDistributionBadge")}
-          badgeColor="teal"
           visual={<DistributionTrackerMock />}
           reverse
         />
@@ -844,16 +838,12 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featureAnalytics")}
           body={t("featureAnalyticsDesc")}
-          badge={t("featureAnalyticsBadge")}
-          badgeColor="blue"
           visual={<AnalyticsMock />}
         />
 
         <FeatureSection
           headline={t("featureTemplates")}
           body={t("featureTemplatesDesc")}
-          badge={t("featureTemplatesBadge")}
-          badgeColor="blue"
           visual={<TemplatesMock />}
           reverse
         />
@@ -861,7 +851,6 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featureExport")}
           body={t("featureExportDesc")}
-          badge={t("featureExportBadge")}
           visual={<DataExportMock />}
         />
       </div>

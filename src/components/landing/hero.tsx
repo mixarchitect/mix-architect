@@ -36,7 +36,7 @@ export async function Hero() {
             return (
               <>
                 {main}
-                <span className="text-[#0D9488]">{accent}</span>
+                <span className="text-[#14B8A6]">{accent}</span>
               </>
             );
           })()}
@@ -49,13 +49,13 @@ export async function Hero() {
         {/* Persona labels */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-12 py-2 mb-7">
           <div className="text-center">
-            <p className="text-[15px] font-medium text-[#0D9488] mb-1">{t("forArtists")}</p>
+            <p className="text-[15px] font-medium text-[#14B8A6] mb-1">{t("forArtists")}</p>
             <p className="text-[13px] text-zinc-400">{t("forArtistsShort")}</p>
           </div>
-          <div className="hidden sm:block w-[2px] self-stretch bg-[#0D9488]/40" />
-          <div className="block sm:hidden h-[2px] w-12 bg-[#0D9488]/40 mx-auto" />
+          <div className="hidden sm:block w-[2px] self-stretch bg-[#14B8A6]/40" />
+          <div className="block sm:hidden h-[2px] w-12 bg-[#14B8A6]/40 mx-auto" />
           <div className="text-center">
-            <p className="text-[15px] font-medium text-[#0D9488] mb-1">{t("forEngineers")}</p>
+            <p className="text-[15px] font-medium text-[#14B8A6] mb-1">{t("forEngineers")}</p>
             <p className="text-[13px] text-zinc-400">{t("forEngineersShort")}</p>
           </div>
         </div>
@@ -64,7 +64,7 @@ export async function Hero() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/auth/sign-in?mode=signup"
-            className="h-14 w-full sm:w-64 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#0D9488] text-white hover:bg-[#0fb9ab] transition-colors whitespace-nowrap"
+            className="h-14 w-full sm:w-64 text-base font-semibold inline-flex items-center justify-center gap-2 rounded-xl bg-[#14B8A6] text-[#1a1a1a] hover:bg-[#2dd4bf] transition-colors whitespace-nowrap"
           >
             {t("startFree")}
             <FilledArrowRight size={18} />
