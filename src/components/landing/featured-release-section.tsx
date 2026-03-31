@@ -29,7 +29,7 @@ export async function FeaturedReleaseSection({
   };
 
   return (
-    <section id="featured" aria-labelledby="featured-heading" className="px-6 py-20">
+    <section id="featured" aria-labelledby="featured-heading" className="px-6 py-12 md:py-20">
       {/* Safe: JSON.stringify escapes HTML; \\u003c prevents script breakout */}
       <script
         type="application/ld+json"

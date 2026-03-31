@@ -18,7 +18,7 @@ export async function FounderNote() {
   ];
 
   return (
-    <section className="px-6 py-20 md:py-28">
+    <section className="px-6 py-12 md:py-20">
       <div className="mx-auto max-w-5xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white">
@@ -32,7 +32,7 @@ export async function FounderNote() {
               key={item.name}
               className="rounded-2xl bg-[#1a1a1a] border border-white/8 p-8 min-h-[200px] flex flex-col"
             >
-              <Quote size={24} className="text-[#0D9488]/40 mb-4" />
+              <Quote size={24} className="text-[#14B8A6]/40 mb-4" />
               <blockquote className="text-white/70 leading-relaxed mb-6 flex-1">
                 &ldquo;{item.quote}&rdquo;
               </blockquote>

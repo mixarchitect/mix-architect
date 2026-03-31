@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 export async function FinalCTA() {
   const t = await getTranslations("landing");
   return (
-    <section className="px-6 py-20 md:py-28">
+    <section className="px-6 py-12 md:py-20">
       <div className="mx-auto max-w-3xl text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white">
           {t("finalCtaHeadline")}

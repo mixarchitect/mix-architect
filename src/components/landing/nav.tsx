@@ -79,7 +79,7 @@ export function LandingNav({ locale = "en-US" }: { locale?: string }) {
           </Link>
           <Link
             href="/auth/sign-in?mode=signup"
-            className="px-3 sm:px-4 py-2 text-xs sm:text-[13px] font-semibold text-white bg-[#0D9488] rounded-full hover:bg-[#0fb9ab] transition-colors whitespace-nowrap"
+            className="px-4 py-2.5 text-[13px] font-semibold text-[#1a1a1a] bg-[#14B8A6] rounded-full hover:bg-[#2dd4bf] transition-colors whitespace-nowrap"
           >
             {t("startFree")}
           </Link>
