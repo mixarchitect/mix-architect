@@ -222,6 +222,9 @@ async function createAuthenticatedClient(
   const client = createClient(SUPABASE_URL, ANON_KEY, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+  const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
 
   // Try sign in first (user may already exist from a previous partial run)
   const { data: signInData, error: signInError } =
@@ -231,22 +234,36 @@ async function createAuthenticatedClient(
     return { client, userId: signInData.user.id };
   }
 
-  // Sign up
-  const { data: signUpData, error: signUpError } = await client.auth.signUp({
-    email,
-    password,
-  });
+  // Create via admin API with email pre-confirmed (bypasses confirmation requirement)
+  let { data: createData, error: createError } =
+    await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
 
-  if (signUpError) {
-    throw new Error(`Failed to create user ${email}: ${signUpError.message}`);
+  // If user already exists (e.g. from a failed previous run), delete and re-create
+  if (createError?.message?.includes("already been registered")) {
+    const { data: listData } = await admin.auth.admin.listUsers();
+    const existing = listData?.users?.find((u) => u.email === email);
+    if (existing) {
+      await admin.auth.admin.deleteUser(existing.id);
+      const retry = await admin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+      createData = retry.data;
+      createError = retry.error;
+    }
   }
 
-  if (!signUpData.user) {
-    throw new Error(
-      `User ${email} created but needs email confirmation. ` +
-        `Disable "Confirm email" in Supabase Auth settings for test accounts, ` +
-        `or manually confirm the test users.`,
-    );
+  if (createError) {
+    throw new Error(`Failed to create user ${email}: ${createError.message}`);
+  }
+
+  if (!createData?.user) {
+    throw new Error(`Admin createUser returned no user for ${email}`);
   }
 
   // Sign in to get a session
