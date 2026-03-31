@@ -23,6 +23,9 @@ import {
   Users,
   ExternalLink,
   TrendingUp,
+  Receipt,
+  CreditCard,
+  ArrowRight,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -280,72 +283,70 @@ function AudioReviewMock() {
 }
 
 function PaymentsMock() {
-  const rows = [
+  const steps = [
     {
-      title: "Late Night Drive",
-      client: "Aria Voss",
+      icon: FileText,
+      label: "Quote Sent",
+      detail: "Late Night Drive EP",
       amount: "$1,200",
-      status: "PAID",
-      color: "#22C55E",
+      color: "#14B8A6",
     },
     {
-      title: "Concrete Jungle",
-      client: "Jay Park",
-      amount: "$800",
-      status: "PARTIAL",
-      color: "#FE5E0E",
-    },
-    {
-      title: "Ocean Eyes",
-      client: "Luna Ray",
-      amount: "$600",
-      status: "UNPAID",
+      icon: Receipt,
+      label: "Invoice Created",
+      detail: "INV-2024-047",
+      amount: "$1,200",
       color: "#3B82F6",
+    },
+    {
+      icon: CreditCard,
+      label: "Payment Collected",
+      detail: "Visa ending 4242",
+      amount: "$1,200",
+      color: "#22C55E",
     },
   ];
 
   return (
     <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
-      {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        <div className="rounded-lg bg-white/4 p-3 text-center">
-          <div className="text-xs text-white/60 mb-1">Outstanding</div>
-          <div className="text-lg font-bold text-[#FE5E0E]">$1,400</div>
-        </div>
-        <div className="rounded-lg bg-white/4 p-3 text-center">
-          <div className="text-xs text-white/60 mb-1">Earned</div>
-          <div className="text-lg font-bold text-[#22C55E]">$1,200</div>
-        </div>
-        <div className="rounded-lg bg-white/4 p-3 text-center">
-          <div className="text-xs text-white/60 mb-1">Total</div>
-          <div className="text-lg font-bold text-white">$2,600</div>
-        </div>
-      </div>
-      {/* Table */}
-      <div className="space-y-2">
-        {rows.map((r) => (
-          <div
-            key={r.title}
-            className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-white/4"
-          >
-            <div>
-              <div className="text-sm text-white/80">{r.title}</div>
-              <div className="text-xs text-white/60">{r.client}</div>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-white/70">{r.amount}</span>
-              <span
-                className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                style={{
-                  color: r.color,
-                  background: `${r.color}15`,
-                }}
+      {/* Flow steps */}
+      <div className="space-y-3">
+        {steps.map((s, i) => (
+          <div key={s.label}>
+            <div className="flex items-center gap-3 py-2.5 px-3 rounded-lg bg-white/4">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                style={{ background: `${s.color}15` }}
               >
-                {r.status}
-              </span>
+                <s.icon size={16} style={{ color: s.color }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm text-white/80 font-medium">{s.label}</div>
+                <div className="text-xs text-white/60">{s.detail}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-white/70">{s.amount}</span>
+                <CheckCircle2 size={14} style={{ color: s.color }} />
+              </div>
             </div>
+            {i < steps.length - 1 && (
+              <div className="flex justify-center py-1">
+                <ArrowRight size={14} className="text-white/20 rotate-90" />
+              </div>
+            )}
           </div>
         ))}
+      </div>
+      {/* Stripe Connect badge */}
+      <div className="mt-4 flex items-center justify-between py-2.5 px-3 rounded-lg bg-[#635BFF]/8 border border-[#635BFF]/15">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-white/60">Powered by</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/stripe-wordmark-white.png" alt="Stripe" className="h-5 w-auto opacity-70" />
+        </div>
+        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#635BFF]/15 text-[#a5a0ff]">
+          Connect
+        </span>
       </div>
     </div>
   );
@@ -804,7 +805,6 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featureClientDelivery")}
           body={t("featureClientDeliveryDesc")}
-          badge={t("featureClientDeliveryBadge")}
           visual={<WebPortalMock />}
           reverse
         />
@@ -818,8 +818,6 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featureFlowSim")}
           body={t("featureFlowSimDesc")}
-          badge={t("featureFlowSimBadge")}
-          badgeColor="blue"
           visual={<FlowSimulatorMock />}
           reverse
         />
@@ -827,16 +825,12 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featurePayments")}
           body={t("featurePaymentsDesc")}
-          badge={t("featurePaymentsBadge")}
-          badgeColor="orange"
           visual={<PaymentsMock />}
         />
 
         <FeatureSection
           headline={t("featureDistribution")}
           body={t("featureDistributionDesc")}
-          badge={t("featureDistributionBadge")}
-          badgeColor="teal"
           visual={<DistributionTrackerMock />}
           reverse
         />
@@ -844,16 +838,12 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featureAnalytics")}
           body={t("featureAnalyticsDesc")}
-          badge={t("featureAnalyticsBadge")}
-          badgeColor="blue"
           visual={<AnalyticsMock />}
         />
 
         <FeatureSection
           headline={t("featureTemplates")}
           body={t("featureTemplatesDesc")}
-          badge={t("featureTemplatesBadge")}
-          badgeColor="blue"
           visual={<TemplatesMock />}
           reverse
         />
@@ -861,7 +851,6 @@ export async function FeatureShowcase() {
         <FeatureSection
           headline={t("featureExport")}
           body={t("featureExportDesc")}
-          badge={t("featureExportBadge")}
           visual={<DataExportMock />}
         />
       </div>

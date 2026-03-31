@@ -1,5 +1,12 @@
 interface BandcampEmbedProps {
-  url: string;
+  url?: string | null;
+  embedCode?: string | null;
+}
+
+/** Extract and validate the src from a pasted Bandcamp <iframe> embed code. */
+function extractBandcampSrc(embedCode: string): string | null {
+  const match = embedCode.match(/src="(https:\/\/bandcamp\.com\/EmbeddedPlayer\/[^"]+)"/);
+  return match ? match[1] : null;
 }
 
 async function fetchBandcampAlbumId(url: string): Promise<string | null> {
@@ -14,11 +21,19 @@ async function fetchBandcampAlbumId(url: string): Promise<string | null> {
   }
 }
 
-export async function BandcampEmbed({ url }: BandcampEmbedProps) {
-  const albumId = await fetchBandcampAlbumId(url);
-  if (!albumId) return null;
+export async function BandcampEmbed({ url, embedCode }: BandcampEmbedProps) {
+  let embedSrc: string | null = null;
 
-  const embedSrc = `https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=large/bgcol=333333/linkcol=0f91ff/artwork=none/transparent=true/`;
+  if (embedCode) {
+    embedSrc = extractBandcampSrc(embedCode);
+  } else if (url) {
+    const albumId = await fetchBandcampAlbumId(url);
+    if (albumId) {
+      embedSrc = `https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=large/bgcol=333333/linkcol=0f91ff/artwork=none/transparent=true/`;
+    }
+  }
+
+  if (!embedSrc) return null;
 
   return (
     <div className="my-8 rounded-lg overflow-hidden border border-white/10">
