@@ -6,9 +6,11 @@ import { useFocusOnRouteChange } from "@/hooks/use-focus-on-route-change";
 
 export function ThemeProvider({
   defaultTheme = "system",
+  nonce,
   children,
 }: {
   defaultTheme?: string;
+  nonce?: string;
   children: React.ReactNode;
 }) {
   useFocusOnRouteChange();
@@ -25,6 +27,7 @@ export function ThemeProvider({
       defaultTheme={defaultTheme}
       enableSystem
       disableTransitionOnChange
+      nonce={nonce}
     >
       {children}
     </NextThemesProvider>

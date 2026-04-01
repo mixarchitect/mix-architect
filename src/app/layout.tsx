@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/lib/theme-provider";
 import "./globals.css";
@@ -16,8 +17,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import type { Viewport } from "next";
-
 export const metadata: Metadata = {
   title: "Mix Architect",
   description: "Blueprints for stereo and immersive mixes",
@@ -34,17 +33,20 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerList = await headers();
+  const nonce = headerList.get("x-nonce") ?? undefined;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
+        <ThemeProvider nonce={nonce}>
           <nav aria-label="Skip links">
             <a
               href="#main-content"
