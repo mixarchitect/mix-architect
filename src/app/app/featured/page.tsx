@@ -23,7 +23,7 @@ export default async function AppFeaturedPage({ searchParams }: Props) {
     <div className="flex-1 overflow-y-auto">
       <div className="py-10 px-6">
         <div className="mx-auto max-w-6xl">
-          <h1 className="text-2xl font-bold text-text">Featured Releases</h1>
+          <h1 className="text-2xl font-bold text-text">What we&apos;re spinning</h1>
           <p className="text-sm text-muted mt-1 max-w-lg">
             Spotlighting great releases and the people behind the sound, from
             indie to major, emerging to established.
