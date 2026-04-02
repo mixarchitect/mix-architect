@@ -1,5 +1,12 @@
 import { NextRequest } from "next/server";
 
+/**
+ * In-memory rate limiter. Note: on serverless platforms (Vercel), each
+ * function invocation may run in a different container, so this provides
+ * per-container limits only — not global. For production-grade rate limiting,
+ * consider Vercel's Edge Middleware rate limiting or an external store (Redis).
+ */
+
 interface RateLimitEntry {
   count: number;
   resetAt: number;

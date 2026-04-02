@@ -39,16 +39,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Quote not found" }, { status: 404 });
   }
 
-  // Validate payable status
-  if (quote.status === "paid") {
-    return NextResponse.json({ error: "Quote already paid" }, { status: 400 });
-  }
-  if (quote.status === "expired") {
-    return NextResponse.json({ error: "Quote has expired" }, { status: 400 });
-  }
-  if (quote.status === "cancelled") {
+  // Validate payable status — only sent/viewed/accepted quotes can be paid
+  const payableStatuses = ["sent", "viewed", "accepted"];
+  if (!payableStatuses.includes(quote.status)) {
+    const messages: Record<string, string> = {
+      paid: "Quote already paid",
+      expired: "Quote has expired",
+      cancelled: "Quote has been cancelled",
+      draft: "Quote has not been sent yet",
+    };
     return NextResponse.json(
-      { error: "Quote has been cancelled" },
+      { error: messages[quote.status] ?? `Quote status "${quote.status}" is not payable` },
       { status: 400 },
     );
   }
@@ -103,10 +104,32 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Validate total is positive
+  if (Number(quote.total) <= 0) {
+    return NextResponse.json(
+      { error: "Quote total must be greater than zero" },
+      { status: 400 },
+    );
+  }
+
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com";
 
   try {
+    // Atomic guard: re-check status hasn't changed (prevents race with concurrent requests)
+    const { data: freshQuote } = await supabase
+      .from("quotes")
+      .select("status")
+      .eq("id", quote.id)
+      .single();
+
+    if (!freshQuote || !payableStatuses.includes(freshQuote.status)) {
+      return NextResponse.json(
+        { error: "Quote is no longer payable" },
+        { status: 409 },
+      );
+    }
+
     // Create Stripe Checkout Session with destination charge
     const session = await stripe.checkout.sessions.create({
       mode: "payment",

@@ -69,6 +69,8 @@ async function getNextDocumentNumber(
   const prefix = documentType === "invoice" ? "INV" : "Q";
   const pattern = `${prefix}-`;
 
+  // Use count of all matching documents + 1 to reduce collision likelihood,
+  // then scan for the highest existing number as a fallback
   const { data } = await supabase
     .from("quotes")
     .select("quote_number")
@@ -76,15 +78,21 @@ async function getNextDocumentNumber(
     .eq("document_type", documentType)
     .like("quote_number", `${pattern}%`)
     .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(50);
 
-  if (!data?.quote_number) return `${prefix}-001`;
+  if (!data || data.length === 0) return `${prefix}-001`;
 
-  const match = data.quote_number.match(new RegExp(`${prefix}-(\\d+)`));
-  if (!match) return `${prefix}-001`;
+  // Find the highest existing number across all documents (not just the latest)
+  let maxNum = 0;
+  for (const row of data) {
+    const match = row.quote_number.match(new RegExp(`${prefix}-(\\d+)`));
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > maxNum) maxNum = num;
+    }
+  }
 
-  const next = parseInt(match[1], 10) + 1;
+  const next = maxNum + 1;
   return `${prefix}-${String(next).padStart(3, "0")}`;
 }
 
@@ -97,11 +105,31 @@ function computeTotals(
     (sum, item) => sum + item.quantity * item.unit_price,
     0,
   );
-  const total = subtotal - discountAmount + taxAmount;
+  const total = Math.max(0, subtotal - discountAmount + taxAmount);
   return {
     subtotal: Math.round(subtotal * 100) / 100,
     total: Math.round(total * 100) / 100,
   };
+}
+
+function validateLineItems(
+  items: { description?: string; quantity: number; unit_price: number }[],
+): string | null {
+  if (!items || items.length === 0) {
+    return "At least one line item is required";
+  }
+  for (const item of items) {
+    if (!item.description?.trim()) {
+      return "Line item description is required";
+    }
+    if (item.quantity <= 0) {
+      return "Quantity must be greater than 0";
+    }
+    if (item.unit_price < 0 || item.unit_price > 999999.99) {
+      return "Unit price must be between 0 and 999,999.99";
+    }
+  }
+  return null;
 }
 
 // ── CRUD ─────────────────────────────────────────────────────────
@@ -178,20 +206,8 @@ export async function createQuote(
   if (!user) return { quote: null, error: "Not authenticated" };
 
   // Input validation
-  if (!data.line_items || data.line_items.length === 0) {
-    return { quote: null, error: "At least one line item is required" };
-  }
-  for (const item of data.line_items) {
-    if (!item.description?.trim()) {
-      return { quote: null, error: "Line item description is required" };
-    }
-    if (item.quantity <= 0) {
-      return { quote: null, error: "Quantity must be greater than 0" };
-    }
-    if (item.unit_price < 0 || item.unit_price > 999999.99) {
-      return { quote: null, error: "Unit price must be between 0 and 999,999.99" };
-    }
-  }
+  const lineItemError = validateLineItems(data.line_items);
+  if (lineItemError) return { quote: null, error: lineItemError };
   if (data.discount_amount && (data.discount_amount < 0 || data.discount_amount > 999999.99)) {
     return { quote: null, error: "Invalid discount amount" };
   }
@@ -274,7 +290,7 @@ export async function updateQuote(
   // Verify ownership and editable status
   const { data: existing } = await supabase
     .from("quotes")
-    .select("id, status, release_id")
+    .select("id, status, release_id, discount_amount, tax_amount")
     .eq("id", quoteId)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -282,6 +298,18 @@ export async function updateQuote(
   if (!existing) return { quote: null, error: "Quote not found" };
   if (existing.status === "paid" || existing.status === "expired") {
     return { quote: null, error: "Cannot edit a paid or expired quote" };
+  }
+
+  // Validate line items if provided
+  if (data.line_items) {
+    const lineItemError = validateLineItems(data.line_items);
+    if (lineItemError) return { quote: null, error: lineItemError };
+  }
+  if (data.discount_amount !== undefined && (data.discount_amount < 0 || data.discount_amount > 999999.99)) {
+    return { quote: null, error: "Invalid discount amount" };
+  }
+  if (data.tax_amount !== undefined && (data.tax_amount < 0 || data.tax_amount > 999999.99)) {
+    return { quote: null, error: "Invalid tax amount" };
   }
 
   // Recalculate totals if line items changed
@@ -326,14 +354,13 @@ export async function updateQuote(
       await supabase.from("quote_line_items").insert(lineItemRows);
     }
 
+    // Use explicitly provided values, falling back to existing DB values
+    const effectiveDiscount = data.discount_amount ?? Number(existing.discount_amount) ?? 0;
+    const effectiveTax = data.tax_amount ?? Number(existing.tax_amount) ?? 0;
     const { subtotal, total } = computeTotals(
       data.line_items,
-      (data.discount_amount as number) ??
-        (updateFields.discount_amount as number) ??
-        0,
-      (data.tax_amount as number) ??
-        (updateFields.tax_amount as number) ??
-        0,
+      effectiveDiscount,
+      effectiveTax,
     );
     updateFields.subtotal = subtotal;
     updateFields.total = total;
@@ -400,20 +427,40 @@ export async function deleteQuote(
   return {};
 }
 
+/**
+ * Send a quote. Can be called from both authenticated (server action) and
+ * service-client contexts (workflow engine).
+ *
+ * @param quoteId - The quote ID to send
+ * @param options.serviceContext - If provided, uses service client instead of
+ *   requiring auth. Must include userId for ownership verification.
+ */
 export async function sendQuote(
   quoteId: string,
+  options?: { serviceContext?: { userId: string } },
 ): Promise<{ error?: string }> {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  let supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>;
+  let userId: string;
+
+  if (options?.serviceContext) {
+    // Service-client context (workflow engine, webhooks)
+    supabase = createSupabaseServiceClient() as unknown as Awaited<ReturnType<typeof createSupabaseServerClient>>;
+    userId = options.serviceContext.userId;
+  } else {
+    // Authenticated context (server action)
+    supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { error: "Not authenticated" };
+    userId = user.id;
+  }
 
   const { data: quote } = await supabase
     .from("quotes")
     .select("*")
     .eq("id", quoteId)
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (!quote) return { error: "Quote not found" };
@@ -428,8 +475,8 @@ export async function sendQuote(
 
   if (error) return { error: error.message };
 
-  // Send email to client (fire-and-forget)
-  const displayName = await getUserDisplayName(user.id);
+  // Send email to client
+  const displayName = await getUserDisplayName(userId);
   const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com"}/portal/quote/${quote.portal_token}`;
 
   // Get release title if linked
@@ -443,13 +490,12 @@ export async function sendQuote(
     releaseTitle = release?.title;
   }
 
-  // Get unsubscribe token for the engineer (email goes to client, but
-  // the engineer's userId is used for logging/preferences)
+  // Get unsubscribe token for the engineer
   const serviceClient = createSupabaseServiceClient();
   const { data: prefs } = await serviceClient
     .from("email_preferences")
     .select("unsubscribe_token")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   const unsubscribeUrl = prefs?.unsubscribe_token
@@ -472,16 +518,16 @@ export async function sendQuote(
   if (resendKey) {
     const { Resend } = require("resend") as typeof import("resend");
     const resend = new Resend(resendKey);
-    resend.emails
-      .send({
+    try {
+      await resend.emails.send({
         from: "Mix Architect <team@mixarchitect.com>",
         to: quote.client_email,
         subject: email.subject,
         html: email.html,
-      })
-      .catch((err: unknown) => {
-        console.error("[quotes] failed to send quote email:", err);
       });
+    } catch (err) {
+      console.error("[quotes] failed to send quote email:", err);
+    }
   }
 
   revalidatePath("/app/quotes");
@@ -566,15 +612,25 @@ export async function markQuotePaid(
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  // Fetch release_id before updating
+  // Fetch quote and validate status before updating
   const { data: quoteData } = await supabase
     .from("quotes")
-    .select("release_id")
+    .select("release_id, status")
     .eq("id", quoteId)
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (!quoteData) return { error: "Quote not found" };
+
+  if (quoteData.status === "paid") {
+    return { error: "Quote is already marked as paid" };
+  }
+  if (quoteData.status === "cancelled") {
+    return { error: "Cannot mark a cancelled quote as paid" };
+  }
+  if (quoteData.status === "expired") {
+    return { error: "Cannot mark an expired quote as paid" };
+  }
 
   const { error } = await supabase
     .from("quotes")

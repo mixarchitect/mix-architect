@@ -125,12 +125,11 @@ export async function POST(req: NextRequest) {
             }).catch(console.error);
           }
 
-          // Send payment confirmation email to engineer (fire-and-forget)
+          // Send payment confirmation email to engineer
           if (quoteUserId) {
-            (async () => {
-              try {
-                const email = await getUserEmail(quoteUserId);
-                if (!email) return;
+            try {
+              const email = await getUserEmail(quoteUserId);
+              if (email) {
                 const displayName = await getUserDisplayName(quoteUserId);
 
                 const { data: prefs } = await supabase
@@ -169,10 +168,10 @@ export async function POST(req: NextRequest) {
                   subject,
                   html,
                 });
-              } catch (err) {
-                console.error("[stripe/webhook] quote payment email error:", err);
               }
-            })();
+            } catch (err) {
+              console.error("[stripe/webhook] quote payment email error:", err);
+            }
           }
 
           break;
@@ -464,7 +463,13 @@ export async function POST(req: NextRequest) {
             if (charge.refunded) {
               await supabase
                 .from("quotes")
-                .update({ status: "sent", paid_at: null, payment_method: null })
+                .update({
+                  status: "sent",
+                  paid_at: null,
+                  payment_method: null,
+                  stripe_checkout_session_id: null,
+                  stripe_payment_intent_id: null,
+                })
                 .eq("id", refundedQuote.id);
 
               if (refundedQuote.release_id) {

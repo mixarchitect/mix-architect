@@ -112,7 +112,13 @@ async function handleSendInvoice(context: TriggerContext): Promise<ActionResult>
     return { skipped: true, reason: "No unsent draft quote found" };
   }
 
-  await sendQuote(quote.id);
+  // Use service context since workflow engine runs outside auth (e.g. webhooks)
+  const result = await sendQuote(quote.id, {
+    serviceContext: { userId: context.userId },
+  });
+  if (result.error) {
+    throw new Error(result.error);
+  }
   return {};
 }
 
