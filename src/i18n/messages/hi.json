@@ -275,7 +275,11 @@
     "statusReady": "रेडी",
     "markedStatus": "रिलीज़ को {status} मार्क किया गया",
     "paymentChanged": "पेमेंट स्टेटस {status} में बदला गया",
-    "pasteUrl": "या URL पेस्ट करें"
+    "pasteUrl": "या URL पेस्ट करें",
+    "noFinancialDataTitle": "अभी तक कोई वित्तीय डेटा नहीं",
+    "noFinancialDataDesc": "इस रिलीज़ के लिए वित्त ट्रैक करने के लिए एक कोटेशन बनाएं या समय लॉग करें।",
+    "newQuote": "नया कोटेशन",
+    "logTime": "समय लॉग करें"
   },
   "releaseSettings": {
     "title": "रिलीज़ सेटिंग्स",

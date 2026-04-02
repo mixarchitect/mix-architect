@@ -315,7 +315,11 @@
     "portalPaymentStatus": "Status do pagamento",
     "portalDistribution": "Distribuição",
     "portalLyrics": "Letras",
-    "portalRequirePayment": "Exigir pagamento"
+    "portalRequirePayment": "Exigir pagamento",
+    "noFinancialDataTitle": "Nenhum dado financeiro ainda",
+    "noFinancialDataDesc": "Crie um orçamento ou registre tempo para começar a acompanhar as finanças deste lançamento.",
+    "newQuote": "Novo orçamento",
+    "logTime": "Registrar tempo"
   },
   "releaseSettings": {
     "title": "Configurações do Lançamento",

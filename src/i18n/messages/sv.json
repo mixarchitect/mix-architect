@@ -275,7 +275,11 @@
     "statusReady": "Klar",
     "markedStatus": "Release markerad {status}",
     "paymentChanged": "Betalningsstatus ändrad till {status}",
-    "pasteUrl": "eller klistra in URL"
+    "pasteUrl": "eller klistra in URL",
+    "noFinancialDataTitle": "Inga ekonomiska data ännu",
+    "noFinancialDataDesc": "Skapa en offert eller logga tid för att börja spåra ekonomin för denna release.",
+    "newQuote": "Ny offert",
+    "logTime": "Logga tid"
   },
   "releaseSettings": {
     "title": "Releaseinställningar",

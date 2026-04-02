@@ -275,7 +275,11 @@
     "statusReady": "準備完了",
     "markedStatus": "リリースを{status}としてマークしました",
     "paymentChanged": "支払い状況を{status}に変更しました",
-    "pasteUrl": "またはURLを貼り付け"
+    "pasteUrl": "またはURLを貼り付け",
+    "noFinancialDataTitle": "財務データはまだありません",
+    "noFinancialDataDesc": "見積もりを作成するか時間を記録して、このリリースの財務管理を始めましょう。",
+    "newQuote": "新規見積もり",
+    "logTime": "時間を記録"
   },
   "releaseSettings": {
     "title": "リリース設定",

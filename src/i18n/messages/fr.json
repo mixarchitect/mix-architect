@@ -315,7 +315,11 @@
     "portalPaymentStatus": "Statut du paiement",
     "portalDistribution": "Distribution",
     "portalLyrics": "Paroles",
-    "portalRequirePayment": "Exiger le paiement"
+    "portalRequirePayment": "Exiger le paiement",
+    "noFinancialDataTitle": "Aucune donnée financière",
+    "noFinancialDataDesc": "Créez un devis ou enregistrez du temps pour commencer à suivre les finances de cette sortie.",
+    "newQuote": "Nouveau devis",
+    "logTime": "Enregistrer le temps"
   },
   "releaseSettings": {
     "title": "Paramètres de sortie",

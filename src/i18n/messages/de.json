@@ -315,7 +315,11 @@
     "portalPaymentStatus": "Zahlungsstatus",
     "portalDistribution": "Distribution",
     "portalLyrics": "Liedtexte",
-    "portalRequirePayment": "Zahlung erforderlich"
+    "portalRequirePayment": "Zahlung erforderlich",
+    "noFinancialDataTitle": "Noch keine Finanzdaten",
+    "noFinancialDataDesc": "Erstellen Sie ein Angebot oder erfassen Sie Zeit, um die Finanzen für diese Veröffentlichung zu verfolgen.",
+    "newQuote": "Neues Angebot",
+    "logTime": "Zeit erfassen"
   },
   "releaseSettings": {
     "title": "Release-Einstellungen",

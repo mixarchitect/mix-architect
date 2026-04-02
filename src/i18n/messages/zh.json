@@ -275,7 +275,11 @@
     "statusReady": "就绪",
     "markedStatus": "发行已标记为 {status}",
     "paymentChanged": "付款状态已更改为 {status}",
-    "pasteUrl": "或粘贴 URL"
+    "pasteUrl": "或粘贴 URL",
+    "noFinancialDataTitle": "暂无财务数据",
+    "noFinancialDataDesc": "创建报价或记录时间以开始跟踪此版本的财务状况。",
+    "newQuote": "新建报价",
+    "logTime": "记录时间"
   },
   "releaseSettings": {
     "title": "发行设置",

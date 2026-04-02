@@ -315,7 +315,11 @@
     "portalPaymentStatus": "Payment status",
     "portalDistribution": "Distribution",
     "portalLyrics": "Lyrics",
-    "portalRequirePayment": "Require payment"
+    "portalRequirePayment": "Require payment",
+    "noFinancialDataTitle": "No financial data yet",
+    "noFinancialDataDesc": "Create a quote or log time to start tracking finances for this release.",
+    "newQuote": "New Quote",
+    "logTime": "Log Time"
   },
   "releaseSettings": {
     "title": "Release Settings",

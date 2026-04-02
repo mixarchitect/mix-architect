@@ -275,7 +275,11 @@
     "statusReady": "준비 완료",
     "markedStatus": "릴리스가 {status}(으)로 표시되었습니다",
     "paymentChanged": "결제 상태가 {status}(으)로 변경되었습니다",
-    "pasteUrl": "또는 URL 붙여넣기"
+    "pasteUrl": "또는 URL 붙여넣기",
+    "noFinancialDataTitle": "아직 재무 데이터가 없습니다",
+    "noFinancialDataDesc": "견적을 생성하거나 시간을 기록하여 이 릴리스의 재무를 추적하세요.",
+    "newQuote": "새 견적",
+    "logTime": "시간 기록"
   },
   "releaseSettings": {
     "title": "릴리스 설정",
