@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/lib/theme-provider";
+import { ThemeWrapper } from "@/components/theme-wrapper";
 import "./globals.css";
 import { PerfOverlayLoader } from "@/components/dev/perf-overlay-loader";
 import { PerfReporterInit } from "@/components/perf-reporter-init";
@@ -33,20 +32,17 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headerList = await headers();
-  const nonce = headerList.get("x-nonce") ?? undefined;
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider nonce={nonce}>
+        <ThemeWrapper>
           <nav aria-label="Skip links">
             <a
               href="#main-content"
@@ -59,7 +55,7 @@ export default async function RootLayout({
           <OpenPanelAnalytics />
           <PerfReporterInit />
           <PerfOverlayLoader />
-        </ThemeProvider>
+        </ThemeWrapper>
       </body>
     </html>
   );
