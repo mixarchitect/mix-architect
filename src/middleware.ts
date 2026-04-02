@@ -15,7 +15,7 @@ function buildCsp(nonce: string): string {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' js.stripe.com`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data: sjdodeauawmuzredpxwa.supabase.co",
-    "connect-src 'self' sjdodeauawmuzredpxwa.supabase.co *.supabase.co api.stripe.com",
+    "connect-src 'self' sjdodeauawmuzredpxwa.supabase.co *.supabase.co wss://sjdodeauawmuzredpxwa.supabase.co api.stripe.com",
     "font-src 'self'",
     "frame-src js.stripe.com bandcamp.com *.bandcamp.com",
     "media-src 'self' blob: sjdodeauawmuzredpxwa.supabase.co",
