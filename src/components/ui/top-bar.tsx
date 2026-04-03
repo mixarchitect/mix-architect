@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, HelpCircle, Sun, Moon, Monitor, LogOut, Settings, Download, Bug, Sparkles, Shield } from "lucide-react";
+import { Search, HelpCircle, Sun, Moon, Monitor, LogOut, Settings, Download, Bug, Shield } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/cn";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
@@ -97,7 +97,19 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
             aria-label="What we're spinning"
             className="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-text hover:bg-panel2 transition-colors"
           >
-            <Sparkles size={18} strokeWidth={1.5} />
+            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+              {/* Turntable base */}
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              {/* Record platter */}
+              <circle cx="11" cy="12" r="6" />
+              {/* Record label */}
+              <circle cx="11" cy="12" r="2" />
+              {/* Spindle dot */}
+              <circle cx="11" cy="12" r="0.5" fill="currentColor" stroke="none" />
+              {/* Tonearm */}
+              <line x1="19" y1="6" x2="19" y2="8" />
+              <line x1="19" y1="8" x2="14" y2="12" />
+            </svg>
           </Link>
         </Tooltip>
 
