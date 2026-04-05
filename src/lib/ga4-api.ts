@@ -98,20 +98,27 @@ export async function getGA4Overview(range: RangeInput): Promise<OverviewMetrics
       { name: "bounceRate" },
       { name: "averageSessionDuration" },
       { name: "screenPageViewsPerSession" },
+      { name: "newUsers" },
+      { name: "engagedSessions" },
     ],
   });
 
   const row = response.rows?.[0];
   const val = (i: number) => parseFloat(row?.metricValues?.[i]?.value || "0");
+  const sessions = Math.round(val(2));
+  const engagedSessions = Math.round(val(7));
 
   return {
     current_visitors: 0, // filled by realtime call
     pageviews: Math.round(val(0)),
     visitors: Math.round(val(1)),
-    sessions: Math.round(val(2)),
+    sessions,
     bounce_rate: Math.round(val(3) * 10000) / 100, // GA4 returns 0-1, convert to %
     session_duration: Math.round(val(4)),
     views_per_session: Math.round(val(5) * 10) / 10,
+    new_users: Math.round(val(6)),
+    returning_users: Math.max(0, Math.round(val(1)) - Math.round(val(6))),
+    engagement_rate: sessions > 0 ? Math.round((engagedSessions / sessions) * 1000) / 10 : 0,
   };
 }
 
@@ -155,10 +162,10 @@ export async function getGA4Referrers(range: RangeInput, limit = 10): Promise<Br
   }));
 }
 
-/** Generic dimension breakdown (browser, deviceCategory, country, operatingSystem) */
+/** Generic dimension breakdown */
 export async function getGA4DimensionBreakdown(
   range: RangeInput,
-  dimension: "browser" | "deviceCategory" | "country" | "operatingSystem",
+  dimension: "browser" | "deviceCategory" | "country" | "operatingSystem" | "screenResolution" | "sessionDefaultChannelGroup",
   limit = 5,
 ): Promise<BreakdownEntry[]> {
   const client = getClient();
@@ -175,6 +182,26 @@ export async function getGA4DimensionBreakdown(
 
   return (response.rows || []).map((row) => ({
     name: row.dimensionValues?.[0]?.value || "Unknown",
+    count: parseInt(row.metricValues?.[0]?.value || "0"),
+  }));
+}
+
+/** Landing pages — which pages visitors enter the site on */
+export async function getGA4LandingPages(range: RangeInput, limit = 10): Promise<BreakdownEntry[]> {
+  const client = getClient();
+  const { startDate, endDate } = resolveDateRange(range);
+
+  const [response] = await client.runReport({
+    property: propertyPath(),
+    dateRanges: [{ startDate, endDate }],
+    dimensions: [{ name: "landingPage" }],
+    metrics: [{ name: "sessions" }],
+    orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
+    limit,
+  });
+
+  return (response.rows || []).map((row) => ({
+    name: row.dimensionValues?.[0]?.value || "",
     count: parseInt(row.metricValues?.[0]?.value || "0"),
   }));
 }
@@ -232,8 +259,15 @@ export async function getGA4RealtimeUsers(): Promise<number> {
  * Full analytics payload matching the TrafficData shape.
  * All queries run in parallel for speed.
  */
-export async function getAllGA4TrafficData(range: RangeInput): Promise<TrafficData & { events: Record<string, number> }> {
-  const [overview, topPages, referrers, browsers, devices, countries, os, events, realtimeUsers] =
+export type GA4FullPayload = TrafficData & {
+  events: Record<string, number>;
+  channels: BreakdownEntry[];
+  landingPages: BreakdownEntry[];
+  screenResolutions: BreakdownEntry[];
+};
+
+export async function getAllGA4TrafficData(range: RangeInput): Promise<GA4FullPayload> {
+  const [overview, topPages, referrers, browsers, devices, countries, os, events, channels, landingPages, screenResolutions, realtimeUsers] =
     await Promise.all([
       getGA4Overview(range),
       getGA4TopPages(range, 10),
@@ -243,6 +277,9 @@ export async function getAllGA4TrafficData(range: RangeInput): Promise<TrafficDa
       getGA4DimensionBreakdown(range, "country", 10),
       getGA4DimensionBreakdown(range, "operatingSystem", 5),
       getGA4EventCounts(range),
+      getGA4DimensionBreakdown(range, "sessionDefaultChannelGroup", 8),
+      getGA4LandingPages(range, 10),
+      getGA4DimensionBreakdown(range, "screenResolution", 5),
       getGA4RealtimeUsers(),
     ]);
 
@@ -255,5 +292,8 @@ export async function getAllGA4TrafficData(range: RangeInput): Promise<TrafficDa
     browsers,
     os,
     events,
+    channels,
+    landingPages,
+    screenResolutions,
   };
 }

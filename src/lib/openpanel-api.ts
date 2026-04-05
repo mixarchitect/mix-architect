@@ -37,6 +37,9 @@ export interface OverviewMetrics {
   bounce_rate: number;
   session_duration: number;
   views_per_session: number;
+  new_users?: number;
+  returning_users?: number;
+  engagement_rate?: number;
 }
 
 export interface BreakdownEntry {

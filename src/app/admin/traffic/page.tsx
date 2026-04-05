@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Users,
+  UserPlus,
+  UserCheck,
   Eye,
   Timer,
   MousePointerClick,
@@ -16,11 +18,19 @@ import {
   Loader2,
   ArrowUp,
   ArrowDown,
+  LogIn,
+  BarChart3,
+  MonitorSmartphone,
 } from "lucide-react";
-import type { TrafficData, OverviewMetrics } from "@/lib/openpanel-api";
+import type { TrafficData, OverviewMetrics, BreakdownEntry } from "@/lib/openpanel-api";
 import { AISynopsis } from "@/components/admin/traffic/AISynopsis";
 
-type TrafficDataWithEvents = TrafficData & { events?: Record<string, number> };
+type TrafficDataWithEvents = TrafficData & {
+  events?: Record<string, number>;
+  channels?: BreakdownEntry[];
+  landingPages?: BreakdownEntry[];
+  screenResolutions?: BreakdownEntry[];
+};
 import LiveVisitorMap from "@/components/admin/traffic/LiveVisitorMap";
 import { DateRangeSelector } from "@/components/ui/date-range-selector";
 import {
@@ -208,7 +218,7 @@ function TrafficDashboard({
 
   return (
     <div className={`space-y-6 ${loading ? "opacity-60" : ""}`}>
-      {/* Stat cards row */}
+      {/* Stat cards — primary row */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <StatCard
           label="Visitors"
@@ -227,9 +237,52 @@ function TrafficDashboard({
           previousRaw={comparison?.pageviews}
         />
         <StatCard
+          label="Engagement"
+          value={`${(overview.engagement_rate ?? 0).toFixed(1)}%`}
+          icon={MousePointerClick}
+          color="text-teal-400"
+          currentRaw={overview.engagement_rate}
+          previousRaw={comparison?.engagement_rate}
+        />
+        <StatCard
+          label="Avg Duration"
+          value={formatDuration(overview.session_duration)}
+          icon={Timer}
+          color="text-amber-400"
+          currentRaw={overview.session_duration}
+          previousRaw={comparison?.session_duration}
+        />
+        <StatCard
+          label="Active Now"
+          value={String(overview.current_visitors)}
+          icon={Activity}
+          color="text-emerald-400"
+          dot
+        />
+      </div>
+
+      {/* Stat cards — secondary row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <StatCard
+          label="New Users"
+          value={(overview.new_users ?? 0).toLocaleString()}
+          icon={UserPlus}
+          color="text-sky-400"
+          currentRaw={overview.new_users}
+          previousRaw={comparison?.new_users}
+        />
+        <StatCard
+          label="Returning"
+          value={(overview.returning_users ?? 0).toLocaleString()}
+          icon={UserCheck}
+          color="text-violet-400"
+          currentRaw={overview.returning_users}
+          previousRaw={comparison?.returning_users}
+        />
+        <StatCard
           label="Bounce Rate"
           value={`${overview.bounce_rate.toFixed(1)}%`}
-          icon={MousePointerClick}
+          icon={LogIn}
           color={
             overview.bounce_rate > 70
               ? "text-red-400"
@@ -242,19 +295,12 @@ function TrafficDashboard({
           invertDelta
         />
         <StatCard
-          label="Avg Duration"
-          value={formatDuration(overview.session_duration)}
-          icon={Timer}
-          color="text-teal-400"
-          currentRaw={overview.session_duration}
-          previousRaw={comparison?.session_duration}
-        />
-        <StatCard
-          label="Active Now"
-          value={String(overview.current_visitors)}
-          icon={Activity}
-          color="text-emerald-400"
-          dot
+          label="Pages / Session"
+          value={overview.views_per_session.toFixed(1)}
+          icon={BarChart3}
+          color="text-orange-400"
+          currentRaw={overview.views_per_session}
+          previousRaw={comparison?.views_per_session}
         />
       </div>
 
@@ -284,35 +330,67 @@ function TrafficDashboard({
       {/* Live visitor map */}
       <LiveVisitorMap />
 
-      {/* Two-column: Top Pages + Referrers */}
+      {/* Two-column: Top Pages + Landing Pages */}
       <div className="grid lg:grid-cols-2 gap-4">
         <BreakdownTable
           title="Top Pages"
-          icon={Globe}
+          icon={Eye}
           rows={data.topPages}
           emptyMessage="No page data yet"
           formatName={formatPath}
         />
+        <BreakdownTable
+          title="Landing Pages"
+          icon={LogIn}
+          rows={data.landingPages ?? []}
+          emptyMessage="No landing page data yet"
+          formatName={formatPath}
+        />
+      </div>
+
+      {/* Two-column: Referrers + Channels */}
+      <div className="grid lg:grid-cols-2 gap-4">
         <BreakdownTable
           title="Referrers"
           icon={ExternalLink}
           rows={data.referrers}
           emptyMessage="No referrer data yet"
         />
+        <BreakdownTable
+          title="Channels"
+          icon={BarChart3}
+          rows={data.channels ?? []}
+          emptyMessage="No channel data yet"
+        />
       </div>
 
-      {/* Custom Events */}
-      {data.events && Object.keys(data.events).length > 0 && (
+      {/* Two-column: Screen Resolutions + Custom Events */}
+      <div className="grid lg:grid-cols-2 gap-4">
         <BreakdownTable
-          title="Custom Events"
-          icon={Activity}
-          rows={Object.entries(data.events)
-            .map(([name, count]) => ({ name, count }))
-            .sort((a, b) => b.count - a.count)}
-          emptyMessage="No custom events yet"
-          formatName={(name) => name.replace(/_/g, " ")}
+          title="Screen Resolutions"
+          icon={MonitorSmartphone}
+          rows={data.screenResolutions ?? []}
+          emptyMessage="No resolution data yet"
         />
-      )}
+        {data.events && Object.keys(data.events).length > 0 ? (
+          <BreakdownTable
+            title="Custom Events"
+            icon={Activity}
+            rows={Object.entries(data.events)
+              .map(([name, count]) => ({ name, count }))
+              .sort((a, b) => b.count - a.count)}
+            emptyMessage="No custom events yet"
+            formatName={(name) => name.replace(/_/g, " ")}
+          />
+        ) : (
+          <BreakdownTable
+            title="Custom Events"
+            icon={Activity}
+            rows={[]}
+            emptyMessage="No custom events yet"
+          />
+        )}
+      </div>
     </div>
   );
 }

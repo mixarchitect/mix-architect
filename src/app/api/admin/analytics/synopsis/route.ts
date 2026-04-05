@@ -47,15 +47,23 @@ Analyze the following site traffic data for ${label} and write a concise 3-5 sen
 Be direct, specific with numbers, and actionable. No filler. Write in a natural, conversational tone. Do not use bullet points or headers. Do not start with "Here's" or "Based on". Just give me the analysis as a short paragraph.
 
 DATA:
-- Visitors: ${o.visitors}
+- Visitors: ${o.visitors} (New: ${o.new_users ?? 0}, Returning: ${o.returning_users ?? 0})
 - Pageviews: ${o.pageviews}
 - Sessions: ${o.sessions}
+- Engagement Rate: ${o.engagement_rate ?? 0}%
 - Bounce Rate: ${o.bounce_rate}%
 - Avg Session Duration: ${o.session_duration}s
+- Pages per Session: ${o.views_per_session}
 - Real-time Active: ${o.current_visitors}
+
+Channels:
+${data.channels.map((c) => `  ${c.name}: ${c.count} sessions`).join("\n")}
 
 Top Pages:
 ${data.topPages.map((p) => `  ${p.name}: ${p.count} views`).join("\n")}
+
+Landing Pages:
+${data.landingPages.map((p) => `  ${p.name}: ${p.count} sessions`).join("\n")}
 
 Referrers:
 ${data.referrers.map((r) => `  ${r.name}: ${r.count} sessions`).join("\n")}
