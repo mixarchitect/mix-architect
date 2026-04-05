@@ -21,24 +21,29 @@ const PROPERTY_ID = process.env.GA4_PROPERTY_ID;
 let _client: BetaAnalyticsDataClient | null = null;
 function getClient(): BetaAnalyticsDataClient {
   if (!_client) {
+    // Option 1: Full JSON key as single env var (most reliable on Vercel)
+    const jsonKey = process.env.GA4_SERVICE_ACCOUNT_KEY;
+    if (jsonKey) {
+      const parsed = JSON.parse(jsonKey);
+      _client = new BetaAnalyticsDataClient({
+        credentials: {
+          client_email: parsed.client_email,
+          private_key: parsed.private_key,
+        },
+      });
+      return _client;
+    }
+
+    // Option 2: Separate env vars
     const email = process.env.GA4_SERVICE_ACCOUNT_EMAIL;
     let key = process.env.GA4_PRIVATE_KEY ?? "";
-
-    // Handle both literal \n (from Vercel env var UI) and actual newlines
     if (key.includes("\\n")) {
       key = key.replace(/\\n/g, "\n");
     }
 
     if (!email || !key) {
-      throw new Error("Missing GA4_SERVICE_ACCOUNT_EMAIL or GA4_PRIVATE_KEY env vars");
+      throw new Error("Missing GA4 credentials: set GA4_SERVICE_ACCOUNT_KEY (full JSON) or GA4_SERVICE_ACCOUNT_EMAIL + GA4_PRIVATE_KEY");
     }
-
-    // Debug: log credential shape (never log actual values)
-    console.log("[ga4] email=" + email.substring(0, 20) + "...");
-    console.log("[ga4] keyLen=" + key.length);
-    console.log("[ga4] keyStart=" + key.substring(0, 30));
-    console.log("[ga4] keyEnd=" + key.substring(key.length - 30));
-    console.log("[ga4] propId=" + PROPERTY_ID);
 
     _client = new BetaAnalyticsDataClient({
       credentials: { client_email: email, private_key: key },
