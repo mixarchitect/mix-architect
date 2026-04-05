@@ -139,6 +139,9 @@ const INITIAL_STATE: PlaybackState = {
   globalTime: 0,
 };
 
+/** Seconds before a transition to start preloading the next track */
+const PRELOAD_LOOKAHEAD = 3;
+
 export function useFlowAudio(
   tracks: FlowTrack[],
   mode: FlowMode,
@@ -150,8 +153,11 @@ export function useFlowAudio(
   const loopModeRef = useRef(loopMode);
   loopModeRef.current = loopMode;
 
-  // Refs for audio element (single element — no crossfade)
+  // Dual audio elements for gapless playback
   const elementA = useRef<HTMLAudioElement | null>(null);
+  const elementB = useRef<HTMLAudioElement | null>(null);
+  // Which element is currently active ("a" or "b")
+  const activeElRef = useRef<"a" | "b">("a");
 
   // State refs for use in callbacks
   const tracksRef = useRef(tracks);
@@ -166,10 +172,16 @@ export function useFlowAudio(
   const rafRef = useRef<number>(0);
   // Current condensed segment index
   const segmentIndexRef = useRef(0);
-  // Track the currently loaded audio URL to avoid fragile URL comparison
+  // Track the currently loaded audio URL on the active element
   const loadedUrlRef = useRef<string>("");
   // Guard: true while a segment advance is in progress (prevents double-advance)
   const isAdvancingRef = useRef(false);
+  // URL that has been preloaded on the inactive element
+  const preloadedUrlRef = useRef<string>("");
+  // Seek position preloaded on the inactive element
+  const preloadedSeekRef = useRef<number>(0);
+  // Whether the preloaded element is ready to play
+  const preloadReadyRef = useRef(false);
 
   // When tracks array changes (reorder), remap currentTrackIndex by ID
   useEffect(() => {
@@ -187,7 +199,7 @@ export function useFlowAudio(
     }
   }, [tracks]);
 
-  /* ---- Initialize audio element ---- */
+  /* ---- Initialize audio elements ---- */
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -196,22 +208,76 @@ export function useFlowAudio(
     a.preload = "auto";
     elementA.current = a;
 
+    const b = new Audio();
+    b.crossOrigin = "anonymous";
+    b.preload = "auto";
+    elementB.current = b;
+
     const handleError = () =>
       setError("Playback failed. The audio file may be unavailable.");
     a.addEventListener("error", handleError);
+    b.addEventListener("error", handleError);
 
     return () => {
       a.removeEventListener("error", handleError);
+      b.removeEventListener("error", handleError);
       a.pause();
       a.removeAttribute("src");
       a.load();
+      b.pause();
+      b.removeAttribute("src");
+      b.load();
       cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
   /* ---- Helpers ---- */
 
-  const getActive = useCallback(() => elementA.current!, []);
+  const getActive = useCallback(
+    () => (activeElRef.current === "a" ? elementA.current! : elementB.current!),
+    [],
+  );
+
+  const getInactive = useCallback(
+    () => (activeElRef.current === "a" ? elementB.current! : elementA.current!),
+    [],
+  );
+
+  /** Swap the active/inactive elements */
+  const swapElements = useCallback(() => {
+    activeElRef.current = activeElRef.current === "a" ? "b" : "a";
+  }, []);
+
+  /** Clear the inactive element after a swap */
+  const clearInactive = useCallback(() => {
+    const el = getInactive();
+    el.pause();
+    el.removeAttribute("src");
+    el.load();
+    preloadedUrlRef.current = "";
+    preloadReadyRef.current = false;
+  }, [getInactive]);
+
+  /** Preload a URL on the inactive element */
+  const preloadNext = useCallback(
+    (audioUrl: string, seekTo: number) => {
+      if (preloadedUrlRef.current === audioUrl) return; // Already preloading/preloaded
+      const el = getInactive();
+      preloadedUrlRef.current = audioUrl;
+      preloadedSeekRef.current = seekTo;
+      preloadReadyRef.current = false;
+
+      const handleCanPlay = () => {
+        el.removeEventListener("canplay", handleCanPlay);
+        el.currentTime = seekTo;
+        preloadReadyRef.current = true;
+      };
+      el.addEventListener("canplay", handleCanPlay);
+      el.src = audioUrl;
+      el.load();
+    },
+    [getInactive],
+  );
 
   /** Compute global time from current segment/track + localTime */
   const computeGlobalTime = useCallback(
@@ -232,13 +298,35 @@ export function useFlowAudio(
     [],
   );
 
-  /** Load a track into the audio element and seek to a position, then optionally play */
+  /** Load a track into the active audio element and seek to a position, then optionally play.
+   *  If the inactive element is preloaded with the right URL, swap instead. */
   const loadAndSeek = useCallback(
     (
       audioUrl: string,
       seekTo: number,
       shouldPlay: boolean,
     ) => {
+      // Check if the inactive element is preloaded with what we need
+      if (preloadedUrlRef.current === audioUrl && preloadReadyRef.current) {
+        // Swap: the preloaded element becomes active
+        const preloaded = getInactive();
+        const oldActive = getActive();
+        oldActive.pause();
+
+        preloaded.currentTime = seekTo;
+        swapElements();
+        loadedUrlRef.current = audioUrl;
+
+        // Clear the old active (now inactive)
+        oldActive.removeAttribute("src");
+        oldActive.load();
+        preloadedUrlRef.current = "";
+        preloadReadyRef.current = false;
+
+        if (shouldPlay) preloaded.play().catch(() => {});
+        return;
+      }
+
       const active = getActive();
       const isSame = loadedUrlRef.current === audioUrl;
 
@@ -260,7 +348,7 @@ export function useFlowAudio(
         active.load();
       }
     },
-    [getActive],
+    [getActive, getInactive, swapElements],
   );
 
   /* ---- Play a condensed segment ---- */
@@ -340,49 +428,96 @@ export function useFlowAudio(
         globalTime,
       }));
 
+      // ── Preload logic: look ahead and preload next track if needed ──
+      if (modeRef.current === "full") {
+        const currentTrack = tracksRef.current[s.currentTrackIndex];
+        if (currentTrack) {
+          const timeLeft = currentTrack.durationSeconds - localTime;
+          if (timeLeft <= PRELOAD_LOOKAHEAD && timeLeft > 0) {
+            const lm = loopModeRef.current;
+            let nextUrl: string | null = null;
+            let nextSeek = 0;
+
+            if (lm === "one") {
+              nextUrl = currentTrack.audioUrl;
+            } else {
+              const nextIdx = s.currentTrackIndex + 1;
+              if (nextIdx < tracksRef.current.length) {
+                nextUrl = tracksRef.current[nextIdx].audioUrl;
+              } else if (lm === "all" && tracksRef.current.length > 0) {
+                nextUrl = tracksRef.current[0].audioUrl;
+              }
+            }
+
+            if (nextUrl && nextUrl !== loadedUrlRef.current) {
+              preloadNext(nextUrl, nextSeek);
+            }
+          }
+        }
+      }
+
       // In condensed mode, check if current segment has ended
       if (modeRef.current === "condensed" && !isAdvancingRef.current) {
         const segments = buildCondensedSegments(tracksRef.current, transitionWindowRef.current);
         const segIdx = segmentIndexRef.current;
         const seg = segments[segIdx];
 
-        if (seg && localTime >= seg.startTime + seg.duration - 0.05) {
-          isAdvancingRef.current = true;
-          const lm = loopModeRef.current;
-          const nextSegIdx = segIdx + 1;
-          const nextSeg = segments[nextSegIdx];
+        if (seg) {
+          const segEndTime = seg.startTime + seg.duration;
+          const timeLeftInSeg = segEndTime - localTime;
 
-          // Check if the next segment belongs to a different track (or doesn't exist)
-          const isLastSegForTrack = !nextSeg || nextSeg.trackIndex !== seg.trackIndex;
-
-          // Loop One: when last segment for this track ends, restart from first segment of same track
-          if (lm === "one" && isLastSegForTrack) {
-            const currentTrackIdx = seg.trackIndex;
-            const firstSegForTrack = segments.findIndex((s) => s.trackIndex === currentTrackIdx);
-            if (firstSegForTrack >= 0) {
-              playSegment(firstSegForTrack);
-              const { offsets } = computeCondensedLayout(tracksRef.current, transitionWindowRef.current);
-              setState((prev) => ({ ...prev, isPlaying: true, globalTime: offsets[firstSegForTrack] ?? 0 }));
+          // Preload next segment's track if it's a different file
+          if (timeLeftInSeg <= PRELOAD_LOOKAHEAD && timeLeftInSeg > 0) {
+            const nextSegIdx = segIdx + 1;
+            const nextSeg = segments[nextSegIdx];
+            if (nextSeg) {
+              const nextTrack = tracksRef.current[nextSeg.trackIndex];
+              const currentTrack = tracksRef.current[seg.trackIndex];
+              if (nextTrack && currentTrack && nextTrack.audioUrl !== currentTrack.audioUrl) {
+                preloadNext(nextTrack.audioUrl, nextSeg.startTime);
+              }
             }
-            isAdvancingRef.current = false;
-          } else if (nextSegIdx >= segments.length) {
-            // Last segment overall ended
-            if (lm === "all") {
-              // Loop All: restart from first segment
-              playSegment(0);
-              setState((prev) => ({ ...prev, isPlaying: true, globalTime: 0 }));
+          }
+
+          // Check if segment has ended
+          if (localTime >= segEndTime - 0.05) {
+            isAdvancingRef.current = true;
+            const lm = loopModeRef.current;
+            const nextSegIdx = segIdx + 1;
+            const nextSeg = segments[nextSegIdx];
+
+            // Check if the next segment belongs to a different track (or doesn't exist)
+            const isLastSegForTrack = !nextSeg || nextSeg.trackIndex !== seg.trackIndex;
+
+            // Loop One: when last segment for this track ends, restart from first segment of same track
+            if (lm === "one" && isLastSegForTrack) {
+              const currentTrackIdx = seg.trackIndex;
+              const firstSegForTrack = segments.findIndex((s) => s.trackIndex === currentTrackIdx);
+              if (firstSegForTrack >= 0) {
+                playSegment(firstSegForTrack);
+                const { offsets } = computeCondensedLayout(tracksRef.current, transitionWindowRef.current);
+                setState((prev) => ({ ...prev, isPlaying: true, globalTime: offsets[firstSegForTrack] ?? 0 }));
+              }
+              isAdvancingRef.current = false;
+            } else if (nextSegIdx >= segments.length) {
+              // Last segment overall ended
+              if (lm === "all") {
+                // Loop All: restart from first segment
+                playSegment(0);
+                setState((prev) => ({ ...prev, isPlaying: true, globalTime: 0 }));
+              } else {
+                // Off: reset to start and stop
+                active.pause();
+                setState({ isPlaying: false, currentTrackIndex: 0, currentTime: 0, globalTime: 0 });
+                segmentIndexRef.current = 0;
+              }
+              isAdvancingRef.current = false;
+              if (lm !== "all") return; // Don't schedule next frame when not looping
             } else {
-              // Off: reset to start and stop
-              active.pause();
-              setState({ isPlaying: false, currentTrackIndex: 0, currentTime: 0, globalTime: 0 });
-              segmentIndexRef.current = 0;
+              // Advance to next segment
+              playSegment(nextSegIdx);
+              isAdvancingRef.current = false;
             }
-            isAdvancingRef.current = false;
-            if (lm !== "all") return; // Don't schedule next frame when not looping
-          } else {
-            // Advance to next segment
-            playSegment(nextSegIdx);
-            isAdvancingRef.current = false;
           }
         }
       }
@@ -391,12 +526,13 @@ export function useFlowAudio(
     };
     cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(tick);
-  }, [getActive, computeGlobalTime, playSegment]);
+  }, [getActive, computeGlobalTime, playSegment, preloadNext]);
 
   /* ---- Handle track ended (Full mode auto-advance) ---- */
   useEffect(() => {
     const a = elementA.current;
-    if (!a) return;
+    const b = elementB.current;
+    if (!a || !b) return;
 
     const handleEnded = () => {
       if (modeRef.current === "full") {
@@ -406,7 +542,11 @@ export function useFlowAudio(
     };
 
     a.addEventListener("ended", handleEnded);
-    return () => a.removeEventListener("ended", handleEnded);
+    b.addEventListener("ended", handleEnded);
+    return () => {
+      a.removeEventListener("ended", handleEnded);
+      b.removeEventListener("ended", handleEnded);
+    };
   }, [advanceToNextFull]);
 
   /* ---- Public actions ---- */
@@ -477,6 +617,9 @@ export function useFlowAudio(
     const active = getActive();
     active.pause();
 
+    // Clear any preload state since we're manually jumping
+    clearInactive();
+
     setState((prev) => ({
       ...prev,
       currentTrackIndex: nextIdx,
@@ -486,13 +629,16 @@ export function useFlowAudio(
     if (stateRef.current.isPlaying) {
       play(nextIdx);
     }
-  }, [getActive, play]);
+  }, [getActive, clearInactive, play]);
 
   const skipPrev = useCallback(() => {
     const prevIdx = Math.max(0, stateRef.current.currentTrackIndex - 1);
 
     const active = getActive();
     active.pause();
+
+    // Clear any preload state since we're manually jumping
+    clearInactive();
 
     setState((prev) => ({
       ...prev,
@@ -503,7 +649,7 @@ export function useFlowAudio(
     if (stateRef.current.isPlaying) {
       play(prevIdx);
     }
-  }, [getActive, play]);
+  }, [getActive, clearInactive, play]);
 
   const seekToGlobal = useCallback(
     (globalTime: number) => {
@@ -519,6 +665,9 @@ export function useFlowAudio(
 
       const wasPlaying = stateRef.current.isPlaying;
 
+      // Clear preload since we're seeking manually
+      clearInactive();
+
       // Update segment index for condensed mode
       if (modeRef.current === "condensed") {
         segmentIndexRef.current = result.segmentIndex;
@@ -533,7 +682,7 @@ export function useFlowAudio(
         globalTime,
       }));
     },
-    [loadAndSeek],
+    [loadAndSeek, clearInactive],
   );
 
   /** Seek to a specific local time within a specific track */
@@ -543,6 +692,9 @@ export function useFlowAudio(
       if (!track) return;
 
       const wasPlaying = stateRef.current.isPlaying;
+
+      // Clear preload since we're seeking manually
+      clearInactive();
 
       // For condensed mode, find the matching segment
       if (modeRef.current === "condensed") {
@@ -574,19 +726,28 @@ export function useFlowAudio(
 
       if (wasPlaying) startRAFLoop();
     },
-    [loadAndSeek, computeGlobalTime, startRAFLoop],
+    [loadAndSeek, clearInactive, computeGlobalTime, startRAFLoop],
   );
 
   /** Stop all playback and reset */
   const stop = useCallback(() => {
     const a = elementA.current;
+    const b = elementB.current;
     if (a) {
       a.pause();
       a.removeAttribute("src");
       a.load();
     }
+    if (b) {
+      b.pause();
+      b.removeAttribute("src");
+      b.load();
+    }
     loadedUrlRef.current = "";
+    preloadedUrlRef.current = "";
+    preloadReadyRef.current = false;
     segmentIndexRef.current = 0;
+    activeElRef.current = "a";
     cancelAnimationFrame(rafRef.current);
     setState(INITIAL_STATE);
   }, []);
