@@ -100,7 +100,11 @@ export function PortalAudioPlayer({
 }: PortalAudioPlayerProps) {
   const { resolvedTheme } = useTheme();
   const audio = useAudio();
-  const { audioElement, isPlaying, currentTime, duration } = audio;
+  const isThisTrackActive = audio.activeVersion?.track_id === trackId;
+  const audioElement = audio.audioElement;
+  const isPlaying = isThisTrackActive ? audio.isPlaying : false;
+  const currentTime = isThisTrackActive ? audio.currentTime : 0;
+  const duration = isThisTrackActive ? audio.duration : 0;
 
   // Version state
   const [activeVersionId, setActiveVersionId] = useState<string | null>(() => {
