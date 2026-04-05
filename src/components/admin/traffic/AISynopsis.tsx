@@ -38,7 +38,7 @@ export function AISynopsis({ range }: AISynopsisProps) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Sparkles size={14} className="text-amber-400" />
-          <span className="text-sm font-medium text-muted">AI Synopsis</span>
+          <span className="text-sm font-medium text-muted">The latest info</span>
         </div>
         <button
           onClick={() => fetchSynopsis(true)}
