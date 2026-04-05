@@ -216,7 +216,10 @@
       "deleteRelease": "Delete Release",
       "deleteConfirm": "Delete {title}? This cannot be undone.",
       "releaseOptions": "Release options",
-      "tracksBriefed": "{completed} of {total} {total, plural, one {track} other {tracks}} briefed"
+      "tracksBriefed": "{completed} of {total} {total, plural, one {track} other {tracks}} briefed",
+      "statusReady": "Ready",
+      "statusInProgress": "In Progress",
+      "statusDraft": "Draft"
     },
     "payment": {
       "status": "Payment Status",

@@ -27,7 +27,7 @@ export function LandingNav() {
     <nav aria-label="Main" className="fixed top-6 left-1/2 -translate-x-1/2 z-50" ref={navRef}>
       <div className="w-[calc(100vw-24px)] sm:w-[92vw] md:w-[78vw] lg:w-[1100px] max-w-6xl flex items-center gap-1.5 sm:gap-2 bg-[#1a1a1a] border border-white/10 rounded-full px-3 py-3 shadow-float">
         <a
-          href="#"
+          href="/"
           onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
           className="flex items-center shrink-0 pl-2 pr-1 sm:pr-3"
         >

@@ -45,10 +45,10 @@ function statusColor(status: string): "green" | "orange" | "blue" {
   return "blue";
 }
 
-function statusLabel(status: string): string {
-  if (status === "ready") return "Ready";
-  if (status === "in_progress") return "In Progress";
-  return "Draft";
+function statusLabelKey(status: string): "statusReady" | "statusInProgress" | "statusDraft" {
+  if (status === "ready") return "statusReady";
+  if (status === "in_progress") return "statusInProgress";
+  return "statusDraft";
 }
 
 function typeLabel(t: string | undefined | null): string {
@@ -192,7 +192,7 @@ export function ReleaseCard({
           ) : (
             pinned && <Pin size={12} className="text-signal fill-current" />
           )}
-          <StatusIndicator color={statusColor(status)} label={statusLabel(status)} withShape />
+          <StatusIndicator color={statusColor(status)} label={tCard(statusLabelKey(status))} withShape />
           <div ref={menuRef} className="relative">
             <button
               type="button"

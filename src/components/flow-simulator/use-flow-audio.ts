@@ -178,10 +178,12 @@ export function useFlowAudio(
   const isAdvancingRef = useRef(false);
   // URL that has been preloaded on the inactive element
   const preloadedUrlRef = useRef<string>("");
-  // Seek position preloaded on the inactive element
-  const preloadedSeekRef = useRef<number>(0);
   // Whether the preloaded element is ready to play
   const preloadReadyRef = useRef(false);
+  // Store the current preload canplay listener so we can remove it on re-preload
+  const preloadListenerRef = useRef<(() => void) | null>(null);
+  // Guard: true during an element swap to prevent spurious 'ended' events
+  const swappingRef = useRef(false);
 
   // When tracks array changes (reorder), remap currentTrackIndex by ID
   useEffect(() => {
@@ -251,6 +253,10 @@ export function useFlowAudio(
   /** Clear the inactive element after a swap */
   const clearInactive = useCallback(() => {
     const el = getInactive();
+    if (preloadListenerRef.current) {
+      el.removeEventListener("canplay", preloadListenerRef.current);
+      preloadListenerRef.current = null;
+    }
     el.pause();
     el.removeAttribute("src");
     el.load();
@@ -263,15 +269,23 @@ export function useFlowAudio(
     (audioUrl: string, seekTo: number) => {
       if (preloadedUrlRef.current === audioUrl) return; // Already preloading/preloaded
       const el = getInactive();
+
+      // Remove any stale canplay listener from a previous preload
+      if (preloadListenerRef.current) {
+        el.removeEventListener("canplay", preloadListenerRef.current);
+        preloadListenerRef.current = null;
+      }
+
       preloadedUrlRef.current = audioUrl;
-      preloadedSeekRef.current = seekTo;
       preloadReadyRef.current = false;
 
       const handleCanPlay = () => {
         el.removeEventListener("canplay", handleCanPlay);
+        preloadListenerRef.current = null;
         el.currentTime = seekTo;
         preloadReadyRef.current = true;
       };
+      preloadListenerRef.current = handleCanPlay;
       el.addEventListener("canplay", handleCanPlay);
       el.src = audioUrl;
       el.load();
@@ -309,6 +323,7 @@ export function useFlowAudio(
       // Check if the inactive element is preloaded with what we need
       if (preloadedUrlRef.current === audioUrl && preloadReadyRef.current) {
         // Swap: the preloaded element becomes active
+        swappingRef.current = true;
         const preloaded = getInactive();
         const oldActive = getActive();
         oldActive.pause();
@@ -317,11 +332,13 @@ export function useFlowAudio(
         swapElements();
         loadedUrlRef.current = audioUrl;
 
-        // Clear the old active (now inactive)
+        // Clear the old active (now inactive) — remove src before load to prevent spurious events
         oldActive.removeAttribute("src");
         oldActive.load();
         preloadedUrlRef.current = "";
         preloadReadyRef.current = false;
+        preloadListenerRef.current = null;
+        swappingRef.current = false;
 
         if (shouldPlay) preloaded.play().catch(() => {});
         return;
@@ -535,6 +552,8 @@ export function useFlowAudio(
     if (!a || !b) return;
 
     const handleEnded = () => {
+      // Ignore ended events fired during an element swap
+      if (swappingRef.current) return;
       if (modeRef.current === "full") {
         advanceToNextFull();
       }
