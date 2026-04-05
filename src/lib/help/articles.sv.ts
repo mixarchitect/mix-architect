@@ -31,7 +31,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Nyckelbegrepp",
-        "body": "Releaser är dina toppnivåprojekt (album, EP:er eller singlar). Varje release innehåller ett eller flera spår. På datorn har release-detaljsidan en tvåkolumnslayout: spårlistan till vänster och ett inspektörssidofält till höger som visar omslaget, Release-info (artist, typ, format, status, måldatum, genre), Global mixriktning, Globala referenser och Betalningsstatus. Varje spår har sex flikar: Intent, Specs, Audio, Distribution, Portal och Notes. Klicka på kugghjulsikonen i release-huvudet för att öppna Release-inställningar, där du kan redigera all metadata, hantera ditt team och konfigurera betalning. Sidhuvudet har även knappar för Portal-växlaren (med en länk för att öppna portalen), Spara som mall och kugghjulsikonen.",
+        "body": "Releaser är dina toppnivåprojekt (album, EP:er eller singlar). Varje release innehåller ett eller flera spår. På datorn har release-detaljsidan en tvåkolumnslayout: spårlistan till vänster och ett inspektörssidofält till höger som visar omslaget, Release-info (artist, typ, format, status, måldatum, genre), Global mixriktning, Globala referenser och Betalningsstatus. Varje spår har fyra flikar: Brief, Audio, Delivery och Notes. Klicka på kugghjulsikonen i release-huvudet för att öppna Release-inställningar, där du kan redigera all metadata, hantera ditt team och konfigurera betalning. Sidhuvudet har även knappar för Portal-växlaren (med en länk för att öppna portalen), Spara som mall och kugghjulsikonen.",
         "mockup": "key-concepts"
       }
     ]
@@ -62,7 +62,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Lägg till spår",
-        "body": "I release-detaljvyn klickar du på \"+ Add Track\" i sidhuvudet bredvid Flow-knappen. Ge ditt spår en titel så skapas det med dina standardspecifikationer från [Inställningar](/app/settings) tillämpade. Varje spår visas i listan med nummer, titel, intent-förhandsvisning, statuspunkt och godkännandeetikett. Du kan dra spår för att ordna om dem med grepphandtaget till vänster, eller använda flytta upp/ner-knapparna. Ta bort spår med papperskorgsikonen till höger. Klicka på valfritt spår för att öppna det och börja arbeta i dess sex flikar.",
+        "body": "I release-detaljvyn klickar du på \"+ Add Track\" i sidhuvudet bredvid Flow-knappen. Ge ditt spår en titel så skapas det med dina standardspecifikationer från [Inställningar](/app/settings) tillämpade. Varje spår visas i listan med nummer, titel, intent-förhandsvisning, statuspunkt och godkännandeetikett. Du kan dra spår för att ordna om dem med grepphandtaget till vänster, eller använda flytta upp/ner-knapparna. Ta bort spår med papperskorgsikonen till höger. Klicka på valfritt spår för att öppna det och börja arbeta i dess fyra flikar.",
         "mockup": "track-upload"
       },
       {
@@ -104,7 +104,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Delning via klientportalen",
-        "body": "För externa intressenter som behöver granska utan att logga in aktiverar du klientportalen från release-detaljsidans sidhuvud. Klicka på Portal-växlaren för att aktivera den (växlaren blir grön när den är aktiv), och använd sedan länkikonen bredvid växlaren för att kopiera den unika delnings-URL:en. Skicka denna länk till din klient för läsåtkomst utan att behöva ett Mix Architect-konto. Portalen visar release-briefen, spårlistan, ljuduppspelning och ett kommentarssystem. Använd portalinställningarna för att styra vilka release-sektioner som är synliga för klienter: mixriktning, specs, referenser, betalningsstatus, distributionsinformation och låttexter. För kontroll per spår använder du Portal-fliken på varje spår.",
+        "body": "För externa intressenter som behöver granska utan att logga in aktiverar du klientportalen från release-detaljsidans sidhuvud. Klicka på Portal-växlaren för att aktivera den (växlaren blir grön när den är aktiv), och använd sedan länkikonen bredvid växlaren för att kopiera den unika delnings-URL:en. Skicka denna länk till din klient för läsåtkomst utan att behöva ett Mix Architect-konto. Portalen visar release-briefen, spårlistan, ljuduppspelning och ett kommentarssystem. Använd portalinställningarna för att styra vilka release-sektioner som är synliga för klienter: mixriktning, specs, referenser, betalningsstatus, distributionsinformation och låttexter. För kontroll per spår använder du Delivery-fliken på varje spår.",
         "mockup": "portal-sharing"
       }
     ]
@@ -113,7 +113,7 @@ export const articles: HelpArticle[] = [
     "id": "track-tabs",
     "title": "Spårdetaljer: Förstå flikarna",
     "category": "releases",
-    "summary": "Varje spår har sex flikar för att hantera alla aspekter av din mix: Intent, Specs, Audio, Distribution, Portal och Notes.",
+    "summary": "Varje spår har fyra flikar för att hantera alla aspekter av din mix: Brief, Audio, Delivery och Notes.",
     "tags": [
       "tracks",
       "tabs",
@@ -127,7 +127,7 @@ export const articles: HelpArticle[] = [
     "updatedAt": "2026-03-04",
     "content": [
       {
-        "heading": "Intent",
+        "heading": "Brief",
         "body": "Fliken Intent är där du beskriver den kreativa visionen för ett spår. Högst upp finns ett fritextfält under \"What should this track feel like?\" där du kan skriva mixriktningen (klicka \"Edit\" för att ändra). Under det låter sektionen Emotional Qualities dig tagga spåret med beskrivande ord: valda taggar visas som fyllda etiketter (t.ex. spacious, warm, punchy, nostalgic), och tillgängliga förslag visas som konturetiketter du kan klicka för att lägga till (aggressive, intimate, gritty, polished, dark, bright, raw, lush, dreamy, lo-fi, cinematic, minimal, dense, ethereal, hypnotic, euphoric, melancholic, organic, synthetic, chaotic, smooth, haunting, playful, anthemic, delicate, heavy, airy). Sektionen Anti-References längst ner låter dig beskriva ljud eller tillvägagångssätt du vill undvika. I det högra sidofältet visar Quick View spårets status, ljudkvalitet (samplingsfrekvens/bitdjup) och format med en snabb överblick. Under det låter sektionen References dig söka och lägga till referensspår (från Apple Music) med valfria anteckningar som beskriver vad som ska refereras från varje spår.",
         "mockup": "track-tab-intent"
       },
@@ -184,7 +184,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Synlighet per spår",
-        "body": "För varje spår går du till Portal-fliken för att styra vad din klient kan se. Sektionen Track Portal Visibility har växlare för: \"Visible on portal\" (visa eller dölj hela spåret), \"Enable download\" (tillåt eller blockera ljudnedladdningar) och individuella versionsväxlare (Version 1, Version 2, Version 3 osv.) för att styra vilka ljudrevisioner klienten kan komma åt. Detta ger dig detaljerad kontroll så att du kan dölja pågående arbeten och bara dela färdiga mixar. Alla växlare är oberoende, så du kan göra ett spår synligt men inaktivera nedladdningar, eller bara visa den senaste versionen.",
+        "body": "För varje spår går du till Delivery-fliken för att styra vad din klient kan se. Sektionen Track Portal Visibility har växlare för: \"Visible on portal\" (visa eller dölj hela spåret), \"Enable download\" (tillåt eller blockera ljudnedladdningar) och individuella versionsväxlare (Version 1, Version 2, Version 3 osv.) för att styra vilka ljudrevisioner klienten kan komma åt. Detta ger dig detaljerad kontroll så att du kan dölja pågående arbeten och bara dela färdiga mixar. Alla växlare är oberoende, så du kan göra ett spår synligt men inaktivera nedladdningar, eller bara visa den senaste versionen.",
         "mockup": "portal-track-visibility"
       },
       {

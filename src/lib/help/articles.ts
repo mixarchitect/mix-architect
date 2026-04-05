@@ -30,7 +30,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Key Concepts",
-        body: "Releases are your top-level projects (albums, EPs, or singles). Each release contains one or more tracks. On desktop, the release detail page has a two-column layout: the track list on the left and an inspector sidebar on the right showing the cover art, Release Info (artist, type, format, status, target date, genre), Global Mix Direction, Global References, and Payment status. Each track has six tabs: Intent, Specs, Audio, Distribution, Portal, and Notes. Click the settings gear icon in the release header to open Release Settings, where you can edit all metadata, manage your team, and configure payment. The header also has buttons for the Portal toggle (with a link to open the portal), Save as Template, and the settings gear.",
+        body: "Releases are your top-level projects (albums, EPs, or singles). Each release contains one or more tracks. On desktop, the release detail page has a two-column layout: the track list on the left and an inspector sidebar on the right showing the cover art, Release Info (artist, type, format, status, target date, genre), Global Mix Direction, Global References, and Payment status. Each track has four tabs: Brief, Audio, Delivery, and Notes. Click the settings gear icon in the release header to open Release Settings, where you can edit all metadata, manage your team, and configure payment. The header also has buttons for the Portal toggle (with a link to open the portal), Save as Template, and the settings gear.",
         mockup: "key-concepts",
       },
     ],
@@ -82,7 +82,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Add Tracks",
-        body: "In the release detail view, click \"+ Add Track\" in the header next to the Flow button. Give your track a title and it will be created with your default specs from [Settings](/app/settings) applied. Each track appears in the list with a number, title, intent preview, status dot, and approval badge. You can drag tracks to reorder them using the grip handle on the left, or use the move up/down buttons. Delete tracks with the trash icon on the right. Click any track to open it and start working in its six tabs.",
+        body: "In the release detail view, click \"+ Add Track\" in the header next to the Flow button. Give your track a title and it will be created with your default specs from [Settings](/app/settings) applied. Each track appears in the list with a number, title, intent preview, status dot, and approval badge. You can drag tracks to reorder them using the grip handle on the left, or use the move up/down buttons. Delete tracks with the trash icon on the right. Click any track to open it and start working in its four tabs.",
         mockup: "track-upload",
       },
       {
@@ -108,7 +108,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Collaborator vs Client Roles",
-        body: "There are two roles. Collaborators have full access to view and edit all release content: tracks, intent, specs, audio, notes, distribution metadata, and release settings. Clients have view-only access through the client portal and can provide feedback through comments, approve or request changes on individual tracks, and download audio files if permitted. The role badge is displayed next to each team member's email in the Team section.",
+        body: "There are two roles. Collaborators have full access to view and edit all release content: tracks, briefs, audio, notes, delivery settings, distribution metadata, and release settings. Clients have view-only access through the client portal and can provide feedback through comments, approve or request changes on individual tracks, and download audio files if permitted. The role badge is displayed next to each team member's email in the Team section.",
         mockup: "collaborator-roles",
       },
       {
@@ -119,7 +119,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Client Portal Sharing",
-        body: "For external stakeholders who need to review without logging in, activate the client portal from the release detail page header. Click the Portal toggle to turn it on (the toggle turns green when active), then use the link icon next to the toggle to copy the unique share URL. The portal provides read-only access to the release brief, track list, audio playback, and comments. You can configure exactly what is visible using the portal settings: mix direction, specs, references, payment status, distribution info, and lyrics. For per-track control, use the Portal tab on each track.",
+        body: "For external stakeholders who need to review without logging in, activate the client portal from the release detail page header. Click the Portal toggle to turn it on (the toggle turns green when active), then use the link icon next to the toggle to copy the unique share URL. The portal provides read-only access to the release brief, track list, audio playback, and comments. You can configure exactly what is visible using the portal settings: mix direction, specs, references, payment status, distribution info, and lyrics. For per-track control, use the Delivery tab on each track.",
         mockup: "portal-sharing",
       },
     ],
@@ -133,19 +133,14 @@ export const articles: HelpArticle[] = [
     title: "Track Detail: Understanding the Tabs",
     category: "releases",
     summary:
-      "Each track has six tabs for managing every aspect of your mix: Intent, Specs, Audio, Distribution, Portal, and Notes.",
-    tags: ["tracks", "tabs", "intent", "specs", "audio", "distribution", "portal", "notes"],
+      "Each track has four tabs for managing every aspect of your mix: Brief, Audio, Delivery, and Notes.",
+    tags: ["tracks", "tabs", "brief", "audio", "delivery", "notes"],
     updatedAt: "2026-03-04",
     content: [
       {
-        heading: "Intent",
-        body: "The Intent tab is where you describe the creative vision for a track. At the top is a free-form text area under \"What should this track feel like?\" where you can write the mix direction (click \"Edit\" to modify). Below that, the Emotional Qualities section lets you tag the track with descriptive words: selected tags appear as filled pills (e.g. spacious, warm, punchy, nostalgic), and available suggestions appear as outline pills you can click to add (aggressive, intimate, gritty, polished, dark, bright, raw, lush, dreamy, lo-fi, cinematic, minimal, dense, ethereal, hypnotic, euphoric, melancholic, organic, synthetic, chaotic, smooth, haunting, playful, anthemic, delicate, heavy, airy). The Anti-References section at the bottom lets you describe sounds or approaches you want to avoid. On the right sidebar, Quick View shows the track status, audio quality (sample rate / bit depth), and format at a glance. Below that, the References section lets you search and add reference tracks (from Apple Music) with optional notes describing what to reference about each one.",
+        heading: "Brief",
+        body: "The Brief tab combines your technical settings and creative direction in one place. At the top, Technical Settings has dropdowns for Mix Format (Stereo, Dolby Atmos, or Stereo + Atmos), File Format (WAV, FLAC, AIFF, MP3, or Any), Sample Rate (44.1kHz through 192kHz), Bit Depth (16-bit, 24-bit, 32-bit float), and Channels (Mono, Stereo, or Any). Uploaded audio is validated against these specs. Below the technical settings, the creative intent section starts with \"What should this track feel like?\" — a free-form text area for describing the sonic direction (click \"Edit\" to modify). The Emotional Qualities section lets you tag the track with descriptive words: selected tags appear as filled pills (e.g. spacious, warm, punchy, nostalgic), and available suggestions appear as outline pills you can click to add. The Anti-References section lets you describe sounds or approaches you want to avoid. On the right sidebar, Quick View shows the track status, audio quality (sample rate / bit depth), and format at a glance. Below that, the References section lets you search and add reference tracks (from Apple Music) with optional notes describing what to reference about each one.",
         mockup: "track-tab-intent",
-      },
-      {
-        heading: "Specs",
-        body: "The Specs tab holds the technical specifications for your track. The Technical Settings section has three dropdowns: Format (Stereo, Dolby Atmos, or Stereo + Atmos), Sample Rate (44.1kHz, 48kHz, 88.2kHz, 96kHz), and Bit Depth (16-bit, 24-bit, 32-bit float). These values are reference metadata describing the source audio and are used as defaults for new tracks created from templates; they are not used to control conversion output. Below that, the Delivery section manages your output formats. Select which formats should be available by clicking the format chips: convertible formats include WAV, AIFF, FLAC, MP3, AAC, OGG, and ALAC. Non-convertible formats (DDP, ADM BWF/Atmos, MQA) can be selected for reference but show an info tooltip explaining they cannot be auto-converted. Selected formats appear highlighted in green with a checkmark. Use the \"Export from\" dropdown to choose which audio version to convert from (e.g. \"v3 - Typical Wonderful 2025-10-10 MGO.wav (latest)\"). Click the download arrow icon next to any selected convertible format to start a conversion. You can also type a custom format name in the \"Custom format...\" field and click \"+ Add\". At the bottom, the Special Requirements text area lets you note any delivery-specific instructions.",
-        mockup: "track-tab-specs",
       },
       {
         heading: "Audio",
@@ -158,14 +153,9 @@ export const articles: HelpArticle[] = [
         mockup: "track-tab-lufs",
       },
       {
-        heading: "Distribution",
-        body: "The Distribution tab captures all metadata needed for digital distribution. It includes three split sections, each with \"+ Add Person\" buttons: Writing Split (person name, percentage, PRO affiliation like ASCAP/BMI, Member Account number, and Writer IPI number), Publishing Split (publisher name, percentage, Publisher Member ID, and Publisher IPI), and Master Recording Split (entity name and percentage). The running total for each split section is shown in green when it equals 100% or orange when it does not. Below the splits: Codes and Identifiers (ISRC and ISWC fields), Credits (producer and composer/songwriter names), Track Properties (featured artist, language selector, toggles for explicit lyrics, instrumental, and cover song), Copyright (registration number and copyright date), and Lyrics (full lyrics text area).",
+        heading: "Delivery",
+        body: "The Delivery tab brings together everything related to output and distribution. At the top, Delivery Formats lets you select which output formats your project needs by clicking format chips (WAV, AIFF, FLAC, MP3, AAC, OGG, ALAC, and non-convertible formats like DDP, ADM BWF/Atmos, MQA). Selected formats appear highlighted in green with a checkmark. Click the download arrow icon next to any convertible format to start a conversion. You can also add custom format names. The Special Requirements text area lets you note delivery-specific instructions. Below the formats, the Portal section (if enabled) controls how clients interact with this track: the Client Approval section shows the current approval status with a timestamped history of all approval events, and Track Portal Visibility lets you toggle whether this track is visible on the portal, whether downloads are enabled, and which audio versions the client can access. Further down, the Distribution section (if enabled) captures metadata for digital distribution: Writing, Publishing, and Master Recording splits with percentage tracking, Codes and Identifiers (ISRC and ISWC), Credits, Track Properties (featured artist, language, toggles for explicit lyrics, instrumental, and cover song), Copyright, and Lyrics.",
         mockup: "track-tab-distribution",
-      },
-      {
-        heading: "Portal",
-        body: "The Portal tab controls how clients interact with this specific track. At the top, the Client Approval section shows the current approval status (e.g. \"Approved\" in green) along with a timestamped history of all approval events: approved, requested changes (with the client's note), reopened for review, and re-approved, each with dates. Below that, Track Portal Visibility lets you toggle whether this track is visible on the portal, whether downloads are enabled, and which specific audio versions (Version 1, Version 2, Version 3, etc.) the client can access, each with its own toggle switch. A note at the bottom reminds you that portal activation and the share link can be found on the release page header.",
-        mockup: "track-tab-portal",
       },
       {
         heading: "Notes",
@@ -190,12 +180,12 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Per-Track Visibility",
-        body: "For each track, go to the Portal tab to control what your client can see. The Track Portal Visibility section has toggle switches for: \"Visible on portal\" (show or hide the entire track), \"Enable download\" (allow or block audio downloads), and individual version toggles (Version 1, Version 2, Version 3, etc.) to control which audio revisions the client can access. This gives you fine-grained control so you can hide works in progress and only share finished mixes. All toggles are independent, so you can make a track visible but disable downloads, or show only the latest version.",
+        body: "For each track, go to the Delivery tab to control what your client can see. The Track Portal Visibility section has toggle switches for: \"Visible on portal\" (show or hide the entire track), \"Enable download\" (allow or block audio downloads), and individual version toggles (Version 1, Version 2, Version 3, etc.) to control which audio revisions the client can access. This gives you fine-grained control so you can hide works in progress and only share finished mixes. All toggles are independent, so you can make a track visible but disable downloads, or show only the latest version.",
         mockup: "portal-track-visibility",
       },
       {
         heading: "Track Approvals",
-        body: "Clients can approve or request changes on individual tracks through the portal. The approval status is tracked in the Client Approval section of each track's Portal tab. The status shows a colored badge (e.g. green \"Approved\") with a full timestamped history of every approval event: when the client approved, when they requested changes (including their note, such as \"Vocals too quiet\"), when the track was reopened for review, and when it was re-approved. This gives you a clear audit trail of all client decisions. Approval badges also appear on the track list in the release detail page, so you can see at a glance which tracks are approved.",
+        body: "Clients can approve or request changes on individual tracks through the portal. The approval status is tracked in the Client Approval section of each track's Delivery tab. The status shows a colored badge (e.g. green \"Approved\") with a full timestamped history of every approval event: when the client approved, when they requested changes (including their note, such as \"Vocals too quiet\"), when the track was reopened for review, and when it was re-approved. This gives you a clear audit trail of all client decisions. Approval badges also appear on the track list in the release detail page, so you can see at a glance which tracks are approved.",
         mockup: "portal-approval",
       },
     ],
@@ -276,8 +266,8 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Spotify Auto-Detection",
-        body: "Spotify is listed at the top of the Distribution Tracker with an \"Updates automatically\" label. Once you mark Spotify as Submitted, Mix Architect periodically checks the Spotify catalog for your release using the ISRC code (from the track Distribution tab) or the release title and artist name. When your release is found on Spotify, the status automatically changes to Live, the Spotify URL is saved, and you receive a notification. You can also click \"Check Now\" to trigger an immediate check. Auto-detection runs daily for all submitted Spotify entries.",
-        tip: "Fill in the ISRC code on your track's Distribution tab before submitting. ISRC-based detection is more reliable than title/artist matching, especially for common names.",
+        body: "Spotify is listed at the top of the Distribution Tracker with an \"Updates automatically\" label. Once you mark Spotify as Submitted, Mix Architect periodically checks the Spotify catalog for your release using the ISRC code (from the track's Delivery tab) or the release title and artist name. When your release is found on Spotify, the status automatically changes to Live, the Spotify URL is saved, and you receive a notification. You can also click \"Check Now\" to trigger an immediate check. Auto-detection runs daily for all submitted Spotify entries.",
+        tip: "Fill in the ISRC code on your track's Delivery tab before submitting. ISRC-based detection is more reliable than title/artist matching, especially for common names.",
         mockup: "distribution-spotify",
       },
       {
@@ -421,22 +411,22 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Setting Delivery Formats",
-        body: "Open any track and go to the Specs tab. Scroll to the Delivery section. Here you select which output formats your project needs by clicking the format chips. Available convertible formats: WAV, AIFF, FLAC, MP3, AAC, OGG, and ALAC. Selected formats appear highlighted in green with a checkmark icon. Additional non-convertible formats (DDP, ADM BWF/Atmos, MQA) can be toggled on for reference; they display an info tooltip explaining that automatic conversion is not available. You can also type a custom format name in the \"Custom format...\" input field and click \"+ Add\" for any format not listed. Use the \"Export from\" dropdown to choose which audio version to convert from, such as \"v3 - filename.wav (latest)\".",
+        body: "Open any track and go to the Delivery tab. Here you select which output formats your project needs by clicking the format chips. Available convertible formats: WAV, AIFF, FLAC, MP3, AAC, OGG, and ALAC. Selected formats appear highlighted in green with a checkmark icon. Additional non-convertible formats (DDP, ADM BWF/Atmos, MQA) can be toggled on for reference; they display an info tooltip explaining that automatic conversion is not available. You can also type a custom format name in the \"Custom format...\" input field and click \"+ Add\" for any format not listed. Use the \"Export from\" dropdown to choose which audio version to convert from, such as \"v3 - filename.wav (latest)\".",
         mockup: "format-convert",
       },
       {
         heading: "Converting and Downloading",
-        body: "Select which formats should be available by clicking the format chips in the Delivery section: convertible formats include WAV, AIFF, FLAC, MP3, AAC, OGG, and ALAC. Selected formats appear highlighted in green with a checkmark. Click the download arrow icon next to any selected convertible format to start a conversion. The icon shows a spinner while the conversion is processing in the background. When the conversion completes, the file downloads automatically to your browser. Each conversion uses the audio version you selected in the \"Export from\" dropdown, converting from the original uploaded file to preserve maximum audio quality. Lossless formats (WAV, AIFF, FLAC, ALAC) preserve the source file's sample rate and bit depth. Lossy formats use optimized presets: MP3 exports at 44.1 kHz / 320 kbps, AAC at 44.1 kHz / 256 kbps, and OGG at 44.1 kHz / Quality 8.",
+        body: "Select which formats should be available by clicking the format chips on the Delivery tab: convertible formats include WAV, AIFF, FLAC, MP3, AAC, OGG, and ALAC. Selected formats appear highlighted in green with a checkmark. Click the download arrow icon next to any selected convertible format to start a conversion. The icon shows a spinner while the conversion is processing in the background. When the conversion completes, the file downloads automatically to your browser. Each conversion uses the audio version you selected in the \"Export from\" dropdown, converting from the original uploaded file to preserve maximum audio quality. Lossless formats (WAV, AIFF, FLAC, ALAC) preserve the source file's sample rate and bit depth. Lossy formats use optimized presets: MP3 exports at 44.1 kHz / 320 kbps, AAC at 44.1 kHz / 256 kbps, and OGG at 44.1 kHz / Quality 8.",
         mockup: "track-tab-specs",
       },
       {
         heading: "Automatic Metadata Embedding",
-        body: "When you convert to MP3, FLAC, AAC, OGG, or ALAC, Mix Architect automatically writes industry-standard metadata tags into the output file. This includes: artist, title, album, track number, genre, release year, copyright, ISRC, UPC/barcode, lyrics, cover art, and ReplayGain. ReplayGain is a loudness tag that tells compatible players how much to adjust the volume so tracks play back at a consistent level without clipping. Mix Architect calculates it from the measured LUFS of your audio using the ReplayGain 2.0 standard (reference level of -18 LUFS). MP3 files get ID3v2 tags, FLAC and OGG use Vorbis comments, and AAC/ALAC use iTunes-style MP4 atoms. All metadata is pulled from your release and track details (including the Distribution tab for ISRC and lyrics, and the release cover art). WAV and AIFF exports do not include metadata tags. After a conversion completes, hover over the tag icon next to the format chip to see exactly which tags were embedded.",
-        tip: "Fill out your Distribution tab (ISRC, lyrics) and upload cover art before exporting. The more metadata you provide, the more complete your exported files will be for distribution.",
+        body: "When you convert to MP3, FLAC, AAC, OGG, or ALAC, Mix Architect automatically writes industry-standard metadata tags into the output file. This includes: artist, title, album, track number, genre, release year, copyright, ISRC, UPC/barcode, lyrics, cover art, and ReplayGain. ReplayGain is a loudness tag that tells compatible players how much to adjust the volume so tracks play back at a consistent level without clipping. Mix Architect calculates it from the measured LUFS of your audio using the ReplayGain 2.0 standard (reference level of -18 LUFS). MP3 files get ID3v2 tags, FLAC and OGG use Vorbis comments, and AAC/ALAC use iTunes-style MP4 atoms. All metadata is pulled from your release and track details (including the Delivery tab for ISRC and lyrics, and the release cover art). WAV and AIFF exports do not include metadata tags. After a conversion completes, hover over the tag icon next to the format chip to see exactly which tags were embedded.",
+        tip: "Fill out distribution metadata on the Delivery tab (ISRC, lyrics) and upload cover art before exporting. The more metadata you provide, the more complete your exported files will be for distribution.",
       },
       {
         heading: "Supported Formats Reference",
-        body: "Lossless formats preserve source quality: WAV (PCM, source rate/depth), AIFF (PCM, source rate/depth), FLAC (source rate), ALAC (source rate). Lossy formats use fixed presets optimized for distribution: MP3 (44.1 kHz, 320 kbps, stereo), AAC (44.1 kHz, 256 kbps, stereo), OGG Vorbis (44.1 kHz, quality 8, stereo). Non-convertible formats (tag only, no auto-conversion): DDP, ADM BWF (Atmos), MQA. The Technical Settings (sample rate and bit depth) at the top of the Specs tab are reference metadata describing the source audio; they do not control conversion output. The Special Requirements text area below the delivery formats lets you add notes about delivery instructions.",
+        body: "Lossless formats preserve source quality: WAV (PCM, source rate/depth), AIFF (PCM, source rate/depth), FLAC (source rate), ALAC (source rate). Lossy formats use fixed presets optimized for distribution: MP3 (44.1 kHz, 320 kbps, stereo), AAC (44.1 kHz, 256 kbps, stereo), OGG Vorbis (44.1 kHz, quality 8, stereo). Non-convertible formats (tag only, no auto-conversion): DDP, ADM BWF (Atmos), MQA. The Technical Settings (sample rate and bit depth) on the Brief tab are reference metadata describing the source audio; they do not control conversion output. The Special Requirements text area on the Delivery tab lets you add notes about delivery instructions.",
         warning: "Converting from a lossy format (MP3, AAC, OGG) to a lossless format (WAV, FLAC) does not improve audio quality. The original compression artifacts remain. Always upload your highest-quality source file.",
         mockup: "supported-formats",
       },
@@ -463,7 +453,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Notes vs Audio Comments",
-        body: "The Audio tab is for timestamped feedback tied to specific moments in the waveform: \"bring up the vocals at 1:22\" or \"the snare is too loud here\". The Notes tab is for general discussion and revision notes that are not tied to a timecode: \"overall the mix needs more low end\" or \"client wants a more aggressive approach\". Audio comments are version-specific (tied to v1, v2, etc.), while Notes apply to the track as a whole. Use the Intent tab to document the overall creative vision, emotional tags, and reference tracks.",
+        body: "The Audio tab is for timestamped feedback tied to specific moments in the waveform: \"bring up the vocals at 1:22\" or \"the snare is too loud here\". The Notes tab is for general discussion and revision notes that are not tied to a timecode: \"overall the mix needs more low end\" or \"client wants a more aggressive approach\". Audio comments are version-specific (tied to v1, v2, etc.), while Notes apply to the track as a whole. Use the Brief tab to document the overall creative vision, emotional tags, and reference tracks.",
         tip: "For a complete picture of feedback on a track, check both the Audio tab's Feedback section (for time-specific notes) and the Notes tab (for general discussion). Client feedback may appear in either place.",
         mockup: "resolve-feedback",
       },

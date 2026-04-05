@@ -127,7 +127,7 @@ export const articles: HelpArticle[] = [
     "updatedAt": "2026-03-04",
     "content": [
       {
-        "heading": "意图",
+        "heading": "Brief",
         "body": "意图选项卡用于描述曲目的创意愿景。顶部是一个自由文本区域，标题为\"这首曲目应该是什么感觉？\"，您可以在此输入混音方向（点击\"编辑\"修改）。下方的情感特质部分允许您用描述性词语标记曲目：已选标签显示为填充色药丸（如 spacious、warm、punchy、nostalgic），可用建议显示为轮廓药丸，点击即可添加（aggressive、intimate、gritty、polished、dark、bright、raw、lush、dreamy、lo-fi、cinematic、minimal、dense、ethereal、hypnotic、euphoric、melancholic、organic、synthetic、chaotic、smooth、haunting、playful、anthemic、delicate、heavy、airy）。底部的反面参考部分允许您描述要避免的声音或方法。右侧边栏中，快速查看显示曲目状态、音频质量（采样率/位深度）和格式。下方的参考曲目部分允许您搜索并添加参考曲目（来自 Apple Music），并可附加备注说明要参考的内容。",
         "mockup": "track-tab-intent"
       },

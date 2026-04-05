@@ -31,7 +31,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "주요 개념",
-        "body": "릴리스는 최상위 프로젝트(Album, EP, Single)입니다. 각 릴리스에는 하나 이상의 트랙이 포함됩니다. 데스크톱에서는 릴리스 상세 페이지가 두 열로 구성됩니다: 왼쪽에는 트랙 목록, 오른쪽에는 커버 아트, 릴리스 정보(아티스트, 유형, 포맷, 상태, 목표일, 장르), 글로벌 믹스 방향, 글로벌 레퍼런스, 결제 상태를 보여주는 인스펙터 사이드바가 있습니다. 각 트랙에는 6개의 탭이 있습니다: Intent, Specs, Audio, Distribution, Portal, Notes. 릴리스 헤더의 설정 톱니바퀴 아이콘을 클릭하면 릴리스 설정이 열리며, 모든 메타데이터를 편집하고 팀을 관리하고 결제를 구성할 수 있습니다. 헤더에는 포털 토글(포털 열기 링크 포함), 템플릿으로 저장, 설정 톱니바퀴 버튼도 있습니다.",
+        "body": "릴리스는 최상위 프로젝트(Album, EP, Single)입니다. 각 릴리스에는 하나 이상의 트랙이 포함됩니다. 데스크톱에서는 릴리스 상세 페이지가 두 열로 구성됩니다: 왼쪽에는 트랙 목록, 오른쪽에는 커버 아트, 릴리스 정보(아티스트, 유형, 포맷, 상태, 목표일, 장르), 글로벌 믹스 방향, 글로벌 레퍼런스, 결제 상태를 보여주는 인스펙터 사이드바가 있습니다. 각 트랙에는 4개의 탭이 있습니다: Brief, Audio, Delivery, Notes. 릴리스 헤더의 설정 톱니바퀴 아이콘을 클릭하면 릴리스 설정이 열리며, 모든 메타데이터를 편집하고 팀을 관리하고 결제를 구성할 수 있습니다. 헤더에는 포털 토글(포털 열기 링크 포함), 템플릿으로 저장, 설정 톱니바퀴 버튼도 있습니다.",
         "mockup": "key-concepts"
       }
     ]
@@ -62,7 +62,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "트랙 추가",
-        "body": "릴리스 상세 보기에서 Flow 버튼 옆의 \"+ Add Track\"을 클릭합니다. 트랙 제목을 입력하면 [설정](/app/settings)의 기본 스펙이 적용되어 생성됩니다. 각 트랙은 목록에 번호, 제목, 인텐트 미리보기, 상태 점, 승인 뱃지와 함께 표시됩니다. 왼쪽의 그립 핸들을 사용하여 드래그로 순서를 변경하거나 위/아래 이동 버튼을 사용할 수 있습니다. 오른쪽의 휴지통 아이콘으로 트랙을 삭제합니다. 트랙을 클릭하면 6개의 탭에서 작업을 시작할 수 있습니다.",
+        "body": "릴리스 상세 보기에서 Flow 버튼 옆의 \"+ Add Track\"을 클릭합니다. 트랙 제목을 입력하면 [설정](/app/settings)의 기본 스펙이 적용되어 생성됩니다. 각 트랙은 목록에 번호, 제목, 인텐트 미리보기, 상태 점, 승인 뱃지와 함께 표시됩니다. 왼쪽의 그립 핸들을 사용하여 드래그로 순서를 변경하거나 위/아래 이동 버튼을 사용할 수 있습니다. 오른쪽의 휴지통 아이콘으로 트랙을 삭제합니다. 트랙을 클릭하면 4개의 탭에서 작업을 시작할 수 있습니다.",
         "mockup": "track-upload"
       },
       {
@@ -104,7 +104,7 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "클라이언트 포털 공유",
-        "body": "로그인 없이 검토가 필요한 외부 이해관계자를 위해 릴리스 상세 페이지 헤더에서 클라이언트 포털을 활성화합니다. 포털 토글을 클릭하여 활성화하면(활성 시 녹색으로 변경) 토글 옆의 링크 아이콘을 클릭하여 고유 공유 URL을 복사할 수 있습니다. 포털은 릴리스 브리프, 트랙 목록, 오디오 재생, 댓글 시스템에 대한 읽기 전용 접근을 제공합니다. 포털 설정을 사용하여 클라이언트에게 표시할 섹션을 제어할 수 있습니다: 믹스 방향, 스펙, 레퍼런스, 결제 상태, 배포 정보, 가사. 트랙별 제어는 각 트랙의 Portal 탭을 사용합니다.",
+        "body": "로그인 없이 검토가 필요한 외부 이해관계자를 위해 릴리스 상세 페이지 헤더에서 클라이언트 포털을 활성화합니다. 포털 토글을 클릭하여 활성화하면(활성 시 녹색으로 변경) 토글 옆의 링크 아이콘을 클릭하여 고유 공유 URL을 복사할 수 있습니다. 포털은 릴리스 브리프, 트랙 목록, 오디오 재생, 댓글 시스템에 대한 읽기 전용 접근을 제공합니다. 포털 설정을 사용하여 클라이언트에게 표시할 섹션을 제어할 수 있습니다: 믹스 방향, 스펙, 레퍼런스, 결제 상태, 배포 정보, 가사. 트랙별 제어는 각 트랙의 Delivery 탭을 사용합니다.",
         "mockup": "portal-sharing"
       }
     ]
@@ -113,7 +113,7 @@ export const articles: HelpArticle[] = [
     "id": "track-tabs",
     "title": "트랙 상세: 탭 이해하기",
     "category": "releases",
-    "summary": "각 트랙에는 믹스의 모든 측면을 관리하는 6개의 탭이 있습니다: Intent, Specs, Audio, Distribution, Portal, Notes.",
+    "summary": "각 트랙에는 믹스의 모든 측면을 관리하는 4개의 탭이 있습니다: Brief, Audio, Delivery, Notes.",
     "tags": [
       "tracks",
       "tabs",
@@ -127,7 +127,7 @@ export const articles: HelpArticle[] = [
     "updatedAt": "2026-03-04",
     "content": [
       {
-        "heading": "Intent",
+        "heading": "Brief",
         "body": "Intent 탭은 트랙의 크리에이티브 비전을 설명하는 곳입니다. 상단에는 \"이 트랙이 어떤 느낌이어야 하나요?\" 아래에 자유 형식 텍스트 영역이 있어 믹스 방향을 작성할 수 있습니다(수정하려면 \"Edit\" 클릭). 그 아래 Emotional Qualities 섹션에서는 설명적인 단어로 트랙에 태그를 지정할 수 있습니다: 선택된 태그는 채워진 필로 표시되고(예: spacious, warm, punchy, nostalgic), 사용 가능한 제안은 클릭하여 추가할 수 있는 아웃라인 필로 표시됩니다(aggressive, intimate, gritty, polished, dark, bright, raw, lush, dreamy, lo-fi, cinematic, minimal, dense, ethereal, hypnotic, euphoric, melancholic, organic, synthetic, chaotic, smooth, haunting, playful, anthemic, delicate, heavy, airy). 하단의 Anti-References 섹션에서는 피하고 싶은 사운드나 접근 방식을 설명합니다. 오른쪽 사이드바의 Quick View에서는 트랙 상태, 오디오 품질(샘플 레이트/비트 뎁스), 포맷을 한눈에 볼 수 있습니다. 그 아래 References 섹션에서는 레퍼런스 트랙을 검색하고 추가할 수 있으며(Apple Music에서), 각 레퍼런스에 대한 참고 사항을 선택적으로 추가할 수 있습니다.",
         "mockup": "track-tab-intent"
       },
@@ -148,12 +148,12 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Distribution",
-        "body": "Distribution 탭은 디지털 배포에 필요한 모든 메타데이터를 관리합니다. 각각 \"+ Add Person\" 버튼이 있는 세 가지 분할 섹션이 있습니다: Writing Split(이름, 비율, PRO 소속(예: ASCAP/BMI), 멤버 계좌 번호, Writer IPI 번호), Publishing Split(퍼블리셔 이름, 비율, Publisher Member ID, Publisher IPI), Master Recording Split(엔티티 이름, 비율). 각 분할 섹션의 합계가 100%이면 녹색으로, 아니면 주황색으로 표시됩니다. 분할 아래에는 Codes and Identifiers(ISRC 및 ISWC 필드), Credits(프로듀서 및 작곡가/송라이터 이름), Track Properties(피처링 아티스트, 언어 선택기, 노골적 가사, 인스트루멘탈, 커버곡 토글), Copyright(등록 번호 및 저작권 날짜), Lyrics(전체 가사 텍스트 영역)가 있습니다.",
+        "body": "Delivery 탭은 디지털 배포에 필요한 모든 메타데이터를 관리합니다. 각각 \"+ Add Person\" 버튼이 있는 세 가지 분할 섹션이 있습니다: Writing Split(이름, 비율, PRO 소속(예: ASCAP/BMI), 멤버 계좌 번호, Writer IPI 번호), Publishing Split(퍼블리셔 이름, 비율, Publisher Member ID, Publisher IPI), Master Recording Split(엔티티 이름, 비율). 각 분할 섹션의 합계가 100%이면 녹색으로, 아니면 주황색으로 표시됩니다. 분할 아래에는 Codes and Identifiers(ISRC 및 ISWC 필드), Credits(프로듀서 및 작곡가/송라이터 이름), Track Properties(피처링 아티스트, 언어 선택기, 노골적 가사, 인스트루멘탈, 커버곡 토글), Copyright(등록 번호 및 저작권 날짜), Lyrics(전체 가사 텍스트 영역)가 있습니다.",
         "mockup": "track-tab-distribution"
       },
       {
         "heading": "Portal",
-        "body": "Portal 탭은 클라이언트가 이 특정 트랙과 상호작용하는 방식을 제어합니다. 상단의 Client Approval 섹션에서는 현재 승인 상태(예: 녹색 \"Approved\")와 모든 승인 이벤트의 타임스탬프 기록이 표시됩니다: 승인, 변경 요청(클라이언트의 메모 포함), 검토 재개, 재승인, 각각의 날짜가 기록됩니다. 그 아래 Track Portal Visibility에서는 이 트랙의 포털 표시 여부, 다운로드 활성화 여부, 클라이언트가 접근 가능한 특정 오디오 버전(Version 1, Version 2, Version 3 등)을 각각의 토글 스위치로 제어할 수 있습니다. 하단의 안내문은 포털 활성화와 공유 링크가 릴리스 페이지 헤더에 있다는 것을 알려줍니다.",
+        "body": "Delivery 탭은 클라이언트가 이 특정 트랙과 상호작용하는 방식을 제어합니다. 상단의 Client Approval 섹션에서는 현재 승인 상태(예: 녹색 \"Approved\")와 모든 승인 이벤트의 타임스탬프 기록이 표시됩니다: 승인, 변경 요청(클라이언트의 메모 포함), 검토 재개, 재승인, 각각의 날짜가 기록됩니다. 그 아래 Track Portal Visibility에서는 이 트랙의 포털 표시 여부, 다운로드 활성화 여부, 클라이언트가 접근 가능한 특정 오디오 버전(Version 1, Version 2, Version 3 등)을 각각의 토글 스위치로 제어할 수 있습니다. 하단의 안내문은 포털 활성화와 공유 링크가 릴리스 페이지 헤더에 있다는 것을 알려줍니다.",
         "mockup": "track-tab-portal"
       },
       {
@@ -184,12 +184,12 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "트랙별 가시성",
-        "body": "각 트랙에서 Portal 탭으로 이동하여 클라이언트에게 보이는 항목을 제어합니다. Track Portal Visibility 섹션에는 다음의 토글 스위치가 있습니다: \"Visible on portal\"(트랙 전체 표시/숨기기), \"Enable download\"(오디오 다운로드 허용/차단), 개별 버전 토글(Version 1, Version 2, Version 3 등)로 클라이언트가 접근할 수 있는 오디오 리비전을 제어합니다. 이를 통해 세밀한 제어가 가능하여 진행 중인 작업을 숨기고 완성된 믹스만 공유할 수 있습니다. 모든 토글은 독립적이므로 트랙을 표시하되 다운로드를 비활성화하거나, 최신 버전만 표시할 수 있습니다.",
+        "body": "각 트랙에서 Delivery 탭으로 이동하여 클라이언트에게 보이는 항목을 제어합니다. Track Portal Visibility 섹션에는 다음의 토글 스위치가 있습니다: \"Visible on portal\"(트랙 전체 표시/숨기기), \"Enable download\"(오디오 다운로드 허용/차단), 개별 버전 토글(Version 1, Version 2, Version 3 등)로 클라이언트가 접근할 수 있는 오디오 리비전을 제어합니다. 이를 통해 세밀한 제어가 가능하여 진행 중인 작업을 숨기고 완성된 믹스만 공유할 수 있습니다. 모든 토글은 독립적이므로 트랙을 표시하되 다운로드를 비활성화하거나, 최신 버전만 표시할 수 있습니다.",
         "mockup": "portal-track-visibility"
       },
       {
         "heading": "트랙 승인",
-        "body": "클라이언트는 포털을 통해 개별 트랙을 승인하거나 변경을 요청할 수 있습니다. 승인 상태는 각 트랙의 Portal 탭에 있는 Client Approval 섹션에서 추적됩니다. 상태에는 색상 뱃지(예: 녹색 \"Approved\")와 모든 승인 이벤트의 전체 타임스탬프 기록이 표시됩니다: 클라이언트가 승인한 시점, 변경을 요청한 시점(메모 포함, 예: \"보컬이 너무 작습니다\"), 검토를 위해 다시 열린 시점, 재승인된 시점. 이를 통해 클라이언트의 모든 결정에 대한 명확한 감사 추적이 가능합니다. 승인 뱃지는 릴리스 상세 페이지의 트랙 목록에도 표시되어 어떤 트랙이 승인되었는지 한눈에 확인할 수 있습니다.",
+        "body": "클라이언트는 포털을 통해 개별 트랙을 승인하거나 변경을 요청할 수 있습니다. 승인 상태는 각 트랙의 Delivery 탭에 있는 Client Approval 섹션에서 추적됩니다. 상태에는 색상 뱃지(예: 녹색 \"Approved\")와 모든 승인 이벤트의 전체 타임스탬프 기록이 표시됩니다: 클라이언트가 승인한 시점, 변경을 요청한 시점(메모 포함, 예: \"보컬이 너무 작습니다\"), 검토를 위해 다시 열린 시점, 재승인된 시점. 이를 통해 클라이언트의 모든 결정에 대한 명확한 감사 추적이 가능합니다. 승인 뱃지는 릴리스 상세 페이지의 트랙 목록에도 표시되어 어떤 트랙이 승인되었는지 한눈에 확인할 수 있습니다.",
         "mockup": "portal-approval"
       }
     ]
@@ -277,8 +277,8 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Spotify 자동 감지",
-        "body": "Spotify는 Distribution Tracker 최상단에 \"자동 업데이트\" 라벨과 함께 표시됩니다. Spotify를 Submitted로 표시하면, Mix Architect가 ISRC 코드(트랙의 Distribution 탭에서 가져옴) 또는 릴리스 제목과 아티스트 이름을 사용하여 Spotify 카탈로그를 주기적으로 확인합니다. Spotify에서 릴리스가 발견되면 상태가 자동으로 Live로 변경되고, Spotify URL이 저장되며, 알림을 받게 됩니다. \"Check Now\"를 클릭하여 즉시 확인을 실행할 수도 있습니다. 자동 감지는 모든 Submitted 상태의 Spotify 항목에 대해 매일 실행됩니다.",
-        "tip": "제출 전에 트랙의 Distribution 탭에서 ISRC 코드를 입력하세요. ISRC 기반 감지가 제목/아티스트 매칭보다 더 신뢰할 수 있으며, 특히 흔한 이름의 경우 더욱 그렇습니다.",
+        "body": "Spotify는 Distribution Tracker 최상단에 \"자동 업데이트\" 라벨과 함께 표시됩니다. Spotify를 Submitted로 표시하면, Mix Architect가 ISRC 코드(트랙의 Delivery 탭에서 가져옴) 또는 릴리스 제목과 아티스트 이름을 사용하여 Spotify 카탈로그를 주기적으로 확인합니다. Spotify에서 릴리스가 발견되면 상태가 자동으로 Live로 변경되고, Spotify URL이 저장되며, 알림을 받게 됩니다. \"Check Now\"를 클릭하여 즉시 확인을 실행할 수도 있습니다. 자동 감지는 모든 Submitted 상태의 Spotify 항목에 대해 매일 실행됩니다.",
+        "tip": "제출 전에 트랙의 Delivery 탭에서 ISRC 코드를 입력하세요. ISRC 기반 감지가 제목/아티스트 매칭보다 더 신뢰할 수 있으며, 특히 흔한 이름의 경우 더욱 그렇습니다.",
         "mockup": "distribution-spotify"
       },
       {
@@ -446,8 +446,8 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "자동 메타데이터 임베딩",
-        "body": "MP3, FLAC, AAC, OGG, ALAC으로 변환할 때 Mix Architect는 출력 파일에 업계 표준 메타데이터 태그를 자동으로 기록합니다. 여기에는 아티스트, 제목, 앨범, 트랙 번호, 장르, 발매 연도, 저작권, ISRC, UPC/바코드, 가사, 커버 아트, ReplayGain이 포함됩니다. ReplayGain은 호환 플레이어에 볼륨을 얼마나 조절해야 하는지 알려주는 라우드니스 태그로, 트랙이 클리핑 없이 일관된 레벨로 재생됩니다. Mix Architect는 ReplayGain 2.0 표준(기준 레벨 -18 LUFS)을 사용하여 오디오의 측정된 LUFS에서 이를 계산합니다. MP3 파일은 ID3v2 태그를, FLAC과 OGG는 Vorbis comments를, AAC/ALAC은 iTunes 스타일 MP4 atoms를 사용합니다. 모든 메타데이터는 릴리스 및 트랙 세부 정보(ISRC 및 가사를 위한 Distribution 탭, 릴리스 커버 아트 포함)에서 가져옵니다. WAV 및 AIFF 내보내기에는 메타데이터 태그가 포함되지 않습니다. 변환이 완료되면 포맷 칩 옆의 태그 아이콘 위에 마우스를 올려 임베딩된 태그를 정확히 확인할 수 있습니다.",
-        "tip": "내보내기 전에 Distribution 탭(ISRC, 가사)을 작성하고 커버 아트를 업로드하세요. 더 많은 메타데이터를 제공할수록 내보낸 파일이 배포에 더 완벽해집니다."
+        "body": "MP3, FLAC, AAC, OGG, ALAC으로 변환할 때 Mix Architect는 출력 파일에 업계 표준 메타데이터 태그를 자동으로 기록합니다. 여기에는 아티스트, 제목, 앨범, 트랙 번호, 장르, 발매 연도, 저작권, ISRC, UPC/바코드, 가사, 커버 아트, ReplayGain이 포함됩니다. ReplayGain은 호환 플레이어에 볼륨을 얼마나 조절해야 하는지 알려주는 라우드니스 태그로, 트랙이 클리핑 없이 일관된 레벨로 재생됩니다. Mix Architect는 ReplayGain 2.0 표준(기준 레벨 -18 LUFS)을 사용하여 오디오의 측정된 LUFS에서 이를 계산합니다. MP3 파일은 ID3v2 태그를, FLAC과 OGG는 Vorbis comments를, AAC/ALAC은 iTunes 스타일 MP4 atoms를 사용합니다. 모든 메타데이터는 릴리스 및 트랙 세부 정보(ISRC 및 가사를 위한 Delivery 탭, 릴리스 커버 아트 포함)에서 가져옵니다. WAV 및 AIFF 내보내기에는 메타데이터 태그가 포함되지 않습니다. 변환이 완료되면 포맷 칩 옆의 태그 아이콘 위에 마우스를 올려 임베딩된 태그를 정확히 확인할 수 있습니다.",
+        "tip": "내보내기 전에 Delivery 탭(ISRC, 가사)을 작성하고 커버 아트를 업로드하세요. 더 많은 메타데이터를 제공할수록 내보낸 파일이 배포에 더 완벽해집니다."
       },
       {
         "heading": "지원 포맷 참조",
