@@ -584,6 +584,115 @@ export function TrackDetailClient({
           {/* Brief (Intent + Specs combined) */}
           {activeTab === "brief" && (
             <div className="space-y-6">
+            {/* Specs (technical settings first) */}
+            <div className="space-y-4">
+              <Panel>
+                <PanelBody className="py-5">
+                  <div className="label-sm text-muted mb-1">Technical settings</div>
+                  <p className="text-[11px] text-faint mb-4">
+                    Uploaded audio will be validated against these specs.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Mix format</label>
+                      <select
+                        value={formatOverride || releaseFormat}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const isRelease = val === releaseFormat;
+                          setFormatOverride(isRelease ? "" : val);
+                          saveSpecs({ format_override: isRelease ? null : val });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="stereo">Stereo</option>
+                        <option value="atmos">Dolby Atmos</option>
+                        <option value="both">Stereo + Atmos</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">File format</label>
+                      <select
+                        value={targetFormat ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value || null;
+                          setTargetFormat(val);
+                          saveTargetSpecs({ target_format: val });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="">Any</option>
+                        <option value="WAV">WAV</option>
+                        <option value="FLAC">FLAC</option>
+                        <option value="AIFF">AIFF</option>
+                        <option value="MP3">MP3</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Sample rate</label>
+                      <select
+                        value={sampleRate}
+                        onChange={(e) => {
+                          setSampleRate(e.target.value);
+                          saveSpecs({ sample_rate: e.target.value });
+                          const intVal = parseSampleRateInt(e.target.value);
+                          setTargetSampleRate(intVal);
+                          saveTargetSpecs({ target_sample_rate: intVal });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="44.1 kHz">44.1 kHz</option>
+                        <option value="48 kHz">48 kHz</option>
+                        <option value="88.2 kHz">88.2 kHz</option>
+                        <option value="96 kHz">96 kHz</option>
+                        <option value="176.4 kHz">176.4 kHz</option>
+                        <option value="192 kHz">192 kHz</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Bit depth</label>
+                      <select
+                        value={bitDepth}
+                        onChange={(e) => {
+                          setBitDepth(e.target.value);
+                          saveSpecs({ bit_depth: e.target.value });
+                          const intVal = parseBitDepthInt(e.target.value);
+                          setTargetBitDepth(intVal);
+                          saveTargetSpecs({ target_bit_depth: intVal });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="16-bit">16-bit</option>
+                        <option value="24-bit">24-bit</option>
+                        <option value="32-bit float">32-bit float</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="label text-muted">Channels</label>
+                      <select
+                        value={targetChannels ?? ""}
+                        onChange={(e) => {
+                          const val = e.target.value ? parseInt(e.target.value, 10) : null;
+                          setTargetChannels(val);
+                          saveTargetSpecs({ target_channels: val });
+                        }}
+                        disabled={!canEdit(role)}
+                        className="input"
+                      >
+                        <option value="">Any</option>
+                        <option value="1">Mono</option>
+                        <option value="2">Stereo</option>
+                      </select>
+                    </div>
+                  </div>
+                </PanelBody>
+              </Panel>
+            </div>
+
             {/* Intent */}
             <div className="space-y-4" data-tour="track-intent">
               <Panel>
@@ -686,116 +795,6 @@ export function TrackDetailClient({
               </Panel>
             </div>
 
-            {/* Specs */}
-            <div className="space-y-4">
-              <Panel>
-                <PanelBody className="py-5">
-                  <div className="label-sm text-muted mb-1">Technical settings</div>
-                  <p className="text-[11px] text-faint mb-4">
-                    Uploaded audio will be validated against these specs.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">Mix format</label>
-                      <select
-                        value={formatOverride || releaseFormat}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          const isRelease = val === releaseFormat;
-                          setFormatOverride(isRelease ? "" : val);
-                          saveSpecs({ format_override: isRelease ? null : val });
-                        }}
-                        disabled={!canEdit(role)}
-                        className="input"
-                      >
-                        <option value="stereo">Stereo</option>
-                        <option value="atmos">Dolby Atmos</option>
-                        <option value="both">Stereo + Atmos</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">File format</label>
-                      <select
-                        value={targetFormat ?? ""}
-                        onChange={(e) => {
-                          const val = e.target.value || null;
-                          setTargetFormat(val);
-                          saveTargetSpecs({ target_format: val });
-                        }}
-                        disabled={!canEdit(role)}
-                        className="input"
-                      >
-                        <option value="">Any</option>
-                        <option value="WAV">WAV</option>
-                        <option value="FLAC">FLAC</option>
-                        <option value="AIFF">AIFF</option>
-                        <option value="MP3">MP3</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">Sample rate</label>
-                      <select
-                        value={sampleRate}
-                        onChange={(e) => {
-                          setSampleRate(e.target.value);
-                          saveSpecs({ sample_rate: e.target.value });
-                          // Also save integer for upload validation
-                          const intVal = parseSampleRateInt(e.target.value);
-                          setTargetSampleRate(intVal);
-                          saveTargetSpecs({ target_sample_rate: intVal });
-                        }}
-                        disabled={!canEdit(role)}
-                        className="input"
-                      >
-                        <option value="44.1 kHz">44.1 kHz</option>
-                        <option value="48 kHz">48 kHz</option>
-                        <option value="88.2 kHz">88.2 kHz</option>
-                        <option value="96 kHz">96 kHz</option>
-                        <option value="176.4 kHz">176.4 kHz</option>
-                        <option value="192 kHz">192 kHz</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">Bit depth</label>
-                      <select
-                        value={bitDepth}
-                        onChange={(e) => {
-                          setBitDepth(e.target.value);
-                          saveSpecs({ bit_depth: e.target.value });
-                          // Also save integer for upload validation
-                          const intVal = parseBitDepthInt(e.target.value);
-                          setTargetBitDepth(intVal);
-                          saveTargetSpecs({ target_bit_depth: intVal });
-                        }}
-                        disabled={!canEdit(role)}
-                        className="input"
-                      >
-                        <option value="16-bit">16-bit</option>
-                        <option value="24-bit">24-bit</option>
-                        <option value="32-bit float">32-bit float</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">Channels</label>
-                      <select
-                        value={targetChannels ?? ""}
-                        onChange={(e) => {
-                          const val = e.target.value ? parseInt(e.target.value, 10) : null;
-                          setTargetChannels(val);
-                          saveTargetSpecs({ target_channels: val });
-                        }}
-                        disabled={!canEdit(role)}
-                        className="input"
-                      >
-                        <option value="">Any</option>
-                        <option value="1">Mono</option>
-                        <option value="2">Stereo</option>
-                      </select>
-                    </div>
-                  </div>
-                </PanelBody>
-              </Panel>
-            </div>
             </div>
           )}
 
