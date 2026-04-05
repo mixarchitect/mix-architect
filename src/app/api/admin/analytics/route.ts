@@ -3,15 +3,15 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { isAdmin } from "@/lib/admin";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import {
-  getAllTrafficData,
-  getOverviewOnly,
-  type OverviewMetrics,
-} from "@/lib/openpanel-api";
+  getAllGA4TrafficData,
+  getGA4Overview,
+} from "@/lib/ga4-api";
+import type { OverviewMetrics } from "@/lib/openpanel-api";
 
 /**
  * GET /api/admin/analytics?from=YYYY-MM-DD&to=YYYY-MM-DD[&compare_from=...&compare_to=...]
  *
- * Returns aggregated site traffic data from OpenPanel.
+ * Returns aggregated site traffic data from GA4.
  * Requires admin authentication.
  *
  * Query params:
@@ -68,13 +68,13 @@ export async function GET(req: NextRequest) {
       /^\d{4}-\d{2}-\d{2}$/.test(compareFrom) &&
       /^\d{4}-\d{2}-\d{2}$/.test(compareTo);
 
-    // Fetch current period data
-    const data = await getAllTrafficData(rangeArg as Parameters<typeof getAllTrafficData>[0]);
+    // Fetch current period data from GA4
+    const data = await getAllGA4TrafficData(rangeArg);
 
     // Fetch comparison period overview (only stat-card metrics, not breakdowns)
     let comparison: OverviewMetrics | null = null;
     if (hasComparison) {
-      comparison = await getOverviewOnly({
+      comparison = await getGA4Overview({
         start: compareFrom,
         end: compareTo,
       });

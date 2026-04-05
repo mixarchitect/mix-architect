@@ -10,6 +10,7 @@ import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
 import { logActivityClient } from "@/lib/activity-logger-client";
+import { trackGA4Event } from "@/lib/ga4-track";
 
 export default function SignInPage() {
   return (
@@ -116,6 +117,7 @@ function SignInPageContent() {
 
       // Fire-and-forget activity log
       logActivityClient(mode === "signin" ? "login" : "signup", { method: "email" });
+      if (mode === "signup") trackGA4Event("signup_start", { source: "auth_page" });
 
       if (mode === "signup") {
         setConfirmationSent(true);

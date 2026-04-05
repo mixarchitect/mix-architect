@@ -18,6 +18,9 @@ import {
   ArrowDown,
 } from "lucide-react";
 import type { TrafficData, OverviewMetrics } from "@/lib/openpanel-api";
+import { AISynopsis } from "@/components/admin/traffic/AISynopsis";
+
+type TrafficDataWithEvents = TrafficData & { events?: Record<string, number> };
 import LiveVisitorMap from "@/components/admin/traffic/LiveVisitorMap";
 import { DateRangeSelector } from "@/components/ui/date-range-selector";
 import {
@@ -73,7 +76,7 @@ export default function SiteTrafficPage() {
     };
   }, [rawRange, rawFrom, rawTo, rawCompare]);
 
-  const [data, setData] = useState<TrafficData | null>(null);
+  const [data, setData] = useState<TrafficDataWithEvents | null>(null);
   const [comparison, setComparison] = useState<OverviewMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -101,7 +104,7 @@ export default function SiteTrafficPage() {
         throw new Error(body.error ?? `HTTP ${res.status}`);
       }
       const json = await res.json();
-      setData(json.data as TrafficData);
+      setData(json.data as TrafficDataWithEvents);
       setComparison(json.comparison as OverviewMetrics | null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load analytics");
@@ -127,12 +130,12 @@ export default function SiteTrafficPage() {
           <p className="text-sm text-muted mt-0.5">
             Analytics powered by{" "}
             <a
-              href="https://dashboard.openpanel.dev/mix-architect/mix-architect"
+              href={`https://analytics.google.com/analytics/web/#/p${process.env.NEXT_PUBLIC_GA4_PROPERTY_ID ?? ""}/reports/reportshub`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-signal hover:underline"
             >
-              OpenPanel
+              Google Analytics
             </a>
           </p>
         </div>
@@ -160,6 +163,9 @@ export default function SiteTrafficPage() {
         </div>
       </div>
 
+      {/* AI Synopsis */}
+      <AISynopsis range={currentRange} />
+
       {/* Content */}
       {loading && !data ? (
         <LoadingSkeleton />
@@ -169,15 +175,15 @@ export default function SiteTrafficPage() {
         <TrafficDashboard data={data} comparison={comparison} loading={loading} />
       ) : null}
 
-      {/* OpenPanel link */}
+      {/* GA4 link */}
       <div className="text-center pt-2 pb-4">
         <a
-          href="https://openpanel.dev"
+          href={`https://analytics.google.com/analytics/web/#/p${process.env.NEXT_PUBLIC_GA4_PROPERTY_ID ?? ""}/reports/reportshub`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-text transition-colors"
         >
-          View full dashboard on OpenPanel
+          Open GA4 Dashboard
           <ExternalLink size={12} />
         </a>
       </div>
@@ -194,7 +200,7 @@ function TrafficDashboard({
   comparison,
   loading,
 }: {
-  data: TrafficData;
+  data: TrafficDataWithEvents;
   comparison: OverviewMetrics | null;
   loading: boolean;
 }) {
@@ -294,6 +300,19 @@ function TrafficDashboard({
           emptyMessage="No referrer data yet"
         />
       </div>
+
+      {/* Custom Events */}
+      {data.events && Object.keys(data.events).length > 0 && (
+        <BreakdownTable
+          title="Custom Events"
+          icon={Activity}
+          rows={Object.entries(data.events)
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)}
+          emptyMessage="No custom events yet"
+          formatName={(name) => name.replace(/_/g, " ")}
+        />
+      )}
     </div>
   );
 }

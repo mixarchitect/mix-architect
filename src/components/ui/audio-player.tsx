@@ -9,6 +9,7 @@ import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
 import { useTheme } from "next-themes";
 import { sendNotification } from "@/lib/notifications/client";
 import { logActivityClient } from "@/lib/activity-logger-client";
+import { trackGA4Event } from "@/lib/ga4-track";
 import {
   SkipBack,
   SkipForward,
@@ -754,6 +755,7 @@ export function AudioPlayer({
         });
 
         logActivityClient("track_uploaded", { releaseId, trackId, version: nextVersion });
+        trackGA4Event("audio_upload", { format: ext });
       }
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed");

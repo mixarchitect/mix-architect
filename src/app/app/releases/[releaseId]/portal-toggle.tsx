@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { trackGA4Event } from "@/lib/ga4-track";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Globe, Share2, Check, ExternalLink } from "lucide-react";
 
@@ -89,6 +90,7 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
     const url = `${window.location.origin}/portal/${share.share_token}`;
     try {
       await navigator.clipboard.writeText(url);
+      trackGA4Event("portal_share");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {

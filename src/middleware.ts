@@ -12,10 +12,10 @@ function generateNonce(): string {
 function buildCsp(nonce: string): string {
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' js.stripe.com`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' js.stripe.com www.googletagmanager.com`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data: sjdodeauawmuzredpxwa.supabase.co",
-    "connect-src 'self' sjdodeauawmuzredpxwa.supabase.co *.supabase.co wss://sjdodeauawmuzredpxwa.supabase.co api.stripe.com",
+    "connect-src 'self' sjdodeauawmuzredpxwa.supabase.co *.supabase.co wss://sjdodeauawmuzredpxwa.supabase.co api.stripe.com www.google-analytics.com *.google-analytics.com *.analytics.google.com",
     "font-src 'self'",
     "frame-src js.stripe.com bandcamp.com *.bandcamp.com",
     "media-src 'self' blob: sjdodeauawmuzredpxwa.supabase.co",

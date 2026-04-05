@@ -11,6 +11,7 @@ import { TagInput } from "@/components/ui/tag-input";
 import { ArrowLeft, Sparkles, LayoutTemplate, Star, ArrowRight } from "lucide-react";
 import { useSubscription } from "@/lib/subscription-context";
 import { logActivityClient } from "@/lib/activity-logger-client";
+import { trackGA4Event } from "@/lib/ga4-track";
 import { cn } from "@/lib/cn";
 import { useTranslations } from "next-intl";
 import type { ReleaseTemplate } from "@/types/template";
@@ -343,6 +344,7 @@ export default function NewReleasePage() {
       }
 
       logActivityClient("release_created", { releaseId, releaseType });
+      trackGA4Event("release_create");
 
       router.push(`/app/releases/${releaseId}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -380,7 +382,10 @@ export default function NewReleasePage() {
                 try {
                   const res = await fetch("/api/stripe/checkout", { method: "POST" });
                   const data = await res.json();
-                  if (data.url) window.location.href = data.url;
+                  if (data.url) {
+                    trackGA4Event("checkout_start", { plan: "monthly" });
+                    window.location.href = data.url;
+                  }
                   else setUpgrading(false);
                 } catch {
                   setUpgrading(false);

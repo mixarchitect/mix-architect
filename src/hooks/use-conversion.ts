@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/toast";
 import { getFormatExtension } from "@/lib/conversion-formats";
+import { trackGA4Event } from "@/lib/ga4-track";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -194,6 +195,7 @@ export function useConversion() {
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.error || "Request failed");
+        trackGA4Event("converter_use", { to_format: targetFormat.toLowerCase() });
 
         if (data.status === "completed" && data.outputUrl) {
           // Cache hit — download immediately

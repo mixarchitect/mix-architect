@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { FilledArrowRight } from "@/components/ui/filled-icon";
 import { PRICING, type BillingInterval } from "@/lib/pricing";
 import { useTranslations } from "next-intl";
+import { trackGA4Event } from "@/lib/ga4-track";
 
 /* ------------------------------------------------------------------ */
 /*  Billing toggle                                                     */
@@ -138,6 +139,10 @@ function PriceCard({
 export function Pricing() {
   const t = useTranslations("landing");
   const [interval, setInterval] = useState<BillingInterval>("monthly");
+  const trackedRef = useRef(false);
+  useEffect(() => {
+    if (!trackedRef.current) { trackedRef.current = true; trackGA4Event("pricing_view"); }
+  }, []);
 
   const proPrice =
     interval === "annual"

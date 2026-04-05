@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 import { Sun, Moon, Monitor, Sparkles, CreditCard, Gift, Download, CalendarDays, Copy, Check, RefreshCw, HardDrive, Cloud, Unplug, Mail, ExternalLink, Zap, Trash2, Plus } from "lucide-react";
 import { ServicesCatalog } from "@/components/settings/services-catalog";
+import { trackGA4Event } from "@/lib/ga4-track";
 import { getConnectedAccount, checkAccountStatus } from "@/actions/stripe-connect";
 import { getWorkflowTriggers, toggleWorkflowTrigger, createWorkflowTrigger, deleteWorkflowTrigger, getWorkflowLog } from "@/actions/workflows";
 import type { StripeConnectedAccount, WorkflowTrigger } from "@/types/payments";
@@ -800,6 +801,7 @@ function SubscriptionPanel() {
       const res = await fetch("/api/stripe/checkout", { method: "POST" });
       const data = await res.json();
       if (data.url) {
+        trackGA4Event("checkout_start", { plan: "monthly" });
         window.location.href = data.url;
       } else {
         console.error("[settings] checkout error:", data.error);
