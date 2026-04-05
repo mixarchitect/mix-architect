@@ -21,11 +21,20 @@ const PROPERTY_ID = process.env.GA4_PROPERTY_ID;
 let _client: BetaAnalyticsDataClient | null = null;
 function getClient(): BetaAnalyticsDataClient {
   if (!_client) {
+    const email = process.env.GA4_SERVICE_ACCOUNT_EMAIL;
+    let key = process.env.GA4_PRIVATE_KEY ?? "";
+
+    // Handle both literal \n (from Vercel env var UI) and actual newlines
+    if (key.includes("\\n")) {
+      key = key.replace(/\\n/g, "\n");
+    }
+
+    if (!email || !key) {
+      throw new Error("Missing GA4_SERVICE_ACCOUNT_EMAIL or GA4_PRIVATE_KEY env vars");
+    }
+
     _client = new BetaAnalyticsDataClient({
-      credentials: {
-        client_email: process.env.GA4_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GA4_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-      },
+      credentials: { client_email: email, private_key: key },
     });
   }
   return _client;

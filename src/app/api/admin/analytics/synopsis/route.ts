@@ -129,7 +129,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ synopsis, range, cached: false });
   } catch (err) {
-    console.error("[admin/analytics/synopsis] Error:", err);
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error("[admin/analytics/synopsis] Error:", errMsg, err instanceof Error ? err.stack : "");
     return NextResponse.json(
       { error: "Failed to generate synopsis" },
       { status: 500 },

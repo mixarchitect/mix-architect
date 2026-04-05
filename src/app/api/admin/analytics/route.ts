@@ -82,7 +82,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, data, comparison });
   } catch (err) {
-    console.error("[admin/analytics] Error:", err);
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error("[admin/analytics] Error:", errMsg, err instanceof Error ? err.stack : "");
     return NextResponse.json(
       { error: "Failed to fetch analytics data" },
       { status: 500 },
