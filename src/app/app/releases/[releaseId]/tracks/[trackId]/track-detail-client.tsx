@@ -891,10 +891,8 @@ export function TrackDetailClient({
             <div className="space-y-6">
             <Panel>
               <PanelBody className="py-5">
-                <div className="label-sm text-muted mb-4">Delivery Formats</div>
                 <div className="space-y-5">
                   <div className="space-y-1.5">
-                    <label className="label text-muted">Delivery formats</label>
                     <DeliveryFormatSelector
                       value={deliveryFormats}
                       onChange={(next) => {
