@@ -34,14 +34,11 @@ function getClient(): BetaAnalyticsDataClient {
     }
 
     // Debug: log credential shape (never log actual values)
-    console.log("[ga4-api] Initializing client:", {
-      email: email.substring(0, 10) + "...",
-      keyLength: key.length,
-      keyStart: key.substring(0, 27),
-      keyEnd: key.substring(key.length - 27),
-      hasRealNewlines: key.includes("\n") && key.charAt(5) !== "\\",
-      propertyId: PROPERTY_ID,
-    });
+    console.log("[ga4] email=" + email.substring(0, 20) + "...");
+    console.log("[ga4] keyLen=" + key.length);
+    console.log("[ga4] keyStart=" + key.substring(0, 30));
+    console.log("[ga4] keyEnd=" + key.substring(key.length - 30));
+    console.log("[ga4] propId=" + PROPERTY_ID);
 
     _client = new BetaAnalyticsDataClient({
       credentials: { client_email: email, private_key: key },
