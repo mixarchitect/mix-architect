@@ -33,6 +33,16 @@ function getClient(): BetaAnalyticsDataClient {
       throw new Error("Missing GA4_SERVICE_ACCOUNT_EMAIL or GA4_PRIVATE_KEY env vars");
     }
 
+    // Debug: log credential shape (never log actual values)
+    console.log("[ga4-api] Initializing client:", {
+      email: email.substring(0, 10) + "...",
+      keyLength: key.length,
+      keyStart: key.substring(0, 27),
+      keyEnd: key.substring(key.length - 27),
+      hasRealNewlines: key.includes("\n") && key.charAt(5) !== "\\",
+      propertyId: PROPERTY_ID,
+    });
+
     _client = new BetaAnalyticsDataClient({
       credentials: { client_email: email, private_key: key },
     });
