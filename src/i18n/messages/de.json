@@ -187,7 +187,7 @@
     "new": {
       "title": "Neues Release",
       "startFree": "Kostenlos starten",
-      "seeHowItWorks": "Sieh, wie es funktioniert",
+      "seeHowItWorks": "Funktionen ansehen",
       "freeToTry": "Kostenlos ausprobieren. Keine Kreditkarte erforderlich.",
       "backToReleases": "Zurück zu Releases",
       "freePlanNote": "Kostenloser Plan enthält 1 Release. Upgrade zu Pro für unbegrenzte Releases.",
@@ -822,7 +822,7 @@
     "engineerFeature2": "Rechnungsverfolgung und Zahlungsstatus",
     "engineerFeature3": "Vorlagen für wiederholbare Workflows",
     "startFree": "Kostenlos starten",
-    "seeHowItWorks": "Sieh, wie es funktioniert",
+    "seeHowItWorks": "Funktionen ansehen",
     "freeToTry": "Kostenlos ausprobieren. Keine Kreditkarte erforderlich.",
     "featureReleasePlanning": "Jedes Release, organisiert vom ersten Tag an",
     "featureReleasePlanningDesc": "Erstelle ein Release, füge deine Tracks hinzu, lege deinen Zeitplan fest. Mix Architect verfolgt alles vom ersten Rough Mix bis zur finalen Lieferung, damit nichts durchrutscht.",

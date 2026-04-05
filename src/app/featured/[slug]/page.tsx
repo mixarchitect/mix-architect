@@ -131,7 +131,7 @@ export default async function FeaturedReleasePage({ params }: Props) {
   return (
     <NextIntlClientProvider locale={locale} messages={{ landing: (messages as Record<string, unknown>).landing }}>
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-[#0A0A0A] focus:outline-none">
-      <LandingNav locale={locale} />
+      <LandingNav />
       {/* Safe: JSON.stringify escapes HTML; \u003c prevents script breakout */}
       <script
         type="application/ld+json"

@@ -5,9 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { LocaleSwitcher } from "./locale-switcher";
 
-export function LandingNav({ locale = "en-US" }: { locale?: string }) {
+export function LandingNav() {
   const t = useTranslations("landing");
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
@@ -70,7 +69,6 @@ export function LandingNav({ locale = "en-US" }: { locale?: string }) {
             {menuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
 
-          <LocaleSwitcher locale={locale} />
           <Link
             href="/auth/sign-in"
             className="hidden sm:inline-flex px-2.5 py-2 text-[13px] text-white/60 hover:text-white transition-colors whitespace-nowrap"

@@ -187,7 +187,7 @@
     "new": {
       "title": "新規リリース",
       "startFree": "無料で開始",
-      "seeHowItWorks": "使い方を見る",
+      "seeHowItWorks": "機能を見る",
       "freeToTry": "無料でお試し。クレジットカード不要。",
       "backToReleases": "リリースに戻る",
       "freePlanNote": "無料プランには1リリースが含まれます。無制限リリースにはProにアップグレードしてください。",
@@ -822,7 +822,7 @@
     "engineerFeature2": "請求書の追跡と支払い状況",
     "engineerFeature3": "繰り返し使えるワークフローテンプレート",
     "startFree": "無料で開始",
-    "seeHowItWorks": "使い方を見る",
+    "seeHowItWorks": "機能を見る",
     "freeToTry": "無料でお試し。クレジットカード不要。",
     "featureReleasePlanning": "すべてのリリースを初日から整理",
     "featureReleasePlanningDesc": "リリースを作成し、トラックを追加し、スケジュールを設定。Mix Architectは最初のラフミックスから最終納品まですべてを管理し、見落としをなくします。",

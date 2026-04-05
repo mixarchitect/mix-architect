@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { LocaleSwitcher } from "./locale-switcher";
 
 export async function LandingFooter() {
-  const t = await getTranslations("landing");
+  const [t, locale] = await Promise.all([getTranslations("landing"), getLocale()]);
   return (
     <footer className="px-6 py-12 border-t border-white/8">
       <div className="mx-auto max-w-6xl">
@@ -46,6 +47,7 @@ export async function LandingFooter() {
           </nav>
 
           <div className="flex items-center gap-4 text-xs text-zinc-400">
+            <LocaleSwitcher locale={locale} />
             <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navTerms")}</span>
             <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navPrivacy")}</span>
           </div>

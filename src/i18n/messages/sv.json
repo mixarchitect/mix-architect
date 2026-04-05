@@ -187,7 +187,7 @@
     "new": {
       "title": "Ny release",
       "startFree": "Börja gratis",
-      "seeHowItWorks": "Se hur det fungerar",
+      "seeHowItWorks": "Se funktioner",
       "freeToTry": "Gratis att prova. Inget kreditkort krävs.",
       "backToReleases": "Tillbaka till releaser",
       "freePlanNote": "Gratisplanen inkluderar 1 release. Uppgradera till Pro för obegränsade releaser.",
@@ -822,7 +822,7 @@
     "engineerFeature2": "Fakturauppföljning och betalningsstatus",
     "engineerFeature3": "Mallar för repeterbara arbetsflöden",
     "startFree": "Börja gratis",
-    "seeHowItWorks": "Se hur det fungerar",
+    "seeHowItWorks": "Se funktioner",
     "freeToTry": "Gratis att prova. Inget kreditkort krävs.",
     "featureReleasePlanning": "Varje release, organiserad från dag ett",
     "featureReleasePlanningDesc": "Skapa en release, lägg till dina spår, sätt din tidslinje. Mix Architect håller koll på allt från första grovmixen till slutleverans så att inget faller mellan stolarna.",

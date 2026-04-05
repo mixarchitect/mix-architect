@@ -36,7 +36,7 @@ export default async function ChangelogPage() {
   return (
     <NextIntlClientProvider locale={locale} messages={{ landing: (messages as Record<string, unknown>).landing }}>
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-bg focus:outline-none">
-      <LandingNav locale={locale} />
+      <LandingNav />
       <div className="mx-auto max-w-3xl px-6 py-16 md:py-24">
         <h1 className="text-3xl font-bold text-text">What&apos;s New</h1>
         <p className="mt-2 text-muted">

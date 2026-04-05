@@ -106,7 +106,7 @@ export default async function ChangelogEntryPage({ params }: Props) {
   return (
     <NextIntlClientProvider locale={locale} messages={{ landing: (messages as Record<string, unknown>).landing }}>
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-bg focus:outline-none">
-      <LandingNav locale={locale} />
+      <LandingNav />
 
       {/* Safe: JSON.stringify escapes; u003c encoding prevents script breakout */}
       <script

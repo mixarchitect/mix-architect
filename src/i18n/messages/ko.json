@@ -187,7 +187,7 @@
     "new": {
       "title": "새 릴리스",
       "startFree": "무료로 시작하기",
-      "seeHowItWorks": "작동 방식 보기",
+      "seeHowItWorks": "기능 보기",
       "freeToTry": "무료 체험. 신용카드가 필요하지 않습니다.",
       "backToReleases": "릴리스로 돌아가기",
       "freePlanNote": "무료 플랜에는 1개의 릴리스가 포함됩니다. Pro로 업그레이드하여 무제한 릴리스를 이용하세요.",
@@ -822,7 +822,7 @@
     "engineerFeature2": "청구서 추적 및 결제 상태",
     "engineerFeature3": "반복 가능한 워크플로우 템플릿",
     "startFree": "무료로 시작하기",
-    "seeHowItWorks": "작동 방식 보기",
+    "seeHowItWorks": "기능 보기",
     "freeToTry": "무료 체험. 신용카드가 필요하지 않습니다.",
     "featureReleasePlanning": "모든 릴리스를 첫날부터 체계적으로",
     "featureReleasePlanningDesc": "릴리스를 만들고, 트랙을 추가하고, 타임라인을 설정하세요. Mix Architect가 첫 러프 믹스부터 최종 납품까지 모든 것을 추적하여 빠뜨리는 것이 없도록 합니다.",

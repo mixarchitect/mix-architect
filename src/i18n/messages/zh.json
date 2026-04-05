@@ -187,7 +187,7 @@
     "new": {
       "title": "新建发行",
       "startFree": "免费开始",
-      "seeHowItWorks": "了解工作原理",
+      "seeHowItWorks": "查看功能",
       "freeToTry": "免费试用，无需信用卡。",
       "backToReleases": "返回发行",
       "freePlanNote": "免费套餐包含 1 个发行。升级至 Pro 版本可获得无限发行。",
@@ -822,7 +822,7 @@
     "engineerFeature2": "发票跟踪和付款状态",
     "engineerFeature3": "可重复使用的工作流模板",
     "startFree": "免费开始",
-    "seeHowItWorks": "了解工作原理",
+    "seeHowItWorks": "查看功能",
     "freeToTry": "免费试用，无需信用卡。",
     "featureReleasePlanning": "每个发行，从第一天起井井有条",
     "featureReleasePlanningDesc": "创建发行、添加曲目、设定时间线。Mix Architect 从第一版粗混到最终交付全程跟踪，确保万无一失。",
