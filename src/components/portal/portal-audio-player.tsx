@@ -224,9 +224,16 @@ export function PortalAudioPlayer({
       if (!container || !container.isConnected) return;
 
       const colors = getWaveColors();
+
+      // Only bind to the shared audio element if this track is already active.
+      // Otherwise render a static waveform from peaks — the media element is
+      // connected on play via audio.loadVersion().
+      const shouldBindMedia =
+        audio.activeVersion?.track_id === trackId;
+
       ws = WaveSurfer.create({
         container,
-        media: audioElement,
+        ...(shouldBindMedia ? { media: audioElement } : {}),
         url: activeVersion.audio_url,
         barWidth: 3,
         barGap: 1,
@@ -252,7 +259,12 @@ export function PortalAudioPlayer({
 
       ws.on("ready", () => {
         setIsReady(true);
-        audio.loadVersion(activeVersion, trackMeta);
+
+        // If this track isn't bound to the media yet, load it now
+        // (this happens when user first visits and no track is active)
+        if (shouldBindMedia) {
+          audio.loadVersion(activeVersion, trackMeta);
+        }
 
         const restore = pendingRestoreRef.current;
         pendingRestoreRef.current = null;
@@ -279,7 +291,7 @@ export function PortalAudioPlayer({
       wavesurferRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeVersion?.id, audioElement]);
+  }, [activeVersion?.id, audioElement, isThisTrackActive]);
 
   // Update waveform colors on theme change
   useEffect(() => {
@@ -300,8 +312,19 @@ export function PortalAudioPlayer({
   /* ---------------------------------------------------------------- */
 
   const togglePlayPause = useCallback(() => {
+    // If this track isn't active yet, load its version first.
+    // The isThisTrackActive change will trigger WaveSurfer to re-create
+    // with media: audioElement bound, then we can play.
+    if (!isThisTrackActive && activeVersion) {
+      audio.loadVersion(activeVersion, trackMeta);
+      // loadVersion changes audio.activeVersion which updates isThisTrackActive,
+      // triggering useEffect to recreate WaveSurfer with media bound.
+      // Play after a short delay to let the rebuild happen.
+      setTimeout(() => audio.togglePlayPause(), 100);
+      return;
+    }
     audio.togglePlayPause();
-  }, [audio]);
+  }, [audio, isThisTrackActive, activeVersion, trackMeta]);
 
   const returnToStart = useCallback(() => {
     audio.seekTo(0);
