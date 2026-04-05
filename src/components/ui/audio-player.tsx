@@ -10,6 +10,8 @@ import { useTheme } from "next-themes";
 import { sendNotification } from "@/lib/notifications/client";
 import { logActivityClient } from "@/lib/activity-logger-client";
 import { trackGA4Event } from "@/lib/ga4-track";
+import { signAudioUrlsAction } from "@/lib/actions/sign-audio-urls";
+import { extractStoragePath } from "@/lib/storage-urls";
 import {
   SkipBack,
   SkipForward,
@@ -53,6 +55,8 @@ export type AudioVersionData = {
   track_id: string;
   version_number: number;
   audio_url: string;
+  /** Raw storage path for deletions (set by signAudioVersions) */
+  storage_path?: string;
   file_name: string | null;
   file_size: number | null;
   duration_seconds: number | null;
@@ -722,16 +726,13 @@ export function AudioPlayer({
         xhr.send(file);
       });
 
-      const { data: urlData } = supabase.storage
-        .from("track-audio")
-        .getPublicUrl(path);
-
+      // Store storage path (not public URL) — server signs at render time
       const { data, error } = await supabase
         .from("track_audio_versions")
         .insert({
           track_id: trackId,
           version_number: nextVersion,
-          audio_url: urlData.publicUrl,
+          audio_url: path,
           file_name: file.name,
           file_size: file.size,
           uploaded_by: currentUserName,
@@ -742,7 +743,14 @@ export function AudioPlayer({
 
       if (error) throw error;
       if (data) {
-        const updated = [...versions, data];
+        // Sign the URL for immediate playback
+        const signedMap = await signAudioUrlsAction([path]);
+        const signedVersion = {
+          ...data,
+          storage_path: path,
+          audio_url: signedMap[path] ?? path,
+        };
+        const updated = [...versions, signedVersion];
         onVersionsChange(updated);
         setActiveVersionId(data.id);
 
@@ -835,12 +843,11 @@ export function AudioPlayer({
         audioElement.src = "";
       }
 
-      // Delete from storage — extract path from public URL
+      // Delete from storage using the raw storage path
       try {
-        const url = new URL(version.audio_url);
-        const pathMatch = url.pathname.match(/\/track-audio\/(.+)$/);
-        if (pathMatch) {
-          await supabase.storage.from("track-audio").remove([decodeURIComponent(pathMatch[1])]);
+        const storagePath = version.storage_path ?? extractStoragePath(version.audio_url);
+        if (storagePath) {
+          await supabase.storage.from("track-audio").remove([storagePath]);
         }
       } catch {
         // Storage delete is best-effort; row delete is what matters

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
+import { extractStoragePath } from "@/lib/storage-urls";
 import archiver from "archiver";
 import { logActivity } from "@/lib/activity-logger";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
@@ -456,12 +458,16 @@ export async function GET(req: NextRequest) {
       const fileName = `v${av.version_number}-${originalName}`;
 
       try {
-        const audioFetch = await fetch(av.audio_url);
-        if (audioFetch.ok && audioFetch.body) {
-          const nodeStream = Readable.fromWeb(
-            audioFetch.body as import("stream/web").ReadableStream
-          );
-          archive.append(nodeStream, {
+        // Download via service client (works for private bucket)
+        const serviceClient = createSupabaseServiceClient();
+        const storagePath = extractStoragePath(av.audio_url);
+        const { data: audioBlob, error: dlError } = await serviceClient.storage
+          .from("track-audio")
+          .download(storagePath);
+
+        if (!dlError && audioBlob) {
+          const audioBuffer = Buffer.from(await audioBlob.arrayBuffer());
+          archive.append(audioBuffer, {
             name: `mix-architect-export/releases/${relDir}/tracks/${trackDir}/${fileName}`,
           });
         }

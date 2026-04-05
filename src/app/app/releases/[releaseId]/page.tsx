@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { getSignedAudioUrls, extractStoragePath } from "@/lib/storage-urls";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button, IconButton } from "@/components/ui/button";
@@ -180,6 +181,15 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           flowHiddenCount++;
         }
       }
+    }
+  }
+
+  // Sign audio URLs for flow tracks
+  if (flowTracks.length > 0) {
+    const paths = flowTracks.map((t) => extractStoragePath(t.audioUrl));
+    const signedMap = await getSignedAudioUrls(paths);
+    for (let i = 0; i < flowTracks.length; i++) {
+      flowTracks[i].audioUrl = signedMap.get(paths[i]) ?? flowTracks[i].audioUrl;
     }
   }
 

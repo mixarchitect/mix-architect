@@ -1,4 +1,5 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
+import { signAudioVersions } from "@/lib/storage-urls";
 import { notFound } from "next/navigation";
 import { PortalClient } from "./portal-client";
 import type { Metadata } from "next";
@@ -167,7 +168,7 @@ export default async function PortalPage({ params }: Props) {
   const allSpecs = (specsRes.data ?? []) as BriefSpec[];
   const trackRefs = (trackRefsRes.data ?? []) as BriefReference[];
   const globalRefs = (globalRefsRes.data ?? []) as BriefReference[];
-  const audioVersions = (audioVersionsRes.data ?? []) as AudioVersionData[];
+  const audioVersions = await signAudioVersions((audioVersionsRes.data ?? []) as AudioVersionData[]);
   const allComments = (commentsRes.data ?? []) as (TimelineComment & { track_id: string })[];
   const trackSettings = (trackSettingsRes.data ?? []) as PortalTrackSetting[];
   const versionSettings = (versionSettingsRes.data ?? []) as PortalVersionSetting[];

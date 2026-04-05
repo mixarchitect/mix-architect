@@ -14,27 +14,39 @@ export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 });
 
 /* ------------------------------------------------------------------ */
-/*  Download source audio from the public track-audio bucket           */
+/*  Download source audio from the track-audio bucket (service role)    */
 /* ------------------------------------------------------------------ */
 
+/** Strip public URL prefix if present, returning bare storage path */
+function extractStoragePath(urlOrPath: string): string {
+  return urlOrPath.replace(
+    /^https?:\/\/[^/]+\/storage\/v1\/object\/public\/track-audio\//,
+    "",
+  );
+}
+
 export async function downloadSourceAudio(
-  audioUrl: string,
+  audioUrlOrPath: string,
   destPath: string,
 ): Promise<void> {
-  // Validate URL is from our Supabase storage to prevent SSRF
-  const supabaseHost = new URL(supabaseUrl).hostname;
-  const parsedUrl = new URL(audioUrl);
-  if (parsedUrl.hostname !== supabaseHost) {
-    throw new Error(`Invalid audio URL host: ${parsedUrl.hostname}`);
-  }
   // Prevent path traversal in destPath
   const resolved = path.resolve(destPath);
   if (resolved.includes("..")) {
     throw new Error("Invalid destination path");
   }
-  const res = await fetch(audioUrl);
-  if (!res.ok) throw new Error(`Download failed: ${res.status} ${res.statusText}`);
-  const buffer = Buffer.from(await res.arrayBuffer());
+
+  const storagePath = extractStoragePath(audioUrlOrPath);
+
+  // Download via service role (works for both public and private buckets)
+  const { data, error } = await supabase.storage
+    .from("track-audio")
+    .download(storagePath);
+
+  if (error || !data) {
+    throw new Error(`Download failed for ${storagePath}: ${error?.message ?? "no data"}`);
+  }
+
+  const buffer = Buffer.from(await data.arrayBuffer());
   await fs.writeFile(resolved, buffer);
 }
 

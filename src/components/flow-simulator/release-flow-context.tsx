@@ -12,6 +12,7 @@ import {
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { FlowSimulator } from "./flow-simulator";
 import type { FlowTrack } from "./use-flow-audio";
+import { signAudioUrlsAction } from "@/lib/actions/sign-audio-urls";
 
 /* ------------------------------------------------------------------ */
 /*  Context                                                            */
@@ -137,6 +138,15 @@ async function fetchFreshTracks(
       });
     } else {
       hiddenCount++;
+    }
+  }
+
+  // Sign storage paths to get playable URLs
+  if (freshTracks.length > 0) {
+    const paths = freshTracks.map((t) => t.audioUrl);
+    const signedMap = await signAudioUrlsAction(paths);
+    for (const t of freshTracks) {
+      t.audioUrl = signedMap[t.audioUrl] ?? t.audioUrl;
     }
   }
 

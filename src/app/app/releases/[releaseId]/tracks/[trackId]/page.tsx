@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { notFound } from "next/navigation";
 import { TrackDetailClient } from "./track-detail-client";
 import { getReleaseRole } from "@/lib/get-release-role";
+import { signAudioVersions } from "@/lib/storage-urls";
 
 type Props = {
   params: Promise<{ releaseId: string; trackId: string }>;
@@ -84,7 +85,7 @@ export default async function TrackDetailPage({ params }: Props) {
       intent={intentRes.data}
       specs={specsRes.data}
       samplyUrl={track.samply_url ?? null}
-      audioVersions={audioVersionsRes.data ?? []}
+      audioVersions={await signAudioVersions(audioVersionsRes.data ?? [])}
       notes={notesRes.data ?? []}
       references={refsRes.data ?? []}
       distribution={distributionRes.data}
