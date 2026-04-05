@@ -391,7 +391,8 @@
     "title": "Artists",
     "empty": "No artists yet",
     "emptyDesc": "Artists will appear here once you create releases with artist names.",
-    "releaseCount": "{count, plural, one {# release} other {# releases}}"
+    "releaseCount": "{count, plural, one {# release} other {# releases}}",
+    "createRelease": "Create a Release"
   },
   "artistInfo": {
     "clientContact": "CLIENT CONTACT",

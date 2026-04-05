@@ -30,11 +30,9 @@ import { MobileInspector } from "@/components/ui/mobile-inspector";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
 
 const ALL_TABS = [
-  { id: "intent", label: "Intent" },
-  { id: "specs", label: "Specs" },
+  { id: "brief", label: "Brief" },
   { id: "audio", label: "Audio" },
-  { id: "distribution", label: "Distribution" },
-  { id: "portal", label: "Portal" },
+  { id: "delivery", label: "Delivery" },
   { id: "notes", label: "Notes" },
 ];
 
@@ -165,17 +163,18 @@ export function TrackDetailClient({
 }: Props) {
   const { isFeatureVisible } = useFeatureVisibility();
 
-  const TABS = useMemo(() => ALL_TABS.filter((tab) => {
-    if (tab.id === "distribution" && !isFeatureVisible("distribution_checklist")) return false;
-    if (tab.id === "portal" && !isFeatureVisible("client_portal")) return false;
-    return true;
-  }), [isFeatureVisible]);
+  const showDistribution = isFeatureVisible("distribution_checklist");
+  const showPortal = isFeatureVisible("client_portal");
+  const TABS = ALL_TABS;
 
   const TAB_IDS = TABS.map((t) => t.id);
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window === "undefined") return "intent";
     const hash = window.location.hash.replace("#", "");
-    return TAB_IDS.includes(hash) ? hash : "intent";
+    // Support old hash values for backwards compat
+    if (hash === "intent" || hash === "specs") return "brief";
+    if (hash === "distribution" || hash === "portal") return "delivery";
+    return TAB_IDS.includes(hash) ? hash : "brief";
   });
 
   const handleTabChange = useCallback((tab: string) => {
@@ -582,8 +581,10 @@ export function TrackDetailClient({
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
         {/* ── Tab content ── */}
         <div>
-          {/* Intent */}
-          {activeTab === "intent" && (
+          {/* Brief (Intent + Specs combined) */}
+          {activeTab === "brief" && (
+            <div className="space-y-6">
+            {/* Intent */}
             <div className="space-y-4" data-tour="track-intent">
               <Panel>
                 <PanelBody className="py-5">
@@ -684,10 +685,8 @@ export function TrackDetailClient({
                 </PanelBody>
               </Panel>
             </div>
-          )}
 
-          {/* Specs */}
-          {activeTab === "specs" && (
+            {/* Specs */}
             <div className="space-y-4">
               <Panel>
                 <PanelBody className="py-5">
@@ -796,71 +795,8 @@ export function TrackDetailClient({
                   </div>
                 </PanelBody>
               </Panel>
-              <Panel>
-                <PanelBody className="py-5">
-                  <div className="label-sm text-muted mb-4">Delivery</div>
-                  <div className="space-y-5">
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">Delivery formats</label>
-                      <DeliveryFormatSelector
-                        value={deliveryFormats}
-                        onChange={(next) => {
-                          setDeliveryFormats(next);
-                          saveSpecs({ delivery_formats: next });
-                        }}
-                        disabled={!canEdit(role)}
-                        audioVersions={localAudioVersions}
-                        onConvert={(format, version) => {
-                          const baseName =
-                            version.file_name?.replace(/\.[^.]+$/, "") ??
-                            "audio";
-                          const fileName = `${baseName}_v${version.version_number}`;
-                          requestConversion(
-                            version.id,
-                            track.id,
-                            format.toLowerCase(),
-                            fileName,
-                            version.version_number,
-                          );
-                        }}
-                        getJobStatus={(audioVersionId, format) =>
-                          getJobStatus(audioVersionId, format)
-                        }
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="label text-muted">Special requirements</label>
-                      <textarea
-                        value={specialReqs}
-                        onChange={canEdit(role) ? (e) => {
-                          setSpecialReqs(e.target.value);
-                          saveSpecs({ special_reqs: e.target.value });
-                        } : undefined}
-                        readOnly={!canEdit(role)}
-                        placeholder={canEdit(role) ? "e.g., Radio edit needed, TV sync version, vinyl master, stems for remix..." : ""}
-                        className="input min-h-[100px] resize-y text-sm"
-                      />
-                    </div>
-                  </div>
-                </PanelBody>
-              </Panel>
             </div>
-          )}
-
-          {/* Portal */}
-          {activeTab === "portal" && (
-            <PortalTrackEditor
-              briefShareId={portalShareId}
-              releaseId={releaseId}
-              trackId={track.id}
-              audioVersions={localAudioVersions.map((v) => ({
-                id: v.id,
-                version_number: v.version_number,
-              }))}
-              role={role}
-              portalApprovalStatus={portalApprovalStatus}
-              portalApprovalEvents={portalApprovalEvents}
-            />
+            </div>
           )}
 
           {/* Player */}
@@ -950,8 +886,72 @@ export function TrackDetailClient({
               )}
             </div>
           )}
-          {/* Distribution */}
-          {activeTab === "distribution" && (
+          {/* Delivery (Formats + Portal + Distribution) */}
+          {activeTab === "delivery" && (
+            <div className="space-y-6">
+            <Panel>
+              <PanelBody className="py-5">
+                <div className="label-sm text-muted mb-4">Delivery Formats</div>
+                <div className="space-y-5">
+                  <div className="space-y-1.5">
+                    <label className="label text-muted">Delivery formats</label>
+                    <DeliveryFormatSelector
+                      value={deliveryFormats}
+                      onChange={(next) => {
+                        setDeliveryFormats(next);
+                        saveSpecs({ delivery_formats: next });
+                      }}
+                      disabled={!canEdit(role)}
+                      audioVersions={localAudioVersions}
+                      onConvert={(format, version) => {
+                        const baseName =
+                          version.file_name?.replace(/\.[^.]+$/, "") ??
+                          "audio";
+                        const fileName = `${baseName}_v${version.version_number}`;
+                        requestConversion(
+                          version.id,
+                          track.id,
+                          format.toLowerCase(),
+                          fileName,
+                          version.version_number,
+                        );
+                      }}
+                      getJobStatus={(audioVersionId, format) =>
+                        getJobStatus(audioVersionId, format)
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="label text-muted">Special requirements</label>
+                    <textarea
+                      value={specialReqs}
+                      onChange={canEdit(role) ? (e) => {
+                        setSpecialReqs(e.target.value);
+                        saveSpecs({ special_reqs: e.target.value });
+                      } : undefined}
+                      readOnly={!canEdit(role)}
+                      placeholder={canEdit(role) ? "e.g., Radio edit needed, TV sync version, vinyl master, stems for remix..." : ""}
+                      className="input min-h-[100px] resize-y text-sm"
+                    />
+                  </div>
+                </div>
+              </PanelBody>
+            </Panel>
+            {showPortal && (
+              <PortalTrackEditor
+                briefShareId={portalShareId}
+                releaseId={releaseId}
+                trackId={track.id}
+                audioVersions={localAudioVersions.map((v) => ({
+                  id: v.id,
+                  version_number: v.version_number,
+                }))}
+                role={role}
+                portalApprovalStatus={portalApprovalStatus}
+                portalApprovalEvents={portalApprovalEvents}
+              />
+            )}
+            {showDistribution && (
             <div className="space-y-4">
               <SplitEditor
                 label="Writing Split"
@@ -1140,6 +1140,8 @@ export function TrackDetailClient({
                   />
                 </PanelBody>
               </Panel>
+            </div>
+          )}
             </div>
           )}
         </div>

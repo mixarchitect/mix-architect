@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Users } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ArtistPhoto } from "@/components/ui/artist-photo";
+import { getTranslations } from "next-intl/server";
 
 type ArtistEntry = {
   displayName: string;
@@ -15,7 +16,7 @@ type ArtistEntry = {
 };
 
 export default async function ArtistsPage() {
-  const supabase = await createSupabaseServerClient();
+  const [supabase, t] = await Promise.all([createSupabaseServerClient(), getTranslations("artists")]);
 
   const [releasesRes, photosRes] = await Promise.all([
     supabase
@@ -110,8 +111,9 @@ export default async function ArtistsPage() {
         <EmptyState
           icon={Users}
           size="lg"
-          title="No artists yet"
-          description="Artists will appear here once you create releases with artist names."
+          title={t("empty")}
+          description={t("emptyDesc")}
+          action={{ label: t("createRelease"), href: "/app/releases/new" }}
         />
       )}
     </div>

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MoreVertical, Pencil, Trash2, Music, Pin } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
-import { StatusDot } from "@/components/ui/status-dot";
+import { StatusIndicator } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
 import { cn } from "@/lib/cn";
 import { Timestamp } from "@/components/ui/timestamp";
@@ -43,6 +43,12 @@ function statusColor(status: string): "green" | "orange" | "blue" {
   if (status === "ready") return "green";
   if (status === "in_progress") return "orange";
   return "blue";
+}
+
+function statusLabel(status: string): string {
+  if (status === "ready") return "Ready";
+  if (status === "in_progress") return "In Progress";
+  return "Draft";
 }
 
 function typeLabel(t: string | undefined | null): string {
@@ -186,7 +192,7 @@ export function ReleaseCard({
           ) : (
             pinned && <Pin size={12} className="text-signal fill-current" />
           )}
-          <StatusDot color={statusColor(status)} />
+          <StatusIndicator color={statusColor(status)} label={statusLabel(status)} withShape />
           <div ref={menuRef} className="relative">
             <button
               type="button"
