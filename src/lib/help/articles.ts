@@ -389,7 +389,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Track Versions",
-        body: "Each time you upload a new file to the same track, it becomes the next version. The version selector above the waveform shows numbered buttons (v1, v2, v3, etc.) plus a + button to upload another version. Click any version to switch to it. Each version displays its version number, upload date, comment count, and a download icon to download the original file. Previous versions are fully preserved with their own comments and waveform.",
+        body: "Each time you upload a new file to the same track, it becomes the next version. The version selector above the waveform shows numbered buttons (v1, v2, v3, etc.) plus a + button to upload another version. Click any version to switch to it. Each version displays its version number, upload date, comment count, and a download icon to download the original file. Previous versions are fully preserved with their own comments and waveform. When switching versions for the first time in a session, you may notice a brief loading delay while the audio file is fetched and the waveform is generated. This is normal — once a version has been loaded, switching back to it is instant because the browser caches the audio data.",
         tip: "Upload revised mixes to the same track rather than creating a new track. This keeps your version history clean, preserves comments on older versions, and lets you compare mixes over time.",
         mockup: "track-versions",
       },
