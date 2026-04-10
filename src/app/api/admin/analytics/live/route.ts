@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { isAdmin } from "@/lib/admin";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
-import { getRecentVisitorLocations } from "@/lib/openpanel-api";
+import { getGA4RealtimeLocations } from "@/lib/ga4-api";
 
 /**
  * GET /api/admin/analytics/live
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const locations = await getRecentVisitorLocations();
+    const locations = await getGA4RealtimeLocations();
 
     return NextResponse.json({ success: true, locations });
   } catch (err) {

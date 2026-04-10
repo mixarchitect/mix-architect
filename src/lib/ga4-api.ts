@@ -11,6 +11,18 @@ import type {
   OverviewMetrics,
   BreakdownEntry,
 } from "./openpanel-api";
+import { COUNTRY_CENTROIDS } from "./country-centroids";
+
+// ---------------------------------------------------------------------------
+// Shared types
+// ---------------------------------------------------------------------------
+
+export interface VisitorLocation {
+  city: string;
+  country: string;
+  lat: number;
+  lng: number;
+}
 
 // ---------------------------------------------------------------------------
 // Client setup
@@ -253,6 +265,58 @@ export async function getGA4RealtimeUsers(): Promise<number> {
   });
 
   return parseInt(response.rows?.[0]?.metricValues?.[0]?.value || "0");
+}
+
+/**
+ * Realtime visitor locations for the live visitor map.
+ * Uses GA4 realtime API with city/country dimensions, then maps to
+ * approximate coordinates via country centroids.
+ */
+export async function getGA4RealtimeLocations(): Promise<VisitorLocation[]> {
+  try {
+    const client = getClient();
+
+    const [response] = await client.runRealtimeReport({
+      property: propertyPath(),
+      dimensions: [
+        { name: "city" },
+        { name: "country" },
+        { name: "countryId" },
+      ],
+      metrics: [{ name: "activeUsers" }],
+    });
+
+    const locations: VisitorLocation[] = [];
+
+    for (const row of response.rows || []) {
+      const city = row.dimensionValues?.[0]?.value || "";
+      const country = row.dimensionValues?.[1]?.value || "";
+      const countryId = row.dimensionValues?.[2]?.value || "";
+      const activeUsers = parseInt(row.metricValues?.[0]?.value || "0");
+
+      if (!countryId || countryId === "(not set)") continue;
+
+      const centroid = COUNTRY_CENTROIDS[countryId];
+      if (!centroid) continue;
+
+      // One entry per active user so the map shows the right dot count.
+      // Small offsets so dots from the same country don't stack exactly.
+      for (let i = 0; i < activeUsers; i++) {
+        const jitter = i * 0.8;
+        locations.push({
+          city: city === "(not set)" ? "" : city,
+          country,
+          lat: centroid.lat + jitter,
+          lng: centroid.lng + jitter,
+        });
+      }
+    }
+
+    return locations;
+  } catch (err) {
+    console.error("[ga4] getGA4RealtimeLocations error:", err);
+    return [];
+  }
 }
 
 /**

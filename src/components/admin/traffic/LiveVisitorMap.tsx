@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import type { VisitorLocation } from "@/lib/openpanel-api";
+import type { VisitorLocation } from "@/lib/ga4-api";
 
 const POLL_INTERVAL_MS = 30_000;
 

@@ -3,8 +3,8 @@ import Script from "next/script";
 /**
  * Google Analytics 4 tracking script.
  *
- * Runs in consent-denied mode (no cookies, no consent banner needed).
- * GA4 uses modeled data for returning visitor estimates.
+ * Analytics storage granted (first-party cookies for session tracking).
+ * Ad storage/personalization remain denied — no consent banner needed.
  * Only loads on production (mixarchitect.com).
  */
 export function GoogleAnalytics() {
@@ -25,7 +25,7 @@ export function GoogleAnalytics() {
           gtag('js', new Date());
 
           gtag('consent', 'default', {
-            'analytics_storage': 'denied',
+            'analytics_storage': 'granted',
             'ad_storage': 'denied',
             'ad_user_data': 'denied',
             'ad_personalization': 'denied',
