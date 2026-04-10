@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelHeader, PanelBody } from "@/components/ui/panel";
@@ -10,6 +10,7 @@ import { TagInput } from "@/components/ui/tag-input";
 import { useToast } from "@/components/ui/toast";
 import { ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { DEFAULT_GENRES, getUserGenreSuggestions } from "@/lib/genre-suggestions";
 import { DELIVERY_FORMATS } from "@/lib/conversion-formats";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import type { ReleaseTemplate } from "@/types/template";
@@ -30,11 +31,6 @@ const FORMAT_OPTIONS = [
   { value: "both", label: "Stereo + Atmos" },
 ];
 
-const GENRE_SUGGESTIONS = [
-  "Rock", "Pop", "Hip-Hop", "R&B", "Electronic", "Country", "Jazz",
-  "Classical", "Indie", "Alternative", "Metal", "Folk", "Soul", "Funk",
-  "Blues", "Reggae", "Latin", "Punk", "Lo-Fi", "Ambient",
-];
 
 const EMOTIONAL_SUGGESTIONS = [
   "aggressive", "intimate", "spacious", "gritty", "polished", "warm",
@@ -153,6 +149,11 @@ export function TemplateForm({ initialData }: Props) {
   const [genreTags, setGenreTags] = useState<string[]>(
     initialData?.genre_tags ?? [],
   );
+  const [genreSuggestions, setGenreSuggestions] = useState(DEFAULT_GENRES);
+
+  useEffect(() => {
+    getUserGenreSuggestions().then(setGenreSuggestions);
+  }, []);
 
   // ── Specs ──
   const [sampleRate, setSampleRate] = useState(
@@ -498,7 +499,7 @@ export function TemplateForm({ initialData }: Props) {
               <TagInput
                 value={genreTags}
                 onChange={setGenreTags}
-                suggestions={GENRE_SUGGESTIONS}
+                suggestions={genreSuggestions}
                 placeholder="Type and press Enter to add"
               />
             </div>

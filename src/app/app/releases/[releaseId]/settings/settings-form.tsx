@@ -13,6 +13,7 @@ import { ArrowLeft, ImageIcon, Upload, X, Trash2, UserPlus } from "lucide-react"
 import { canEdit, canEditPayment, canManageTeam, type ReleaseRole } from "@/lib/permissions";
 import { logActivityClient } from "@/lib/activity-logger-client";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
+import { DEFAULT_GENRES, getUserGenreSuggestions } from "@/lib/genre-suggestions";
 import { useLocale, useTranslations } from "next-intl";
 import { formatMoney } from "@/lib/format-money";
 import { supportedCurrencies } from "@/i18n/config";
@@ -59,11 +60,6 @@ const PAYMENT_STATUS_OPTIONS = [
 
 const CURRENCY_OPTIONS = supportedCurrencies.map((c) => c.code);
 
-const GENRE_SUGGESTIONS = [
-  "Rock", "Pop", "Hip-Hop", "R&B", "Electronic", "Country", "Jazz",
-  "Classical", "Indie", "Alternative", "Metal", "Folk", "Soul", "Funk",
-  "Blues", "Reggae", "Latin", "Punk", "Lo-Fi", "Ambient",
-];
 
 function PillSelect({
   options,
@@ -119,6 +115,7 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
   const [status, setStatus] = useState("draft");
   const [globalDirection, setGlobalDirection] = useState("");
   const [genreTags, setGenreTags] = useState<string[]>([]);
+  const [genreSuggestions, setGenreSuggestions] = useState(DEFAULT_GENRES);
   const [targetDate, setTargetDate] = useState("");
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
@@ -163,6 +160,10 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
   });
   const isDirty = initialSnapshot.current !== "" && currentSnapshot !== initialSnapshot.current;
   const guardedNavigate = useUnsavedChanges(isDirty);
+
+  useEffect(() => {
+    getUserGenreSuggestions().then(setGenreSuggestions);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -587,7 +588,7 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
             <TagInput
               value={genreTags}
               onChange={editable ? setGenreTags : undefined}
-              suggestions={GENRE_SUGGESTIONS}
+              suggestions={genreSuggestions}
               placeholder={editable ? "Type and press Enter" : ""}
               disabled={!editable}
             />

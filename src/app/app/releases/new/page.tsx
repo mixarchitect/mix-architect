@@ -13,6 +13,7 @@ import { useSubscription } from "@/lib/subscription-context";
 import { logActivityClient } from "@/lib/activity-logger-client";
 import { trackGA4Event } from "@/lib/ga4-track";
 import { cn } from "@/lib/cn";
+import { DEFAULT_GENRES, getUserGenreSuggestions } from "@/lib/genre-suggestions";
 import { useTranslations } from "next-intl";
 import type { ReleaseTemplate } from "@/types/template";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
@@ -41,11 +42,6 @@ function useFormatOptions() {
   ];
 }
 
-const GENRE_SUGGESTIONS = [
-  "Rock", "Pop", "Hip-Hop", "R&B", "Electronic", "Country", "Jazz",
-  "Classical", "Indie", "Alternative", "Metal", "Folk", "Soul", "Funk",
-  "Blues", "Reggae", "Latin", "Punk", "Lo-Fi", "Ambient",
-];
 
 /* ------------------------------------------------------------------ */
 /*  PillSelect                                                         */
@@ -143,6 +139,7 @@ export default function NewReleasePage() {
   const [releaseType, setReleaseType] = useState("single");
   const [format, setFormat] = useState("stereo");
   const [genreTags, setGenreTags] = useState<string[]>([]);
+  const [genreSuggestions, setGenreSuggestions] = useState(DEFAULT_GENRES);
   const [targetDate, setTargetDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -166,6 +163,11 @@ export default function NewReleasePage() {
   const { persona } = useFeatureVisibility();
   const tour = useTourContext();
   const isFree = sub.plan !== "pro" || (sub.status !== "active" && sub.status !== "trialing");
+
+  // Fetch dynamic genre suggestions (defaults + user's previously used genres)
+  useEffect(() => {
+    getUserGenreSuggestions().then(setGenreSuggestions);
+  }, []);
 
   // Fetch templates on mount
   useEffect(() => {
@@ -510,7 +512,7 @@ export default function NewReleasePage() {
                 <TagInput
                   value={genreTags}
                   onChange={setGenreTags}
-                  suggestions={GENRE_SUGGESTIONS}
+                  suggestions={genreSuggestions}
                   placeholder={t("genreTagsPlaceholder")}
                 />
               </div>
