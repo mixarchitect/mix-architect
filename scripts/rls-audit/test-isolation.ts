@@ -160,7 +160,7 @@ export async function runIsolationTests(ctx: TestContext): Promise<void> {
   const insertVersion = await clientB.from("track_audio_versions").insert({
     track_id: seedA.trackIds[0],
     version_number: 99,
-    audio_url: "https://evil.com/audio.wav",
+    audio_url: "evil-user/audio.wav",
     uploaded_by: "Hacker",
   }).select();
   expectBlocked(insertVersion, "track_audio_versions: B cannot insert on A's track");

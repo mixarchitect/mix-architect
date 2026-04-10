@@ -360,7 +360,7 @@ async function seedUser(
       trackIds.map((tid: string) => ({
         track_id: tid,
         version_number: 1,
-        audio_url: `https://example.com/${label}-audio.wav`,
+        audio_url: `test-user/${label}-audio.wav`,
         file_name: `${label}-audio.wav`,
         uploaded_by: label,
       })),
