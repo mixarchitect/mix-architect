@@ -12,10 +12,22 @@ import Anthropic from "@anthropic-ai/sdk";
 const synopsisCache = new Map<string, { text: string; timestamp: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
+const MAX_CACHE_ENTRIES = 20;
+
 function getCachedSynopsis(range: string): string | null {
   const cached = synopsisCache.get(range);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.text;
+  if (cached) synopsisCache.delete(range); // expired
   return null;
+}
+
+function setCachedSynopsis(range: string, text: string) {
+  // Evict oldest entries if cache is full
+  if (synopsisCache.size >= MAX_CACHE_ENTRIES) {
+    const oldest = synopsisCache.keys().next().value;
+    if (oldest) synopsisCache.delete(oldest);
+  }
+  synopsisCache.set(range, { text, timestamp: Date.now() });
 }
 
 // ---------------------------------------------------------------------------
@@ -133,7 +145,7 @@ export async function GET(req: NextRequest) {
     const synopsis = message.content[0].type === "text" ? message.content[0].text : "";
 
     // Cache the result
-    synopsisCache.set(range, { text: synopsis, timestamp: Date.now() });
+    setCachedSynopsis(range, synopsis);
 
     return NextResponse.json({ synopsis, range, cached: false });
   } catch (err) {

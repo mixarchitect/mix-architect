@@ -36,7 +36,7 @@ export async function getSignedAudioUrl(
     .createSignedUrl(path, SIGNED_URL_EXPIRY);
 
   if (error || !data?.signedUrl) {
-    console.error("[storage-urls] Failed to sign:", path, error?.message);
+    console.warn("[storage-urls] Failed to sign:", path, error?.message);
     return storagePath; // fallback to raw path
   }
   return data.signedUrl;
@@ -59,7 +59,7 @@ export async function getSignedAudioUrls(
 
   const result = new Map<string, string>();
   if (error || !data) {
-    console.error("[storage-urls] Batch sign failed:", error?.message);
+    console.warn("[storage-urls] Batch sign failed:", error?.message);
     // Fallback: map each path to itself
     for (const p of normalized) result.set(p, p);
     return result;

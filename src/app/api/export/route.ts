@@ -437,6 +437,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Append audio files sequentially to bound memory
+    const storageClient = createSupabaseServiceClient();
     const audioVersions = audioRes.data ?? [];
     for (const av of audioVersions) {
       if (!av.audio_url) continue;
@@ -459,9 +460,8 @@ export async function GET(req: NextRequest) {
 
       try {
         // Download via service client (works for private bucket)
-        const serviceClient = createSupabaseServiceClient();
         const storagePath = extractStoragePath(av.audio_url);
-        const { data: audioBlob, error: dlError } = await serviceClient.storage
+        const { data: audioBlob, error: dlError } = await storageClient.storage
           .from("track-audio")
           .download(storagePath);
 

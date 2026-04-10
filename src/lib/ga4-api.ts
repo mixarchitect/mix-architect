@@ -36,7 +36,12 @@ function getClient(): BetaAnalyticsDataClient {
     // Option 1: Full JSON key as single env var (most reliable on Vercel)
     const jsonKey = process.env.GA4_SERVICE_ACCOUNT_KEY;
     if (jsonKey) {
-      const parsed = JSON.parse(jsonKey);
+      let parsed: { client_email: string; private_key: string };
+      try {
+        parsed = JSON.parse(jsonKey);
+      } catch {
+        throw new Error("GA4_SERVICE_ACCOUNT_KEY is not valid JSON");
+      }
       _client = new BetaAnalyticsDataClient({
         credentials: {
           client_email: parsed.client_email,

@@ -13,6 +13,9 @@ import { getSignedAudioUrls, extractStoragePath } from "@/lib/storage-urls";
 export async function signAudioUrlsAction(
   paths: string[],
 ): Promise<Record<string, string>> {
+  // Guard against abuse — limit batch size
+  if (!paths.length || paths.length > 100) return {};
+
   // Auth check
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();

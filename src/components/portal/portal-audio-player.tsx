@@ -125,6 +125,10 @@ export function PortalAudioPlayer({
     [trackId, releaseId, trackTitle, releaseTitle, coverArtUrl],
   );
 
+  // When user clicks play on a non-active track, we set this flag so
+  // the WaveSurfer "ready" handler auto-plays after re-creation.
+  const pendingPlayRef = useRef(false);
+
   const pendingRestoreRef = useRef<{
     seekTime: number;
     shouldPlay: boolean;
@@ -266,6 +270,12 @@ export function PortalAudioPlayer({
           audio.loadVersion(activeVersion, trackMeta);
         }
 
+        // Auto-play if the user clicked play before WaveSurfer was ready
+        if (pendingPlayRef.current) {
+          pendingPlayRef.current = false;
+          audioElement.play().catch(() => {});
+        }
+
         const restore = pendingRestoreRef.current;
         pendingRestoreRef.current = null;
         if (restore) {
@@ -313,14 +323,11 @@ export function PortalAudioPlayer({
 
   const togglePlayPause = useCallback(() => {
     // If this track isn't active yet, load its version first.
-    // The isThisTrackActive change will trigger WaveSurfer to re-create
-    // with media: audioElement bound, then we can play.
+    // isThisTrackActive will change, triggering the useEffect to re-create
+    // WaveSurfer with media bound. The "ready" handler checks pendingPlayRef.
     if (!isThisTrackActive && activeVersion) {
+      pendingPlayRef.current = true;
       audio.loadVersion(activeVersion, trackMeta);
-      // loadVersion changes audio.activeVersion which updates isThisTrackActive,
-      // triggering useEffect to recreate WaveSurfer with media bound.
-      // Play after a short delay to let the rebuild happen.
-      setTimeout(() => audio.togglePlayPause(), 100);
       return;
     }
     audio.togglePlayPause();

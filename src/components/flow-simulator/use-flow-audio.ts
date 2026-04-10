@@ -332,7 +332,10 @@ export function useFlowAudio(
         swapElements();
         loadedUrlRef.current = audioUrl;
 
-        // Clear the old active (now inactive) — remove src before load to prevent spurious events
+        // Clear the old active (now inactive).
+        // IMPORTANT: removeAttribute("src") must come before load() to prevent
+        // the browser from firing a spurious "ended" event. The swappingRef
+        // guard catches any that slip through — handleEnded checks it.
         oldActive.removeAttribute("src");
         oldActive.load();
         preloadedUrlRef.current = "";
