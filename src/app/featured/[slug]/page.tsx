@@ -231,7 +231,7 @@ export default async function FeaturedReleasePage({ params }: Props) {
           )}
 
           {/* Body (Markdown) */}
-          <div className="prose prose-invert prose-zinc prose-base max-w-none font-sans prose-headings:text-white prose-headings:font-sans prose-p:text-zinc-300 prose-li:text-zinc-300 prose-a:text-teal-400 prose-blockquote:border-teal-500 prose-code:font-sans prose-pre:font-sans">
+          <div className="prose prose-invert prose-base max-w-none font-sans prose-headings:text-white prose-headings:font-sans prose-p:text-zinc-200 prose-li:text-zinc-200 prose-strong:text-white prose-a:text-teal-400 prose-blockquote:border-teal-500 prose-code:font-sans prose-pre:font-sans">
             <Markdown remarkPlugins={[remarkGfm]}>{bodyBefore}</Markdown>
 
             {release.pull_quote && (
@@ -251,7 +251,7 @@ export default async function FeaturedReleasePage({ params }: Props) {
               <h3 className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-3">
                 Credits
               </h3>
-              <div className="text-sm text-zinc-500 space-y-1">
+              <div className="text-sm text-zinc-400 space-y-1">
                 {release.credits.split(/\n|\\n/).map((line, i) => (
                   <p key={i}>{line.trim()}</p>
                 ))}
