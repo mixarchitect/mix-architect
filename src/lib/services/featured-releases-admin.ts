@@ -21,7 +21,10 @@ export async function createFeaturedRelease(data: CreateInput) {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error("[featured] Insert failed:", error.message, error.details, error.hint);
+    throw error;
+  }
   return row as FeaturedRelease;
 }
 

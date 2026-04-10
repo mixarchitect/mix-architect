@@ -44,6 +44,7 @@ export async function createFeaturedReleaseAction(formData: FormData) {
     .map((t) => t.trim())
     .filter(Boolean) ?? [];
 
+  console.log("[featured] Creating release with slug:", slug, "cover:", coverArtPath || "(none)");
   await createFeaturedRelease({
     slug,
     title: formData.get("title") as string,
