@@ -11,7 +11,7 @@ import type {
   OverviewMetrics,
   BreakdownEntry,
 } from "./openpanel-api";
-import { COUNTRY_CENTROIDS } from "./country-centroids";
+import { CITY_COORDS, COUNTRY_CENTROIDS } from "./country-centroids";
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -296,8 +296,11 @@ export async function getGA4RealtimeLocations(): Promise<VisitorLocation[]> {
 
       if (!countryId || countryId === "(not set)") continue;
 
-      const centroid = COUNTRY_CENTROIDS[countryId];
-      if (!centroid) continue;
+      // Try city-level coordinates first, fall back to country centroid
+      const cityKey = city.toLowerCase();
+      const coords = (cityKey && cityKey !== "(not set)" ? CITY_COORDS[cityKey] : null)
+        ?? COUNTRY_CENTROIDS[countryId];
+      if (!coords) continue;
 
       // One entry per active user so the map shows the right dot count.
       // Small offsets so dots from the same country don't stack exactly.
@@ -306,8 +309,8 @@ export async function getGA4RealtimeLocations(): Promise<VisitorLocation[]> {
         locations.push({
           city: city === "(not set)" ? "" : city,
           country,
-          lat: centroid.lat + jitter,
-          lng: centroid.lng + jitter,
+          lat: coords.lat + jitter,
+          lng: coords.lng + jitter,
         });
       }
     }
