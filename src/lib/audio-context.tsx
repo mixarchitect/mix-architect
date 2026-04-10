@@ -65,7 +65,10 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   // Persistent audio element — created once, never destroyed
   const audioRef = useRef<HTMLAudioElement | null>(null);
   if (!audioRef.current && typeof window !== "undefined") {
-    audioRef.current = new Audio();
+    const el = new Audio();
+    el.preload = "auto";
+    el.crossOrigin = "anonymous";
+    audioRef.current = el;
   }
 
   const [activeVersion, setActiveVersion] = useState<AudioVersionData | null>(null);
@@ -192,7 +195,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         el.removeEventListener("playing", onPlay);
       };
       el.addEventListener("playing", onPlay);
-      el.play();
+      el.play().catch(() => {});
     } else {
       el.pause();
     }
