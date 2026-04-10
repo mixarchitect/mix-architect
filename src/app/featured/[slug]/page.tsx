@@ -231,7 +231,7 @@ export default async function FeaturedReleasePage({ params }: Props) {
           )}
 
           {/* Body (Markdown) */}
-          <div className="prose prose-invert prose-zinc prose-base max-w-none font-sans prose-headings:text-white prose-headings:font-sans prose-a:text-teal-400 prose-blockquote:border-teal-500 prose-code:font-sans prose-pre:font-sans">
+          <div className="prose prose-invert prose-zinc prose-base max-w-none font-sans prose-headings:text-white prose-headings:font-sans prose-p:text-zinc-300 prose-li:text-zinc-300 prose-a:text-teal-400 prose-blockquote:border-teal-500 prose-code:font-sans prose-pre:font-sans">
             <Markdown remarkPlugins={[remarkGfm]}>{bodyBefore}</Markdown>
 
             {release.pull_quote && (
