@@ -29,14 +29,24 @@ function slugify(text: string): string {
 }
 
 export async function createFeaturedReleaseAction(formData: FormData) {
+  console.log("[featured] Action called");
   await requireAdmin();
+  console.log("[featured] Admin check passed");
 
   const coverFile = formData.get("cover_art") as File | null;
-  const slug = (formData.get("slug") as string) || slugify(formData.get("title") as string);
+  const title = formData.get("title") as string;
+  const slug = (formData.get("slug") as string) || slugify(title);
+  console.log("[featured] slug=" + slug, "title=" + title, "coverFile=" + (coverFile?.name ?? "none"), "coverSize=" + (coverFile?.size ?? 0));
 
   let coverArtPath = "";
   if (coverFile && coverFile.size > 0) {
-    coverArtPath = await uploadCoverArt(coverFile, slug);
+    try {
+      coverArtPath = await uploadCoverArt(coverFile, slug);
+      console.log("[featured] Cover uploaded:", coverArtPath);
+    } catch (err) {
+      console.error("[featured] Cover upload failed:", err instanceof Error ? err.message : err);
+      throw err;
+    }
   }
 
   const genreTags = (formData.get("genre_tags") as string)
@@ -44,7 +54,7 @@ export async function createFeaturedReleaseAction(formData: FormData) {
     .map((t) => t.trim())
     .filter(Boolean) ?? [];
 
-  console.log("[featured] Creating release with slug:", slug, "cover:", coverArtPath || "(none)");
+  console.log("[featured] Creating release with slug:", slug, "cover:", coverArtPath || "(none)", "genres:", genreTags);
   await createFeaturedRelease({
     slug,
     title: formData.get("title") as string,
