@@ -119,6 +119,30 @@ export async function deleteEntry(id: string): Promise<boolean> {
 }
 
 /**
+ * Upload a cover image for a changelog entry.
+ * Stores in the featured-releases bucket under changelog/{slug}/.
+ */
+export async function uploadChangelogImage(
+  file: File,
+  slug: string,
+): Promise<string> {
+  const supabase = createSupabaseServiceClient();
+  const rawExt = file.name.split(".").pop() ?? "png";
+  const ext = rawExt.replace(/[^a-zA-Z0-9]/g, "") || "png";
+  const safeSlug = slug.replace(/[^a-zA-Z0-9\-_]/g, "");
+  const path = `changelog/${safeSlug}/cover.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("featured-releases")
+    .upload(path, file, { upsert: true });
+
+  if (error) throw error;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  return `${supabaseUrl}/storage/v1/object/public/featured-releases/${path}`;
+}
+
+/**
  * Toggle the is_published flag on an entry.
  */
 export async function togglePublished(

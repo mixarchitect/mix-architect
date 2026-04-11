@@ -145,25 +145,32 @@ export function ChangelogEntryForm({
         </p>
       </div>
 
-      {/* Cover Image Path */}
+      {/* Cover Image */}
       <div>
-        <label
-          htmlFor="cover_image_path"
-          className="block text-sm font-medium text-text"
-        >
-          Cover Image URL
+        <label className="block text-sm font-medium text-text">
+          Cover Image
         </label>
+        <input
+          id="cover_image_file"
+          name="cover_image_file"
+          type="file"
+          accept="image/*"
+          className="mt-1 text-sm text-zinc-400 file:mr-3 file:px-3 file:py-1.5 file:text-xs file:font-medium file:rounded-full file:border file:border-white/10 file:bg-panel file:text-zinc-300 file:cursor-pointer hover:file:bg-white/5"
+        />
+        <p className="mt-1 text-xs text-faint">
+          Upload a screenshot or hero image. Or paste a URL below instead.
+          {entry?.cover_image_path && (
+            <> Current: <a href={entry.cover_image_path} target="_blank" rel="noopener noreferrer" className="text-signal hover:underline">view</a></>
+          )}
+        </p>
         <input
           id="cover_image_path"
           name="cover_image_path"
           type="text"
           defaultValue={entry?.cover_image_path ?? ""}
-          className="mt-1 w-full rounded-lg border border-border bg-panel px-3 py-2 text-text placeholder:text-faint focus:border-signal focus:outline-none"
-          placeholder="https://..."
+          className="mt-2 w-full rounded-lg border border-border bg-panel px-3 py-2 text-text placeholder:text-faint focus:border-signal focus:outline-none text-sm"
+          placeholder="https://... (optional URL fallback)"
         />
-        <p className="mt-1 text-xs text-faint">
-          Optional. URL to a screenshot or hero image.
-        </p>
       </div>
 
       {/* Video URL */}

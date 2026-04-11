@@ -9,6 +9,7 @@ import {
   deleteEntry,
   togglePublished,
   generateSlug,
+  uploadChangelogImage,
 } from "@/lib/services/changelog-admin";
 import { logAdminAction } from "@/lib/admin-audit-logger";
 import type { ChangelogCategory } from "@/types/changelog";
@@ -16,6 +17,9 @@ import type { ChangelogCategory } from "@/types/changelog";
 function revalidateChangelog() {
   revalidatePath("/changelog");
   revalidatePath("/admin/changelog");
+  revalidatePath("/api/changelog/recent");
+  revalidatePath("/api/changelog/latest");
+  revalidatePath("/app/help");
 }
 
 export async function createChangelogEntryAction(formData: FormData) {
@@ -26,7 +30,13 @@ export async function createChangelogEntryAction(formData: FormData) {
   const category = formData.get("category") as ChangelogCategory;
   const summary = formData.get("summary") as string;
   const body = formData.get("body") as string;
-  const cover_image_path = (formData.get("cover_image_path") as string) || null;
+  // Handle cover image: file upload takes priority over URL
+  const coverFile = formData.get("cover_image_file") as File | null;
+  let cover_image_path = (formData.get("cover_image_path") as string) || null;
+  if (coverFile && coverFile.size > 0) {
+    cover_image_path = await uploadChangelogImage(coverFile, slug);
+  }
+
   const video_url = (formData.get("video_url") as string) || null;
   const version_tag = (formData.get("version_tag") as string) || null;
   const published_at = formData.get("published_at") as string;
@@ -69,7 +79,13 @@ export async function updateChangelogEntryAction(formData: FormData) {
   const category = formData.get("category") as ChangelogCategory;
   const summary = formData.get("summary") as string;
   const body = formData.get("body") as string;
-  const cover_image_path = (formData.get("cover_image_path") as string) || null;
+
+  // Handle cover image: file upload takes priority over URL
+  const coverFile = formData.get("cover_image_file") as File | null;
+  let cover_image_path = (formData.get("cover_image_path") as string) || null;
+  if (coverFile && coverFile.size > 0) {
+    cover_image_path = await uploadChangelogImage(coverFile, slug);
+  }
   const video_url = (formData.get("video_url") as string) || null;
   const version_tag = (formData.get("version_tag") as string) || null;
   const published_at = formData.get("published_at") as string;
