@@ -16,7 +16,7 @@ import {
   ExternalLink, BarChart3, DollarSign,
   Sun, Moon, Monitor, Mail, Gift,
   RefreshCw, User, Trash2, UserPlus,
-  Pause, Square,
+  Pause, Square, Star,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -3312,6 +3312,313 @@ function SignInMockup() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   STRIPE CONNECT MOCKUPS
+   ═══════════════════════════════════════════════════════════ */
+
+function StripeConnectSetupMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>Payment Collection</PanelHeader>
+      <PanelBody className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-md bg-[#635bff]/10 flex items-center justify-center">
+            <CreditCard size={20} className="text-[#635bff]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-text">Stripe</p>
+            <p className="text-xs text-muted">Accept payments from clients</p>
+          </div>
+        </div>
+        <Button variant="primary" className="w-full">Connect Stripe Account</Button>
+        <p className="text-[10px] text-faint text-center">1% platform fee on transactions &middot; Stripe processing fees apply</p>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function StripeCreateQuoteMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>New Quote</PanelHeader>
+      <PanelBody className="space-y-3">
+        {[
+          { desc: "Mixing — 6 tracks", amount: "$1,200" },
+          { desc: "Mastering", amount: "$600" },
+        ].map((item) => (
+          <div key={item.desc} className="flex items-center justify-between py-2 px-3 rounded-md border border-border bg-panel">
+            <span className="text-sm text-text">{item.desc}</span>
+            <span className="text-sm font-semibold text-text">{item.amount}</span>
+          </div>
+        ))}
+        <Rule />
+        <div className="flex items-center justify-between px-3">
+          <span className="text-sm font-semibold text-text">Total</span>
+          <span className="text-base font-bold text-text">$1,800</span>
+        </div>
+        <Rule />
+        <div>
+          <span className="label-sm text-muted mb-2 block">PAYMENT SCHEDULE</span>
+          <div className="flex flex-wrap gap-1.5">
+            <Pill>Single</Pill>
+            <Pill className="!bg-signal-muted !text-signal ring-1 ring-signal/30">Deposit + Balance</Pill>
+            <Pill>50/50</Pill>
+            <Pill>Custom</Pill>
+          </div>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function StripeSendQuoteMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>Quote #1024</PanelHeader>
+      <PanelBody className="space-y-3">
+        <div className="flex items-center justify-between">
+          <StatusIndicator color="blue" label="Sent" />
+          <span className="text-xs text-muted">client@email.com</span>
+        </div>
+        <div className="space-y-2">
+          {[
+            { label: "Deposit", amount: "$900", status: "green" as const, statusLabel: "Paid" },
+            { label: "Balance", amount: "$900", status: "orange" as const, statusLabel: "Pending" },
+          ].map((inst) => (
+            <div key={inst.label} className="flex items-center justify-between py-2 px-3 rounded-md border border-border bg-panel">
+              <div className="flex items-center gap-2">
+                <StatusDot color={inst.status} />
+                <span className="text-sm text-text">{inst.label}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-semibold text-text">{inst.amount}</span>
+                <Pill className={inst.status === "green" ? "!bg-emerald-500/10 !text-emerald-500" : "!bg-amber-500/10 !text-amber-500"}>{inst.statusLabel}</Pill>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Button variant="secondary" className="flex-1 gap-1.5"><Copy size={14} /> Copy Link</Button>
+        </div>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function StripePaymentFlowMockup() {
+  return (
+    <div className="m-4 p-4">
+      <div className="flex items-center justify-between gap-2">
+        {[
+          { icon: Send, label: "Quote Sent" },
+          { icon: CreditCard, label: "Client Pays" },
+          { icon: CheckCircle2, label: "Status Updated" },
+          { icon: Download, label: "Files Unlocked" },
+        ].map((step, i, arr) => (
+          <div key={step.label} className="flex items-center gap-2 flex-1 min-w-0">
+            <div className="flex flex-col items-center gap-1.5 shrink-0">
+              <div className="w-8 h-8 rounded-full bg-signal-muted flex items-center justify-center">
+                <step.icon size={14} className="text-signal" />
+              </div>
+              <span className="text-[10px] text-muted text-center whitespace-nowrap">{step.label}</span>
+            </div>
+            {i < arr.length - 1 && <ArrowRight size={14} className="text-faint shrink-0 mb-5" />}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EMAIL PREFERENCES MOCKUPS
+   ═══════════════════════════════════════════════════════════ */
+
+function EmailTypesMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>Email Notifications</PanelHeader>
+      <PanelBody className="divide-y divide-border">
+        {[
+          { label: "Release Live Alerts", desc: "When a release goes live on a platform" },
+          { label: "New Comment Alerts", desc: "When someone comments on your release" },
+          { label: "Weekly Digest", desc: "Activity summary across your releases" },
+          { label: "Client Feedback", desc: "When a client approves or requests changes" },
+        ].map((item) => (
+          <div key={item.label} className="flex items-center gap-3 py-3">
+            <div className="w-7 h-7 rounded-md bg-signal-muted flex items-center justify-center shrink-0">
+              <Mail size={14} className="text-signal" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-text">{item.label}</p>
+              <p className="text-xs text-muted truncate">{item.desc}</p>
+            </div>
+          </div>
+        ))}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function EmailTogglesMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>Email Preferences</PanelHeader>
+      <PanelBody className="divide-y divide-border">
+        {[
+          { label: "Activity", on: true },
+          { label: "Billing", on: true },
+          { label: "Comments", on: false },
+          { label: "Digest", on: true },
+        ].map((item) => (
+          <div key={item.label} className="flex items-center justify-between py-3">
+            <span className="text-sm text-text">{item.label}</span>
+            <div className="flex items-center gap-2">
+              <div className={cn("w-2 h-2 rounded-full", item.on ? "bg-emerald-500" : "bg-border")} />
+              <span className="text-xs text-muted">{item.on ? "On" : "Off"}</span>
+            </div>
+          </div>
+        ))}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PERSONA ONBOARDING MOCKUPS
+   ═══════════════════════════════════════════════════════════ */
+
+function PersonaSelectionMockup() {
+  return (
+    <div className="m-4 grid grid-cols-2 gap-3">
+      {[
+        { icon: Music, label: "Artist", desc: "I'm releasing my own music", selected: false },
+        { icon: Users, label: "Engineer", desc: "I work with clients", selected: true },
+      ].map((card) => (
+        <div
+          key={card.label}
+          className={cn(
+            "rounded-lg border-2 p-4 text-center space-y-2 transition-colors",
+            card.selected ? "border-signal bg-signal-muted" : "border-border bg-panel",
+          )}
+        >
+          <div className="w-10 h-10 mx-auto rounded-full bg-panel2 flex items-center justify-center">
+            <card.icon size={20} className={card.selected ? "text-signal" : "text-muted"} />
+          </div>
+          <p className="text-sm font-semibold text-text">{card.label}</p>
+          <p className="text-xs text-muted">{card.desc}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PersonaComparisonMockup() {
+  return (
+    <div className="m-4 grid grid-cols-2 gap-3">
+      {[
+        { label: "Artist", items: ["Releases", "Audio", "Distribution"] },
+        { label: "Engineer", items: ["Releases", "Audio", "Distribution", "Payments", "Portal", "Analytics", "Time"] },
+      ].map((col) => (
+        <Panel key={col.label}>
+          <PanelHeader>{col.label}</PanelHeader>
+          <PanelBody className="space-y-1">
+            {col.items.map((item) => (
+              <div key={item} className="flex items-center gap-2 py-1.5 px-2 rounded-md text-xs text-muted">
+                <div className="w-1.5 h-1.5 rounded-full bg-signal shrink-0" />
+                {item}
+              </div>
+            ))}
+          </PanelBody>
+        </Panel>
+      ))}
+    </div>
+  );
+}
+
+function PersonaFeatureTogglesMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>Feature Visibility</PanelHeader>
+      <PanelBody className="divide-y divide-border">
+        {[
+          { label: "Payment Tracking", on: true },
+          { label: "Client Portal", on: true },
+          { label: "Distribution Tracker", on: true },
+          { label: "Time Tracking", on: false },
+          { label: "Analytics", on: true },
+        ].map((item) => (
+          <div key={item.label} className="flex items-center justify-between py-3">
+            <span className="text-sm text-text">{item.label}</span>
+            <div className="flex items-center gap-2">
+              <div className={cn("w-2 h-2 rounded-full", item.on ? "bg-emerald-500" : "bg-border")} />
+              <span className="text-xs text-muted">{item.on ? "On" : "Off"}</span>
+            </div>
+          </div>
+        ))}
+      </PanelBody>
+    </Panel>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SUBMIT FOR FEATURE MOCKUPS
+   ═══════════════════════════════════════════════════════════ */
+
+function SubmitFeatureModalMockup() {
+  return (
+    <Panel className="m-4">
+      <PanelHeader>Submit for Feature</PanelHeader>
+      <PanelBody className="space-y-4">
+        <div className="flex items-center gap-3 p-3 rounded-md border border-border bg-panel">
+          <div className="w-12 h-12 rounded-md shrink-0 flex items-center justify-center" style={{ background: "var(--panel2)" }}>
+            <Music size={20} className="text-muted opacity-30" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-text">Album Title</p>
+            <p className="text-xs text-muted">Artist Name</p>
+            <p className="text-[10px] text-faint mt-0.5">6 tracks &middot; Album</p>
+          </div>
+        </div>
+        <div>
+          <span className="label-sm text-muted mb-1 block">PITCH NOTE</span>
+          <div className="input min-h-[60px] text-xs text-faint" style={{ pointerEvents: "none" }}>
+            Why should we feature this release?
+          </div>
+        </div>
+        <div className="flex items-start gap-2">
+          <div className="w-4 h-4 mt-0.5 rounded border border-signal bg-signal-muted flex items-center justify-center shrink-0">
+            <Check size={10} className="text-signal" />
+          </div>
+          <span className="text-xs text-muted">I grant permission to feature this release</span>
+        </div>
+        <Button variant="primary" className="w-full">Submit for Review</Button>
+      </PanelBody>
+    </Panel>
+  );
+}
+
+function SubmitFeatureStatusMockup() {
+  return (
+    <div className="m-4 p-4">
+      <div className="flex items-center justify-between gap-4">
+        {[
+          { icon: Clock, label: "Submitted", color: "text-amber-500", bg: "bg-amber-500/10" },
+          { icon: Star, label: "Featured", color: "text-signal", bg: "bg-signal-muted" },
+          { icon: X, label: "Declined", color: "text-faint", bg: "bg-panel2" },
+        ].map((s) => (
+          <div key={s.label} className="flex flex-col items-center gap-1.5 flex-1">
+            <div className={cn("w-9 h-9 rounded-full flex items-center justify-center", s.bg)}>
+              <s.icon size={16} className={s.color} />
+            </div>
+            <span className="text-xs text-muted">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    MOCKUP REGISTRY
    ═══════════════════════════════════════════════════════════ */
 
@@ -3424,6 +3731,21 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "time-export": TimeExportMockup,
   /* Article 21: Signing In */
   "sign-in-page": SignInMockup,
+  /* Article: Stripe Connect */
+  "stripe-connect-setup": StripeConnectSetupMockup,
+  "stripe-create-quote": StripeCreateQuoteMockup,
+  "stripe-send-quote": StripeSendQuoteMockup,
+  "stripe-payment-flow": StripePaymentFlowMockup,
+  /* Article: Email Preferences */
+  "email-types": EmailTypesMockup,
+  "email-toggles": EmailTogglesMockup,
+  /* Article: Persona Onboarding */
+  "persona-selection": PersonaSelectionMockup,
+  "persona-comparison": PersonaComparisonMockup,
+  "persona-feature-toggles": PersonaFeatureTogglesMockup,
+  /* Article: Submit for Feature */
+  "submit-feature-modal": SubmitFeatureModalMockup,
+  "submit-feature-status": SubmitFeatureStatusMockup,
 };
 
 /* ═══════════════════════════════════════════════════════════

@@ -11,7 +11,7 @@ export const articles: HelpArticle[] = [
     summary:
       "A quick tour of the platform: your dashboard, releases, tracks, and collaboration tools.",
     tags: ["overview", "intro", "dashboard", "getting started"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Your Dashboard",
@@ -42,7 +42,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Sign in with email and password or use Google for one-click access.",
     tags: ["sign in", "login", "google", "oauth", "account", "create account", "register"],
-    updatedAt: "2026-03-18",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Sign In Options",
@@ -61,13 +61,40 @@ export const articles: HelpArticle[] = [
     ],
   },
   {
+    id: "persona-onboarding",
+    title: "Choosing Your Workspace",
+    category: "getting-started",
+    summary: "Set up Mix Architect for how you work — as an artist releasing your own music or an engineer working with clients.",
+    tags: ["onboarding", "persona", "artist", "engineer", "setup", "workspace", "features"],
+    updatedAt: "2026-04-10",
+    content: [
+      {
+        heading: "The Persona Selection",
+        body: "When you first sign up, Mix Architect asks how you use the platform: \"I'm releasing my own music\" (Artist) or \"I work with clients\" (Engineer). This sets which features are visible in your workspace by default. You can also choose Both if you do both.",
+        tip: "This is not permanent. You can change your visible features anytime in Settings under Feature Visibility.",
+        mockup: "persona-selection",
+      },
+      {
+        heading: "What Changes Per Persona",
+        body: "The Artist setup keeps your workspace focused on releases, audio, and distribution. Client-facing features like payment tracking, invoicing, expense tracking, time tracking, and the client portal are hidden by default. The Engineer setup shows everything, including all financial tools and client management features. If you choose Both, you get the full Engineer view.",
+        mockup: "persona-comparison",
+      },
+      {
+        heading: "Customizing Feature Visibility",
+        body: "Go to [Settings](/app/settings) and find the Feature Visibility section. Here you can toggle any feature on or off regardless of your initial persona choice. Features include: Payment Tracking, Client Portal, Distribution Tracker, Time Tracking, and Analytics. This gives you full control over what appears in your sidebar and release pages.",
+        tip: "If you skipped the persona selection during onboarding, you default to the Engineer view with everything visible.",
+        mockup: "persona-feature-toggles",
+      },
+    ],
+  },
+  {
     id: "create-first-release",
     title: "Creating Your First Release",
     category: "getting-started",
     summary:
       "Step-by-step guide to creating a release, adding cover art, uploading tracks, and setting your status.",
     tags: ["create", "release", "new project", "setup"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Create a New Release",
@@ -99,7 +126,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Share your release with team members and external clients using roles and the portal.",
     tags: ["collaborators", "invite", "share", "team", "permissions"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Sending Invitations",
@@ -135,7 +162,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Each track has four tabs for managing every aspect of your mix: Brief, Audio, Delivery, and Notes.",
     tags: ["tracks", "tabs", "brief", "audio", "delivery", "notes"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Brief",
@@ -171,7 +198,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Share your release with clients via a unique link, control what they see, and track per-track approvals.",
     tags: ["portal", "client", "approval", "sharing", "review"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Activating the Portal",
@@ -197,7 +224,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Save time by creating releases from reusable templates with pre-configured specs and settings.",
     tags: ["templates", "reuse", "workflow", "presets"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "What Templates Include",
@@ -224,7 +251,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Track fees, payments, and outstanding balances across your releases.",
     tags: ["payments", "fees", "billing", "tracking", "invoicing"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Enabling Payment Tracking",
@@ -252,7 +279,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Track where your release has been submitted, monitor status across platforms, and get notified when it goes live on Spotify.",
     tags: ["distribution", "tracker", "spotify", "apple music", "platform", "status", "live", "submitted"],
-    updatedAt: "2026-03-14",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Adding Platforms to a Release",
@@ -295,7 +322,7 @@ export const articles: HelpArticle[] = [
     summary:
       "View your completed releases, average turnaround time, total revenue, and per-client breakdown in the Analytics dashboard.",
     tags: ["analytics", "dashboard", "revenue", "turnaround", "velocity", "clients", "charts"],
-    updatedAt: "2026-03-14",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "What the Analytics Page Shows",
@@ -333,7 +360,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Configure release details, client information, distribution metadata, payment tracking, and team members for each release.",
     tags: ["release", "settings", "client", "distribution", "payment", "team", "collaborators", "metadata", "UPC", "copyright"],
-    updatedAt: "2026-03-15",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Opening Release Settings",
@@ -380,7 +407,7 @@ export const articles: HelpArticle[] = [
     summary:
       "How to upload audio files, manage versions, and use the waveform player.",
     tags: ["upload", "tracks", "audio", "versions", "waveform"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Uploading Audio",
@@ -407,7 +434,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Set up delivery formats, convert audio, and automatically embed metadata tags like artist, cover art, ISRC, and lyrics.",
     tags: ["convert", "export", "format", "delivery", "wav", "mp3", "flac", "aiff", "specs", "metadata", "tags", "isrc", "lyrics", "cover art", "replaygain"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Setting Delivery Formats",
@@ -439,7 +466,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Add time-coded feedback directly on the waveform so collaborators know exactly where to listen.",
     tags: ["comments", "feedback", "review", "timestamp", "waveform", "notes"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Adding a Comment",
@@ -470,7 +497,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Switch to timeline view on your dashboard to visualize release schedules and countdown to release dates.",
     tags: ["timeline", "schedule", "calendar", "planning", "release date"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Switching to Timeline View",
@@ -501,7 +528,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Download a complete ZIP export of your releases, tracks, audio files, and payment records.",
     tags: ["export", "data", "download", "backup", "privacy", "zip"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "What's Included",
@@ -532,7 +559,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Configure your profile, appearance, email notifications, mix defaults, and more.",
     tags: ["settings", "profile", "email", "notifications", "preferences", "theme", "appearance", "defaults", "persona", "calendar", "export"],
-    updatedAt: "2026-03-15",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Settings Overview",
@@ -594,6 +621,32 @@ export const articles: HelpArticle[] = [
       },
     ],
   },
+  {
+    id: "email-preferences",
+    title: "Managing Email Notifications",
+    category: "account",
+    summary: "Control which emails Mix Architect sends you, from activity alerts to weekly digests.",
+    tags: ["email", "notifications", "preferences", "unsubscribe", "digest"],
+    updatedAt: "2026-04-10",
+    content: [
+      {
+        heading: "What Emails Does Mix Architect Send?",
+        body: "Mix Architect sends several types of email notifications: Release Live Alerts when a release goes live on a platform, New Comment Alerts when someone comments on your release, Weekly Digest summarizing activity across your releases, Payment Reminders when a subscription payment fails, Payment Confirmations when a payment is processed, Subscription Confirmations when your plan is activated, Cancellation Notices when your plan is cancelled, and Client Feedback when a client approves or requests changes on a track.",
+        mockup: "email-types",
+      },
+      {
+        heading: "Controlling Your Preferences",
+        body: "Go to [Settings](/app/settings) and scroll to the Email Preferences section. Each email category has an on/off toggle. All categories are enabled by default. Toggle off any category you do not want to receive. Changes save instantly.",
+        tip: "You can also unsubscribe from a specific email category by clicking the unsubscribe link at the bottom of any notification email. No sign-in required.",
+        mockup: "email-toggles",
+      },
+      {
+        heading: "Unsubscribing from All Emails",
+        body: "Every email includes a one-click unsubscribe link in the footer. You can also turn off all email categories at once from [Settings](/app/settings). Unsubscribing does not affect your account or subscription — you can re-enable emails anytime.",
+        warning: "Account-critical emails like password resets and email verification cannot be disabled. These are required for account security.",
+      },
+    ],
+  },
 
   /* ──────────────────────────────────────────────────────
      BILLING
@@ -605,7 +658,7 @@ export const articles: HelpArticle[] = [
     summary:
       "View your plan, update payment details, and manage your Pro subscription through Stripe.",
     tags: ["subscription", "pro", "billing", "payment", "plan"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Viewing Your Plan",
@@ -631,7 +684,7 @@ export const articles: HelpArticle[] = [
     summary:
       "How to cancel your Pro subscription and what happens to your data.",
     tags: ["cancel", "resubscribe", "downgrade", "billing"],
-    updatedAt: "2026-03-04",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Cancelling Your Subscription",
@@ -652,13 +705,49 @@ export const articles: HelpArticle[] = [
     ],
   },
   {
+    id: "stripe-connect-payments",
+    title: "Collecting Payments with Stripe Connect",
+    category: "billing",
+    summary: "Connect your Stripe account to collect payments directly from clients through Mix Architect.",
+    tags: ["stripe", "payments", "quotes", "invoicing", "checkout", "connect"],
+    updatedAt: "2026-04-10",
+    content: [
+      {
+        heading: "Connecting Your Stripe Account",
+        body: "Go to [Settings](/app/settings) and find the Payment Collection section. Click \"Connect Stripe Account\" to authorize via Stripe's secure OAuth flow. Once connected, you become the merchant of record — payouts go directly to your Stripe account, and you handle any disputes through the Stripe Dashboard. Mix Architect facilitates the checkout experience but never holds your funds.",
+        tip: "Mix Architect charges a 1% platform fee on transactions processed through the platform. Stripe's standard processing fees also apply.",
+        mockup: "stripe-connect-setup",
+      },
+      {
+        heading: "Creating a Quote",
+        body: "Navigate to any release, open the Financials tab, and go to the Quotes section. Click \"+ New Quote\" to start. Add line items with descriptions and amounts, choose a payment schedule (single payment, deposit + balance, 50/50 split, or custom milestones), and add optional notes for the client. Each quote generates a unique checkout link your client can use to pay.",
+        mockup: "stripe-create-quote",
+      },
+      {
+        heading: "Sending a Quote to Your Client",
+        body: "Click \"Send Quote\" to notify the client. If you have a client portal active, the quote appears in the portal with a payment schedule breakdown. Each installment has its own \"Pay Now\" button that takes the client directly to a Stripe Checkout page. You can also copy the quote link and send it via email or messaging.",
+        mockup: "stripe-send-quote",
+      },
+      {
+        heading: "What Happens When a Client Pays",
+        body: "When the client clicks \"Pay Now\", they are redirected to a Stripe Checkout page. On successful payment, the installment status updates automatically from pending to paid. If you have file downloads gated behind payment on the client portal, they unlock automatically after payment. You will see the payout in your Stripe Dashboard according to your Stripe payout schedule.",
+        mockup: "stripe-payment-flow",
+      },
+      {
+        heading: "Disconnecting Stripe",
+        body: "Go to [Settings](/app/settings) and find the Payment Collection section. Click \"Disconnect\" to remove your Stripe account. Existing payment records and quote history are preserved in Mix Architect, but you will not be able to collect new payments until you reconnect.",
+        warning: "Disconnecting removes your ability to collect payments through Mix Architect. Any pending quotes will no longer have working checkout links.",
+      },
+    ],
+  },
+  {
     id: "tracking-expenses",
     title: "Tracking Project Expenses",
     category: "billing",
     summary:
       "Record and manage expenses for each release — gear rentals, session fees, travel, and more.",
     tags: ["expenses", "costs", "budget", "money", "tracking", "payments"],
-    updatedAt: "2026-03-17",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Enabling Expense Tracking",
@@ -696,7 +785,7 @@ export const articles: HelpArticle[] = [
     summary:
       "Use the built-in timer or manual entry to track hours spent on each release.",
     tags: ["time", "timer", "hours", "rate", "billing", "tracking", "stopwatch"],
-    updatedAt: "2026-03-17",
+    updatedAt: "2026-04-10",
     content: [
       {
         heading: "Enabling Time Tracking",
@@ -742,6 +831,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "How to Submit",
         body: "Navigate to your release detail page and look for the \"Submit for Feature\" button in the toolbar at the top of the page. Click it to open the submission form. You can add an optional pitch note explaining what makes this release special, then check the permission box and submit. Your submission will be reviewed by the Mix Architect team.",
+        mockup: "submit-feature-modal",
       },
       {
         heading: "Requirements",
@@ -750,6 +840,7 @@ export const articles: HelpArticle[] = [
       {
         heading: "What Happens Next",
         body: "The Mix Architect team reviews submissions on a weekly basis. You will receive an in-app notification whether your release is selected or not. If selected, your release will be featured on the blog with cover art, streaming links, and audio playback.",
+        mockup: "submit-feature-status",
       },
       {
         heading: "Resubmitting and Withdrawing",
