@@ -726,4 +726,39 @@ export const articles: HelpArticle[] = [
       },
     ],
   },
+  {
+    id: "submit-for-feature",
+    title: "Submit Your Release for What We're Spinning",
+    category: "releases",
+    summary:
+      "How to submit your release for consideration on the Mix Architect blog's featured releases section.",
+    tags: ["featured", "blog", "submit", "what we're spinning", "feature"],
+    updatedAt: "2026-04-10",
+    content: [
+      {
+        heading: "What is What We're Spinning?",
+        body: "What We're Spinning is Mix Architect's featured releases blog, spotlighting standout releases from the community and the wider music world. Each week, the Mix Architect team selects a release to feature with a full writeup, streaming links, and an audio preview.",
+      },
+      {
+        heading: "How to Submit",
+        body: "Navigate to your release detail page and look for the \"Submit for Feature\" button in the toolbar at the top of the page. Click it to open the submission form. You can add an optional pitch note explaining what makes this release special, then check the permission box and submit. Your submission will be reviewed by the Mix Architect team.",
+      },
+      {
+        heading: "Requirements",
+        body: "Your release must have a title, an artist name, and at least one track with audio uploaded. Each release can only be submitted once.",
+      },
+      {
+        heading: "What Happens Next",
+        body: "The Mix Architect team reviews submissions on a weekly basis. You will receive an in-app notification whether your release is selected or not. If selected, your release will be featured on the blog with cover art, streaming links, and audio playback.",
+      },
+      {
+        heading: "Resubmitting and Withdrawing",
+        body: "Each release can only be submitted once. If your submission is pending, you can withdraw it by clicking the \"Withdraw\" link next to the status indicator. If your submission is declined, you cannot resubmit the same release, but you can submit a different release at any time.",
+      },
+      {
+        heading: "Permission",
+        body: "By submitting, you grant Mix Architect permission to feature the release on the blog, including cover art and audio playback. The permission checkbox creates a clear record of your consent.",
+      },
+    ],
+  },
 ];

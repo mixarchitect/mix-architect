@@ -19,6 +19,7 @@ function handleTabInTextarea(e: React.KeyboardEvent<HTMLTextAreaElement>) {
 interface Props {
   action: (formData: FormData) => Promise<void>;
   release?: FeaturedRelease;
+  submissionId?: string;
 }
 
 function slugify(text: string): string {
@@ -30,7 +31,7 @@ function slugify(text: string): string {
     .slice(0, 80);
 }
 
-export function FeaturedReleaseForm({ action, release }: Props) {
+export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
   const [source, setSource] = useState<string>(release?.source ?? "external");
   const [slug, setSlug] = useState(release?.slug ?? "");
   const [autoSlug, setAutoSlug] = useState(!release);
@@ -40,7 +41,8 @@ export function FeaturedReleaseForm({ action, release }: Props) {
 
   return (
     <form ref={formRef} action={action} className="space-y-8 max-w-2xl">
-      {release && <input type="hidden" name="id" value={release.id} />}
+      {release?.id && <input type="hidden" name="id" value={release.id} />}
+      {submissionId && <input type="hidden" name="submission_id" value={submissionId} />}
 
       {/* ── Release Info ── */}
       <fieldset className="space-y-4">
@@ -282,6 +284,27 @@ export function FeaturedReleaseForm({ action, release }: Props) {
           />
           <p className="text-[10px] text-zinc-600 mt-1">
             On Bandcamp, go to Share / Embed → copy the iframe code. When present, this replaces the auto-detected embed.
+          </p>
+        </Field>
+      </fieldset>
+
+      {/* ── Audio Preview ── */}
+      <fieldset className="space-y-4">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+          Audio Preview
+        </legend>
+        <Field label="Audio File">
+          <input
+            name="audio_file"
+            type="file"
+            accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/aac,audio/flac,audio/mp4"
+            className="text-sm text-zinc-400 file:mr-3 file:px-3 file:py-1.5 file:text-xs file:font-medium file:rounded-full file:border file:border-white/10 file:bg-panel file:text-zinc-300 file:cursor-pointer hover:file:bg-white/5"
+          />
+          <p className="text-[10px] text-zinc-600 mt-1">
+            MP3, WAV, AAC, or FLAC. Max 50MB. Plays on the blog page.
+            {release?.audio_file_name && (
+              <> Current: {release.audio_file_name}</>
+            )}
           </p>
         </Field>
       </fieldset>

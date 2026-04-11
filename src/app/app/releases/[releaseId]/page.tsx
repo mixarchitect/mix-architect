@@ -31,6 +31,7 @@ import { canEdit } from "@/lib/permissions";
 import { formatLabel } from "@/lib/format-labels";
 import { getLocale, getTranslations } from "next-intl/server";
 import { resolveVisibility } from "@/lib/features/feature-registry";
+import { SubmitForFeatureButton } from "@/components/feature-submissions/SubmitForFeatureButton";
 
 type Props = {
   params: Promise<{ releaseId: string }>;
@@ -255,6 +256,16 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                 show_lyrics: briefShareRes.data.show_lyrics ?? false,
                 require_payment_for_download: briefShareRes.data.require_payment_for_download ?? false,
               } : null}
+            />
+          )}
+          {canEdit(role) && (
+            <SubmitForFeatureButton
+              releaseId={releaseId}
+              releaseTitle={release.title as string}
+              artist={release.artist as string ?? ""}
+              releaseType={release.release_type as string}
+              trackCount={tracks?.length ?? 0}
+              coverArtUrl={release.cover_art_url as string | null}
             />
           )}
           {canEdit(role) && (

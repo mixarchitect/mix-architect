@@ -13,6 +13,7 @@ import { CoverArt } from "@/components/featured/CoverArt";
 import { StreamingLinks } from "@/components/featured/StreamingLinks";
 import { FeaturedReleaseCard } from "@/components/featured/FeaturedReleaseCard";
 import { BandcampEmbed } from "@/components/featured/BandcampEmbed";
+import { FeaturedAudioPlayer } from "@/components/featured/FeaturedAudioPlayer";
 import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { LandingNav } from "@/components/landing/nav";
@@ -197,6 +198,18 @@ export default async function FeaturedReleasePage({ params }: Props) {
             </p>
             <StreamingLinks release={release} size="md" layout="grid" />
           </div>
+
+          {/* Audio player */}
+          {release.audio_file_path && (
+            <div className="mb-10">
+              <FeaturedAudioPlayer
+                audioUrl={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/featured-audio/${release.audio_file_path}`}
+                title={release.title}
+                artist={release.artist_name}
+                duration={release.audio_duration_seconds ?? undefined}
+              />
+            </div>
+          )}
 
           {/* Bandcamp embed */}
           {(release.bandcamp_embed || release.link_bandcamp) && (

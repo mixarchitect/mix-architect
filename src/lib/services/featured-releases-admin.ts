@@ -1,7 +1,11 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import type { FeaturedRelease } from "@/types/featured-release";
 
-type CreateInput = Omit<FeaturedRelease, "id" | "created_at" | "updated_at">;
+type CreateInput = Omit<FeaturedRelease, "id" | "created_at" | "updated_at" | "audio_file_path" | "audio_file_name" | "audio_duration_seconds"> & {
+  audio_file_path?: string | null;
+  audio_file_name?: string | null;
+  audio_duration_seconds?: number | null;
+};
 type UpdateInput = Partial<Omit<FeaturedRelease, "id" | "created_at" | "updated_at">>;
 
 export async function createFeaturedRelease(data: CreateInput) {
@@ -110,6 +114,24 @@ export async function uploadCoverArt(
 
   if (error) throw error;
   return path;
+}
+
+export async function uploadFeaturedAudio(
+  file: File,
+  featuredReleaseId: string,
+): Promise<{ path: string; fileName: string }> {
+  const supabase = createSupabaseServiceClient();
+  const rawExt = file.name.split(".").pop() ?? "mp3";
+  const ext = rawExt.replace(/[^a-zA-Z0-9]/g, "") || "mp3";
+  const safeId = featuredReleaseId.replace(/[^a-zA-Z0-9\-]/g, "");
+  const path = `${safeId}/audio.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("featured-audio")
+    .upload(path, file, { upsert: true });
+
+  if (error) throw error;
+  return { path, fileName: file.name };
 }
 
 export async function getAllFeaturedReleasesAdmin(): Promise<FeaturedRelease[]> {

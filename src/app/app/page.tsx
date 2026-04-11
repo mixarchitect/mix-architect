@@ -133,6 +133,21 @@ export default async function DashboardPage({ searchParams }: Props) {
     }
   }
 
+  // Fetch feature submission statuses for all releases
+  const submissionStatusByRelease = new Map<string, "pending" | "approved" | "declined">();
+  if (allReleaseIds.length > 0) {
+    const { data: submissions } = await supabase
+      .from("feature_submissions")
+      .select("release_id, status")
+      .in("release_id", allReleaseIds);
+    for (const s of submissions ?? []) {
+      submissionStatusByRelease.set(
+        s.release_id as string,
+        s.status as "pending" | "approved" | "declined",
+      );
+    }
+  }
+
   let outstandingTotal = 0;
   let outstandingCount = 0;
   let earnedTotal = 0;
@@ -277,6 +292,7 @@ export default async function DashboardPage({ searchParams }: Props) {
               pinned={r.pinned as boolean}
               role="owner"
               hasNotes={!!r.internal_notes}
+              submissionStatus={submissionStatusByRelease.get(r.id as string)}
             />
             </div>
           );
@@ -448,6 +464,7 @@ export default async function DashboardPage({ searchParams }: Props) {
                   coverArtUrl={r.cover_art_url as string | null}
                   pinned={r.pinned as boolean}
                   role={(memberRole as "collaborator" | "client") ?? "client"}
+                  submissionStatus={submissionStatusByRelease.get(r.id as string)}
                 />
               );
             })}

@@ -24,6 +24,9 @@ export interface FeaturedRelease {
   link_qobuz: string | null;
   link_website: string | null;
   bandcamp_embed: string | null;
+  audio_file_path: string | null;
+  audio_file_name: string | null;
+  audio_duration_seconds: number | null;
   genre_tags: string[];
   credits: string | null;
   release_date: string | null;

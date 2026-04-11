@@ -36,6 +36,7 @@ type Props = {
   pinned?: boolean;
   role?: ReleaseRole;
   hasNotes?: boolean;
+  submissionStatus?: "pending" | "approved" | "declined";
   className?: string;
 };
 
@@ -67,7 +68,7 @@ export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt,
   paymentStatus, feeTotal, paidAmount, balance, feeCurrency, paymentsEnabled,
-  coverArtUrl, pinned, role, hasNotes, className,
+  coverArtUrl, pinned, role, hasNotes, submissionStatus, className,
 }: Props) {
   const locale = useLocale();
   const tCard = useTranslations("releases.card");
@@ -314,6 +315,16 @@ export function ReleaseCard({
           {roleLabel(role ?? null) && (
             <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700 border border-blue-200">
               {roleLabel(role ?? null)}
+            </span>
+          )}
+          {submissionStatus === "pending" && (
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
+              Submitted
+            </span>
+          )}
+          {submissionStatus === "approved" && (
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-teal-500/10 text-teal-500 border border-teal-500/20">
+              Featured
             </span>
           )}
         </div>

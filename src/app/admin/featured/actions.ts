@@ -9,7 +9,9 @@ import {
   deleteFeaturedRelease,
   setActiveFeaturedRelease,
   uploadCoverArt,
+  uploadFeaturedAudio,
 } from "@/lib/services/featured-releases-admin";
+import { linkSubmissionToFeaturedRelease } from "@/lib/services/feature-submissions-admin";
 
 function revalidateAll(slug?: string) {
   revalidatePath("/");
@@ -54,8 +56,10 @@ export async function createFeaturedReleaseAction(formData: FormData) {
     .map((t) => t.trim())
     .filter(Boolean) ?? [];
 
+  const submissionId = (formData.get("submission_id") as string) || null;
+
   console.log("[featured] Creating release with slug:", slug, "cover:", coverArtPath || "(none)", "genres:", genreTags);
-  await createFeaturedRelease({
+  const created = await createFeaturedRelease({
     slug,
     title: formData.get("title") as string,
     artist_name: formData.get("artist_name") as string,
@@ -88,6 +92,21 @@ export async function createFeaturedReleaseAction(formData: FormData) {
     meta_title: (formData.get("meta_title") as string) || null,
     meta_description: (formData.get("meta_description") as string) || null,
   });
+
+  // Upload audio file if provided
+  const audioFile = formData.get("audio_file") as File | null;
+  if (audioFile && audioFile.size > 0 && created?.id) {
+    const { path, fileName } = await uploadFeaturedAudio(audioFile, created.id);
+    await updateFeaturedRelease(created.id, {
+      audio_file_path: path,
+      audio_file_name: fileName,
+    });
+  }
+
+  // Link the submission to the new featured release
+  if (submissionId && created?.id) {
+    await linkSubmissionToFeaturedRelease(submissionId, created.id);
+  }
 
   revalidateAll(slug);
   redirect("/admin/featured");
@@ -145,6 +164,14 @@ export async function updateFeaturedReleaseAction(formData: FormData) {
 
   if (coverArtPath) {
     updates.cover_art_path = coverArtPath;
+  }
+
+  // Handle audio file upload
+  const audioFile = formData.get("audio_file") as File | null;
+  if (audioFile && audioFile.size > 0) {
+    const { path, fileName } = await uploadFeaturedAudio(audioFile, id);
+    updates.audio_file_path = path;
+    updates.audio_file_name = fileName;
   }
 
   await updateFeaturedRelease(id, updates);
