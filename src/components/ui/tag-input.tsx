@@ -40,7 +40,8 @@ export function TagInput({ value, onChange, suggestions = [], placeholder, disab
     }
   }
 
-  const unused = suggestions.filter((s) => !value.includes(s));
+  const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
+  const unused = safeSuggestions.filter((s) => !value.includes(s));
 
   return (
     <div className={cn("space-y-2", className)}>
