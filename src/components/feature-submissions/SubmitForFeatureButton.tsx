@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Megaphone, Clock, Star, X as XIcon, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, IconButton } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import {
   checkEligibilityAction,
@@ -93,14 +93,13 @@ export function SubmitForFeatureButton({
 
   return (
     <>
-      <Button
-        variant="secondary"
-        className="h-8 text-xs gap-1.5"
+      <IconButton
+        size="sm"
+        title="Submit for Feature"
         onClick={() => setModalOpen(true)}
       >
-        <Megaphone size={13} strokeWidth={1.5} />
-        Submit for Feature
-      </Button>
+        <Megaphone size={14} strokeWidth={1.5} />
+      </IconButton>
 
       {modalOpen && (
         <SubmissionModal
