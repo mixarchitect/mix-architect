@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getRecentEntries } from "@/lib/services/changelog";
 
 export async function GET() {
-  const entries = await getRecentEntries(5);
+  const entries = await getRecentEntries(3);
 
   return NextResponse.json(
     {
