@@ -135,7 +135,7 @@ const CHANGELOG_STORAGE_KEY = "ma_last_seen_changelog";
 
 function ChangelogSection() {
   const t = useTranslations("help");
-  const [entries, setEntries] = useState<{ slug: string; title: string; summary: string; category: string; published_at: string }[]>([]);
+  const [entries, setEntries] = useState<{ slug: string; title: string; summary: string; category: string; published_at: string; version_tag: string | null }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -200,8 +200,14 @@ function ChangelogSection() {
                     <span className="capitalize">{entry.category}</span>
                     <span>&middot;</span>
                     <time dateTime={entry.published_at}>
-                      {new Date(entry.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      {new Date(entry.published_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                     </time>
+                    {entry.version_tag && (
+                      <>
+                        <span>&middot;</span>
+                        <span>Release {entry.version_tag}</span>
+                      </>
+                    )}
                   </div>
                   <p className="text-sm font-medium text-text">{entry.title}</p>
                   <p className="text-sm text-muted mt-1 line-clamp-2">{entry.summary}</p>

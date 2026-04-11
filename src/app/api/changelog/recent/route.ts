@@ -12,6 +12,7 @@ export async function GET() {
         summary: e.summary,
         category: e.category,
         published_at: e.published_at,
+        version_tag: e.version_tag ?? null,
       })),
     },
     {
