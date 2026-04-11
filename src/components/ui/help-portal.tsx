@@ -200,7 +200,7 @@ function ChangelogSection() {
                     <span className="capitalize">{entry.category}</span>
                     <span>&middot;</span>
                     <time dateTime={entry.published_at}>
-                      {new Date(entry.published_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                      {new Date(entry.published_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" })}
                     </time>
                     {entry.version_tag && (
                       <>
