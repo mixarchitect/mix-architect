@@ -486,7 +486,7 @@ function PortalSharingMockup() {
    ARTICLE 4: TRACK DETAIL TABS (6 mockups, one per tab)
    ═══════════════════════════════════════════════════════════ */
 
-const TRACK_TABS = ["Intent", "Specs", "Audio", "Distribution", "Portal", "Notes"] as const;
+const TRACK_TABS = ["Brief", "Audio", "Delivery", "Notes"] as const;
 
 function TrackTabBar({ active }: { active: typeof TRACK_TABS[number] }) {
   return (
@@ -510,7 +510,7 @@ function TrackTabIntentMockup() {
   return (
     <>
       <div className="p-4 space-y-4">
-        <TrackTabBar active="Intent" />
+        <TrackTabBar active="Brief" />
         <Panel>
           <PanelBody className="pt-6 space-y-3">
             <span className="label text-xs text-faint">WHAT SHOULD THIS TRACK FEEL LIKE?</span>
@@ -536,7 +536,7 @@ function TrackTabSpecsMockup() {
   return (
     <>
       <div className="p-4 space-y-4">
-        <TrackTabBar active="Specs" />
+        <TrackTabBar active="Brief" />
         <Panel>
           <PanelBody className="pt-6 space-y-3">
             <span className="label text-xs text-faint">TECHNICAL SETTINGS</span>
@@ -751,7 +751,7 @@ function TrackTabDistributionMockup() {
   return (
     <>
       <div className="p-4 space-y-4">
-        <TrackTabBar active="Distribution" />
+        <TrackTabBar active="Delivery" />
         <Panel>
           <PanelBody className="pt-6 space-y-3">
             <span className="label text-xs text-faint">WRITING SPLIT</span>
@@ -821,7 +821,7 @@ function TrackTabPortalMockup() {
   return (
     <>
       <div className="p-4 space-y-4">
-        <TrackTabBar active="Portal" />
+        <TrackTabBar active="Delivery" />
         <Panel>
           <PanelBody className="pt-6 space-y-3">
             <span className="label text-xs text-faint">CLIENT APPROVAL</span>
