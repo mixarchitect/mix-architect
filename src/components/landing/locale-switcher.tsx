@@ -113,7 +113,7 @@ export function LocaleSwitcher({ locale }: { locale: string }) {
           role="listbox"
           aria-label="Languages"
           onKeyDown={handleKeyDownOnList}
-          className="absolute right-0 top-full mt-2 z-50 min-w-[260px] max-h-[min(50vh,400px)] overflow-y-auto overscroll-contain rounded-lg bg-[#1a1a1a] border border-white/10 ring-1 ring-white/5 py-1 shadow-float animate-in fade-in slide-in-from-top-1 duration-150 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-full"
+          className="absolute right-0 bottom-full mb-2 z-50 min-w-[260px] max-h-[min(50vh,400px)] overflow-y-auto overscroll-contain rounded-lg bg-[#1a1a1a] border border-white/10 ring-1 ring-white/5 py-1 shadow-float animate-in fade-in slide-in-from-bottom-1 duration-150 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-full"
         >
           {locales.map((loc, i) => {
             const isActive = loc === current;
