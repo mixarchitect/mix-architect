@@ -18,8 +18,7 @@ export async function getSubmissions(
     .from("feature_submissions")
     .select(`
       *,
-      releases!inner (cover_art_url, genre_tags, release_type),
-      profiles!feature_submissions_user_id_fkey (display_name)
+      releases!inner (cover_art_url, genre_tags, release_type)
     `)
     .order("created_at", { ascending: false });
 
@@ -30,8 +29,25 @@ export async function getSubmissions(
   const { data, error } = await query;
   if (error) throw error;
 
-  // Also get track counts for each release
-  const releaseIds = (data ?? []).map((s: Record<string, unknown>) => s.release_id as string);
+  const rows = data ?? [];
+
+  // Fetch submitter names from profiles
+  const userIds = [...new Set(rows.map((s: Record<string, unknown>) => s.user_id as string))];
+  let profileMap: Record<string, string> = {};
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, display_name")
+      .in("id", userIds);
+    if (profiles) {
+      for (const p of profiles) {
+        if (p.display_name) profileMap[p.id] = p.display_name;
+      }
+    }
+  }
+
+  // Fetch track counts for each release
+  const releaseIds = rows.map((s: Record<string, unknown>) => s.release_id as string);
   let trackCountMap: Record<string, number> = {};
   if (releaseIds.length > 0) {
     const { data: tracks } = await supabase
@@ -45,9 +61,8 @@ export async function getSubmissions(
     }
   }
 
-  return (data ?? []).map((row: Record<string, unknown>) => {
+  return rows.map((row: Record<string, unknown>) => {
     const release = row.releases as Record<string, unknown> | null;
-    const profile = row.profiles as Record<string, unknown> | null;
     return {
       id: row.id as string,
       user_id: row.user_id as string,
@@ -62,7 +77,7 @@ export async function getSubmissions(
       featured_release_id: row.featured_release_id as string | null,
       created_at: row.created_at as string,
       updated_at: row.updated_at as string,
-      submitter_name: (profile?.display_name as string) ?? null,
+      submitter_name: profileMap[row.user_id as string] ?? null,
       cover_art_url: (release?.cover_art_url as string) ?? null,
       track_count: trackCountMap[row.release_id as string] ?? 0,
       genre_tags: (release?.genre_tags as string[]) ?? [],
