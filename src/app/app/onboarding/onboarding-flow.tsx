@@ -94,7 +94,7 @@ export function OnboardingFlow({ userId }: Props) {
     <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-12" style={{ background: "var(--panel)" }}>
       {/* Logo */}
       <div className="mb-8">
-        <img src={logoSrc} alt="Mix Architect" className="h-7 w-auto" />
+        <img key={mounted ? resolvedTheme : "ssr"} src={logoSrc} alt="Mix Architect" className="h-7 w-auto" suppressHydrationWarning />
       </div>
 
       {/* Step indicator */}

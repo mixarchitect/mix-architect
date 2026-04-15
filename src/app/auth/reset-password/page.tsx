@@ -77,9 +77,11 @@ function ResetPasswordContent() {
         <Panel>
           <PanelHeader className="text-center">
             <img
+              key={mounted ? resolvedTheme : "ssr"}
               src={mounted && resolvedTheme === "dark" ? "/mixarchvert1whitetextoutline.svg" : "/mixarchvert1blackoutline.svg"}
               alt="Mix Architect"
               className="h-7 w-auto mx-auto mb-5"
+              suppressHydrationWarning
             />
             <h1 className="mt-3 text-2xl font-semibold h1 text-text">
               {t("resetPasswordTitle")}

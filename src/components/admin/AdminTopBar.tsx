@@ -46,9 +46,11 @@ export function AdminTopBar({ userId, userEmail, displayName }: Props) {
           className="flex items-center hover:opacity-90 transition-opacity"
         >
           <img
+            key={mounted ? resolvedTheme : "ssr"}
             src={mounted && resolvedTheme === "dark" ? "/mixarchvert1whitetextoutline.svg" : "/mixarchvert1blackoutline.svg"}
             alt="Mix Architect"
             className="h-6 w-auto"
+            suppressHydrationWarning
           />
         </Link>
         <div className="h-4 w-px bg-border" />
