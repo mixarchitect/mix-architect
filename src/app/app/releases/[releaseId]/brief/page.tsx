@@ -311,7 +311,7 @@ export default async function BriefPage({ params }: Props) {
         {/* Footer */}
         <Rule className="my-8" />
         <div className="flex items-center justify-center gap-2">
-          <img src="/mix-architect-logo.svg" alt="Mix Architect" className="h-4 w-auto opacity-40" />
+          <img src="/mixarchvert1blackoutline.svg" alt="Mix Architect" className="h-4 w-auto opacity-40" />
           <span className="text-xs text-faint">· mixarchitect.com</span>
         </div>
       </div>

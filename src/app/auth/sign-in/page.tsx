@@ -143,7 +143,7 @@ function SignInPageContent() {
         <Panel>
           <PanelHeader className="text-center">
             <img
-              src={mounted && resolvedTheme === "dark" ? "/mix-architect-logo-white.svg" : "/mix-architect-logo.svg"}
+              src={mounted && resolvedTheme === "dark" ? "/mixarchvert1whitetextoutline.svg" : "/mixarchvert1blackoutline.svg"}
               alt="Mix Architect"
               className="h-7 w-auto mx-auto mb-5"
             />

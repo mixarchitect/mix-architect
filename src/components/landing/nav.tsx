@@ -32,7 +32,7 @@ export function LandingNav() {
           className="flex items-center shrink-0 pl-2 pr-1 sm:pr-3"
         >
           <Image
-            src="/mix-architect-logo-white.svg"
+            src="/mixarchvert1whitetextoutline.svg"
             alt="Mix Architect"
             width={180}
             height={36}

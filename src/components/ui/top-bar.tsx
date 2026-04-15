@@ -56,7 +56,7 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
           className="flex items-center hover:opacity-90 transition-opacity"
         >
           <img
-            src={mounted && resolvedTheme === "dark" ? "/mix-architect-logo-white.svg" : "/mix-architect-logo.svg"}
+            src={mounted && resolvedTheme === "dark" ? "/mixarchvert1whitetextoutline.svg" : "/mixarchvert1blackoutline.svg"}
             alt="Mix Architect"
             className="h-6 w-auto"
           />

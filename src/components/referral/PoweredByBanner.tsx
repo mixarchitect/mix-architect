@@ -40,7 +40,7 @@ export function PoweredByBanner({ engineerId }: PoweredByBannerProps) {
           Powered by
         </span>
         <img
-          src="/mix-architect-logo-white.svg"
+          src="/mixarchvert1whitetextoutline.svg"
           alt="Mix Architect"
           className="h-4 w-auto opacity-60 group-hover:opacity-80 transition-opacity"
         />

@@ -10,7 +10,7 @@ export async function LandingFooter() {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <Image
-            src="/mix-architect-logo-white.svg"
+            src="/mixarchvert1whitetextoutline.svg"
             alt="Mix Architect"
             width={140}
             height={28}

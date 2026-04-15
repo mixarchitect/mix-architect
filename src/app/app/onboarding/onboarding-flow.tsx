@@ -87,8 +87,8 @@ export function OnboardingFlow({ userId }: Props) {
 
   const logoSrc =
     mounted && resolvedTheme === "dark"
-      ? "/mix-architect-logo-white.svg"
-      : "/mix-architect-logo.svg";
+      ? "/mixarchvert1whitetextoutline.svg"
+      : "/mixarchvert1blackoutline.svg";
 
   return (
     <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-12" style={{ background: "var(--panel)" }}>
