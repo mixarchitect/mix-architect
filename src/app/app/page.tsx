@@ -265,7 +265,7 @@ export default async function DashboardPage({ searchParams }: Props) {
   // ── Grid content (server-rendered cards) ──
   const gridContent =
     displayReleases && displayReleases.length > 0 ? (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {displayReleases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }, rIdx: number) => {
           const trackCount = r.tracks?.length ?? 0;
           const completedTracks =
@@ -437,7 +437,7 @@ export default async function DashboardPage({ searchParams }: Props) {
       {sharedReleases.length > 0 && (
         <>
           <h2 className="text-base font-semibold text-text mt-10 mb-4">{t("sharedWithYou")}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {sharedReleases.map((r: Record<string, unknown> & { tracks?: { id: string; status: string }[] }) => {
               const trackCount = r.tracks?.length ?? 0;
               const completedTracks =
