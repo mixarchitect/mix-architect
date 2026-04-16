@@ -68,6 +68,79 @@ export const TRUE_PEAK_TARGETS = [
   { name: "Facebook", dbtp: -1, group: "Social" },
 ] as const;
 
+/* ------------------------------------------------------------------ */
+/*  Quality thresholds (clipping, DC offset, sample peak at 0)         */
+/* ------------------------------------------------------------------ */
+
+/** DC offset above this magnitude is worth flagging. Typical clean masters
+ *  come in well below 0.001; anything above 0.002 usually indicates a
+ *  gain-stage or filtering issue. */
+export const DC_OFFSET_THRESHOLD = 0.002;
+
+/** Sample peak at or above this dBFS counts as "peaks at digital full
+ *  scale" — leaves no headroom for downstream DSP or lossy codecs. */
+export const SAMPLE_PEAK_AT_FULL_SCALE_DBFS = -0.1;
+
+/** Clip sample counts above this are considered severe rather than
+ *  borderline (a few clipped samples in a long track may be inaudible;
+ *  thousands definitely aren't). Used for severity coloring only. */
+export const CLIPPING_SEVERE_SAMPLE_COUNT = 1000;
+
+export type QualityIssue = "clipping" | "dc_offset" | "peak_at_full_scale";
+
+export type QualitySnapshot = {
+  issues: QualityIssue[];
+  /** true if any issue is considered severe (red badge) rather than
+   *  borderline (amber badge). */
+  severe: boolean;
+  /** Raw values carried through for the popover render. */
+  clipSampleCount: number | null;
+  samplePeakDbfs: number | null;
+  dcOffset: number | null;
+};
+
+/** Compute which quality issues are present for an audio version. Returns
+ *  null when the worker hasn't populated any of the inputs (so the pill
+ *  stays hidden rather than showing "no issues" for not-yet-analyzed rows). */
+export function computeQualitySnapshot(input: {
+  clipSampleCount: number | null | undefined;
+  samplePeakDbfs: number | null | undefined;
+  dcOffset: number | null | undefined;
+}): QualitySnapshot | null {
+  const { clipSampleCount, samplePeakDbfs, dcOffset } = input;
+  const anyField =
+    clipSampleCount != null || samplePeakDbfs != null || dcOffset != null;
+  if (!anyField) return null;
+
+  const issues: QualityIssue[] = [];
+  if (clipSampleCount != null && clipSampleCount > 0) issues.push("clipping");
+  if (
+    samplePeakDbfs != null &&
+    samplePeakDbfs >= SAMPLE_PEAK_AT_FULL_SCALE_DBFS &&
+    // Don't double-count when clipping is already flagged, since clipping
+    // implies sample peak at full scale. Keep this as a separate flag only
+    // when clipping didn't trigger.
+    !(clipSampleCount != null && clipSampleCount > 0)
+  ) {
+    issues.push("peak_at_full_scale");
+  }
+  if (dcOffset != null && Math.abs(dcOffset) > DC_OFFSET_THRESHOLD) {
+    issues.push("dc_offset");
+  }
+
+  const severe =
+    issues.length >= 2 ||
+    (clipSampleCount != null && clipSampleCount > CLIPPING_SEVERE_SAMPLE_COUNT);
+
+  return {
+    issues,
+    severe,
+    clipSampleCount: clipSampleCount ?? null,
+    samplePeakDbfs: samplePeakDbfs ?? null,
+    dcOffset: dcOffset ?? null,
+  };
+}
+
 export const AUTHOR_COLORS = [
   "#0D9488",
   "#6B8AFF",

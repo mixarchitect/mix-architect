@@ -37,6 +37,7 @@ import {
   LOUDNESS_GROUPS,
   TRUE_PEAK_CEILING,
   TRUE_PEAK_TARGETS,
+  computeQualitySnapshot,
   AUTHOR_COLORS,
 } from "@/components/ui/audio-player-shared";
 import {
@@ -74,6 +75,12 @@ export type AudioVersionData = {
   analysis_version?: number | null;
   /** ITU-R BS.1770-4 true peak in dBTP. NULL until worker runs. */
   true_peak_dbtp?: number | null;
+  /** Raw sample peak in dBFS (always ≤ 0). NULL until worker runs. */
+  sample_peak_dbfs?: number | null;
+  /** DC offset as a fraction (abs value). NULL until worker runs. */
+  dc_offset?: number | null;
+  /** Number of samples at ±full scale (strict clipping). NULL until worker runs. */
+  clip_sample_count?: number | null;
   uploaded_by: string;
   created_at: string;
 };
@@ -209,13 +216,31 @@ export function AudioPlayer({
           activeVersion.analysis_version === 0)));
   const [showStreamingInfo, setShowStreamingInfo] = useState(false);
   const [showTruePeakInfo, setShowTruePeakInfo] = useState(false);
+  const [showQualityInfo, setShowQualityInfo] = useState(false);
   const lufsBadgeRef = useRef<HTMLSpanElement | null>(null);
   const truePeakBadgeRef = useRef<HTMLSpanElement | null>(null);
+  const qualityBadgeRef = useRef<HTMLSpanElement | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
   const [truePeakDropdownPos, setTruePeakDropdownPos] = useState<
     { top: number; right: number } | null
   >(null);
+  const [qualityDropdownPos, setQualityDropdownPos] = useState<
+    { top: number; right: number } | null
+  >(null);
   const measuredTruePeak = activeVersion?.true_peak_dbtp ?? null;
+  const qualitySnapshot = useMemo(
+    () =>
+      computeQualitySnapshot({
+        clipSampleCount: activeVersion?.clip_sample_count,
+        samplePeakDbfs: activeVersion?.sample_peak_dbfs,
+        dcOffset: activeVersion?.dc_offset,
+      }),
+    [
+      activeVersion?.clip_sample_count,
+      activeVersion?.sample_peak_dbfs,
+      activeVersion?.dc_offset,
+    ],
+  );
 
   // Position the streaming dropdown under the LUFS button (fixed, escapes overflow)
   useEffect(() => {
@@ -254,6 +279,25 @@ export function AudioPlayer({
       window.removeEventListener("resize", update);
     };
   }, [showTruePeakInfo]);
+
+  // Position the quality issue dropdown under its pill
+  useEffect(() => {
+    if (!showQualityInfo || !qualityBadgeRef.current) {
+      setQualityDropdownPos(null);
+      return;
+    }
+    const update = () => {
+      const rect = qualityBadgeRef.current?.getBoundingClientRect();
+      if (rect) setQualityDropdownPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+    };
+    update();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [showQualityInfo]);
 
   // Comment state
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
@@ -391,6 +435,7 @@ export function AudioPlayer({
   useEffect(() => {
     setShowStreamingInfo(false);
     setShowTruePeakInfo(false);
+    setShowQualityInfo(false);
   }, [activeVersion?.id]);
 
   /* ---------------------------------------------------------------- */
@@ -1077,13 +1122,18 @@ export function AudioPlayer({
             </span>
           )}
           {/* Loudness metrics (worker-populated) */}
-          {measuredLufs == null && measuredTruePeak == null && isAnalysisProcessing && (
-            <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-faint">
-              <Loader2 size={10} className="animate-spin" />
-              Measurements processing
-            </span>
-          )}
-          {(measuredLufs != null || measuredTruePeak != null) && (
+          {measuredLufs == null &&
+            measuredTruePeak == null &&
+            qualitySnapshot == null &&
+            isAnalysisProcessing && (
+              <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-faint">
+                <Loader2 size={10} className="animate-spin" />
+                Measurements processing
+              </span>
+            )}
+          {(measuredLufs != null ||
+            measuredTruePeak != null ||
+            (qualitySnapshot != null && qualitySnapshot.issues.length > 0)) && (
             <span className="ml-auto inline-flex items-center gap-3 text-[10px]">
               {measuredLufs != null && (() => {
                 const delta = measuredLufs - LUFS_REFERENCE;
@@ -1094,6 +1144,7 @@ export function AudioPlayer({
                       type="button"
                       onClick={() => {
                         setShowTruePeakInfo(false);
+                        setShowQualityInfo(false);
                         setShowStreamingInfo((v) => !v);
                       }}
                       className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
@@ -1146,6 +1197,7 @@ export function AudioPlayer({
                       type="button"
                       onClick={() => {
                         setShowStreamingInfo(false);
+                        setShowQualityInfo(false);
                         setShowTruePeakInfo((v) => !v);
                       }}
                       className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
@@ -1171,6 +1223,48 @@ export function AudioPlayer({
                     >
                       {badgeText}
                     </span>
+                  </span>
+                );
+              })()}
+              {qualitySnapshot != null && qualitySnapshot.issues.length > 0 && (() => {
+                const { issues, severe } = qualitySnapshot;
+                const colorClass = severe
+                  ? "bg-red-500/10 text-red-500"
+                  : "bg-signal-muted text-signal";
+                const label =
+                  issues.length > 1
+                    ? `${issues.length} issues`
+                    : issues[0] === "clipping"
+                      ? "Clipping detected"
+                      : issues[0] === "peak_at_full_scale"
+                        ? "Peak at full scale"
+                        : "DC offset detected";
+                return (
+                  <span ref={qualityBadgeRef} className="inline-flex items-center gap-1.5">
+                    <span className="text-faint">·</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowStreamingInfo(false);
+                        setShowTruePeakInfo(false);
+                        setShowQualityInfo((v) => !v);
+                      }}
+                      className={cn(
+                        "inline-flex items-center gap-1 px-1.5 py-px rounded text-[10px] transition-colors",
+                        colorClass,
+                      )}
+                      title="Show audio quality issues"
+                    >
+                      <AlertTriangle size={10} />
+                      {label}
+                      <ChevronDown
+                        size={10}
+                        className={cn(
+                          "transition-transform",
+                          showQualityInfo && "rotate-180",
+                        )}
+                      />
+                    </button>
                   </span>
                 );
               })()}
@@ -1516,6 +1610,47 @@ export function AudioPlayer({
             </tbody>
           </table>
           <div className="h-1.5" />
+        </div>
+      )}
+
+      {/* Quality check dropdown — shows per-issue detail and remediation tips.
+          Pill only appears when at least one issue is detected, so this block
+          always has something meaningful to display when open. */}
+      {showQualityInfo && qualitySnapshot != null && qualityDropdownPos && (
+        <div
+          className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden max-w-[320px]"
+          style={{ top: qualityDropdownPos.top, right: qualityDropdownPos.right, background: "var(--panel-2)" }}
+        >
+          <div className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider font-sans">
+            Quality check
+          </div>
+          <div className="flex flex-col gap-2 px-3 py-2 text-[11px] font-sans">
+            {qualitySnapshot.issues.includes("clipping") && (
+              <div>
+                <div className="text-text font-semibold">Clipping</div>
+                <div className="text-muted">
+                  {qualitySnapshot.clipSampleCount?.toLocaleString() ?? "?"} clipped samples detected. Reduce output gain or check your limiter ceiling.
+                </div>
+              </div>
+            )}
+            {qualitySnapshot.issues.includes("peak_at_full_scale") && (
+              <div>
+                <div className="text-text font-semibold">Sample peak at full scale</div>
+                <div className="text-muted">
+                  Peak {qualitySnapshot.samplePeakDbfs != null ? `${qualitySnapshot.samplePeakDbfs.toFixed(2)} dBFS` : "at 0 dBFS"}. Leave at least 0.3 dB of headroom for DSP processing.
+                </div>
+              </div>
+            )}
+            {qualitySnapshot.issues.includes("dc_offset") && (
+              <div>
+                <div className="text-text font-semibold">DC offset</div>
+                <div className="text-muted">
+                  {qualitySnapshot.dcOffset != null ? `Offset of ${qualitySnapshot.dcOffset.toFixed(4)} detected. ` : ""}
+                  Apply a high-pass filter at 20 Hz or lower to remove.
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
