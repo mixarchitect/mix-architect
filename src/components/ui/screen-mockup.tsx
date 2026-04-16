@@ -16,7 +16,7 @@ import {
   ExternalLink, BarChart3, DollarSign,
   Sun, Moon, Monitor, Mail, Gift,
   RefreshCw, User, Trash2, UserPlus,
-  Pause, Square, Star,
+  Pause, Square, Star, AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
@@ -650,6 +650,142 @@ function TrackTabLufsMockup() {
   );
 }
 
+function TrackTabTruePeakMockup() {
+  const measured = -0.9;
+  const ceiling = -1;
+  const services = [
+    { label: "STREAMING", items: [
+      { name: "Spotify", target: -1 },
+      { name: "Spotify (Loud)", target: -2 },
+      { name: "Apple Music", target: -1 },
+      { name: "YouTube", target: -1 },
+      { name: "Tidal", target: -1 },
+      { name: "Amazon Music", target: -2 },
+      { name: "Deezer", target: -1 },
+      { name: "Qobuz", target: -1 },
+      { name: "Pandora", target: -1 },
+    ]},
+    { label: "BROADCAST", items: [
+      { name: "EBU R128", target: -1 },
+      { name: "ATSC A/85", target: -2 },
+      { name: "ITU-R BS.1770", target: -1 },
+    ]},
+    { label: "SOCIAL", items: [
+      { name: "Instagram/Reels", target: -1 },
+      { name: "TikTok", target: -1 },
+      { name: "Facebook", target: -1 },
+    ]},
+  ];
+  const pillColor =
+    measured > 0
+      ? "bg-red-500/10 text-red-500"
+      : measured > ceiling
+        ? "bg-status-orange/20 text-status-orange"
+        : "bg-status-green/10 text-status-green";
+  const headroom = ceiling - measured;
+  const pillText = headroom >= 0 ? `${headroom.toFixed(1)} dB` : `+${Math.abs(headroom).toFixed(1)} dB`;
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <TrackTabBar active="Audio" />
+        <Panel>
+          <PanelBody className="pt-6 space-y-4">
+            {/* True peak header */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-text">True Peak</span>
+              <div className="flex items-center gap-2 text-xs text-faint">
+                <span>{measured.toFixed(1)} dBTP</span>
+                <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-medium", pillColor)}>{pillText}</span>
+              </div>
+            </div>
+
+            {/* Per-platform ceilings */}
+            <div className="border border-border rounded-lg overflow-hidden">
+              {services.map((group, gi) => (
+                <div key={gi}>
+                  <div className="px-3 py-2 bg-panel2">
+                    <span className="label text-[10px] text-faint tracking-wider">{group.label}</span>
+                  </div>
+                  {group.items.map((s, si) => {
+                    const plHeadroom = +(s.target - measured).toFixed(1);
+                    const over = plHeadroom < 0;
+                    const rightColor = over
+                      ? Math.abs(plHeadroom) > 1 ? "text-red-500" : "text-status-orange"
+                      : "text-status-green";
+                    return (
+                      <div key={si} className="flex items-center justify-between px-3 py-1.5 border-t border-border">
+                        <span className="text-xs text-text">{s.name}</span>
+                        <div className="flex items-center gap-4 text-xs">
+                          <span className="text-faint w-8 text-right">{s.target}</span>
+                          <span className={cn("w-24 text-right font-medium", rightColor)}>
+                            {over ? `+${Math.abs(plHeadroom).toFixed(1)} dB over` : `${plHeadroom.toFixed(1)} dB headroom`}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </PanelBody>
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+function TrackTabQualityMockup() {
+  return (
+    <>
+      <div className="p-4 space-y-4">
+        <TrackTabBar active="Audio" />
+        <Panel>
+          <PanelBody className="pt-6 space-y-4">
+            {/* Quality pill header — shown only when issues are detected */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-text">Quality Check</span>
+              <div className="flex items-center gap-2 text-xs text-faint">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-status-orange/20 text-status-orange text-[10px] font-medium">
+                  <AlertTriangle size={10} />
+                  Peak at full scale
+                </span>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted">
+              This pill only appears when the worker detects something worth
+              flagging. Clean mixes show nothing — the only audio QC readouts
+              on the player are LUFS and true peak.
+            </p>
+
+            {/* Mocked popover content */}
+            <div className="border border-border rounded-lg p-3 space-y-3 max-w-[360px]">
+              <div>
+                <div className="text-xs font-semibold text-text">Clipping</div>
+                <div className="text-[11px] text-muted">
+                  1,247 clipped samples detected. Reduce output gain or check your limiter ceiling.
+                </div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-text">Sample peak at full scale</div>
+                <div className="text-[11px] text-muted">
+                  Peak -0.00 dBFS. Leave at least 0.3 dB of headroom for DSP processing.
+                </div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-text">DC offset</div>
+                <div className="text-[11px] text-muted">
+                  Offset of 0.0034 detected. Apply a high-pass filter at 20 Hz or lower to remove.
+                </div>
+              </div>
+            </div>
+          </PanelBody>
+        </Panel>
+      </div>
+    </>
+  );
+}
+
 function TrackTabAudioMockup() {
   const commentMarkers = [
     { pos: 6, color: "#6366f1" },   // Alex - purple
@@ -681,13 +817,18 @@ function TrackTabAudioMockup() {
               </div>
             </div>
 
-            {/* Version metadata */}
+            {/* Version metadata — three QC pills on the right edge */}
             <div className="flex items-center gap-2 text-xs text-faint">
               <span>V1 &middot; MAR 4 &middot; 5 comments</span>
               <Download size={12} />
               <span className="flex-1" />
+              {/* LUFS */}
               <span>-14.2 LUFS</span>
               <span className="px-1.5 py-0.5 rounded bg-status-orange/20 text-status-orange text-[10px] font-medium">-0.8 dB</span>
+              {/* True peak */}
+              <span className="text-faint">·</span>
+              <span>-0.9 dBTP</span>
+              <span className="px-1.5 py-0.5 rounded bg-status-green/10 text-status-green text-[10px] font-medium">0.1 dB</span>
             </div>
 
             {/* Waveform with comment markers */}
@@ -3642,6 +3783,8 @@ const MOCKUPS: Record<string, () => React.ReactNode> = {
   "track-tab-specs": TrackTabSpecsMockup,
   "track-tab-audio": TrackTabAudioMockup,
   "track-tab-lufs": TrackTabLufsMockup,
+  "track-tab-truepeak": TrackTabTruePeakMockup,
+  "track-tab-quality": TrackTabQualityMockup,
   "track-tab-distribution": TrackTabDistributionMockup,
   "track-tab-portal": TrackTabPortalMockup,
   "track-tab-notes": TrackTabNotesMockup,
