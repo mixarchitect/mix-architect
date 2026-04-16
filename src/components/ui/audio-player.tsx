@@ -438,6 +438,21 @@ export function AudioPlayer({
     setShowQualityInfo(false);
   }, [activeVersion?.id]);
 
+  // Fire a warning-shown analytics event once per version when the quality
+  // pill appears. Keyed on version + issue set so switching between tracks
+  // re-fires (gives us usable per-track QC issue counts in analytics).
+  useEffect(() => {
+    if (!activeVersion) return;
+    if (!qualitySnapshot || qualitySnapshot.issues.length === 0) return;
+    trackGA4Event("audio_qc_warning_shown", {
+      version_id: activeVersion.id,
+      // GA4 parameter values are scalars; join issues for queryability.
+      issue_types: qualitySnapshot.issues.join(","),
+      severe: qualitySnapshot.severe,
+      surface: "app",
+    });
+  }, [activeVersion?.id, qualitySnapshot?.issues.join(","), qualitySnapshot?.severe]); // eslint-disable-line react-hooks/exhaustive-deps
+
   /* ---------------------------------------------------------------- */
   /*  WaveSurfer lifecycle                                             */
   /* ---------------------------------------------------------------- */
@@ -1143,6 +1158,13 @@ export function AudioPlayer({
                     <button
                       type="button"
                       onClick={() => {
+                        if (!showStreamingInfo && activeVersion) {
+                          trackGA4Event("audio_qc_panel_opened", {
+                            panel_type: "lufs",
+                            version_id: activeVersion.id,
+                            surface: "app",
+                          });
+                        }
                         setShowTruePeakInfo(false);
                         setShowQualityInfo(false);
                         setShowStreamingInfo((v) => !v);
@@ -1196,6 +1218,13 @@ export function AudioPlayer({
                     <button
                       type="button"
                       onClick={() => {
+                        if (!showTruePeakInfo && activeVersion) {
+                          trackGA4Event("audio_qc_panel_opened", {
+                            panel_type: "peak",
+                            version_id: activeVersion.id,
+                            surface: "app",
+                          });
+                        }
                         setShowStreamingInfo(false);
                         setShowQualityInfo(false);
                         setShowTruePeakInfo((v) => !v);
@@ -1245,6 +1274,13 @@ export function AudioPlayer({
                     <button
                       type="button"
                       onClick={() => {
+                        if (!showQualityInfo && activeVersion) {
+                          trackGA4Event("audio_qc_panel_opened", {
+                            panel_type: "quality",
+                            version_id: activeVersion.id,
+                            surface: "app",
+                          });
+                        }
                         setShowStreamingInfo(false);
                         setShowTruePeakInfo(false);
                         setShowQualityInfo((v) => !v);

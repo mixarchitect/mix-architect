@@ -17,6 +17,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import WaveSurfer from "wavesurfer.js";
+import { trackGA4Event } from "@/lib/ga4-track";
 import {
   getWaveColors,
   formatTime,
@@ -275,6 +276,20 @@ export function PortalAudioPlayer({
     setShowTruePeakInfo(false);
     setShowQualityInfo(false);
   }, [activeVersion?.id]);
+
+  // Fire warning-shown analytics event once per version when the quality
+  // pill appears with issues. Portal surface is tagged separately so we can
+  // distinguish engineer-side QC views from client-side QC views.
+  useEffect(() => {
+    if (!activeVersion) return;
+    if (!qualitySnapshot || qualitySnapshot.issues.length === 0) return;
+    trackGA4Event("audio_qc_warning_shown", {
+      version_id: activeVersion.id,
+      issue_types: qualitySnapshot.issues.join(","),
+      severe: qualitySnapshot.severe,
+      surface: "portal",
+    });
+  }, [activeVersion?.id, qualitySnapshot?.issues.join(","), qualitySnapshot?.severe]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // WaveSurfer refs
   const wavesurferRef = useRef<WaveSurfer | null>(null);
@@ -631,6 +646,13 @@ export function PortalAudioPlayer({
                       <button
                         type="button"
                         onClick={() => {
+                          if (!showStreamingInfo && activeVersion) {
+                            trackGA4Event("audio_qc_panel_opened", {
+                              panel_type: "lufs",
+                              version_id: activeVersion.id,
+                              surface: "portal",
+                            });
+                          }
                           setShowTruePeakInfo(false);
                           setShowQualityInfo(false);
                           setShowStreamingInfo((v) => !v);
@@ -683,6 +705,13 @@ export function PortalAudioPlayer({
                       <button
                         type="button"
                         onClick={() => {
+                          if (!showTruePeakInfo && activeVersion) {
+                            trackGA4Event("audio_qc_panel_opened", {
+                              panel_type: "peak",
+                              version_id: activeVersion.id,
+                              surface: "portal",
+                            });
+                          }
                           setShowStreamingInfo(false);
                           setShowQualityInfo(false);
                           setShowTruePeakInfo((v) => !v);
@@ -734,6 +763,13 @@ export function PortalAudioPlayer({
                       <button
                         type="button"
                         onClick={() => {
+                          if (!showQualityInfo && activeVersion) {
+                            trackGA4Event("audio_qc_panel_opened", {
+                              panel_type: "quality",
+                              version_id: activeVersion.id,
+                              surface: "portal",
+                            });
+                          }
                           setShowStreamingInfo(false);
                           setShowTruePeakInfo(false);
                           setShowQualityInfo((v) => !v);
