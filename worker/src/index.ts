@@ -21,6 +21,11 @@ import {
   convertAudio,
   getExtension,
 } from "./converter.js";
+import { analyzeLoudness } from "./loudness.js";
+
+/** Current loudness analysis algorithm version. Bump when parser or
+ *  FFmpeg filter chain changes in a way that should trigger reanalysis. */
+const LOUDNESS_ANALYSIS_VERSION = 1;
 
 /* ------------------------------------------------------------------ */
 /*  Config                                                             */
@@ -241,30 +246,57 @@ async function processNextJob() {
 /* ------------------------------------------------------------------ */
 
 async function processNextAnalysis() {
-  // Grab the oldest pending analysis
+  // Grab the oldest row that needs (re)analysis. Two classes qualify:
+  //   (a) Newly uploaded rows: spec_analysis_status = 'pending'
+  //   (b) Stale rows from older pipeline: status = 'complete' but
+  //       analysis_version is NULL (never ran through the loudness pass)
   const { data: rows } = await supabase
     .from("track_audio_versions")
-    .select("id, audio_url, file_name")
-    .eq("spec_analysis_status", "pending")
+    .select("id, audio_url, file_name, spec_analysis_status, analysis_version")
+    .or(
+      `spec_analysis_status.eq.pending,and(spec_analysis_status.eq.complete,analysis_version.is.null)`,
+    )
     .order("created_at", { ascending: true })
     .limit(1);
 
   if (!rows?.length) return;
   const row = rows[0];
+  const isBackfill = row.spec_analysis_status === "complete";
 
-  // Claim the analysis (optimistic lock)
-  const { error: claimError } = await supabase
-    .from("track_audio_versions")
-    .update({ spec_analysis_status: "analyzing" })
-    .eq("id", row.id)
-    .eq("spec_analysis_status", "pending");
+  // Claim the analysis (optimistic lock). For pending rows we transition
+  // to 'analyzing'. For backfill rows we leave spec_analysis_status alone
+  // (it's already 'complete') and use analysis_version as the lock: only
+  // claim if it's still NULL.
+  if (isBackfill) {
+    const { error: claimError, data: claimed } = await supabase
+      .from("track_audio_versions")
+      .update({ analysis_version: 0 }) // 0 = "in progress" sentinel
+      .eq("id", row.id)
+      .is("analysis_version", null)
+      .select("id");
 
-  if (claimError) {
-    console.warn(`Failed to claim analysis ${row.id}:`, claimError.message);
-    return;
+    if (claimError || !claimed?.length) {
+      if (claimError) {
+        console.warn(`Failed to claim backfill ${row.id}:`, claimError.message);
+      }
+      return;
+    }
+  } else {
+    const { error: claimError } = await supabase
+      .from("track_audio_versions")
+      .update({ spec_analysis_status: "analyzing" })
+      .eq("id", row.id)
+      .eq("spec_analysis_status", "pending");
+
+    if (claimError) {
+      console.warn(`Failed to claim analysis ${row.id}:`, claimError.message);
+      return;
+    }
   }
 
-  console.log(`Analyzing specs for ${row.id} (${row.file_name ?? "unknown"})`);
+  console.log(
+    `${isBackfill ? "Backfilling" : "Analyzing"} loudness for ${row.id} (${row.file_name ?? "unknown"})`,
+  );
 
   const analysisDir = path.join(TEMP_DIR, `analyze-${row.id}`);
   await fs.mkdir(analysisDir, { recursive: true });
@@ -275,23 +307,41 @@ async function processNextAnalysis() {
     const sourcePath = path.join(analysisDir, `source.${ext}`);
     await downloadSourceAudio(row.audio_url, sourcePath);
 
-    // Run ffprobe
-    const info = await probeSource(sourcePath);
+    // Run ffprobe + loudness analysis in parallel (both read the same file
+    // but from different processes — OS page cache makes the second read
+    // cheap).
+    const [info, loudness] = await Promise.all([
+      probeSource(sourcePath),
+      analyzeLoudness(sourcePath),
+    ]);
     const format = normalizeFormat(info.formatName, info.codecName);
     const lossy = isLossyCodec(info.codecName);
 
-    // Write results back
+    // Build update payload. For backfill rows, only touch loudness fields
+    // so we don't disturb format metadata that's already correct.
+    const update: Record<string, unknown> = {
+      measured_lufs: loudness.integratedLufs,
+      loudness_range: loudness.loudnessRange,
+      sample_peak_dbfs: loudness.samplePeakDbfs,
+      true_peak_dbtp: loudness.truePeakDbtp,
+      dc_offset: loudness.dcOffset,
+      clip_sample_count: loudness.clipSampleCount,
+      analysis_version: LOUDNESS_ANALYSIS_VERSION,
+    };
+
+    if (!isBackfill) {
+      update.sample_rate = info.sampleRate;
+      update.bit_depth = lossy ? null : info.bitDepth;
+      update.channels = info.channels;
+      update.codec = info.codecName;
+      update.file_format = format;
+      update.duration_seconds = info.duration > 0 ? info.duration : null;
+      update.spec_analysis_status = "complete";
+    }
+
     const { error } = await supabase
       .from("track_audio_versions")
-      .update({
-        sample_rate: info.sampleRate,
-        bit_depth: lossy ? null : info.bitDepth,
-        channels: info.channels,
-        codec: info.codecName,
-        file_format: format,
-        duration_seconds: info.duration > 0 ? info.duration : null,
-        spec_analysis_status: "complete",
-      })
+      .update(update)
       .eq("id", row.id);
 
     if (error) throw error;
@@ -299,22 +349,39 @@ async function processNextAnalysis() {
     console.log(
       `  Detected: ${format}, ${info.sampleRate}Hz, ${lossy ? "lossy" : `${info.bitDepth}-bit`}, ${info.channels}ch`,
     );
+    console.log(
+      `  Loudness: ${fmt(loudness.integratedLufs, "LUFS")}, true peak ${fmt(loudness.truePeakDbtp, "dBTP")}, ${loudness.clipSampleCount ?? "?"} clipped`,
+    );
     console.log(`✅ Analysis ${row.id} complete`);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`❌ Analysis ${row.id} failed:`, message);
 
     try {
-      await supabase
-        .from("track_audio_versions")
-        .update({ spec_analysis_status: "failed" })
-        .eq("id", row.id);
+      if (isBackfill) {
+        // Reset the sentinel so the row can be retried on the next pass.
+        // (Could mark it -1 to prevent retry loops if this becomes an
+        // issue, but with 10 existing files that's overkill.)
+        await supabase
+          .from("track_audio_versions")
+          .update({ analysis_version: null })
+          .eq("id", row.id);
+      } else {
+        await supabase
+          .from("track_audio_versions")
+          .update({ spec_analysis_status: "failed" })
+          .eq("id", row.id);
+      }
     } catch {
       // Ignore cleanup errors
     }
   } finally {
     await fs.rm(analysisDir, { recursive: true, force: true }).catch(() => {});
   }
+}
+
+function fmt(value: number | null, unit: string): string {
+  return value == null ? `—` : `${value.toFixed(1)} ${unit}`;
 }
 
 /* ------------------------------------------------------------------ */

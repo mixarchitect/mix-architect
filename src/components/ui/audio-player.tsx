@@ -68,6 +68,8 @@ export type AudioVersionData = {
   channels: number | null;
   codec: string | null;
   spec_analysis_status: "pending" | "analyzing" | "complete" | "failed" | null;
+  /** Worker-side loudness pipeline version. NULL until worker runs. */
+  analysis_version?: number | null;
   uploaded_by: string;
   created_at: string;
 };
@@ -184,13 +186,24 @@ export function AudioPlayer({
     shouldPlay: boolean;
   } | null>(null);
 
-  // LUFS measurement state
-  const [measuredLufs, setMeasuredLufs] = useState<number | null>(
-    activeVersion?.measured_lufs ?? null,
-  );
-  const [measuring, setMeasuring] = useState(false);
+  // LUFS comes from the worker (populated on upload). We read it directly
+  // from activeVersion rather than holding our own state, so the realtime
+  // subscription update below triggers a render without extra wiring.
+  const measuredLufs = activeVersion?.measured_lufs ?? null;
+  // A version is "processing" when the worker hasn't completed a full
+  // loudness analysis pass yet. Two cases qualify:
+  //   (a) spec_analysis_status is pending/analyzing (new upload)
+  //   (b) spec_analysis_status is complete but analysis_version is NULL
+  //       (legacy row awaiting backfill)
+  const isAnalysisProcessing =
+    activeVersion != null &&
+    (activeVersion.spec_analysis_status === "pending" ||
+      activeVersion.spec_analysis_status === "analyzing" ||
+      (activeVersion.spec_analysis_status === "complete" &&
+        activeVersion.measured_lufs == null &&
+        (activeVersion.analysis_version == null ||
+          activeVersion.analysis_version === 0)));
   const [showStreamingInfo, setShowStreamingInfo] = useState(false);
-  const measureAbortRef = useRef<AbortController | null>(null);
   const lufsBadgeRef = useRef<HTMLSpanElement | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
 
@@ -227,10 +240,16 @@ export function AudioPlayer({
 
   // ── Spec analysis Realtime subscription ──
   useEffect(() => {
-    // Subscribe to analysis status changes for all versions that aren't complete
-    const pending = versions.filter(
-      (v) => v.spec_analysis_status && v.spec_analysis_status !== "complete" && v.spec_analysis_status !== "failed",
-    );
+    // Subscribe to rows still awaiting analysis. Three cases qualify:
+    //   (a) status pending/analyzing (new upload, worker will process)
+    //   (b) status complete but analysis_version is null (legacy row awaiting
+    //       backfill to populate loudness fields)
+    const pending = versions.filter((v) => {
+      if (!v.spec_analysis_status) return false;
+      if (v.spec_analysis_status === "pending" || v.spec_analysis_status === "analyzing") return true;
+      if (v.spec_analysis_status === "complete" && v.analysis_version == null) return true;
+      return false;
+    });
     if (pending.length === 0) return;
 
     const channels = pending.map((v) => {
@@ -246,11 +265,9 @@ export function AudioPlayer({
           },
           (payload: { new: Record<string, unknown> }) => {
             const updated = payload.new as unknown as AudioVersionData;
-            if (updated.spec_analysis_status === "complete" || updated.spec_analysis_status === "failed") {
-              onVersionsChange(
-                versions.map((ver) => (ver.id === updated.id ? { ...ver, ...updated } : ver)),
-              );
-            }
+            onVersionsChange(
+              versions.map((ver) => (ver.id === updated.id ? { ...ver, ...updated } : ver)),
+            );
           },
         )
         .subscribe();
@@ -260,7 +277,8 @@ export function AudioPlayer({
     return () => {
       channels.forEach((ch) => supabase.removeChannel(ch));
     };
-  }, [versions.map((v) => `${v.id}:${v.spec_analysis_status}`).join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
+    // Resubscribe whenever any version's analysis state changes.
+  }, [versions.map((v) => `${v.id}:${v.spec_analysis_status}:${v.analysis_version ?? "null"}`).join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Spec mismatch computation ──
   // Compare whenever we have any detected specs (from client-side parsing or worker analysis)
@@ -340,11 +358,10 @@ export function AudioPlayer({
     return map;
   }, [comments]);
 
-  // Sync measuredLufs when active version changes
+  // Close the streaming info popover when switching versions.
   useEffect(() => {
-    setMeasuredLufs(activeVersion?.measured_lufs ?? null);
     setShowStreamingInfo(false);
-  }, [activeVersion?.id, activeVersion?.measured_lufs]);
+  }, [activeVersion?.id]);
 
   /* ---------------------------------------------------------------- */
   /*  WaveSurfer lifecycle                                             */
@@ -484,88 +501,9 @@ export function AudioPlayer({
             });
         }
 
-        // Measure LUFS + extract file metadata if not cached.
-        // Both share the same fetch/decode pipeline to avoid double-downloading.
-        const needsLufs = activeVersion.measured_lufs == null;
-        const needsMeta = activeVersion.sample_rate == null;
-
-        if (needsLufs || needsMeta) {
-          measureAbortRef.current?.abort();
-          const controller = new AbortController();
-          measureAbortRef.current = controller;
-          if (needsLufs) setMeasuring(true);
-
-          (async () => {
-            try {
-              const [{ decodeAudioWithRawBuffer }, { measureLUFS }, { parseAudioHeaderMetadata }] =
-                await Promise.all([
-                  import("@/lib/decode-audio"),
-                  import("@/lib/lufs"),
-                  import("@/lib/parse-audio-metadata"),
-                ]);
-
-              const { audioBuffer, rawBuffer } = await decodeAudioWithRawBuffer(
-                activeVersion.audio_url,
-                controller.signal,
-              );
-              if (controller.signal.aborted || cancelled) return;
-
-              // Parse binary headers for bit depth + format
-              const headerMeta = needsMeta
-                ? parseAudioHeaderMetadata(rawBuffer, activeVersion.file_name)
-                : null;
-
-              // Measure LUFS
-              const lufs = needsLufs ? measureLUFS(audioBuffer) : null;
-              if (controller.signal.aborted || cancelled) return;
-
-              // Build DB update payload
-              const dbUpdate: Record<string, unknown> = {};
-              let roundedLufs: number | null = null;
-              if (lufs != null) {
-                roundedLufs = Math.round(lufs * 100) / 100;
-                dbUpdate.measured_lufs = roundedLufs;
-              }
-              if (headerMeta) {
-                dbUpdate.sample_rate = audioBuffer.sampleRate;
-                dbUpdate.bit_depth = headerMeta.bitDepth;
-                dbUpdate.file_format = headerMeta.fileFormat;
-              }
-
-              await supabase
-                .from("track_audio_versions")
-                .update(dbUpdate)
-                .eq("id", activeVersion.id);
-
-              if (controller.signal.aborted || cancelled) return;
-
-              if (roundedLufs != null) setMeasuredLufs(roundedLufs);
-
-              onVersionsChange(
-                versionsRef.current.map((v) =>
-                  v.id === activeVersion.id
-                    ? {
-                        ...v,
-                        ...(roundedLufs != null ? { measured_lufs: roundedLufs } : {}),
-                        ...(headerMeta
-                          ? {
-                              sample_rate: audioBuffer.sampleRate,
-                              bit_depth: headerMeta.bitDepth,
-                              file_format: headerMeta.fileFormat,
-                            }
-                          : {}),
-                      }
-                    : v,
-                ),
-              );
-            } catch (err) {
-              if (err instanceof DOMException && err.name === "AbortError") return;
-              console.warn("Audio analysis failed:", err);
-            } finally {
-              if (!controller.signal.aborted && !cancelled) setMeasuring(false);
-            }
-          })();
-        }
+        // Loudness + file-metadata measurement moved to the worker
+        // (see worker/src/loudness.ts). The player just reads the values
+        // from the row once the worker has populated them.
       });
 
       ws.on("dblclick", () => {
@@ -627,7 +565,6 @@ export function AudioPlayer({
         audioElement.play().catch(() => {});
       }
       wavesurferRef.current = null;
-      measureAbortRef.current?.abort();
       resizeCleanupRef.current?.();
       resizeCleanupRef.current = null;
     };
@@ -1109,13 +1046,14 @@ export function AudioPlayer({
               )}
             </span>
           )}
-          {/* LUFS measurement */}
-          {measuring && (
-            <span className="text-[10px] text-faint animate-pulse">
-              · measuring…
+          {/* LUFS measurement (worker-populated) */}
+          {measuredLufs == null && isAnalysisProcessing && (
+            <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-faint">
+              <Loader2 size={10} className="animate-spin" />
+              Measurements processing
             </span>
           )}
-          {measuredLufs != null && !measuring && (() => {
+          {measuredLufs != null && (() => {
             const delta = measuredLufs - LUFS_REFERENCE;
             return (
               <span className="ml-auto inline-flex items-center gap-1.5 text-[10px]">
