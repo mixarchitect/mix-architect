@@ -219,7 +219,20 @@ export function AudioPlayer({
   const [showQualityInfo, setShowQualityInfo] = useState(false);
   const lufsBadgeRef = useRef<HTMLSpanElement | null>(null);
   const truePeakBadgeRef = useRef<HTMLSpanElement | null>(null);
+  // qualityBadgeRef is already on the wrapper span (the quality pill
+  // doesn't have a separate delta badge), so it doubles as the trigger
+  // ref for click-outside — no separate qualityTriggerRef needed.
   const qualityBadgeRef = useRef<HTMLSpanElement | null>(null);
+  // Trigger-group refs wrap the clickable button + delta badge so the
+  // click-outside handler below knows to ignore clicks on the whole pill
+  // (button clicks must fall through to the button's own onClick toggle
+  // instead of being closed by the document listener first).
+  const lufsTriggerRef = useRef<HTMLSpanElement | null>(null);
+  const truePeakTriggerRef = useRef<HTMLSpanElement | null>(null);
+  // Popover content refs — used by the click-outside handler below.
+  const streamingDropdownElRef = useRef<HTMLDivElement | null>(null);
+  const truePeakDropdownElRef = useRef<HTMLDivElement | null>(null);
+  const qualityDropdownElRef = useRef<HTMLDivElement | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; right: number } | null>(null);
   const [truePeakDropdownPos, setTruePeakDropdownPos] = useState<
     { top: number; right: number } | null
@@ -437,6 +450,36 @@ export function AudioPlayer({
     setShowTruePeakInfo(false);
     setShowQualityInfo(false);
   }, [activeVersion?.id]);
+
+  // Click-outside to close an open metric popover. Uses mousedown (not
+  // click) so a stray drag doesn't accidentally dismiss the popover.
+  // Clicks on the trigger pill fall through to the pill's own onClick
+  // (which toggles the open state) — the trigger-group refs below
+  // include both the button and the delta badge.
+  useEffect(() => {
+    if (!showStreamingInfo && !showTruePeakInfo && !showQualityInfo) return;
+    function handleMouseDown(e: MouseEvent) {
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (showStreamingInfo) {
+        if (lufsTriggerRef.current?.contains(target)) return;
+        if (streamingDropdownElRef.current?.contains(target)) return;
+        setShowStreamingInfo(false);
+      }
+      if (showTruePeakInfo) {
+        if (truePeakTriggerRef.current?.contains(target)) return;
+        if (truePeakDropdownElRef.current?.contains(target)) return;
+        setShowTruePeakInfo(false);
+      }
+      if (showQualityInfo) {
+        if (qualityBadgeRef.current?.contains(target)) return;
+        if (qualityDropdownElRef.current?.contains(target)) return;
+        setShowQualityInfo(false);
+      }
+    }
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
+  }, [showStreamingInfo, showTruePeakInfo, showQualityInfo]);
 
   // Fire a warning-shown analytics event once per version when the quality
   // pill appears. Keyed on version + issue set so switching between tracks
@@ -1153,7 +1196,7 @@ export function AudioPlayer({
               {measuredLufs != null && (() => {
                 const delta = measuredLufs - LUFS_REFERENCE;
                 return (
-                  <span className="inline-flex items-center gap-1.5">
+                  <span ref={lufsTriggerRef} className="inline-flex items-center gap-1.5">
                     <span className="text-faint">·</span>
                     <button
                       type="button"
@@ -1213,7 +1256,7 @@ export function AudioPlayer({
                     ? `${headroom.toFixed(1)} dB`
                     : `+${Math.abs(headroom).toFixed(1)} dB`;
                 return (
-                  <span className="inline-flex items-center gap-1.5">
+                  <span ref={truePeakTriggerRef} className="inline-flex items-center gap-1.5">
                     <span className="text-faint">·</span>
                     <button
                       type="button"
@@ -1556,6 +1599,7 @@ export function AudioPlayer({
       {/* Streaming normalization dropdown — fixed position to escape overflow-hidden */}
       {showStreamingInfo && measuredLufs != null && dropdownPos && (
         <div
+          ref={streamingDropdownElRef}
           className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden"
           style={{ top: dropdownPos.top, right: dropdownPos.right, background: "var(--panel-2)" }}
         >
@@ -1611,6 +1655,7 @@ export function AudioPlayer({
           against a ceiling (pass if ≤ target, over if > target). */}
       {showTruePeakInfo && measuredTruePeak != null && truePeakDropdownPos && (
         <div
+          ref={truePeakDropdownElRef}
           className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden"
           style={{ top: truePeakDropdownPos.top, right: truePeakDropdownPos.right, background: "var(--panel-2)" }}
         >
@@ -1664,6 +1709,7 @@ export function AudioPlayer({
           always has something meaningful to display when open. */}
       {showQualityInfo && qualitySnapshot != null && qualityDropdownPos && (
         <div
+          ref={qualityDropdownElRef}
           className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden max-w-[320px]"
           style={{ top: qualityDropdownPos.top, right: qualityDropdownPos.right, background: "var(--panel-2)" }}
         >

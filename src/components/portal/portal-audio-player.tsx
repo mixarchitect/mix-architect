@@ -160,7 +160,15 @@ export function PortalAudioPlayer({
   const [showQualityInfo, setShowQualityInfo] = useState(false);
   const lufsBadgeRef = useRef<HTMLSpanElement | null>(null);
   const truePeakBadgeRef = useRef<HTMLSpanElement | null>(null);
+  // qualityBadgeRef already wraps the whole pill, doubles as trigger ref.
   const qualityBadgeRef = useRef<HTMLSpanElement | null>(null);
+  // Trigger-group refs wrap button + delta badge for click-outside.
+  const lufsTriggerRef = useRef<HTMLSpanElement | null>(null);
+  const truePeakTriggerRef = useRef<HTMLSpanElement | null>(null);
+  // Popover content refs for click-outside.
+  const streamingDropdownElRef = useRef<HTMLDivElement | null>(null);
+  const truePeakDropdownElRef = useRef<HTMLDivElement | null>(null);
+  const qualityDropdownElRef = useRef<HTMLDivElement | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{
     top: number;
     right: number;
@@ -276,6 +284,33 @@ export function PortalAudioPlayer({
     setShowTruePeakInfo(false);
     setShowQualityInfo(false);
   }, [activeVersion?.id]);
+
+  // Click-outside to close an open metric popover (see audio-player.tsx
+  // for detailed reasoning; this mirrors that handler).
+  useEffect(() => {
+    if (!showStreamingInfo && !showTruePeakInfo && !showQualityInfo) return;
+    function handleMouseDown(e: MouseEvent) {
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (showStreamingInfo) {
+        if (lufsTriggerRef.current?.contains(target)) return;
+        if (streamingDropdownElRef.current?.contains(target)) return;
+        setShowStreamingInfo(false);
+      }
+      if (showTruePeakInfo) {
+        if (truePeakTriggerRef.current?.contains(target)) return;
+        if (truePeakDropdownElRef.current?.contains(target)) return;
+        setShowTruePeakInfo(false);
+      }
+      if (showQualityInfo) {
+        if (qualityBadgeRef.current?.contains(target)) return;
+        if (qualityDropdownElRef.current?.contains(target)) return;
+        setShowQualityInfo(false);
+      }
+    }
+    document.addEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
+  }, [showStreamingInfo, showTruePeakInfo, showQualityInfo]);
 
   // Fire warning-shown analytics event once per version when the quality
   // pill appears with issues. Portal surface is tagged separately so we can
@@ -641,7 +676,7 @@ export function PortalAudioPlayer({
                 (() => {
                   const delta = measuredLufs - LUFS_REFERENCE;
                   return (
-                    <span className="inline-flex items-center gap-1.5">
+                    <span ref={lufsTriggerRef} className="inline-flex items-center gap-1.5">
                       <span className="text-faint">&middot;</span>
                       <button
                         type="button"
@@ -700,7 +735,7 @@ export function PortalAudioPlayer({
                       ? `${headroom.toFixed(1)} dB`
                       : `+${Math.abs(headroom).toFixed(1)} dB`;
                   return (
-                    <span className="inline-flex items-center gap-1.5">
+                    <span ref={truePeakTriggerRef} className="inline-flex items-center gap-1.5">
                       <span className="text-faint">&middot;</span>
                       <button
                         type="button"
@@ -1083,6 +1118,7 @@ export function PortalAudioPlayer({
       {/* Streaming normalization dropdown */}
       {showStreamingInfo && measuredLufs != null && dropdownPos && (
         <div
+          ref={streamingDropdownElRef}
           className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden"
           style={{
             top: dropdownPos.top,
@@ -1148,6 +1184,7 @@ export function PortalAudioPlayer({
       {/* True peak target dropdown — ceiling-based comparison */}
       {showTruePeakInfo && measuredTruePeak != null && truePeakDropdownPos && (
         <div
+          ref={truePeakDropdownElRef}
           className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden"
           style={{
             top: truePeakDropdownPos.top,
@@ -1206,6 +1243,7 @@ export function PortalAudioPlayer({
       {/* Quality check dropdown */}
       {showQualityInfo && qualitySnapshot != null && qualityDropdownPos && (
         <div
+          ref={qualityDropdownElRef}
           className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden max-w-[320px]"
           style={{
             top: qualityDropdownPos.top,
