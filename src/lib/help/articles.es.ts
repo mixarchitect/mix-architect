@@ -122,9 +122,13 @@ export const articles: HelpArticle[] = [
       "audio",
       "distribution",
       "portal",
-      "notes"
+      "notes",
+      "lufs",
+      "true peak",
+      "calidad",
+      "sonoridad"
     ],
-    "updatedAt": "2026-03-04",
+    "updatedAt": "2026-04-15",
     "content": [
       {
         "heading": "Brief",
@@ -138,13 +142,23 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Audio",
-        "body": "La pestaña Audio es donde subes archivos, gestionas versiones y reproduces audio. El encabezado muestra el nombre del lanzamiento y la pista con la portada del álbum. El selector de versión (v1, v2, v3, etc.) te permite cambiar entre revisiones, haz clic en el botón + para subir una nueva versión. Cada versión muestra su número de versión, fecha de subida, recuento de comentarios y un botón de descarga. La visualización de forma de onda muestra el audio con reproducción interactiva: haz clic en cualquier lugar para buscar, y usa los controles de transporte debajo (bucle, saltar atrás, reproducir/pausa, saltar adelante, repetir). La medición de sonoridad LUFS se muestra junto a los metadatos del archivo (formato, frecuencia de muestreo, profundidad de bits), codificada por colores contra objetivos de sonoridad. La sección Comentarios debajo de la forma de onda muestra todos los comentarios con marca de tiempo para la versión actual. Haz doble clic en cualquier lugar de la forma de onda para añadir un nuevo comentario en ese código de tiempo. Los marcadores de comentarios aparecen como pequeños iconos en la forma de onda en sus posiciones respectivas.",
+        "body": "La pestaña Audio es donde subes archivos, gestionas versiones y reproduces audio. El encabezado muestra una pequeña ruta (Artista · Lanzamiento), seguida del título de la pista con flechas (chevrons) izquierda y derecha que te llevan a la pista anterior o siguiente del lanzamiento. Hacer clic en una flecha preserva la pestaña actual — pasar de Audio en la pista 1 te lleva a Audio en la pista 2 — así puedes recorrer un álbum pestaña por pestaña. El selector de versión (v1, v2, v3, etc.) te permite cambiar entre revisiones; haz clic en el botón + para subir una nueva versión. Cada versión muestra su número, fecha de subida, recuento de comentarios y un botón de descarga. La forma de onda muestra el audio con reproducción interactiva: haz clic en cualquier punto para buscar, y usa los controles de transporte debajo (bucle, retroceder, reproducir/pausa, avanzar, repetir). Justo encima de la forma de onda, una fila de pastillas de QC expone las estadísticas medidas por el worker — LUFS, True Peak (dBTP) y un aviso de Calidad condicional — cada una clicable para mostrar una explicación completa. Mientras el worker aún está analizando una subida nueva, un pequeño indicador \"Procesando mediciones\" aparece donde irán las pastillas. La sección Comentarios muestra todos los comentarios con marca de tiempo de la versión actual. Haz doble clic en la forma de onda para añadir un comentario en ese punto.",
         "mockup": "track-tab-audio"
       },
       {
-        "heading": "Análisis de Sonoridad (LUFS)",
-        "body": "Cuando subes audio, Mix Architect mide automáticamente la sonoridad integrada en LUFS (Unidades de Sonoridad Escala Completa). Haz clic en la lectura LUFS junto a los metadatos de versión para expandir el panel Análisis de Sonoridad. Esto muestra cómo cada servicio principal de streaming, estándar de transmisión y plataforma social ajustará tu pista durante la reproducción. Cada fila muestra el nombre de la plataforma, su sonoridad objetivo (ej. Spotify apunta a -14 LUFS) y el cambio de ganancia que se aplicaría a tu archivo. Un valor positivo significa que el servicio subirá tu pista, un valor negativo (mostrado en naranja) significa que se bajará. Por ejemplo, si tu mezcla mide -14.9 LUFS, Spotify aplicaría +0.9 dB mientras Apple Music (objetivo -16) aplicaría -1.1 dB. El panel está agrupado en Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Transmisión (EBU R128, ATSC A/85, ITU-R BS.1770) y Social (Instagram/Reels, TikTok, Facebook). Usa esto para comprobar si tu máster será alterado significativamente en cualquier plataforma antes de la entrega.",
+        "heading": "Análisis de Sonoridad",
+        "body": "Cuando subes audio, Mix Architect mide automáticamente la sonoridad integrada en LUFS (Unidades de Sonoridad Escala Completa) en el servidor y la guarda. Haz clic en la pastilla LUFS junto a los metadatos de versión para expandir el popover Análisis de Sonoridad. Esto muestra cómo cada servicio principal de streaming, estándar de transmisión y plataforma social ajustará tu pista durante la reproducción. Cada fila muestra el nombre de la plataforma, su sonoridad objetivo (ej. Spotify apunta a -14 LUFS) y el cambio de ganancia que se aplicaría a tu archivo. Un valor positivo significa que el servicio subirá tu pista, un valor negativo (mostrado en naranja) significa que se bajará. Por ejemplo, si tu mezcla mide -14.9 LUFS, Spotify aplicaría +0.9 dB mientras Apple Music (objetivo -16) aplicaría -1.1 dB. Pasa el cursor sobre el nombre de una plataforma para ver una breve explicación de cómo esa plataforma normaliza el audio. El popover está agrupado en Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Transmisión (EBU R128, ATSC A/85, ITU-R BS.1770) y Social (Instagram/Reels, TikTok, Facebook). Haz clic fuera del popover para cerrarlo. Usa esto para comprobar si tu máster será alterado significativamente en alguna plataforma antes de la entrega.",
         "mockup": "track-tab-lufs"
+      },
+      {
+        "heading": "True Peak",
+        "body": "El True Peak (dBTP) mide valores de pico entre muestras usando sobremuestreo 4× según ITU-R BS.1770-4. Esto es diferente del pico bruto de muestra porque los códecs con pérdida (MP3, AAC, Ogg Vorbis, Opus) pueden introducir sobrepicos entre muestras durante la codificación, causando clipping audible incluso cuando las muestras subyacentes nunca alcanzan 0 dBFS. Haz clic en la pastilla True Peak para ver cómo tu true peak medido se compara con el techo de cada plataforma. A diferencia de LUFS (donde quieres igualar el objetivo), el true peak es un techo — estar en o por debajo del objetivo siempre es correcto. Cada fila muestra la plataforma, su techo (la mayoría son -1 dBTP; el modo Loud de Spotify y Amazon Music usan -2 dBTP), y ya sea \"X.X dB de margen\" (verde, estás por debajo del techo) o \"+X.X dB por encima\" (naranja o rojo, estás por encima). La insignia junto a la lectura dBTP en la fila principal sigue la misma regla de color: verde por debajo de -1 dBTP, naranja entre -1 y 0, rojo por encima de 0 (sobrepicos entre muestras que harán clip en cadenas DSP). Pasa el cursor sobre el nombre de una plataforma para ver por qué se eligió ese techo específico.",
+        "mockup": "track-tab-truepeak"
+      },
+      {
+        "heading": "Verificación de Calidad",
+        "body": "La pastilla Verificación de Calidad es condicional — solo aparece cuando el worker detecta algo que merece ser marcado en tu subida. Las mezclas limpias no muestran ninguna pastilla. Cuando aparece, es ámbar para un único problema leve o roja para múltiples problemas o problemas graves. Hoy se señalan tres tipos de problemas: Clipping (un alto recuento de muestras a escala completa combinado con un pico de muestra en o muy cerca de 0 dBFS — la huella de un limitador apretado contra el techo), Pico de muestra a escala completa (tu muestra más ruidosa es ≥ -0.1 dBFS, sin dejar margen para DSP posterior o codificación con pérdida) y Desplazamiento DC (una amplitud promedio distinta de cero superior a 0.002, generalmente por un problema de etapa de ganancia o filtrado). Hacer clic en la pastilla expande un popover con cada problema detectado, una breve explicación para ingenieros y una acción correctiva — ej. \"Reduce la ganancia de salida o verifica el techo del limitador\" para clipping, \"Aplica un filtro paso alto a 20 Hz o menos\" para desplazamiento DC.",
+        "mockup": "track-tab-quality"
       },
       {
         "heading": "Distribución",

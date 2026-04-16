@@ -122,9 +122,13 @@ export const articles: HelpArticle[] = [
       "audio",
       "distribution",
       "portal",
-      "notes"
+      "notes",
+      "lufs",
+      "true peak",
+      "qualität",
+      "lautheit"
     ],
-    "updatedAt": "2026-03-04",
+    "updatedAt": "2026-04-15",
     "content": [
       {
         "heading": "Brief",
@@ -138,13 +142,23 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Audio",
-        "body": "Der Audio-Tab ist der Ort zum Hochladen von Dateien, Verwalten von Versionen und Abspielen von Audio. Die Kopfzeile zeigt den Veröffentlichungs- und Tracknamen mit dem Album-Cover. Der Versionsauswähler (v1, v2, v3 usw.) ermöglicht das Wechseln zwischen Revisionen; klicken Sie auf die +-Schaltfläche, um eine neue Version hochzuladen. Jede Version zeigt ihre Versionsnummer, das Uploaddatum, die Kommentaranzahl und eine Download-Schaltfläche. Die Wellenformvisualisierung zeigt das Audio mit interaktiver Wiedergabe: Klicken Sie irgendwo, um zu dieser Position zu springen, und verwenden Sie die Transportsteuerung darunter (Schleife, Zurückspringen, Play/Pause, Vorwärtsspringen, Wiederholen). Die LUFS-Lautheitsmessung wird neben den Dateimetadaten (Format, Abtastrate, Bittiefe) angezeigt, farbcodiert anhand von Lautheitszielwerten. Der Feedback-Bereich unterhalb der Wellenform zeigt alle zeitgestempelten Kommentare für die aktuelle Version. Doppelklicken Sie irgendwo auf die Wellenform, um einen neuen Kommentar an diesem Timecode hinzuzufügen. Kommentarmarkierungen erscheinen als kleine Symbole auf der Wellenform an ihren jeweiligen Positionen.",
+        "body": "Der Audio-Tab ist der Ort zum Hochladen von Dateien, Verwalten von Versionen und Abspielen von Audio. Die Kopfzeile zeigt einen kleinen Breadcrumb (Künstler · Veröffentlichung), dann den Tracktitel mit Chevron-Pfeilen links und rechts, die Sie zum vorherigen oder nächsten Track der Veröffentlichung bringen. Ein Klick auf einen Pfeil erhält den aktuellen Tab — vom Audio-Tab auf Track 1 landen Sie auf dem Audio-Tab auf Track 2 — so können Sie ein Album Tab für Tab durchgehen. Der Versionsauswähler (v1, v2, v3 usw.) ermöglicht das Wechseln zwischen Revisionen; klicken Sie auf die +-Schaltfläche, um eine neue Version hochzuladen. Jede Version zeigt Nummer, Upload-Datum, Kommentaranzahl und eine Download-Schaltfläche. Die Wellenform zeigt das Audio mit interaktiver Wiedergabe: Klicken Sie irgendwo, um zu springen, und verwenden Sie die Transportsteuerung darunter (Schleife, Zurück, Play/Pause, Vor, Wiederholen). Direkt oberhalb der Wellenform zeigt eine Reihe von QC-Badges die vom Worker gemessenen Audiostatistiken — LUFS, True Peak (dBTP) und eine optionale Qualitätswarnung — jeweils anklickbar für eine ausführliche Erklärung. Während der Worker noch einen neuen Upload analysiert, erscheint ein kleiner Hinweis \"Messungen werden verarbeitet\" dort, wo die Badges später erscheinen. Der Feedback-Bereich unterhalb zeigt alle zeitgestempelten Kommentare für die aktuelle Version. Doppelklicken Sie auf die Wellenform, um einen Kommentar an diesem Timecode hinzuzufügen.",
         "mockup": "track-tab-audio"
       },
       {
-        "heading": "Lautheitsanalyse (LUFS)",
-        "body": "Wenn Sie Audio hochladen, misst Mix Architect automatisch die integrierte Lautheit in LUFS (Loudness Units Full Scale). Klicken Sie auf den LUFS-Wert neben den Versionsmetadaten, um das Lautheitsanalyse-Panel zu erweitern. Dieses zeigt, wie jeder große Streaming-Dienst, Broadcast-Standard und jede soziale Plattform Ihren Track während der Wiedergabe anpassen wird. Jede Zeile zeigt den Plattformnamen, deren Ziellautheit (z. B. Spotify zielt auf -14 LUFS) und die Verstärkungsänderung, die auf Ihre Datei angewendet würde. Ein positiver Wert bedeutet, dass der Dienst Ihren Track lauter macht; ein negativer Wert (in Orange dargestellt) bedeutet, dass er leiser gemacht wird. Wenn Ihr Mix beispielsweise -14,9 LUFS misst, würde Spotify +0,9 dB anwenden, während Apple Music (Zielwert -16) -1,1 dB anwenden würde. Das Panel ist gruppiert in Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Broadcast (EBU R128, ATSC A/85, ITU-R BS.1770) und Social (Instagram/Reels, TikTok, Facebook). Verwenden Sie dies, um vor der Auslieferung zu prüfen, ob Ihr Master auf einer Plattform wesentlich verändert wird.",
+        "heading": "Lautheitsanalyse",
+        "body": "Wenn Sie Audio hochladen, misst Mix Architect automatisch die integrierte Lautheit in LUFS (Loudness Units Full Scale) serverseitig und speichert sie. Klicken Sie auf das LUFS-Badge neben den Versionsmetadaten, um das Lautheitsanalyse-Popover zu erweitern. Dieses zeigt, wie jeder große Streaming-Dienst, Broadcast-Standard und jede soziale Plattform Ihren Track während der Wiedergabe anpassen wird. Jede Zeile zeigt den Plattformnamen, deren Ziellautheit (z. B. Spotify zielt auf -14 LUFS) und die Verstärkungsänderung, die auf Ihre Datei angewendet würde. Ein positiver Wert bedeutet, dass der Dienst Ihren Track lauter macht; ein negativer Wert (in Orange dargestellt) bedeutet, dass er leiser gemacht wird. Wenn Ihr Mix beispielsweise -14,9 LUFS misst, würde Spotify +0,9 dB anwenden, während Apple Music (Zielwert -16) -1,1 dB anwenden würde. Fahren Sie mit der Maus über einen Plattformnamen, um eine kurze Erklärung zu sehen, wie diese Plattform Audio normalisiert. Das Popover ist gruppiert in Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Broadcast (EBU R128, ATSC A/85, ITU-R BS.1770) und Social (Instagram/Reels, TikTok, Facebook). Klicken Sie außerhalb des Popovers, um es zu schließen. Verwenden Sie dies, um vor der Auslieferung zu prüfen, ob Ihr Master auf einer Plattform wesentlich verändert wird.",
         "mockup": "track-tab-lufs"
+      },
+      {
+        "heading": "True Peak",
+        "body": "True Peak (dBTP) misst Inter-Sample-Peaks mit 4× Oversampling gemäß ITU-R BS.1770-4. Dies unterscheidet sich vom rohen Sample-Peak, da verlustbehaftete Codecs (MP3, AAC, Ogg Vorbis, Opus) bei der Kodierung Überschwinger zwischen Samples einführen können, die hörbares Clipping verursachen, selbst wenn die zugrunde liegenden Samples nie 0 dBFS erreichen. Klicken Sie auf das True-Peak-Badge, um zu sehen, wie Ihr gemessener True Peak mit der Obergrenze jeder Plattform verglichen wird. Anders als bei LUFS (wo Sie den Zielwert treffen wollen) ist True Peak eine Obergrenze — auf oder unter dem Ziel zu bleiben ist immer in Ordnung. Jede Zeile zeigt die Plattform, ihre Obergrenze (die meisten sind -1 dBTP; Spotify Loud-Modus und Amazon Music sind -2 dBTP) und entweder \"X.X dB Headroom\" (grün, Sie sind unter der Obergrenze) oder \"+X.X dB darüber\" (orange oder rot, Sie liegen darüber). Das kleine Badge neben dem dBTP-Wert in der Hauptzeile folgt derselben Farbregel: grün unter -1 dBTP, orange zwischen -1 und 0, rot über 0 (Inter-Sample-Overs, die DSP-Ketten clippen lassen). Fahren Sie mit der Maus über einen Plattformnamen, um zu sehen, warum diese spezifische Obergrenze gewählt wurde.",
+        "mockup": "track-tab-truepeak"
+      },
+      {
+        "heading": "Qualitätsprüfung",
+        "body": "Das Qualitätsprüfung-Badge ist bedingt — es erscheint nur, wenn der Worker etwas erkennt, das auf Ihrem Upload markiert werden sollte. Saubere Mixe zeigen kein Badge. Wenn es erscheint, ist es bernsteinfarben für ein einzelnes leichtes Problem oder rot für mehrere oder schwerwiegende Probleme. Heute werden drei Problemtypen angezeigt: Clipping (eine hohe Anzahl an Samples auf Vollaussteuerung kombiniert mit einem Sample-Peak auf oder sehr nahe 0 dBFS — das Kennzeichen eines Limiter-Ceilings, auf dem gesessen wird), Sample-Peak auf Vollaussteuerung (Ihr lautestes Sample ist ≥ -0,1 dBFS, was keinen Headroom für nachgelagertes DSP oder verlustbehaftete Kodierung lässt) und DC-Offset (eine durchschnittliche Amplitude über 0,002, die nicht null ist, meist durch ein Gain-Stage- oder Filterproblem). Ein Klick auf das Badge öffnet ein Popover mit jedem erkannten Problem, einer kurzen technischen Erklärung und einer umsetzbaren Korrektur — z. B. \"Reduzieren Sie den Ausgabepegel oder prüfen Sie die Limiter-Obergrenze\" bei Clipping, \"Hochpassfilter bei 20 Hz oder tiefer anwenden\" bei DC-Offset.",
+        "mockup": "track-tab-quality"
       },
       {
         "heading": "Distribution",

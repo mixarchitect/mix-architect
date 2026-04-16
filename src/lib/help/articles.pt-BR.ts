@@ -122,9 +122,13 @@ export const articles: HelpArticle[] = [
       "audio",
       "distribution",
       "portal",
-      "notes"
+      "notes",
+      "lufs",
+      "true peak",
+      "qualidade",
+      "volume"
     ],
-    "updatedAt": "2026-03-04",
+    "updatedAt": "2026-04-15",
     "content": [
       {
         "heading": "Brief",
@@ -138,13 +142,23 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Áudio",
-        "body": "A aba Áudio é onde você faz upload de arquivos, gerencia versões e reproduz áudio. O cabeçalho mostra o nome do lançamento e da faixa com a capa do álbum. O seletor de versão (v1, v2, v3, etc.) permite alternar entre revisões, clique no botão + para fazer upload de uma nova versão. Cada versão exibe seu número de versão, data de upload, contagem de comentários e um botão de download. A visualização da forma de onda mostra o áudio com reprodução interativa: clique em qualquer lugar para buscar, e use os controles de transporte abaixo (loop, pular para trás, reproduzir/pausar, pular para frente, repetir). A medição de volume LUFS é exibida ao lado dos metadados do arquivo (formato, taxa de amostragem, profundidade de bits), com código de cores contra alvos de volume. A seção Feedback abaixo da forma de onda mostra todos os comentários com marca de tempo para a versão atual. Clique duas vezes em qualquer lugar na forma de onda para adicionar um novo comentário naquele timecode. Marcadores de comentários aparecem como pequenos ícones na forma de onda em suas respectivas posições.",
+        "body": "A aba Áudio é onde você faz upload de arquivos, gerencia versões e reproduz áudio. O cabeçalho mostra um pequeno caminho (Artista · Lançamento), depois o título da faixa com setas chevron esquerda e direita que levam você para a faixa anterior ou próxima do lançamento. Clicar em uma seta preserva a aba atual — passar de Áudio na faixa 1 leva você para Áudio na faixa 2 — assim você pode percorrer um álbum aba por aba. O seletor de versão (v1, v2, v3, etc.) permite alternar entre revisões; clique no botão + para fazer upload de uma nova versão. Cada versão exibe seu número, data de upload, contagem de comentários e um botão de download. A forma de onda mostra o áudio com reprodução interativa: clique em qualquer lugar para buscar, e use os controles de transporte abaixo (loop, voltar, reproduzir/pausar, avançar, repetir). Logo acima da forma de onda, uma linha de pílulas de QC expõe as estatísticas medidas pelo worker — LUFS, True Peak (dBTP) e um aviso de Qualidade condicional — cada uma clicável para revelar uma explicação completa. Enquanto o worker ainda está analisando um upload novo, um pequeno indicador \"Processando medições\" mostra onde as pílulas aparecerão. A seção Feedback abaixo mostra todos os comentários com marca de tempo para a versão atual. Clique duas vezes na forma de onda para adicionar um comentário naquele timecode.",
         "mockup": "track-tab-audio"
       },
       {
-        "heading": "Análise de Volume (LUFS)",
-        "body": "Quando você faz upload de áudio, o Mix Architect automaticamente mede o volume integrado em LUFS (Loudness Units Full Scale). Clique na leitura LUFS ao lado dos metadados da versão para expandir o painel de Análise de Volume. Isso mostra como cada grande serviço de streaming, padrão de transmissão e plataforma social ajustará sua faixa durante a reprodução. Cada linha exibe o nome da plataforma, seu volume alvo (ex. Spotify tem como alvo -14 LUFS) e a mudança de ganho que seria aplicada ao seu arquivo. Um valor positivo significa que o serviço aumentará sua faixa, um valor negativo (mostrado em laranja) significa que será diminuído. Por exemplo, se sua mixagem mede -14.9 LUFS, o Spotify aplicaria +0.9 dB enquanto o Apple Music (alvo -16) aplicaria -1.1 dB. O painel é agrupado em Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Transmissão (EBU R128, ATSC A/85, ITU-R BS.1770) e Social (Instagram/Reels, TikTok, Facebook). Use isso para verificar se seu master será significativamente alterado em qualquer plataforma antes da entrega.",
+        "heading": "Análise de Volume",
+        "body": "Quando você faz upload de áudio, o Mix Architect automaticamente mede o volume integrado em LUFS (Loudness Units Full Scale) no servidor e faz cache. Clique na pílula LUFS ao lado dos metadados da versão para expandir o popover de Análise de Volume. Isso mostra como cada grande serviço de streaming, padrão de transmissão e plataforma social ajustará sua faixa durante a reprodução. Cada linha exibe o nome da plataforma, seu volume alvo (ex. Spotify tem como alvo -14 LUFS) e a mudança de ganho que seria aplicada ao seu arquivo. Um valor positivo significa que o serviço aumentará sua faixa, um valor negativo (mostrado em laranja) significa que será diminuído. Por exemplo, se sua mixagem mede -14.9 LUFS, o Spotify aplicaria +0.9 dB enquanto o Apple Music (alvo -16) aplicaria -1.1 dB. Passe o cursor sobre o nome de uma plataforma para ver uma breve explicação de como aquela plataforma normaliza áudio. O popover é agrupado em Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Transmissão (EBU R128, ATSC A/85, ITU-R BS.1770) e Social (Instagram/Reels, TikTok, Facebook). Clique fora do popover para fechá-lo. Use isso para verificar se seu master será significativamente alterado em qualquer plataforma antes da entrega.",
         "mockup": "track-tab-lufs"
+      },
+      {
+        "heading": "True Peak",
+        "body": "O True Peak (dBTP) mede valores de pico entre amostras usando superamostragem 4× segundo ITU-R BS.1770-4. Isso é diferente do pico bruto de amostra porque codecs com perdas (MP3, AAC, Ogg Vorbis, Opus) podem introduzir picos entre amostras durante a codificação, causando clipping audível mesmo quando as amostras subjacentes nunca atingem 0 dBFS. Clique na pílula True Peak para ver como seu true peak medido se compara ao teto de cada plataforma. Diferente do LUFS (onde você quer igualar o alvo), o true peak é um teto — ficar em ou abaixo do alvo sempre é aceitável. Cada linha mostra a plataforma, seu teto (a maioria é -1 dBTP; o modo Loud do Spotify e Amazon Music são -2 dBTP), e ou \"X.X dB de margem\" (verde, você está abaixo do teto) ou \"+X.X dB acima\" (laranja ou vermelho, você está acima). O badge pequeno ao lado da leitura dBTP na linha principal segue a mesma regra de cor: verde abaixo de -1 dBTP, laranja entre -1 e 0, vermelho acima de 0 (picos entre amostras que farão clip em cadeias DSP). Passe o cursor sobre o nome de uma plataforma para ver por que aquele teto específico foi escolhido.",
+        "mockup": "track-tab-truepeak"
+      },
+      {
+        "heading": "Verificação de Qualidade",
+        "body": "A pílula Verificação de Qualidade é condicional — só aparece quando o worker detecta algo que vale a pena sinalizar no seu upload. Mixagens limpas não mostram nenhuma pílula. Quando aparece, é âmbar para um único problema leve ou vermelha para múltiplos problemas ou problemas graves. Três tipos de problemas são sinalizados hoje: Clipping (uma alta contagem de amostras em escala completa combinada com o pico de amostra em ou muito perto de 0 dBFS — a marca de um teto de limitador sendo pressionado), Pico de amostra em escala completa (sua amostra mais alta é ≥ -0.1 dBFS, sem deixar margem para DSP posterior ou codificação com perdas) e Offset DC (uma amplitude média diferente de zero acima de 0.002, geralmente de um problema de estágio de ganho ou filtragem). Clicar na pílula expande um popover com cada problema detectado, uma breve explicação técnica e uma correção acionável — ex. \"Reduza o ganho de saída ou verifique o teto do limitador\" para clipping, \"Aplique um filtro passa-alta a 20 Hz ou menos\" para offset DC.",
+        "mockup": "track-tab-quality"
       },
       {
         "heading": "Distribuição",

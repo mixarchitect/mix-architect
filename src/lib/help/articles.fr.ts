@@ -122,9 +122,13 @@ export const articles: HelpArticle[] = [
       "audio",
       "distribution",
       "portal",
-      "notes"
+      "notes",
+      "lufs",
+      "true peak",
+      "qualité",
+      "volume"
     ],
-    "updatedAt": "2026-03-04",
+    "updatedAt": "2026-04-15",
     "content": [
       {
         "heading": "Brief",
@@ -138,13 +142,23 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Audio",
-        "body": "L'onglet Audio est où vous téléchargez des fichiers, gérez les versions et lisez l'audio. L'en-tête montre le nom de la sortie et du morceau avec la pochette d'album. Le sélecteur de version (v1, v2, v3, etc.) vous permet de basculer entre les révisions, cliquez sur le bouton + pour télécharger une nouvelle version. Chaque version affiche son numéro de version, sa date de téléchargement, son nombre de commentaires et un bouton de téléchargement. La visualisation de forme d'onde montre l'audio avec une lecture interactive : cliquez n'importe où pour naviguer, et utilisez les contrôles de transport en dessous (boucle, reculer, lecture/pause, avancer, répéter). La mesure de volume LUFS est affichée à côté des métadonnées du fichier (format, fréquence d'échantillonnage, profondeur de bits), codée en couleur par rapport aux cibles de volume. La section Retours sous la forme d'onde montre tous les commentaires horodatés pour la version actuelle. Double-cliquez n'importe où sur la forme d'onde pour ajouter un nouveau commentaire à ce timecode. Les marqueurs de commentaire apparaissent comme de petites icônes sur la forme d'onde à leurs positions respectives.",
+        "body": "L'onglet Audio est où vous téléchargez des fichiers, gérez les versions et lisez l'audio. L'en-tête montre un petit fil d'Ariane (Artiste · Sortie), puis le titre du morceau avec des flèches chevron gauche et droite qui vous amènent au morceau précédent ou suivant de la sortie. Cliquer sur une flèche préserve l'onglet actif — passer d'Audio sur le morceau 1 vous amène à Audio sur le morceau 2 — vous pouvez ainsi parcourir un album onglet par onglet. Le sélecteur de version (v1, v2, v3, etc.) vous permet de basculer entre les révisions ; cliquez sur le bouton + pour télécharger une nouvelle version. Chaque version affiche son numéro, sa date de téléchargement, son nombre de commentaires et un bouton de téléchargement. La forme d'onde montre l'audio avec une lecture interactive : cliquez n'importe où pour naviguer, et utilisez les contrôles de transport en dessous (boucle, reculer, lecture/pause, avancer, répéter). Juste au-dessus de la forme d'onde, une rangée de pastilles de QC affiche les statistiques mesurées par le worker — LUFS, True Peak (dBTP) et un avertissement de Qualité conditionnel — chacune cliquable pour révéler une explication complète. Pendant que le worker analyse encore un nouveau téléchargement, un petit indicateur « Mesures en cours » montre où les pastilles apparaîtront. La section Retours sous la forme d'onde montre tous les commentaires horodatés pour la version actuelle. Double-cliquez sur la forme d'onde pour ajouter un commentaire à ce timecode.",
         "mockup": "track-tab-audio"
       },
       {
-        "heading": "Analyse de volume (LUFS)",
-        "body": "Quand vous téléchargez de l'audio, Mix Architect mesure automatiquement le volume intégré en LUFS (Loudness Units Full Scale). Cliquez sur la lecture LUFS à côté des métadonnées de version pour développer le panneau d'Analyse de volume. Celui-ci montre comment chaque service de streaming majeur, standard de diffusion et plateforme sociale ajustera votre morceau pendant la lecture. Chaque ligne affiche le nom de la plateforme, son volume cible (ex. Spotify cible -14 LUFS) et le changement de gain qui serait appliqué à votre fichier. Une valeur positive signifie que le service augmentera votre morceau, une valeur négative (montrée en orange) signifie qu'il sera baissé. Par exemple, si votre mix mesure -14,9 LUFS, Spotify appliquerait +0,9 dB alors qu'Apple Music (cible -16) appliquerait -1,1 dB. Le panneau est groupé en Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Diffusion (EBU R128, ATSC A/85, ITU-R BS.1770) et Social (Instagram/Reels, TikTok, Facebook). Utilisez ceci pour vérifier si votre master sera significativement altéré sur une plateforme avant livraison.",
+        "heading": "Analyse de volume",
+        "body": "Quand vous téléchargez de l'audio, Mix Architect mesure automatiquement le volume intégré en LUFS (Loudness Units Full Scale) côté serveur et le met en cache. Cliquez sur la pastille LUFS à côté des métadonnées de version pour développer le popover d'Analyse de volume. Celui-ci montre comment chaque service de streaming majeur, standard de diffusion et plateforme sociale ajustera votre morceau pendant la lecture. Chaque ligne affiche le nom de la plateforme, son volume cible (ex. Spotify cible -14 LUFS) et le changement de gain qui serait appliqué à votre fichier. Une valeur positive signifie que le service augmentera votre morceau, une valeur négative (montrée en orange) signifie qu'il sera baissé. Par exemple, si votre mix mesure -14,9 LUFS, Spotify appliquerait +0,9 dB alors qu'Apple Music (cible -16) appliquerait -1,1 dB. Survolez le nom d'une plateforme pour voir une courte explication de comment cette plateforme normalise l'audio. Le popover est groupé en Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Diffusion (EBU R128, ATSC A/85, ITU-R BS.1770) et Social (Instagram/Reels, TikTok, Facebook). Cliquez en dehors du popover pour le fermer. Utilisez ceci pour vérifier si votre master sera significativement altéré sur une plateforme avant livraison.",
         "mockup": "track-tab-lufs"
+      },
+      {
+        "heading": "True Peak",
+        "body": "Le True Peak (dBTP) mesure les valeurs de crête inter-échantillons en utilisant un suréchantillonnage 4× selon ITU-R BS.1770-4. C'est différent de la crête brute d'échantillon car les codecs avec perte (MP3, AAC, Ogg Vorbis, Opus) peuvent introduire des dépassements entre les échantillons lors de l'encodage, causant un clipping audible même quand les échantillons sous-jacents n'atteignent jamais 0 dBFS. Cliquez sur la pastille True Peak pour voir comment votre true peak mesuré se compare au plafond de chaque plateforme. Contrairement au LUFS (où vous voulez atteindre la cible), le true peak est un plafond — rester à ou en dessous de la cible est toujours bien. Chaque ligne montre la plateforme, son plafond (la plupart sont à -1 dBTP ; le mode Loud de Spotify et Amazon Music sont à -2 dBTP), et soit « X.X dB de marge » (vert, vous êtes sous le plafond) soit « +X.X dB au-dessus » (orange ou rouge, vous êtes au-dessus). Le petit badge à côté de la lecture dBTP sur la ligne principale suit la même règle de couleur : vert en dessous de -1 dBTP, orange entre -1 et 0, rouge au-dessus de 0 (dépassements inter-échantillons qui cliperont les chaînes DSP). Survolez le nom d'une plateforme pour voir pourquoi ce plafond spécifique a été choisi.",
+        "mockup": "track-tab-truepeak"
+      },
+      {
+        "heading": "Contrôle Qualité",
+        "body": "La pastille Contrôle Qualité est conditionnelle — elle n'apparaît que quand le worker détecte quelque chose qui mérite d'être signalé dans votre téléchargement. Les mixes propres ne montrent aucune pastille. Quand elle apparaît, elle est ambre pour un seul problème léger ou rouge pour plusieurs problèmes ou des problèmes sévères. Trois types de problèmes sont signalés aujourd'hui : Clipping (un nombre élevé d'échantillons à pleine échelle combiné avec la crête d'échantillon située à ou très près de 0 dBFS — la signature d'un plafond de limiteur sur lequel on s'assoit), Crête d'échantillon à pleine échelle (votre échantillon le plus fort est ≥ -0,1 dBFS, ne laissant aucune marge pour le DSP en aval ou l'encodage avec perte) et Décalage DC (une amplitude moyenne non nulle supérieure à 0,002, généralement due à un problème d'étage de gain ou de filtrage). Cliquer sur la pastille développe un popover avec chaque problème détecté, une courte explication technique et une correction actionnable — ex. « Réduisez le gain de sortie ou vérifiez le plafond de votre limiteur » pour le clipping, « Appliquez un filtre passe-haut à 20 Hz ou moins » pour le décalage DC.",
+        "mockup": "track-tab-quality"
       },
       {
         "heading": "Distribution",

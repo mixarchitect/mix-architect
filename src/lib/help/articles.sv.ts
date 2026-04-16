@@ -122,9 +122,13 @@ export const articles: HelpArticle[] = [
       "audio",
       "distribution",
       "portal",
-      "notes"
+      "notes",
+      "lufs",
+      "true peak",
+      "kvalitet",
+      "ljudstyrka"
     ],
-    "updatedAt": "2026-03-04",
+    "updatedAt": "2026-04-15",
     "content": [
       {
         "heading": "Brief",
@@ -138,13 +142,23 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Audio",
-        "body": "Fliken Audio är där du laddar upp filer, hanterar versioner och spelar upp ljud. Sidhuvudet visar release- och spårnamnet med albumomslaget. Versionsväljaren (v1, v2, v3 osv.) låter dig växla mellan revisioner; klicka på +-knappen för att ladda upp en ny version. Varje version visar sitt versionsnummer, uppladdningsdatum, antal kommentarer och en nedladdningsknapp. Vågformsvisualiseringen visar ljudet med interaktiv uppspelning: klicka var som helst för att hoppa till den positionen, och använd transportkontrollerna nedanför (loop, hoppa bakåt, spela/pausa, hoppa framåt, upprepa). LUFS-ljudstyrkemätningen visas bredvid filens metadata (format, samplingsfrekvens, bitdjup), färgkodad mot ljudstyrkemål. Sektionen Feedback under vågformen visar alla tidsstämplade kommentarer för aktuell version. Dubbelklicka var som helst på vågformen för att lägga till en ny kommentar vid den tidkoden. Kommentarsmarkörer visas som små ikoner på vågformen vid sina respektive positioner.",
+        "body": "Fliken Audio är där du laddar upp filer, hanterar versioner och spelar upp ljud. Sidhuvudet visar en liten brödsmulelist (Artist · Release), sedan spårets titel med vänster och höger chevronpilar som tar dig till föregående eller nästa spår i releasen. Att klicka på en pil bevarar aktuell flik — att gå från Audio på spår 1 landar dig på Audio på spår 2 — så du kan svepa igenom ett album en flik i taget. Versionsväljaren (v1, v2, v3 osv.) låter dig växla mellan revisioner; klicka på +-knappen för att ladda upp en ny version. Varje version visar sitt nummer, uppladdningsdatum, antal kommentarer och en nedladdningsknapp. Vågformen visar ljudet med interaktiv uppspelning: klicka var som helst för att hoppa, och använd transportkontrollerna nedanför (loop, bakåt, spela/pausa, framåt, upprepa). Precis ovanför vågformen visar en rad QC-pillar den worker-mätta ljudstatistiken — LUFS, True Peak (dBTP) och en villkorlig kvalitetsvarning — var och en klickbar för att visa en fullständig förklaring. Medan workern fortfarande analyserar en ny uppladdning visar en liten indikator \"Mätningar pågår\" där pillarna kommer att visas. Sektionen Feedback under vågformen visar alla tidsstämplade kommentarer för aktuell version. Dubbelklicka på vågformen för att lägga till en kommentar vid den tidkoden.",
         "mockup": "track-tab-audio"
       },
       {
-        "heading": "Ljudstyrkeanalys (LUFS)",
-        "body": "När du laddar upp ljud mäter Mix Architect automatiskt den integrerade ljudstyrkan i LUFS (Loudness Units Full Scale). Klicka på LUFS-värdet bredvid versionsmetadata för att expandera panelen Loudness Analysis. Denna visar hur varje större streamingtjänst, sändningsstandard och social plattform kommer att justera ditt spår under uppspelning. Varje rad visar plattformens namn, dess målloudness (t.ex. Spotify riktar sig mot -14 LUFS) och den förstärkningsändring som skulle tillämpas på din fil. Ett positivt värde betyder att tjänsten höjer volymen på ditt spår; ett negativt värde (visat i orange) betyder att den sänks. Om din mix till exempel mäter -14.9 LUFS skulle Spotify tillämpa +0.9 dB medan Apple Music (mål -16) skulle tillämpa -1.1 dB. Panelen är grupperad i Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Broadcast (EBU R128, ATSC A/85, ITU-R BS.1770) och Social (Instagram/Reels, TikTok, Facebook). Använd detta för att kontrollera om din master kommer att ändras avsevärt på någon plattform innan leverans.",
+        "heading": "Ljudstyrkeanalys",
+        "body": "När du laddar upp ljud mäter Mix Architect automatiskt den integrerade ljudstyrkan i LUFS (Loudness Units Full Scale) på servern och cachar den. Klicka på LUFS-pillen bredvid versionsmetadata för att expandera popovern Loudness Analysis. Denna visar hur varje större streamingtjänst, sändningsstandard och social plattform kommer att justera ditt spår under uppspelning. Varje rad visar plattformens namn, dess målloudness (t.ex. Spotify riktar sig mot -14 LUFS) och den förstärkningsändring som skulle tillämpas på din fil. Ett positivt värde betyder att tjänsten höjer volymen på ditt spår; ett negativt värde (visat i orange) betyder att den sänks. Om din mix till exempel mäter -14.9 LUFS skulle Spotify tillämpa +0.9 dB medan Apple Music (mål -16) skulle tillämpa -1.1 dB. Hovra över ett plattformsnamn för att se en kort förklaring av hur den plattformen normaliserar ljud. Popovern är grupperad i Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Broadcast (EBU R128, ATSC A/85, ITU-R BS.1770) och Social (Instagram/Reels, TikTok, Facebook). Klicka utanför popovern för att stänga den. Använd detta för att kontrollera om din master kommer att ändras avsevärt på någon plattform innan leverans.",
         "mockup": "track-tab-lufs"
+      },
+      {
+        "heading": "True Peak",
+        "body": "True Peak (dBTP) mäter topparvärden mellan samples med 4× oversampling enligt ITU-R BS.1770-4. Detta skiljer sig från rå sampletopp eftersom förstörande codecs (MP3, AAC, Ogg Vorbis, Opus) kan introducera översvängningar mellan samples under kodning, vilket orsakar hörbar clipping även när de underliggande samplena aldrig når 0 dBFS. Klicka på True Peak-pillen för att se hur din uppmätta true peak jämförs med varje plattforms tak. Till skillnad från LUFS (där du vill matcha målet) är true peak ett tak — att vara på eller under målet är alltid okej. Varje rad visar plattformen, dess tak (de flesta är -1 dBTP; Spotify Loud-läge och Amazon Music är -2 dBTP), och antingen \"X.X dB utrymme\" (grön, du är under taket) eller \"+X.X dB över\" (orange eller röd, du är över). Den lilla etiketten bredvid dBTP-avläsningen på huvudraden följer samma färgregel: grön under -1 dBTP, orange mellan -1 och 0, röd över 0 (inter-sample-översvängningar som kommer att clippa DSP-kedjor). Hovra över ett plattformsnamn för att se varför just det taket valdes.",
+        "mockup": "track-tab-truepeak"
+      },
+      {
+        "heading": "Kvalitetskontroll",
+        "body": "Kvalitetskontroll-pillen är villkorlig — den visas bara när workern upptäcker något som är värt att flagga i din uppladdning. Rena mixar visar ingen pill alls. När den visas är den bärnstensfärgad för ett enda lindrigt problem eller röd för flera problem eller allvarliga. Tre problemtyper flaggas idag: Clipping (hög mängd samples på full skala kombinerat med en sampletopp på eller mycket nära 0 dBFS — kännetecknet på en limiter-tröskel som sitter fast), Sampletopp på full skala (din högsta sample är ≥ -0.1 dBFS, vilket inte lämnar utrymme för efterföljande DSP eller förstörande kodning) och DC-offset (en medelamplitud över 0.002 som inte är noll, vanligtvis från ett problem med förstärkningssteg eller filtrering). Ett klick på pillen expanderar en popover med varje upptäckt problem, en kort teknisk förklaring och en åtgärdbar fix — t.ex. \"Sänk utgångsnivån eller kontrollera limiterns tak\" för clipping, \"Använd ett högpassfilter vid 20 Hz eller lägre\" för DC-offset.",
+        "mockup": "track-tab-quality"
       },
       {
         "heading": "Distribution",

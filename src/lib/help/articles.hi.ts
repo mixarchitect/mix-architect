@@ -122,9 +122,13 @@ export const articles: HelpArticle[] = [
       "audio",
       "distribution",
       "portal",
-      "notes"
+      "notes",
+      "lufs",
+      "true peak",
+      "गुणवत्ता",
+      "loudness"
     ],
-    "updatedAt": "2026-03-04",
+    "updatedAt": "2026-04-15",
     "content": [
       {
         "heading": "Brief",
@@ -138,13 +142,23 @@ export const articles: HelpArticle[] = [
       },
       {
         "heading": "Audio",
-        "body": "Audio tab वह जगह है जहाँ आप files अपलोड करते हैं, versions प्रबंधित करते हैं और audio playback करते हैं। हेडर में release और track का नाम album art के साथ दिखता है। Version selector (v1, v2, v3 आदि) से आप revisions के बीच स्विच कर सकते हैं; नया version अपलोड करने के लिए + बटन पर क्लिक करें। प्रत्येक version अपना version number, upload date, comment count और download बटन दिखाता है। Waveform visualization interactive playback के साथ audio दिखाता है: seek करने के लिए कहीं भी क्लिक करें, और नीचे transport controls (loop, skip back, play/pause, skip forward, repeat) का उपयोग करें। LUFS loudness measurement file metadata (format, sample rate, bit depth) के बगल में दिखता है, loudness targets के अनुसार color-coded। Waveform के नीचे Feedback सेक्शन वर्तमान version के सभी timestamped comments दिखाता है। उस timecode पर नया comment जोड़ने के लिए waveform पर कहीं भी double-click करें। Comment markers waveform पर उनके संबंधित positions पर छोटे icons के रूप में दिखते हैं।",
+        "body": "Audio tab वह जगह है जहाँ आप files अपलोड करते हैं, versions प्रबंधित करते हैं और audio playback करते हैं। हेडर में एक छोटा breadcrumb (Artist · Release) दिखता है, उसके नीचे track title के साथ बाएँ और दाएँ chevron तीर जो आपको release में पिछले या अगले track पर ले जाते हैं। तीर पर क्लिक करने से current tab बना रहता है — track 1 के Audio tab से click करने पर आप track 2 के Audio tab पर पहुँचेंगे — इस तरह आप एक album को tab-दर-tab देख सकते हैं। Version selector (v1, v2, v3 आदि) से आप revisions के बीच switch कर सकते हैं; नया version अपलोड करने के लिए + बटन पर क्लिक करें। प्रत्येक version अपना version number, upload date, comment count और download बटन दिखाता है। Waveform interactive playback के साथ audio दिखाता है: seek करने के लिए कहीं भी क्लिक करें, और नीचे transport controls (loop, skip back, play/pause, skip forward, repeat) का उपयोग करें। Waveform के ठीक ऊपर QC pills की एक row worker-measured audio stats — LUFS, True Peak (dBTP) और एक conditional Quality warning — दिखाती है, प्रत्येक पर click करके पूरा explanation देख सकते हैं। जब worker नई upload का analysis कर रहा होता है, तो pills की जगह एक छोटा \"Measurements processing\" indicator दिखता है। Waveform के नीचे Feedback सेक्शन वर्तमान version के सभी timestamped comments दिखाता है। उस timecode पर comment जोड़ने के लिए waveform पर double-click करें।",
         "mockup": "track-tab-audio"
       },
       {
-        "heading": "Loudness Analysis (LUFS)",
-        "body": "जब आप audio अपलोड करते हैं, Mix Architect स्वचालित रूप से integrated loudness को LUFS (Loudness Units Full Scale) में मापता है। Version metadata के बगल में LUFS reading पर क्लिक करें Loudness Analysis पैनल खोलने के लिए। यह दिखाता है कि हर प्रमुख streaming service, broadcast standard और social platform playback के दौरान आपके ट्रैक को कैसे adjust करेगा। प्रत्येक row में platform का नाम, उसकी target loudness (जैसे Spotify -14 LUFS को target करता है), और आपकी file पर लागू होने वाला gain change दिखता है। एक positive value का मतलब है कि service आपके ट्रैक को louder करेगी; एक negative value (नारंगी में दिखाई गई) का मतलब है कि इसे softer किया जाएगा। उदाहरण के लिए, अगर आपका mix -14.9 LUFS मापता है, तो Spotify +0.9 dB लागू करेगा जबकि Apple Music (target -16) -1.1 dB लागू करेगा। पैनल Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Broadcast (EBU R128, ATSC A/85, ITU-R BS.1770), और Social (Instagram/Reels, TikTok, Facebook) में grouped है। इसका उपयोग delivery से पहले यह जाँचने के लिए करें कि आपका master किसी platform पर significantly बदला जाएगा या नहीं।",
+        "heading": "Loudness Analysis",
+        "body": "जब आप audio अपलोड करते हैं, Mix Architect server पर automatically integrated loudness को LUFS (Loudness Units Full Scale) में मापता है और cache करता है। Version metadata के बगल में LUFS pill पर क्लिक करें Loudness Analysis popover खोलने के लिए। यह दिखाता है कि हर प्रमुख streaming service, broadcast standard और social platform playback के दौरान आपके ट्रैक को कैसे adjust करेगा। प्रत्येक row में platform का नाम, उसकी target loudness (जैसे Spotify -14 LUFS को target करता है), और आपकी file पर लागू होने वाला gain change दिखता है। एक positive value का मतलब है कि service आपके ट्रैक को louder करेगी; एक negative value (नारंगी में दिखाई गई) का मतलब है कि इसे softer किया जाएगा। उदाहरण के लिए, अगर आपका mix -14.9 LUFS मापता है, तो Spotify +0.9 dB लागू करेगा जबकि Apple Music (target -16) -1.1 dB लागू करेगा। किसी platform name पर hover करने से यह छोटा explanation दिखता है कि वह platform audio को कैसे normalize करता है। पैनल Streaming (Spotify, Apple Music, YouTube, Tidal, Amazon Music, Deezer, Qobuz, Pandora), Broadcast (EBU R128, ATSC A/85, ITU-R BS.1770), और Social (Instagram/Reels, TikTok, Facebook) में grouped है। Popover के बाहर क्लिक करने पर यह बंद हो जाता है। इसका उपयोग delivery से पहले यह जाँचने के लिए करें कि आपका master किसी platform पर significantly बदला जाएगा या नहीं।",
         "mockup": "track-tab-lufs"
+      },
+      {
+        "heading": "True Peak",
+        "body": "True Peak (dBTP) ITU-R BS.1770-4 के अनुसार 4× oversampling का उपयोग करके inter-sample peak values मापता है। यह raw sample peak से अलग है क्योंकि lossy codecs (MP3, AAC, Ogg Vorbis, Opus) encoding के दौरान samples के बीच overshoots introduce कर सकते हैं, जिससे audible clipping होती है भले ही underlying samples कभी 0 dBFS तक न पहुँचें। True Peak pill पर click करें यह देखने के लिए कि आपका measured true peak प्रत्येक platform की ceiling से कैसे तुलना करता है। LUFS (जहाँ आप target से match करना चाहते हैं) के विपरीत, true peak एक ceiling है — target पर या नीचे रहना हमेशा ठीक है। प्रत्येक row में platform, उसकी ceiling (अधिकांश -1 dBTP पर हैं; Spotify Loud mode और Amazon Music -2 dBTP पर), और या तो \"X.X dB headroom\" (हरा, आप ceiling के नीचे हैं) या \"+X.X dB over\" (नारंगी या लाल, आप ऊपर हैं) दिखती है। Main row पर dBTP reading के बगल का छोटा badge उसी color rule का पालन करता है: -1 dBTP से नीचे हरा, -1 से 0 के बीच नारंगी, 0 से ऊपर लाल (inter-sample overs जो DSP chains को clip करेंगे)। किसी platform name पर hover करें यह देखने के लिए कि वह specific ceiling क्यों चुनी गई।",
+        "mockup": "track-tab-truepeak"
+      },
+      {
+        "heading": "Quality Check",
+        "body": "Quality Check pill conditional है — यह तभी दिखती है जब worker आपकी upload में कुछ flag करने योग्य detect करता है। साफ mixes में कोई pill नहीं दिखती। जब दिखती है, यह एक हल्की समस्या के लिए amber और multiple या गंभीर समस्याओं के लिए लाल होती है। आज तीन प्रकार की समस्याएँ flag की जाती हैं: Clipping (full scale पर samples की high count, sample peak 0 dBFS पर या बहुत पास — यह limiter ceiling पर बैठने का hallmark है), Full scale पर sample peak (आपका सबसे loud sample ≥ -0.1 dBFS है, जिससे downstream DSP या lossy encoding के लिए कोई headroom नहीं बचता) और DC offset (0.002 से अधिक non-zero average amplitude, आमतौर पर gain-stage या filtering समस्या से)। Pill पर click करने से एक popover expand होता है जिसमें प्रत्येक detected समस्या, एक छोटा technical explanation और एक actionable fix है — जैसे clipping के लिए \"Output gain कम करें या limiter ceiling check करें\", DC offset के लिए \"20 Hz या उससे नीचे पर एक high-pass filter लगाएँ\"।",
+        "mockup": "track-tab-quality"
       },
       {
         "heading": "Distribution",
