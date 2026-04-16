@@ -96,9 +96,11 @@ export function EditableTitle({
     >
       {prefix}
       <span className={className}>{value}</span>
+      {/* hidden (not opacity-0) so it doesn't reserve trailing space and
+           throw off sibling layout — e.g. a following right-arrow button. */}
       <Pencil
         size={14}
-        className="text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+        className="hidden group-hover:inline-block text-muted shrink-0"
       />
     </button>
   );
