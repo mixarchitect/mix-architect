@@ -40,6 +40,34 @@ export const LOUDNESS_TARGETS = [
 
 export const LOUDNESS_GROUPS = ["Streaming", "Broadcast", "Social"] as const;
 
+/** Common true peak ceiling used for pass/fail badge coloring.
+ *  Most streaming platforms recommend ≤ -1.0 dBTP to leave headroom for
+ *  lossy codec inter-sample peaks. Spotify (Loud) and Amazon Music are
+ *  stricter at -2.0 dBTP; the per-platform table below holds those. */
+export const TRUE_PEAK_CEILING = -1;
+
+/** Per-platform true peak ceilings (dBTP). The mix should sit at or below
+ *  each target for delivery to that platform. Unlike LUFS, true peak is a
+ *  one-sided spec — being below the ceiling is always fine, being above
+ *  it risks clipping after lossy encoding. */
+export const TRUE_PEAK_TARGETS = [
+  { name: "Spotify", dbtp: -1, group: "Streaming" },
+  { name: "Spotify (Loud)", dbtp: -2, group: "Streaming" },
+  { name: "Apple Music", dbtp: -1, group: "Streaming" },
+  { name: "YouTube", dbtp: -1, group: "Streaming" },
+  { name: "Tidal", dbtp: -1, group: "Streaming" },
+  { name: "Amazon Music", dbtp: -2, group: "Streaming" },
+  { name: "Deezer", dbtp: -1, group: "Streaming" },
+  { name: "Qobuz", dbtp: -1, group: "Streaming" },
+  { name: "Pandora", dbtp: -1, group: "Streaming" },
+  { name: "EBU R128", dbtp: -1, group: "Broadcast" },
+  { name: "ATSC A/85", dbtp: -2, group: "Broadcast" },
+  { name: "ITU-R BS.1770", dbtp: -1, group: "Broadcast" },
+  { name: "Instagram/Reels", dbtp: -1, group: "Social" },
+  { name: "TikTok", dbtp: -1, group: "Social" },
+  { name: "Facebook", dbtp: -1, group: "Social" },
+] as const;
+
 export const AUTHOR_COLORS = [
   "#0D9488",
   "#6B8AFF",

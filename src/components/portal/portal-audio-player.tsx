@@ -24,6 +24,8 @@ import {
   LUFS_REFERENCE,
   LOUDNESS_TARGETS,
   LOUDNESS_GROUPS,
+  TRUE_PEAK_CEILING,
+  TRUE_PEAK_TARGETS,
   AUTHOR_COLORS,
 } from "@/components/ui/audio-player-shared";
 import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
@@ -134,11 +136,18 @@ export function PortalAudioPlayer({
     shouldPlay: boolean;
   } | null>(null);
 
-  // LUFS display state
+  // LUFS + true peak display state
   const measuredLufs = activeVersion?.measured_lufs ?? null;
+  const measuredTruePeak = activeVersion?.true_peak_dbtp ?? null;
   const [showStreamingInfo, setShowStreamingInfo] = useState(false);
+  const [showTruePeakInfo, setShowTruePeakInfo] = useState(false);
   const lufsBadgeRef = useRef<HTMLSpanElement | null>(null);
+  const truePeakBadgeRef = useRef<HTMLSpanElement | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{
+    top: number;
+    right: number;
+  } | null>(null);
+  const [truePeakDropdownPos, setTruePeakDropdownPos] = useState<{
     top: number;
     right: number;
   } | null>(null);
@@ -194,8 +203,32 @@ export function PortalAudioPlayer({
     };
   }, [showStreamingInfo]);
 
+  // Position true peak dropdown (same pattern as LUFS)
+  useEffect(() => {
+    if (!showTruePeakInfo || !truePeakBadgeRef.current) {
+      setTruePeakDropdownPos(null);
+      return;
+    }
+    const update = () => {
+      const rect = truePeakBadgeRef.current?.getBoundingClientRect();
+      if (rect)
+        setTruePeakDropdownPos({
+          top: rect.bottom + 6,
+          right: window.innerWidth - rect.right,
+        });
+    };
+    update();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [showTruePeakInfo]);
+
   useEffect(() => {
     setShowStreamingInfo(false);
+    setShowTruePeakInfo(false);
   }, [activeVersion?.id]);
 
   // WaveSurfer refs
@@ -539,45 +572,100 @@ export function PortalAudioPlayer({
             &middot; {versionComments.length} comment
             {versionComments.length !== 1 ? "s" : ""}
           </span>
-          {/* LUFS display */}
-          {measuredLufs != null &&
-            (() => {
-              const delta = measuredLufs - LUFS_REFERENCE;
-              return (
-                <span className="ml-auto inline-flex items-center gap-1.5 text-[10px]">
-                  <span className="text-faint">&middot;</span>
-                  <button
-                    type="button"
-                    onClick={() => setShowStreamingInfo((v) => !v)}
-                    className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
-                    title="Show streaming normalization"
-                  >
-                    {measuredLufs.toFixed(1)} LUFS
-                    <ChevronDown
-                      size={10}
-                      className={cn(
-                        "transition-transform",
-                        showStreamingInfo && "rotate-180",
-                      )}
-                    />
-                  </button>
-                  <span
-                    ref={lufsBadgeRef}
-                    className={cn(
-                      "px-1.5 py-px rounded text-[10px]",
-                      Math.abs(delta) <= 0.5
-                        ? "bg-status-green/10 text-status-green"
-                        : Math.abs(delta) <= 1.5
-                          ? "bg-signal-muted text-signal"
-                          : "bg-red-500/10 text-red-500",
-                    )}
-                  >
-                    {delta > 0 ? "+" : ""}
-                    {delta.toFixed(1)} dB
-                  </span>
-                </span>
-              );
-            })()}
+          {/* Loudness metrics */}
+          {(measuredLufs != null || measuredTruePeak != null) && (
+            <span className="ml-auto inline-flex items-center gap-3 text-[10px]">
+              {measuredLufs != null &&
+                (() => {
+                  const delta = measuredLufs - LUFS_REFERENCE;
+                  return (
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="text-faint">&middot;</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowTruePeakInfo(false);
+                          setShowStreamingInfo((v) => !v);
+                        }}
+                        className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
+                        title="Show streaming normalization"
+                      >
+                        {measuredLufs.toFixed(1)} LUFS
+                        <ChevronDown
+                          size={10}
+                          className={cn(
+                            "transition-transform",
+                            showStreamingInfo && "rotate-180",
+                          )}
+                        />
+                      </button>
+                      <span
+                        ref={lufsBadgeRef}
+                        className={cn(
+                          "px-1.5 py-px rounded text-[10px]",
+                          Math.abs(delta) <= 0.5
+                            ? "bg-status-green/10 text-status-green"
+                            : Math.abs(delta) <= 1.5
+                              ? "bg-signal-muted text-signal"
+                              : "bg-red-500/10 text-red-500",
+                        )}
+                      >
+                        {delta > 0 ? "+" : ""}
+                        {delta.toFixed(1)} dB
+                      </span>
+                    </span>
+                  );
+                })()}
+              {measuredTruePeak != null &&
+                (() => {
+                  const headroom = TRUE_PEAK_CEILING - measuredTruePeak;
+                  const colorClass =
+                    measuredTruePeak > 0
+                      ? "bg-red-500/10 text-red-500"
+                      : measuredTruePeak > TRUE_PEAK_CEILING
+                        ? "bg-signal-muted text-signal"
+                        : "bg-status-green/10 text-status-green";
+                  const badgeText =
+                    headroom >= 0
+                      ? `${headroom.toFixed(1)} dB`
+                      : `+${Math.abs(headroom).toFixed(1)} dB`;
+                  return (
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="text-faint">&middot;</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowStreamingInfo(false);
+                          setShowTruePeakInfo((v) => !v);
+                        }}
+                        className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
+                        title="Show true peak targets"
+                      >
+                        {measuredTruePeak.toFixed(1)} dBTP
+                        <ChevronDown
+                          size={10}
+                          className={cn(
+                            "transition-transform",
+                            showTruePeakInfo && "rotate-180",
+                          )}
+                        />
+                      </button>
+                      <span
+                        ref={truePeakBadgeRef}
+                        className={cn("px-1.5 py-px rounded text-[10px]", colorClass)}
+                        title={
+                          headroom >= 0
+                            ? `${headroom.toFixed(1)} dB below the ${TRUE_PEAK_CEILING} dBTP ceiling`
+                            : `${Math.abs(headroom).toFixed(1)} dB over the ${TRUE_PEAK_CEILING} dBTP ceiling`
+                        }
+                      >
+                        {badgeText}
+                      </span>
+                    </span>
+                  );
+                })()}
+            </span>
+          )}
         </div>
 
         {/* File info line */}
@@ -913,6 +1001,61 @@ export function PortalAudioPlayer({
                             : adj > 0
                               ? `\u2212${adj.toFixed(1)} dB`
                               : `+${Math.abs(adj).toFixed(1)} dB`}
+                        </td>
+                      </tr>
+                    );
+                  }),
+                ];
+              })}
+            </tbody>
+          </table>
+          <div className="h-1.5" />
+        </div>
+      )}
+
+      {/* True peak target dropdown — ceiling-based comparison */}
+      {showTruePeakInfo && measuredTruePeak != null && truePeakDropdownPos && (
+        <div
+          className="fixed z-50 rounded-md border border-border shadow-lg overflow-hidden"
+          style={{
+            top: truePeakDropdownPos.top,
+            right: truePeakDropdownPos.right,
+            background: "var(--panel-2)",
+          }}
+        >
+          <table className="text-[11px]">
+            <tbody>
+              {LOUDNESS_GROUPS.map((group) => {
+                const targets = TRUE_PEAK_TARGETS.filter((t) => t.group === group);
+                return [
+                  <tr key={`tp-h-${group}`}>
+                    <td
+                      colSpan={3}
+                      className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider font-sans"
+                    >
+                      {group}
+                    </td>
+                  </tr>,
+                  ...targets.map((t) => {
+                    const headroom = t.dbtp - measuredTruePeak;
+                    const over = headroom < 0;
+                    const rightColor = over
+                      ? Math.abs(headroom) > 1
+                        ? "text-red-500"
+                        : "text-signal"
+                      : "text-status-green";
+                    return (
+                      <tr key={`tp-${t.name}`} className="leading-6">
+                        <td className="pl-3 pr-4 text-muted font-sans whitespace-nowrap">
+                          {t.name}
+                        </td>
+                        <td className="pr-4 text-faint text-right whitespace-nowrap">
+                          {t.dbtp}
+                        </td>
+                        <td className={cn("pr-3 text-right whitespace-nowrap", rightColor)}>
+                          {over
+                            ? `+${Math.abs(headroom).toFixed(1)} dB over`
+                            : `${headroom.toFixed(1)} dB headroom`}
                         </td>
                       </tr>
                     );
