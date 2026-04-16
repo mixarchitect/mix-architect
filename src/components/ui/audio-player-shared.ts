@@ -81,10 +81,22 @@ export const DC_OFFSET_THRESHOLD = 0.002;
  *  scale" — leaves no headroom for downstream DSP or lossy codecs. */
 export const SAMPLE_PEAK_AT_FULL_SCALE_DBFS = -0.1;
 
+/** Minimum clip sample count to flag as clipping. IMPORTANT context: the
+ *  worker populates clip_sample_count from FFmpeg astats' Peak_count, which
+ *  is "number of occasions the signal attained either min or max values" —
+ *  i.e. the signal's own min/max, not digital full scale. Every file has
+ *  Peak_count ≥ 1 regardless of whether it's clipped.
+ *
+ *  To make this signal meaningful, the pill logic requires BOTH
+ *  clip_sample_count > this threshold AND sample_peak_dbfs near full scale.
+ *  This threshold is the "enough occasions to suggest a limiter sat at
+ *  full scale" floor — clean files show 2-20, genuinely clipped files
+ *  are in the thousands. */
+export const CLIPPING_SAMPLE_COUNT_THRESHOLD = 1000;
+
 /** Clip sample counts above this are considered severe rather than
- *  borderline (a few clipped samples in a long track may be inaudible;
- *  thousands definitely aren't). Used for severity coloring only. */
-export const CLIPPING_SEVERE_SAMPLE_COUNT = 1000;
+ *  borderline (used for severity coloring only). */
+export const CLIPPING_SEVERE_SAMPLE_COUNT = 10000;
 
 export type QualityIssue = "clipping" | "dc_offset" | "peak_at_full_scale";
 
@@ -113,14 +125,24 @@ export function computeQualitySnapshot(input: {
   if (!anyField) return null;
 
   const issues: QualityIssue[] = [];
-  if (clipSampleCount != null && clipSampleCount > 0) issues.push("clipping");
+  // Clipping requires BOTH a high Peak_count from astats AND the sample
+  // peak being at/near full scale. Peak_count alone is unreliable (it
+  // counts a clean file's own peaks too); pairing it with sample peak near
+  // 0 dBFS is what makes it mean "the limiter sat on full scale for a while."
+  const hasClipping =
+    clipSampleCount != null &&
+    clipSampleCount > CLIPPING_SAMPLE_COUNT_THRESHOLD &&
+    samplePeakDbfs != null &&
+    samplePeakDbfs >= SAMPLE_PEAK_AT_FULL_SCALE_DBFS;
+  if (hasClipping) issues.push("clipping");
+
   if (
     samplePeakDbfs != null &&
     samplePeakDbfs >= SAMPLE_PEAK_AT_FULL_SCALE_DBFS &&
     // Don't double-count when clipping is already flagged, since clipping
     // implies sample peak at full scale. Keep this as a separate flag only
     // when clipping didn't trigger.
-    !(clipSampleCount != null && clipSampleCount > 0)
+    !hasClipping
   ) {
     issues.push("peak_at_full_scale");
   }
