@@ -1573,7 +1573,12 @@ export function AudioPlayer({
                     const adj = measuredLufs - t.lufs;
                     return (
                       <tr key={t.name} className="leading-6">
-                        <td className="pl-3 pr-4 text-muted font-sans whitespace-nowrap">{t.name}</td>
+                        <td
+                          className="pl-3 pr-4 text-muted font-sans whitespace-nowrap cursor-help"
+                          title={t.description}
+                        >
+                          {t.name}
+                        </td>
                         <td className="pr-4 text-faint text-right whitespace-nowrap">{t.lufs}</td>
                         <td
                           className={cn(
@@ -1631,7 +1636,12 @@ export function AudioPlayer({
                       : "text-status-green";
                     return (
                       <tr key={`tp-${t.name}`} className="leading-6">
-                        <td className="pl-3 pr-4 text-muted font-sans whitespace-nowrap">{t.name}</td>
+                        <td
+                          className="pl-3 pr-4 text-muted font-sans whitespace-nowrap cursor-help"
+                          title={t.description}
+                        >
+                          {t.name}
+                        </td>
                         <td className="pr-4 text-faint text-right whitespace-nowrap">{t.dbtp}</td>
                         <td className={cn("pr-3 text-right whitespace-nowrap", rightColor)}>
                           {over

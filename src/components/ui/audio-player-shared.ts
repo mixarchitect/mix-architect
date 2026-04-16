@@ -20,22 +20,94 @@ export function formatTime(seconds: number): string {
 /** Reference LUFS target used for the delta badge comparison. */
 export const LUFS_REFERENCE = -14;
 
-/** Loudness targets for the streaming / broadcast / social normalization table. */
+/** Loudness targets for the streaming / broadcast / social normalization
+ *  table. The description field is shown as a tooltip when the user hovers
+ *  a row's name, explaining what that platform does with loudness. */
 export const LOUDNESS_TARGETS = [
-  { name: "Spotify", lufs: -14, group: "Streaming" },
-  { name: "Apple Music", lufs: -16, group: "Streaming" },
-  { name: "YouTube", lufs: -14, group: "Streaming" },
-  { name: "Tidal", lufs: -14, group: "Streaming" },
-  { name: "Amazon Music", lufs: -14, group: "Streaming" },
-  { name: "Deezer", lufs: -15, group: "Streaming" },
-  { name: "Qobuz", lufs: -14, group: "Streaming" },
-  { name: "Pandora", lufs: -14, group: "Streaming" },
-  { name: "EBU R128", lufs: -23, group: "Broadcast" },
-  { name: "ATSC A/85", lufs: -24, group: "Broadcast" },
-  { name: "ITU-R BS.1770", lufs: -24, group: "Broadcast" },
-  { name: "Instagram/Reels", lufs: -14, group: "Social" },
-  { name: "TikTok", lufs: -14, group: "Social" },
-  { name: "Facebook", lufs: -16, group: "Social" },
+  {
+    name: "Spotify",
+    lufs: -14,
+    group: "Streaming",
+    description: "Normalizes to -14 LUFS by default. Louder masters are turned down; quieter ones left as is.",
+  },
+  {
+    name: "Apple Music",
+    lufs: -16,
+    group: "Streaming",
+    description: "Sound Check normalizes to -16 LUFS. User-togglable but on by default.",
+  },
+  {
+    name: "YouTube",
+    lufs: -14,
+    group: "Streaming",
+    description: "Normalizes to roughly -14 LUFS. Loud masters are turned down automatically.",
+  },
+  {
+    name: "Tidal",
+    lufs: -14,
+    group: "Streaming",
+    description: "ReplayGain-based normalization to -14 LUFS.",
+  },
+  {
+    name: "Amazon Music",
+    lufs: -14,
+    group: "Streaming",
+    description: "Normalizes to -14 LUFS.",
+  },
+  {
+    name: "Deezer",
+    lufs: -15,
+    group: "Streaming",
+    description: "Normalizes to -15 LUFS on mobile and web playback.",
+  },
+  {
+    name: "Qobuz",
+    lufs: -14,
+    group: "Streaming",
+    description: "Optional ReplayGain normalization to -14 LUFS. Off by default in hi-res mode.",
+  },
+  {
+    name: "Pandora",
+    lufs: -14,
+    group: "Streaming",
+    description: "Normalizes to -14 LUFS.",
+  },
+  {
+    name: "EBU R128",
+    lufs: -23,
+    group: "Broadcast",
+    description: "European broadcast standard: -23 LUFS integrated loudness target for TV and radio.",
+  },
+  {
+    name: "ATSC A/85",
+    lufs: -24,
+    group: "Broadcast",
+    description: "US broadcast standard (CALM Act): -24 LKFS integrated loudness target.",
+  },
+  {
+    name: "ITU-R BS.1770",
+    lufs: -24,
+    group: "Broadcast",
+    description: "International loudness measurement spec: -24 LUFS reference used by both EBU and ATSC.",
+  },
+  {
+    name: "Instagram/Reels",
+    lufs: -14,
+    group: "Social",
+    description: "Normalizes to around -14 LUFS in feed playback.",
+  },
+  {
+    name: "TikTok",
+    lufs: -14,
+    group: "Social",
+    description: "Normalizes to around -14 LUFS in the in-feed audio path.",
+  },
+  {
+    name: "Facebook",
+    lufs: -16,
+    group: "Social",
+    description: "Normalizes to around -16 LUFS for video audio.",
+  },
 ] as const;
 
 export const LOUDNESS_GROUPS = ["Streaming", "Broadcast", "Social"] as const;
@@ -49,23 +121,101 @@ export const TRUE_PEAK_CEILING = -1;
 /** Per-platform true peak ceilings (dBTP). The mix should sit at or below
  *  each target for delivery to that platform. Unlike LUFS, true peak is a
  *  one-sided spec — being below the ceiling is always fine, being above
- *  it risks clipping after lossy encoding. */
+ *  it risks clipping after lossy encoding.
+ *
+ *  Description field is shown as a tooltip on each row's name and
+ *  explains why the platform cares about this ceiling. */
 export const TRUE_PEAK_TARGETS = [
-  { name: "Spotify", dbtp: -1, group: "Streaming" },
-  { name: "Spotify (Loud)", dbtp: -2, group: "Streaming" },
-  { name: "Apple Music", dbtp: -1, group: "Streaming" },
-  { name: "YouTube", dbtp: -1, group: "Streaming" },
-  { name: "Tidal", dbtp: -1, group: "Streaming" },
-  { name: "Amazon Music", dbtp: -2, group: "Streaming" },
-  { name: "Deezer", dbtp: -1, group: "Streaming" },
-  { name: "Qobuz", dbtp: -1, group: "Streaming" },
-  { name: "Pandora", dbtp: -1, group: "Streaming" },
-  { name: "EBU R128", dbtp: -1, group: "Broadcast" },
-  { name: "ATSC A/85", dbtp: -2, group: "Broadcast" },
-  { name: "ITU-R BS.1770", dbtp: -1, group: "Broadcast" },
-  { name: "Instagram/Reels", dbtp: -1, group: "Social" },
-  { name: "TikTok", dbtp: -1, group: "Social" },
-  { name: "Facebook", dbtp: -1, group: "Social" },
+  {
+    name: "Spotify",
+    dbtp: -1,
+    group: "Streaming",
+    description: "Spotify recommends -1 dBTP ceiling to avoid clipping after Ogg Vorbis encoding.",
+  },
+  {
+    name: "Spotify (Loud)",
+    dbtp: -2,
+    group: "Streaming",
+    description: "Loud normalization mode applies additional limiting; requires a stricter -2 dBTP ceiling.",
+  },
+  {
+    name: "Apple Music",
+    dbtp: -1,
+    group: "Streaming",
+    description: "Apple Digital Masters certification requires a -1 dBTP ceiling.",
+  },
+  {
+    name: "YouTube",
+    dbtp: -1,
+    group: "Streaming",
+    description: "Recommended -1 dBTP ceiling to leave headroom for AAC/Opus encoding.",
+  },
+  {
+    name: "Tidal",
+    dbtp: -1,
+    group: "Streaming",
+    description: "-1 dBTP ceiling recommended for lossy codec delivery.",
+  },
+  {
+    name: "Amazon Music",
+    dbtp: -2,
+    group: "Streaming",
+    description: "-2 dBTP ceiling recommended for their codec pipeline.",
+  },
+  {
+    name: "Deezer",
+    dbtp: -1,
+    group: "Streaming",
+    description: "-1 dBTP ceiling for lossy delivery.",
+  },
+  {
+    name: "Qobuz",
+    dbtp: -1,
+    group: "Streaming",
+    description: "-1 dBTP ceiling on both hi-res and lossy streams.",
+  },
+  {
+    name: "Pandora",
+    dbtp: -1,
+    group: "Streaming",
+    description: "-1 dBTP ceiling for their AAC delivery chain.",
+  },
+  {
+    name: "EBU R128",
+    dbtp: -1,
+    group: "Broadcast",
+    description: "European broadcast spec: maximum true peak of -1 dBTP for delivery masters.",
+  },
+  {
+    name: "ATSC A/85",
+    dbtp: -2,
+    group: "Broadcast",
+    description: "US broadcast spec: maximum true peak of -2 dBTP.",
+  },
+  {
+    name: "ITU-R BS.1770",
+    dbtp: -1,
+    group: "Broadcast",
+    description: "International true peak measurement reference, -1 dBTP ceiling.",
+  },
+  {
+    name: "Instagram/Reels",
+    dbtp: -1,
+    group: "Social",
+    description: "-1 dBTP recommended to avoid inter-sample overs on mobile playback.",
+  },
+  {
+    name: "TikTok",
+    dbtp: -1,
+    group: "Social",
+    description: "-1 dBTP recommended for their in-feed encoding chain.",
+  },
+  {
+    name: "Facebook",
+    dbtp: -1,
+    group: "Social",
+    description: "-1 dBTP recommended for the video encoding pipeline.",
+  },
 ] as const;
 
 /* ------------------------------------------------------------------ */
