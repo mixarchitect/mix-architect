@@ -19,7 +19,7 @@ import { StatusIndicator } from "@/components/ui/status-dot";
 import { AudioPlayer, type AudioVersionData, type TimelineComment } from "@/components/ui/audio-player";
 import { DeliveryFormatSelector } from "@/components/ui/delivery-format-selector";
 import { useConversion } from "@/hooks/use-conversion";
-import { ArrowLeft, Bookmark, Check, Disc3, Plus, StickyNote, Users, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Bookmark, Check, Disc3, Plus, StickyNote, Users, X } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { EditableTitle } from "@/components/ui/editable-title";
 import { canEdit, canEditCreative, type ReleaseRole } from "@/lib/permissions";
@@ -134,6 +134,12 @@ type PortalApprovalEvent = {
   created_at: string;
 };
 
+type SiblingTrack = {
+  id: string;
+  track_number: number;
+  title: string;
+};
+
 type Props = {
   releaseId: string;
   releaseTitle: string;
@@ -149,6 +155,9 @@ type Props = {
   references: RefData[];
   distribution: DistributionData;
   splits: SplitData[];
+  /** All tracks on this release (incl. current), ordered by track_number.
+   *  Used for prev/next arrow navigation in the top bar. */
+  siblingTracks: SiblingTrack[];
   role: ReleaseRole;
   currentUserName: string;
   portalShareId: string | null;
@@ -158,7 +167,8 @@ type Props = {
 
 export function TrackDetailClient({
   releaseId, releaseTitle, artistName, releaseFormat, releaseCoverArt,
-  track, intent, specs, samplyUrl, audioVersions, notes, references, distribution, splits, role,
+  track, intent, specs, samplyUrl, audioVersions, notes, references, distribution, splits,
+  siblingTracks, role,
   currentUserName, portalShareId, portalApprovalStatus, portalApprovalEvents = [],
 }: Props) {
   const { isFeatureVisible } = useFeatureVisibility();
@@ -181,6 +191,19 @@ export function TrackDetailClient({
     setActiveTab(tab);
     window.location.hash = tab;
   }, []);
+
+  // Prev/next track navigation. Preserves the active tab via URL hash so
+  // clicking "next" from the Audio tab lands on the next track's Audio tab.
+  const currentTrackIndex = siblingTracks.findIndex((t) => t.id === track.id);
+  const prevTrack = currentTrackIndex > 0 ? siblingTracks[currentTrackIndex - 1] : null;
+  const nextTrack =
+    currentTrackIndex >= 0 && currentTrackIndex < siblingTracks.length - 1
+      ? siblingTracks[currentTrackIndex + 1]
+      : null;
+  const trackHref = useCallback(
+    (id: string) => `/app/releases/${releaseId}/tracks/${id}#${activeTab}`,
+    [releaseId, activeTab],
+  );
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const [mixVision, setMixVision] = useState(intent?.mix_vision ?? "");
@@ -507,35 +530,47 @@ export function TrackDetailClient({
 
   return (
     <div>
-      {/* Toolbar */}
+      {/* Breadcrumb row — small, muted links up to artist and release */}
+      <div className="flex items-center gap-2 text-xs md:text-sm text-muted mb-2">
+        {artistName && (
+          <>
+            <Link
+              href={`/app?artist=${encodeURIComponent(artistName)}`}
+              className="hover:text-signal transition-colors truncate"
+            >
+              {artistName}
+            </Link>
+            <span className="text-faint">·</span>
+          </>
+        )}
+        <Link
+          href={`/app/releases/${releaseId}`}
+          className="hover:text-text transition-colors truncate"
+        >
+          {releaseTitle || "Release"}
+        </Link>
+      </div>
+
+      {/* Title row — prev arrow, editable title, next arrow, then actions */}
       <div className="flex items-center justify-between flex-wrap gap-3 mb-6 md:mb-8">
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
-          {releaseCoverArt && (
-            <img
-              src={releaseCoverArt}
-              alt=""
-              className="w-8 h-8 rounded object-cover flex-shrink-0 hidden md:block"
-            />
+          {prevTrack ? (
+            <Link
+              href={trackHref(prevTrack.id)}
+              aria-label={`Previous track: ${String(prevTrack.track_number).padStart(2, "0")} ${prevTrack.title}`}
+              title={`Previous: ${String(prevTrack.track_number).padStart(2, "0")} ${prevTrack.title}`}
+              className="text-muted hover:text-text transition-colors shrink-0"
+            >
+              <ChevronLeft size={20} />
+            </Link>
+          ) : (
+            <span
+              aria-hidden="true"
+              className="text-faint opacity-40 shrink-0 cursor-not-allowed"
+            >
+              <ChevronLeft size={20} />
+            </span>
           )}
-          {artistName && (
-            <>
-              <Link
-                href={`/app?artist=${encodeURIComponent(artistName)}`}
-                className="text-sm text-muted hover:text-signal transition-colors shrink-0 hidden md:inline"
-              >
-                {artistName}
-              </Link>
-              <span className="text-faint hidden md:inline">·</span>
-            </>
-          )}
-          <Link
-            href={`/app/releases/${releaseId}`}
-            className="text-sm text-muted hover:text-text transition-colors flex items-center gap-1 shrink-0"
-          >
-            <ArrowLeft size={14} />
-            <span className="hidden md:inline">{releaseTitle}</span>
-          </Link>
-          <span className="text-faint hidden md:inline">/</span>
           {canEdit(role) ? (
             <EditableTitle
               value={track.title}
@@ -555,6 +590,23 @@ export function TrackDetailClient({
               </span>
               {track.title}
             </h1>
+          )}
+          {nextTrack ? (
+            <Link
+              href={trackHref(nextTrack.id)}
+              aria-label={`Next track: ${String(nextTrack.track_number).padStart(2, "0")} ${nextTrack.title}`}
+              title={`Next: ${String(nextTrack.track_number).padStart(2, "0")} ${nextTrack.title}`}
+              className="text-muted hover:text-text transition-colors shrink-0"
+            >
+              <ChevronRight size={20} />
+            </Link>
+          ) : (
+            <span
+              aria-hidden="true"
+              className="text-faint opacity-40 shrink-0 cursor-not-allowed"
+            >
+              <ChevronRight size={20} />
+            </span>
           )}
         </div>
         <div className="flex items-center gap-3">

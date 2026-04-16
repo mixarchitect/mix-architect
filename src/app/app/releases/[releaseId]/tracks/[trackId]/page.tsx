@@ -12,10 +12,12 @@ export default async function TrackDetailPage({ params }: Props) {
   const { releaseId, trackId } = await params;
   const supabase = await createSupabaseServerClient();
 
-  // Fire all queries in parallel — track, release, and sub-tables
-  const [trackRes, releaseRes, intentRes, specsRes, notesRes, refsRes, distributionRes, splitsRes, audioVersionsRes, briefShareRes] = await Promise.all([
+  // Fire all queries in parallel — track, release, sub-tables, and the
+  // list of sibling tracks (just enough to render prev/next nav).
+  const [trackRes, releaseRes, siblingTracksRes, intentRes, specsRes, notesRes, refsRes, distributionRes, splitsRes, audioVersionsRes, briefShareRes] = await Promise.all([
     supabase.from("tracks").select("*").eq("id", trackId).eq("release_id", releaseId).maybeSingle(),
     supabase.from("releases").select("title, artist, format, cover_art_url").eq("id", releaseId).maybeSingle(),
+    supabase.from("tracks").select("id, track_number, title").eq("release_id", releaseId).order("track_number"),
     supabase.from("track_intent").select("*").eq("track_id", trackId).maybeSingle(),
     supabase.from("track_specs").select("*").eq("track_id", trackId).maybeSingle(),
     supabase
@@ -90,6 +92,7 @@ export default async function TrackDetailPage({ params }: Props) {
       references={refsRes.data ?? []}
       distribution={distributionRes.data}
       splits={splitsRes.data ?? []}
+      siblingTracks={siblingTracksRes.data ?? []}
       role={role}
       currentUserName={currentUserName}
       portalShareId={briefShareRes.data?.id ?? null}
