@@ -415,7 +415,19 @@ export function PortalAudioPlayer({
             audioElement.currentTime = restore.seekTime;
           }
           if (restore.shouldPlay) {
-            audioElement.play().catch(() => {});
+            // On a version switch, audio.loadVersion() may have just called
+            // el.load() on a new src, so the element isn't ready to play
+            // yet. Calling play() now silently no-ops; wait for the browser
+            // to buffer enough data (canplay) before starting.
+            if (audioElement.readyState >= 3 /* HAVE_FUTURE_DATA */) {
+              audioElement.play().catch(() => {});
+            } else {
+              const onCanPlay = () => {
+                audioElement.removeEventListener("canplay", onCanPlay);
+                audioElement.play().catch(() => {});
+              };
+              audioElement.addEventListener("canplay", onCanPlay);
+            }
           }
         }
       });
