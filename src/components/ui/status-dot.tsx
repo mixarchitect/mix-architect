@@ -27,7 +27,7 @@ export function StatusDot({ color, withShape, className }: StatusDotProps) {
         </svg>
       )}
       {withShape && color === "orange" && (
-        <svg viewBox="0 0 4 8" className="status-dot-icon" style={{ overflow: "hidden" }}>
+        <svg viewBox="0 0 8 8" className="status-dot-icon">
           <circle cx="4" cy="4" r="3" fill="currentColor" />
         </svg>
       )}
