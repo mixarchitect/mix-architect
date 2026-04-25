@@ -201,7 +201,7 @@ function WebPortalMock() {
 
 function AudioReviewMock() {
   return (
-    <div className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
+    <div className="la-hover-anim group rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg">
       <div className="flex items-center justify-between mb-4">
         <div className="text-sm font-semibold text-white">
           Waveform &middot; v3
@@ -229,26 +229,27 @@ function AudioReviewMock() {
           return (
             <div
               key={i}
-              className="flex-1 rounded-full"
+              className={`flex-1 rounded-full ${isPast ? "" : "la-anim-big-wave-future"}`}
               style={{
                 height: `${h * 100}%`,
                 background: isPast
                   ? "rgba(20,184,166,0.6)"
                   : "rgba(255,255,255,0.15)",
+                animationDelay: isPast ? undefined : `${(i - 35) * 32}ms`,
               }}
             />
           );
         })}
         {/* Comment markers */}
         <div
-          className="absolute top-1 rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-bold"
-          style={{ left: "25%", background: "#FE5E0E", color: "#fff" }}
+          className="la-anim-marker absolute top-1 rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-bold"
+          style={{ left: "25%", background: "#FE5E0E", color: "#fff", animationDelay: "0ms" }}
         >
           1
         </div>
         <div
-          className="absolute top-1 rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-bold"
-          style={{ left: "58%", background: "#3B82F6", color: "#fff" }}
+          className="la-anim-marker absolute top-1 rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-bold"
+          style={{ left: "58%", background: "#3B82F6", color: "#fff", animationDelay: "400ms" }}
         >
           2
         </div>
