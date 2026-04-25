@@ -22,7 +22,7 @@ function LufsMeter() {
       </div>
       <div className="relative h-3 rounded-full bg-white/8 overflow-hidden">
         <div
-          className="absolute inset-y-0 left-0 rounded-full"
+          className="la-anim-lufs absolute inset-y-0 left-0 rounded-full origin-left"
           style={{
             width: "62%",
             background: "linear-gradient(90deg, #14B8A6 0%, #22C55E 80%, #FE5E0E 100%)",
@@ -52,7 +52,8 @@ function FormatConversion() {
               i === 0
                 ? "bg-[#14B8A6]/15 text-[#5eead4]"
                 : "bg-white/6 text-white/60"
-            }`}
+            } ${i > 0 ? "la-anim-fmt" : ""}`}
+            style={i > 0 ? { animationDelay: `${(i - 1) * 200}ms` } : undefined}
           >
             {fmt}
           </span>
@@ -74,12 +75,13 @@ function MiniWaveform() {
         return (
           <div
             key={i}
-            className="flex-1 rounded-full"
+            className={`flex-1 rounded-full ${isPast ? "" : "la-anim-wave-future"}`}
             style={{
               height: `${h * 100}%`,
               background: isPast
                 ? "rgba(20,184,166,0.5)"
                 : "rgba(255,255,255,0.12)",
+              animationDelay: isPast ? undefined : `${(i - 18) * 40}ms`,
             }}
           />
         );
@@ -96,11 +98,15 @@ function CommentTimeline() {
         { pos: "22%", color: "#FE5E0E" },
         { pos: "45%", color: "#3B82F6" },
         { pos: "72%", color: "#14B8A6" },
-      ].map((m) => (
+      ].map((m, idx) => (
         <div
           key={m.pos}
-          className="absolute top-1 w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold text-white"
-          style={{ left: m.pos, background: m.color }}
+          className="la-anim-dot absolute top-1 w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold text-white"
+          style={{
+            left: m.pos,
+            background: m.color,
+            animationDelay: `${idx * 80}ms`,
+          }}
         >
           &bull;
         </div>
@@ -111,7 +117,7 @@ function CommentTimeline() {
 
 function BriefPreview() {
   return (
-    <div className="mt-4 rounded-lg bg-white/4 p-3 space-y-2">
+    <div className="mt-4 rounded-lg bg-white/4 p-3 space-y-2 relative overflow-hidden">
       <div className="h-2 w-20 rounded-full bg-white/12" />
       <div className="h-1.5 w-full rounded-full bg-white/6" />
       <div className="h-1.5 w-3/4 rounded-full bg-white/6" />
@@ -122,17 +128,26 @@ function BriefPreview() {
           </span>
         ))}
       </div>
+      <div
+        aria-hidden="true"
+        className="la-anim-shimmer pointer-events-none absolute inset-0 opacity-0"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,255,255,0.08) 50%, transparent)",
+        }}
+      />
     </div>
   );
 }
 
 function VersionTabs() {
+  const pillAnim = ["la-anim-pill-v1", "la-anim-pill-v2", "la-anim-pill-v3"];
   return (
     <div className="mt-4 flex items-center gap-1.5">
       {["v1", "v2", "v3"].map((v, i) => (
         <span
           key={v}
-          className={`text-[10px] px-2.5 py-1 rounded-full font-medium ${
+          className={`${pillAnim[i]} text-[10px] px-2.5 py-1 rounded-full font-medium ${
             i === 2
               ? "bg-[#14B8A6] text-[#1a1a1a] font-semibold"
               : "bg-white/8 text-white/60"
@@ -216,7 +231,7 @@ export async function AudioToolsGrid() {
           {tools.map((tool) => (
             <div
               key={tool.title}
-              className="rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg"
+              className="la-hover-anim group rounded-xl bg-[#1a1a1a] border border-white/8 p-5 shadow-lg"
             >
               <div className="w-11 h-11 rounded-lg bg-[#14B8A6]/12 flex items-center justify-center text-[#14B8A6] mb-4" aria-hidden="true">
                 {tool.icon}
