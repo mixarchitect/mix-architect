@@ -4,6 +4,7 @@ import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { logAdminAction } from "@/lib/admin-audit-logger";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 /**
  * POST /api/admin/delete-user
@@ -12,6 +13,9 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
  * Body: { userId: string }
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
   const { success } = rateLimit(`admin-delete-user:${ip}`, 5, 60_000);
   if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });

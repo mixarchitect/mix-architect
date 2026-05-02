@@ -5,6 +5,11 @@ import { isAdmin } from "@/lib/admin";
 import { buildAdminEmail } from "@/lib/email-templates/admin-notification";
 import { logAdminAction } from "@/lib/admin-audit-logger";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
+
+/** Resend's batch endpoint accepts up to 100 emails per call. */
+const MAX_BULK_RECIPIENTS = 100;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -27,6 +32,9 @@ function getResend() {
  * }
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
   const { success } = rateLimit(`admin-bulk-email:${ip}`, 30, 60_000);
   if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
@@ -61,6 +69,27 @@ export async function POST(req: NextRequest) {
     if (!recipients?.length || !subject || !heading || !emailBody) {
       return NextResponse.json(
         { error: "Missing required fields: recipients, subject, heading, body" },
+        { status: 400 },
+      );
+    }
+
+    // Cap recipient count — Resend batch maxes at 100. Beyond this an
+    // admin should split their send. Validates each address shape so
+    // a malformed input doesn't burn a whole batch.
+    if (recipients.length > MAX_BULK_RECIPIENTS) {
+      return NextResponse.json(
+        {
+          error: `Too many recipients (max ${MAX_BULK_RECIPIENTS} per request)`,
+        },
+        { status: 400 },
+      );
+    }
+    const invalidEmails = recipients.filter(
+      (r) => typeof r?.email !== "string" || !EMAIL_RE.test(r.email),
+    );
+    if (invalidEmails.length > 0) {
+      return NextResponse.json(
+        { error: `Invalid recipient email(s): ${invalidEmails.length} rejected` },
         { status: 400 },
       );
     }
