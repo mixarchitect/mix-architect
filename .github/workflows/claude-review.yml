@@ -8,6 +8,10 @@ permissions:
   contents: read
   pull-requests: write
   issues: write
+  # Required by anthropics/claude-code-action@v1 for the OIDC token
+  # exchange it uses to authenticate. Without this the action fails
+  # with "Could not fetch an OIDC token".
+  id-token: write
 
 jobs:
   review:
