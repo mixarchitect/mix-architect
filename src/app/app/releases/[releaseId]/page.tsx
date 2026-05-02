@@ -318,24 +318,37 @@ export default async function ReleasePage({ params, searchParams }: Props) {
               </div>
 
               {tracks && tracks.length > 0 ? (
-                <TrackList
-                  releaseId={releaseId}
-                  tracks={tracks.map((t: Record<string, unknown> & { track_intent?: { mix_vision?: string } | { mix_vision?: string }[] }) => {
-                    const intent = Array.isArray(t.track_intent)
-                      ? t.track_intent[0]
-                      : t.track_intent;
-                    return {
-                      id: t.id as string,
-                      track_number: t.track_number as number,
-                      title: t.title as string,
-                      status: t.status as string,
-                      intentPreview: intent?.mix_vision,
-                      portalApprovalStatus: portalApprovalMap[t.id as string] ?? null,
-                    };
-                  })}
-                  canReorder={canEdit(role)}
-                  canDelete={canEdit(role)}
-                />
+                (() => {
+                  // Map trackId → latest signed audio URL so the
+                  // track list can prefetch the file on hover/focus,
+                  // warming the browser cache before the user
+                  // navigates to the track page.
+                  const latestAudioByTrack = new Map<string, string>();
+                  for (const ft of flowTracks) {
+                    latestAudioByTrack.set(ft.id, ft.audioUrl);
+                  }
+                  return (
+                    <TrackList
+                      releaseId={releaseId}
+                      tracks={tracks.map((t: Record<string, unknown> & { track_intent?: { mix_vision?: string } | { mix_vision?: string }[] }) => {
+                        const intent = Array.isArray(t.track_intent)
+                          ? t.track_intent[0]
+                          : t.track_intent;
+                        return {
+                          id: t.id as string,
+                          track_number: t.track_number as number,
+                          title: t.title as string,
+                          status: t.status as string,
+                          intentPreview: intent?.mix_vision,
+                          portalApprovalStatus: portalApprovalMap[t.id as string] ?? null,
+                          latestAudioUrl: latestAudioByTrack.get(t.id as string) ?? null,
+                        };
+                      })}
+                      canReorder={canEdit(role)}
+                      canDelete={canEdit(role)}
+                    />
+                  );
+                })()
               ) : (
                 <EmptyState
                   icon={ListMusic}

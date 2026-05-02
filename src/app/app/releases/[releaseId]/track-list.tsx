@@ -16,6 +16,10 @@ type TrackItem = {
   status: string;
   intentPreview?: string | null;
   portalApprovalStatus?: string | null;
+  /** Signed URL for the latest version's audio file. When present,
+   *  hover/focus warms up the browser HTTP cache so the audio is
+   *  ready to play by the time the user clicks through. */
+  latestAudioUrl?: string | null;
 };
 
 type Props = {
@@ -57,8 +61,34 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const confirmRef = useRef<HTMLDivElement>(null);
+  const prefetchedRef = useRef<Set<string>>(new Set());
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const router = useRouter();
+
+  // Hover/focus prefetch: warm the browser's HTTP cache for the
+  // track's audio file as soon as the user signals interest. By the
+  // time they click through to the track page, the persistent audio
+  // element can hit cache instead of waiting on a fresh signed-URL
+  // round-trip — collapsing cold playback start.
+  function prefetchAudio(url: string | null | undefined) {
+    if (!url) return;
+    if (prefetchedRef.current.has(url)) return;
+    prefetchedRef.current.add(url);
+    // Range-limit to the first 1 MB so hovering the whole track list
+    // doesn't drag down the network. That's enough to start playback
+    // for almost any sample-rate/bit-depth combination; the rest
+    // streams in once the audio element starts playing.
+    fetch(url, {
+      headers: { Range: "bytes=0-1048575" },
+      credentials: "omit",
+      // priority hint where supported (Chromium); harmless elsewhere.
+      ...({ priority: "low" } as RequestInit),
+    }).catch(() => {
+      // Best-effort — drop the URL from the prefetched set so we can
+      // retry on a future hover (e.g. transient network blip).
+      prefetchedRef.current.delete(url);
+    });
+  }
 
   // Close confirmation on outside click
   useEffect(() => {
@@ -206,6 +236,9 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
             href={`/app/releases/${releaseId}/tracks/${track.id}`}
             className="group flex-1 flex items-center gap-4 min-w-0"
             draggable={false}
+            onMouseEnter={() => prefetchAudio(track.latestAudioUrl)}
+            onFocus={() => prefetchAudio(track.latestAudioUrl)}
+            onTouchStart={() => prefetchAudio(track.latestAudioUrl)}
             {...(idx === 0 ? { "data-tour": "track-link" } : {})}
           >
             <span className="w-8 text-right text-sm font-medium text-muted shrink-0">

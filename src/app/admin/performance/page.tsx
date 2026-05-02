@@ -13,7 +13,8 @@ const METRIC_BUDGETS: Record<string, number> = {
   "waveform:render": 500,
   "waveform:seek": 50,
   "waveform:resize": 100,
-  "playback:start": 100,
+  "playback:start:warm": 100,
+  "playback:start:cold": 2500,
 };
 
 type BudgetStatus = "good" | "warn" | "bad" | "none";
@@ -74,7 +75,8 @@ const METRIC_LABELS: Record<string, string> = {
   "waveform:render": "Waveform Render",
   "waveform:seek": "Seek Latency",
   "waveform:resize": "Resize Redraw",
-  "playback:start": "Playback Start",
+  "playback:start:warm": "Playback Start (Warm)",
+  "playback:start:cold": "Playback Start (Cold)",
   "fps:playback": "Playback FPS",
 };
 
@@ -83,7 +85,8 @@ const METRIC_ICONS: Record<string, typeof Gauge> = {
   "waveform:render": MonitorSpeaker,
   "waveform:seek": Clock,
   "waveform:resize": BarChart3,
-  "playback:start": Zap,
+  "playback:start:warm": Zap,
+  "playback:start:cold": Zap,
   "fps:playback": Gauge,
 };
 

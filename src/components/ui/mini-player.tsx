@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { X, Repeat } from "lucide-react";
+import { X, Repeat, Loader2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
 import { useAudio } from "@/lib/audio-context";
@@ -20,6 +20,7 @@ export function MiniPlayer() {
     currentTime,
     duration,
     isLooping,
+    isBuffering,
     togglePlayPause,
     toggleLoop,
     stop,
@@ -76,9 +77,18 @@ export function MiniPlayer() {
         {/* Play / Pause */}
         <button
           onClick={togglePlayPause}
+          title={
+            isBuffering
+              ? "Buffering lossless audio…"
+              : isPlaying
+                ? "Pause"
+                : "Play"
+          }
           className="w-9 h-9 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm shrink-0"
         >
-          {isPlaying ? (
+          {isBuffering ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : isPlaying ? (
             <FilledPause size={16} />
           ) : (
             <FilledPlay size={16} className="ml-0.5" />

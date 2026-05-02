@@ -168,7 +168,7 @@ export function AudioPlayer({
 
   // Shared audio context
   const audio = useAudio();
-  const { audioElement, isPlaying, currentTime, duration } = audio;
+  const { audioElement, isPlaying, currentTime, duration, isBuffering } = audio;
 
   // Version state — sync with context if it's already playing a version for this track
   const [activeVersionId, setActiveVersionId] = useState<string | null>(() => {
@@ -417,7 +417,6 @@ export function AudioPlayer({
   // WaveSurfer ref
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const resizeCleanupRef = useRef<(() => void) | null>(null);
 
   // Keep a ref to latest versions so ready/LUFS callbacks never use stale closures
   const versionsRef = useRef(versions);
@@ -659,32 +658,21 @@ export function AudioPlayer({
         audioElement.pause();
       });
 
-      // Perf: track seek interactions (waveform click → visual update)
+      // Perf: track seek interactions (waveform click → visual cursor
+      // update). Measure to the next paint via double-RAF so the metric
+      // reflects only the visual response, not the media element's
+      // network-bound `seeking` event (which can wait on a Range
+      // request to unbuffered regions of the source file).
       ws.on("interaction", () => {
         perf.start("waveform:seek", { trackId: activeVersion.id });
-      });
-      ws.on("seeking", () => {
-        perf.end("waveform:seek");
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            perf.end("waveform:seek");
+          });
+        });
       });
 
       wavesurferRef.current = ws;
-
-      // Perf: measure waveform redraw time on window resize
-      if (perf.enabled) {
-        let resizeTimer: ReturnType<typeof setTimeout> | null = null;
-        const onResize = () => {
-          perf.start("waveform:resize", { trackId: activeVersion.id });
-          // WaveSurfer redraws asynchronously via ResizeObserver — measure on next frame
-          if (resizeTimer) clearTimeout(resizeTimer);
-          resizeTimer = setTimeout(() => {
-            requestAnimationFrame(() => {
-              perf.end("waveform:resize");
-            });
-          }, 100);
-        };
-        window.addEventListener("resize", onResize);
-        resizeCleanupRef.current = () => window.removeEventListener("resize", onResize);
-      }
     }
 
     // Double-RAF: defer WaveSurfer creation by two frames so the container
@@ -711,11 +699,52 @@ export function AudioPlayer({
         audioElement.play().catch(() => {});
       }
       wavesurferRef.current = null;
-      resizeCleanupRef.current?.();
-      resizeCleanupRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeVersion?.id, audioElement]);
+
+  /* ---------------------------------------------------------------- */
+  /*  Resize redraw measurement                                        */
+  /* ---------------------------------------------------------------- */
+  // Measure WaveSurfer's redraw cost when the container width changes.
+  // Uses a ResizeObserver on the container (not window) so we ignore
+  // resize events that don't actually change layout, and starts the
+  // measurement INSIDE the debounce so the 100ms wait isn't included
+  // in the recorded duration.
+  useEffect(() => {
+    if (!perf.enabled) return;
+    const el = containerRef.current;
+    const versionId = activeVersion?.id;
+    if (!el || !versionId) return;
+
+    let debounce: ReturnType<typeof setTimeout> | null = null;
+    let lastWidth = el.getBoundingClientRect().width;
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const width = entry.contentRect.width;
+      // Ignore the initial observe-fires-once callback and any
+      // sub-pixel jitter that doesn't trigger a redraw.
+      if (Math.abs(width - lastWidth) < 1) return;
+      lastWidth = width;
+      if (debounce) clearTimeout(debounce);
+      debounce = setTimeout(() => {
+        perf.start("waveform:resize", { trackId: versionId });
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            perf.end("waveform:resize");
+          });
+        });
+      }, 100);
+    });
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      if (debounce) clearTimeout(debounce);
+    };
+  }, [activeVersion?.id]);
 
   // Update waveform colors when the theme changes.
   // Defer to the next frame so the browser has recomputed CSS variables
@@ -1517,9 +1546,22 @@ export function AudioPlayer({
             <button
               onClick={togglePlayPause}
               disabled={!isReady}
+              title={
+                isBuffering
+                  ? "Buffering lossless audio…"
+                  : isPlaying
+                    ? "Pause"
+                    : "Play"
+              }
               className="w-10 h-10 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md"
             >
-              {isPlaying ? <FilledPause size={18} /> : <FilledPlay size={18} className="ml-0.5" />}
+              {isBuffering ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : isPlaying ? (
+                <FilledPause size={18} />
+              ) : (
+                <FilledPlay size={18} className="ml-0.5" />
+              )}
             </button>
             <button
               onClick={skipForward}
@@ -1543,6 +1585,24 @@ export function AudioPlayer({
           </div>
           <span className="text-xs text-faint min-w-[42px] text-right">
             {formatTime(duration)}
+          </span>
+        </div>
+        {/* Lossless-streaming notice. Reserves vertical space so it
+            can fade in/out without shifting the layout. We stream the
+            uncompressed source rather than a lossy proxy so producers
+            hear exactly what they uploaded — the brief wait is the
+            tradeoff for full audio fidelity. */}
+        <div
+          className="px-5 pb-3 -mt-1 h-4 flex justify-center"
+          aria-live="polite"
+        >
+          <span
+            className={cn(
+              "text-[11px] text-faint transition-opacity duration-200",
+              isBuffering ? "opacity-100" : "opacity-0",
+            )}
+          >
+            Streaming lossless audio…
           </span>
         </div>
       </div>
