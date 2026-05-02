@@ -4,7 +4,11 @@ import Link from "next/link";
 import { X, Repeat, Loader2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
-import { useAudio } from "@/lib/audio-context";
+import {
+  useAudio,
+  useAudioCurrentTime,
+  useAudioDuration,
+} from "@/lib/audio-context";
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -17,14 +21,14 @@ export function MiniPlayer() {
     activeVersion,
     trackMeta,
     isPlaying,
-    currentTime,
-    duration,
     isLooping,
     isBuffering,
     togglePlayPause,
     toggleLoop,
     stop,
   } = useAudio();
+  const currentTime = useAudioCurrentTime();
+  const duration = useAudioDuration();
 
   // Hide when nothing is loaded
   if (!activeVersion || !trackMeta) return null;
