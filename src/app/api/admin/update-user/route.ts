@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 /**
  * POST /api/admin/update-user
  * Updates user details: display_name, email, persona, is_test_account
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`admin-update-user:${ip}`, 30, 60_000);
+  if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

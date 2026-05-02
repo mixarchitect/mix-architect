@@ -5,6 +5,7 @@ import { isAdmin } from "@/lib/admin";
 import { logActivity } from "@/lib/activity-logger";
 import { logAdminAction } from "@/lib/admin-audit-logger";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 /**
  * POST /api/admin/comp-account
@@ -18,6 +19,9 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
  * }
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
   const { success } = rateLimit(`admin-comp:${ip}`, 30, 60_000);
   if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });

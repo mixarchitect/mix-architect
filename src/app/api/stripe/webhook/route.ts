@@ -66,6 +66,33 @@ export async function POST(req: NextRequest) {
 
   console.log("[stripe/webhook] event:", event.type, event.id);
 
+  // Idempotency: Stripe retries deliveries with the same event.id.
+  // Insert before any side-effecting work; if the row already exists
+  // we've processed this event and return 200 immediately so Stripe
+  // stops retrying. The previous handler only checked idempotency in
+  // the quote-payment branch, so subscription/payment events could
+  // re-fire emails and workflow triggers on every retry.
+  const { error: idempotencyErr } = await supabase
+    .from("stripe_processed_events")
+    .insert({ event_id: event.id, event_type: event.type });
+
+  if (idempotencyErr) {
+    // Postgres unique-violation = duplicate event = already processed.
+    if (idempotencyErr.code === "23505") {
+      console.log(
+        `[stripe/webhook] duplicate event ${event.id} (${event.type}) — skipping`,
+      );
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+    // Any other error is unexpected — log but don't block. Worst case
+    // is a re-delivery still gets through (the same as before this
+    // change), so we degrade gracefully rather than failing webhooks.
+    console.error(
+      "[stripe/webhook] idempotency insert failed (continuing):",
+      idempotencyErr.message,
+    );
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {
