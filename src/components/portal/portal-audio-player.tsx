@@ -16,7 +16,8 @@ import {
   Repeat,
   AlertTriangle,
 } from "lucide-react";
-import WaveSurfer from "wavesurfer.js";
+import type WaveSurfer from "wavesurfer.js";
+import { loadWaveSurfer } from "@/lib/wavesurfer-loader";
 import { trackGA4Event } from "@/lib/ga4-track";
 import {
   getWaveColors,
@@ -352,8 +353,14 @@ export function PortalAudioPlayer({
 
     const container = containerRef.current;
     let ws: WaveSurfer | null = null;
-    const raf = requestAnimationFrame(() => {
-      if (!container || !container.isConnected) return;
+    let cancelled = false;
+    const raf = requestAnimationFrame(async () => {
+      if (cancelled || !container || !container.isConnected) return;
+
+      // Dynamic import keeps wavesurfer out of the initial portal
+      // bundle. Cached at the loader's module scope.
+      const WaveSurfer = await loadWaveSurfer();
+      if (cancelled || !container.isConnected || !activeVersion) return;
 
       const colors = getWaveColors();
 
@@ -436,6 +443,7 @@ export function PortalAudioPlayer({
     });
 
     return () => {
+      cancelled = true;
       cancelAnimationFrame(raf);
       if (ws) ws.destroy();
       wavesurferRef.current = null;

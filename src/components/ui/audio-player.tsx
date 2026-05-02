@@ -24,7 +24,8 @@ import {
   X,
   Repeat,
 } from "lucide-react";
-import WaveSurfer from "wavesurfer.js";
+import type WaveSurfer from "wavesurfer.js";
+import { loadWaveSurfer } from "@/lib/wavesurfer-loader";
 import { perf } from "@/lib/perf";
 import { perfReporter } from "@/lib/perf-reporter";
 import {
@@ -522,8 +523,14 @@ export function AudioPlayer({
     let retryTimeout: ReturnType<typeof setTimeout> | null = null;
     const container = containerRef.current;
 
-    function createWaveSurfer() {
+    async function createWaveSurfer() {
       if (cancelled || !container || !container.isConnected || !activeVersion) return;
+
+      // Dynamically import wavesurfer so it's not in the initial
+      // bundle for users who don't visit a track page. Cached at the
+      // loader's module scope, so subsequent navigations are instant.
+      const WaveSurfer = await loadWaveSurfer();
+      if (cancelled || !container.isConnected || !activeVersion) return;
 
       const colors = getWaveColors();
       perf.setAudioFileInfo({

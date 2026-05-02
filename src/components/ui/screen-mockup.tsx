@@ -1,8 +1,13 @@
-"use client";
-
 /* ═══════════════════════════════════════════════════════════
    SCREEN MOCKUP — Help article visual aids using real components
    74 mockups (18 articles)
+
+   Renders as a Server Component: every mockup is pure presentational
+   JSX with no hooks, no event handlers (the two onClick refs are
+   no-op placeholders inside mock data), and no client-only imports.
+   When this was "use client", the entire 3,909-line module shipped
+   to every visitor of /app/help — about 80–120 KB of JS for content
+   that has no interactivity.
    ═══════════════════════════════════════════════════════════ */
 
 import {
