@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/attributions/attribute-signup
  * Called during the signup flow when an attribution cookie is present.
- * Links the new user to the attribution record and sets attributed_to_engineer
- * on the profile.
+ * Links the AUTHENTICATED user to the attribution record and sets
+ * attributed_to_engineer on the profile.
+ *
+ * Authorization: the target user id is taken from the session, NOT
+ * the request body. The previous version trusted body.new_user_id +
+ * a body-supplied attribution_id (which is publicly returned by
+ * /track-click), letting any caller stamp attribution onto any
+ * user's profile.
  */
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -16,13 +23,18 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const { attribution_id, new_user_id } = body as {
-      attribution_id: string;
-      new_user_id: string;
-    };
+    // Auth: the caller MUST be the just-signed-up user.
+    const userClient = await createSupabaseServerClient();
+    const { data: { user } } = await userClient.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const new_user_id = user.id;
 
-    if (!attribution_id || !new_user_id) {
+    const body = await req.json();
+    const { attribution_id } = body as { attribution_id: string };
+
+    if (!attribution_id) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },

@@ -65,6 +65,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
+    // Generate an opaque delete token. The portal client stores it in
+    // localStorage keyed by the new comment's id; only the holder of
+    // this token can delete the comment via the portal endpoint
+    // (preventing the previous bug where any visitor with the share
+    // token could delete any comment by spoofing author_name).
+    const deleteToken = crypto.randomUUID();
+
     // Insert the comment
     const { data: comment, error } = await supabase
       .from("revision_notes")
@@ -74,6 +81,7 @@ export async function POST(req: NextRequest) {
         content: content.trim(),
         author: author_name?.trim() || "Client",
         timecode_seconds: Math.round(timecode_seconds * 100) / 100,
+        delete_token: deleteToken,
       })
       .select("*")
       .single();
@@ -124,7 +132,14 @@ export async function POST(req: NextRequest) {
 
 /**
  * DELETE /api/portal/comment
- * Deletes a comment by ID (only if author matches).
+ * Deletes a portal-authored comment by id. Authorization is by an
+ * opaque delete_token issued at POST time; the previous self-asserted
+ * author_name check let any portal visitor with the share token
+ * delete any comment (defaults named "Client" were deletable by all).
+ *
+ * Comments created before delete_token shipped have NULL — they can't
+ * be deleted from the portal. Release owners can still delete them
+ * via the in-app comment thread.
  */
 export async function DELETE(req: NextRequest) {
   const ip = getClientIp(req);
@@ -133,13 +148,13 @@ export async function DELETE(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { share_token, comment_id, author_name } = body as {
+    const { share_token, comment_id, delete_token } = body as {
       share_token: string;
       comment_id: string;
-      author_name?: string;
+      delete_token?: string;
     };
 
-    if (!share_token || !comment_id) {
+    if (!share_token || !comment_id || !delete_token) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 },
@@ -159,18 +174,24 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Invalid share token" }, { status: 401 });
     }
 
-    // Fetch the comment and verify it belongs to this release + author matches
+    // Fetch the comment with its delete_token. Don't surface whether the
+    // row exists vs. token-mismatched — both return 403 — so a probe
+    // can't enumerate comment ids.
     const { data: comment } = await supabase
       .from("revision_notes")
-      .select("id, author, track_id")
+      .select("id, track_id, delete_token")
       .eq("id", comment_id)
       .maybeSingle();
 
-    if (!comment) {
-      return NextResponse.json({ error: "Comment not found" }, { status: 404 });
+    if (!comment || !comment.delete_token || comment.delete_token !== delete_token) {
+      return NextResponse.json(
+        { error: "Cannot delete this comment" },
+        { status: 403 },
+      );
     }
 
-    // Verify the track belongs to this release
+    // Verify the comment's track belongs to this share's release
+    // (defense in depth — the token alone already authorizes delete).
     const { data: track } = await supabase
       .from("tracks")
       .select("id")
@@ -180,15 +201,6 @@ export async function DELETE(req: NextRequest) {
 
     if (!track) {
       return NextResponse.json({ error: "Comment not found" }, { status: 404 });
-    }
-
-    // Only allow deletion if author matches
-    const authorToCheck = author_name?.trim() || "Client";
-    if (comment.author !== authorToCheck) {
-      return NextResponse.json(
-        { error: "Cannot delete another user's comment" },
-        { status: 403 },
-      );
     }
 
     const { error } = await supabase
