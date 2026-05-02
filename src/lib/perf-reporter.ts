@@ -34,7 +34,8 @@ const COLLECTED_METRICS = new Set([
   "waveform:render",
   "waveform:seek",
   "waveform:resize",
-  "playback:start",
+  "playback:start:warm",
+  "playback:start:cold",
 ]);
 
 const FLUSH_INTERVAL_MS = 30_000; // 30 seconds

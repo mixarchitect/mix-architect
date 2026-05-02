@@ -22,6 +22,7 @@ import {
   getExtension,
 } from "./converter.js";
 import { analyzeLoudness } from "./loudness.js";
+import { computeWaveformPeaks } from "./peaks.js";
 
 /** Current loudness analysis algorithm version. Bump when parser or
  *  FFmpeg filter chain changes in a way that should trigger reanalysis. */
@@ -307,12 +308,21 @@ async function processNextAnalysis() {
     const sourcePath = path.join(analysisDir, `source.${ext}`);
     await downloadSourceAudio(row.audio_url, sourcePath);
 
-    // Run ffprobe + loudness analysis in parallel (both read the same file
-    // but from different processes — OS page cache makes the second read
-    // cheap).
-    const [info, loudness] = await Promise.all([
-      probeSource(sourcePath),
+    // Probe first — peak generation needs the duration. Loudness +
+    // peaks then run in parallel (both read the same file from
+    // different processes; OS page cache makes the second read cheap).
+    const info = await probeSource(sourcePath);
+    const [loudness, peaks] = await Promise.all([
       analyzeLoudness(sourcePath),
+      // Peak generation is best-effort — never fail the whole analysis
+      // if it can't be computed (corrupt file, exotic codec, etc.).
+      // The client falls back to in-browser peak computation.
+      info.duration > 0
+        ? computeWaveformPeaks(sourcePath, info.duration).catch((err) => {
+            console.warn(`  Peak generation failed:`, err.message);
+            return null as number[][] | null;
+          })
+        : Promise.resolve(null),
     ]);
     const format = normalizeFormat(info.formatName, info.codecName);
     const lossy = isLossyCodec(info.codecName);
@@ -328,6 +338,12 @@ async function processNextAnalysis() {
       clip_sample_count: loudness.clipSampleCount,
       analysis_version: LOUDNESS_ANALYSIS_VERSION,
     };
+
+    // Always populate peaks when computed — even on backfill rows so
+    // legacy tracks get fast cold render once the worker re-processes.
+    if (peaks) {
+      update.waveform_peaks = peaks;
+    }
 
     if (!isBackfill) {
       update.sample_rate = info.sampleRate;
@@ -351,6 +367,9 @@ async function processNextAnalysis() {
     );
     console.log(
       `  Loudness: ${fmt(loudness.integratedLufs, "LUFS")}, true peak ${fmt(loudness.truePeakDbtp, "dBTP")}, ${loudness.clipSampleCount ?? "?"} clipped`,
+    );
+    console.log(
+      `  Peaks: ${peaks ? `${peaks[0]?.length ?? 0} buckets cached` : "skipped"}`,
     );
     console.log(`✅ Analysis ${row.id} complete`);
   } catch (err) {

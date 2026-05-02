@@ -27,11 +27,24 @@ export const PERF_BUDGETS = {
   /** Per-track budget for multi-track release page load */
   MULTI_WAVEFORM_LOAD_PER_TRACK: 600,
 
-  /** Click play → audible output */
-  PLAYBACK_START: 100,
+  /** Click play → audible output, when the audio element is already
+   *  buffered (readyState >= HAVE_FUTURE_DATA). Pure local latency. */
+  PLAYBACK_START_WARM: 100,
 
-  /** Waveform click → visual seek update */
+  /** Click play → audible output, when the audio element still has to
+   *  buffer enough lossless audio to start. Network-bound; the
+   *  budget reflects "good 4G/cable" expectations for a typical
+   *  5-minute WAV with a hot CDN edge. */
+  PLAYBACK_START_COLD: 2500,
+
+  /** Waveform click → visual seek update (cursor moves on canvas).
+   *  Decoupled from the media element's `seeking` event, which can
+   *  wait on a Range request to unbuffered regions of the file. */
   WAVEFORM_SEEK: 50,
+
+  /** Container width change → waveform redrawn at new size. Measured
+   *  inside the resize debounce so the 100ms wait isn't included. */
+  WAVEFORM_RESIZE: 100,
 
   /** Zoom in/out → waveform redraw */
   WAVEFORM_ZOOM: 100,
@@ -58,8 +71,10 @@ export function toBudgetArray(): PerfBudget[] {
     WAVEFORM_FIRST_PAINT: "waveform:first-paint",
     WAVEFORM_FULL_RENDER: "waveform:render",
     PEAK_CALCULATION: "peaks:calculate",
-    PLAYBACK_START: "playback:start",
+    PLAYBACK_START_WARM: "playback:start:warm",
+    PLAYBACK_START_COLD: "playback:start:cold",
     WAVEFORM_SEEK: "waveform:seek",
+    WAVEFORM_RESIZE: "waveform:resize",
     WAVEFORM_ZOOM: "waveform:zoom",
     PLAYER_TTI: "player:tti",
   };
