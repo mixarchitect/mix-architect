@@ -62,4 +62,7 @@ jobs:
             One summary comment for cross-cutting concerns. Skip nitpicks
             (formatting, debatable style) — focus on what could break in
             production or hurt paying customers.
-          claude_args: "--max-turns 5 --model claude-sonnet-4-6"
+          # 10 turns: PR #23 hit the 5-turn cap mid-review with a
+          # multi-file documentation PR. 10 leaves headroom for typical
+          # PRs while keeping per-PR cost bounded (~$0.10–$0.50).
+          claude_args: "--max-turns 10 --model claude-sonnet-4-6"
