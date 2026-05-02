@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import {
@@ -19,7 +20,13 @@ const MAX_ERRORS = 5;
  */
 export async function GET(request: NextRequest) {
   const secret = request.headers.get("authorization");
-  if (secret !== `Bearer ${process.env.CRON_SECRET}`) {
+  const expectedSecret = `Bearer ${process.env.CRON_SECRET}`;
+  if (!secret || !process.env.CRON_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const actual = crypto.createHash('sha256').update(secret).digest();
+  const expected = crypto.createHash('sha256').update(expectedSecret).digest();
+  if (!crypto.timingSafeEqual(actual, expected)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
