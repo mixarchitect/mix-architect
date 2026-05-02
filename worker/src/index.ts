@@ -35,6 +35,14 @@ const LOUDNESS_ANALYSIS_VERSION = 1;
 const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL_MS ?? "5000", 10);
 const TEMP_DIR = path.join(os.tmpdir(), "mix-architect-worker");
 
+/**
+ * After this many minutes, a row stuck in 'processing'/'analyzing'/0
+ * is presumed crashed and reset to its pending state so another
+ * worker iteration can pick it up. Long enough that genuinely slow
+ * FFmpeg jobs (5min timeout in convertAudio) finish before reclaim.
+ */
+const STUCK_JOB_RECLAIM_MINUTES = 15;
+
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
@@ -62,12 +70,99 @@ async function main() {
   // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
+      // Reclaim stranded rows BEFORE picking up new work, so a worker
+      // that crashed mid-job (SIGTERM, OOM, redeploy) doesn't leave
+      // user-facing jobs stuck in "processing" forever.
+      await reclaimStuckJobs();
+      await reclaimStuckAnalyses();
       await processNextJob();
       await processNextAnalysis();
     } catch (err) {
       console.error("Worker loop error:", err);
     }
     await sleep(POLL_INTERVAL);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Stuck-job reclamation                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Reset conversion_jobs whose `started_at` is older than
+ * STUCK_JOB_RECLAIM_MINUTES back to 'pending' so the next loop
+ * iteration retries them. Catches SIGTERM / OOM / redeploy crashes
+ * that bypass the normal try/catch failure path.
+ */
+async function reclaimStuckJobs() {
+  const cutoff = new Date(
+    Date.now() - STUCK_JOB_RECLAIM_MINUTES * 60_000,
+  ).toISOString();
+
+  const { data: reclaimed, error } = await supabase
+    .from("conversion_jobs")
+    .update({ status: "pending", started_at: null })
+    .eq("status", "processing")
+    .lt("started_at", cutoff)
+    .select("id");
+
+  if (error) {
+    console.warn("Reclaim conversion_jobs failed:", error.message);
+    return;
+  }
+  if (reclaimed?.length) {
+    console.log(
+      `♻️  Reclaimed ${reclaimed.length} stuck conversion job(s): ${reclaimed.map((r) => r.id).join(", ")}`,
+    );
+  }
+}
+
+/**
+ * Reset track_audio_versions whose analysis claim is older than
+ * STUCK_JOB_RECLAIM_MINUTES. Two stuck-state shapes exist:
+ *
+ *   - Newly uploaded rows: spec_analysis_status='analyzing' →
+ *     reset to 'pending'.
+ *   - Backfill rows: analysis_version=0 sentinel → reset to NULL.
+ *
+ * Rows whose analysis_started_at is NULL but whose state is stuck
+ * (legacy claims from before this column was added) are also
+ * reclaimed; we treat NULL as "definitely older than the cutoff."
+ */
+async function reclaimStuckAnalyses() {
+  const cutoff = new Date(
+    Date.now() - STUCK_JOB_RECLAIM_MINUTES * 60_000,
+  ).toISOString();
+
+  // Newly uploaded rows: 'analyzing' that haven't progressed.
+  const { data: pendingReclaimed } = await supabase
+    .from("track_audio_versions")
+    .update({
+      spec_analysis_status: "pending",
+      analysis_started_at: null,
+    })
+    .eq("spec_analysis_status", "analyzing")
+    .or(`analysis_started_at.is.null,analysis_started_at.lt.${cutoff}`)
+    .select("id");
+
+  if (pendingReclaimed?.length) {
+    console.log(
+      `♻️  Reclaimed ${pendingReclaimed.length} stuck analysis row(s) (pending path)`,
+    );
+  }
+
+  // Backfill rows: analysis_version=0 sentinel that hasn't progressed.
+  const { data: backfillReclaimed } = await supabase
+    .from("track_audio_versions")
+    .update({ analysis_version: null, analysis_started_at: null })
+    .eq("analysis_version", 0)
+    .or(`analysis_started_at.is.null,analysis_started_at.lt.${cutoff}`)
+    .select("id");
+
+  if (backfillReclaimed?.length) {
+    console.log(
+      `♻️  Reclaimed ${backfillReclaimed.length} stuck analysis row(s) (backfill path)`,
+    );
   }
 }
 
@@ -267,11 +362,16 @@ async function processNextAnalysis() {
   // Claim the analysis (optimistic lock). For pending rows we transition
   // to 'analyzing'. For backfill rows we leave spec_analysis_status alone
   // (it's already 'complete') and use analysis_version as the lock: only
-  // claim if it's still NULL.
+  // claim if it's still NULL. Both paths stamp analysis_started_at so
+  // the reclaim sweep can detect rows abandoned mid-analysis.
+  const claimedAt = new Date().toISOString();
   if (isBackfill) {
     const { error: claimError, data: claimed } = await supabase
       .from("track_audio_versions")
-      .update({ analysis_version: 0 }) // 0 = "in progress" sentinel
+      .update({
+        analysis_version: 0, // 0 = "in progress" sentinel
+        analysis_started_at: claimedAt,
+      })
       .eq("id", row.id)
       .is("analysis_version", null)
       .select("id");
@@ -285,7 +385,10 @@ async function processNextAnalysis() {
   } else {
     const { error: claimError } = await supabase
       .from("track_audio_versions")
-      .update({ spec_analysis_status: "analyzing" })
+      .update({
+        spec_analysis_status: "analyzing",
+        analysis_started_at: claimedAt,
+      })
       .eq("id", row.id)
       .eq("spec_analysis_status", "pending");
 
@@ -337,6 +440,9 @@ async function processNextAnalysis() {
       dc_offset: loudness.dcOffset,
       clip_sample_count: loudness.clipSampleCount,
       analysis_version: LOUDNESS_ANALYSIS_VERSION,
+      // Clear the claim timestamp now that the row is no longer in
+      // an in-progress state, so the reclaim sweep ignores it.
+      analysis_started_at: null,
     };
 
     // Always populate peaks when computed — even on backfill rows so
@@ -383,12 +489,15 @@ async function processNextAnalysis() {
         // issue, but with 10 existing files that's overkill.)
         await supabase
           .from("track_audio_versions")
-          .update({ analysis_version: null })
+          .update({ analysis_version: null, analysis_started_at: null })
           .eq("id", row.id);
       } else {
         await supabase
           .from("track_audio_versions")
-          .update({ spec_analysis_status: "failed" })
+          .update({
+            spec_analysis_status: "failed",
+            analysis_started_at: null,
+          })
           .eq("id", row.id);
       }
     } catch {
