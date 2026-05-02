@@ -85,6 +85,37 @@ function Timestamp({ date, className }: { date: string; className?: string }) {
 }
 
 const CLIENT_NAME_KEY = "portal_client_name";
+const DELETE_TOKEN_KEY_PREFIX = "portal_delete_token_";
+
+/** Read a stored portal-comment delete token from localStorage. */
+function readDeleteToken(commentId: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(`${DELETE_TOKEN_KEY_PREFIX}${commentId}`);
+  } catch {
+    return null;
+  }
+}
+
+/** Persist a delete token returned by POST /api/portal/comment. */
+function writeDeleteToken(commentId: string, token: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(`${DELETE_TOKEN_KEY_PREFIX}${commentId}`, token);
+  } catch {
+    /* localStorage full / disabled — delete UX gracefully degrades */
+  }
+}
+
+/** Remove a token after a successful delete. */
+function clearDeleteToken(commentId: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(`${DELETE_TOKEN_KEY_PREFIX}${commentId}`);
+  } catch {
+    /* ignore */
+  }
+}
 
 /* ------------------------------------------------------------------ */
 /*  PortalAudioPlayer                                                  */
@@ -548,6 +579,12 @@ export function PortalAudioPlayer({
 
       if (!res.ok) return;
       const data = await res.json();
+      // Persist the server-issued delete_token so this client can
+      // later authorize deleting its own comment. Other portal
+      // visitors don't have it and thus can't delete the comment.
+      if (data?.id && data?.delete_token) {
+        writeDeleteToken(data.id, data.delete_token);
+      }
       setComments((prev) => [data, ...prev]);
       setNewCommentText("");
       setCommentInput(null);
@@ -559,6 +596,9 @@ export function PortalAudioPlayer({
   }
 
   async function handleDeleteComment(commentId: string) {
+    const deleteToken = readDeleteToken(commentId);
+    if (!deleteToken) return; // No token → not the author of this comment
+
     const prev = comments;
     setComments(comments.filter((c) => c.id !== commentId));
     if (highlightedCommentId === commentId) setHighlightedCommentId(null);
@@ -570,12 +610,14 @@ export function PortalAudioPlayer({
         body: JSON.stringify({
           share_token: shareToken,
           comment_id: commentId,
-          author_name: clientName.trim() || "Client",
+          delete_token: deleteToken,
         }),
       });
 
       if (!res.ok) {
         setComments(prev);
+      } else {
+        clearDeleteToken(commentId);
       }
     } catch {
       setComments(prev);
@@ -1098,8 +1140,11 @@ export function PortalAudioPlayer({
                 const color =
                   authorColorMap.get(c.author) ?? AUTHOR_COLORS[0];
                 const isActive = highlightedCommentId === c.id;
-                const canDelete =
-                  c.author === (clientName.trim() || "Client");
+                // The user can delete a comment only if they hold its
+                // server-issued delete token in localStorage. This
+                // matches the server's authorization check and avoids
+                // showing a delete button that would 403.
+                const canDelete = readDeleteToken(c.id) !== null;
                 return (
                   <CommentRow
                     key={c.id}
