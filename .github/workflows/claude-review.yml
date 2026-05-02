@@ -1,0 +1,65 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  # Required by anthropics/claude-code-action@v1 for the OIDC token
+  # exchange it uses to authenticate. Without this the action fails
+  # with "Could not fetch an OIDC token".
+  id-token: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review this pull request as a senior engineer on a music-production SaaS.
+            Stack: Next.js 16 App Router, React 19, Supabase (auth + RLS + storage),
+            Stripe, and a Node.js audio worker (FFmpeg).
+
+            For each change, look hard at:
+            - Security: auth bypasses, missing/weak RLS, service-role key used in
+              client code, secret exposure in logs/responses, OWASP top 10, Stripe
+              webhook signature verification, CSRF/Origin checks on admin POSTs,
+              IDOR (verify ownership of every ID accepted from the client).
+            - Correctness: server-only code imported into client components,
+              missing error handling on Supabase calls, race conditions,
+              incorrect Supabase query patterns, idempotency on webhook handlers.
+            - Performance: N+1 Supabase queries, heavy libs in client bundles
+              (wavesurfer.js, recharts, fuse.js, archiver should be dynamically
+              imported or kept in server-only paths), unnecessary "use client",
+              missing memoization where state churns, audio-pipeline regressions
+              on peaks/loudness/conversion, hot-path JSON.stringify.
+            - Code quality: any/as casts, dead code, duplication of utilities
+              already in src/lib/**, missing tests for non-trivial logic,
+              i18n missing on user-facing strings.
+
+            Conventions:
+            - Server Components by default; "use client" only for interactivity.
+            - Service role key only via src/lib/supabaseServiceClient.ts on the
+              server. Treat new call sites of createSupabaseServiceClient as
+              suspicious — call them out unless behind requireAdmin or a
+              webhook signature check.
+            - RLS lives in supabase/migrations/*.sql. New tables must enable RLS
+              and have at least one policy.
+            - Worker (worker/) is a separate process — coupling to src/ is a
+              smell. The worker talks to the app only via Supabase rows.
+            - currentTime should not be added to AudioContext (it would re-render
+              every consumer 4x/sec).
+
+            Post inline review comments where a specific file/line is at fault.
+            One summary comment for cross-cutting concerns. Skip nitpicks
+            (formatting, debatable style) — focus on what could break in
+            production or hurt paying customers.
+          claude_args: "--max-turns 5 --model claude-sonnet-4-6"
