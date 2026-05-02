@@ -15,6 +15,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import * as Sentry from "@sentry/nextjs";
 
 export default function ErrorPage({
   error,
@@ -24,11 +25,11 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Surface to whatever runtime error tracker is connected. For now
-    // this is just console.error; once Sentry/Bugsnag/etc. is wired in
-    // src/instrumentation.ts, the error tracker will pick this up via
-    // the global handler. Including the `digest` so server-side stack
-    // traces in Vercel logs can be correlated with this client view.
+    // Forward to Sentry. No-op when NEXT_PUBLIC_SENTRY_DSN is unset,
+    // so this is safe even before a Sentry account exists. The
+    // `digest` is kept in console output so a Vercel runtime log
+    // line can be correlated with the Sentry event when both exist.
+    Sentry.captureException(error);
     console.error("[app/error] Unhandled error:", error, {
       digest: error.digest,
     });

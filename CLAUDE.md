@@ -64,6 +64,13 @@ A public unauthenticated read should use the anon client + RLS policies, not the
 - Audio is streamed **losslessly** (WAV). Don't introduce a lossy proxy; the buffering chip on the player explains the brief wait.
 - Waveform peaks are computed by the worker at upload time and cached on `track_audio_versions.waveform_peaks`. Browser-side computation is a fallback only.
 
+## Error tracking
+
+- Sentry is wired in via `instrumentation.ts` (server/edge) and `instrumentation-client.ts` (browser). Both are no-ops when `NEXT_PUBLIC_SENTRY_DSN` is unset.
+- `src/app/error.tsx` and `src/app/global-error.tsx` call `Sentry.captureException`. Don't replace those with `console.error`-only patterns.
+- Server-action errors and route-handler throws are forwarded automatically via `onRequestError` in `instrumentation.ts`. New code should `throw` rather than swallowing — the boundary picks it up.
+- `next.config.ts` is wrapped with `withSentryConfig`. New build-time wrappers must compose with it (Sentry stays outermost).
+
 ## Stripe
 
 - Webhook handler at `src/app/api/stripe/webhook/route.ts`:
