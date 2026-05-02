@@ -2,7 +2,12 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { cn } from "@/lib/cn";
-import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
+import {
+  useAudio,
+  useAudioCurrentTime,
+  useAudioDuration,
+  type AudioTrackMeta,
+} from "@/lib/audio-context";
 import { useTheme } from "next-themes";
 import {
   SkipBack,
@@ -140,8 +145,13 @@ export function PortalAudioPlayer({
   const isThisTrackActive = audio.activeVersion?.track_id === trackId;
   const audioElement = audio.audioElement;
   const isPlaying = isThisTrackActive ? audio.isPlaying : false;
-  const currentTime = isThisTrackActive ? audio.currentTime : 0;
-  const duration = isThisTrackActive ? audio.duration : 0;
+  // Subscribe directly to the audio element for time. The
+  // isThisTrackActive gate keeps the displayed cursor at 0 for
+  // tracks that aren't the currently-playing one.
+  const sharedCurrentTime = useAudioCurrentTime();
+  const sharedDuration = useAudioDuration();
+  const currentTime = isThisTrackActive ? sharedCurrentTime : 0;
+  const duration = isThisTrackActive ? sharedDuration : 0;
 
   // Version state
   const [activeVersionId, setActiveVersionId] = useState<string | null>(() => {

@@ -5,7 +5,12 @@ import { cn } from "@/lib/cn";
 import { Timestamp } from "@/components/ui/timestamp";
 import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
-import { useAudio, type AudioTrackMeta } from "@/lib/audio-context";
+import {
+  useAudio,
+  useAudioCurrentTime,
+  useAudioDuration,
+  type AudioTrackMeta,
+} from "@/lib/audio-context";
 import { useTheme } from "next-themes";
 import { sendNotification } from "@/lib/notifications/client";
 import { logActivityClient } from "@/lib/activity-logger-client";
@@ -169,7 +174,12 @@ export function AudioPlayer({
 
   // Shared audio context
   const audio = useAudio();
-  const { audioElement, isPlaying, currentTime, duration, isBuffering } = audio;
+  const { audioElement, isPlaying, isBuffering } = audio;
+  // Time + duration come from dedicated subscriptions so non-time
+  // consumers (mini-player on other pages, shell, etc.) don't
+  // re-render on every `timeupdate`.
+  const currentTime = useAudioCurrentTime();
+  const duration = useAudioDuration();
 
   // Version state — sync with context if it's already playing a version for this track
   const [activeVersionId, setActiveVersionId] = useState<string | null>(() => {
