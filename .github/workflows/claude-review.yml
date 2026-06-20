@@ -62,7 +62,9 @@ jobs:
             One summary comment for cross-cutting concerns. Skip nitpicks
             (formatting, debatable style) — focus on what could break in
             production or hurt paying customers.
-          # 10 turns: PR #23 hit the 5-turn cap mid-review with a
-          # multi-file documentation PR. 10 leaves headroom for typical
-          # PRs while keeping per-PR cost bounded (~$0.10–$0.50).
-          claude_args: "--max-turns 10 --model claude-sonnet-4-6"
+          # 15 turns: 10 wasn't enough when a PR touches a long file
+          # (settings/page.tsx is ~1700 lines) — Claude exhausted the
+          # budget reading surrounding context before producing the
+          # summary and returned error_max_turns. Per-PR cost rises
+          # to roughly $0.20–$0.60, still bounded.
+          claude_args: "--max-turns 15 --model claude-sonnet-4-6"
