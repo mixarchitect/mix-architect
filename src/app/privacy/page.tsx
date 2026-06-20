@@ -38,11 +38,11 @@ export default async function PrivacyPage() {
 
           <Section title="1. About This Policy">
             <p>
-              This Privacy Policy explains how <strong>Tiix</strong>{" "}
-              (&quot;Mix Architect,&quot; &quot;we,&quot; &quot;us,&quot; or
-              &quot;our&quot;) collects, uses, shares, and protects information
-              when you use mixarchitect.com, the Mix Architect web application,
-              and related services (the &quot;Services&quot;).
+              This Privacy Policy explains how{" "}
+              <strong>Mix Architect</strong> (&quot;we,&quot; &quot;us,&quot;
+              or &quot;our&quot;) collects, uses, shares, and protects
+              information when you use mixarchitect.com, the Mix Architect web
+              application, and related services (the &quot;Services&quot;).
             </p>
             <p>
               By using the Services, you agree to the practices described here
@@ -442,8 +442,8 @@ export default async function PrivacyPage() {
             </p>
             <p>
               The data controller for the purposes of EU/UK data-protection law
-              is Tiix, located in Los Angeles County, California, United
-              States.
+              is Mix Architect, located in Los Angeles County, California,
+              United States.
             </p>
           </Section>
         </article>

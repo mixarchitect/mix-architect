@@ -40,11 +40,10 @@ export default async function TermsPage() {
             <p>
               These Terms of Service (the &quot;Terms&quot;) are a legal
               agreement between you and{" "}
-              <strong>Tiix</strong> (&quot;Mix Architect,&quot;
-              &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) governing your
-              access to and use of mixarchitect.com, the Mix Architect web
-              application, and any related services we offer (together, the
-              &quot;Services&quot;).
+              <strong>Mix Architect</strong> (&quot;we,&quot; &quot;us,&quot;
+              or &quot;our&quot;) governing your access to and use of
+              mixarchitect.com, the Mix Architect web application, and any
+              related services we offer (together, the &quot;Services&quot;).
             </p>
             <p>
               By creating an account, accessing, or using the Services, you
