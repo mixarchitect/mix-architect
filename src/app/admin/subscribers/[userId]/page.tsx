@@ -15,6 +15,7 @@ import { notFound } from "next/navigation";
 import { AdminToggleButton } from "@/components/admin/AdminToggleButton";
 import { TestAccountToggle } from "@/components/admin/UserDetailHeader";
 import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
+import { SubscriptionPlanControl } from "@/components/admin/SubscriptionPlanControl";
 
 export const dynamic = "force-dynamic";
 
@@ -198,6 +199,22 @@ export default async function UserDetailPage({ params }: Props) {
         <div className="flex flex-wrap items-center gap-2 mt-3">
           <TestAccountToggle userId={userId} initial={isTestAccount} />
           <AdminToggleButton userId={userId} isAdmin={profile.is_admin === true} />
+          <SubscriptionPlanControl
+            userId={userId}
+            subscription={
+              subscription
+                ? {
+                    plan: subscription.plan ?? null,
+                    status: subscription.status ?? null,
+                    granted_by_admin: subscription.granted_by_admin ?? null,
+                    stripe_subscription_id:
+                      subscription.stripe_subscription_id ?? null,
+                    cancel_at_period_end:
+                      subscription.cancel_at_period_end ?? null,
+                  }
+                : null
+            }
+          />
           <DeleteUserButton userId={userId} />
         </div>
 
