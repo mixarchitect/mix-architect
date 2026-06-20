@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { logActivity, type ActivityEventType } from "@/lib/activity-logger";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 import { sendTransactionalEmail, buildUnsubscribeUrl } from "@/lib/email/service";
 import { buildWelcomeEmail } from "@/lib/email-templates/transactional";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
@@ -20,6 +21,9 @@ const ALLOWED_EVENTS: Set<string> = new Set([
  * Authenticates the caller and logs the event with their user ID.
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
   const { success } = rateLimit(`admin-log:${ip}`, 30, 60_000);
   if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });

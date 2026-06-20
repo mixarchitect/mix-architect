@@ -45,9 +45,16 @@ export async function analyzeLoudness(filePath: string): Promise<LoudnessResult>
       "-f", "null",
       "-",
     ],
-    // ebur128 + astats stderr is a few KB; 4 MB is plenty of headroom
-    // and far less wasteful than the previous 256 MB allocation.
-    { maxBuffer: 4 * 1024 * 1024 },
+    {
+      // ebur128 + astats stderr is a few KB; 4 MB is plenty of headroom
+      // and far less wasteful than the previous 256 MB allocation.
+      maxBuffer: 4 * 1024 * 1024,
+      // Hard ceiling — a pathological input that makes ebur128 spin
+      // would otherwise hang the worker indefinitely (the 15-min
+      // reclaim sweep flips the DB row but the OS process keeps
+      // burning CPU/RAM).
+      timeout: 5 * 60 * 1000,
+    },
   );
 
   return parseLoudnessOutput(stderr);

@@ -4,7 +4,7 @@ import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { buildAdminEmail } from "@/lib/email-templates/admin-notification";
 import { logAdminAction } from "@/lib/admin-audit-logger";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { dbRateLimit, getClientIp } from "@/lib/rate-limit";
 import { requireSameOrigin } from "@/lib/origin-check";
 
 /** Resend's batch endpoint accepts up to 100 emails per call. */
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   if (originErr) return originErr;
 
   const ip = getClientIp(req);
-  const { success } = rateLimit(`admin-bulk-email:${ip}`, 30, 60_000);
+  const { success } = await dbRateLimit(`admin-bulk-email:${ip}`, 30, 60_000);
   if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   try {

@@ -4,7 +4,7 @@ import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { isAdmin } from "@/lib/admin";
 import { logActivity } from "@/lib/activity-logger";
 import { logAdminAction } from "@/lib/admin-audit-logger";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { dbRateLimit, getClientIp } from "@/lib/rate-limit";
 import { requireSameOrigin } from "@/lib/origin-check";
 
 /** Cap on bulk operations. Beyond this an admin should script it. */
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   if (originErr) return originErr;
 
   const ip = getClientIp(req);
-  const { success } = rateLimit(`admin-bulk-comp:${ip}`, 30, 60_000);
+  const { success } = await dbRateLimit(`admin-bulk-comp:${ip}`, 30, 60_000);
   if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   try {

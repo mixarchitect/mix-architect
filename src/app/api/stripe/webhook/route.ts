@@ -84,12 +84,19 @@ export async function POST(req: NextRequest) {
       );
       return NextResponse.json({ received: true, duplicate: true });
     }
-    // Any other error is unexpected — log but don't block. Worst case
-    // is a re-delivery still gets through (the same as before this
-    // change), so we degrade gracefully rather than failing webhooks.
+    // Any other error (connection blip, table dropped, RLS edit gone
+    // wrong) means we can't confirm this event isn't a re-delivery.
+    // Return 500 so Stripe retries against a healthy DB rather than
+    // letting the side-effect branches double-fire emails + workflow
+    // triggers. Better to fail loud than to silently double-charge
+    // a customer's receipt or fire `payment_received` twice.
     console.error(
-      "[stripe/webhook] idempotency insert failed (continuing):",
+      "[stripe/webhook] idempotency insert failed:",
       idempotencyErr.message,
+    );
+    return NextResponse.json(
+      { error: "Idempotency check failed; retry" },
+      { status: 500 },
     );
   }
 
@@ -443,11 +450,14 @@ export async function POST(req: NextRequest) {
             })
           : "your next billing date";
 
-        // Send payment received email (fire-and-forget)
-        (async () => {
-          try {
-            const email = await getUserEmail(sub.user_id);
-            if (!email) return;
+        // Send payment received email. Awaited — the previous
+        // fire-and-forget IIFE was getting killed by Vercel Fluid
+        // Compute when the handler returned 200 to Stripe, so
+        // receipts silently failed (same root cause as the
+        // subscription-confirmed email pre-PR #28).
+        try {
+          const email = await getUserEmail(sub.user_id);
+          if (email) {
             const displayName = await getUserDisplayName(sub.user_id);
 
             const { data: prefs } = await supabase
@@ -474,10 +484,105 @@ export async function POST(req: NextRequest) {
               subject,
               html,
             });
-          } catch (err) {
-            console.error("[stripe/webhook] payment received email error:", err);
           }
-        })();
+        } catch (err) {
+          console.error("[stripe/webhook] payment received email error:", err);
+        }
+        break;
+      }
+
+      case "charge.dispute.created": {
+        // Chargeback. Revoke Pro access immediately rather than
+        // waiting for `customer.subscription.deleted` (which may
+        // never arrive if the dispute is decided weeks later or if
+        // the merchant doesn't auto-cancel on dispute).
+        const dispute = event.data.object as Stripe.Dispute;
+        const chargeId =
+          typeof dispute.charge === "string"
+            ? dispute.charge
+            : dispute.charge?.id;
+
+        if (!chargeId) break;
+
+        // Charge → customer. Could also key off payment_intent here,
+        // but the charge object already has customer hydrated.
+        let customerId: string | null = null;
+        try {
+          const charge = await stripe.charges.retrieve(chargeId);
+          customerId =
+            typeof charge.customer === "string"
+              ? charge.customer
+              : charge.customer?.id ?? null;
+        } catch (err) {
+          console.error("[stripe/webhook] dispute charge fetch failed:", err);
+          break;
+        }
+
+        if (!customerId) break;
+
+        // Quote-payment dispute? Revert the quote to "sent" and let
+        // the engineer chase the client. Don't touch subscriptions.
+        const { data: disputedQuote } = await supabase
+          .from("quotes")
+          .select("id, release_id")
+          .eq("stripe_payment_intent_id", dispute.payment_intent ?? "")
+          .maybeSingle();
+
+        if (disputedQuote) {
+          await supabase
+            .from("quotes")
+            .update({
+              status: "sent",
+              paid_at: null,
+              payment_method: null,
+              stripe_checkout_session_id: null,
+              stripe_payment_intent_id: null,
+            })
+            .eq("id", disputedQuote.id);
+          if (disputedQuote.release_id) {
+            await syncPaymentStatus(disputedQuote.release_id);
+          }
+          console.log("[stripe/webhook] quote disputed:", disputedQuote.id);
+          break;
+        }
+
+        // Otherwise it's a subscription dispute. Revoke Pro.
+        const { data: sub } = await supabase
+          .from("subscriptions")
+          .select("id, user_id, granted_by_admin")
+          .eq("stripe_customer_id", customerId)
+          .maybeSingle();
+
+        if (!sub || sub.granted_by_admin || !sub.user_id) break;
+
+        const { error } = await supabase
+          .from("subscriptions")
+          .update({
+            plan: "free",
+            status: "canceled",
+            cancel_at_period_end: false,
+          })
+          .eq("id", sub.id);
+
+        if (error) {
+          console.error(
+            "[stripe/webhook] dispute revoke failed:",
+            error.message,
+          );
+        } else {
+          console.log(
+            "[stripe/webhook] subscription revoked on dispute:",
+            customerId,
+          );
+          logActivity(sub.user_id, "subscription_cancelled", {
+            reason: "chargeback",
+            dispute_id: dispute.id,
+          });
+          createChurnSignal(sub.user_id, "subscription_cancelled", "high", {
+            stripe_customer_id: customerId,
+            reason: "chargeback",
+          });
+        }
         break;
       }
 

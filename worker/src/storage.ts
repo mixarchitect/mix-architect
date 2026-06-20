@@ -25,6 +25,14 @@ function extractStoragePath(urlOrPath: string): string {
   );
 }
 
+/**
+ * Hard ceiling on the size of an audio source the worker will buffer
+ * into memory. Mirrors the cover-art bucket cap from migration 058
+ * (600 MB) with headroom for re-encoded versions. Beyond this the
+ * worker would OOM trying to `arrayBuffer()` the whole file.
+ */
+const MAX_AUDIO_BYTES = 700 * 1024 * 1024;
+
 export async function downloadSourceAudio(
   audioUrlOrPath: string,
   destPath: string,
@@ -37,6 +45,24 @@ export async function downloadSourceAudio(
 
   const storagePath = extractStoragePath(audioUrlOrPath);
 
+  // Reject oversized files before buffering — `download()` returns a
+  // Blob whose arrayBuffer() will OOM the container on multi-GB uploads.
+  // The bucket itself caps at 600 MB (migration 058) so this is a
+  // defensive belt-and-suspenders check against drift.
+  const { data: meta, error: metaErr } = await supabase.storage
+    .from("track-audio")
+    .info(storagePath);
+
+  if (metaErr) {
+    throw new Error(`Metadata fetch failed for ${storagePath}: ${metaErr.message}`);
+  }
+
+  if (meta?.size && meta.size > MAX_AUDIO_BYTES) {
+    throw new Error(
+      `Source audio too large (${meta.size} bytes > ${MAX_AUDIO_BYTES} cap): ${storagePath}`,
+    );
+  }
+
   // Download via service role (works for both public and private buckets)
   const { data, error } = await supabase.storage
     .from("track-audio")
@@ -47,6 +73,14 @@ export async function downloadSourceAudio(
   }
 
   const buffer = Buffer.from(await data.arrayBuffer());
+
+  // Belt + suspenders if .info() returned without size for some reason.
+  if (buffer.length > MAX_AUDIO_BYTES) {
+    throw new Error(
+      `Source audio too large after download (${buffer.length} bytes): ${storagePath}`,
+    );
+  }
+
   await fs.writeFile(resolved, buffer);
 }
 
@@ -284,13 +318,65 @@ export async function getTrackMetadata(
 /*  Download artwork to a local temp file                              */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Hostname of this project's Supabase instance, parsed once at module
+ * load. We only ever fetch cover art from this host — anything else
+ * gets rejected.
+ *
+ * cover_art_url is user-controlled (the release editors accept any
+ * URL the user types). Without this gate, the worker would happily
+ * fetch http://169.254.169.254/... (cloud metadata, which can return
+ * IAM credentials on AWS), http://localhost:54321/auth/v1/admin/users
+ * (internal Supabase admin endpoints), or any other reachable URL.
+ * The response is then fed to FFmpeg, where a decoder bug becomes
+ * RCE-class — so SSRF here is unusually dangerous.
+ */
+const ALLOWED_ARTWORK_HOST = (() => {
+  try {
+    return new URL(supabaseUrl).host;
+  } catch {
+    return null;
+  }
+})();
+
+function isAllowedArtworkUrl(rawUrl: string): boolean {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return false;
+  // Only allow this project's Supabase storage host. Different
+  // Supabase projects can't reach each other's internal admin
+  // endpoints anyway, but pinning to exactly our host removes the
+  // entire SSRF surface.
+  return ALLOWED_ARTWORK_HOST !== null && parsed.host === ALLOWED_ARTWORK_HOST;
+}
+
 export async function downloadArtwork(
   artworkUrl: string,
   tempDir: string,
 ): Promise<string | null> {
+  if (!isAllowedArtworkUrl(artworkUrl)) {
+    console.warn(
+      `[storage] rejected artwork URL (host not allowlisted): ${artworkUrl}`,
+    );
+    return null;
+  }
+
   try {
     const response = await fetch(artworkUrl);
     if (!response.ok) return null;
+
+    // Reject oversize responses before buffering. 10 MB matches the
+    // cover-art bucket cap from migration 058.
+    const declaredLen = Number(response.headers.get("content-length") ?? 0);
+    const MAX_ARTWORK_BYTES = 10 * 1024 * 1024;
+    if (declaredLen > MAX_ARTWORK_BYTES) {
+      console.warn(`[storage] artwork too large: ${declaredLen} bytes`);
+      return null;
+    }
 
     const contentType = response.headers.get("content-type") || "";
     let ext = "jpg";
@@ -299,18 +385,28 @@ export async function downloadArtwork(
 
     const artworkPath = path.join(tempDir, `cover.${ext}`);
     const buffer = Buffer.from(await response.arrayBuffer());
+
+    // Belt + suspenders if content-length wasn't sent.
+    if (buffer.length > MAX_ARTWORK_BYTES) {
+      console.warn(`[storage] artwork too large (post-buffer): ${buffer.length} bytes`);
+      return null;
+    }
+
     await fs.writeFile(artworkPath, buffer);
 
-    // If WebP, convert to JPEG for maximum player compatibility
+    // If WebP, convert to JPEG for maximum player compatibility.
+    // `-map_metadata -1` strips EXIF (which may include GPS).
     if (ext === "webp") {
       const { execFile: execFileCb } = await import("node:child_process");
       const { promisify } = await import("node:util");
       const execFileAsync = promisify(execFileCb);
 
       const jpegPath = path.join(tempDir, "cover.jpg");
-      await execFileAsync("ffmpeg", [
-        "-i", artworkPath, "-q:v", "2", jpegPath,
-      ]);
+      await execFileAsync(
+        "ffmpeg",
+        ["-i", artworkPath, "-map_metadata", "-1", "-q:v", "2", jpegPath],
+        { timeout: 30_000 },
+      );
       await fs.unlink(artworkPath).catch(() => {});
       return jpegPath;
     }
