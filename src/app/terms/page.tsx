@@ -40,7 +40,7 @@ export default async function TermsPage() {
             <p>
               These Terms of Service (the &quot;Terms&quot;) are a legal
               agreement between you and{" "}
-              <strong>[LEGAL ENTITY NAME]</strong> (&quot;Mix Architect,&quot;
+              <strong>Tiix</strong> (&quot;Mix Architect,&quot;
               &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) governing your
               access to and use of mixarchitect.com, the Mix Architect web
               application, and any related services we offer (together, the
@@ -140,7 +140,7 @@ export default async function TermsPage() {
                 We do not offer refunds for partial billing periods, unused
                 features, or unused time. If you believe you were charged in
                 error, contact us at{" "}
-                <Anchor href="mailto:[CONTACT EMAIL]">[CONTACT EMAIL]</Anchor>{" "}
+                <Anchor href="mailto:legal@mixarchitect.com">legal@mixarchitect.com</Anchor>{" "}
                 within 30 days of the charge and we will review the request in
                 good faith.
               </p>
@@ -281,8 +281,8 @@ export default async function TermsPage() {
             <p>
               If you believe content on the Services infringes your copyright,
               send a notice to our designated DMCA agent at{" "}
-              <Anchor href="mailto:[DMCA AGENT EMAIL]">
-                [DMCA AGENT EMAIL]
+              <Anchor href="mailto:legal@mixarchitect.com">
+                legal@mixarchitect.com
               </Anchor>{" "}
               containing:
             </p>
@@ -438,11 +438,11 @@ export default async function TermsPage() {
           <Section title="17. Governing Law and Disputes">
             <p>
               These Terms are governed by the laws of the State of{" "}
-              <strong>[STATE]</strong>, without regard to its conflict-of-law
+              <strong>California</strong>, without regard to its conflict-of-law
               principles. Any dispute arising out of or relating to these Terms
               or the Services will be resolved exclusively in the state or
-              federal courts located in <strong>[COUNTY]</strong>,{" "}
-              <strong>[STATE]</strong>, and you consent to personal jurisdiction
+              federal courts located in <strong>Los Angeles County</strong>,{" "}
+              <strong>California</strong>, and you consent to personal jurisdiction
               and venue in those courts.
             </p>
             <p>
@@ -493,7 +493,7 @@ export default async function TermsPage() {
                 We may send notices to you at the email address associated with
                 your account or through in-app notification. You should send
                 notices to us at{" "}
-                <Anchor href="mailto:[CONTACT EMAIL]">[CONTACT EMAIL]</Anchor>.
+                <Anchor href="mailto:legal@mixarchitect.com">legal@mixarchitect.com</Anchor>.
               </p>
             </SubSection>
           </Section>
@@ -501,7 +501,7 @@ export default async function TermsPage() {
           <Section title="19. Contact">
             <p>
               Questions about these Terms? Contact us at{" "}
-              <Anchor href="mailto:[CONTACT EMAIL]">[CONTACT EMAIL]</Anchor>.
+              <Anchor href="mailto:legal@mixarchitect.com">legal@mixarchitect.com</Anchor>.
             </p>
           </Section>
         </article>
