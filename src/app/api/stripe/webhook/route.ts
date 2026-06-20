@@ -143,13 +143,18 @@ export async function POST(req: NextRequest) {
             await syncPaymentStatus(effectiveReleaseId);
           }
 
-          // Fire workflow triggers (fire-and-forget)
+          // Fire workflow triggers. Awaited so Vercel doesn't kill
+          // the in-flight call when the handler returns 200 to Stripe.
           if (quoteUserId && effectiveReleaseId) {
-            fireTrigger("payment_received", {
-              userId: quoteUserId,
-              releaseId: effectiveReleaseId,
-              quoteId,
-            }).catch(console.error);
+            try {
+              await fireTrigger("payment_received", {
+                userId: quoteUserId,
+                releaseId: effectiveReleaseId,
+                quoteId,
+              });
+            } catch (err) {
+              console.error("[stripe/webhook] fireTrigger payment_received failed:", err);
+            }
           }
 
           // Send payment confirmation email to engineer
@@ -249,8 +254,11 @@ export async function POST(req: NextRequest) {
           console.log("[stripe/webhook] subscription activated for user:", userId);
           logActivity(userId, "subscription_started", { plan: "pro" });
 
-          // Send subscription confirmed email (fire-and-forget)
-          sendSubscriptionEmail(supabase, userId, "subscription_confirmed");
+          // Send subscription confirmed email. Awaited so Vercel
+          // doesn't terminate the Resend call after the handler
+          // returns 200 to Stripe — that's why this email was
+          // silently missing in production.
+          await sendSubscriptionEmail(supabase, userId, "subscription_confirmed");
         }
         break;
       }
@@ -372,8 +380,10 @@ export async function POST(req: NextRequest) {
               stripe_customer_id: customerId,
             });
 
-            // Send subscription cancelled email (fire-and-forget)
-            sendSubscriptionEmail(supabase, existingSub.user_id, "subscription_cancelled");
+            // Send subscription cancelled email. Awaited so the
+            // Resend call completes before Vercel terminates the
+            // function (same reason as the confirmation email above).
+            await sendSubscriptionEmail(supabase, existingSub.user_id, "subscription_cancelled");
           }
         }
         break;
@@ -396,8 +406,9 @@ export async function POST(req: NextRequest) {
 
         if (!sub?.user_id || sub.granted_by_admin) break;
 
-        // Send payment reminder email (fire-and-forget)
-        sendPaymentEmail(supabase, sub.user_id, "payment_reminder");
+        // Send payment reminder email. Awaited so the Resend call
+        // completes before Vercel terminates the function.
+        await sendPaymentEmail(supabase, sub.user_id, "payment_reminder");
         break;
       }
 
