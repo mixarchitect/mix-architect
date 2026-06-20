@@ -54,8 +54,12 @@ export async function LandingFooter() {
             >
               {t("navTerms")}
             </Link>
-            {/* Privacy stays a non-link span until /privacy ships. */}
-            <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navPrivacy")}</span>
+            <Link
+              href="/privacy"
+              className="min-h-[44px] inline-flex items-center hover:text-white/70 transition-colors"
+            >
+              {t("navPrivacy")}
+            </Link>
           </div>
         </div>
 
