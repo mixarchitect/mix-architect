@@ -48,7 +48,13 @@ export async function LandingFooter() {
 
           <div className="flex items-center gap-4 text-xs text-zinc-400">
             <LocaleSwitcher locale={locale} />
-            <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navTerms")}</span>
+            <Link
+              href="/terms"
+              className="min-h-[44px] inline-flex items-center hover:text-white/70 transition-colors"
+            >
+              {t("navTerms")}
+            </Link>
+            {/* Privacy stays a non-link span until /privacy ships. */}
             <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navPrivacy")}</span>
           </div>
         </div>
