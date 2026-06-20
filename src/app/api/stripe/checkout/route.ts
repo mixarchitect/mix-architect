@@ -58,10 +58,13 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
-      // Include the chosen interval in the return URL so the settings
-      // page can fire a GA4 `subscription_started` conversion event
-      // with the right plan dimension (monthly vs annual).
-      success_url: `${origin}/app/settings?checkout=success&interval=${interval}`,
+      // Include the chosen interval + Stripe-supplied session id in
+      // the return URL so the settings page can fire a GA4 `purchase`
+      // conversion event with the right plan dimension and a stable
+      // transaction_id (used by Google Ads for dedup against the
+      // server-side conversion-API call if we ever wire that in).
+      // Stripe substitutes {CHECKOUT_SESSION_ID} server-side.
+      success_url: `${origin}/app/settings?checkout=success&interval=${interval}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/app/settings?checkout=canceled`,
       subscription_data: {
         metadata: { supabase_user_id: user.id },
