@@ -6,7 +6,12 @@ import { Hero } from "@/components/landing/hero";
 import { FeatureShowcase } from "@/components/landing/feature-showcase";
 import { AudioToolsGrid } from "@/components/landing/audio-tools-grid";
 import { Pricing } from "@/components/landing/pricing";
-import { FounderNote } from "@/components/landing/founder-note";
+// FounderNote (the "Trusted by engineers and artists" testimonials
+// block) is intentionally not rendered yet — its current quotes are
+// placeholder copy. Re-import and add <FounderNote /> back to the
+// page below once real customer quotes are in
+// src/i18n/messages/*.json under landing.testimonial1*/testimonial2*.
+// import { FounderNote } from "@/components/landing/founder-note";
 import { FinalCTA } from "@/components/landing/final-cta";
 import { LandingFooter } from "@/components/landing/footer";
 import { FeaturedReleaseSection } from "@/components/landing/featured-release-section";
@@ -43,7 +48,7 @@ export default async function HomePage() {
         <AudioToolsGrid />
         <Pricing />
         {featuredRelease && <FeaturedReleaseSection release={featuredRelease} />}
-        <FounderNote />
+        {/* <FounderNote /> — hidden until we have real customer quotes. */}
         <FinalCTA />
         <LandingFooter />
       </main>
