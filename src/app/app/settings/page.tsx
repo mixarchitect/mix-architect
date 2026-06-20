@@ -61,6 +61,32 @@ export default function SettingsPage() {
   useEffect(() => setMounted(true), []);
   const resolvedTheme = mounted ? currentTheme : undefined;
 
+  // Stripe checkout redirects back to /app/settings?checkout=success
+  // (or canceled) with the chosen interval. Fire a GA4 conversion on
+  // success so ad platforms can optimize for paid signups rather than
+  // just page visits, then strip the query string so a manual refresh
+  // doesn't re-fire the event.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("checkout");
+    if (status !== "success") return;
+    const interval = params.get("interval") === "annual" ? "annual" : "monthly";
+    trackGA4Event("subscription_started", {
+      plan: "pro",
+      interval,
+    });
+    // Drop checkout / interval params from the URL without a reload.
+    params.delete("checkout");
+    params.delete("interval");
+    const qs = params.toString();
+    window.history.replaceState(
+      {},
+      "",
+      window.location.pathname + (qs ? `?${qs}` : ""),
+    );
+  }, []);
+
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<
     "idle" | "saving" | "saved" | "error"

@@ -58,7 +58,10 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${origin}/app/settings?checkout=success`,
+      // Include the chosen interval in the return URL so the settings
+      // page can fire a GA4 `subscription_started` conversion event
+      // with the right plan dimension (monthly vs annual).
+      success_url: `${origin}/app/settings?checkout=success&interval=${interval}`,
       cancel_url: `${origin}/app/settings?checkout=canceled`,
       subscription_data: {
         metadata: { supabase_user_id: user.id },
