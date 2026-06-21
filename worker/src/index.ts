@@ -28,6 +28,24 @@ import { computeWaveformPeaks } from "./peaks.js";
  *  FFmpeg filter chain changes in a way that should trigger reanalysis. */
 const LOUDNESS_ANALYSIS_VERSION = 1;
 
+/**
+ * Strip absolute filesystem paths + the tmpdir root from an error
+ * message before storing it in `conversion_jobs.error_message`. That
+ * column is surfaced in the admin UI, and FFmpeg stderr regularly
+ * embeds the worker's tmpdir layout (e.g. `/tmp/job-<uuid>/source.wav`).
+ * Leaking that to the user-facing UI is a small recon vector and
+ * also makes error messages noisier than necessary.
+ */
+function sanitizeErrorMessage(msg: string): string {
+  const tmp = os.tmpdir().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return msg
+    // Per-job temp dirs.
+    .replace(new RegExp(`${tmp}/[^\\s'":]+`, "g"), "<tmp>")
+    // Bare absolute paths anywhere (e.g. /app/dist/storage.js:9:25).
+    .replace(/(^|\s)\/[A-Za-z0-9._/-]+/g, (m) => m.startsWith(" ") ? " <path>" : "<path>")
+    .slice(0, 2000);
+}
+
 /* ------------------------------------------------------------------ */
 /*  Config                                                             */
 /* ------------------------------------------------------------------ */
@@ -327,7 +345,11 @@ async function processNextJob() {
       .from("conversion_jobs")
       .update({
         status: "failed",
-        error_message: message,
+        // Sanitize before storing: FFmpeg stderr can include the
+        // worker's tmpdir paths, and error_message is surfaced in
+        // the user-facing admin UI. Strip absolute paths so we don't
+        // leak the container's filesystem layout.
+        error_message: sanitizeErrorMessage(message),
         completed_at: new Date().toISOString(),
       })
       .eq("id", job.id);

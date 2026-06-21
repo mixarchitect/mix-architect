@@ -62,43 +62,22 @@ export default function SettingsPage() {
   const resolvedTheme = mounted ? currentTheme : undefined;
 
   // Stripe checkout redirects back to /app/settings?checkout=success
-  // (or canceled) with the chosen interval + checkout session id.
-  // Fire GA4's recommended `purchase` event so ad platforms can
-  // optimize for paid conversions, then strip the query string so
-  // a manual refresh doesn't re-fire.
+  // with the chosen interval + checkout session id. We verify the
+  // session server-side BEFORE firing the GA4 `purchase` conversion
+  // — without that gate, an attacker could DM
+  //   /app/settings?checkout=success&session_id=cs_fake&interval=annual
+  // and skew Google Ads / GA4 conversion optimization. Server pulls
+  // the authoritative interval + amount from Stripe, so we ignore
+  // the query-string values for everything except the cs_ id.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const status = params.get("checkout");
     if (status !== "success") return;
-    const interval =
-      params.get("interval") === "annual" ? "annual" : "monthly";
-    const sessionId = params.get("session_id") ?? undefined;
-    const value = interval === "annual" ? 129 : 14;
-    const itemId = interval === "annual" ? "pro_annual" : "pro_monthly";
-    const itemName =
-      interval === "annual"
-        ? "Mix Architect Pro (Annual)"
-        : "Mix Architect Pro (Monthly)";
+    const sessionId = params.get("session_id");
 
-    trackGA4Event("purchase", {
-      // transaction_id lets Google Ads dedupe if we later add a
-      // server-side conversion API call.
-      transaction_id: sessionId,
-      value,
-      currency: "USD",
-      items: [
-        {
-          item_id: itemId,
-          item_name: itemName,
-          item_category: "subscription",
-          item_variant: interval,
-          price: value,
-          quantity: 1,
-        },
-      ],
-    });
-
+    // Always strip the params first so a manual refresh can't re-fire,
+    // even if the verify call fails.
     params.delete("checkout");
     params.delete("interval");
     params.delete("session_id");
@@ -108,6 +87,51 @@ export default function SettingsPage() {
       "",
       window.location.pathname + (qs ? `?${qs}` : ""),
     );
+
+    if (!sessionId) return;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/stripe/verify-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId }),
+        });
+        const data = await res.json();
+        if (!data?.verified) return;
+
+        const interval: "monthly" | "annual" =
+          data.interval === "annual" ? "annual" : "monthly";
+        const value = (data.amountTotal ?? 0) / 100;
+        const currency = (data.currency ?? "usd").toUpperCase();
+        const itemId = interval === "annual" ? "pro_annual" : "pro_monthly";
+        const itemName =
+          interval === "annual"
+            ? "Mix Architect Pro (Annual)"
+            : "Mix Architect Pro (Monthly)";
+
+        trackGA4Event("purchase", {
+          // transaction_id lets Google Ads dedupe if we later add a
+          // server-side conversion API call.
+          transaction_id: sessionId,
+          value,
+          currency,
+          items: [
+            {
+              item_id: itemId,
+              item_name: itemName,
+              item_category: "subscription",
+              item_variant: interval,
+              price: value,
+              quantity: 1,
+            },
+          ],
+        });
+      } catch {
+        // Verification failure is silent on purpose — don't surface
+        // ad-tracking errors to the user mid-purchase celebration.
+      }
+    })();
   }, []);
 
   const [loading, setLoading] = useState(true);

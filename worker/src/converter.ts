@@ -329,10 +329,19 @@ export async function convertAudio(
   if (targetFormat === "mp3" && metadata?.lyrics) {
     try {
       const { default: NodeID3 } = await import("node-id3");
+      // Cap lyrics at 64 KB so a pathologically large blob (or a
+      // hostile user pasting megabytes into the lyrics field) can't
+      // OOM the post-process step. ID3v2 has no hard frame size but
+      // most players choke past ~32 KB anyway; 64 KB is generous.
+      const MAX_LYRICS_BYTES = 64 * 1024;
+      const lyricsText =
+        metadata.lyrics.length > MAX_LYRICS_BYTES
+          ? metadata.lyrics.slice(0, MAX_LYRICS_BYTES)
+          : metadata.lyrics;
       const tags = {
         unsynchronisedLyrics: {
           language: "eng",
-          text: metadata.lyrics,
+          text: lyricsText,
         },
       };
       const ok = NodeID3.update(tags, outputPath);
