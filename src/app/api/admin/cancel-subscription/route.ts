@@ -112,6 +112,11 @@ export async function POST(req: NextRequest) {
 
     if (existing.granted_by_admin === true) {
       // Comp account — no Stripe call needed. Just flip the row.
+      // The WHERE includes `granted_by_admin = true` to close a race
+      // where a Stripe webhook (customer.subscription.created) lands
+      // between our lookup above and this UPDATE — without the
+      // guard we'd strip granted_by_admin and overwrite a real paid
+      // sub's status to canceled.
       const { error: updateErr } = await serviceClient
         .from("subscriptions")
         .update({
@@ -119,7 +124,8 @@ export async function POST(req: NextRequest) {
           status: "canceled",
           granted_by_admin: false,
         })
-        .eq("user_id", userId);
+        .eq("user_id", userId)
+        .eq("granted_by_admin", true);
 
       if (updateErr) {
         console.error("[admin/cancel-subscription] comp revoke failed:", updateErr.message);

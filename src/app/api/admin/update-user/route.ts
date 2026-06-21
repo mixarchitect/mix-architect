@@ -51,13 +51,21 @@ export async function POST(req: NextRequest) {
       }
 
       case "email": {
-        const { error } = await service.auth.admin.updateUserById(userId, {
-          email: value as string,
-        });
-        if (error) {
-          return NextResponse.json({ error: error.message }, { status: 500 });
-        }
-        break;
+        // Silent ATO vector: admin sets victim's email to attacker's
+        // address, then triggers password reset to that address.
+        // Supabase's `updateUserById({ email })` doesn't send a
+        // verification challenge to the NEW address — it just
+        // changes the auth.users row. Block it here entirely; users
+        // must change their own email through the account settings
+        // flow, which goes through Supabase's verified-email
+        // confirmation challenge.
+        return NextResponse.json(
+          {
+            error:
+              "Admin email changes are disabled. Ask the user to change their own email from account settings (sends a verification challenge to the new address).",
+          },
+          { status: 400 },
+        );
       }
 
       case "persona": {
