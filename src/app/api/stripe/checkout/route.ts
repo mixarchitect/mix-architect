@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { stripe } from "@/lib/stripe-server";
-import { getStripePriceId, type BillingInterval } from "@/lib/pricing";
+import { getStripePriceId, type BillingInterval, type PaidPlan } from "@/lib/pricing";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/stripe/checkout
- * Creates a Stripe Checkout session for upgrading to Pro.
- * Accepts an optional `interval` body param: "monthly" | "annual" (default: "monthly").
+ * Creates a Stripe Checkout session for upgrading to a paid plan.
+ * Body params (both optional):
+ *   - plan: "pro" | "studio"         (default: "pro")
+ *   - interval: "monthly" | "annual" (default: "monthly")
  */
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -18,6 +20,19 @@ export async function POST(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const interval: BillingInterval =
       body.interval === "annual" ? "annual" : "monthly";
+    // Allowlist the plan — never trust the body to name an arbitrary price.
+    const plan: PaidPlan = body.plan === "studio" ? "studio" : "pro";
+
+    const priceId = getStripePriceId(plan, interval);
+    if (!priceId) {
+      // Price env var for this plan/interval isn't configured (e.g. the
+      // Studio product hasn't been created yet). Fail clearly rather
+      // than handing Stripe an empty price id.
+      return NextResponse.json(
+        { error: `Pricing for the ${plan} plan is not configured.` },
+        { status: 503 },
+      );
+    }
 
     const supabase = await createSupabaseServerClient({ allowCookieWrite: true });
     const {
@@ -54,7 +69,7 @@ export async function POST(req: NextRequest) {
       mode: "subscription",
       line_items: [
         {
-          price: getStripePriceId(interval),
+          price: priceId,
           quantity: 1,
         },
       ],
@@ -66,10 +81,13 @@ export async function POST(req: NextRequest) {
       // Stripe substitutes {CHECKOUT_SESSION_ID} server-side.
       success_url: `${origin}/app/settings?checkout=success&interval=${interval}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/app/settings?checkout=canceled`,
+      // Stamp the plan into both the session and the subscription so the
+      // webhook can record the right plan. The subscription_data copy
+      // survives onto the Subscription object for later events.
       subscription_data: {
-        metadata: { supabase_user_id: user.id },
+        metadata: { supabase_user_id: user.id, plan },
       },
-      metadata: { supabase_user_id: user.id },
+      metadata: { supabase_user_id: user.id, plan },
     });
 
     console.log("[stripe/checkout] session created:", session.id);

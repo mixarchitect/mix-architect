@@ -10,6 +10,7 @@ import { Plus, Sparkles, Music, Search } from "lucide-react";
 import { formatMoney } from "@/lib/format-money";
 import { getLocale, getTranslations } from "next-intl/server";
 import type { DashboardRelease } from "@/types/release";
+import { hasProAccess } from "@/lib/entitlements";
 
 const VALID_FILTERS = ["outstanding", "earned"] as const;
 type PaymentFilter = (typeof VALID_FILTERS)[number];
@@ -91,7 +92,8 @@ export default async function DashboardPage({ searchParams }: Props) {
   const releases = allReleases?.filter((r) => !sharedReleaseIds.has(r.id as string)) ?? null;
   const sharedReleases = allReleases?.filter((r) => sharedReleaseIds.has(r.id as string)) ?? [];
 
-  const isPro = subPlan === "pro" && (subStatus === "active" || subStatus === "trialing");
+  // Pro-or-better access (Pro or Studio) gates the unlimited-release perk.
+  const isPro = hasProAccess(subPlan, subStatus);
   const ownedReleaseCount = releases?.length ?? 0;
   const atFreeLimit = !isPro && ownedReleaseCount >= 1;
 

@@ -20,6 +20,7 @@ import {
 import { buildPaymentConfirmationEmail } from "@/lib/email-templates/quote-emails";
 import { syncPaymentStatus } from "@/lib/payment-sync";
 import { fireTrigger } from "@/lib/workflow-engine";
+import { planFromPriceId } from "@/lib/pricing";
 
 /**
  * In Stripe API v2025+, current_period_end lives on the subscription
@@ -232,6 +233,11 @@ export async function POST(req: NextRequest) {
           break;
         }
 
+        // Which plan was bought? The checkout route stamps it into
+        // metadata; default to "pro" for any older/uninstrumented
+        // session so existing behavior is preserved.
+        const checkoutPlan = session.metadata?.plan === "studio" ? "studio" : "pro";
+
         // Fetch the subscription to get period end
         let periodEnd: string | null = null;
         if (subscriptionId) {
@@ -246,7 +252,7 @@ export async function POST(req: NextRequest) {
             user_id: userId,
             stripe_customer_id: customerId,
             stripe_subscription_id: subscriptionId || null,
-            plan: "pro",
+            plan: checkoutPlan,
             status: "active",
             current_period_end: periodEnd,
             cancel_at_period_end: false,
@@ -258,8 +264,8 @@ export async function POST(req: NextRequest) {
         if (error) {
           console.error("[stripe/webhook] upsert failed:", error);
         } else {
-          console.log("[stripe/webhook] subscription activated for user:", userId);
-          logActivity(userId, "subscription_started", { plan: "pro" });
+          console.log("[stripe/webhook] subscription activated for user:", userId, checkoutPlan);
+          logActivity(userId, "subscription_started", { plan: checkoutPlan });
 
           // Send subscription confirmed email. Awaited so Vercel
           // doesn't terminate the Resend call after the handler
@@ -280,7 +286,7 @@ export async function POST(req: NextRequest) {
         // Look up the subscription row by stripe_customer_id
         const { data: existingSub } = await supabase
           .from("subscriptions")
-          .select("id, user_id, granted_by_admin")
+          .select("id, user_id, granted_by_admin, plan")
           .eq("stripe_customer_id", customerId)
           .maybeSingle();
 
@@ -309,11 +315,23 @@ export async function POST(req: NextRequest) {
         const mappedStatus = statusMap[subscription.status] || "active";
         const periodEnd = getPeriodEnd(subscription);
 
+        // Resolve the plan from the subscription's current price (robust
+        // to portal-driven Pro↔Studio switches, which change the price
+        // but not the original checkout metadata). Fall back to the
+        // subscription metadata, then the existing row, then "pro".
+        const priceId = subscription.items?.data?.[0]?.price?.id;
+        const resolvedPlan =
+          planFromPriceId(priceId) ??
+          (subscription.metadata?.plan === "studio" ? "studio" : null) ??
+          (existingSub.plan === "studio" || existingSub.plan === "pro"
+            ? existingSub.plan
+            : "pro");
+
         const { error } = await supabase
           .from("subscriptions")
           .update({
             status: mappedStatus,
-            plan: subscription.status === "canceled" ? "free" : "pro",
+            plan: subscription.status === "canceled" ? "free" : resolvedPlan,
             current_period_end: periodEnd,
             cancel_at_period_end: subscription.cancel_at_period_end,
           })
@@ -325,7 +343,7 @@ export async function POST(req: NextRequest) {
           console.log("[stripe/webhook] subscription updated:", customerId, mappedStatus);
           if (existingSub.user_id) {
             if (mappedStatus === "active") {
-              logActivity(existingSub.user_id, "subscription_renewed", { plan: "pro" });
+              logActivity(existingSub.user_id, "subscription_renewed", { plan: resolvedPlan });
               // Resolve any open churn signals when subscription becomes active again
               resolveChurnSignals(existingSub.user_id);
             } else if (mappedStatus === "past_due") {

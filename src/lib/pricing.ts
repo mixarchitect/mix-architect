@@ -2,6 +2,8 @@
 /*  Centralized pricing constants                                      */
 /* ------------------------------------------------------------------ */
 
+import type { Plan } from "@/lib/entitlements";
+
 export const PRICING = {
   FREE: {
     name: "Free",
@@ -34,6 +36,23 @@ export const PRICING = {
       "Priority support",
     ],
   },
+  STUDIO: {
+    name: "Studio",
+    description: "A white-labeled studio with your whole team",
+    monthlyPrice: 39,
+    annualPrice: 390,
+    annualMonthlyEquivalent: 32.5, // $390 / 12
+    annualSavingsPercent: 17, // Math.round((1 - 390/468) * 100)
+    features: [
+      "Unlimited team members",
+      "Everything in Pro, plus:",
+      "Full white-label client portal",
+      "Custom portal domain",
+      "Branded email sender",
+      "Shared client roster & releases",
+      "Member roles & permissions",
+    ],
+  },
 } as const;
 
 /* ------------------------------------------------------------------ */
@@ -43,33 +62,57 @@ export const PRICING = {
 export const STRIPE_PRICES = {
   PRO_MONTHLY: process.env.STRIPE_PRO_PRICE_ID_MONTHLY ?? "",
   PRO_ANNUAL: process.env.STRIPE_PRO_PRICE_ID_ANNUAL ?? "",
+  STUDIO_MONTHLY: process.env.STRIPE_STUDIO_PRICE_ID_MONTHLY ?? "",
+  STUDIO_ANNUAL: process.env.STRIPE_STUDIO_PRICE_ID_ANNUAL ?? "",
 } as const;
 
 /** Billing interval type */
 export type BillingInterval = "monthly" | "annual";
 
-/** Get the Stripe Price ID for a given interval */
-export function getStripePriceId(interval: BillingInterval): string {
+/** The paid plans that have Stripe prices (Free has none). */
+export type PaidPlan = "pro" | "studio";
+
+/** Get the Stripe Price ID for a given paid plan + interval. */
+export function getStripePriceId(plan: PaidPlan, interval: BillingInterval): string {
+  if (plan === "studio") {
+    return interval === "annual"
+      ? STRIPE_PRICES.STUDIO_ANNUAL
+      : STRIPE_PRICES.STUDIO_MONTHLY;
+  }
   return interval === "annual"
     ? STRIPE_PRICES.PRO_ANNUAL
     : STRIPE_PRICES.PRO_MONTHLY;
 }
 
-/** Display price for a given interval */
-export function getDisplayPrice(interval: BillingInterval): {
-  amount: number;
-  period: string;
-  totalAnnual?: number;
-} {
+/**
+ * Resolve a Stripe Price ID back to a plan. Used by the webhook to
+ * tell Pro from Studio on customer.subscription.* events (which carry
+ * the price but no checkout metadata — e.g. a portal upgrade). Returns
+ * null for an unrecognized price id.
+ */
+export function planFromPriceId(priceId: string | null | undefined): PaidPlan | null {
+  if (!priceId) return null;
+  if (priceId === STRIPE_PRICES.STUDIO_MONTHLY || priceId === STRIPE_PRICES.STUDIO_ANNUAL) {
+    return "studio";
+  }
+  if (priceId === STRIPE_PRICES.PRO_MONTHLY || priceId === STRIPE_PRICES.PRO_ANNUAL) {
+    return "pro";
+  }
+  return null;
+}
+
+/** Display price for a given plan + interval. */
+export function getDisplayPrice(
+  plan: PaidPlan,
+  interval: BillingInterval,
+): { amount: number; period: string; totalAnnual?: number } {
+  const tier = plan === "studio" ? PRICING.STUDIO : PRICING.PRO;
   if (interval === "annual") {
     return {
-      amount: PRICING.PRO.annualMonthlyEquivalent,
+      amount: tier.annualMonthlyEquivalent,
       period: "/mo",
-      totalAnnual: PRICING.PRO.annualPrice,
+      totalAnnual: tier.annualPrice,
     };
   }
-  return {
-    amount: PRICING.PRO.monthlyPrice,
-    period: "/mo",
-  };
+  return { amount: tier.monthlyPrice, period: "/mo" };
 }

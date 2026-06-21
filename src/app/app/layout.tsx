@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { Shell } from "@/components/ui/shell";
 import { createNotification } from "@/lib/notifications/service";
+import { normalizePlan } from "@/lib/entitlements";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const supabase = await createSupabaseServerClient();
@@ -131,7 +132,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   })();
 
   const subscription = {
-    plan: (subRes.data?.plan as "free" | "pro") ?? "free",
+    plan: normalizePlan(subRes.data?.plan),
     status: (subRes.data?.status as "active" | "canceled" | "past_due" | "trialing" | "incomplete") ?? "active",
     cancelAtPeriodEnd: subRes.data?.cancel_at_period_end ?? false,
     currentPeriodEnd: subRes.data?.current_period_end ?? null,

@@ -17,6 +17,7 @@ import { Rule } from "@/components/ui/rule";
 import { TagInput } from "@/components/ui/tag-input";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { useSubscription } from "@/lib/subscription-context";
+import { hasProAccess } from "@/lib/entitlements";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
 import {
@@ -864,7 +865,7 @@ function SubscriptionPanel() {
   const [upgrading, setUpgrading] = useState(false);
   const [managingBilling, setManagingBilling] = useState(false);
 
-  const isPro = sub.plan === "pro" && (sub.status === "active" || sub.status === "trialing");
+  const isPro = hasProAccess(sub.plan, sub.status);
   const isCanceling = isPro && sub.cancelAtPeriodEnd;
   const isAdminGranted = sub.grantedByAdmin;
 
