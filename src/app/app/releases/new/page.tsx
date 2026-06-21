@@ -10,6 +10,7 @@ import { Rule } from "@/components/ui/rule";
 import { TagInput } from "@/components/ui/tag-input";
 import { ArrowLeft, Sparkles, LayoutTemplate, Star, ArrowRight } from "lucide-react";
 import { useSubscription } from "@/lib/subscription-context";
+import { hasProAccess } from "@/lib/entitlements";
 import { logActivityClient } from "@/lib/activity-logger-client";
 import { trackGA4Event } from "@/lib/ga4-track";
 import { cn } from "@/lib/cn";
@@ -162,7 +163,7 @@ export default function NewReleasePage() {
   const sub = useSubscription();
   const { persona } = useFeatureVisibility();
   const tour = useTourContext();
-  const isFree = sub.plan !== "pro" || (sub.status !== "active" && sub.status !== "trialing");
+  const isFree = !hasProAccess(sub.plan, sub.status);
 
   // Fetch dynamic genre suggestions (defaults + user's previously used genres)
   useEffect(() => {

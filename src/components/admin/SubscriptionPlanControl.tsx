@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Gift, X, Clock, AlertTriangle } from "lucide-react";
+import { isAtLeastPro } from "@/lib/entitlements";
 
 /**
  * Plan controls for the admin user-detail page.
@@ -47,7 +48,7 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const isActivePro =
-    subscription?.plan === "pro" && subscription?.status === "active";
+    isAtLeastPro(subscription?.plan) && subscription?.status === "active";
   const isComp = isActivePro && subscription?.granted_by_admin === true;
   const isPaidPro =
     isActivePro && !!subscription?.stripe_subscription_id && !isComp;

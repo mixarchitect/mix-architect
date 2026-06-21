@@ -7,6 +7,7 @@ import { logAdminAction } from "@/lib/admin-audit-logger";
 import { logActivity } from "@/lib/activity-logger";
 import { dbRateLimit, getClientIp } from "@/lib/rate-limit";
 import { requireSameOrigin } from "@/lib/origin-check";
+import { isAtLeastPro } from "@/lib/entitlements";
 
 /**
  * POST /api/admin/cancel-subscription
@@ -101,9 +102,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (existing.plan !== "pro" || existing.status === "canceled") {
+    if (!isAtLeastPro(existing.plan) || existing.status === "canceled") {
       return NextResponse.json(
-        { error: "User is not on an active Pro plan" },
+        { error: "User is not on an active paid plan" },
         { status: 400 },
       );
     }

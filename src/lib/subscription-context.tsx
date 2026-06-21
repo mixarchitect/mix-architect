@@ -2,10 +2,11 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import { normalizePlan, type Plan, type SubStatus } from "@/lib/entitlements";
 
 export type SubscriptionState = {
-  plan: "free" | "pro";
-  status: "active" | "canceled" | "past_due" | "trialing" | "incomplete";
+  plan: Plan;
+  status: SubStatus;
   cancelAtPeriodEnd: boolean;
   currentPeriodEnd: string | null;
   grantedByAdmin: boolean;
@@ -48,7 +49,7 @@ export function SubscriptionProvider({
         .then(({ data }: { data: { plan?: string; status?: string; cancel_at_period_end?: boolean; current_period_end?: string | null; granted_by_admin?: boolean } | null }) => {
           if (data) {
             setState({
-              plan: (data.plan as "free" | "pro") ?? "free",
+              plan: normalizePlan(data.plan),
               status: (data.status as SubscriptionState["status"]) ?? "active",
               cancelAtPeriodEnd: data.cancel_at_period_end ?? false,
               currentPeriodEnd: data.current_period_end ?? null,
