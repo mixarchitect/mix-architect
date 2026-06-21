@@ -41,6 +41,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Authorize: caller must be the release owner OR an accepted
+    // collaborator. Without this check, any logged-in user could
+    // POST { releaseId: <someone-else's-uuid>, ... } and push spam
+    // notifications + comment emails to a release they have no
+    // access to (the handler uses the service-role client to fan
+    // out, so RLS is no defense here).
+    const svcAuthz = createSupabaseServiceClient();
+    const [ownerRes, memberRes] = await Promise.all([
+      svcAuthz
+        .from("releases")
+        .select("user_id")
+        .eq("id", releaseId)
+        .maybeSingle(),
+      svcAuthz
+        .from("release_members")
+        .select("user_id")
+        .eq("release_id", releaseId)
+        .eq("user_id", user.id)
+        .not("accepted_at", "is", null)
+        .maybeSingle(),
+    ]);
+
+    const isOwner = ownerRes.data?.user_id === user.id;
+    const isMember = !!memberRes.data;
+    if (!isOwner && !isMember) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const resolvedActorName = actorName || user.user_metadata?.display_name || user.user_metadata?.full_name || user.email?.split("@")[0] || "Someone";
 
     await notifyReleaseMembers({

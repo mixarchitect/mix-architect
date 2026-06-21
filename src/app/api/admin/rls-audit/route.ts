@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { isAdmin } from "@/lib/admin";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { dbRateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 import {
   setup,
   cleanup,
@@ -29,8 +30,11 @@ export type RlsAuditResponse = {
 };
 
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
-  const { success } = rateLimit(`admin-rls-audit:${ip}`, 2, 300_000);
+  const { success } = await dbRateLimit(`admin-rls-audit:${ip}`, 2, 300_000);
   if (!success) {
     return NextResponse.json(
       { error: "Too many requests. Wait 5 minutes between audits." },

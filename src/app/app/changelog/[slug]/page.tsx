@@ -40,7 +40,9 @@ function getVideoEmbedUrl(url: string): string | null {
       const match = parsed.pathname.match(/\/share\/([a-zA-Z0-9]+)/);
       if (match) return `https://www.loom.com/embed/${match[1]}`;
     }
-    return url;
+    // Refuse anything not on the YouTube/Loom allowlist — see
+    // src/app/changelog/[slug]/page.tsx for the rationale.
+    return null;
   } catch {
     return null;
   }

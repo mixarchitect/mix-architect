@@ -5,7 +5,7 @@ import { stripe } from "@/lib/stripe-server";
 import { isAdmin } from "@/lib/admin";
 import { logAdminAction } from "@/lib/admin-audit-logger";
 import { logActivity } from "@/lib/activity-logger";
-import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { dbRateLimit, getClientIp } from "@/lib/rate-limit";
 import { requireSameOrigin } from "@/lib/origin-check";
 
 /**
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
   if (originErr) return originErr;
 
   const ip = getClientIp(req);
-  const { success } = rateLimit(`admin-cancel-sub:${ip}`, 20, 60_000);
+  const { success } = await dbRateLimit(`admin-cancel-sub:${ip}`, 20, 60_000);
   if (!success) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }

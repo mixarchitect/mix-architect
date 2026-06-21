@@ -64,7 +64,11 @@ function getVideoEmbedUrl(url: string): string | null {
       if (match) return `https://www.loom.com/embed/${match[1]}`;
     }
 
-    return url;
+    // Anything else: refuse to embed. Returning the raw URL here
+    // would let an admin (or anyone with write access to changelog
+    // entries via a future compromise) drop an arbitrary iframe src
+    // — including a phishing page — onto a public marketing page.
+    return null;
   } catch {
     return null;
   }

@@ -46,6 +46,15 @@ export async function computeWaveformPeaks(
 }
 
 /**
+ * Hard ceiling on a single FFmpeg run. A pathological input
+ * (malformed container that makes the decoder spin, infinite stream
+ * crafted to exhaust memory) is force-killed at this mark. The 15-min
+ * reclaim sweep would otherwise flip the row's status but the OS
+ * process would keep running and eating worker memory until OOM.
+ */
+const FFMPEG_TIMEOUT_MS = 5 * 60 * 1000;
+
+/**
  * Pipe the file through FFmpeg, downmixing to mono and resampling to
  * 8 kHz, and collect the raw 32-bit float little-endian PCM stream.
  */
@@ -65,6 +74,12 @@ function extractMonoFloatPcm(filePath: string): Promise<Buffer> {
     const chunks: Buffer[] = [];
     let totalBytes = 0;
     let stderr = "";
+    let timedOut = false;
+
+    const killTimer = setTimeout(() => {
+      timedOut = true;
+      ff.kill("SIGKILL");
+    }, FFMPEG_TIMEOUT_MS);
 
     ff.stdout.on("data", (chunk: Buffer) => {
       chunks.push(chunk);
@@ -74,8 +89,17 @@ function extractMonoFloatPcm(filePath: string): Promise<Buffer> {
       stderr += chunk.toString();
     });
 
-    ff.once("error", reject);
+    ff.once("error", (err) => {
+      clearTimeout(killTimer);
+      reject(err);
+    });
     ff.once("close", (code) => {
+      clearTimeout(killTimer);
+      if (timedOut) {
+        return reject(
+          new Error(`ffmpeg pcm extraction killed after ${FFMPEG_TIMEOUT_MS}ms`),
+        );
+      }
       if (code !== 0) {
         return reject(
           new Error(
