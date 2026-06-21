@@ -97,16 +97,32 @@ WHERE id = 'cover-art';
 -- only). RLS-on + no-policies is "deny all" today, but if anyone
 -- adds even a permissive SELECT for debugging it would leak event
 -- ids/types. Make the intent explicit with an explicit false policy.
+--
+-- Conditional on 057 having been applied — this migration was
+-- originally written assuming 057 was already in prod, but env
+-- drift can leave that table missing. Skip cleanly rather than
+-- aborting the whole migration.
 
-DROP POLICY IF EXISTS stripe_processed_events_no_user_access
-  ON stripe_processed_events;
-
-CREATE POLICY stripe_processed_events_no_user_access
-  ON stripe_processed_events
-  FOR ALL
-  TO authenticated, anon
-  USING (false)
-  WITH CHECK (false);
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_tables
+    WHERE schemaname = 'public' AND tablename = 'stripe_processed_events'
+  ) THEN
+    EXECUTE 'DROP POLICY IF EXISTS stripe_processed_events_no_user_access
+               ON stripe_processed_events';
+    EXECUTE $POLICY$
+      CREATE POLICY stripe_processed_events_no_user_access
+        ON stripe_processed_events
+        FOR ALL
+        TO authenticated, anon
+        USING (false)
+        WITH CHECK (false)
+    $POLICY$;
+  ELSE
+    RAISE NOTICE '[058] stripe_processed_events not found; skipping policy. Apply migration 057 then re-run 058 to lock it down.';
+  END IF;
+END $$;
 
 -- ─── 4. Shared rate-limit table ────────────────────────────────────
 -- One row per attempt. Window queries are `attempted_at > now() - X`
