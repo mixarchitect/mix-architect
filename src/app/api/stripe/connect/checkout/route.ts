@@ -62,14 +62,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Quote has expired" }, { status: 400 });
   }
 
-  // Fetch engineer's connected account
+  // Resolve the destination connected account. Per D1 Option B, client
+  // payments route to the *workspace's* connected account (the studio's),
+  // not the individual engineer's. quote.workspace_id was backfilled in
+  // migration 063; fall back to the quote owner's personal connected
+  // account when it's missing (transition safety / older rows).
+  let destinationAccountId: string | null = null;
+  if (quote.workspace_id) {
+    const { data: ws } = await supabase
+      .from("workspaces")
+      .select("connected_account_id")
+      .eq("id", quote.workspace_id)
+      .maybeSingle();
+    destinationAccountId = ws?.connected_account_id ?? null;
+  }
+  if (!destinationAccountId) {
+    const { data: ownerAccount } = await supabase
+      .from("stripe_connected_accounts")
+      .select("stripe_account_id")
+      .eq("user_id", quote.user_id)
+      .maybeSingle();
+    destinationAccountId = ownerAccount?.stripe_account_id ?? null;
+  }
+
+  if (!destinationAccountId) {
+    return NextResponse.json(
+      { error: "Payment processing not available" },
+      { status: 400 },
+    );
+  }
+
+  // Confirm that account can actually accept charges (onboarding complete).
   const { data: connectedAccount } = await supabase
     .from("stripe_connected_accounts")
-    .select("stripe_account_id, charges_enabled")
-    .eq("user_id", quote.user_id)
+    .select("charges_enabled")
+    .eq("stripe_account_id", destinationAccountId)
     .maybeSingle();
 
-  if (!connectedAccount || !connectedAccount.charges_enabled) {
+  if (!connectedAccount?.charges_enabled) {
     return NextResponse.json(
       { error: "Payment processing not available" },
       { status: 400 },
@@ -144,9 +174,15 @@ export async function POST(req: NextRequest) {
         quantity: Math.round(Number(item.quantity)),
       })),
       payment_intent_data: {
-        application_fee_amount: Math.round(Number(quote.total) * 0.01 * 100), // 1% platform fee
+        // 0% platform fee — Mix Architect takes no cut of client payments.
+        // `on_behalf_of` makes the connected account the merchant of
+        // record, so it bears the standard Stripe processing fee and any
+        // disputes (not the platform). Without on_behalf_of the platform
+        // is the settlement merchant and eats the ~2.9%+30¢ fee, which a
+        // 1% application fee didn't even cover.
+        on_behalf_of: destinationAccountId,
         transfer_data: {
-          destination: connectedAccount.stripe_account_id,
+          destination: destinationAccountId,
         },
       },
       customer_email: quote.client_email ?? undefined,
