@@ -45,25 +45,15 @@ export async function downloadSourceAudio(
 
   const storagePath = extractStoragePath(audioUrlOrPath);
 
-  // Reject oversized files before buffering — `download()` returns a
-  // Blob whose arrayBuffer() will OOM the container on multi-GB uploads.
-  // The bucket itself caps at 600 MB (migration 058) so this is a
-  // defensive belt-and-suspenders check against drift.
-  const { data: meta, error: metaErr } = await supabase.storage
-    .from("track-audio")
-    .info(storagePath);
-
-  if (metaErr) {
-    throw new Error(`Metadata fetch failed for ${storagePath}: ${metaErr.message}`);
-  }
-
-  if (meta?.size && meta.size > MAX_AUDIO_BYTES) {
-    throw new Error(
-      `Source audio too large (${meta.size} bytes > ${MAX_AUDIO_BYTES} cap): ${storagePath}`,
-    );
-  }
-
-  // Download via service role (works for both public and private buckets)
+  // Download via service role (works for both public and private buckets).
+  // We rely on the bucket's file_size_limit (600 MB, set in migration 058)
+  // to reject oversize uploads server-side before they ever reach storage.
+  // The post-download buffer.length check below is a cheap defense against
+  // bucket-cap drift. The previous version also called .info() pre-download
+  // for a HEAD-style size check, but that endpoint was slow/hanging in
+  // practice and made every analysis run take minutes. The bucket cap +
+  // post-download buffer check covers the same threat with no extra round
+  // trip.
   const { data, error } = await supabase.storage
     .from("track-audio")
     .download(storagePath);
@@ -74,10 +64,9 @@ export async function downloadSourceAudio(
 
   const buffer = Buffer.from(await data.arrayBuffer());
 
-  // Belt + suspenders if .info() returned without size for some reason.
   if (buffer.length > MAX_AUDIO_BYTES) {
     throw new Error(
-      `Source audio too large after download (${buffer.length} bytes): ${storagePath}`,
+      `Source audio too large (${buffer.length} bytes > ${MAX_AUDIO_BYTES} cap): ${storagePath}`,
     );
   }
 
