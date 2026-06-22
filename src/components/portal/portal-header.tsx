@@ -16,6 +16,8 @@ type PortalHeaderProps = {
   trackCount: number;
   engineerName: string | null;
   approvalCounts: ApprovalCounts;
+  /** Workspace logo URL (Pro/Studio branding), shown as a letterhead. */
+  logoUrl?: string | null;
 };
 
 export function PortalHeader({
@@ -23,6 +25,7 @@ export function PortalHeader({
   trackCount,
   engineerName,
   approvalCounts,
+  logoUrl = null,
 }: PortalHeaderProps) {
   const typeLabel =
     release.release_type === "ep"
@@ -82,6 +85,15 @@ export function PortalHeader({
 
       {/* Full header */}
       <header className="text-center mb-10">
+        {/* Studio logo (Pro/Studio branding) — letterhead above the artwork */}
+        {logoUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logoUrl}
+            alt={engineerName ? `${engineerName} logo` : "Studio logo"}
+            className="h-10 max-w-[180px] object-contain mx-auto mb-6"
+          />
+        )}
         {release.cover_art_url && (
           <img
             src={release.cover_art_url}

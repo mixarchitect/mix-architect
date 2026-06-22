@@ -18,6 +18,7 @@ import { TagInput } from "@/components/ui/tag-input";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { useSubscription } from "@/lib/subscription-context";
 import { hasProAccess } from "@/lib/entitlements";
+import { PortalBrandingCard } from "@/components/settings/portal-branding-card";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
 import {
@@ -302,6 +303,9 @@ export default function SettingsPage() {
 
         {/* Subscription */}
         <SubscriptionPanel />
+
+        {/* Portal branding (Pro/Studio) */}
+        <PortalBrandingCard />
 
         {/* Region & Currency */}
         <Panel>
