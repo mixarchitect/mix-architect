@@ -17,7 +17,7 @@ import { Rule } from "@/components/ui/rule";
 import { TagInput } from "@/components/ui/tag-input";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { useSubscription } from "@/lib/subscription-context";
-import { hasProAccess } from "@/lib/entitlements";
+import { hasProAccess, isStudio } from "@/lib/entitlements";
 import { PortalBrandingCard } from "@/components/settings/portal-branding-card";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
@@ -866,28 +866,33 @@ function SubscriptionPanel() {
   const t = useTranslations("settings.subscription");
   const tc = useTranslations("common");
   const sub = useSubscription();
-  const [upgrading, setUpgrading] = useState(false);
+  const [upgradingPlan, setUpgradingPlan] = useState<null | "pro" | "studio">(null);
   const [managingBilling, setManagingBilling] = useState(false);
 
   const isPro = hasProAccess(sub.plan, sub.status);
+  const onStudio = isStudio(sub.plan);
   const isCanceling = isPro && sub.cancelAtPeriodEnd;
   const isAdminGranted = sub.grantedByAdmin;
 
-  async function handleUpgrade() {
-    setUpgrading(true);
+  async function handleUpgrade(plan: "pro" | "studio") {
+    setUpgradingPlan(plan);
     try {
-      const res = await fetch("/api/stripe/checkout", { method: "POST" });
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
       const data = await res.json();
       if (data.url) {
-        trackGA4Event("checkout_start", { plan: "monthly" });
+        trackGA4Event("checkout_start", { plan });
         window.location.href = data.url;
       } else {
         console.error("[settings] checkout error:", data.error);
-        setUpgrading(false);
+        setUpgradingPlan(null);
       }
     } catch (err) {
       console.error("[settings] checkout failed:", err);
-      setUpgrading(false);
+      setUpgradingPlan(null);
     }
   }
 
@@ -932,7 +937,7 @@ function SubscriptionPanel() {
             )}
             <div>
               <div className="text-sm font-semibold text-text">
-                {isPro ? t("pro") : t("free")}
+                {onStudio ? t("studio") : isPro ? t("pro") : t("free")}
                 {isAdminGranted && (
                   <span className="ml-1.5 text-xs font-medium text-signal">{t("complimentary")}</span>
                 )}
@@ -941,7 +946,9 @@ function SubscriptionPanel() {
                 {isPro
                   ? isAdminGranted
                     ? t("unlimitedReleases")
-                    : t("proPrice")
+                    : onStudio
+                      ? t("studioPrice")
+                      : t("proPrice")
                   : t("freeLimit")}
               </div>
             </div>
@@ -955,7 +962,7 @@ function SubscriptionPanel() {
               color: isPro ? "var(--signal-on)" : "var(--muted)",
             }}
           >
-            {isPro ? "PRO" : "FREE"}
+            {onStudio ? "STUDIO" : isPro ? "PRO" : "FREE"}
           </span>
         </div>
 
@@ -977,12 +984,27 @@ function SubscriptionPanel() {
 
         {/* Actions */}
         {!isPro && (
-          <Button variant="primary" onClick={handleUpgrade} disabled={upgrading}>
-            <Sparkles size={16} />
-            {upgrading ? tc("redirecting") : t("upgradeToPro")}
-          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              variant="primary"
+              onClick={() => handleUpgrade("pro")}
+              disabled={upgradingPlan !== null}
+            >
+              <Sparkles size={16} />
+              {upgradingPlan === "pro" ? tc("redirecting") : t("upgradeToPro")}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => handleUpgrade("studio")}
+              disabled={upgradingPlan !== null}
+            >
+              {upgradingPlan === "studio" ? tc("redirecting") : t("upgradeToStudio")}
+            </Button>
+          </div>
         )}
 
+        {/* Pro→Studio switching goes through the billing portal to avoid a
+            second subscription; a dedicated in-app upgrade is a follow-up. */}
         {isPro && !isAdminGranted && (
           <Button variant="secondary" onClick={handleManageBilling} disabled={managingBilling}>
             <CreditCard size={16} />
