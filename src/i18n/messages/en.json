@@ -694,6 +694,9 @@
       "freeLimit": "1 release included",
       "cancelNote": "Your Pro plan will end on {date}. You can resubscribe from Manage Billing.",
       "upgradeToPro": "Upgrade to Pro",
+      "upgradeToStudio": "Upgrade to Studio",
+      "studio": "Studio",
+      "studioPrice": "$39/month, unlimited team members",
       "manageBilling": "Manage Billing"
     }
   },
@@ -899,6 +902,15 @@
     "pricingProF6": "Payment tracking with export",
     "pricingProF7": "Multi-project dashboard",
     "pricingProF8": "Priority support",
+    "pricingStudioDesc": "A white-labeled studio with your whole team",
+    "pricingStudioF1": "Unlimited team members",
+    "pricingStudioF2": "Everything in Pro, plus:",
+    "pricingStudioF3": "Full white-label client portal",
+    "pricingStudioF4": "Custom portal domain",
+    "pricingStudioF5": "Branded email sender",
+    "pricingStudioF6": "Shared client roster & releases",
+    "pricingStudioF7": "Member roles & permissions",
+    "startStudio": "Start Studio",
 
     "testimonialsHeadline": "Trusted by engineers and artists",
     "testimonial1Quote": "I used to lose track of revisions across email threads and Dropbox folders. Now every mix note, reference, and approval lives in one place.",

@@ -164,9 +164,23 @@ export function Pricing() {
     t("pricingProF7"), t("pricingProF8"),
   ];
 
+  const studioPrice =
+    interval === "annual"
+      ? `$${PRICING.STUDIO.annualMonthlyEquivalent}`
+      : `$${PRICING.STUDIO.monthlyPrice}`;
+  const studioAnnualNote =
+    interval === "annual"
+      ? t("billedAnnually", { price: PRICING.STUDIO.annualPrice })
+      : undefined;
+  const studioFeatures = [
+    t("pricingStudioF1"), t("pricingStudioF2"), t("pricingStudioF3"),
+    t("pricingStudioF4"), t("pricingStudioF5"), t("pricingStudioF6"),
+    t("pricingStudioF7"),
+  ];
+
   return (
     <section id="pricing" aria-labelledby="pricing-heading" className="px-6 py-12 md:py-20">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-6xl">
         <div className="text-center mb-12">
           <h2 id="pricing-heading" className="text-3xl md:text-4xl font-bold text-white">
             {t("pricingHeadline")}
@@ -186,7 +200,7 @@ export function Pricing() {
           }}
         />
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-3">
           <PriceCard
             title="FREE"
             price={`$${PRICING.FREE.monthlyPrice}`}
@@ -203,6 +217,15 @@ export function Pricing() {
             ctaLabel={t("startPro")}
             highlighted
             annualNote={annualNote}
+          />
+          <PriceCard
+            title="STUDIO"
+            price={studioPrice}
+            period={t("perMonth")}
+            subtitle={t("pricingStudioDesc")}
+            features={studioFeatures}
+            ctaLabel={t("startStudio")}
+            annualNote={studioAnnualNote}
           />
         </div>
 

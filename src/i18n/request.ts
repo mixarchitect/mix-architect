@@ -55,8 +55,42 @@ export default getRequestConfig(async () => {
 
   const messageFile = getMessageFile(locale);
 
+  // Deep-merge the requested locale's messages over the English source so
+  // any key missing from a translation falls back to English instead of
+  // rendering as a raw key path. en is the source of truth; locale values
+  // always win per-leaf.
+  const enMessages = (await import("./messages/en.json")).default;
+  const localeMessages =
+    messageFile === "en"
+      ? enMessages
+      : (await import(`./messages/${messageFile}.json`)).default;
+
   return {
     locale,
-    messages: (await import(`./messages/${messageFile}.json`)).default,
+    messages: deepMergeMessages(
+      enMessages as MessageTree,
+      localeMessages as MessageTree,
+    ),
   };
 });
+
+type MessageTree = { [key: string]: string | MessageTree };
+
+/** Recursively overlay `override` onto `base`; leaf values in `override` win. */
+function deepMergeMessages(base: MessageTree, override: MessageTree): MessageTree {
+  const out: MessageTree = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    const existing = out[key];
+    if (
+      value &&
+      typeof value === "object" &&
+      existing &&
+      typeof existing === "object"
+    ) {
+      out[key] = deepMergeMessages(existing, value);
+    } else {
+      out[key] = value;
+    }
+  }
+  return out;
+}
