@@ -1,5 +1,6 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { signAudioVersions } from "@/lib/storage-urls";
+import { isAtLeastPro } from "@/lib/entitlements";
 import { notFound } from "next/navigation";
 import { PortalClient } from "./portal-client";
 import type { Metadata } from "next";
@@ -80,7 +81,7 @@ export default async function PortalPage({ params }: Props) {
 
   const { data: release, error: releaseErr } = await supabase
     .from("releases")
-    .select("id, user_id, title, artist, release_type, format, cover_art_url, global_direction, payment_status, fee_total, fee_currency, paid_amount, client_name, client_email, delivery_notes, status, target_date, genre_tags, payment_notes, pinned, distributor, record_label, upc, copyright_holder, copyright_year, phonogram_copyright, catalog_number, created_at, updated_at")
+    .select("id, user_id, workspace_id, title, artist, release_type, format, cover_art_url, global_direction, payment_status, fee_total, fee_currency, paid_amount, client_name, client_email, delivery_notes, status, target_date, genre_tags, payment_notes, pinned, distributor, record_label, upc, copyright_holder, copyright_year, phonogram_copyright, catalog_number, created_at, updated_at")
     .eq("id", portalShare.release_id)
     .maybeSingle();
 
@@ -187,6 +188,31 @@ export default async function PortalPage({ params }: Props) {
     engineerName = userDefaults?.company_name ?? null;
   } catch {
     // Silently fail — engineer name is optional
+  }
+
+  /* ── 4c. Portal branding (Pro/Studio workspaces only) ─────────── */
+
+  let portalAccent: string | null = null;
+  let portalLogoUrl: string | null = null;
+  if (release.workspace_id) {
+    const [{ data: ws }, { data: branding }] = await Promise.all([
+      supabase.from("workspaces").select("plan").eq("id", release.workspace_id).maybeSingle(),
+      supabase
+        .from("workspace_branding")
+        .select("logo_path, accent_color")
+        .eq("workspace_id", release.workspace_id)
+        .maybeSingle(),
+    ]);
+    // Only honor branding for Pro/Studio (a downgraded workspace keeps its
+    // row but loses the entitlement).
+    if (ws && isAtLeastPro(ws.plan) && branding) {
+      if (branding.accent_color) portalAccent = branding.accent_color;
+      if (branding.logo_path) {
+        portalLogoUrl = supabase.storage
+          .from("workspace-logos")
+          .getPublicUrl(branding.logo_path).data.publicUrl;
+      }
+    }
   }
 
   /* ── 5. Build visibility + approval maps ──────────────────────── */
@@ -349,6 +375,8 @@ export default async function PortalPage({ params }: Props) {
       globalRefs={portalShare.show_references ? globalRefs : []}
       quotes={portalQuotes}
       hasStripeConnected={hasStripeConnected}
+      accentColor={portalAccent}
+      logoUrl={portalLogoUrl}
     />
   );
 }

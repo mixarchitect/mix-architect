@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, type CSSProperties } from "react";
 import { PortalHeader } from "@/components/portal/portal-header";
 import { PortalTrackCard } from "@/components/portal/portal-track-card";
 import { PortalFooter } from "@/components/portal/portal-footer";
@@ -33,6 +33,10 @@ type PortalClientProps = {
   globalRefs: BriefReference[];
   quotes?: PortalQuote[];
   hasStripeConnected?: boolean;
+  /** Workspace accent color (Pro/Studio branding), or null for default teal. */
+  accentColor?: string | null;
+  /** Workspace logo URL (Pro/Studio branding), or null. */
+  logoUrl?: string | null;
 };
 
 export function PortalClient({
@@ -44,6 +48,8 @@ export function PortalClient({
   globalRefs,
   quotes = [],
   hasStripeConnected = false,
+  accentColor = null,
+  logoUrl = null,
 }: PortalClientProps) {
   const [tracks, setTracks] = useState(initialTracks);
 
@@ -76,7 +82,15 @@ export function PortalClient({
     (share.show_references && globalRefs.length > 0);
 
   return (
-    <main id="main-content" tabIndex={-1} className="portal-page min-h-screen bg-bg py-12 px-4 md:px-6 pb-24 focus:outline-none">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="portal-page min-h-screen bg-bg py-12 px-4 md:px-6 pb-24 focus:outline-none"
+      // Override the teal accent with the workspace's color (Pro/Studio
+      // branding). Cascades to every `bg-signal` / `text-signal` /
+      // var(--signal) descendant on the portal.
+      style={accentColor ? ({ "--signal": accentColor } as CSSProperties) : undefined}
+    >
       <div className="max-w-3xl mx-auto">
         {/* ═══ Zone 1: Release Header ═══ */}
         <PortalHeader
@@ -84,6 +98,7 @@ export function PortalClient({
           trackCount={tracks.length}
           engineerName={release.engineer_name}
           approvalCounts={approvalCounts}
+          logoUrl={logoUrl}
         />
 
         {/* ═══ Global Mix Brief (collapsible) ═══ */}
@@ -337,7 +352,7 @@ function QuotePaymentRow({
           onClick={handlePay}
           disabled={loading}
           className="shrink-0 px-4 py-1.5 rounded-md text-xs font-semibold text-white transition-colors"
-          style={{ backgroundColor: loading ? "#999" : "#0D9488" }}
+          style={{ backgroundColor: loading ? "#999" : "var(--signal)" }}
         >
           {loading ? "..." : "Pay Now"}
         </button>
