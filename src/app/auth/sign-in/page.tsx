@@ -41,6 +41,8 @@ function SignInPageContent() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent">("idle");
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,11 +59,15 @@ function SignInPageContent() {
     }
   }, [searchParams]);
 
-  // Show error from OAuth callback failure
+  // Show error surfaced by the auth callback / confirm routes
   useEffect(() => {
     const error = searchParams.get("error");
     if (error === "auth_failed") {
       setErrorMsg(t("signInFailed"));
+    } else if (error === "link_expired") {
+      // Expired or already-used email confirmation link
+      setErrorMsg(t("linkExpired"));
+      setShowResend(true);
     }
   }, [searchParams]);
 
@@ -87,9 +93,31 @@ function SignInPageContent() {
     }
   }
 
+  async function handleResendConfirmation() {
+    if (!email) {
+      setErrorMsg(t("resendNeedEmail"));
+      return;
+    }
+    setErrorMsg(null);
+    setResendStatus("sending");
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (error) {
+      setResendStatus("idle");
+      setErrorMsg(error.message);
+    } else {
+      setResendStatus("sent");
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErrorMsg(null);
+    setShowResend(false);
+    setResendStatus("idle");
     setLoading(true);
     // Clear error query param if present
     if (searchParams.get("error")) {
@@ -129,8 +157,14 @@ function SignInPageContent() {
       window.location.href = "/app";
     } catch (err: unknown) {
       setLoading(false);
-      if (err instanceof Error) {
-        setErrorMsg(err.message);
+      const code = (err as { code?: string })?.code;
+      const message = err instanceof Error ? err.message : "";
+      if (code === "email_not_confirmed" || /email not confirmed/i.test(message)) {
+        // Account exists but the email was never confirmed — offer a fresh link
+        setErrorMsg(t("emailNotConfirmed"));
+        setShowResend(true);
+      } else if (err instanceof Error) {
+        setErrorMsg(message);
       } else {
         setErrorMsg(t("somethingWrong"));
       }
@@ -234,6 +268,26 @@ function SignInPageContent() {
                   {errorMsg}
                 </p>
               )}
+
+              {showResend && resendStatus === "sent" ? (
+                <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2">
+                  {t.rich("confirmationResent", {
+                    email,
+                    b: (chunks) => <strong className="text-emerald-900">{chunks}</strong>,
+                  })}
+                </p>
+              ) : showResend ? (
+                <button
+                  type="button"
+                  onClick={handleResendConfirmation}
+                  disabled={resendStatus === "sending"}
+                  className="w-full text-sm text-text underline underline-offset-2 hover:text-signal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {resendStatus === "sending"
+                    ? t("resendingConfirmation")
+                    : t("resendConfirmation")}
+                </button>
+              ) : null}
 
               <Button
                 type="submit"
