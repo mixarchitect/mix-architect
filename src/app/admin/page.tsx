@@ -29,6 +29,7 @@ import {
 export const dynamic = "force-dynamic";
 
 const PRO_PRICE = 14; // $14/month
+const STUDIO_PRICE = 39; // $39/month
 
 const currencyFmt = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -210,8 +211,21 @@ export default async function AdminDashboard({ searchParams }: Props) {
   const newSignups = signupsRes.count ?? 0;
   const events = activityRes.count ?? 0;
 
-  // MRR (always current)
-  const mrr = activePro * PRO_PRICE;
+  // MRR (always current). Count only PAYING subscribers — exclude
+  // admin-granted comps (no revenue) and test accounts — and price each
+  // tier. (The Pro headcount above still includes comps; they're also
+  // listed on the comp-accounts page.)
+  let payingQ = supabase
+    .from("subscriptions")
+    .select("plan")
+    .eq("status", "active")
+    .eq("granted_by_admin", false)
+    .in("plan", ["pro", "studio"]);
+  if (testIds.length > 0) payingQ = payingQ.not("user_id", "in", `(${testIds.join(",")})`);
+  const { data: payingRows } = await payingQ;
+  const payingPro = (payingRows ?? []).filter((r) => r.plan === "pro").length;
+  const payingStudio = (payingRows ?? []).filter((r) => r.plan === "studio").length;
+  const mrr = payingPro * PRO_PRICE + payingStudio * STUDIO_PRICE;
 
   // Churn rate for selected period
   const periodStartSubs = activePro + cancellations;
