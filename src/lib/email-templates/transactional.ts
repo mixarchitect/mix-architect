@@ -349,3 +349,31 @@ export function buildSubscriptionCancelledEmail({
     ),
   };
 }
+
+// ─── 9. Complimentary Pro granted (admin comp) ───────────────────────
+
+export function buildCompGrantedEmail({
+  displayName,
+  unsubscribeUrl,
+}: {
+  displayName: string;
+  unsubscribeUrl?: string;
+}) {
+  return {
+    subject: "You've been upgraded to Mix Architect Pro",
+    html: wrap(
+      `
+      ${heading("Complimentary Pro unlocked")}
+      ${paragraph(`Hi ${escapeHtml(displayName)}, we've upgraded your account to Mix Architect Pro — on us. Here's what's now unlocked:`)}
+      <ul style="margin:8px 0 16px;padding-left:20px;font-size:14px;color:#666;line-height:1.8">
+        <li>Unlimited releases and tracks</li>
+        <li>Web-based client delivery portal</li>
+        <li>Release templates &amp; payment tracking</li>
+        <li>Priority support</li>
+      </ul>
+      ${cta("Open Mix Architect", "https://mixarchitect.com/app")}
+    `,
+      unsubscribeUrl,
+    ),
+  };
+}
