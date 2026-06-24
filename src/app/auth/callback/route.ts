@@ -16,6 +16,10 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const next = getSafeRedirectUrl(searchParams.get("next"));
 
+  // Supabase appends these to the redirect when an upstream link/OAuth step
+  // fails (e.g. an expired confirmation link → error_code=otp_expired).
+  const inboundErrorCode = searchParams.get("error_code");
+
   if (code) {
     const response = NextResponse.redirect(new URL(next, request.url));
 
@@ -43,8 +47,12 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // If no code or exchange failed, redirect to sign-in with error hint
+  // If no code or exchange failed, redirect to sign-in with an error hint.
+  // Preserve "link expired" specifically so the page can offer a resend.
   const signInUrl = new URL("/auth/sign-in", request.url);
-  signInUrl.searchParams.set("error", "auth_failed");
+  signInUrl.searchParams.set(
+    "error",
+    inboundErrorCode === "otp_expired" ? "link_expired" : "auth_failed",
+  );
   return NextResponse.redirect(signInUrl);
 }

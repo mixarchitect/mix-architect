@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
@@ -27,8 +28,16 @@ function ForgotPasswordContent() {
   const supabase = createSupabaseBrowserClient();
   const { resolvedTheme } = useTheme();
   const t = useTranslations("auth");
+  const searchParams = useSearchParams();
 
   useEffect(() => setMounted(true), []);
+
+  // An expired/invalid recovery link redirects back here — prompt for a resend
+  useEffect(() => {
+    if (searchParams.get("error") === "link_expired") {
+      setErrorMsg(t("linkExpired"));
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
