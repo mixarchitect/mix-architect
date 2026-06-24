@@ -6,6 +6,55 @@ import { logActivity } from "@/lib/activity-logger";
 import { logAdminAction } from "@/lib/admin-audit-logger";
 import { dbRateLimit, getClientIp } from "@/lib/rate-limit";
 import { requireSameOrigin } from "@/lib/origin-check";
+import { createNotification } from "@/lib/notifications/service";
+import {
+  sendTransactionalEmail,
+  buildUnsubscribeUrl,
+  getUserEmail,
+  getUserDisplayName,
+} from "@/lib/email/service";
+import { buildCompGrantedEmail } from "@/lib/email-templates/transactional";
+
+/**
+ * Notify a user that they've been granted a complimentary Pro account:
+ * an in-app notification + a confirmation email. Never throws — a
+ * notification failure must not fail the grant itself.
+ */
+async function notifyCompGranted(userId: string) {
+  try {
+    await createNotification({
+      userId,
+      type: "payment_update",
+      title: "Complimentary Pro unlocked",
+      body: "An admin upgraded your account to Pro — unlimited releases and all Pro features are now active.",
+    });
+
+    const email = await getUserEmail(userId);
+    if (!email) return;
+    const displayName = await getUserDisplayName(userId);
+
+    const svc = createSupabaseServiceClient();
+    const { data: prefs } = await svc
+      .from("email_preferences")
+      .select("unsubscribe_token")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const unsubscribeUrl = prefs?.unsubscribe_token
+      ? buildUnsubscribeUrl(prefs.unsubscribe_token, "subscription_confirmed")
+      : undefined;
+
+    const { subject, html } = buildCompGrantedEmail({ displayName, unsubscribeUrl });
+    await sendTransactionalEmail({
+      userId,
+      to: email,
+      category: "subscription_confirmed",
+      subject,
+      html,
+    });
+  } catch (err) {
+    console.error("[admin/comp-account] grant notification failed (non-fatal):", err);
+  }
+}
 
 /**
  * POST /api/admin/comp-account
@@ -96,6 +145,10 @@ export async function POST(req: NextRequest) {
         duration: duration || "indefinite",
         expires_at: expiresAt || undefined,
       }, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
+
+      // Notify the user (in-app + email). Awaited so the email send isn't
+      // killed when the handler returns; non-fatal on failure.
+      await notifyCompGranted(userId);
     } else {
       // Revoke: set plan back to free
       const { error } = await serviceClient
