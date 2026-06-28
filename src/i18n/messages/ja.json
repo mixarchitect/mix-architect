@@ -691,7 +691,8 @@
       "cancelNote": "Proプランは{date}に終了します。請求管理から再契約できます。",
       "upgradeToPro": "Proにアップグレード",
       "manageBilling": "請求管理",
-      "manageBillingError": "請求情報を開けませんでした。もう一度お試しいただくか、問題が続く場合はサポートにお問い合わせください。"
+      "manageBillingError": "請求情報を開けませんでした。もう一度お試しいただくか、問題が続く場合はサポートにお問い合わせください。",
+      "compUpgradeStudioNote": "現在、無償のProプランをご利用中です。いつでもStudioにアップグレードできます。"
     }
   },
   "help": {

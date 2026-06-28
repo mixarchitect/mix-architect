@@ -691,7 +691,8 @@
       "cancelNote": "Tu plan Pro terminará el {date}. Puedes volver a suscribirte desde Administrar Facturación.",
       "upgradeToPro": "Actualizar a Pro",
       "manageBilling": "Administrar Facturación",
-      "manageBillingError": "No se pudo abrir la facturación. Inténtalo de nuevo o contacta a soporte si el problema continúa."
+      "manageBillingError": "No se pudo abrir la facturación. Inténtalo de nuevo o contacta a soporte si el problema continúa.",
+      "compUpgradeStudioNote": "Tienes un plan Pro de cortesía. Puedes cambiar a Studio cuando quieras."
     }
   },
   "help": {

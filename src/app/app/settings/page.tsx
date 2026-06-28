@@ -1023,6 +1023,22 @@ function SubscriptionPanel() {
             )}
           </div>
         )}
+
+        {/* Comp Pro accounts have no Stripe customer, so a fresh checkout is the
+            correct upgrade path to a paid Studio plan (no second-subscription
+            risk). A successful purchase clears the comp via the webhook. */}
+        {isPro && isAdminGranted && !onStudio && (
+          <div className="space-y-2">
+            <p className="text-xs text-muted">{t("compUpgradeStudioNote")}</p>
+            <Button
+              variant="secondary"
+              onClick={() => handleUpgrade("studio")}
+              disabled={upgradingPlan !== null}
+            >
+              {upgradingPlan === "studio" ? tc("redirecting") : t("upgradeToStudio")}
+            </Button>
+          </div>
+        )}
       </PanelBody>
     </Panel>
   );

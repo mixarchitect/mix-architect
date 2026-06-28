@@ -691,7 +691,8 @@
       "cancelNote": "Dein Pro-Plan endet am {date}. Du kannst unter Abrechnung verwalten erneut abonnieren.",
       "upgradeToPro": "Zu Pro upgraden",
       "manageBilling": "Abrechnung verwalten",
-      "manageBillingError": "Abrechnung konnte nicht geöffnet werden. Bitte versuche es erneut oder kontaktiere den Support, wenn es weiterhin auftritt."
+      "manageBillingError": "Abrechnung konnte nicht geöffnet werden. Bitte versuche es erneut oder kontaktiere den Support, wenn es weiterhin auftritt.",
+      "compUpgradeStudioNote": "Du hast einen kostenlosen Pro-Plan. Du kannst jederzeit auf Studio upgraden."
     }
   },
   "help": {

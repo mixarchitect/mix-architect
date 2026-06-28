@@ -691,7 +691,8 @@
       "cancelNote": "您的 Pro 套餐将在 {date} 结束。您可以从管理账单重新订阅。",
       "upgradeToPro": "升级至 Pro",
       "manageBilling": "管理账单",
-      "manageBillingError": "无法打开账单。请重试，如果问题持续存在，请联系支持。"
+      "manageBillingError": "无法打开账单。请重试，如果问题持续存在，请联系支持。",
+      "compUpgradeStudioNote": "您当前使用的是赠送的 Pro 套餐。您可以随时升级到 Studio。"
     }
   },
   "help": {

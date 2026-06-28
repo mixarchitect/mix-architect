@@ -698,7 +698,8 @@
       "studio": "Studio",
       "studioPrice": "$39/month, unlimited team members",
       "manageBilling": "Manage Billing",
-      "manageBillingError": "Couldn't open billing. Please try again, or contact support if this keeps happening."
+      "manageBillingError": "Couldn't open billing. Please try again, or contact support if this keeps happening.",
+      "compUpgradeStudioNote": "You're on a complimentary Pro plan. Upgrade to Studio anytime."
     }
   },
   "help": {
