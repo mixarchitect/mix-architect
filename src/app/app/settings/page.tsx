@@ -21,6 +21,7 @@ import { hasProAccess, isStudio } from "@/lib/entitlements";
 import { PortalBrandingCard } from "@/components/settings/portal-branding-card";
 import { WorkspaceMembersCard } from "@/components/settings/workspace-members-card";
 import { WorkspaceEmailDomainCard } from "@/components/settings/workspace-email-domain-card";
+import { WorkspaceCustomDomainCard } from "@/components/settings/workspace-custom-domain-card";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
 import {
@@ -314,6 +315,9 @@ export default function SettingsPage() {
 
         {/* Branded email (Studio) */}
         <WorkspaceEmailDomainCard />
+
+        {/* Custom portal domain (Studio) */}
+        <WorkspaceCustomDomainCard />
 
         {/* Region & Currency */}
         <Panel>
