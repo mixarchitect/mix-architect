@@ -50,6 +50,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: portalSession.url });
   } catch (err) {
     console.error("[stripe/portal] error:", err);
+    // The stored customer no longer exists under the current Stripe account/mode
+    // (e.g. a stale test-mode customer after switching to live keys). That's a
+    // data condition, not a server fault — surface it distinctly.
+    const code = (err as { code?: string })?.code;
+    if (code === "resource_missing") {
+      return NextResponse.json(
+        { error: "Your billing account is no longer valid. Please contact support." },
+        { status: 409 },
+      );
+    }
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
       { error: `Failed to create portal session: ${message}` },

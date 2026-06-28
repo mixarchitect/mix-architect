@@ -868,6 +868,7 @@ function SubscriptionPanel() {
   const sub = useSubscription();
   const [upgradingPlan, setUpgradingPlan] = useState<null | "pro" | "studio">(null);
   const [managingBilling, setManagingBilling] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
 
   const isPro = hasProAccess(sub.plan, sub.status);
   const onStudio = isStudio(sub.plan);
@@ -898,17 +899,21 @@ function SubscriptionPanel() {
 
   async function handleManageBilling() {
     setManagingBilling(true);
+    setBillingError(null);
     try {
       const res = await fetch("/api/stripe/portal", { method: "POST" });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
-      } else {
-        console.error("[settings] portal error:", data.error);
-        setManagingBilling(false);
+        return;
       }
+      // Surface the failure instead of silently doing nothing.
+      console.error("[settings] portal error:", data.error);
+      setBillingError(t("manageBillingError"));
+      setManagingBilling(false);
     } catch (err) {
       console.error("[settings] portal failed:", err);
+      setBillingError(t("manageBillingError"));
       setManagingBilling(false);
     }
   }
@@ -1006,10 +1011,33 @@ function SubscriptionPanel() {
         {/* Pro→Studio switching goes through the billing portal to avoid a
             second subscription; a dedicated in-app upgrade is a follow-up. */}
         {isPro && !isAdminGranted && (
-          <Button variant="secondary" onClick={handleManageBilling} disabled={managingBilling}>
-            <CreditCard size={16} />
-            {managingBilling ? tc("redirecting") : t("manageBilling")}
-          </Button>
+          <div className="space-y-2">
+            <Button variant="secondary" onClick={handleManageBilling} disabled={managingBilling}>
+              <CreditCard size={16} />
+              {managingBilling ? tc("redirecting") : t("manageBilling")}
+            </Button>
+            {billingError && (
+              <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                {billingError}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Comp Pro accounts have no Stripe customer, so a fresh checkout is the
+            correct upgrade path to a paid Studio plan (no second-subscription
+            risk). A successful purchase clears the comp via the webhook. */}
+        {isPro && isAdminGranted && !onStudio && (
+          <div className="space-y-2">
+            <p className="text-xs text-muted">{t("compUpgradeStudioNote")}</p>
+            <Button
+              variant="secondary"
+              onClick={() => handleUpgrade("studio")}
+              disabled={upgradingPlan !== null}
+            >
+              {upgradingPlan === "studio" ? tc("redirecting") : t("upgradeToStudio")}
+            </Button>
+          </div>
         )}
       </PanelBody>
     </Panel>

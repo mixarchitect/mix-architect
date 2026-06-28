@@ -690,7 +690,9 @@
       "freeLimit": "1 sortie incluse",
       "cancelNote": "Votre plan Pro se terminera le {date}. Vous pouvez vous réabonner depuis Gérer la facturation.",
       "upgradeToPro": "Passer à Pro",
-      "manageBilling": "Gérer la facturation"
+      "manageBilling": "Gérer la facturation",
+      "manageBillingError": "Impossible d'ouvrir la facturation. Réessayez ou contactez le support si le problème persiste.",
+      "compUpgradeStudioNote": "Vous bénéficiez d'un plan Pro offert. Passez à Studio à tout moment."
     }
   },
   "help": {

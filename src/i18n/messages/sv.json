@@ -690,7 +690,9 @@
       "freeLimit": "1 release inkluderad",
       "cancelNote": "Ditt Pro-abonnemang slutar {date}. Du kan förnya från Hantera fakturering.",
       "upgradeToPro": "Uppgradera till Pro",
-      "manageBilling": "Hantera fakturering"
+      "manageBilling": "Hantera fakturering",
+      "manageBillingError": "Det gick inte att öppna faktureringen. Försök igen, eller kontakta supporten om det kvarstår.",
+      "compUpgradeStudioNote": "Du har en kostnadsfri Pro-plan. Uppgradera till Studio när du vill."
     }
   },
   "help": {

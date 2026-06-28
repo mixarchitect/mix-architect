@@ -54,6 +54,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
   // Bulk comp state
   const [showCompForm, setShowCompForm] = useState(false);
   const [compDuration, setCompDuration] = useState<Duration>("indefinite");
+  const [compPlan, setCompPlan] = useState<"pro" | "studio">("pro");
   const [compReason, setCompReason] = useState("");
 
   // Bulk email state
@@ -127,6 +128,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
           body: JSON.stringify({
             userIds,
             duration: compDuration,
+            plan: compPlan,
             reason: compReason || undefined,
           }),
         });
@@ -134,7 +136,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
           const data = await res.json();
           throw new Error(data.error || "Failed");
         }
-        showFeedback("success", `Granted comp to ${userIds.length} user${userIds.length > 1 ? "s" : ""}`);
+        showFeedback("success", `Granted ${compPlan === "studio" ? "Studio" : "Pro"} comp to ${userIds.length} user${userIds.length > 1 ? "s" : ""}`);
         clearSelection();
         router.refresh();
       } catch (err) {
@@ -232,6 +234,17 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
           {/* Inline comp form */}
           {showCompForm && (
             <div className="w-full mt-2 flex items-end gap-3">
+              <div>
+                <label className="text-xs text-muted block mb-1">Plan</label>
+                <select
+                  value={compPlan}
+                  onChange={(e) => setCompPlan(e.target.value as "pro" | "studio")}
+                  className="rounded-md border border-border bg-panel px-2 py-1.5 text-xs text-text focus:outline-none focus:border-amber-500/50"
+                >
+                  <option value="pro">Pro</option>
+                  <option value="studio">Studio</option>
+                </select>
+              </div>
               <div>
                 <label className="text-xs text-muted block mb-1">Duration</label>
                 <select

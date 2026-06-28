@@ -690,7 +690,9 @@
       "freeLimit": "1개 릴리스 포함",
       "cancelNote": "Pro 플랜이 {date}에 종료됩니다. 결제 관리에서 재구독할 수 있습니다.",
       "upgradeToPro": "Pro로 업그레이드",
-      "manageBilling": "결제 관리"
+      "manageBilling": "결제 관리",
+      "manageBillingError": "결제 정보를 열 수 없습니다. 다시 시도하거나 문제가 계속되면 고객지원에 문의하세요.",
+      "compUpgradeStudioNote": "무료 Pro 플랜을 이용 중입니다. 언제든지 Studio로 업그레이드할 수 있습니다."
     }
   },
   "help": {

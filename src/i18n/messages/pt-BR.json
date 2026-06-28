@@ -690,7 +690,9 @@
       "freeLimit": "1 lançamento incluído",
       "cancelNote": "Seu plano Pro terminará em {date}. Você pode reassinar em Gerenciar Cobrança.",
       "upgradeToPro": "Upgrade para Pro",
-      "manageBilling": "Gerenciar Cobrança"
+      "manageBilling": "Gerenciar Cobrança",
+      "manageBillingError": "Não foi possível abrir a cobrança. Tente novamente ou entre em contato com o suporte se o problema persistir.",
+      "compUpgradeStudioNote": "Você está em um plano Pro de cortesia. Faça upgrade para o Studio quando quiser."
     }
   },
   "help": {

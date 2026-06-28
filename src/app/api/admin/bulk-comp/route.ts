@@ -39,10 +39,11 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { userIds, duration, reason } = body as {
+    const { userIds, duration, reason, plan } = body as {
       userIds: string[];
       duration?: "indefinite" | "30d" | "90d" | "6m" | "1y";
       reason?: string;
+      plan?: "pro" | "studio";
     };
 
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
@@ -88,9 +89,11 @@ export async function POST(req: NextRequest) {
     }
 
     const serviceClient = createSupabaseServiceClient();
+    // Allowlist the plan — Studio comps grant the top tier; default to Pro.
+    const compPlan = plan === "studio" ? "studio" : "pro";
     const rows = userIds.map((userId) => ({
       user_id: userId,
-      plan: "pro",
+      plan: compPlan,
       status: "active",
       granted_by_admin: true,
       cancel_at_period_end: false,
