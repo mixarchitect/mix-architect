@@ -31,10 +31,10 @@ BEGIN
 
   -- Fixture: one Studio workspace, three members, one release in it.
   INSERT INTO workspaces (id, owner_user_id, name, plan) VALUES (ws, u_owner, 'TEST WS', 'studio');
-  INSERT INTO workspace_members (workspace_id, user_id, role, accepted_at) VALUES
-    (ws, u_owner,    'owner',    now()),
-    (ws, u_viewer,   'viewer',   now()),
-    (ws, u_engineer, 'engineer', now());
+  INSERT INTO workspace_members (workspace_id, user_id, invited_email, role, accepted_at) VALUES
+    (ws, u_owner,    'owner@test.local',    'owner',    now()),
+    (ws, u_viewer,   'viewer@test.local',   'viewer',   now()),
+    (ws, u_engineer, 'engineer@test.local', 'engineer', now());
   INSERT INTO releases (id, user_id, workspace_id, title) VALUES (rel, u_owner, ws, 'TEST REL');
 
   -- Impersonation: accessible_release_ids() is SECURITY DEFINER and reads auth.uid(),
