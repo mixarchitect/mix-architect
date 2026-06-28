@@ -20,6 +20,7 @@ import { useSubscription } from "@/lib/subscription-context";
 import { hasProAccess, isStudio } from "@/lib/entitlements";
 import { PortalBrandingCard } from "@/components/settings/portal-branding-card";
 import { WorkspaceMembersCard } from "@/components/settings/workspace-members-card";
+import { WorkspaceEmailDomainCard } from "@/components/settings/workspace-email-domain-card";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
 import {
@@ -310,6 +311,9 @@ export default function SettingsPage() {
 
         {/* Team members (Studio) */}
         <WorkspaceMembersCard />
+
+        {/* Branded email (Studio) */}
+        <WorkspaceEmailDomainCard />
 
         {/* Region & Currency */}
         <Panel>

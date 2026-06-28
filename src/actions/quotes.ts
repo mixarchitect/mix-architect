@@ -9,6 +9,7 @@ import {
   buildUnsubscribeUrl,
 } from "@/lib/email/service";
 import { buildQuoteReceivedEmail } from "@/lib/email-templates/quote-emails";
+import { getWorkspaceSenderFrom } from "@/lib/email/workspace-sender";
 import { syncPaymentStatus } from "@/lib/payment-sync";
 import { fireTrigger } from "@/lib/workflow-engine";
 import type { Quote, QuoteLineItem, PaymentSchedule } from "@/types/payments";
@@ -520,7 +521,7 @@ export async function sendQuote(
     const resend = new Resend(resendKey);
     try {
       await resend.emails.send({
-        from: "Mix Architect <team@mixarchitect.com>",
+        from: await getWorkspaceSenderFrom(quote.workspace_id),
         to: quote.client_email,
         subject: email.subject,
         html: email.html,

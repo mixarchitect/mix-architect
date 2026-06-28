@@ -5,6 +5,7 @@ import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { requireSameOrigin } from "@/lib/origin-check";
 import { getEntitlements } from "@/lib/entitlements";
+import { getWorkspaceSenderFrom } from "@/lib/email/workspace-sender";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
 
@@ -163,7 +164,7 @@ export async function POST(request: NextRequest) {
   // and the invitee will be claimed on sign-in regardless).
   try {
     await resend.emails.send({
-      from: "Mix Architect <team@mixarchitect.com>",
+      from: await getWorkspaceSenderFrom(ws.id),
       to: email,
       subject: `You've been added to ${ws.name || "a team"} on Mix Architect`,
       html: buildWorkspaceInviteHtml({
