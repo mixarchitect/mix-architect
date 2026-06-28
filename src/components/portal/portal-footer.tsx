@@ -10,6 +10,8 @@ type PortalFooterProps = {
   tracks: PortalTrack[];
   engineerName: string | null;
   paymentGated: boolean;
+  /** Studio workspaces are fully white-labeled — hide the Powered-by banner. */
+  removePoweredBy: boolean;
 };
 
 function formatCurrency(amount: number, currency: string) {
@@ -27,6 +29,7 @@ export function PortalFooter({
   tracks,
   engineerName,
   paymentGated,
+  removePoweredBy,
 }: PortalFooterProps) {
   const hasPaymentData =
     showPayment &&
@@ -192,8 +195,11 @@ export function PortalFooter({
         </div>
       )}
 
-      {/* Powered by footer with attribution tracking */}
-      <PoweredByBanner engineerId={release.engineer_id} />
+      {/* Powered by footer with attribution tracking. Hidden for Studio
+          workspaces (full white-label). */}
+      {!removePoweredBy && (
+        <PoweredByBanner engineerId={release.engineer_id} />
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { signAudioVersions } from "@/lib/storage-urls";
-import { isAtLeastPro } from "@/lib/entitlements";
+import { isAtLeastPro, getEntitlements } from "@/lib/entitlements";
 import { notFound } from "next/navigation";
 import { PortalClient } from "./portal-client";
 import type { Metadata } from "next";
@@ -194,6 +194,7 @@ export default async function PortalPage({ params }: Props) {
 
   let portalAccent: string | null = null;
   let portalLogoUrl: string | null = null;
+  let removePoweredBy = false;
   if (release.workspace_id) {
     const [{ data: ws }, { data: branding }] = await Promise.all([
       supabase.from("workspaces").select("plan").eq("id", release.workspace_id).maybeSingle(),
@@ -213,6 +214,9 @@ export default async function PortalPage({ params }: Props) {
           .getPublicUrl(branding.logo_path).data.publicUrl;
       }
     }
+    // Studio is fully white-labeled — drop the "Powered by" banner.
+    // (Resolved from entitlements, independent of whether branding is set.)
+    if (ws) removePoweredBy = getEntitlements(ws.plan).removePoweredBy;
   }
 
   /* ── 5. Build visibility + approval maps ──────────────────────── */
@@ -377,6 +381,7 @@ export default async function PortalPage({ params }: Props) {
       hasStripeConnected={hasStripeConnected}
       accentColor={portalAccent}
       logoUrl={portalLogoUrl}
+      removePoweredBy={removePoweredBy}
     />
   );
 }

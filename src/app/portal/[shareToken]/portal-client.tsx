@@ -37,6 +37,8 @@ type PortalClientProps = {
   accentColor?: string | null;
   /** Workspace logo URL (Pro/Studio branding), or null. */
   logoUrl?: string | null;
+  /** Studio workspaces hide the "Powered by Mix Architect" banner. */
+  removePoweredBy?: boolean;
 };
 
 export function PortalClient({
@@ -50,6 +52,7 @@ export function PortalClient({
   hasStripeConnected = false,
   accentColor = null,
   logoUrl = null,
+  removePoweredBy = false,
 }: PortalClientProps) {
   const [tracks, setTracks] = useState(initialTracks);
 
@@ -190,6 +193,7 @@ export function PortalClient({
           tracks={tracks}
           engineerName={release.engineer_name}
           paymentGated={paymentGated}
+          removePoweredBy={removePoweredBy}
         />
       </div>
 
