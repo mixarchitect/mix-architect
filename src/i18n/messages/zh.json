@@ -690,7 +690,8 @@
       "freeLimit": "包含 1 个发行",
       "cancelNote": "您的 Pro 套餐将在 {date} 结束。您可以从管理账单重新订阅。",
       "upgradeToPro": "升级至 Pro",
-      "manageBilling": "管理账单"
+      "manageBilling": "管理账单",
+      "manageBillingError": "无法打开账单。请重试，如果问题持续存在，请联系支持。"
     }
   },
   "help": {

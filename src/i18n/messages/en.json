@@ -697,7 +697,8 @@
       "upgradeToStudio": "Upgrade to Studio",
       "studio": "Studio",
       "studioPrice": "$39/month, unlimited team members",
-      "manageBilling": "Manage Billing"
+      "manageBilling": "Manage Billing",
+      "manageBillingError": "Couldn't open billing. Please try again, or contact support if this keeps happening."
     }
   },
   "help": {

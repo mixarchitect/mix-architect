@@ -690,7 +690,8 @@
       "freeLimit": "1 lanzamiento incluido",
       "cancelNote": "Tu plan Pro terminará el {date}. Puedes reactivar la suscripción desde Gestionar Facturación.",
       "upgradeToPro": "Actualizar a Pro",
-      "manageBilling": "Gestionar Facturación"
+      "manageBilling": "Gestionar Facturación",
+      "manageBillingError": "No se pudo abrir la facturación. Inténtalo de nuevo o contacta con soporte si el problema persiste."
     }
   },
   "help": {
