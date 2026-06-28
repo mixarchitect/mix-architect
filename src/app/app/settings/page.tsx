@@ -19,6 +19,7 @@ import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
 import { useSubscription } from "@/lib/subscription-context";
 import { hasProAccess, isStudio } from "@/lib/entitlements";
 import { PortalBrandingCard } from "@/components/settings/portal-branding-card";
+import { WorkspaceMembersCard } from "@/components/settings/workspace-members-card";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
 import {
@@ -306,6 +307,9 @@ export default function SettingsPage() {
 
         {/* Portal branding (Pro/Studio) */}
         <PortalBrandingCard />
+
+        {/* Team members (Studio) */}
+        <WorkspaceMembersCard />
 
         {/* Region & Currency */}
         <Panel>
