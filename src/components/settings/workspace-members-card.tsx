@@ -28,17 +28,21 @@ export function WorkspaceMembersCard() {
   const gated = !getEntitlements(sub.plan).teamWorkspace;
 
   const [loading, setLoading] = useState(true);
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<(typeof ASSIGNABLE_ROLES)[number]>("engineer");
   const [inviting, setInviting] = useState(false);
   const [error, setError] = useState("");
 
-  const loadMembers = useCallback(async () => {
+  // Scoped to the workspace the user OWNS — not every workspace they belong to
+  // (a guest in another studio shouldn't see/manage that team here).
+  const loadMembers = useCallback(async (wsId: string) => {
     const supabase = createSupabaseBrowserClient();
     const { data } = await supabase
       .from("workspace_members")
       .select("id, invited_email, role, accepted_at, user_id")
+      .eq("workspace_id", wsId)
       .order("invited_at", { ascending: true });
     setMembers((data as Member[] | null) ?? []);
   }, []);
@@ -50,7 +54,21 @@ export function WorkspaceMembersCard() {
     }
     (async () => {
       try {
-        await loadMembers();
+        const supabase = createSupabaseBrowserClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: ws } = await supabase
+          .from("workspaces")
+          .select("id")
+          .eq("owner_user_id", user.id)
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        if (!ws) return;
+        setWorkspaceId(ws.id);
+        await loadMembers(ws.id);
       } finally {
         setLoading(false);
       }
@@ -70,7 +88,7 @@ export function WorkspaceMembersCard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to invite.");
       setInviteEmail("");
-      await loadMembers();
+      if (workspaceId) await loadMembers(workspaceId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to invite.");
     } finally {
@@ -86,7 +104,7 @@ export function WorkspaceMembersCard() {
       setError(err.message);
       return;
     }
-    await loadMembers();
+    if (workspaceId) await loadMembers(workspaceId);
   }
 
   async function handleRemove(id: string) {
