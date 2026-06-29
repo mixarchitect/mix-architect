@@ -37,6 +37,8 @@ type PortalClientProps = {
   accentColor?: string | null;
   /** Workspace logo URL (Pro/Studio branding), or null. */
   logoUrl?: string | null;
+  /** Dark-mode logo URL, shown when the portal is viewed in dark mode. */
+  logoUrlDark?: string | null;
   /** Studio workspaces hide the "Powered by Mix Architect" banner. */
   removePoweredBy?: boolean;
 };
@@ -52,6 +54,7 @@ export function PortalClient({
   hasStripeConnected = false,
   accentColor = null,
   logoUrl = null,
+  logoUrlDark = null,
   removePoweredBy = false,
 }: PortalClientProps) {
   const [tracks, setTracks] = useState(initialTracks);
@@ -102,6 +105,7 @@ export function PortalClient({
           engineerName={release.engineer_name}
           approvalCounts={approvalCounts}
           logoUrl={logoUrl}
+          logoUrlDark={logoUrlDark}
         />
 
         {/* ═══ Global Mix Brief (collapsible) ═══ */}

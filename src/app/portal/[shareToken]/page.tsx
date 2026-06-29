@@ -194,13 +194,14 @@ export default async function PortalPage({ params }: Props) {
 
   let portalAccent: string | null = null;
   let portalLogoUrl: string | null = null;
+  let portalLogoUrlDark: string | null = null;
   let removePoweredBy = false;
   if (release.workspace_id) {
     const [{ data: ws }, { data: branding }] = await Promise.all([
       supabase.from("workspaces").select("plan").eq("id", release.workspace_id).maybeSingle(),
       supabase
         .from("workspace_branding")
-        .select("logo_path, accent_color")
+        .select("logo_path, logo_path_dark, accent_color")
         .eq("workspace_id", release.workspace_id)
         .maybeSingle(),
     ]);
@@ -212,6 +213,11 @@ export default async function PortalPage({ params }: Props) {
         portalLogoUrl = supabase.storage
           .from("workspace-logos")
           .getPublicUrl(branding.logo_path).data.publicUrl;
+      }
+      if (branding.logo_path_dark) {
+        portalLogoUrlDark = supabase.storage
+          .from("workspace-logos")
+          .getPublicUrl(branding.logo_path_dark).data.publicUrl;
       }
     }
     // Studio is fully white-labeled — drop the "Powered by" banner.
@@ -381,6 +387,7 @@ export default async function PortalPage({ params }: Props) {
       hasStripeConnected={hasStripeConnected}
       accentColor={portalAccent}
       logoUrl={portalLogoUrl}
+      logoUrlDark={portalLogoUrlDark}
       removePoweredBy={removePoweredBy}
     />
   );
