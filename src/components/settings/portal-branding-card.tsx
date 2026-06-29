@@ -13,10 +13,84 @@ const LOGO_BUCKET = "workspace-logos";
 const MAX_LOGO_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
 
+type LogoVariant = "light" | "dark";
+
 /**
- * Pro/Studio portal branding: studio logo + accent color applied to the
- * client portal. Gated on the `branding` entitlement — Free sees an
- * upgrade prompt.
+ * One logo upload slot (light or dark variant). The preview sits on a
+ * representative background so the studio can judge contrast the way a client
+ * will see it on the portal.
+ */
+function LogoSlot({
+  label,
+  hint,
+  url,
+  previewBg,
+  uploading,
+  onPick,
+  onRemove,
+}: {
+  label: string;
+  hint: string;
+  url: string | null;
+  previewBg: string;
+  uploading: boolean;
+  onPick: (file: File) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <span className="text-xs font-medium text-muted uppercase tracking-wider">{label}</span>
+      <div className="flex items-center gap-4">
+        <div
+          className="w-28 h-16 rounded-md border border-border flex items-center justify-center overflow-hidden shrink-0"
+          style={{ background: previewBg }}
+        >
+          {url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={url} alt={label} className="max-w-full max-h-full object-contain" />
+          ) : (
+            <ImageIcon size={20} className="text-muted opacity-30" />
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          <label
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors w-fit"
+            style={{ background: "var(--panel-2)", color: "var(--text-muted)" }}
+          >
+            <Upload size={14} />
+            {uploading ? "Uploading…" : url ? "Replace" : "Upload"}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg"
+              className="hidden"
+              disabled={uploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) onPick(f);
+                e.target.value = "";
+              }}
+            />
+          </label>
+          {url && (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors w-fit"
+            >
+              <X size={12} /> Remove
+            </button>
+          )}
+          <span className="text-[10px] text-faint">{hint}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Pro/Studio portal branding: studio logo (light + optional dark variant) and
+ * accent color applied to the client portal. Gated on the `branding`
+ * entitlement — Free sees an upgrade prompt.
  */
 export function PortalBrandingCard() {
   const sub = useSubscription();
@@ -25,11 +99,11 @@ export function PortalBrandingCard() {
 
   const [loading, setLoading] = useState(true);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
-  const [logoPath, setLogoPath] = useState<string | null>(null);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUrlDark, setLogoUrlDark] = useState<string | null>(null);
   const [accent, setAccent] = useState<string>(DEFAULT_ACCENT);
   const [savedAccent, setSavedAccent] = useState<string>(DEFAULT_ACCENT);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingVariant, setUploadingVariant] = useState<LogoVariant | null>(null);
   const [savingAccent, setSavingAccent] = useState(false);
   const [error, setError] = useState("");
 
@@ -65,14 +139,12 @@ export function PortalBrandingCard() {
 
         const { data: branding } = await supabase
           .from("workspace_branding")
-          .select("logo_path, accent_color")
+          .select("logo_path, logo_path_dark, accent_color")
           .eq("workspace_id", ws.id)
           .maybeSingle();
 
-        if (branding?.logo_path) {
-          setLogoPath(branding.logo_path);
-          setLogoUrl(publicUrl(branding.logo_path));
-        }
+        if (branding?.logo_path) setLogoUrl(publicUrl(branding.logo_path));
+        if (branding?.logo_path_dark) setLogoUrlDark(publicUrl(branding.logo_path_dark));
         if (branding?.accent_color && HEX_RE.test(branding.accent_color)) {
           setAccent(branding.accent_color);
           setSavedAccent(branding.accent_color);
@@ -83,22 +155,23 @@ export function PortalBrandingCard() {
     })();
   }, [gated, publicUrl]);
 
-  async function upsertBranding(fields: { logo_path?: string | null; accent_color?: string }) {
+  // Only the provided columns are written, so saving the accent never clobbers
+  // a logo and removing one logo never touches the other.
+  async function upsertBranding(fields: {
+    logo_path?: string | null;
+    logo_path_dark?: string | null;
+    accent_color?: string;
+  }) {
     if (!workspaceId) return;
     const supabase = createSupabaseBrowserClient();
     const { error: upsertErr } = await supabase.from("workspace_branding").upsert(
-      {
-        workspace_id: workspaceId,
-        logo_path: fields.logo_path !== undefined ? fields.logo_path : logoPath,
-        accent_color: fields.accent_color !== undefined ? fields.accent_color : savedAccent,
-        updated_at: new Date().toISOString(),
-      },
+      { workspace_id: workspaceId, ...fields, updated_at: new Date().toISOString() },
       { onConflict: "workspace_id" },
     );
     if (upsertErr) throw upsertErr;
   }
 
-  async function handleUpload(file: File) {
+  async function handleUpload(file: File, variant: LogoVariant) {
     setError("");
     if (file.size > MAX_LOGO_BYTES) {
       setError("Logo must be under 5MB.");
@@ -108,33 +181,34 @@ export function PortalBrandingCard() {
       setError("Use a PNG, JPG, WebP, or SVG image.");
       return;
     }
-    setUploading(true);
+    setUploadingVariant(variant);
     try {
-      // All uploads go through the server route. It authenticates via cookies,
-      // sanitizes SVGs, and writes both the file and the branding row with the
-      // service client — so it never depends on the browser storage session,
-      // which doesn't reliably attach the auth token (uploads would 400 on RLS).
+      // The server route authenticates via cookies, sanitizes SVGs, and writes
+      // both the file and the branding row with the service client — so it never
+      // depends on the browser storage session (which doesn't reliably attach
+      // the auth token, causing 400s on storage RLS).
       const fd = new FormData();
       fd.append("file", file);
+      fd.append("variant", variant);
       const res = await fetch("/api/workspace/logo", { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Upload failed.");
-      const path: string = data.path;
-      setLogoPath(path);
-      setLogoUrl(publicUrl(path));
+      const url = publicUrl(data.path);
+      if (variant === "dark") setLogoUrlDark(url);
+      else setLogoUrl(url);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
-      setUploading(false);
+      setUploadingVariant(null);
     }
   }
 
-  async function handleRemoveLogo() {
+  async function handleRemoveLogo(variant: LogoVariant) {
     setError("");
     try {
-      await upsertBranding({ logo_path: null });
-      setLogoPath(null);
-      setLogoUrl(null);
+      await upsertBranding(variant === "dark" ? { logo_path_dark: null } : { logo_path: null });
+      if (variant === "dark") setLogoUrlDark(null);
+      else setLogoUrl(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to remove logo.");
     }
@@ -199,53 +273,29 @@ export function PortalBrandingCard() {
         </div>
       ) : (
         <>
-          {/* Logo */}
-          <div className="space-y-2">
-            <span className="text-xs font-medium text-muted uppercase tracking-wider">Logo</span>
-            <div className="flex items-center gap-4">
-              <div
-                className="w-28 h-16 rounded-md border border-border flex items-center justify-center overflow-hidden shrink-0"
-                style={{ background: "var(--panel-2)" }}
-              >
-                {logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logoUrl} alt="Studio logo" className="max-w-full max-h-full object-contain" />
-                ) : (
-                  <ImageIcon size={20} className="text-muted opacity-30" />
-                )}
-              </div>
-              <div className="flex flex-col gap-2">
-                <label
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors w-fit"
-                  style={{ background: "var(--panel-2)", color: "var(--text-muted)" }}
-                >
-                  <Upload size={14} />
-                  {uploading ? "Uploading…" : logoUrl ? "Replace" : "Upload logo"}
-                  <input
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg"
-                    className="hidden"
-                    disabled={uploading}
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) handleUpload(f);
-                    }}
-                  />
-                </label>
-                {logoUrl && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveLogo}
-                    className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors w-fit"
-                  >
-                    <X size={12} /> Remove
-                  </button>
-                )}
-                <span className="text-[10px] text-faint">
-                  SVG, PNG, JPG, or WebP · max 5MB · SVG (or a 2–3× PNG export) stays crisp on retina
-                </span>
-              </div>
-            </div>
+          {/* Logos — light + optional dark variant */}
+          <div className="space-y-4">
+            <LogoSlot
+              label="Logo"
+              hint="Shown on light backgrounds, and everywhere if no dark version is set."
+              url={logoUrl}
+              previewBg="#ffffff"
+              uploading={uploadingVariant === "light"}
+              onPick={(f) => handleUpload(f, "light")}
+              onRemove={() => handleRemoveLogo("light")}
+            />
+            <LogoSlot
+              label="Dark-mode logo"
+              hint="Optional — shown when a client views the portal in dark mode."
+              url={logoUrlDark}
+              previewBg="#0b0d12"
+              uploading={uploadingVariant === "dark"}
+              onPick={(f) => handleUpload(f, "dark")}
+              onRemove={() => handleRemoveLogo("dark")}
+            />
+            <p className="text-[10px] text-faint">
+              SVG, PNG, JPG, or WebP · max 5MB · SVG (or a 2–3× PNG export) stays crisp on retina.
+            </p>
           </div>
 
           {/* Accent color */}

@@ -18,6 +18,8 @@ type PortalHeaderProps = {
   approvalCounts: ApprovalCounts;
   /** Workspace logo URL (Pro/Studio branding), shown as a letterhead. */
   logoUrl?: string | null;
+  /** Dark-mode logo URL, swapped in via CSS when the portal is dark. */
+  logoUrlDark?: string | null;
 };
 
 export function PortalHeader({
@@ -26,7 +28,12 @@ export function PortalHeader({
   engineerName,
   approvalCounts,
   logoUrl = null,
+  logoUrlDark = null,
 }: PortalHeaderProps) {
+  // Letterhead logo: pick per-theme variants, each falling back to the other
+  // so a single uploaded logo still shows in both light and dark.
+  const lightLogo = logoUrl ?? logoUrlDark;
+  const darkLogo = logoUrlDark ?? logoUrl;
   const typeLabel =
     release.release_type === "ep"
       ? "EP"
@@ -85,14 +92,24 @@ export function PortalHeader({
 
       {/* Full header */}
       <header className="text-center mb-10">
-        {/* Studio logo (Pro/Studio branding) — letterhead above the artwork */}
-        {logoUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={logoUrl}
-            alt={engineerName ? `${engineerName} logo` : "Studio logo"}
-            className="h-10 max-w-[180px] object-contain mx-auto mb-6"
-          />
+        {/* Studio logo (Pro/Studio branding) — letterhead above the artwork.
+            The dark variant swaps in via CSS when the portal is viewed in dark
+            mode; if only one logo was uploaded it shows in both themes. */}
+        {lightLogo && darkLogo && (
+          <div className="mb-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={lightLogo}
+              alt={engineerName ? `${engineerName} logo` : "Studio logo"}
+              className="h-10 max-w-[180px] object-contain mx-auto block dark:hidden"
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={darkLogo}
+              alt={engineerName ? `${engineerName} logo` : "Studio logo"}
+              className="h-10 max-w-[180px] object-contain mx-auto hidden dark:block"
+            />
+          </div>
         )}
         {release.cover_art_url && (
           <img

@@ -63,6 +63,9 @@ export async function POST(req: NextRequest) {
     const ext = EXT[file.type];
     if (!ext) return NextResponse.json({ error: "Use a PNG, JPG, WebP, or SVG image." }, { status: 400 });
 
+    // "light" (default) or "dark" — the dark-mode portal logo variant.
+    const variant = form.get("variant") === "dark" ? "dark" : "light";
+
     let body: Buffer;
     if (file.type === "image/svg+xml") {
       // Load the sanitizer lazily so a raster upload never depends on it.
@@ -80,7 +83,7 @@ export async function POST(req: NextRequest) {
       body = Buffer.from(await file.arrayBuffer());
     }
 
-    const path = `${user.id}/logo.${ext}`;
+    const path = `${user.id}/logo${variant === "dark" ? "-dark" : ""}.${ext}`;
     const service = createSupabaseServiceClient();
     const { error: upErr } = await service.storage
       .from("workspace-logos")
@@ -91,12 +94,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Persist the path on the branding row server-side too, so the whole
-    // operation doesn't depend on a second browser-side write. Only logo_path
-    // is touched on conflict — a previously saved accent_color is preserved.
-    const { error: brandErr } = await service.from("workspace_branding").upsert(
-      { workspace_id: ws.id, logo_path: path, updated_at: new Date().toISOString() },
-      { onConflict: "workspace_id" },
-    );
+    // operation doesn't depend on a second browser-side write. Only the
+    // variant's column is touched on conflict — the other logo and a saved
+    // accent_color are preserved.
+    const brandingRow =
+      variant === "dark"
+        ? { workspace_id: ws.id, logo_path_dark: path, updated_at: new Date().toISOString() }
+        : { workspace_id: ws.id, logo_path: path, updated_at: new Date().toISOString() };
+    const { error: brandErr } = await service
+      .from("workspace_branding")
+      .upsert(brandingRow, { onConflict: "workspace_id" });
     if (brandErr) {
       console.error("[workspace/logo] branding upsert failed:", brandErr);
       return NextResponse.json(
