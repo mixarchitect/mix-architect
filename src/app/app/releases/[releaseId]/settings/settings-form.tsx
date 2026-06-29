@@ -312,22 +312,15 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
     }
     setUploading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      const rawExt = file.type.split("/")[1];
-      const ext = (rawExt === "jpeg" ? "jpg" : rawExt ?? "").replace(/[^a-zA-Z0-9]/g, "") || "bin";
-      const path = `${user.id}/${releaseId}.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from("cover-art")
-        .upload(path, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
-      const { data: urlData } = supabase.storage
-        .from("cover-art")
-        .getPublicUrl(path);
-      const url = urlData.publicUrl + `?t=${Date.now()}`;
-      setCoverArtUrl(url);
+      // Server-side upload: avoids the browser storage client falling back to
+      // the anon key when the session lapses (which fails storage RLS).
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(`/api/releases/${releaseId}/cover-art`, { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      setCoverArtUrl(data.url);
       setCoverArtMode("preview");
-      await supabase.from("releases").update({ cover_art_url: url }).eq("id", releaseId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -338,7 +331,11 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
   async function handleRemoveCover() {
     setCoverArtUrl("");
     setCoverArtMode("none");
-    await supabase.from("releases").update({ cover_art_url: null }).eq("id", releaseId);
+    await fetch(`/api/releases/${releaseId}/cover-art`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: null }),
+    });
   }
 
   async function handleInvite() {

@@ -491,23 +491,15 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
     }
     setUploading(true);
     setError("");
-    const supabase = createSupabaseBrowserClient();
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      const rawExt = file.type.split("/")[1];
-      const ext = (rawExt === "jpeg" ? "jpg" : rawExt ?? "").replace(/[^a-zA-Z0-9]/g, "") || "bin";
-      const path = `${user.id}/${releaseId}.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from("cover-art")
-        .upload(path, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
-      const { data: urlData } = supabase.storage
-        .from("cover-art")
-        .getPublicUrl(path);
-      const newUrl = urlData.publicUrl + `?t=${Date.now()}`;
-      setUrl(newUrl);
-      await supabase.from("releases").update({ cover_art_url: newUrl }).eq("id", releaseId);
+      // Server-side upload: avoids the browser storage client falling back to
+      // the anon key when the session lapses (which fails storage RLS).
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch(`/api/releases/${releaseId}/cover-art`, { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || t("uploadFailed"));
+      setUrl(data.url);
       setEditing(false);
       router.refresh();
     } catch (err) {
@@ -520,9 +512,14 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
   async function handleUrlSave() {
     if (!urlInput.trim()) return;
     setError("");
-    const supabase = createSupabaseBrowserClient();
     try {
-      await supabase.from("releases").update({ cover_art_url: urlInput.trim() }).eq("id", releaseId);
+      const res = await fetch(`/api/releases/${releaseId}/cover-art`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: urlInput.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || t("urlSaveFailed"));
       setUrl(urlInput.trim());
       setUrlInput("");
       setEditing(false);
@@ -534,9 +531,16 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
 
   async function handleRemove() {
     setError("");
-    const supabase = createSupabaseBrowserClient();
     try {
-      await supabase.from("releases").update({ cover_art_url: null }).eq("id", releaseId);
+      const res = await fetch(`/api/releases/${releaseId}/cover-art`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: null }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || t("removeFailed"));
+      }
       setUrl("");
       setEditing(false);
       router.refresh();
