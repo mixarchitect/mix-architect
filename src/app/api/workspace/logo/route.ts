@@ -82,5 +82,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Upload failed." }, { status: 500 });
   }
 
+  // Persist the path on the branding row server-side too, so the whole
+  // operation doesn't depend on a second browser-side write. Only logo_path
+  // is touched on conflict — a previously saved accent_color is preserved.
+  const { error: brandErr } = await service.from("workspace_branding").upsert(
+    { workspace_id: ws.id, logo_path: path, updated_at: new Date().toISOString() },
+    { onConflict: "workspace_id" },
+  );
+  if (brandErr) {
+    console.error("[workspace/logo] branding upsert failed:", brandErr);
+    return NextResponse.json(
+      { error: "Uploaded the file but couldn't save branding." },
+      { status: 500 },
+    );
+  }
+
   return NextResponse.json({ path });
 }

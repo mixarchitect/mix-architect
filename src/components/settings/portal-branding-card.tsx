@@ -25,7 +25,6 @@ export function PortalBrandingCard() {
 
   const [loading, setLoading] = useState(true);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [logoPath, setLogoPath] = useState<string | null>(null);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [accent, setAccent] = useState<string>(DEFAULT_ACCENT);
@@ -53,7 +52,6 @@ export function PortalBrandingCard() {
           data: { user },
         } = await supabase.auth.getUser();
         if (!user) return;
-        setUserId(user.id);
 
         const { data: ws } = await supabase
           .from("workspaces")
@@ -110,30 +108,18 @@ export function PortalBrandingCard() {
       setError("Use a PNG, JPG, WebP, or SVG image.");
       return;
     }
-    if (!userId) return;
     setUploading(true);
     try {
-      let path: string;
-      if (file.type === "image/svg+xml") {
-        // SVGs are sanitized server-side before storing — the logo bucket is
-        // public, so a raw SVG with scripts would be an XSS vector.
-        const fd = new FormData();
-        fd.append("file", file);
-        const res = await fetch("/api/workspace/logo", { method: "POST", body: fd });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Upload failed.");
-        path = data.path;
-      } else {
-        const supabase = createSupabaseBrowserClient();
-        const rawExt = file.type.split("/")[1];
-        const ext = (rawExt === "jpeg" ? "jpg" : rawExt ?? "").replace(/[^a-z0-9]/gi, "") || "png";
-        path = `${userId}/logo.${ext}`;
-        const { error: uploadErr } = await supabase.storage
-          .from(LOGO_BUCKET)
-          .upload(path, file, { upsert: true });
-        if (uploadErr) throw uploadErr;
-      }
-      await upsertBranding({ logo_path: path });
+      // All uploads go through the server route. It authenticates via cookies,
+      // sanitizes SVGs, and writes both the file and the branding row with the
+      // service client — so it never depends on the browser storage session,
+      // which doesn't reliably attach the auth token (uploads would 400 on RLS).
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/workspace/logo", { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Upload failed.");
+      const path: string = data.path;
       setLogoPath(path);
       setLogoUrl(publicUrl(path));
     } catch (err) {
