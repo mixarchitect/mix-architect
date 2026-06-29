@@ -10,8 +10,8 @@ import { getEntitlements } from "@/lib/entitlements";
 const DEFAULT_ACCENT = "#0D9488";
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 const LOGO_BUCKET = "workspace-logos";
-const MAX_LOGO_BYTES = 2 * 1024 * 1024;
-const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const MAX_LOGO_BYTES = 5 * 1024 * 1024;
+const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
 
 /**
  * Pro/Studio portal branding: studio logo + accent color applied to the
@@ -103,24 +103,36 @@ export function PortalBrandingCard() {
   async function handleUpload(file: File) {
     setError("");
     if (file.size > MAX_LOGO_BYTES) {
-      setError("Logo must be under 2MB.");
+      setError("Logo must be under 5MB.");
       return;
     }
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setError("Use a PNG, JPG, or WebP image.");
+      setError("Use a PNG, JPG, WebP, or SVG image.");
       return;
     }
     if (!userId) return;
     setUploading(true);
-    const supabase = createSupabaseBrowserClient();
     try {
-      const rawExt = file.type.split("/")[1];
-      const ext = (rawExt === "jpeg" ? "jpg" : rawExt ?? "").replace(/[^a-z0-9]/gi, "") || "png";
-      const path = `${userId}/logo.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from(LOGO_BUCKET)
-        .upload(path, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
+      let path: string;
+      if (file.type === "image/svg+xml") {
+        // SVGs are sanitized server-side before storing — the logo bucket is
+        // public, so a raw SVG with scripts would be an XSS vector.
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/workspace/logo", { method: "POST", body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Upload failed.");
+        path = data.path;
+      } else {
+        const supabase = createSupabaseBrowserClient();
+        const rawExt = file.type.split("/")[1];
+        const ext = (rawExt === "jpeg" ? "jpg" : rawExt ?? "").replace(/[^a-z0-9]/gi, "") || "png";
+        path = `${userId}/logo.${ext}`;
+        const { error: uploadErr } = await supabase.storage
+          .from(LOGO_BUCKET)
+          .upload(path, file, { upsert: true });
+        if (uploadErr) throw uploadErr;
+      }
       await upsertBranding({ logo_path: path });
       setLogoPath(path);
       setLogoUrl(publicUrl(path));
@@ -225,7 +237,7 @@ export function PortalBrandingCard() {
                   {uploading ? "Uploading…" : logoUrl ? "Replace" : "Upload logo"}
                   <input
                     type="file"
-                    accept="image/png,image/jpeg,image/webp"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg"
                     className="hidden"
                     disabled={uploading}
                     onChange={(e) => {
@@ -243,7 +255,9 @@ export function PortalBrandingCard() {
                     <X size={12} /> Remove
                   </button>
                 )}
-                <span className="text-[10px] text-faint">PNG, JPG, or WebP · max 2MB</span>
+                <span className="text-[10px] text-faint">
+                  SVG, PNG, JPG, or WebP · max 5MB · SVG (or a 2–3× PNG export) stays crisp on retina
+                </span>
               </div>
             </div>
           </div>
