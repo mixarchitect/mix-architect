@@ -16,17 +16,21 @@ import {
 import { buildCompGrantedEmail } from "@/lib/email-templates/transactional";
 
 /**
- * Notify a user that they've been granted a complimentary Pro account:
+ * Notify a user that they've been granted a complimentary account:
  * an in-app notification + a confirmation email. Never throws — a
  * notification failure must not fail the grant itself.
  */
-async function notifyCompGranted(userId: string) {
+async function notifyCompGranted(userId: string, plan: "pro" | "studio") {
+  const planLabel = plan === "studio" ? "Studio" : "Pro";
   try {
     await createNotification({
       userId,
       type: "payment_update",
-      title: "Complimentary Pro unlocked",
-      body: "An admin upgraded your account to Pro — unlimited releases and all Pro features are now active.",
+      title: `Complimentary ${planLabel} unlocked`,
+      body:
+        plan === "studio"
+          ? "An admin upgraded your account to Studio — unlimited releases, team workspace, and full white-label features are now active."
+          : "An admin upgraded your account to Pro — unlimited releases and all Pro features are now active.",
     });
 
     const email = await getUserEmail(userId);
@@ -43,7 +47,7 @@ async function notifyCompGranted(userId: string) {
       ? buildUnsubscribeUrl(prefs.unsubscribe_token, "subscription_confirmed")
       : undefined;
 
-    const { subject, html } = buildCompGrantedEmail({ displayName, unsubscribeUrl });
+    const { subject, html } = buildCompGrantedEmail({ displayName, unsubscribeUrl, plan });
     await sendTransactionalEmail({
       userId,
       to: email,
@@ -58,11 +62,14 @@ async function notifyCompGranted(userId: string) {
 
 /**
  * POST /api/admin/comp-account
- * Grant or revoke a comp (admin-granted) Pro subscription.
+ * Grant or revoke a comp (admin-granted) subscription. The grant action
+ * doubles as a tier switch: re-granting with a different plan upserts the
+ * existing comp row in place (the workspace plan follows via DB trigger).
  *
  * Body: {
  *   userId: string;
  *   action: "grant" | "revoke";
+ *   plan?: "pro" | "studio";   // grant only, defaults to "pro"
  *   reason?: string;
  *   duration?: "indefinite" | "30d" | "90d" | "6m" | "1y";
  * }
@@ -85,11 +92,12 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { userId, action, reason, duration } = body as {
+    const { userId, action, reason, duration, plan } = body as {
       userId: string;
       action: "grant" | "revoke";
       reason?: string;
       duration?: "indefinite" | "30d" | "90d" | "6m" | "1y";
+      plan?: "pro" | "studio";
     };
 
     if (!userId || !action || !["grant", "revoke"].includes(action)) {
@@ -98,6 +106,10 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    // Comp tier — anything other than "studio" falls back to "pro" so older
+    // callers (e.g. bulk-comp) that omit `plan` keep granting Pro.
+    const compPlan: "pro" | "studio" = plan === "studio" ? "studio" : "pro";
 
     const serviceClient = createSupabaseServiceClient();
 
@@ -123,7 +135,7 @@ export async function POST(req: NextRequest) {
       const { error } = await serviceClient.from("subscriptions").upsert(
         {
           user_id: userId,
-          plan: "pro",
+          plan: compPlan,
           status: "active",
           granted_by_admin: true,
           cancel_at_period_end: false,
@@ -141,6 +153,7 @@ export async function POST(req: NextRequest) {
 
       logActivity(userId, "comp_account_granted", {
         granted_by: user.id,
+        plan: compPlan,
         reason: reason || undefined,
         duration: duration || "indefinite",
         expires_at: expiresAt || undefined,
@@ -148,7 +161,7 @@ export async function POST(req: NextRequest) {
 
       // Notify the user (in-app + email). Awaited so the email send isn't
       // killed when the handler returns; non-fatal on failure.
-      await notifyCompGranted(userId);
+      await notifyCompGranted(userId, compPlan);
     } else {
       // Revoke: set plan back to free
       const { error } = await serviceClient
@@ -172,7 +185,7 @@ export async function POST(req: NextRequest) {
       }, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
     }
 
-    logAdminAction(user.id, `comp_${action}`, { target_user: userId, reason, duration }, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
+    logAdminAction(user.id, `comp_${action}`, { target_user: userId, reason, duration, plan: action === "grant" ? compPlan : undefined }, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
 
     return NextResponse.json({ success: true, action });
   } catch (err) {

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Gift, X, Clock, AlertTriangle } from "lucide-react";
-import { isAtLeastPro } from "@/lib/entitlements";
+import { Gift, X, Clock, AlertTriangle, ArrowLeftRight } from "lucide-react";
+import { isAtLeastPro, normalizePlan, type Plan } from "@/lib/entitlements";
 
 /**
  * Plan controls for the admin user-detail page.
@@ -11,12 +11,12 @@ import { isAtLeastPro } from "@/lib/entitlements";
  * The buttons surface different actions depending on what kind of
  * subscription the user has:
  *
- *   - Free / no row → "Grant Comp Pro" (calls existing
- *     /api/admin/comp-account, action=grant).
+ *   - Free / no row → "Grant Comp Pro" + "Grant Comp Studio" (both call
+ *     /api/admin/comp-account, action=grant, with the chosen plan).
  *
- *   - Admin-granted comp → "Remove Comp" (calls
- *     /api/admin/cancel-subscription — handler short-circuits to a
- *     DB-only flip when granted_by_admin = true).
+ *   - Admin-granted comp → "Switch to Pro/Studio" (re-grants the other
+ *     tier in place) + "Remove Comp" (calls /api/admin/cancel-subscription
+ *     — handler short-circuits to a DB-only flip when granted_by_admin = true).
  *
  *   - Paid Pro (real Stripe sub, active, NOT scheduled to cancel) →
  *     "Cancel Now" + "Cancel at Period End".
@@ -54,9 +54,14 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
     isActivePro && !!subscription?.stripe_subscription_id && !isComp;
   const willCancelAtPeriodEnd =
     isPaidPro && subscription?.cancel_at_period_end === true;
+  const currentPlan = normalizePlan(subscription?.plan);
 
-  async function grantComp() {
-    if (!confirm("Grant this user a comp Pro subscription (indefinite)?")) return;
+  async function grantComp(plan: Plan, opts?: { switching?: boolean }) {
+    const planLabel = plan === "studio" ? "Studio" : "Pro";
+    const message = opts?.switching
+      ? `Switch this comp account to ${planLabel}? Their workspace plan updates immediately.`
+      : `Grant this user a comp ${planLabel} subscription (indefinite)?`;
+    if (!confirm(message)) return;
     setState("loading");
     setErrorMsg(null);
     try {
@@ -66,8 +71,11 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
         body: JSON.stringify({
           userId,
           action: "grant",
+          plan,
           duration: "indefinite",
-          reason: "Admin testing / support",
+          reason: opts?.switching
+            ? `Admin switched comp to ${planLabel}`
+            : "Admin testing / support",
         }),
       });
       if (!res.ok) {
@@ -115,19 +123,29 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
     }
   }
 
-  // Free user — offer to grant comp.
+  // Free user — offer to grant a comp at either tier.
   if (!isActivePro) {
     return (
       <>
         <button
           type="button"
-          onClick={grantComp}
+          onClick={() => grantComp("pro")}
           disabled={state === "loading"}
           className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 transition-colors disabled:opacity-50"
           title="Grant a comp (admin-granted) Pro subscription"
         >
           <Gift size={12} />
           {state === "loading" ? "Granting…" : "Grant Comp Pro"}
+        </button>
+        <button
+          type="button"
+          onClick={() => grantComp("studio")}
+          disabled={state === "loading"}
+          className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded border border-violet-500/30 text-violet-400 hover:bg-violet-500/10 transition-colors disabled:opacity-50"
+          title="Grant a comp (admin-granted) Studio subscription"
+        >
+          <Gift size={12} />
+          {state === "loading" ? "Granting…" : "Grant Comp Studio"}
         </button>
         {errorMsg && (
           <span className="text-xs text-red-400 inline-flex items-center gap-1">
@@ -139,7 +157,43 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
     );
   }
 
-  // Active Pro — offer cancel paths.
+  // Admin-granted comp — offer a tier switch + removal.
+  if (isComp) {
+    const otherPlan: Plan = currentPlan === "studio" ? "pro" : "studio";
+    const otherLabel = otherPlan === "studio" ? "Studio" : "Pro";
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => grantComp(otherPlan, { switching: true })}
+          disabled={state === "loading"}
+          className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded border border-sky-500/30 text-sky-400 hover:bg-sky-500/10 transition-colors disabled:opacity-50"
+          title={`Switch this comp account to ${otherLabel}`}
+        >
+          <ArrowLeftRight size={12} />
+          {state === "loading" ? "Working…" : `Switch to ${otherLabel}`}
+        </button>
+        <button
+          type="button"
+          onClick={() => cancel("immediate")}
+          disabled={state === "loading"}
+          className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+          title="Remove comp — user immediately goes back to Free"
+        >
+          <X size={12} />
+          Remove Comp
+        </button>
+        {errorMsg && (
+          <span className="text-xs text-red-400 inline-flex items-center gap-1">
+            <AlertTriangle size={12} />
+            {errorMsg}
+          </span>
+        )}
+      </>
+    );
+  }
+
+  // Paid Pro/Studio (real Stripe sub) — offer cancel paths.
   return (
     <>
       <button
@@ -147,14 +201,10 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
         onClick={() => cancel("immediate")}
         disabled={state === "loading"}
         className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
-        title={
-          isComp
-            ? "Remove comp Pro — user immediately goes back to Free"
-            : "Cancel this Stripe subscription immediately"
-        }
+        title="Cancel this Stripe subscription immediately"
       >
         <X size={12} />
-        {isComp ? "Remove Comp" : "Cancel Now"}
+        Cancel Now
       </button>
 
       {isPaidPro && !willCancelAtPeriodEnd && (
