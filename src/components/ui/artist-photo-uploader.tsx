@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Upload, X, Check, ImageIcon } from "lucide-react";
-import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { ArtistPhoto } from "./artist-photo";
 
 type Props = {
@@ -31,10 +30,6 @@ export function ArtistPhotoUploader({
   const displayUrl = url ?? fallbackCoverUrl;
   const px = SIZES[size];
 
-  function sanitizeName(name: string) {
-    return name.toLowerCase().trim().replace(/[^a-z0-9]/g, "-");
-  }
-
   async function handleUpload(file: File) {
     const MAX_SIZE = 5 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
@@ -48,31 +43,16 @@ export function ArtistPhotoUploader({
     }
     setUploading(true);
     setError("");
-    const supabase = createSupabaseBrowserClient();
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      const rawExt = file.type.split("/")[1];
-      const ext = (rawExt === "jpeg" ? "jpg" : rawExt ?? "").replace(/[^a-zA-Z0-9]/g, "") || "bin";
-      const path = `${user.id}/artist-${sanitizeName(artistName)}.${ext}`;
-      const { error: uploadErr } = await supabase.storage
-        .from("cover-art")
-        .upload(path, file, { upsert: true });
-      if (uploadErr) throw uploadErr;
-      const { data: urlData } = supabase.storage.from("cover-art").getPublicUrl(path);
-      const newUrl = urlData.publicUrl + `?t=${Date.now()}`;
-      // Upsert artist_photos row
-      await supabase.from("artist_photos").upsert(
-        {
-          user_id: user.id,
-          artist_name_key: artistName.toLowerCase().trim(),
-          photo_url: newUrl,
-        },
-        { onConflict: "user_id,artist_name_key" },
-      );
-      setUrl(newUrl);
+      // Server-side upload: avoids the browser storage client falling back to
+      // the anon key when the session lapses (which fails storage RLS).
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("artistName", artistName);
+      const res = await fetch("/api/artist-photo", { method: "POST", body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      setUrl(data.url);
       setEditing(false);
       router.refresh();
     } catch (err) {
@@ -85,47 +65,40 @@ export function ArtistPhotoUploader({
   async function handleUrlSave() {
     if (!urlInput.trim()) return;
     setError("");
-    const supabase = createSupabaseBrowserClient();
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      await supabase.from("artist_photos").upsert(
-        {
-          user_id: user.id,
-          artist_name_key: artistName.toLowerCase().trim(),
-          photo_url: urlInput.trim(),
-        },
-        { onConflict: "user_id,artist_name_key" },
-      );
+      const res = await fetch("/api/artist-photo", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artistName, url: urlInput.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Failed to save URL");
       setUrl(urlInput.trim());
       setUrlInput("");
       setEditing(false);
       router.refresh();
-    } catch {
-      setError("Failed to save URL");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save URL");
     }
   }
 
   async function handleRemove() {
     setError("");
-    const supabase = createSupabaseBrowserClient();
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      await supabase
-        .from("artist_photos")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("artist_name_key", artistName.toLowerCase().trim());
+      const res = await fetch("/api/artist-photo", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artistName }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to remove photo");
+      }
       setUrl(null);
       setEditing(false);
       router.refresh();
-    } catch {
-      setError("Failed to remove photo");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove photo");
     }
   }
 
