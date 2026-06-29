@@ -355,21 +355,36 @@ export function buildSubscriptionCancelledEmail({
 export function buildCompGrantedEmail({
   displayName,
   unsubscribeUrl,
+  plan = "pro",
 }: {
   displayName: string;
   unsubscribeUrl?: string;
+  plan?: "pro" | "studio";
 }) {
+  const planLabel = plan === "studio" ? "Studio" : "Pro";
+  const features =
+    plan === "studio"
+      ? [
+          "Unlimited releases and tracks",
+          "Team workspace with unlimited seats",
+          "Full white-label portal — your logo, colors, and custom domain",
+          "Branded client emails from your own domain",
+          "Priority support",
+        ]
+      : [
+          "Unlimited releases and tracks",
+          "Web-based client delivery portal",
+          "Release templates &amp; payment tracking",
+          "Priority support",
+        ];
   return {
-    subject: "You've been upgraded to Mix Architect Pro",
+    subject: `You've been upgraded to Mix Architect ${planLabel}`,
     html: wrap(
       `
-      ${heading("Complimentary Pro unlocked")}
-      ${paragraph(`Hi ${escapeHtml(displayName)}, we've upgraded your account to Mix Architect Pro — on us. Here's what's now unlocked:`)}
+      ${heading(`Complimentary ${planLabel} unlocked`)}
+      ${paragraph(`Hi ${escapeHtml(displayName)}, we've upgraded your account to Mix Architect ${planLabel} — on us. Here's what's now unlocked:`)}
       <ul style="margin:8px 0 16px;padding-left:20px;font-size:14px;color:#666;line-height:1.8">
-        <li>Unlimited releases and tracks</li>
-        <li>Web-based client delivery portal</li>
-        <li>Release templates &amp; payment tracking</li>
-        <li>Priority support</li>
+        ${features.map((f) => `<li>${f}</li>`).join("\n        ")}
       </ul>
       ${cta("Open Mix Architect", "https://mixarchitect.com/app")}
     `,
