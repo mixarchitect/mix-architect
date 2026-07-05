@@ -6,8 +6,24 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { requireSameOrigin } from "@/lib/origin-check";
 import { getEntitlements } from "@/lib/entitlements";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
+// Domain management (create/verify/get) needs a full-access Resend key with the
+// Domains permission — NOT the restricted send-only RESEND_API_KEY used by every
+// other send site. Prefer a dedicated management key so the send key can stay
+// least-privilege; fall back to RESEND_API_KEY for single-full-access-key setups.
+const resend = new Resend(
+  process.env.RESEND_MANAGEMENT_API_KEY || process.env.RESEND_API_KEY || "re_placeholder",
+);
 const DOMAIN_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i;
+
+// Resend's "only send emails" restriction surfaces on domain-management calls
+// when the key lacks the Domains permission — turn it into an actionable hint.
+function domainMgmtError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : "";
+  if (/restricted|only send|permission|unauthorized|forbidden/i.test(msg)) {
+    return "The email service key can't manage domains yet. Please try again later or contact support.";
+  }
+  return msg || "Failed to add domain.";
+}
 
 /**
  * POST /api/workspace/email-domain
@@ -76,10 +92,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ domain, status: d.status ?? "pending", records: d.records ?? [] });
     } catch (err) {
       console.error("[workspace/email-domain] add failed:", err);
-      return NextResponse.json(
-        { error: err instanceof Error ? err.message : "Failed to add domain." },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: domainMgmtError(err) }, { status: 500 });
     }
   }
 
