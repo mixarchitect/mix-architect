@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Users, Lock, Loader2, Trash2, UserPlus } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { useSubscription } from "@/lib/subscription-context";
@@ -24,6 +25,8 @@ const ASSIGNABLE_ROLES = ["admin", "engineer", "viewer"] as const;
  * through /api/workspace/invite (Studio gate + email).
  */
 export function WorkspaceMembersCard() {
+  const t = useTranslations("settings.teamMembers");
+  const tc = useTranslations("common");
   const sub = useSubscription();
   const gated = !getEntitlements(sub.plan).teamWorkspace;
 
@@ -86,11 +89,11 @@ export function WorkspaceMembersCard() {
         body: JSON.stringify({ email: inviteEmail.trim(), role: inviteRole }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to invite.");
+      if (!res.ok) throw new Error(data.error || t("inviteFailed"));
       setInviteEmail("");
       if (workspaceId) await loadMembers(workspaceId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to invite.");
+      setError(err instanceof Error ? err.message : t("inviteFailed"));
     } finally {
       setInviting(false);
     }
@@ -124,17 +127,15 @@ export function WorkspaceMembersCard() {
       <div className="rounded-xl border border-border p-6" style={{ background: "var(--panel)" }}>
         <div className="flex items-center gap-2">
           <Lock size={16} className="text-muted" />
-          <h2 className="text-sm font-semibold text-text">Team members</h2>
+          <h2 className="text-sm font-semibold text-text">{t("title")}</h2>
         </div>
-        <p className="mt-2 text-sm text-muted">
-          Invite your team to collaborate on releases with shared access and roles. Available on Studio.
-        </p>
+        <p className="mt-2 text-sm text-muted">{t("gatedDesc")}</p>
         <Link
           href="/app/settings?upgrade=studio"
           className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
           style={{ background: "var(--signal)", color: "var(--signal-on)" }}
         >
-          Upgrade to Studio
+          {t("upgradeCta")}
         </Link>
       </div>
     );
@@ -144,17 +145,15 @@ export function WorkspaceMembersCard() {
   return (
     <div className="rounded-xl border border-border p-6 space-y-5" style={{ background: "var(--panel)" }}>
       <div>
-        <h2 className="text-sm font-semibold text-text">Team members</h2>
-        <p className="mt-1 text-sm text-muted">
-          Invite teammates to your workspace. They get access to all releases, gated by role.
-        </p>
+        <h2 className="text-sm font-semibold text-text">{t("title")}</h2>
+        <p className="mt-1 text-sm text-muted">{t("desc")}</p>
       </div>
 
       {error && <p className="text-xs text-red-500">{error}</p>}
 
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-muted">
-          <Loader2 size={14} className="animate-spin" /> Loading…
+          <Loader2 size={14} className="animate-spin" /> {tc("loading")}
         </div>
       ) : (
         <>
@@ -172,10 +171,10 @@ export function WorkspaceMembersCard() {
                   <Users size={14} className="text-muted shrink-0" />
                   <span className="text-sm text-text truncate flex-1">{m.invited_email}</span>
                   {pending && (
-                    <span className="text-[10px] font-medium uppercase tracking-wide text-amber-500">Pending</span>
+                    <span className="text-[10px] font-medium uppercase tracking-wide text-amber-500">{t("pending")}</span>
                   )}
                   {isOwner ? (
-                    <span className="text-xs text-muted capitalize px-2">Owner</span>
+                    <span className="text-xs text-muted capitalize px-2">{t("roles.owner")}</span>
                   ) : (
                     <>
                       <select
@@ -185,7 +184,7 @@ export function WorkspaceMembersCard() {
                       >
                         {ASSIGNABLE_ROLES.map((r) => (
                           <option key={r} value={r}>
-                            {r.charAt(0).toUpperCase() + r.slice(1)}
+                            {t(`roles.${r}`)}
                           </option>
                         ))}
                       </select>
@@ -193,7 +192,7 @@ export function WorkspaceMembersCard() {
                         type="button"
                         onClick={() => handleRemove(m.id)}
                         className="text-muted hover:text-red-500 transition-colors shrink-0"
-                        aria-label={`Remove ${m.invited_email}`}
+                        aria-label={t("removeLabel", { email: m.invited_email })}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -211,7 +210,7 @@ export function WorkspaceMembersCard() {
               required
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              placeholder="teammate@email.com"
+              placeholder={t("emailPlaceholder")}
               className="input text-sm flex-1"
             />
             <select
@@ -221,7 +220,7 @@ export function WorkspaceMembersCard() {
             >
               {ASSIGNABLE_ROLES.map((r) => (
                 <option key={r} value={r}>
-                  {r.charAt(0).toUpperCase() + r.slice(1)}
+                  {t(`roles.${r}`)}
                 </option>
               ))}
             </select>
@@ -232,12 +231,10 @@ export function WorkspaceMembersCard() {
               style={{ background: "var(--signal)", color: "var(--signal-on)" }}
             >
               {inviting ? <Loader2 size={12} className="animate-spin" /> : <UserPlus size={12} />}
-              Invite
+              {t("invite")}
             </button>
           </form>
-          <p className="text-[10px] text-faint">
-            Admin/Engineer can edit releases; Viewer is read-only. Only owner &amp; admin can delete.
-          </p>
+          <p className="text-[10px] text-faint">{t("roleHint")}</p>
         </>
       )}
     </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Upload, X, Check, ImageIcon, Lock, Loader2 } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { useSubscription } from "@/lib/subscription-context";
@@ -37,6 +38,8 @@ function LogoSlot({
   onPick: (file: File) => void;
   onRemove: () => void;
 }) {
+  const t = useTranslations("settings.portalBranding");
+  const tc = useTranslations("common");
   return (
     <div className="space-y-2">
       <span className="text-xs font-medium text-muted uppercase tracking-wider">{label}</span>
@@ -58,7 +61,7 @@ function LogoSlot({
             style={{ background: "var(--panel-2)", color: "var(--text-muted)" }}
           >
             <Upload size={14} />
-            {uploading ? "Uploading…" : url ? "Replace" : "Upload"}
+            {uploading ? tc("uploading") : url ? t("replace") : t("upload")}
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp,image/svg+xml,.svg"
@@ -77,7 +80,7 @@ function LogoSlot({
               onClick={onRemove}
               className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors w-fit"
             >
-              <X size={12} /> Remove
+              <X size={12} /> {t("remove")}
             </button>
           )}
           <span className="text-[10px] text-faint">{hint}</span>
@@ -93,6 +96,8 @@ function LogoSlot({
  * entitlement — Free sees an upgrade prompt.
  */
 export function PortalBrandingCard() {
+  const t = useTranslations("settings.portalBranding");
+  const tc = useTranslations("common");
   const sub = useSubscription();
   const brandingLevel = getEntitlements(sub.plan).branding;
   const gated = brandingLevel === "none";
@@ -174,11 +179,11 @@ export function PortalBrandingCard() {
   async function handleUpload(file: File, variant: LogoVariant) {
     setError("");
     if (file.size > MAX_LOGO_BYTES) {
-      setError("Logo must be under 5MB.");
+      setError(t("errLogoSize"));
       return;
     }
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setError("Use a PNG, JPG, WebP, or SVG image.");
+      setError(t("errLogoType"));
       return;
     }
     setUploadingVariant(variant);
@@ -192,12 +197,12 @@ export function PortalBrandingCard() {
       fd.append("variant", variant);
       const res = await fetch("/api/workspace/logo", { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Upload failed.");
+      if (!res.ok) throw new Error(data.error || t("errUploadFailed"));
       const url = publicUrl(data.path);
       if (variant === "dark") setLogoUrlDark(url);
       else setLogoUrl(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed.");
+      setError(err instanceof Error ? err.message : t("errUploadFailed"));
     } finally {
       setUploadingVariant(null);
     }
@@ -210,14 +215,14 @@ export function PortalBrandingCard() {
       if (variant === "dark") setLogoUrlDark(null);
       else setLogoUrl(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to remove logo.");
+      setError(err instanceof Error ? err.message : t("errRemoveFailed"));
     }
   }
 
   async function handleSaveAccent() {
     setError("");
     if (!HEX_RE.test(accent)) {
-      setError("Enter a valid hex color, e.g. #0D9488.");
+      setError(t("errInvalidHex"));
       return;
     }
     setSavingAccent(true);
@@ -225,7 +230,7 @@ export function PortalBrandingCard() {
       await upsertBranding({ accent_color: accent });
       setSavedAccent(accent);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save color.");
+      setError(err instanceof Error ? err.message : t("errSaveColorFailed"));
     } finally {
       setSavingAccent(false);
     }
@@ -237,17 +242,15 @@ export function PortalBrandingCard() {
       <div className="rounded-xl border border-border p-6" style={{ background: "var(--panel)" }}>
         <div className="flex items-center gap-2">
           <Lock size={16} className="text-muted" />
-          <h2 className="text-sm font-semibold text-text">Portal branding</h2>
+          <h2 className="text-sm font-semibold text-text">{t("title")}</h2>
         </div>
-        <p className="mt-2 text-sm text-muted">
-          Add your logo and accent color to the client portal. Available on Pro and Studio.
-        </p>
+        <p className="mt-2 text-sm text-muted">{t("gatedDesc")}</p>
         <Link
           href="/app/settings?upgrade=branding"
           className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
           style={{ background: "var(--signal)", color: "var(--signal-on)" }}
         >
-          Upgrade to Pro
+          {t("upgradeCta")}
         </Link>
       </div>
     );
@@ -259,25 +262,23 @@ export function PortalBrandingCard() {
   return (
     <div className="rounded-xl border border-border p-6 space-y-6" style={{ background: "var(--panel)" }}>
       <div>
-        <h2 className="text-sm font-semibold text-text">Portal branding</h2>
-        <p className="mt-1 text-sm text-muted">
-          Your logo and accent color appear on the client portal.
-        </p>
+        <h2 className="text-sm font-semibold text-text">{t("title")}</h2>
+        <p className="mt-1 text-sm text-muted">{t("desc")}</p>
       </div>
 
       {error && <p className="text-xs text-red-500">{error}</p>}
 
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-muted">
-          <Loader2 size={14} className="animate-spin" /> Loading…
+          <Loader2 size={14} className="animate-spin" /> {tc("loading")}
         </div>
       ) : (
         <>
           {/* Logos — light + optional dark variant */}
           <div className="space-y-4">
             <LogoSlot
-              label="Logo"
-              hint="Shown on light backgrounds, and everywhere if no dark version is set."
+              label={t("logoLabel")}
+              hint={t("logoHint")}
               url={logoUrl}
               previewBg="#ffffff"
               uploading={uploadingVariant === "light"}
@@ -285,29 +286,27 @@ export function PortalBrandingCard() {
               onRemove={() => handleRemoveLogo("light")}
             />
             <LogoSlot
-              label="Dark-mode logo"
-              hint="Optional — shown when a client views the portal in dark mode."
+              label={t("darkLogoLabel")}
+              hint={t("darkLogoHint")}
               url={logoUrlDark}
               previewBg="#0b0d12"
               uploading={uploadingVariant === "dark"}
               onPick={(f) => handleUpload(f, "dark")}
               onRemove={() => handleRemoveLogo("dark")}
             />
-            <p className="text-[10px] text-faint">
-              SVG, PNG, JPG, or WebP · max 5MB · SVG (or a 2–3× PNG export) stays crisp on retina.
-            </p>
+            <p className="text-[10px] text-faint">{t("formatsHint")}</p>
           </div>
 
           {/* Accent color */}
           <div className="space-y-2">
-            <span className="text-xs font-medium text-muted uppercase tracking-wider">Accent color</span>
+            <span className="text-xs font-medium text-muted uppercase tracking-wider">{t("accentColor")}</span>
             <div className="flex items-center gap-3">
               <input
                 type="color"
                 value={HEX_RE.test(accent) ? accent : DEFAULT_ACCENT}
                 onChange={(e) => setAccent(e.target.value.toUpperCase())}
                 className="w-10 h-10 rounded-md border border-border cursor-pointer bg-transparent p-0"
-                aria-label="Accent color picker"
+                aria-label={t("accentPickerLabel")}
               />
               <input
                 type="text"
@@ -325,12 +324,10 @@ export function PortalBrandingCard() {
                 style={{ background: "var(--signal)", color: "var(--signal-on)" }}
               >
                 {savingAccent ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                Save
+                {tc("save")}
               </button>
             </div>
-            <p className="text-[10px] text-faint">
-              Used for buttons and highlights on the portal. Default is Mix Architect teal.
-            </p>
+            <p className="text-[10px] text-faint">{t("accentHint")}</p>
           </div>
         </>
       )}
