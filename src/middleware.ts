@@ -35,10 +35,10 @@ function buildCsp(): string {
     "form-action 'self'",
     "frame-ancestors 'none'",
     "upgrade-insecure-requests",
-    // Violations POST'd to /api/csp-report → forwarded to Sentry as
-    // a captureMessage. Without this, a policy regression (e.g. a
-    // new third-party script silently blocked) shows up as a broken
-    // page in prod with no diagnostic. Browsers send the body as
+    // Violations POST'd to /api/csp-report → logged server-side (Vercel
+    // runtime logs). Without this, a policy regression (e.g. a new
+    // third-party script silently blocked) shows up as a broken page in
+    // prod with no diagnostic. Browsers send the body as
     // application/csp-report or application/reports+json.
     "report-uri /api/csp-report",
   ].join("; ");

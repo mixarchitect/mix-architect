@@ -13,7 +13,6 @@
  */
 
 import { useEffect } from "react";
-import * as Sentry from "@sentry/nextjs";
 
 export default function GlobalError({
   error,
@@ -23,10 +22,8 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Even more important to capture here — global-error means the
-    // root layout itself broke, so the user has no app shell context.
-    // No-op when NEXT_PUBLIC_SENTRY_DSN is unset.
-    Sentry.captureException(error);
+    // Root layout itself broke — the user has no app shell context.
+    // Logged so it surfaces in the Vercel runtime logs.
     console.error("[app/global-error] Root layout crashed:", error, {
       digest: error.digest,
     });

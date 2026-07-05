@@ -15,7 +15,6 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import * as Sentry from "@sentry/nextjs";
 
 export default function ErrorPage({
   error,
@@ -25,11 +24,8 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Forward to Sentry. No-op when NEXT_PUBLIC_SENTRY_DSN is unset,
-    // so this is safe even before a Sentry account exists. The
-    // `digest` is kept in console output so a Vercel runtime log
-    // line can be correlated with the Sentry event when both exist.
-    Sentry.captureException(error);
+    // Logged to the server/browser console; the `digest` correlates
+    // this render error with the matching Vercel runtime log line.
     console.error("[app/error] Unhandled error:", error, {
       digest: error.digest,
     });
@@ -44,7 +40,7 @@ export default function ErrorPage({
         <div className="space-y-2">
           <h1 className="text-2xl font-semibold">Something went wrong</h1>
           <p className="text-sm text-muted">
-            We hit an unexpected error. The team has been notified.
+            We hit an unexpected error. Please try again, or head back home.
           </p>
         </div>
         {error.digest && (

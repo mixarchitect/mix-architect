@@ -306,8 +306,8 @@ export default async function TermsPage() {
             <p>
               The Services rely on third-party providers, including but not
               limited to Supabase (database and storage), Vercel (hosting),
-              Stripe (payments and Stripe Connect), Resend (email), and Sentry
-              (error monitoring). Your use of these providers&apos; portions of
+              Stripe (payments and Stripe Connect), and Resend (email). Your use
+              of these providers&apos; portions of
               the Services is also subject to their respective terms and
               privacy policies. We are not responsible for the acts or
               omissions of third-party providers beyond our reasonable
