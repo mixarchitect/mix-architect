@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
-import { getWorkspaceSenderFrom, getWorkspaceEmailBrand } from "@/lib/email/workspace-sender";
+import {
+  getWorkspaceSenderFrom,
+  getWorkspaceEmailBrand,
+  getWorkspaceReplyTo,
+} from "@/lib/email/workspace-sender";
 import {
   brandedWrap,
   brandedCta,
@@ -93,6 +97,7 @@ export async function POST(request: NextRequest) {
   try {
     await resend.emails.send({
       from: await getWorkspaceSenderFrom(release.workspace_id),
+      replyTo: await getWorkspaceReplyTo(release.workspace_id),
       to: email,
       subject: `You've been invited to collaborate on "${releaseTitle}"`,
       html: buildInviteHtml({ inviterEmail, releaseTitle, role, appUrl }, brand),
