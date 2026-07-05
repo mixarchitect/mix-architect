@@ -7,7 +7,7 @@ import {
   buildTrackDeliveredEmail,
 } from "@/lib/email-templates/portal-notification";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
-import { getWorkspaceSenderFrom } from "@/lib/email/workspace-sender";
+import { getWorkspaceSenderFrom, getWorkspaceEmailBrand } from "@/lib/email/workspace-sender";
 
 // Lazy-init Resend to avoid build failures when RESEND_API_KEY is missing
 function getResend() {
@@ -93,6 +93,7 @@ export async function POST(req: NextRequest) {
     // Determine recipient and check notification preferences
     let recipientEmail: string | null = null;
     let emailContent: { subject: string; html: string } | null = null;
+    const brand = await getWorkspaceEmailBrand(releaseRel?.workspace_id ?? null);
 
     if (event === "approved" || event === "changes_requested") {
       // Notify engineer (release owner)
@@ -109,20 +110,26 @@ export async function POST(req: NextRequest) {
       recipientEmail = ownerData?.user?.email ?? null;
 
       if (event === "approved") {
-        emailContent = buildTrackApprovedEmail({
-          releaseTitle,
-          trackTitle,
-          actorName: actor_name || "Client",
-          portalUrl,
-        });
+        emailContent = buildTrackApprovedEmail(
+          {
+            releaseTitle,
+            trackTitle,
+            actorName: actor_name || "Client",
+            portalUrl,
+          },
+          brand,
+        );
       } else {
-        emailContent = buildChangesRequestedEmail({
-          releaseTitle,
-          trackTitle,
-          actorName: actor_name || "Client",
-          note: note || "",
-          portalUrl,
-        });
+        emailContent = buildChangesRequestedEmail(
+          {
+            releaseTitle,
+            trackTitle,
+            actorName: actor_name || "Client",
+            note: note || "",
+            portalUrl,
+          },
+          brand,
+        );
       }
     } else if (event === "new_version" || event === "delivered") {
       // Notify client
@@ -133,9 +140,9 @@ export async function POST(req: NextRequest) {
       recipientEmail = share.client_notification_email;
 
       if (event === "new_version") {
-        emailContent = buildNewVersionEmail({ releaseTitle, trackTitle, portalUrl });
+        emailContent = buildNewVersionEmail({ releaseTitle, trackTitle, portalUrl }, brand);
       } else {
-        emailContent = buildTrackDeliveredEmail({ releaseTitle, trackTitle, portalUrl });
+        emailContent = buildTrackDeliveredEmail({ releaseTitle, trackTitle, portalUrl }, brand);
       }
     }
 

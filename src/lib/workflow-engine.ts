@@ -1,6 +1,6 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { sendQuote } from "@/actions/quotes";
-import { getWorkspaceSenderFrom } from "@/lib/email/workspace-sender";
+import { getWorkspaceSenderFrom, getWorkspaceEmailBrand } from "@/lib/email/workspace-sender";
 import type { TriggerEvent, ActionType } from "@/types/payments";
 
 export type TriggerContext = {
@@ -166,11 +166,15 @@ async function handleSendEmailThankYou(context: TriggerContext): Promise<ActionR
   const { getUserDisplayName } = await import("@/lib/email/service");
   const engineerName = await getUserDisplayName(context.userId);
 
-  const { subject, html } = buildThankYouEmail({
-    engineerName,
-    clientName: release.client_name || "there",
-    releaseTitle: release.title,
-  });
+  const brand = await getWorkspaceEmailBrand(release?.workspace_id ?? null);
+  const { subject, html } = buildThankYouEmail(
+    {
+      engineerName,
+      clientName: release.client_name || "there",
+      releaseTitle: release.title,
+    },
+    brand,
+  );
 
   const { Resend } = require("resend") as typeof import("resend");
   const resend = new Resend(process.env.RESEND_API_KEY);
@@ -206,11 +210,15 @@ async function handleSendEmailTestimonialRequest(
   const { getUserDisplayName } = await import("@/lib/email/service");
   const engineerName = await getUserDisplayName(context.userId);
 
-  const { subject, html } = buildTestimonialRequestEmail({
-    engineerName,
-    clientName: release.client_name || "there",
-    releaseTitle: release.title,
-  });
+  const brand = await getWorkspaceEmailBrand(release?.workspace_id ?? null);
+  const { subject, html } = buildTestimonialRequestEmail(
+    {
+      engineerName,
+      clientName: release.client_name || "there",
+      releaseTitle: release.title,
+    },
+    brand,
+  );
 
   const { Resend } = require("resend") as typeof import("resend");
   const resend = new Resend(process.env.RESEND_API_KEY);
@@ -253,15 +261,19 @@ async function handleSendPaymentReminder(context: TriggerContext): Promise<Actio
     .eq("id", context.releaseId)
     .maybeSingle();
 
-  const { subject, html } = buildPaymentReminderWorkflowEmail({
-    engineerName,
-    quoteNumber: quote.quote_number,
-    total: Number(quote.total),
-    currency: quote.currency,
-    releaseTitle: release?.title,
-    portalUrl: `${baseUrl}/portal/quote/${quote.portal_token}`,
-    dueDate: quote.due_date,
-  });
+  const brand = await getWorkspaceEmailBrand(release?.workspace_id ?? null);
+  const { subject, html } = buildPaymentReminderWorkflowEmail(
+    {
+      engineerName,
+      quoteNumber: quote.quote_number,
+      total: Number(quote.total),
+      currency: quote.currency,
+      releaseTitle: release?.title,
+      portalUrl: `${baseUrl}/portal/quote/${quote.portal_token}`,
+      dueDate: quote.due_date,
+    },
+    brand,
+  );
 
   const { Resend } = require("resend") as typeof import("resend");
   const resend = new Resend(process.env.RESEND_API_KEY);
