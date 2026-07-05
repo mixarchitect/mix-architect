@@ -9,7 +9,11 @@ import {
   buildUnsubscribeUrl,
 } from "@/lib/email/service";
 import { buildQuoteReceivedEmail } from "@/lib/email-templates/quote-emails";
-import { getWorkspaceSenderFrom, getWorkspaceEmailBrand } from "@/lib/email/workspace-sender";
+import {
+  getWorkspaceSenderFrom,
+  getWorkspaceEmailBrand,
+  getWorkspaceReplyTo,
+} from "@/lib/email/workspace-sender";
 import { syncPaymentStatus } from "@/lib/payment-sync";
 import { fireTrigger } from "@/lib/workflow-engine";
 import type { Quote, QuoteLineItem, PaymentSchedule } from "@/types/payments";
@@ -526,6 +530,7 @@ export async function sendQuote(
     try {
       await resend.emails.send({
         from: await getWorkspaceSenderFrom(quote.workspace_id),
+        replyTo: await getWorkspaceReplyTo(quote.workspace_id),
         to: quote.client_email,
         subject: email.subject,
         html: email.html,

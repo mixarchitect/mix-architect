@@ -1,6 +1,10 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { sendQuote } from "@/actions/quotes";
-import { getWorkspaceSenderFrom, getWorkspaceEmailBrand } from "@/lib/email/workspace-sender";
+import {
+  getWorkspaceSenderFrom,
+  getWorkspaceEmailBrand,
+  getWorkspaceReplyTo,
+} from "@/lib/email/workspace-sender";
 import type { TriggerEvent, ActionType } from "@/types/payments";
 
 export type TriggerContext = {
@@ -180,6 +184,7 @@ async function handleSendEmailThankYou(context: TriggerContext): Promise<ActionR
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
     from: await getWorkspaceSenderFrom(release?.workspace_id ?? null),
+    replyTo: await getWorkspaceReplyTo(release?.workspace_id ?? null),
     to: release.client_email,
     subject,
     html,
@@ -224,6 +229,7 @@ async function handleSendEmailTestimonialRequest(
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
     from: await getWorkspaceSenderFrom(release?.workspace_id ?? null),
+    replyTo: await getWorkspaceReplyTo(release?.workspace_id ?? null),
     to: release.client_email,
     subject,
     html,
@@ -279,6 +285,7 @@ async function handleSendPaymentReminder(context: TriggerContext): Promise<Actio
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
     from: await getWorkspaceSenderFrom(release?.workspace_id ?? null),
+    replyTo: await getWorkspaceReplyTo(release?.workspace_id ?? null),
     to: quote.client_email,
     subject,
     html,

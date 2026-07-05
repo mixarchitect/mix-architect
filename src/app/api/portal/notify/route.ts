@@ -7,7 +7,11 @@ import {
   buildTrackDeliveredEmail,
 } from "@/lib/email-templates/portal-notification";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
-import { getWorkspaceSenderFrom, getWorkspaceEmailBrand } from "@/lib/email/workspace-sender";
+import {
+  getWorkspaceSenderFrom,
+  getWorkspaceEmailBrand,
+  getWorkspaceReplyTo,
+} from "@/lib/email/workspace-sender";
 
 // Lazy-init Resend to avoid build failures when RESEND_API_KEY is missing
 function getResend() {
@@ -152,6 +156,7 @@ export async function POST(req: NextRequest) {
 
     await resend.emails.send({
       from: await getWorkspaceSenderFrom(releaseRel?.workspace_id ?? null),
+      replyTo: await getWorkspaceReplyTo(releaseRel?.workspace_id ?? null),
       to: recipientEmail,
       subject: emailContent.subject,
       html: emailContent.html,
