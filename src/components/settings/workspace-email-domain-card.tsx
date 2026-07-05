@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Lock, Loader2, Check, Mail } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { useSubscription } from "@/lib/subscription-context";
@@ -15,6 +16,8 @@ type DomainRow = { domain: string; status: string; dns_records: DnsRecord[] | nu
  * from noreply@yourstudio.com. Gated on the `brandedEmail` entitlement.
  */
 export function WorkspaceEmailDomainCard() {
+  const t = useTranslations("settings.brandedEmail");
+  const tc = useTranslations("common");
   const sub = useSubscription();
   const gated = !getEntitlements(sub.plan).brandedEmail;
 
@@ -57,10 +60,10 @@ export function WorkspaceEmailDomainCard() {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Request failed.");
+      if (!res.ok) throw new Error(data.error || t("requestFailed"));
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Request failed.");
+      setError(err instanceof Error ? err.message : t("requestFailed"));
     } finally {
       setBusy(false);
     }
@@ -72,17 +75,15 @@ export function WorkspaceEmailDomainCard() {
       <div className="rounded-xl border border-border p-6" style={{ background: "var(--panel)" }}>
         <div className="flex items-center gap-2">
           <Lock size={16} className="text-muted" />
-          <h2 className="text-sm font-semibold text-text">Branded email</h2>
+          <h2 className="text-sm font-semibold text-text">{t("title")}</h2>
         </div>
-        <p className="mt-2 text-sm text-muted">
-          Send client emails from your own domain (noreply@yourstudio.com). Available on Studio.
-        </p>
+        <p className="mt-2 text-sm text-muted">{t("gatedDesc")}</p>
         <Link
           href="/app/settings?upgrade=studio"
           className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
           style={{ background: "var(--signal)", color: "var(--signal-on)" }}
         >
-          Upgrade to Studio
+          {t("upgradeCta")}
         </Link>
       </div>
     );
@@ -94,17 +95,15 @@ export function WorkspaceEmailDomainCard() {
   return (
     <div className="rounded-xl border border-border p-6 space-y-5" style={{ background: "var(--panel)" }}>
       <div>
-        <h2 className="text-sm font-semibold text-text">Branded email</h2>
-        <p className="mt-1 text-sm text-muted">
-          Verify a domain so client emails send from your studio instead of Mix Architect.
-        </p>
+        <h2 className="text-sm font-semibold text-text">{t("title")}</h2>
+        <p className="mt-1 text-sm text-muted">{t("desc")}</p>
       </div>
 
       {error && <p className="text-xs text-red-500">{error}</p>}
 
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-muted">
-          <Loader2 size={14} className="animate-spin" /> Loading…
+          <Loader2 size={14} className="animate-spin" /> {tc("loading")}
         </div>
       ) : !row ? (
         /* No domain yet — add one */
@@ -120,7 +119,7 @@ export function WorkspaceEmailDomainCard() {
             required
             value={domainInput}
             onChange={(e) => setDomainInput(e.target.value)}
-            placeholder="yourstudio.com"
+            placeholder={t("domainPlaceholder")}
             className="input text-sm flex-1"
           />
           <button
@@ -130,7 +129,7 @@ export function WorkspaceEmailDomainCard() {
             style={{ background: "var(--signal)", color: "var(--signal-on)" }}
           >
             {busy ? <Loader2 size={12} className="animate-spin" /> : <Mail size={12} />}
-            Add domain
+            {t("addDomain")}
           </button>
         </form>
       ) : (
@@ -140,32 +139,30 @@ export function WorkspaceEmailDomainCard() {
             <span className="text-text font-medium">{row.domain}</span>
             {verified ? (
               <span className="inline-flex items-center gap-1 text-xs text-emerald-500">
-                <Check size={12} /> Verified
+                <Check size={12} /> {t("verified")}
               </span>
             ) : (
-              <span className="text-xs font-medium uppercase tracking-wide text-amber-500">Pending</span>
+              <span className="text-xs font-medium uppercase tracking-wide text-amber-500">{t("pending")}</span>
             )}
           </div>
 
           {verified ? (
             <p className="text-xs text-muted">
-              Client emails now send from <strong className="text-text">noreply@{row.domain}</strong>.
+              {t("sendingFromLabel")} <strong className="text-text">noreply@{row.domain}</strong>
             </p>
           ) : (
             <>
               {/* DNS records to add */}
               {row.dns_records && row.dns_records.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-xs text-muted">
-                    Add these DNS records at your domain registrar, then verify:
-                  </p>
+                  <p className="text-xs text-muted">{t("addDnsRecords")}</p>
                   <div className="overflow-x-auto rounded-md border border-border" style={{ background: "var(--panel-2)" }}>
                     <table className="w-full text-[11px]">
                       <thead className="text-faint">
                         <tr>
-                          <th className="text-left px-3 py-1.5 font-medium">Type</th>
-                          <th className="text-left px-3 py-1.5 font-medium">Name</th>
-                          <th className="text-left px-3 py-1.5 font-medium">Value</th>
+                          <th className="text-left px-3 py-1.5 font-medium">{t("colType")}</th>
+                          <th className="text-left px-3 py-1.5 font-medium">{t("colName")}</th>
+                          <th className="text-left px-3 py-1.5 font-medium">{t("colValue")}</th>
                         </tr>
                       </thead>
                       <tbody className="font-mono text-text">
@@ -189,7 +186,7 @@ export function WorkspaceEmailDomainCard() {
                 style={{ background: "var(--signal)", color: "var(--signal-on)" }}
               >
                 {busy ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                Verify domain
+                {t("verifyDomain")}
               </button>
             </>
           )}
