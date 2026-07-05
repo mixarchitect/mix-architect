@@ -66,10 +66,8 @@ A public unauthenticated read should use the anon client + RLS policies, not the
 
 ## Error tracking
 
-- Sentry is wired in via `instrumentation.ts` (server/edge) and `instrumentation-client.ts` (browser). Both are no-ops when `NEXT_PUBLIC_SENTRY_DSN` is unset.
-- `src/app/error.tsx` and `src/app/global-error.tsx` call `Sentry.captureException`. Don't replace those with `console.error`-only patterns.
-- Server-action errors and route-handler throws are forwarded automatically via `onRequestError` in `instrumentation.ts`. New code should `throw` rather than swallowing — the boundary picks it up.
-- `next.config.ts` is wrapped with `withSentryConfig`. New build-time wrappers must compose with it (Sentry stays outermost).
+- No external error tracker (Sentry was removed). `src/app/error.tsx` and `src/app/global-error.tsx` are the error boundaries — they render the fallback UI and `console.error` the failure with the Next.js `digest`, which surfaces in the Vercel runtime logs. Keep those boundaries; new code should `throw` rather than swallow so they catch it.
+- CSP violations POST to `/api/csp-report`, which logs them server-side.
 
 ## Stripe
 

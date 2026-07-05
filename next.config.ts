@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
-import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -44,21 +43,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-// Wrap with Sentry's config helper. When SENTRY_AUTH_TOKEN is set
-// in CI, this also uploads source maps; when it's unset, the wrap
-// is effectively a no-op. Order matters: Sentry must be the
-// outermost wrapper so it sees the final webpack config from
-// next-intl + any future plugins.
-export default withSentryConfig(withNextIntl(nextConfig), {
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  // Quiet build logs unless we're in CI explicitly debugging.
-  silent: !process.env.CI,
-  // Tunnels Sentry traffic through a Next.js route to avoid ad-block
-  // false-positives. Cheap; safe to leave on.
-  tunnelRoute: "/monitoring",
-  // Source maps: only upload if an auth token is set. Without one,
-  // the build still succeeds but errors show minified frames.
-  disableLogger: true,
-  automaticVercelMonitors: false,
-});
+export default withNextIntl(nextConfig);

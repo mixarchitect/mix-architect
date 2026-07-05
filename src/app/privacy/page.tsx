@@ -172,7 +172,6 @@ export default async function PrivacyPage() {
                   "Vercel — hosting and content delivery for the web application.",
                   "Stripe — payment processing for subscriptions and Stripe Connect engineer payouts.",
                   "Resend — transactional email delivery.",
-                  "Sentry — error monitoring (captures stack traces, browser context, and the user ID associated with an error).",
                   "Google Analytics 4 — web traffic analytics.",
                   "OpenPanel — product usage analytics.",
                   "Anthropic — AI summarization of admin analytics dashboards (used internally; not applied to your User Content).",
