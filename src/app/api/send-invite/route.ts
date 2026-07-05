@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { getWorkspaceSenderFrom } from "@/lib/email/workspace-sender";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
 
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
   // Verify caller owns the release
   const { data: release } = await supabase
     .from("releases")
-    .select("id")
+    .select("id, workspace_id")
     .eq("id", releaseId)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -111,7 +112,7 @@ export async function POST(request: NextRequest) {
 
   try {
     await resend.emails.send({
-      from: "Mix Architect <team@mixarchitect.com>",
+      from: await getWorkspaceSenderFrom(release.workspace_id),
       to: email,
       subject: `You've been invited to collaborate on "${releaseTitle}"`,
       html: buildInviteHtml({ inviterEmail, releaseTitle, role, appUrl }),

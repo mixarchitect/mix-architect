@@ -7,6 +7,7 @@ import {
   buildTrackDeliveredEmail,
 } from "@/lib/email-templates/portal-notification";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { getWorkspaceSenderFrom } from "@/lib/email/workspace-sender";
 
 // Lazy-init Resend to avoid build failures when RESEND_API_KEY is missing
 function getResend() {
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
     // Fetch share + release + track
     const { data: share } = await supabase
       .from("brief_shares")
-      .select("*, releases!inner(title, user_id)")
+      .select("*, releases!inner(title, user_id, workspace_id)")
       .eq("share_token", share_token)
       .maybeSingle();
 
@@ -82,9 +83,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Track not found" }, { status: 404 });
     }
 
-    const releaseTitle = (share as Record<string, unknown>).releases
-      ? ((share as Record<string, unknown>).releases as { title: string }).title
-      : "Release";
+    const releaseRel = (share as Record<string, unknown>).releases as
+      | { title: string; user_id: string; workspace_id: string | null }
+      | undefined;
+    const releaseTitle = releaseRel?.title ?? "Release";
     const trackTitle = track.title;
     const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://app.mixarchitect.com"}/portal/${share_token}`;
 
@@ -102,7 +104,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Get engineer email
-      const ownerId = ((share as Record<string, unknown>).releases as { user_id: string }).user_id;
+      const ownerId = releaseRel?.user_id ?? "";
       const { data: ownerData } = await supabase.auth.admin.getUserById(ownerId);
       recipientEmail = ownerData?.user?.email ?? null;
 
@@ -142,7 +144,7 @@ export async function POST(req: NextRequest) {
     }
 
     await resend.emails.send({
-      from: "Mix Architect <team@mixarchitect.com>",
+      from: await getWorkspaceSenderFrom(releaseRel?.workspace_id ?? null),
       to: recipientEmail,
       subject: emailContent.subject,
       html: emailContent.html,
