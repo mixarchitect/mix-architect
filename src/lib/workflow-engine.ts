@@ -1,5 +1,6 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { sendQuote } from "@/actions/quotes";
+import { getWorkspaceSenderFrom } from "@/lib/email/workspace-sender";
 import type { TriggerEvent, ActionType } from "@/types/payments";
 
 export type TriggerContext = {
@@ -154,7 +155,7 @@ async function handleSendEmailThankYou(context: TriggerContext): Promise<ActionR
   // Get release info and client email
   const { data: release } = await supabase
     .from("releases")
-    .select("title, client_email, client_name")
+    .select("title, client_email, client_name, workspace_id")
     .eq("id", context.releaseId)
     .maybeSingle();
 
@@ -174,7 +175,7 @@ async function handleSendEmailThankYou(context: TriggerContext): Promise<ActionR
   const { Resend } = require("resend") as typeof import("resend");
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
-    from: "Mix Architect <team@mixarchitect.com>",
+    from: await getWorkspaceSenderFrom(release?.workspace_id ?? null),
     to: release.client_email,
     subject,
     html,
@@ -194,7 +195,7 @@ async function handleSendEmailTestimonialRequest(
 
   const { data: release } = await supabase
     .from("releases")
-    .select("title, client_email, client_name")
+    .select("title, client_email, client_name, workspace_id")
     .eq("id", context.releaseId)
     .maybeSingle();
 
@@ -214,7 +215,7 @@ async function handleSendEmailTestimonialRequest(
   const { Resend } = require("resend") as typeof import("resend");
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
-    from: "Mix Architect <team@mixarchitect.com>",
+    from: await getWorkspaceSenderFrom(release?.workspace_id ?? null),
     to: release.client_email,
     subject,
     html,
@@ -248,7 +249,7 @@ async function handleSendPaymentReminder(context: TriggerContext): Promise<Actio
 
   const { data: release } = await supabase
     .from("releases")
-    .select("title")
+    .select("title, workspace_id")
     .eq("id", context.releaseId)
     .maybeSingle();
 
@@ -265,7 +266,7 @@ async function handleSendPaymentReminder(context: TriggerContext): Promise<Actio
   const { Resend } = require("resend") as typeof import("resend");
   const resend = new Resend(process.env.RESEND_API_KEY);
   await resend.emails.send({
-    from: "Mix Architect <team@mixarchitect.com>",
+    from: await getWorkspaceSenderFrom(release?.workspace_id ?? null),
     to: quote.client_email,
     subject,
     html,
