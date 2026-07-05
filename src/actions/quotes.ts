@@ -9,7 +9,7 @@ import {
   buildUnsubscribeUrl,
 } from "@/lib/email/service";
 import { buildQuoteReceivedEmail } from "@/lib/email-templates/quote-emails";
-import { getWorkspaceSenderFrom } from "@/lib/email/workspace-sender";
+import { getWorkspaceSenderFrom, getWorkspaceEmailBrand } from "@/lib/email/workspace-sender";
 import { syncPaymentStatus } from "@/lib/payment-sync";
 import { fireTrigger } from "@/lib/workflow-engine";
 import type { Quote, QuoteLineItem, PaymentSchedule } from "@/types/payments";
@@ -503,16 +503,20 @@ export async function sendQuote(
     ? buildUnsubscribeUrl(prefs.unsubscribe_token, "payment_received")
     : undefined;
 
-  const email = buildQuoteReceivedEmail({
-    engineerName: displayName,
-    quoteNumber: quote.quote_number,
-    total: quote.total,
-    currency: quote.currency,
-    releaseTitle,
-    portalUrl,
-    unsubscribeUrl,
-    documentType: quote.document_type ?? "quote",
-  });
+  const brand = await getWorkspaceEmailBrand(quote.workspace_id);
+  const email = buildQuoteReceivedEmail(
+    {
+      engineerName: displayName,
+      quoteNumber: quote.quote_number,
+      total: quote.total,
+      currency: quote.currency,
+      releaseTitle,
+      portalUrl,
+      unsubscribeUrl,
+      documentType: quote.document_type ?? "quote",
+    },
+    brand,
+  );
 
   // Send directly via Resend (client email, not engineer's preference system)
   const resendKey = process.env.RESEND_API_KEY;
