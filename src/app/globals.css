@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Dark mode is driven by next-themes via [data-theme="dark"] on <html>, not the
+   OS prefers-color-scheme. Bind Tailwind's `dark:` variant to that attribute so
+   every dark: utility matches the app's actual theme (e.g. the portal's per-theme
+   studio logo). Without this, dark: defaults to prefers-color-scheme and mis-fires
+   whenever the chosen theme differs from the OS. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* Toast slide-in animation */
 @keyframes toast-slide-in {
   from { opacity: 0; transform: translateX(100%); }
