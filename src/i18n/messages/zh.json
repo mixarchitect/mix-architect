@@ -895,6 +895,12 @@
     "save": "保存"
   },
   "landing": {
+    "aboutEyebrow": "关于",
+    "aboutHeadline": "我为什么做了 Mix Architect",
+    "aboutBody1": "我从 90 年代末开始，用一台 Boss BR-8 给南加州的本地乐队录音。之后我加入了 Surf City Studios，从 Berklee College of Music 毕业，跟随业内几位备受尊敬的工程师学习混音与母带，并创办了硬件公司 Vermilion Audio。一直没变的只有音乐。",
+    "aboutBody2": "这些工作都跑在同样的混乱上：用表格排日程，一个装着 final_v3_REAL 这类文件名的 WAV 文件夹，以及一堆写着“大概在两分钟那里”的邮件。Mix Architect 是我为自己的发行想要的工具。在一个地方规划工作、直接在波形上留下反馈，并交出与音乐同样考究的成果。",
+    "aboutName": "Mike Giardina",
+    "aboutRole": "创始人 · 音乐人与录音师",
     "headline": "计划发行。审查混音。跟踪付款。一站式解决。",
     "subheadline": "Mix Architect 是为独立艺人和音频专业人士打造的发行管理平台。",
     "forArtists": "为艺人",
