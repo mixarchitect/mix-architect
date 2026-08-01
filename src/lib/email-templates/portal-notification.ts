@@ -23,7 +23,7 @@ export function buildNewVersionEmail(
   brand: EmailBrand = DEFAULT_BRAND,
 ) {
   return {
-    subject: `New version ready for review — ${escapeHtml(trackTitle)}`,
+    subject: `New version ready for review: ${escapeHtml(trackTitle)}`,
     html: brandedWrap(
       `
       <h2 style="margin:0 0 8px;font-size:18px;color:#1a1a1a">New version ready for review</h2>
@@ -50,7 +50,7 @@ export function buildTrackApprovedEmail(
   brand: EmailBrand = DEFAULT_BRAND,
 ) {
   return {
-    subject: `Track approved — ${escapeHtml(trackTitle)}`,
+    subject: `Track approved: ${escapeHtml(trackTitle)}`,
     html: brandedWrap(
       `
       <h2 style="margin:0 0 8px;font-size:18px;color:#1a1a1a">Track approved</h2>
@@ -81,7 +81,7 @@ export function buildChangesRequestedEmail(
   brand: EmailBrand = DEFAULT_BRAND,
 ) {
   return {
-    subject: `Changes requested — ${escapeHtml(trackTitle)}`,
+    subject: `Changes requested: ${escapeHtml(trackTitle)}`,
     html: brandedWrap(
       `
       <h2 style="margin:0 0 8px;font-size:18px;color:#1a1a1a">Changes requested</h2>
@@ -111,7 +111,7 @@ export function buildTrackDeliveredEmail(
   brand: EmailBrand = DEFAULT_BRAND,
 ) {
   return {
-    subject: `Track delivered — ${escapeHtml(trackTitle)}`,
+    subject: `Track delivered: ${escapeHtml(trackTitle)}`,
     html: brandedWrap(
       `
       <h2 style="margin:0 0 8px;font-size:18px;color:#1a1a1a">Track delivered</h2>

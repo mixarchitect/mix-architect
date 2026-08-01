@@ -105,7 +105,7 @@ export function ChangelogFeed({
       <div className="mt-10 space-y-10">
         {groups.length === 0 && (
           <div className="rounded-xl border border-border p-8 text-center text-muted">
-            Nothing here yet — but we&apos;re working on it. Check back soon!
+            Nothing here yet, but we&apos;re working on it. Check back soon!
           </div>
         )}
 

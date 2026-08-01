@@ -134,7 +134,7 @@ export function DeliveryFormatSelector({
               {[...audioVersions].reverse().map((v) => (
                 <option key={v.id} value={v.id}>
                   v{v.version_number}
-                  {v.file_name ? ` — ${v.file_name}` : ""}
+                  {v.file_name ? ` · ${v.file_name}` : ""}
                   {v.id === latestVersion?.id ? " (latest)" : ""}
                 </option>
               ))}

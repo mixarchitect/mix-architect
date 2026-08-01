@@ -105,13 +105,13 @@ export function buildPaymentConfirmationEmail(
     : "";
 
   return {
-    subject: `Payment received — ${quoteNumber}`,
+    subject: `Payment received: ${quoteNumber}`,
     html: brandedWrap(
       `
       ${heading("Payment Received")}
       ${paragraph(`${escapeHtml(clientName)} has paid ${formattedTotal}${projectLine}.`)}
       <div style="margin:16px 0;padding:16px;background:#f0fdf4;border-radius:6px;border:1px solid #bbf7d0">
-        <div style="font-size:14px;font-weight:600;color:#166534">Quote ${escapeHtml(quoteNumber)} — Paid</div>
+        <div style="font-size:14px;font-weight:600;color:#166534">Quote ${escapeHtml(quoteNumber)} · Paid</div>
         <div style="font-size:24px;font-weight:700;color:#166534;margin-top:4px">${formattedTotal}</div>
       </div>
       ${paragraph("The payment has been processed and will appear in your Stripe dashboard.")}

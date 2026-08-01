@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
     // Postgres unique-violation = duplicate event = already processed.
     if (idempotencyErr.code === "23505") {
       console.log(
-        `[stripe/webhook] duplicate event ${event.id} (${event.type}) — skipping`,
+        `[stripe/webhook] duplicate event ${event.id} (${event.type}): skipping`,
       );
       return NextResponse.json({ received: true, duplicate: true });
     }

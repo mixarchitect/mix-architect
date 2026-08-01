@@ -29,8 +29,8 @@ async function notifyCompGranted(userId: string, plan: "pro" | "studio") {
       title: `Complimentary ${planLabel} unlocked`,
       body:
         plan === "studio"
-          ? "An admin upgraded your account to Studio — unlimited releases, team workspace, and full white-label features are now active."
-          : "An admin upgraded your account to Pro — unlimited releases and all Pro features are now active.",
+          ? "An admin upgraded your account to Studio: unlimited releases, team workspace, and full white-label features are now active."
+          : "An admin upgraded your account to Pro: unlimited releases and all Pro features are now active.",
     });
 
     const email = await getUserEmail(userId);

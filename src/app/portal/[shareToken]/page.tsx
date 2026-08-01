@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .select("id", { count: "exact", head: true })
     .eq("release_id", share.release_id);
 
-  const title = `${release.title}${release.artist ? ` — ${release.artist}` : ""} | Mix Architect`;
+  const title = `${release.title}${release.artist ? ` · ${release.artist}` : ""} | Mix Architect`;
   const description = `${release.artist || "Artist"} · ${count ?? 0} track${count !== 1 ? "s" : ""}`;
 
   return {

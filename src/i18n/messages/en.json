@@ -152,11 +152,11 @@
       "create-submit": "Hit the button to create your release. You\u2019ll be able to explore it right away.",
       "release-tabs": "These tabs organize your release: Tracks, Globals, Distribution, and Financials. Each section helps manage a different aspect of your project.",
       "release-sidebar": "Upload cover art, view release info, and add internal or client notes here.",
-      "release-track-link": "Click into a track to see its details \u2014 mix intent, specs, audio versions, and more.",
+      "release-track-link": "Click into a track to see its details: mix intent, specs, audio versions, and more.",
       "track-tabs": "Each tab captures a different aspect: Intent (your vision), Specs (technical requirements), Audio (uploads & versions), and more.",
-      "track-intent": "Describe the vision for this mix \u2014 mood, references, and direction. This is the heart of your brief.",
+      "track-intent": "Describe the vision for this mix: mood, references, and direction. This is the heart of your brief.",
       "dashboard-card": "Each release shows its status, track progress, and key info at a glance. Click to dive back in.",
-      "dashboard-nav": "The sidebar gives you quick access to all sections \u2014 Releases, Artists, Templates, Payments, and Analytics."
+      "dashboard-nav": "The sidebar gives you quick access to all sections: Releases, Artists, Templates, Payments, and Analytics."
     }
   },
   "dashboard": {
@@ -580,8 +580,8 @@
       "logoLabel": "Logo",
       "logoHint": "Shown on light backgrounds, and everywhere if no dark version is set.",
       "darkLogoLabel": "Dark-mode logo",
-      "darkLogoHint": "Optional — shown when a client views the portal in dark mode.",
-      "formatsHint": "SVG, PNG, JPG, or WebP · max 5MB · SVG (or a 2–3× PNG export) stays crisp on retina.",
+      "darkLogoHint": "Optional. Shown when a client views the portal in dark mode.",
+      "formatsHint": "SVG, PNG, JPG, or WebP · max 5MB · SVG (or a 2-3× PNG export) stays crisp on retina.",
       "replace": "Replace",
       "upload": "Upload",
       "remove": "Remove",
@@ -637,7 +637,7 @@
     },
     "featureVisibility": {
       "title": "Feature Visibility",
-      "description": "Control which features appear in your sidebar and release pages. Hidden features aren't deleted — you can re-enable them anytime.",
+      "description": "Control which features appear in your sidebar and release pages. Hidden features aren't deleted. You can re-enable them anytime.",
       "clientBusiness": "Client & Business",
       "releaseAudio": "Release & Audio"
     },
@@ -705,7 +705,7 @@
       "description": "Connect your Stripe account to collect payments directly from clients.",
       "descriptionConnected": "Your Stripe account is connected and ready to collect payments.",
       "notConnected": "Not connected",
-      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record — funds go straight to your Stripe account.",
+      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record. Funds go straight to your Stripe account.",
       "connect": "Connect Stripe Account",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
@@ -714,7 +714,7 @@
       "businessName": "Business",
       "connectedDate": "Connected",
       "status": "Status",
-      "statusActive": "Active — ready to accept payments",
+      "statusActive": "Active, ready to accept payments",
       "statusPending": "Setup incomplete",
       "statusPendingHelp": "Complete your Stripe account setup to start accepting payments.",
       "completeSetup": "Complete setup in Stripe",
@@ -795,7 +795,7 @@
     "searchPlaceholder": "Search articles...",
     "whatsNew": "What's New",
     "whatsNewDesc": "Latest updates and improvements to Mix Architect.",
-    "noChangelog": "No updates yet — check back soon!",
+    "noChangelog": "No updates yet. Check back soon!",
     "viewAllChangelog": "View all updates",
     "systemStatus": "System Status",
     "systemStatusTitle": "System Status",
@@ -899,6 +899,7 @@
     "save": "Save"
   },
   "landing": {
+    "navAbout": "About",
     "aboutEyebrow": "About",
     "aboutHeadline": "Why I built Mix Architect",
     "aboutBody1": "I started out in the late '90s recording local SoCal bands on a Boss BR-8. Since then I have joined Surf City Studios, graduated from Berklee College of Music, studied mixing and mastering under some of the industry's most respected engineers, and founded the hardware company Vermilion Audio. Music has been the one constant.",

@@ -152,11 +152,11 @@
       "create-submit": "बटन दबाकर अपनी रिलीज़ बनाएं। आप इसे तुरंत एक्सप्लोर कर सकते हैं।",
       "release-tabs": "ये टैब आपकी रिलीज़ को व्यवस्थित करते हैं: ट्रैक्स, ग्लोबल्स, डिस्ट्रीब्यूशन और फाइनेंशियल्स। हर सेक्शन आपके प्रोजेक्ट के अलग पहलू को मैनेज करने में मदद करता है।",
       "release-sidebar": "यहाँ कवर आर्ट अपलोड करें, रिलीज़ की जानकारी देखें, और इंटर्नल या क्लाइंट नोट्स जोड़ें।",
-      "release-track-link": "ट्रैक पर क्लिक करके डिटेल्स देखें — मिक्स इंटेंट, स्पेक्स, ऑडियो वर्शन और बहुत कुछ।",
+      "release-track-link": "ट्रैक पर क्लिक करके डिटेल्स देखें: मिक्स इंटेंट, स्पेक्स, ऑडियो वर्शन और बहुत कुछ।",
       "track-tabs": "हर टैब एक अलग पहलू कैप्चर करता है: इंटेंट (आपका विज़न), स्पेक्स (तकनीकी आवश्यकताएं), ऑडियो (अपलोड और वर्शन) और बहुत कुछ।",
-      "track-intent": "इस मिक्स के लिए विज़न बताएं — मूड, रेफरेंस और डायरेक्शन। यह आपके ब्रीफ का दिल है।",
+      "track-intent": "इस मिक्स के लिए विज़न बताएं: मूड, रेफरेंस और डायरेक्शन। यह आपके ब्रीफ का दिल है।",
       "dashboard-card": "हर रिलीज़ में स्टेटस, ट्रैक प्रोग्रेस और मुख्य जानकारी एक नज़र में दिखती है। अंदर जाने के लिए क्लिक करें।",
-      "dashboard-nav": "साइडबार से सभी सेक्शन तक तुरंत पहुँचें — रिलीज़, आर्टिस्ट, टेम्प्लेट, पेमेंट और एनालिटिक्स।"
+      "dashboard-nav": "साइडबार से सभी सेक्शन तक तुरंत पहुँचें: रिलीज़, आर्टिस्ट, टेम्प्लेट, पेमेंट और एनालिटिक्स।"
     }
   },
   "dashboard": {
@@ -576,8 +576,8 @@
       "logoLabel": "लोगो",
       "logoHint": "हल्के बैकग्राउंड पर दिखाया जाता है, और यदि कोई डार्क वर्शन सेट नहीं है तो हर जगह।",
       "darkLogoLabel": "डार्क-मोड लोगो",
-      "darkLogoHint": "वैकल्पिक — जब कोई क्लाइंट पोर्टल को डार्क मोड में देखता है तब दिखाया जाता है।",
-      "formatsHint": "SVG, PNG, JPG या WebP · अधिकतम 5MB · SVG (या 2–3× PNG एक्सपोर्ट) रेटिना पर साफ़ रहता है।",
+      "darkLogoHint": "वैकल्पिक. जब कोई क्लाइंट पोर्टल को डार्क मोड में देखता है तब दिखाया जाता है।",
+      "formatsHint": "SVG, PNG, JPG या WebP · अधिकतम 5MB · SVG (या 2-3× PNG एक्सपोर्ट) रेटिना पर साफ़ रहता है।",
       "replace": "बदलें",
       "upload": "अपलोड करें",
       "remove": "हटाएँ",
@@ -633,7 +633,7 @@
     },
     "featureVisibility": {
       "title": "फीचर विज़िबिलिटी",
-      "description": "कंट्रोल करें कि आपके साइडबार और रिलीज़ पेजेस में कौन से फीचर्स दिखाई दें। छिपाए गए फीचर्स डिलीट नहीं होते — आप उन्हें कभी भी फिर से एनेबल कर सकते हैं।",
+      "description": "कंट्रोल करें कि आपके साइडबार और रिलीज़ पेजेस में कौन से फीचर्स दिखाई दें। छिपाए गए फीचर्स डिलीट नहीं होते. आप उन्हें कभी भी फिर से एनेबल कर सकते हैं।",
       "clientBusiness": "क्लाइंट और बिज़नेस",
       "releaseAudio": "रिलीज़ और ऑडियो"
     },
@@ -701,7 +701,7 @@
       "description": "Connect your Stripe account to collect payments directly from clients.",
       "descriptionConnected": "Your Stripe account is connected and ready to collect payments.",
       "notConnected": "Not connected",
-      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record — funds go straight to your Stripe account.",
+      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record. funds go straight to your Stripe account.",
       "connect": "Connect Stripe Account",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
@@ -710,7 +710,7 @@
       "businessName": "Business",
       "connectedDate": "Connected",
       "status": "Status",
-      "statusActive": "Active — ready to accept payments",
+      "statusActive": "Active, ready to accept payments",
       "statusPending": "Setup incomplete",
       "statusPendingHelp": "Complete your Stripe account setup to start accepting payments.",
       "completeSetup": "Complete setup in Stripe",
@@ -796,7 +796,7 @@
     "noResults": "\"{query}\" के लिए कोई लेख नहीं मिला",
     "whatsNew": "नया क्या है",
     "whatsNewDesc": "Mix Architect के नवीनतम अपडेट और सुधार।",
-    "noChangelog": "अभी तक कोई अपडेट नहीं — जल्द ही वापस आएं!",
+    "noChangelog": "अभी तक कोई अपडेट नहीं. जल्द ही वापस आएं!",
     "viewAllChangelog": "सभी अपडेट देखें",
     "systemStatus": "सिस्टम स्टेटस",
     "systemStatusTitle": "सिस्टम स्टेटस",
@@ -895,6 +895,7 @@
     "save": "सेव करें"
   },
   "landing": {
+    "navAbout": "परिचय",
     "aboutEyebrow": "मेरे बारे में",
     "aboutHeadline": "मैंने Mix Architect क्यों बनाया",
     "aboutBody1": "मैंने 90 के दशक के आख़िर में दक्षिणी कैलिफ़ोर्निया के लोकल बैंड्स को Boss BR-8 पर रिकॉर्ड करते हुए शुरुआत की। उसके बाद मैं Surf City Studios से जुड़ा, Berklee College of Music से ग्रेजुएट हुआ, इंडस्ट्री के कुछ सबसे सम्मानित इंजीनियरों से मिक्सिंग और मास्टरिंग सीखी, और हार्डवेयर कंपनी Vermilion Audio की शुरुआत की। संगीत हमेशा साथ रहा।",
@@ -949,7 +950,7 @@
     "toolLufs": "LUFS मापन",
     "toolLufsDesc": "Spotify, Apple Music, YouTube और 8 अन्य प्लेटफ़ॉर्म मानकों के अनुसार लाउडनेस की स्वचालित जांच।",
     "toolFormatConversion": "ऑडियो फ़ॉर्मेट कन्वर्ज़न",
-    "toolFormatConversionDesc": "WAV, AIFF, FLAC और MP3 के बीच कन्वर्ट करें, पूर्ण मेटाडेटा एम्बेडिंग के साथ: आर्टिस्ट, शीर्षक, कवर आर्ट, ISRC, गीत और ReplayGain — सब कुछ फ़ाइल में लिखा जाता है।",
+    "toolFormatConversionDesc": "WAV, AIFF, FLAC और MP3 के बीच कन्वर्ट करें, पूर्ण मेटाडेटा एम्बेडिंग के साथ: आर्टिस्ट, शीर्षक, कवर आर्ट, ISRC, गीत और ReplayGain: सब कुछ फ़ाइल में लिखा जाता है।",
     "toolWaveform": "वेवफ़ॉर्म विज़ुअलाइज़ेशन",
     "toolWaveformDesc": "अपना ऑडियो सिर्फ सुनें नहीं, देखें भी। WaveSurfer-संचालित वेवफ़ॉर्म, ज़ूम और सीकिंग के साथ।",
     "toolComments": "टाइमस्टैम्प्ड कमेंट्स",

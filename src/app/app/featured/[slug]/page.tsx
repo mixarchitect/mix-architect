@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!release) return {};
 
   return {
-    title: release.meta_title || `${release.title} by ${release.artist_name} — Featured`,
+    title: release.meta_title || `${release.title} by ${release.artist_name} | Featured`,
   };
 }
 

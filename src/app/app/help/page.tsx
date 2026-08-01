@@ -1,7 +1,7 @@
 import { HelpPortal } from "@/components/ui/help-portal";
 
 export const metadata = {
-  title: "Help Center — Mix Architect",
+  title: "Help Center | Mix Architect",
   description:
     "Documentation, bug reports, feature requests, and contact for Mix Architect.",
 };

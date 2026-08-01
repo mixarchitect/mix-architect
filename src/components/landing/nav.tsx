@@ -61,6 +61,12 @@ export function LandingNav() {
           >
             {t("navFeatured")}
           </a>
+          <a
+            href="/#about"
+            className="px-2.5 py-2 rounded-full text-[13px] text-white/60 hover:text-white hover:bg-white/8 transition-colors whitespace-nowrap"
+          >
+            {t("navAbout")}
+          </a>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-1.5 ml-auto lg:ml-0 shrink-0">
@@ -111,6 +117,13 @@ export function LandingNav() {
             className="block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
           >
             {t("navFeatured")}
+          </a>
+          <a
+            href="/#about"
+            onClick={() => setMenuOpen(false)}
+            className="block px-4 py-3 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/8 transition-colors"
+          >
+            {t("navAbout")}
           </a>
           <Link
             href="/auth/sign-in"

@@ -60,7 +60,7 @@ function SpotlightCard({
 
         <div className="flex flex-col gap-3 min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold tracking-widest uppercase text-teal-500">
+            <span className="text-sm font-semibold tracking-wide text-teal-500">
               Featured Release
             </span>
             {release.source === "platform" && (

@@ -108,10 +108,10 @@ export function ApprovalControls({
         onPromoTrigger?.("approval");
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Failed to approve — please try again");
+        setError(data.error || "Failed to approve. Please try again");
       }
     } catch {
-      setError("Network error — please check your connection");
+      setError("Network error. Please check your connection");
     } finally {
       setSubmitting(false);
     }
@@ -141,10 +141,10 @@ export function ApprovalControls({
         setShowRequestForm(false);
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Failed to submit changes — please try again");
+        setError(data.error || "Failed to submit changes. Please try again");
       }
     } catch {
-      setError("Network error — please check your connection");
+      setError("Network error. Please check your connection");
     } finally {
       setSubmitting(false);
     }
@@ -169,10 +169,10 @@ export function ApprovalControls({
         onStatusChange?.("awaiting_review");
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Failed to undo — please try again");
+        setError(data.error || "Failed to undo. Please try again");
       }
     } catch {
-      setError("Network error — please check your connection");
+      setError("Network error. Please check your connection");
     } finally {
       setSubmitting(false);
     }

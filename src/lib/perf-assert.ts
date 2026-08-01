@@ -81,7 +81,7 @@ export function printBudgetReport(results: PerfAssertionResult[]): void {
   if (worst) {
     // eslint-disable-next-line no-console
     console.log(
-      `Worst offender: ${worst.metric} — ${worst.actual}ms vs ${worst.budget}ms budget (+${worst.overage}%)`,
+      `Worst offender: ${worst.metric} · ${worst.actual}ms vs ${worst.budget}ms budget (+${worst.overage}%)`,
     );
   }
 }

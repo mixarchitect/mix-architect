@@ -44,7 +44,7 @@ export async function AboutFounder({ photoExists = false }: { photoExists?: bool
 
           {/* Copy */}
           <div className="min-w-0 text-center md:text-left">
-            <span className="text-xs uppercase tracking-[0.2em] text-teal-400/80">
+            <span className="text-sm font-medium tracking-wide text-teal-400/80">
               {t("aboutEyebrow")}
             </span>
             <h2 className="mt-3 text-3xl font-bold text-white tracking-tight">

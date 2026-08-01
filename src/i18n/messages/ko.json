@@ -152,11 +152,11 @@
       "create-submit": "버튼을 눌러 릴리스를 만드세요. 바로 살펴볼 수 있습니다.",
       "release-tabs": "이 탭들이 릴리스를 정리합니다: 트랙, 글로벌, 배포, 재무. 각 섹션은 프로젝트의 다른 측면을 관리합니다.",
       "release-sidebar": "커버 아트 업로드, 릴리스 정보 확인, 내부 또는 클라이언트 메모를 추가할 수 있습니다.",
-      "release-track-link": "트랙을 클릭하여 상세 정보를 확인하세요 — 믹스 의도, 스펙, 오디오 버전 등.",
+      "release-track-link": "트랙을 클릭하여 상세 정보를 확인하세요: 믹스 의도, 스펙, 오디오 버전 등.",
       "track-tabs": "각 탭은 다른 측면을 기록합니다: 의도(비전), 스펙(기술 요구사항), 오디오(업로드 및 버전) 등.",
-      "track-intent": "이 믹스의 비전을 설명하세요 — 분위기, 레퍼런스, 방향성. 브리프의 핵심입니다.",
+      "track-intent": "이 믹스의 비전을 설명하세요: 분위기, 레퍼런스, 방향성. 브리프의 핵심입니다.",
       "dashboard-card": "각 릴리스의 상태, 트랙 진행률, 주요 정보를 한눈에 볼 수 있습니다. 클릭하여 상세 확인.",
-      "dashboard-nav": "사이드바에서 모든 섹션에 빠르게 접근할 수 있습니다 — 릴리스, 아티스트, 템플릿, 결제, 분석."
+      "dashboard-nav": "사이드바에서 모든 섹션에 빠르게 접근할 수 있습니다: 릴리스, 아티스트, 템플릿, 결제, 분석."
     }
   },
   "dashboard": {
@@ -576,7 +576,7 @@
       "logoLabel": "로고",
       "logoHint": "밝은 배경에 표시되며, 다크 버전이 없으면 모든 곳에 표시됩니다.",
       "darkLogoLabel": "다크 모드 로고",
-      "darkLogoHint": "선택 사항 — 클라이언트가 포털을 다크 모드로 볼 때 표시됩니다.",
+      "darkLogoHint": "선택 사항. 클라이언트가 포털을 다크 모드로 볼 때 표시됩니다.",
       "formatsHint": "SVG, PNG, JPG 또는 WebP · 최대 5MB · SVG(또는 2~3× PNG 내보내기)는 레티나에서도 선명합니다.",
       "replace": "교체",
       "upload": "업로드",
@@ -701,7 +701,7 @@
       "description": "Connect your Stripe account to collect payments directly from clients.",
       "descriptionConnected": "Your Stripe account is connected and ready to collect payments.",
       "notConnected": "Not connected",
-      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record — funds go straight to your Stripe account.",
+      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record. funds go straight to your Stripe account.",
       "connect": "Connect Stripe Account",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
@@ -710,7 +710,7 @@
       "businessName": "Business",
       "connectedDate": "Connected",
       "status": "Status",
-      "statusActive": "Active — ready to accept payments",
+      "statusActive": "Active, ready to accept payments",
       "statusPending": "Setup incomplete",
       "statusPendingHelp": "Complete your Stripe account setup to start accepting payments.",
       "completeSetup": "Complete setup in Stripe",
@@ -895,6 +895,7 @@
     "save": "저장"
   },
   "landing": {
+    "navAbout": "소개",
     "aboutEyebrow": "소개",
     "aboutHeadline": "Mix Architect를 만든 이유",
     "aboutBody1": "90년대 후반, 남캘리포니아 로컬 밴드를 Boss BR-8으로 녹음하며 시작했습니다. 이후 Surf City Studios에 합류했고, Berklee College of Music을 졸업했으며, 업계에서 손꼽히는 엔지니어들에게 믹싱과 마스터링을 배웠고, 하드웨어 회사 Vermilion Audio를 세웠습니다. 변하지 않은 건 음악뿐입니다.",

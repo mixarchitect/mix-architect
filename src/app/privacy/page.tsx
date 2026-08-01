@@ -79,7 +79,7 @@ export default async function PrivacyPage() {
             <SubSection title="2.3 Payment Information">
               <p>
                 Payments are processed by <strong>Stripe, Inc.</strong> Stripe
-                collects and stores your full payment card details — we never
+                collects and stores your full payment card details. We never
                 see your card number, expiration date, or CVC. We do store and
                 retain identifiers we receive from Stripe, such as your Stripe
                 customer ID, subscription ID, and payment status, which we use
@@ -168,13 +168,13 @@ export default async function PrivacyPage() {
               </p>
               <List
                 items={[
-                  "Supabase — database, authentication, and file storage. Data is hosted in the United States.",
-                  "Vercel — hosting and content delivery for the web application.",
-                  "Stripe — payment processing for subscriptions and Stripe Connect engineer payouts.",
-                  "Resend — transactional email delivery.",
-                  "Google Analytics 4 — web traffic analytics.",
-                  "OpenPanel — product usage analytics.",
-                  "Anthropic — AI summarization of admin analytics dashboards (used internally; not applied to your User Content).",
+                  "Supabase: database, authentication, and file storage. Data is hosted in the United States.",
+                  "Vercel: hosting and content delivery for the web application.",
+                  "Stripe: payment processing for subscriptions and Stripe Connect engineer payouts.",
+                  "Resend: transactional email delivery.",
+                  "Google Analytics 4: web traffic analytics.",
+                  "OpenPanel: product usage analytics.",
+                  "Anthropic: AI summarization of admin analytics dashboards (used internally; not applied to your User Content).",
                 ]}
               />
               <p>
@@ -264,7 +264,7 @@ export default async function PrivacyPage() {
                   "The right to know what personal information we collect, use, share, or sell about you;",
                   "The right to delete personal information we have collected from you, subject to legal exceptions;",
                   "The right to correct inaccurate personal information;",
-                  "The right to opt out of the sale or sharing of personal information — we do not sell personal information, so this right is automatically respected;",
+                  "The right to opt out of the sale or sharing of personal information (we do not sell personal information, so this right is automatically respected);",
                   "The right to limit the use and disclosure of sensitive personal information;",
                   "The right not to be discriminated against for exercising any of these rights.",
                 ]}
@@ -352,10 +352,10 @@ export default async function PrivacyPage() {
             <p>Specific tools we use:</p>
             <List
               items={[
-                "Authentication cookie (set by Supabase) — strictly necessary; allows you to remain logged in.",
-                "Google Analytics 4 — measures aggregate page views, sessions, and conversion events. You can opt out using Google's browser opt-out plugin (https://tools.google.com/dlpage/gaoptout).",
-                "OpenPanel — measures product engagement and feature usage with first-party cookies (proxied through our domain). You can opt out by enabling Do Not Track in your browser; we honor that signal where applicable.",
-                "Stripe — sets cookies during the checkout flow to support fraud prevention. See Stripe's cookie policy at https://stripe.com/cookies-policy/legal.",
+                "Authentication cookie (set by Supabase): strictly necessary; allows you to remain logged in.",
+                "Google Analytics 4: measures aggregate page views, sessions, and conversion events. You can opt out using Google's browser opt-out plugin (https://tools.google.com/dlpage/gaoptout).",
+                "OpenPanel: measures product engagement and feature usage with first-party cookies (proxied through our domain). You can opt out by enabling Do Not Track in your browser; we honor that signal where applicable.",
+                "Stripe: sets cookies during the checkout flow to support fraud prevention. See Stripe's cookie policy at https://stripe.com/cookies-policy/legal.",
               ]}
             />
           </Section>

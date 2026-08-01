@@ -13,11 +13,11 @@ import { FeaturedArchiveLoadMore } from "./load-more";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Featured Releases — Mix Architect",
+  title: "Featured Releases | Mix Architect",
   description:
     "Spotlighting great releases and the people behind the sound. Curated writeups covering production, mixing, and mastering across indie and major releases.",
   openGraph: {
-    title: "Featured Releases — Mix Architect",
+    title: "Featured Releases | Mix Architect",
     description:
       "Spotlighting great releases and the people behind the sound.",
     url: "https://mixarchitect.com/featured",

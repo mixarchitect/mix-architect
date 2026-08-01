@@ -214,7 +214,7 @@ export function FlowTransport({
         {/* Currently playing track name */}
         {currentTrackTitle && (
           <span className="text-xs text-muted truncate max-w-48 hidden sm:inline">
-            — {currentTrackTitle}
+            · {currentTrackTitle}
           </span>
         )}
       </div>

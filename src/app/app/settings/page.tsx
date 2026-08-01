@@ -379,7 +379,7 @@ export default function SettingsPage() {
               >
                 {supportedCurrencies.map((c) => (
                   <option key={c.code} value={c.code}>
-                    {c.symbol} {c.code} — {c.label}
+                    {c.symbol} {c.code} · {c.label}
                   </option>
                 ))}
               </select>

@@ -178,7 +178,7 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
           onClick={() => cancel("immediate")}
           disabled={state === "loading"}
           className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
-          title="Remove comp — user immediately goes back to Free"
+          title="Remove comp: user immediately goes back to Free"
         >
           <X size={12} />
           Remove Comp

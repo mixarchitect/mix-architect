@@ -289,11 +289,11 @@ function QuoteRow({
               {quote.quote_number}
             </span>
             {isScheduleItem && quote.schedule_label && (
-              <span className="text-xs text-muted">— {quote.schedule_label}</span>
+              <span className="text-xs text-muted">· {quote.schedule_label}</span>
             )}
             {quote.title && !isScheduleItem && (
               <span className="text-xs text-muted truncate hidden sm:inline">
-                — {quote.title}
+                · {quote.title}
               </span>
             )}
             <span
