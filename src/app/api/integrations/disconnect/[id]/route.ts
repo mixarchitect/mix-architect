@@ -3,10 +3,14 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { revokeProviderToken } from "@/lib/integrations/oauth";
 import type { IntegrationProvider } from "@/lib/integrations/types";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  const originErr = requireSameOrigin(request);
+  if (originErr) return originErr;
+
   const { id } = await params;
 
   const ip = getClientIp(request);

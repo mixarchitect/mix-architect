@@ -10,10 +10,14 @@ import {
 } from "@/lib/integrations/oauth";
 import type { IntegrationProvider } from "@/lib/integrations/types";
 import crypto from "crypto";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 type RouteParams = { params: Promise<{ provider: string }> };
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
+  const originErr = requireSameOrigin(request);
+  if (originErr) return originErr;
+
   const { provider } = await params;
 
   if (!isValidProvider(provider)) {

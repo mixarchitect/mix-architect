@@ -1,5 +1,5 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
-import { sendQuote } from "@/actions/quotes";
+import { sendQuoteCore } from "@/lib/quotes/send-quote-core";
 import {
   getWorkspaceSenderFrom,
   getWorkspaceEmailBrand,
@@ -117,10 +117,9 @@ async function handleSendInvoice(context: TriggerContext): Promise<ActionResult>
     return { skipped: true, reason: "No unsent draft quote found" };
   }
 
-  // Use service context since workflow engine runs outside auth (e.g. webhooks)
-  const result = await sendQuote(quote.id, {
-    serviceContext: { userId: context.userId },
-  });
+  // The workflow engine runs outside auth (webhooks/cron), so call the
+  // non-action core with the service client + the job row's user_id.
+  const result = await sendQuoteCore(supabase, context.userId, quote.id);
   if (result.error) {
     throw new Error(result.error);
   }

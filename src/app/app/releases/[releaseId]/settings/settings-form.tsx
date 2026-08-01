@@ -376,8 +376,7 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
               email: sentEmail,
               role: sentRole,
               releaseTitle: title,
-              inviterEmail: user?.email ?? "A team member",
-              releaseId,
+                  releaseId,
             }),
           });
         } catch {
@@ -402,7 +401,6 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
           email: member.invited_email,
           role: member.role,
           releaseTitle: title,
-          inviterEmail: user?.email ?? "A team member",
           releaseId,
         }),
       });

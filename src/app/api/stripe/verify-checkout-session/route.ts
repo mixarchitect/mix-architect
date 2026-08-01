@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { stripe } from "@/lib/stripe-server";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 /**
  * POST /api/stripe/verify-checkout-session
@@ -21,6 +22,9 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
  *   { verified: false, reason: string }
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
   const { success } = rateLimit(`verify-checkout:${ip}`, 30, 60_000);
   if (!success) {

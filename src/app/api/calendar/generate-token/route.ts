@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { generateFeedToken } from "@/lib/calendar";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 export async function POST(request: NextRequest) {
+  const originErr = requireSameOrigin(request);
+  if (originErr) return originErr;
+
   const ip = getClientIp(request);
   const { success } = rateLimit(`calendar-token:${ip}`, 5, 60_000);
   if (!success) {

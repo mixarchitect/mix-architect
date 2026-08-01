@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { isConvertible } from "@/lib/conversion-formats";
 import { logActivity } from "@/lib/activity-logger";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 /**
  * POST /api/convert
@@ -16,6 +17,9 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
  *   - New:        { jobId, status: "pending" }
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
   const { success } = rateLimit(`convert:${ip}`, 10, 60_000);
   if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });

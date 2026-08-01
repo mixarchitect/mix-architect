@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { notifyReleaseMembers } from "@/lib/notifications/service";
@@ -183,7 +184,14 @@ export async function DELETE(req: NextRequest) {
       .eq("id", comment_id)
       .maybeSingle();
 
-    if (!comment || !comment.delete_token || comment.delete_token !== delete_token) {
+    // Constant-time token compare (hash first so lengths always match).
+    const tokenMatches =
+      !!comment?.delete_token &&
+      crypto.timingSafeEqual(
+        crypto.createHash("sha256").update(String(delete_token)).digest(),
+        crypto.createHash("sha256").update(comment.delete_token).digest(),
+      );
+    if (!comment || !tokenMatches) {
       return NextResponse.json(
         { error: "Cannot delete this comment" },
         { status: 403 },
