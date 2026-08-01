@@ -160,11 +160,23 @@
     }
   },
   "dashboard": {
+    "checklist": {
+      "title": "시작 설정",
+      "subtitle": "첫 믹스를 공유하기까지 네 단계면 됩니다.",
+      "stepRelease": "릴리스 만들기",
+      "stepTrack": "곡 추가하기",
+      "stepAudio": "오디오 업로드",
+      "stepShare": "공유하고 피드백 받기",
+      "progress": "{total}개 중 {done}개",
+      "continue": "계속",
+      "takeTour": "둘러보기",
+      "dismiss": "닫기"
+    },
     "title": "릴리스",
     "newRelease": "새 릴리스",
     "upgrade": "업그레이드",
     "noReleases": "릴리스가 없습니다",
-    "noReleasesDesc": "첫 번째 릴리스를 만들어 트랙 브리프를 작성하고, 스펙을 관리하고, 믹스 워크플로우를 정리해보세요.",
+    "noReleasesDesc": "릴리스를 만들고 곡을 추가한 다음 공유해 피드백을 받아 보세요.",
     "createFirst": "첫 번째 릴리스 만들기",
     "noFilteredReleases": "{filter} 릴리스가 없습니다",
     "noFilteredReleasesDesc": "검색어나 필터를 조정해보세요.",
@@ -199,8 +211,8 @@
       "setupNote": "프로젝트를 설정하세요. 이 세부 사항은 언제든지 편집할 수 있습니다.",
       "releaseTitle": "릴리스 제목 *",
       "releaseTitlePlaceholder": "Midnight Drive EP",
-      "artistClient": "아티스트 / 클라이언트",
-      "artistPlaceholder": "아티스트 또는 클라이언트 이름",
+      "artistClient": "아티스트 이름",
+      "artistPlaceholder": "아티스트 또는 밴드 이름",
       "releaseType": "릴리스 타입",
       "format": "포맷",
       "genreTags": "장르 태그",
@@ -769,6 +781,7 @@
     }
   },
   "help": {
+    "takeTour": "둘러보기",
     "title": "도움말 센터",
     "description": "문서, 버그 신고, 기능 요청, 연락처.",
     "articles": "도움말 문서",

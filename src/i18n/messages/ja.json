@@ -160,11 +160,23 @@
     }
   },
   "dashboard": {
+    "checklist": {
+      "title": "セットアップ",
+      "subtitle": "最初のミックスを共有するまで、4ステップです。",
+      "stepRelease": "リリースを作成",
+      "stepTrack": "曲を追加",
+      "stepAudio": "オーディオをアップロード",
+      "stepShare": "共有してフィードバックをもらう",
+      "progress": "{total}件中{done}件",
+      "continue": "続ける",
+      "takeTour": "ツアーを見る",
+      "dismiss": "閉じる"
+    },
     "title": "リリース",
     "newRelease": "新規リリース",
     "upgrade": "アップグレード",
     "noReleases": "リリースがありません",
-    "noReleasesDesc": "最初のリリースを作成して、トラック概要の作成、仕様の管理、ミックスワークフローの整理を開始しましょう。",
+    "noReleasesDesc": "リリースを作成し、曲を追加して、共有してフィードバックをもらいましょう。",
     "createFirst": "最初のリリースを作成",
     "noFilteredReleases": "{filter}のリリースがありません",
     "noFilteredReleasesDesc": "検索やフィルターを調整してください。",
@@ -199,8 +211,8 @@
       "setupNote": "プロジェクトを設定してください。詳細はいつでも編集できます。",
       "releaseTitle": "リリースタイトル *",
       "releaseTitlePlaceholder": "Midnight Drive EP",
-      "artistClient": "アーティスト／クライアント",
-      "artistPlaceholder": "アーティストまたはクライアント名",
+      "artistClient": "アーティスト名",
+      "artistPlaceholder": "アーティスト名またはバンド名",
       "releaseType": "リリースタイプ",
       "format": "フォーマット",
       "genreTags": "ジャンルタグ",
@@ -769,6 +781,7 @@
     }
   },
   "help": {
+    "takeTour": "ツアーを見る",
     "title": "ヘルプセンター",
     "description": "ドキュメント、バグ報告、機能リクエスト、お問い合わせ。",
     "articles": "ヘルプ記事",

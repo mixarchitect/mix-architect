@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ReleaseCard } from "@/components/ui/release-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
+import { GettingStartedChecklist } from "@/components/onboarding/getting-started-checklist";
 import { ArtistInfoBar } from "@/components/dashboard/artist-sidebar";
 import { Plus, Sparkles, Music, Search } from "lucide-react";
 import { formatMoney } from "@/lib/format-money";
@@ -53,6 +54,8 @@ export default async function DashboardPage({ searchParams }: Props) {
 
   const user = userRes.data.user;
   let paymentsEnabled = false;
+  let checklistDismissed = false;
+  let persona: string | null = null;
 
   // Fetch user defaults + shared release memberships in parallel
   type MemberRow = { release_id: string; role: string };
@@ -64,7 +67,7 @@ export default async function DashboardPage({ searchParams }: Props) {
     const [defaultsRes, membersRes, subRes] = await Promise.all([
       supabase
         .from("user_defaults")
-        .select("payments_enabled")
+        .select("payments_enabled, checklist_dismissed, persona")
         .eq("user_id", user.id)
         .maybeSingle(),
       supabase
@@ -79,6 +82,8 @@ export default async function DashboardPage({ searchParams }: Props) {
         .maybeSingle(),
     ]);
     paymentsEnabled = defaultsRes.data?.payments_enabled ?? false;
+    checklistDismissed = defaultsRes.data?.checklist_dismissed ?? false;
+    persona = (defaultsRes.data?.persona as string) ?? null;
     sharedMemberships = (membersRes.data ?? []) as MemberRow[];
     subPlan = (subRes.data?.plan as string) ?? "free";
     subStatus = (subRes.data?.status as string) ?? "active";
@@ -96,6 +101,48 @@ export default async function DashboardPage({ searchParams }: Props) {
   const isPro = hasProAccess(subPlan, subStatus);
   const ownedReleaseCount = releases?.length ?? 0;
   const atFreeLimit = !isPro && ownedReleaseCount >= 1;
+
+  /* ── Getting-started checklist ──────────────────────────────────────
+     Steps derive from real data so the card self-completes. The audio +
+     share lookups only run while the checklist is still visible. */
+  const ownedReleaseIds = (releases ?? []).map((r) => r.id as string);
+  const hasRelease = ownedReleaseCount > 0;
+  const hasTrack = (releases ?? []).some(
+    (r) => ((r.tracks as { id: string }[] | null)?.length ?? 0) > 0,
+  );
+  // Artists don't get the client portal, so don't ask them to share one.
+  const showPortalStep = persona !== "artist";
+  let hasAudio = false;
+  let hasShared = false;
+
+  const checklistCandidate = !!user && !checklistDismissed;
+  if (checklistCandidate && ownedReleaseIds.length > 0) {
+    const [audioRes, sharesRes] = await Promise.all([
+      supabase
+        .from("track_audio_versions")
+        .select("id, tracks!inner(release_id)")
+        .in("tracks.release_id", ownedReleaseIds)
+        .limit(1),
+      showPortalStep
+        ? supabase
+            .from("brief_shares")
+            .select("id")
+            .in("release_id", ownedReleaseIds)
+            .limit(1)
+        : Promise.resolve({ data: [] }),
+    ]);
+    hasAudio = (audioRes.data?.length ?? 0) > 0;
+    hasShared = ((sharesRes.data as unknown[] | null)?.length ?? 0) > 0;
+  }
+
+  const checklistSteps = showPortalStep ? 4 : 3;
+  const checklistDone =
+    [hasRelease, hasTrack, hasAudio, ...(showPortalStep ? [hasShared] : [])].filter(Boolean)
+      .length;
+  const showChecklist = checklistCandidate && checklistDone < checklistSteps;
+  const mostRecentReleaseHref = ownedReleaseIds.length
+    ? `/app/releases/${ownedReleaseIds[0]}`
+    : null;
 
   // Fetch time entries + expenses per release for balance calculation
   const allReleaseIds = (allReleases ?? []).map((r) => r.id as string);
@@ -333,6 +380,20 @@ export default async function DashboardPage({ searchParams }: Props) {
       </div>
 
       <div>
+
+      {showChecklist && user && (
+        <GettingStartedChecklist
+          userId={user.id}
+          showPortalStep={showPortalStep}
+          progress={{
+            hasRelease,
+            hasTrack,
+            hasAudio,
+            hasShared,
+            releaseHref: mostRecentReleaseHref,
+          }}
+        />
+      )}
 
       {artistFilter && (
         <>

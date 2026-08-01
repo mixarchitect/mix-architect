@@ -160,11 +160,23 @@
     }
   },
   "dashboard": {
+    "checklist": {
+      "title": "Einrichten",
+      "subtitle": "Vier schnelle Schritte bis zum ersten geteilten Mix.",
+      "stepRelease": "Release anlegen",
+      "stepTrack": "Song hinzufügen",
+      "stepAudio": "Audio hochladen",
+      "stepShare": "Zum Feedback teilen",
+      "progress": "{done} von {total}",
+      "continue": "Weiter",
+      "takeTour": "Tour starten",
+      "dismiss": "Ausblenden"
+    },
     "title": "Releases",
     "newRelease": "Neues Release",
     "upgrade": "Upgraden",
     "noReleases": "Noch keine Releases",
-    "noReleasesDesc": "Erstelle dein erstes Release, um Track-Briefings zu erstellen, Spezifikationen zu verwalten und deinen Mix-Workflow zu organisieren.",
+    "noReleasesDesc": "Lege ein Release an, füge deine Songs hinzu und teile sie für Feedback.",
     "createFirst": "Dein erstes Release erstellen",
     "noFilteredReleases": "Keine {filter} Releases",
     "noFilteredReleasesDesc": "Versuche, deine Suche oder Filter anzupassen.",
@@ -199,8 +211,8 @@
       "setupNote": "Richte dein Projekt ein. Du kannst diese Details später immer bearbeiten.",
       "releaseTitle": "Release-Titel *",
       "releaseTitlePlaceholder": "Midnight Drive EP",
-      "artistClient": "Künstler / Kunde",
-      "artistPlaceholder": "Künstler- oder Kundenname",
+      "artistClient": "Künstlername",
+      "artistPlaceholder": "Dein Künstler- oder Bandname",
       "releaseType": "Release-Typ",
       "format": "Format",
       "genreTags": "Genre-Tags",
@@ -769,6 +781,7 @@
     }
   },
   "help": {
+    "takeTour": "Tour starten",
     "title": "Hilfe-Center",
     "description": "Dokumentation, Fehlerberichte, Feature-Wünsche und Kontakt.",
     "articles": "Hilfe-Artikel",
