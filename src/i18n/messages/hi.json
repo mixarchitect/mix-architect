@@ -345,7 +345,11 @@
     "portalPaymentStatus": "पेमेंट स्टेटस",
     "portalDistribution": "डिस्ट्रिब्यूशन",
     "portalLyrics": "लिरिक्स",
-    "portalRequirePayment": "पेमेंट आवश्यक"
+    "portalRequirePayment": "पेमेंट आवश्यक",
+    "dropOrClick": "यहां इमेज ड्रैग करें, या चुनने के लिए क्लिक करें",
+    "dropToUpload": "अपलोड करने के लिए छोड़ें",
+    "imageFormats": "PNG, JPG, WebP या GIF, 5MB तक",
+    "removeCoverArt": "हटाएं"
   },
   "releaseSettings": {
     "title": "रिलीज़ सेटिंग्स",

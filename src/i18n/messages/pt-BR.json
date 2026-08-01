@@ -345,7 +345,11 @@
     "noFinancialDataTitle": "Nenhum dado financeiro ainda",
     "noFinancialDataDesc": "Crie um orçamento ou registre tempo para começar a acompanhar as finanças deste lançamento.",
     "newQuote": "Novo orçamento",
-    "logTime": "Registrar tempo"
+    "logTime": "Registrar tempo",
+    "dropOrClick": "Arraste uma imagem aqui ou clique para procurar",
+    "dropToUpload": "Solte para enviar",
+    "imageFormats": "PNG, JPG, WebP ou GIF, até 5 MB",
+    "removeCoverArt": "Remover"
   },
   "releaseSettings": {
     "title": "Configurações do Lançamento",

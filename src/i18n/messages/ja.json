@@ -345,7 +345,11 @@
     "portalPaymentStatus": "支払い状況",
     "portalDistribution": "配信",
     "portalLyrics": "歌詞",
-    "portalRequirePayment": "支払いを要求"
+    "portalRequirePayment": "支払いを要求",
+    "dropOrClick": "画像をここにドラッグ、またはクリックして選択",
+    "dropToUpload": "ドロップしてアップロード",
+    "imageFormats": "PNG、JPG、WebP、GIF（5MBまで）",
+    "removeCoverArt": "削除"
   },
   "releaseSettings": {
     "title": "リリース設定",

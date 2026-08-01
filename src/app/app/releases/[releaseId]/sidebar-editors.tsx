@@ -475,7 +475,11 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
   const [url, setUrl] = useState(initialUrl ?? "");
   const [urlInput, setUrlInput] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const [error, setError] = useState("");
+  // dragenter/dragleave fire for every child element, so count depth rather
+  // than clearing the highlight on the first leave.
+  const dragDepth = useRef(0);
   const router = useRouter();
 
   async function handleUpload(file: File) {
@@ -552,55 +556,80 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
   if (editing) {
     return (
       <div className="rounded-lg border border-border overflow-hidden">
-        {/* Preview */}
-        <div
-          className="w-full aspect-square flex items-center justify-center"
-          style={{ background: "var(--panel2)" }}
+        {/* Drop zone doubles as the preview. Clicking it opens the file picker,
+            so the whole square is a target rather than just the small button. */}
+        <label
+          onDragEnter={(e) => {
+            e.preventDefault();
+            dragDepth.current += 1;
+            setDragging(true);
+          }}
+          onDragOver={(e) => e.preventDefault()}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            dragDepth.current -= 1;
+            if (dragDepth.current <= 0) setDragging(false);
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            dragDepth.current = 0;
+            setDragging(false);
+            const f = e.dataTransfer.files?.[0];
+            if (f) handleUpload(f);
+          }}
+          className="relative w-full aspect-square flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
+          style={{
+            background: dragging
+              ? "color-mix(in srgb, var(--signal) 15%, var(--panel-2))"
+              : "var(--panel-2)",
+            outline: dragging ? "2px dashed var(--signal)" : "2px dashed transparent",
+            outlineOffset: "-8px",
+          }}
         >
-          {url ? (
-            <img src={url} alt="Cover art" className="w-full h-full object-cover" />
+          {url && !dragging ? (
+            <>
+              <img src={url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/55 opacity-0 hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 px-4 text-center">
+                <Upload size={22} className="text-white" />
+                <span className="text-xs text-white">{t("dropOrClick")}</span>
+              </div>
+            </>
           ) : (
-            <ImageIcon size={48} className="text-muted opacity-30" />
+            <div className="flex flex-col items-center gap-2 px-4 text-center pointer-events-none">
+              {dragging ? (
+                <Upload size={40} className="text-signal" />
+              ) : (
+                <ImageIcon size={40} className="text-muted opacity-30" />
+              )}
+              <span className="text-xs text-text">
+                {dragging ? t("dropToUpload") : t("dropOrClick")}
+              </span>
+              {!dragging && (
+                <span className="text-[11px] text-faint">{t("imageFormats")}</span>
+              )}
+            </div>
           )}
-        </div>
+
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleUpload(f);
+              e.target.value = "";
+            }}
+            disabled={uploading}
+          />
+        </label>
 
         {/* Controls */}
-        <div className="p-3 space-y-2" style={{ background: "var(--panel)" }}>
-          {error && (
-            <p className="text-xs text-red-500">{error}</p>
-          )}
+        <div className="p-3 space-y-3" style={{ background: "var(--panel)" }}>
+          {error && <p className="text-xs text-red-500">{error}</p>}
+          {uploading && <p className="text-xs text-muted">{tc("uploading")}</p>}
 
-          <div className="flex items-center gap-2">
-            <label
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors"
-              style={{ background: "var(--panel2)", color: "var(--text-muted)" }}
-            >
-              <Upload size={14} />
-              {uploading ? tc("uploading") : "Upload"}
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) handleUpload(f);
-                }}
-                disabled={uploading}
-              />
-            </label>
-            {url && (
-              <button
-                type="button"
-                onClick={handleRemove}
-                className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors"
-              >
-                <X size={12} /> Remove
-              </button>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <span className="text-[10px] text-muted uppercase tracking-wider">{t("pasteUrl")}</span>
+          <div className="space-y-1.5">
+            <span className="text-[11px] text-muted">{t("pasteUrl")}</span>
             <div className="flex gap-1.5">
               <input
                 type="url"
@@ -613,6 +642,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
                 type="button"
                 onClick={handleUrlSave}
                 disabled={!urlInput.trim()}
+                aria-label={tc("save")}
                 className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md transition-colors disabled:opacity-40"
                 style={{ background: "var(--signal)", color: "var(--signal-on)" }}
               >
@@ -621,17 +651,28 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setUrlInput("");
-              setError("");
-              setEditing(false);
-            }}
-            className="inline-flex items-center gap-1 text-xs text-muted hover:text-text transition-colors"
-          >
-            <X size={12} /> {tc("cancel")}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setUrlInput("");
+                setError("");
+                setEditing(false);
+              }}
+              className="inline-flex items-center gap-1 text-xs text-muted hover:text-text transition-colors"
+            >
+              <X size={12} /> {tc("cancel")}
+            </button>
+            {url && (
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-400 transition-colors"
+              >
+                <X size={12} /> {t("removeCoverArt")}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -658,7 +699,7 @@ export function CoverArtEditor({ releaseId, initialUrl, role }: CoverArtEditorPr
       ) : (
         <div
           className="w-full aspect-square flex flex-col items-center justify-center gap-2"
-          style={{ background: "var(--panel2)" }}
+          style={{ background: "var(--panel-2)" }}
         >
           <ImageIcon size={40} className="text-muted opacity-30" />
           <span className="text-xs text-muted">{t("addCoverArt")}</span>

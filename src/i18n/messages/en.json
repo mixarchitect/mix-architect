@@ -345,7 +345,11 @@
     "noFinancialDataTitle": "No financial data yet",
     "noFinancialDataDesc": "Create a quote or log time to start tracking finances for this release.",
     "newQuote": "New Quote",
-    "logTime": "Log Time"
+    "logTime": "Log Time",
+    "dropOrClick": "Drag an image here, or click to browse",
+    "dropToUpload": "Drop to upload",
+    "imageFormats": "PNG, JPG, WebP or GIF, up to 5MB",
+    "removeCoverArt": "Remove"
   },
   "releaseSettings": {
     "title": "Release Settings",

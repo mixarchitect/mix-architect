@@ -345,7 +345,11 @@
     "noFinancialDataTitle": "Noch keine Finanzdaten",
     "noFinancialDataDesc": "Erstellen Sie ein Angebot oder erfassen Sie Zeit, um die Finanzen für diese Veröffentlichung zu verfolgen.",
     "newQuote": "Neues Angebot",
-    "logTime": "Zeit erfassen"
+    "logTime": "Zeit erfassen",
+    "dropOrClick": "Bild hierher ziehen oder klicken zum Auswählen",
+    "dropToUpload": "Zum Hochladen loslassen",
+    "imageFormats": "PNG, JPG, WebP oder GIF, bis 5 MB",
+    "removeCoverArt": "Entfernen"
   },
   "releaseSettings": {
     "title": "Release-Einstellungen",
