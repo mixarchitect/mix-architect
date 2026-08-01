@@ -9,6 +9,7 @@ import {
   buildUnsubscribeUrl,
 } from "@/lib/email/service";
 import { buildQuoteReceivedEmail } from "@/lib/email-templates/quote-emails";
+import { sendQuoteCore } from "@/lib/quotes/send-quote-core";
 import {
   getWorkspaceSenderFrom,
   getWorkspaceEmailBrand,
@@ -433,119 +434,24 @@ export async function deleteQuote(
 }
 
 /**
- * Send a quote. Can be called from both authenticated (server action) and
- * service-client contexts (workflow engine).
- *
- * @param quoteId - The quote ID to send
- * @param options.serviceContext - If provided, uses service client instead of
- *   requiring auth. Must include userId for ownership verification.
+ * Send a quote (server action). Identity is always the signed-in session
+ * user — there is deliberately no identity/service override here: this is
+ * a network-reachable action, so any parameter is attacker-controlled.
+ * Server-side automation (workflow engine) calls sendQuoteCore directly
+ * with a trusted userId instead.
  */
-export async function sendQuote(
-  quoteId: string,
-  options?: { serviceContext?: { userId: string } },
-): Promise<{ error?: string }> {
-  let supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>;
-  let userId: string;
+export async function sendQuote(quoteId: string): Promise<{ error?: string }> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
 
-  if (options?.serviceContext) {
-    // Service-client context (workflow engine, webhooks)
-    supabase = createSupabaseServiceClient() as unknown as Awaited<ReturnType<typeof createSupabaseServerClient>>;
-    userId = options.serviceContext.userId;
-  } else {
-    // Authenticated context (server action)
-    supabase = await createSupabaseServerClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return { error: "Not authenticated" };
-    userId = user.id;
-  }
-
-  const { data: quote } = await supabase
-    .from("quotes")
-    .select("*")
-    .eq("id", quoteId)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (!quote) return { error: "Quote not found" };
-  if (quote.status !== "draft") return { error: "Only draft quotes can be sent" };
-  if (!quote.client_email) return { error: "Client email is required to send" };
-
-  // Update status
-  const { error } = await supabase
-    .from("quotes")
-    .update({ status: "sent", issued_at: new Date().toISOString() })
-    .eq("id", quoteId);
-
-  if (error) return { error: error.message };
-
-  // Send email to client
-  const displayName = await getUserDisplayName(userId);
-  const portalUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com"}/portal/quote/${quote.portal_token}`;
-
-  // Get release title if linked
-  let releaseTitle: string | undefined;
-  if (quote.release_id) {
-    const { data: release } = await supabase
-      .from("releases")
-      .select("title")
-      .eq("id", quote.release_id)
-      .maybeSingle();
-    releaseTitle = release?.title;
-  }
-
-  // Get unsubscribe token for the engineer
-  const serviceClient = createSupabaseServiceClient();
-  const { data: prefs } = await serviceClient
-    .from("email_preferences")
-    .select("unsubscribe_token")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  const unsubscribeUrl = prefs?.unsubscribe_token
-    ? buildUnsubscribeUrl(prefs.unsubscribe_token, "payment_received")
-    : undefined;
-
-  const brand = await getWorkspaceEmailBrand(quote.workspace_id);
-  const email = buildQuoteReceivedEmail(
-    {
-      engineerName: displayName,
-      quoteNumber: quote.quote_number,
-      total: quote.total,
-      currency: quote.currency,
-      releaseTitle,
-      portalUrl,
-      unsubscribeUrl,
-      documentType: quote.document_type ?? "quote",
-    },
-    brand,
+  return sendQuoteCore(
+    supabase as unknown as ReturnType<typeof createSupabaseServiceClient>,
+    user.id,
+    quoteId,
   );
-
-  // Send directly via Resend (client email, not engineer's preference system)
-  const resendKey = process.env.RESEND_API_KEY;
-  if (resendKey) {
-    const { Resend } = require("resend") as typeof import("resend");
-    const resend = new Resend(resendKey);
-    try {
-      await resend.emails.send({
-        from: await getWorkspaceSenderFrom(quote.workspace_id),
-        replyTo: await getWorkspaceReplyTo(quote.workspace_id),
-        to: quote.client_email,
-        subject: email.subject,
-        html: email.html,
-      });
-    } catch (err) {
-      console.error("[quotes] failed to send quote email:", err);
-    }
-  }
-
-  revalidatePath("/app/quotes");
-  if (quote.release_id) {
-    revalidatePath(`/app/releases/${quote.release_id}`);
-  }
-
-  return {};
 }
 
 export async function duplicateQuote(

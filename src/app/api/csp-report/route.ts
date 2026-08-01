@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 /**
  * POST /api/csp-report
@@ -18,6 +19,10 @@ import { NextRequest, NextResponse } from "next/server";
  * to prevent a hostile page from spamming the endpoint.
  */
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const { success } = rateLimit(`csp-report:${ip}`, 20, 60_000);
+  if (!success) return NextResponse.json({ ok: true });
+
   try {
     const payload = await req.json().catch(() => null);
     if (!payload) {

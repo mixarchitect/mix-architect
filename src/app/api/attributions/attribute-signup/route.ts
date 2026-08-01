@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 /**
  * POST /api/attributions/attribute-signup
@@ -16,6 +17,9 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
  * user's profile.
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
   const { success } = rateLimit(`attribution-signup:${ip}`, 10, 60_000);
   if (!success) {

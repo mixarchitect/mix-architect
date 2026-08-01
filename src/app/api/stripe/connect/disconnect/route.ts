@@ -3,8 +3,12 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { stripe } from "@/lib/stripe-server";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 export async function POST(request: NextRequest) {
+  const originErr = requireSameOrigin(request);
+  if (originErr) return originErr;
+
   const ip = getClientIp(request);
   const { success } = rateLimit(`stripe-disconnect:${ip}`, 10, 60_000);
   if (!success) {

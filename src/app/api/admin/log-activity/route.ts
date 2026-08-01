@@ -92,7 +92,30 @@ export async function POST(req: NextRequest) {
     // Signup side effects: welcome email to the user + admin alert.
     // Awaited (not fire-and-forget) so Vercel doesn't terminate the sends
     // when the handler returns.
+    //
+    // Replay guards — this endpoint is reachable by any signed-in user, so
+    // "signup" must not be re-fireable: (a) only within 1h of account
+    // creation, (b) only if no welcome email was ever logged for this user.
+    // Without these, a user could re-post {eventType:"signup"} in a loop and
+    // spam every admin + re-send themselves welcome mail.
     if (eventType === "signup" && user.email) {
+      const accountAgeMs = Date.now() - new Date(user.created_at).getTime();
+      if (accountAgeMs > 60 * 60 * 1000) {
+        return NextResponse.json({ ok: true });
+      }
+
+      const dedupeSvc = createSupabaseServiceClient();
+      const { data: priorWelcome } = await dedupeSvc
+        .from("email_log")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("category", "welcome")
+        .limit(1)
+        .maybeSingle();
+      if (priorWelcome) {
+        return NextResponse.json({ ok: true });
+      }
+
       const displayName =
         user.user_metadata?.display_name ?? user.email.split("@")[0];
 

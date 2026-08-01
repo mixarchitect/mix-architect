@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 /** Shape of a single metric sent from the client. */
 interface PerfMetricPayload {
@@ -32,6 +33,9 @@ const MAX_BATCH = 50;
  * Authenticated — user must be logged in.
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
   const { success } = rateLimit(`perf-ingest:${ip}`, 10, 60_000);
   if (!success) {

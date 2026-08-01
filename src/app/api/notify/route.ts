@@ -5,6 +5,7 @@ import { notifyReleaseMembers, type NotificationType } from "@/lib/notifications
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { emailReleaseMembers } from "@/lib/email/release-email";
 import { buildNewCommentEmail } from "@/lib/email-templates/transactional";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 /**
  * POST /api/notify
@@ -12,6 +13,9 @@ import { buildNewCommentEmail } from "@/lib/email-templates/transactional";
  * Authenticates the caller and notifies all release members except the caller.
  */
 export async function POST(req: NextRequest) {
+  const originErr = requireSameOrigin(req);
+  if (originErr) return originErr;
+
   const ip = getClientIp(req);
   const { success } = rateLimit(`notify:${ip}`, 30, 60_000);
   if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });

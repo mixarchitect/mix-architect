@@ -23,7 +23,9 @@ const MAX_ERRORS = 5; // circuit breaker
  */
 export async function GET(request: NextRequest) {
   const secret = request.headers.get("authorization");
-  if (!secret) {
+  // Fail closed if CRON_SECRET is unset — otherwise the expected digest is
+  // of the literal "Bearer undefined", which an attacker can simply send.
+  if (!secret || !process.env.CRON_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const actual = crypto.createHash('sha256').update(secret).digest();

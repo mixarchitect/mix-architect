@@ -4,8 +4,12 @@ import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { encodeOAuthState } from "@/lib/integrations/oauth";
 import type { OAuthState } from "@/lib/integrations/types";
 import crypto from "crypto";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 export async function POST(request: NextRequest) {
+  const originErr = requireSameOrigin(request);
+  if (originErr) return originErr;
+
   const ip = getClientIp(request);
   const { success } = rateLimit(`stripe-connect:${ip}`, 5, 60_000);
   if (!success) {

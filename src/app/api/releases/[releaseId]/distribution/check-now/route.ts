@@ -11,10 +11,14 @@ import {
 } from "@/lib/distribution/apple-music-detection";
 import { notifyReleaseMembers } from "@/lib/notifications/service";
 import { getPlatformLabel } from "@/lib/distribution/platforms";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 type RouteContext = { params: Promise<{ releaseId: string }> };
 
 export async function POST(request: NextRequest, { params }: RouteContext) {
+  const originErr = requireSameOrigin(request);
+  if (originErr) return originErr;
+
   const ip = getClientIp(request);
   const { success } = rateLimit(`dist-check:${ip}`, 3, 60_000);
   if (!success) {

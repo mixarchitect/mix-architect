@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { PLATFORMS } from "@/lib/distribution/platforms";
+import { requireSameOrigin } from "@/lib/origin-check";
 
 type RouteContext = { params: Promise<{ releaseId: string }> };
 
@@ -41,6 +42,9 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
 }
 
 export async function POST(request: NextRequest, { params }: RouteContext) {
+  const originErr = requireSameOrigin(request);
+  if (originErr) return originErr;
+
   const ip = getClientIp(request);
   const { success } = rateLimit(`dist-add:${ip}`, 20, 60_000);
   if (!success) {

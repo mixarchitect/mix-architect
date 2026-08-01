@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { requireSameOrigin } from "@/lib/origin-check";
 import {
   getWorkspaceSenderFrom,
   getWorkspaceEmailBrand,
@@ -48,6 +49,9 @@ function buildInviteHtml(
 }
 
 export async function POST(request: NextRequest) {
+  const originErr = requireSameOrigin(request);
+  if (originErr) return originErr;
+
   const ip = getClientIp(request);
   const { success } = rateLimit(`invite:${ip}`, 10, 60_000);
   if (!success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
@@ -59,15 +63,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { email, role, releaseTitle, inviterEmail, releaseId } = body as {
+  const { email, role, releaseTitle, releaseId } = body as {
     email?: string;
     role?: string;
     releaseTitle?: string;
-    inviterEmail?: string;
     releaseId?: string;
   };
 
-  if (!email || !role || !releaseTitle || !inviterEmail || !releaseId) {
+  if (!email || !role || !releaseTitle || !releaseId) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -90,7 +93,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Send email
+  // Send email. Inviter identity comes from the session — a body-supplied
+  // inviterEmail would let any authenticated user impersonate someone else
+  // in the invite.
+  const inviterEmail = user.email ?? "A collaborator";
   const appUrl = new URL(request.url).origin;
   const brand = await getWorkspaceEmailBrand(release.workspace_id);
 
