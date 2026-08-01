@@ -45,7 +45,7 @@ function MockReleaseCard({ title, artist, type, status, tracks, completed, time 
   return (
     <div className="card px-5 py-4">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-md shrink-0 flex items-center justify-center" style={{ background: "var(--panel2)" }}>
+        <div className="w-10 h-10 rounded-md shrink-0 flex items-center justify-center" style={{ background: "var(--panel-2)" }}>
           <Music size={18} className="text-muted opacity-30" />
         </div>
         <div className="min-w-0 flex-1">
@@ -2616,15 +2616,15 @@ function SettingsProfileMockup() {
       <PanelBody className="pt-4 space-y-3">
         <div className="space-y-1">
           <span className="text-[10px] text-muted">Display Name</span>
-          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Jordan Rivera</div>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel-2)" }}>Jordan Rivera</div>
         </div>
         <div className="space-y-1">
           <span className="text-[10px] text-muted">Company Name</span>
-          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Riverstone Audio</div>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel-2)" }}>Riverstone Audio</div>
         </div>
         <div className="space-y-1">
           <span className="text-[10px] text-muted">Email</span>
-          <div className="rounded-md px-3 py-1.5 text-xs text-muted opacity-60" style={{ background: "var(--panel2)" }}>jordan@riverstone.audio</div>
+          <div className="rounded-md px-3 py-1.5 text-xs text-muted opacity-60" style={{ background: "var(--panel-2)" }}>jordan@riverstone.audio</div>
         </div>
         <Button variant="primary" className="text-xs px-3 py-1.5">Save</Button>
       </PanelBody>
@@ -2666,19 +2666,19 @@ function SettingsRegionMockup() {
       <PanelBody className="pt-4 space-y-3">
         <div className="space-y-1">
           <span className="text-[10px] text-muted">Locale</span>
-          <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel2)" }}>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel-2)" }}>
             <span>🇺🇸 English</span>
             <ChevronDown size={12} className="text-muted" />
           </div>
         </div>
         <div className="space-y-1">
           <span className="text-[10px] text-muted">Currency</span>
-          <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel2)" }}>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel-2)" }}>
             <span>$ USD</span>
             <ChevronDown size={12} className="text-muted" />
           </div>
         </div>
-        <div className="rounded-lg px-3 py-2" style={{ background: "var(--panel2)" }}>
+        <div className="rounded-lg px-3 py-2" style={{ background: "var(--panel-2)" }}>
           <span className="text-[10px] text-muted">Preview: </span>
           <span className="text-xs font-medium text-text">$1,234.56</span>
         </div>
@@ -2708,7 +2708,7 @@ function SettingsAppearanceMockup() {
               style={
                 opt.active
                   ? { background: "var(--signal)", color: "var(--signal-on)" }
-                  : { background: "var(--panel2)", color: "var(--text-muted)" }
+                  : { background: "var(--panel-2)", color: "var(--muted)" }
               }
             >
               <opt.icon size={14} />
@@ -2788,7 +2788,7 @@ function SettingsMixDefaultsMockup() {
                 style={
                   i === 0
                     ? { background: "var(--signal)", color: "var(--signal-on)" }
-                    : { background: "var(--panel2)", color: "var(--text-muted)" }
+                    : { background: "var(--panel-2)", color: "var(--muted)" }
                 }
               >
                 {f}
@@ -2799,14 +2799,14 @@ function SettingsMixDefaultsMockup() {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <span className="text-[10px] text-muted">Sample Rate</span>
-            <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel2)" }}>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel-2)" }}>
               <span>48kHz</span>
               <ChevronDown size={12} className="text-muted" />
             </div>
           </div>
           <div className="space-y-1">
             <span className="text-[10px] text-muted">Bit Depth</span>
-            <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel2)" }}>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center justify-between" style={{ background: "var(--panel-2)" }}>
               <span>24-bit</span>
               <ChevronDown size={12} className="text-muted" />
             </div>
@@ -2836,15 +2836,15 @@ function SettingsCalendarMockup() {
         <div className="space-y-1">
           <span className="text-[10px] text-muted">Feed URL</span>
           <div className="flex items-center gap-2">
-            <div className="flex-1 rounded-md px-3 py-1.5 text-[10px] text-muted truncate" style={{ background: "var(--panel2)" }}>
+            <div className="flex-1 rounded-md px-3 py-1.5 text-[10px] text-muted truncate" style={{ background: "var(--panel-2)" }}>
               https://mixarchitect.com/api/cal/abc123...
             </div>
-            <button className="shrink-0 p-1.5 rounded-md" style={{ background: "var(--panel2)" }}>
+            <button className="shrink-0 p-1.5 rounded-md" style={{ background: "var(--panel-2)" }}>
               <Copy size={12} className="text-muted" />
             </button>
           </div>
         </div>
-        <div className="rounded-lg px-3 py-2 text-[10px] text-muted space-y-1" style={{ background: "var(--panel2)" }}>
+        <div className="rounded-lg px-3 py-2 text-[10px] text-muted space-y-1" style={{ background: "var(--panel-2)" }}>
           <p>Add this URL to your calendar app:</p>
           <p>Google Calendar, Apple Calendar, Outlook</p>
         </div>
@@ -2903,7 +2903,7 @@ function ReleaseSettingsOverviewMockup() {
       <Rule />
       <PanelBody className="pt-3 space-y-0.5">
         {sections.map((s) => (
-          <div key={s.label} className="flex items-center gap-2.5 px-2 py-2 rounded-md" style={{ background: "var(--panel2)" }}>
+          <div key={s.label} className="flex items-center gap-2.5 px-2 py-2 rounded-md" style={{ background: "var(--panel-2)" }}>
             <s.icon size={14} className="text-muted shrink-0" />
             <div>
               <div className="text-xs font-medium text-text">{s.label}</div>
@@ -2925,17 +2925,17 @@ function ReleaseSettingsDetailsMockup() {
       <Rule />
       <PanelBody className="pt-4 space-y-3">
         <div className="flex items-start gap-3">
-          <div className="w-14 h-14 rounded-md shrink-0 flex items-center justify-center" style={{ background: "var(--panel2)" }}>
+          <div className="w-14 h-14 rounded-md shrink-0 flex items-center justify-center" style={{ background: "var(--panel-2)" }}>
             <Image size={20} className="text-muted opacity-30" />
           </div>
           <div className="flex-1 space-y-2">
             <div className="space-y-1">
               <span className="text-[10px] text-muted">Title</span>
-              <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Midnight Sessions</div>
+              <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel-2)" }}>Midnight Sessions</div>
             </div>
             <div className="space-y-1">
               <span className="text-[10px] text-muted">Artist</span>
-              <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Luna Park</div>
+              <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel-2)" }}>Luna Park</div>
             </div>
           </div>
         </div>
@@ -2943,7 +2943,7 @@ function ReleaseSettingsDetailsMockup() {
           <span className="text-[10px] text-muted">Type</span>
           <div className="flex gap-1.5">
             {["Single", "EP", "Album"].map((t, i) => (
-              <div key={t} className="px-2.5 py-1 text-[10px] font-medium rounded-md" style={i === 2 ? { background: "var(--signal)", color: "var(--signal-on)" } : { background: "var(--panel2)", color: "var(--text-muted)" }}>{t}</div>
+              <div key={t} className="px-2.5 py-1 text-[10px] font-medium rounded-md" style={i === 2 ? { background: "var(--signal)", color: "var(--signal-on)" } : { background: "var(--panel-2)", color: "var(--muted)" }}>{t}</div>
             ))}
           </div>
         </div>
@@ -2951,7 +2951,7 @@ function ReleaseSettingsDetailsMockup() {
           <span className="text-[10px] text-muted">Status</span>
           <div className="flex gap-1.5">
             {["Draft", "In Progress", "Ready"].map((s, i) => (
-              <div key={s} className="px-2.5 py-1 text-[10px] font-medium rounded-md" style={i === 1 ? { background: "var(--signal)", color: "var(--signal-on)" } : { background: "var(--panel2)", color: "var(--text-muted)" }}>{s}</div>
+              <div key={s} className="px-2.5 py-1 text-[10px] font-medium rounded-md" style={i === 1 ? { background: "var(--signal)", color: "var(--signal-on)" } : { background: "var(--panel-2)", color: "var(--muted)" }}>{s}</div>
             ))}
           </div>
         </div>
@@ -2963,7 +2963,7 @@ function ReleaseSettingsDetailsMockup() {
         </div>
         <div className="space-y-1">
           <span className="text-[10px] text-muted">Target Date</span>
-          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>2026-04-15</div>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel-2)" }}>2026-04-15</div>
         </div>
       </PanelBody>
     </Panel>
@@ -2985,12 +2985,12 @@ function ReleaseSettingsClientMockup() {
         ].map((f) => (
           <div key={f.label} className="space-y-1">
             <span className="text-[10px] text-muted">{f.label}</span>
-            <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>{f.value}</div>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel-2)" }}>{f.value}</div>
           </div>
         ))}
         <div className="space-y-1">
           <span className="text-[10px] text-muted">Delivery Notes</span>
-          <div className="rounded-md px-3 py-2 text-xs text-text min-h-[48px]" style={{ background: "var(--panel2)" }}>
+          <div className="rounded-md px-3 py-2 text-xs text-text min-h-[48px]" style={{ background: "var(--panel-2)" }}>
             WAV 48kHz/24-bit. Label copy needed by April 1.
           </div>
         </div>
@@ -3016,22 +3016,22 @@ function ReleaseSettingsDistributionMockup() {
           ].map((f) => (
             <div key={f.label} className="space-y-1">
               <span className="text-[10px] text-muted">{f.label}</span>
-              <div className="rounded-md px-3 py-1.5 text-[10px] text-text" style={{ background: "var(--panel2)" }}>{f.value}</div>
+              <div className="rounded-md px-3 py-1.5 text-[10px] text-text" style={{ background: "var(--panel-2)" }}>{f.value}</div>
             </div>
           ))}
         </div>
         <div className="space-y-1">
           <span className="text-[10px] text-muted">Copyright Holder</span>
-          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>Apex Records LLC</div>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel-2)" }}>Apex Records LLC</div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <span className="text-[10px] text-muted">Copyright Year</span>
-            <div className="rounded-md px-3 py-1.5 text-[10px] text-text" style={{ background: "var(--panel2)" }}>2026</div>
+            <div className="rounded-md px-3 py-1.5 text-[10px] text-text" style={{ background: "var(--panel-2)" }}>2026</div>
           </div>
           <div className="space-y-1">
             <span className="text-[10px] text-muted">P-line</span>
-            <div className="rounded-md px-3 py-1.5 text-[10px] text-text" style={{ background: "var(--panel2)" }}>Apex Records LLC</div>
+            <div className="rounded-md px-3 py-1.5 text-[10px] text-text" style={{ background: "var(--panel-2)" }}>Apex Records LLC</div>
           </div>
         </div>
       </PanelBody>
@@ -3051,21 +3051,21 @@ function ReleaseSettingsPaymentMockup() {
           <span className="text-[10px] text-muted">Payment Status</span>
           <div className="flex gap-1.5">
             {["No Fee", "Unpaid", "Partial", "Paid"].map((s, i) => (
-              <div key={s} className="px-2.5 py-1 text-[10px] font-medium rounded-md" style={i === 2 ? { background: "var(--signal)", color: "var(--signal-on)" } : { background: "var(--panel2)", color: "var(--text-muted)" }}>{s}</div>
+              <div key={s} className="px-2.5 py-1 text-[10px] font-medium rounded-md" style={i === 2 ? { background: "var(--signal)", color: "var(--signal-on)" } : { background: "var(--panel-2)", color: "var(--muted)" }}>{s}</div>
             ))}
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <span className="text-[10px] text-muted">Project Fee</span>
-            <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>$2,500.00</div>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel-2)" }}>$2,500.00</div>
           </div>
           <div className="space-y-1">
             <span className="text-[10px] text-muted">Paid Amount</span>
-            <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel2)" }}>$1,000.00</div>
+            <div className="rounded-md px-3 py-1.5 text-xs text-text" style={{ background: "var(--panel-2)" }}>$1,000.00</div>
           </div>
         </div>
-        <div className="rounded-lg px-3 py-2" style={{ background: "var(--panel2)" }}>
+        <div className="rounded-lg px-3 py-2" style={{ background: "var(--panel-2)" }}>
           <span className="text-[10px] text-muted">Balance Due: </span>
           <span className="text-xs font-semibold text-text">$1,500.00</span>
         </div>
@@ -3083,10 +3083,10 @@ function ReleaseSettingsTeamMockup() {
       <Rule />
       <PanelBody className="pt-4 space-y-3">
         <div className="flex items-center gap-2">
-          <div className="flex-1 rounded-md px-3 py-1.5 text-xs text-muted" style={{ background: "var(--panel2)" }}>
+          <div className="flex-1 rounded-md px-3 py-1.5 text-xs text-muted" style={{ background: "var(--panel-2)" }}>
             Email address
           </div>
-          <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center gap-1" style={{ background: "var(--panel2)" }}>
+          <div className="rounded-md px-3 py-1.5 text-xs text-text flex items-center gap-1" style={{ background: "var(--panel-2)" }}>
             Collaborator
             <ChevronDown size={10} className="text-muted" />
           </div>
@@ -3101,7 +3101,7 @@ function ReleaseSettingsTeamMockup() {
             { name: "alex@studio.com", role: "Collaborator", color: "text-muted", pending: false },
             { name: "client@label.com", role: "Client", color: "text-muted", pending: true },
           ].map((m) => (
-            <div key={m.name} className="flex items-center justify-between py-1.5 px-2 rounded-md" style={{ background: "var(--panel2)" }}>
+            <div key={m.name} className="flex items-center justify-between py-1.5 px-2 rounded-md" style={{ background: "var(--panel-2)" }}>
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium" style={{ background: "var(--border)" }}>
                   {m.name[0].toUpperCase()}
@@ -3716,7 +3716,7 @@ function SubmitFeatureModalMockup() {
       <PanelHeader>Submit for Feature</PanelHeader>
       <PanelBody className="space-y-4">
         <div className="flex items-center gap-3 p-3 rounded-md border border-border bg-panel">
-          <div className="w-12 h-12 rounded-md shrink-0 flex items-center justify-center" style={{ background: "var(--panel2)" }}>
+          <div className="w-12 h-12 rounded-md shrink-0 flex items-center justify-center" style={{ background: "var(--panel-2)" }}>
             <Music size={20} className="text-muted opacity-30" />
           </div>
           <div className="min-w-0">

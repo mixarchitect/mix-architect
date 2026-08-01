@@ -68,7 +68,7 @@ function PillSelect({
           style={
             value === opt.value
               ? { background: "var(--signal)", color: "var(--signal-on)" }
-              : { background: "var(--panel2)", color: "var(--text-muted)" }
+              : { background: "var(--panel-2)", color: "var(--muted)" }
           }
         >
           {opt.label}

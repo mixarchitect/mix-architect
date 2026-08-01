@@ -58,7 +58,7 @@ function LogoSlot({
         <div className="flex flex-col gap-2">
           <label
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors w-fit"
-            style={{ background: "var(--panel-2)", color: "var(--text-muted)" }}
+            style={{ background: "var(--panel-2)", color: "var(--muted)" }}
           >
             <Upload size={14} />
             {uploading ? tc("uploading") : url ? t("replace") : t("upload")}

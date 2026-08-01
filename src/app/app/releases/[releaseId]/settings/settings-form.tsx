@@ -84,7 +84,7 @@ function PillSelect({
           style={
             value === opt.value
               ? { background: "var(--signal)", color: "var(--signal-on)" }
-              : { background: "var(--panel2)", color: "var(--text-muted)" }
+              : { background: "var(--panel-2)", color: "var(--muted)" }
           }
         >
           {opt.label}
@@ -463,7 +463,7 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
             <div className="flex items-start gap-4">
               <div
                 className="relative w-[160px] h-[160px] rounded-lg border border-border overflow-hidden flex-shrink-0 flex items-center justify-center"
-                style={{ background: "var(--panel2)" }}
+                style={{ background: "var(--panel-2)" }}
               >
                 {coverArtMode === "preview" && coverArtUrl ? (
                   <img
@@ -481,7 +481,7 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
                   <div>
                     <label
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors"
-                      style={{ background: "var(--panel2)", color: "var(--text-muted)" }}
+                      style={{ background: "var(--panel-2)", color: "var(--muted)" }}
                     >
                       <Upload size={14} />
                       {uploading ? tCommon("uploading") : t("uploadImage")}
