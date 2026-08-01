@@ -882,6 +882,12 @@
     "save": "Spara"
   },
   "landing": {
+    "aboutEyebrow": "Om",
+    "aboutHeadline": "Varför jag byggde Mix Architect",
+    "aboutBody1": "Jag släpper egen musik och jobbar på andras. Båda sidor byggde på samma röra: ett kalkylark för tidsplanen, en mapp med WAV-filer som hette final_v3_REAL och en mejltråd full av ”runt tvåminutersstrecket”.",
+    "aboutBody2": "Mix Architect är verktyget jag ville ha för mina egna releaser — ett ställe för att planera arbetet, lämna feedback direkt på vågformen och lämna ifrån sig något som ser lika genomtänkt ut som musiken låter. Sparar det en kväll av fillätande har det gjort sitt jobb.",
+    "aboutName": "Mike Giardina",
+    "aboutRole": "Grundare · Artist & tekniker",
     "headline": "Planera releaser. Granska mixar. Spåra betalningar. Allt på ett ställe.",
     "subheadline": "Mix Architect är releashanteringsplattformen byggd för oberoende artister och ljudproffs.",
     "forArtists": "För artister",

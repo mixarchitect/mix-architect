@@ -882,6 +882,12 @@
     "save": "保存"
   },
   "landing": {
+    "aboutEyebrow": "关于",
+    "aboutHeadline": "我为什么做了 Mix Architect",
+    "aboutBody1": "我发行自己的作品，也参与别人的项目。两边都是同样的混乱：用表格排日程，一个冒着 final_v3_REAL 这种名字的 WAV 文件夹，以及一堆写着“大概在两分钟那里”的邮件。",
+    "aboutBody2": "Mix Architect 是我为自己的发行想要的工具——在一个地方规划工作、直接在波形上留下反馈，并交出与音乐同样考究的成果。如果它能省下你一晚上找文件的时间，那它就没白做。",
+    "aboutName": "Mike Giardina",
+    "aboutRole": "创始人 · 音乐人与录音师",
     "headline": "计划发行。审查混音。跟踪付款。一站式解决。",
     "subheadline": "Mix Architect 是为独立艺人和音频专业人士打造的发行管理平台。",
     "forArtists": "为艺人",

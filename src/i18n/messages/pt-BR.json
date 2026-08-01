@@ -882,6 +882,12 @@
     "save": "Salvar"
   },
   "landing": {
+    "aboutEyebrow": "Sobre",
+    "aboutHeadline": "Por que criei o Mix Architect",
+    "aboutBody1": "Eu lanço minha própria música e também trabalho na dos outros. Os dois lados viviam a mesma bagunça: uma planilha para o cronograma, uma pasta de WAVs com nomes como final_v3_REAL e uma sequência de e-mails do tipo “lá pelos 2 minutos”.",
+    "aboutBody2": "O Mix Architect é a ferramenta que eu queria para os meus próprios lançamentos — um lugar só para planejar o trabalho, deixar feedback na própria forma de onda e entregar algo tão caprichado quanto a música soa. Se poupar uma noite atrás de arquivos, cumpriu seu papel.",
+    "aboutName": "Mike Giardina",
+    "aboutRole": "Fundador · Artista e engenheiro",
     "headline": "Planeje lançamentos. Revise mixagens. Rastreie pagamentos. Tudo em um lugar.",
     "subheadline": "Mix Architect é a plataforma de gerenciamento de lançamentos criada para artistas independentes e profissionais de áudio.",
     "forArtists": "Para Artistas",

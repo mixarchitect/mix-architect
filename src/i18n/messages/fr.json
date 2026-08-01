@@ -882,6 +882,12 @@
     "save": "Enregistrer"
   },
   "landing": {
+    "aboutEyebrow": "À propos",
+    "aboutHeadline": "Pourquoi j'ai créé Mix Architect",
+    "aboutBody1": "Je sors mes propres disques et je travaille sur ceux des autres. Des deux côtés, le même bazar : un tableur pour le planning, un dossier de WAV nommés final_v3_REAL et un fil d'e-mails du genre « vers 2 minutes ».",
+    "aboutBody2": "Mix Architect est l'outil que je voulais pour mes propres sorties — un seul endroit pour planifier le travail, laisser des retours directement sur la forme d'onde et livrer quelque chose d'aussi soigné que la musique. S'il vous épargne une soirée à chercher des fichiers, il a fait son travail.",
+    "aboutName": "Mike Giardina",
+    "aboutRole": "Fondateur · Artiste & ingénieur",
     "headline": "Planifiez les sorties. Révisez les mixages. Suivez les paiements. Tout en un seul endroit.",
     "subheadline": "Mix Architect est la plateforme de gestion de sorties conçue pour les artistes indépendants et les professionnels de l'audio.",
     "forArtists": "Pour les artistes",

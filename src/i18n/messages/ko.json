@@ -882,6 +882,12 @@
     "save": "저장"
   },
   "landing": {
+    "aboutEyebrow": "소개",
+    "aboutHeadline": "Mix Architect를 만든 이유",
+    "aboutBody1": "제 음악을 내기도 하고, 다른 사람의 작업에도 참여합니다. 양쪽 모두 같은 혼란이었습니다. 일정은 스프레드시트에, final_v3_REAL 같은 이름의 WAV 폴더, 그리고 “2분쯤 근처” 같은 메일 스레드까지.",
+    "aboutBody2": "Mix Architect는 제 릴리스를 위해 원했던 도구입니다. 작업을 계획하고, 실제 파형 위에 피드백을 남기고, 음악만큼 정성스러운 결과물을 건네는 곳 하나입니다. 파일을 찾느라 보내는 하룻저녁을 아낌 수 있다면 그것으로 충분합니다.",
+    "aboutName": "Mike Giardina",
+    "aboutRole": "창업자 · 아티스트 & 엔지니어",
     "headline": "릴리스 계획. 믹스 리뷰. 결제 추적. 모든 것을 한 곳에서.",
     "subheadline": "Mix Architect는 독립 아티스트와 오디오 전문가를 위해 만들어진 릴리스 관리 플랫폼입니다.",
     "forArtists": "아티스트를 위한",
