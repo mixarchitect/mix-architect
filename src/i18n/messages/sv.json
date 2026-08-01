@@ -152,11 +152,11 @@
       "create-submit": "Tryck på knappen för att skapa din release. Du kan utforska den direkt.",
       "release-tabs": "Dessa flikar organiserar din release: Spår, Globalt, Distribution och Ekonomi. Varje avsnitt hjälper till att hantera en annan aspekt av ditt projekt.",
       "release-sidebar": "Ladda upp omslagskonst, visa releaseinformation och lägg till interna eller klientanteckningar här.",
-      "release-track-link": "Klicka på ett spår för att se dess detaljer — mixintention, specifikationer, ljudversioner och mer.",
+      "release-track-link": "Klicka på ett spår för att se dess detaljer: mixintention, specifikationer, ljudversioner och mer.",
       "track-tabs": "Varje flik fångar en annan aspekt: Intention (din vision), Specifikationer (tekniska krav), Ljud (uppladdningar och versioner) och mer.",
-      "track-intent": "Beskriv visionen för denna mix — stämning, referenser och riktning. Detta är kärnan i ditt uppdrag.",
+      "track-intent": "Beskriv visionen för denna mix: stämning, referenser och riktning. Detta är kärnan i ditt uppdrag.",
       "dashboard-card": "Varje release visar status, spårframsteg och viktig information i en överblick. Klicka för att dyka in.",
-      "dashboard-nav": "Sidofältet ger dig snabb åtkomst till alla sektioner — Releaser, Artister, Mallar, Betalningar och Analys."
+      "dashboard-nav": "Sidofältet ger dig snabb åtkomst till alla sektioner: Releaser, Artister, Mallar, Betalningar och Analys."
     }
   },
   "dashboard": {
@@ -576,8 +576,8 @@
       "logoLabel": "Logotyp",
       "logoHint": "Visas på ljusa bakgrunder, och överallt om ingen mörk version har angetts.",
       "darkLogoLabel": "Logotyp för mörkt läge",
-      "darkLogoHint": "Valfritt – visas när en klient ser portalen i mörkt läge.",
-      "formatsHint": "SVG, PNG, JPG eller WebP · max 5 MB · SVG (eller en PNG-export i 2–3×) förblir skarp på retina.",
+      "darkLogoHint": "Valfritt. Visas när en klient ser portalen i mörkt läge.",
+      "formatsHint": "SVG, PNG, JPG eller WebP · max 5 MB · SVG (eller en PNG-export i 2-3×) förblir skarp på retina.",
       "replace": "Ersätt",
       "upload": "Ladda upp",
       "remove": "Ta bort",
@@ -633,7 +633,7 @@
     },
     "featureVisibility": {
       "title": "Funktionssynlighet",
-      "description": "Styr vilka funktioner som visas i sidopanelen och releasesidorna. Dolda funktioner tas inte bort — du kan aktivera dem igen när som helst.",
+      "description": "Styr vilka funktioner som visas i sidopanelen och releasesidorna. Dolda funktioner tas inte bort. Du kan aktivera dem igen när som helst.",
       "clientBusiness": "Klient och affär",
       "releaseAudio": "Release och ljud"
     },
@@ -701,7 +701,7 @@
       "description": "Connect your Stripe account to collect payments directly from clients.",
       "descriptionConnected": "Your Stripe account is connected and ready to collect payments.",
       "notConnected": "Not connected",
-      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record — funds go straight to your Stripe account.",
+      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record. Funds go straight to your Stripe account.",
       "connect": "Connect Stripe Account",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
@@ -710,7 +710,7 @@
       "businessName": "Business",
       "connectedDate": "Connected",
       "status": "Status",
-      "statusActive": "Active — ready to accept payments",
+      "statusActive": "Active, ready to accept payments",
       "statusPending": "Setup incomplete",
       "statusPendingHelp": "Complete your Stripe account setup to start accepting payments.",
       "completeSetup": "Complete setup in Stripe",
@@ -796,7 +796,7 @@
     "noResults": "Inga artiklar hittades för \"{query}\"",
     "whatsNew": "Nyheter",
     "whatsNewDesc": "Senaste uppdateringar och förbättringar av Mix Architect.",
-    "noChangelog": "Inga uppdateringar ännu — kom tillbaka snart!",
+    "noChangelog": "Inga uppdateringar ännu. Kom tillbaka snart!",
     "viewAllChangelog": "Visa alla uppdateringar",
     "systemStatus": "Systemstatus",
     "systemStatusTitle": "Systemstatus",
@@ -895,6 +895,7 @@
     "save": "Spara"
   },
   "landing": {
+    "navAbout": "Om",
     "aboutEyebrow": "Om",
     "aboutHeadline": "Varför jag byggde Mix Architect",
     "aboutBody1": "Jag började i slutet av 90-talet med att spela in lokala band i södra Kalifornien på en Boss BR-8. Sedan dess har jag kommit till Surf City Studios, tagit examen från Berklee College of Music, studerat mixning och mastering för några av branschens mest respekterade tekniker och grundat hårdvaruföretaget Vermilion Audio. Musiken har varit det enda konstanta.",

@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const coverUrl = getCoverArtUrl(release.cover_art_path);
   const title =
     release.meta_title ||
-    `${release.title} by ${release.artist_name} — Featured on Mix Architect`;
+    `${release.title} by ${release.artist_name} | Featured on Mix Architect`;
   const description =
     release.meta_description || release.body.slice(0, 155) + "...";
 

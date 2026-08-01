@@ -759,7 +759,7 @@ function TrackTabQualityMockup() {
 
             <p className="text-xs text-muted">
               This pill only appears when the worker detects something worth
-              flagging. Clean mixes show nothing — the only audio QC readouts
+              flagging. Clean mixes show nothing: the only audio QC readouts
               on the player are LUFS and true peak.
             </p>
 
@@ -3161,7 +3161,7 @@ function ExpenseAddMockup() {
         <Rule />
         {/* Inline add form */}
         <div className="space-y-2">
-          <MockInput text="Studio rental — 2 days" className="text-xs h-7" />
+          <MockInput text="Studio rental, 2 days" className="text-xs h-7" />
           <div className="grid grid-cols-3 gap-2">
             <MockInput text="$450.00" className="text-xs h-7" />
             <MockInput text="Mike G" className="text-xs h-7" />
@@ -3187,7 +3187,7 @@ function ExpenseListMockup() {
         </div>
         <Rule />
         {[
-          { desc: "Studio rental — 2 days", amount: "$450.00", by: "Mike G" },
+          { desc: "Studio rental, 2 days", amount: "$450.00", by: "Mike G" },
           { desc: "Mastering reference tracks", amount: "$29.99", by: "Mike G" },
           { desc: "Session musician (bass)", amount: "$200.00", by: "Client" },
         ].map((e) => (
@@ -3362,7 +3362,7 @@ function TimeEntryListMockup() {
         <Rule />
         {[
           { icon: Clock, desc: "Mix revisions for track 3", hrs: "1.50", rate: "$50", total: "$75.00", type: "timer" },
-          { icon: Pencil, desc: "Initial session — rough mix", hrs: "3.00", rate: "$50", total: "$150.00", type: "manual" },
+          { icon: Pencil, desc: "Initial session, rough mix", hrs: "3.00", rate: "$50", total: "$150.00", type: "manual" },
           { icon: Clock, desc: "Mastering pass", hrs: "2.00", rate: "$50", total: "$100.00", type: "timer" },
         ].map((e) => (
           <div key={e.desc} className="flex items-center gap-3 py-1.5">
@@ -3397,7 +3397,7 @@ function TimeExportMockup() {
           <Rule />
           {[
             { hrs: "1.50", rate: "$50.00", desc: "Mix revisions for track 3", type: "timer" },
-            { hrs: "3.00", rate: "$50.00", desc: "Initial session — rough mix", type: "manual" },
+            { hrs: "3.00", rate: "$50.00", desc: "Initial session, rough mix", type: "manual" },
             { hrs: "2.00", rate: "$50.00", desc: "Mastering pass", type: "timer" },
           ].map((r) => (
             <div key={r.desc} className="text-xs text-muted flex gap-4 py-1.5">
@@ -3488,7 +3488,7 @@ function StripeCreateQuoteMockup() {
       <PanelHeader>New Quote</PanelHeader>
       <PanelBody className="space-y-3">
         {[
-          { desc: "Mixing — 6 tracks", amount: "$1,200" },
+          { desc: "Mixing, 6 tracks", amount: "$1,200" },
           { desc: "Mastering", amount: "$600" },
         ].map((item) => (
           <div key={item.desc} className="flex items-center justify-between py-2 px-3 rounded-md border border-border bg-panel">

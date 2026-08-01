@@ -51,7 +51,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Creating a New Account",
-        body: "If you do not have an account yet, click \"Create one\" at the bottom of the sign-in page to switch to sign-up mode. Enter your full name, email, and a password, then click \"Create Account\". You will receive a confirmation email — click the link in the email to activate your account. Alternatively, click \"Continue with Google\" to create your account instantly using your Google credentials. No confirmation email is needed when signing up with Google.",
+        body: "If you do not have an account yet, click \"Create one\" at the bottom of the sign-in page to switch to sign-up mode. Enter your full name, email, and a password, then click \"Create Account\". You will receive a confirmation email. Click the link in the email to activate your account. Alternatively, click \"Continue with Google\" to create your account instantly using your Google credentials. No confirmation email is needed when signing up with Google.",
         tip: "If you sign up with email and later click \"Continue with Google\" using the same email address, your accounts are automatically linked. You can use either method to sign in going forward.",
       },
       {
@@ -64,7 +64,7 @@ export const articles: HelpArticle[] = [
     id: "persona-onboarding",
     title: "Choosing Your Workspace",
     category: "getting-started",
-    summary: "Set up Mix Architect for how you work — as an artist releasing your own music or an engineer working with clients.",
+    summary: "Set up Mix Architect for how you work: as an artist releasing your own music or an engineer working with clients.",
     tags: ["onboarding", "persona", "artist", "engineer", "setup", "workspace", "features"],
     updatedAt: "2026-04-10",
     content: [
@@ -140,7 +140,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Accepting Invitations",
-        body: "When someone clicks the invite link and joins the release, they appear in the Team list with their role badge and \"Active\" status. You will receive an in-app notification letting you know they have joined. Invitees who do not have a Mix Architect account will be prompted to create one when they click the invite link — they can sign up with email and password or use Google for instant access.",
+        body: "When someone clicks the invite link and joins the release, they appear in the Team list with their role badge and \"Active\" status. You will receive an in-app notification letting you know they have joined. Invitees who do not have a Mix Architect account will be prompted to create one when they click the invite link. They can sign up with email and password or use Google for instant access.",
         tip: "You can remove a team member at any time by clicking the trash icon next to their name in the Team section of Release Settings.",
         mockup: "accept-invitation",
       },
@@ -166,12 +166,12 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Brief",
-        body: "The Brief tab combines your technical settings and creative direction in one place. At the top, Technical Settings has dropdowns for Mix Format (Stereo, Dolby Atmos, or Stereo + Atmos), File Format (WAV, FLAC, AIFF, MP3, or Any), Sample Rate (44.1kHz through 192kHz), Bit Depth (16-bit, 24-bit, 32-bit float), and Channels (Mono, Stereo, or Any). Uploaded audio is validated against these specs. Below the technical settings, the creative intent section starts with \"What should this track feel like?\" — a free-form text area for describing the sonic direction (click \"Edit\" to modify). The Emotional Qualities section lets you tag the track with descriptive words: selected tags appear as filled pills (e.g. spacious, warm, punchy, nostalgic), and available suggestions appear as outline pills you can click to add. The Anti-References section lets you describe sounds or approaches you want to avoid. On the right sidebar, Quick View shows the track status, audio quality (sample rate / bit depth), and format at a glance. Below that, the References section lets you search and add reference tracks (from Apple Music) with optional notes describing what to reference about each one.",
+        body: "The Brief tab combines your technical settings and creative direction in one place. At the top, Technical Settings has dropdowns for Mix Format (Stereo, Dolby Atmos, or Stereo + Atmos), File Format (WAV, FLAC, AIFF, MP3, or Any), Sample Rate (44.1kHz through 192kHz), Bit Depth (16-bit, 24-bit, 32-bit float), and Channels (Mono, Stereo, or Any). Uploaded audio is validated against these specs. Below the technical settings, the creative intent section starts with \"What should this track feel like?\", a free-form text area for describing the sonic direction (click \"Edit\" to modify). The Emotional Qualities section lets you tag the track with descriptive words: selected tags appear as filled pills (e.g. spacious, warm, punchy, nostalgic), and available suggestions appear as outline pills you can click to add. The Anti-References section lets you describe sounds or approaches you want to avoid. On the right sidebar, Quick View shows the track status, audio quality (sample rate / bit depth), and format at a glance. Below that, the References section lets you search and add reference tracks (from Apple Music) with optional notes describing what to reference about each one.",
         mockup: "track-tab-intent",
       },
       {
         heading: "Audio",
-        body: "The Audio tab is where you upload files, manage versions, and play back audio. The header shows a small breadcrumb (Artist · Release), then the track title with left and right chevron arrows that take you to the previous or next track in the release. Clicking a chevron preserves your current tab — jumping from Audio on track 1 lands you on Audio on track 2 — so you can sweep through an album one tab at a time. The version selector (v1, v2, v3, etc.) lets you switch between revisions; click the + button to upload a new version. Each version displays its version number, upload date, comment count, and a download button. The waveform visualization shows the audio with interactive playback: click anywhere to seek, and use the transport controls below (loop, skip back, play/pause, skip forward, repeat). Just above the waveform, a row of QC pills surfaces the worker-measured audio stats — LUFS, True Peak (dBTP), and a conditional Quality warning — each clickable to reveal a full explanation. While the worker is still analyzing a fresh upload, a small \"Measurements processing\" indicator shows where the pills will appear. The Feedback section below the waveform shows all timestamped comments for the current version. Double-click anywhere on the waveform to add a new comment at that timecode.",
+        body: "The Audio tab is where you upload files, manage versions, and play back audio. The header shows a small breadcrumb (Artist · Release), then the track title with left and right chevron arrows that take you to the previous or next track in the release. Clicking a chevron preserves your current tab (jumping from Audio on track 1 lands you on Audio on track 2), so you can sweep through an album one tab at a time. The version selector (v1, v2, v3, etc.) lets you switch between revisions; click the + button to upload a new version. Each version displays its version number, upload date, comment count, and a download button. The waveform visualization shows the audio with interactive playback: click anywhere to seek, and use the transport controls below (loop, skip back, play/pause, skip forward, repeat). Just above the waveform, a row of QC pills surfaces the worker-measured audio stats: LUFS, True Peak (dBTP), and a conditional Quality warning, each clickable to reveal a full explanation. While the worker is still analyzing a fresh upload, a small \"Measurements processing\" indicator shows where the pills will appear. The Feedback section below the waveform shows all timestamped comments for the current version. Double-click anywhere on the waveform to add a new comment at that timecode.",
         mockup: "track-tab-audio",
       },
       {
@@ -181,12 +181,12 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "True Peak",
-        body: "True Peak (dBTP) measures inter-sample peak values using 4× oversampling per ITU-R BS.1770-4. This is different from raw sample peak because lossy codecs (MP3, AAC, Ogg Vorbis, Opus) can introduce overshoots between samples during encoding, which cause audible clipping even when the underlying samples never hit 0 dBFS. Click the True Peak pill to see how your measured true peak compares to each platform's ceiling. Unlike LUFS (where you want to match the target), true peak is a ceiling — staying at or below the target is good. Each row shows the platform, its ceiling (most are -1 dBTP; Spotify Loud mode and Amazon Music are -2 dBTP), and either \"X.X dB headroom\" (green, you're under the ceiling) or \"+X.X dB over\" (orange or red, you're above it). The small badge next to the dBTP reading on the main row follows the same color rule: green when under -1 dBTP, orange between -1 and 0, red above 0 (inter-sample overs that will clip DSP chains). Hover any platform name for context on why that specific ceiling was chosen.",
+        body: "True Peak (dBTP) measures inter-sample peak values using 4× oversampling per ITU-R BS.1770-4. This is different from raw sample peak because lossy codecs (MP3, AAC, Ogg Vorbis, Opus) can introduce overshoots between samples during encoding, which cause audible clipping even when the underlying samples never hit 0 dBFS. Click the True Peak pill to see how your measured true peak compares to each platform's ceiling. Unlike LUFS (where you want to match the target), true peak is a ceiling. Staying at or below the target is good. Each row shows the platform, its ceiling (most are -1 dBTP; Spotify Loud mode and Amazon Music are -2 dBTP), and either \"X.X dB headroom\" (green, you're under the ceiling) or \"+X.X dB over\" (orange or red, you're above it). The small badge next to the dBTP reading on the main row follows the same color rule: green when under -1 dBTP, orange between -1 and 0, red above 0 (inter-sample overs that will clip DSP chains). Hover any platform name for context on why that specific ceiling was chosen.",
         mockup: "track-tab-truepeak",
       },
       {
         heading: "Quality Check",
-        body: "The Quality Check pill is conditional — it only appears when the worker detects something worth flagging on your upload. Clean mixes show no pill at all. When it does appear, it's amber for a single borderline issue or red for multiple issues or severe ones. Three issue types are surfaced today: Clipping (a high count of samples at full scale combined with the sample peak sitting at or very near 0 dBFS — the hallmark of a limiter ceiling being sat on), Sample peak at full scale (your loudest sample is ≥ -0.1 dBFS, leaving no headroom for downstream DSP or lossy encoding), and DC offset (a non-zero average amplitude above 0.002, usually from a gain-stage or filtering issue). Clicking the pill expands a popover with each detected issue, a short engineer-facing explanation, and an actionable fix — e.g. \"Reduce output gain or check your limiter ceiling\" for clipping, \"Apply a high-pass filter at 20 Hz or lower\" for DC offset.",
+        body: "The Quality Check pill is conditional. It only appears when the worker detects something worth flagging on your upload. Clean mixes show no pill at all. When it does appear, it's amber for a single borderline issue or red for multiple issues or severe ones. Three issue types are surfaced today: Clipping (a high count of samples at full scale combined with the sample peak sitting at or very near 0 dBFS, the hallmark of a limiter ceiling being sat on), Sample peak at full scale (your loudest sample is ≥ -0.1 dBFS, leaving no headroom for downstream DSP or lossy encoding), and DC offset (a non-zero average amplitude above 0.002, usually from a gain-stage or filtering issue). Clicking the pill expands a popover with each detected issue, a short engineer-facing explanation, and an actionable fix, e.g. \"Reduce output gain or check your limiter ceiling\" for clipping, \"Apply a high-pass filter at 20 Hz or lower\" for DC offset.",
         mockup: "track-tab-quality",
       },
       {
@@ -426,7 +426,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Track Versions",
-        body: "Each time you upload a new file to the same track, it becomes the next version. The version selector above the waveform shows numbered buttons (v1, v2, v3, etc.) plus a + button to upload another version. Click any version to switch to it. Each version displays its version number, upload date, comment count, and a download icon to download the original file. Previous versions are fully preserved with their own comments and waveform. When switching versions for the first time in a session, you may notice a brief loading delay while the audio file is fetched and the waveform is generated. This is normal — once a version has been loaded, switching back to it is instant because the browser caches the audio data.",
+        body: "Each time you upload a new file to the same track, it becomes the next version. The version selector above the waveform shows numbered buttons (v1, v2, v3, etc.) plus a + button to upload another version. Click any version to switch to it. Each version displays its version number, upload date, comment count, and a download icon to download the original file. Previous versions are fully preserved with their own comments and waveform. When switching versions for the first time in a session, you may notice a brief loading delay while the audio file is fetched and the waveform is generated. This is normal. Once a version has been loaded, switching back to it is instant because the browser caches the audio data.",
         tip: "Upload revised mixes to the same track rather than creating a new track. This keeps your version history clean, preserves comments on older versions, and lets you compare mixes over time.",
         mockup: "track-versions",
       },
@@ -652,7 +652,7 @@ export const articles: HelpArticle[] = [
       },
       {
         heading: "Unsubscribing from All Emails",
-        body: "Every email includes a one-click unsubscribe link in the footer. You can also turn off all email categories at once from [Settings](/app/settings). Unsubscribing does not affect your account or subscription — you can re-enable emails anytime.",
+        body: "Every email includes a one-click unsubscribe link in the footer. You can also turn off all email categories at once from [Settings](/app/settings). Unsubscribing does not affect your account or subscription. You can re-enable emails anytime.",
         warning: "Account-critical emails like password resets and email verification cannot be disabled. These are required for account security.",
       },
     ],
@@ -724,7 +724,7 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Connecting Your Stripe Account",
-        body: "Go to [Settings](/app/settings) and find the Payment Collection section. Click \"Connect Stripe Account\" to authorize via Stripe's secure OAuth flow. Once connected, you become the merchant of record — payouts go directly to your Stripe account, and you handle any disputes through the Stripe Dashboard. Mix Architect facilitates the checkout experience but never holds your funds.",
+        body: "Go to [Settings](/app/settings) and find the Payment Collection section. Click \"Connect Stripe Account\" to authorize via Stripe's secure OAuth flow. Once connected, you become the merchant of record: payouts go directly to your Stripe account, and you handle any disputes through the Stripe Dashboard. Mix Architect facilitates the checkout experience but never holds your funds.",
         tip: "Mix Architect charges a 1% platform fee on transactions processed through the platform. Stripe's standard processing fees also apply.",
         mockup: "stripe-connect-setup",
       },
@@ -755,13 +755,13 @@ export const articles: HelpArticle[] = [
     title: "Tracking Project Expenses",
     category: "billing",
     summary:
-      "Record and manage expenses for each release — gear rentals, session fees, travel, and more.",
+      "Record and manage expenses for each release: gear rentals, session fees, travel, and more.",
     tags: ["expenses", "costs", "budget", "money", "tracking", "payments"],
     updatedAt: "2026-04-10",
     content: [
       {
         heading: "Enabling Expense Tracking",
-        body: "Expense tracking is part of the Payment Tracking feature. To enable it, go to [Settings](/app/settings) and toggle on \"Payment Tracking\" in the Payment section. Once enabled, a Financials tab appears on every release detail page — this is where you'll find Expenses alongside your Financial Summary, Payment status, and Time Log.",
+        body: "Expense tracking is part of the Payment Tracking feature. To enable it, go to [Settings](/app/settings) and toggle on \"Payment Tracking\" in the Payment section. Once enabled, a Financials tab appears on every release detail page. This is where you'll find Expenses alongside your Financial Summary, Payment status, and Time Log.",
         tip: "Expenses are per-release, so each project keeps its own running total.",
         mockup: "expense-financials-tab",
       },
@@ -799,12 +799,12 @@ export const articles: HelpArticle[] = [
     content: [
       {
         heading: "Enabling Time Tracking",
-        body: "Time tracking is part of the Payment Tracking feature. Go to [Settings](/app/settings) and toggle on \"Payment Tracking\". You can also set a default hourly rate in the same section — this rate is pre-filled whenever you log a new time entry.",
+        body: "Time tracking is part of the Payment Tracking feature. Go to [Settings](/app/settings) and toggle on \"Payment Tracking\". You can also set a default hourly rate in the same section. This rate is pre-filled whenever you log a new time entry.",
         mockup: "timer-settings",
       },
       {
         heading: "Using the Timer",
-        body: "A floating timer button appears in the bottom-right corner of every release page. Click the stopwatch icon to expand it, then click \"Start\" to begin timing. The stopwatch runs in real time — you can pause and resume as needed. When you're finished, click the stop button. A log entry form appears with the elapsed time (rounded to the nearest quarter hour), your default hourly rate, a billable toggle, and a description field. Edit any values and click \"Save Entry\" to add it to the Time Log.",
+        body: "A floating timer button appears in the bottom-right corner of every release page. Click the stopwatch icon to expand it, then click \"Start\" to begin timing. The stopwatch runs in real time. You can pause and resume as needed. When you're finished, click the stop button. A log entry form appears with the elapsed time (rounded to the nearest quarter hour), your default hourly rate, a billable toggle, and a description field. Edit any values and click \"Save Entry\" to add it to the Time Log.",
         tip: "The timer uses your system clock so it stays accurate even if the browser tab is in the background. However, it does not persist across page reloads.",
         mockup: "timer-floating",
       },

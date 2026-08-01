@@ -7,7 +7,7 @@ import { Music } from "lucide-react";
 import { FeaturedArchiveLoadMore } from "./load-more";
 
 export const metadata: Metadata = {
-  title: "Featured Releases — Mix Architect",
+  title: "Featured Releases | Mix Architect",
 };
 
 type Props = { searchParams: Promise<{ genre?: string }> };

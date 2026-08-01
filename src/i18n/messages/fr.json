@@ -152,11 +152,11 @@
       "create-submit": "Appuyez sur le bouton pour créer votre sortie. Vous pourrez l'explorer immédiatement.",
       "release-tabs": "Ces onglets organisent votre sortie : Morceaux, Globaux, Distribution et Finances. Chaque section aide à gérer un aspect différent de votre projet.",
       "release-sidebar": "Téléchargez la pochette, consultez les informations de la sortie et ajoutez des notes internes ou client ici.",
-      "release-track-link": "Cliquez sur un morceau pour voir ses détails — intention du mix, spécifications, versions audio, et plus encore.",
+      "release-track-link": "Cliquez sur un morceau pour voir ses détails: intention du mix, spécifications, versions audio, et plus encore.",
       "track-tabs": "Chaque onglet capture un aspect différent : Intention (votre vision), Spécifications (exigences techniques), Audio (téléchargements & versions), et plus encore.",
-      "track-intent": "Décrivez la vision de ce mix — ambiance, références et direction. C'est le cœur de votre brief.",
+      "track-intent": "Décrivez la vision de ce mix: ambiance, références et direction. C'est le cœur de votre brief.",
       "dashboard-card": "Chaque sortie affiche son statut, la progression des morceaux et les informations clés en un coup d'œil. Cliquez pour y replonger.",
-      "dashboard-nav": "La barre latérale vous donne un accès rapide à toutes les sections — Sorties, Artistes, Modèles, Paiements et Analytiques."
+      "dashboard-nav": "La barre latérale vous donne un accès rapide à toutes les sections: Sorties, Artistes, Modèles, Paiements et Analytiques."
     }
   },
   "dashboard": {
@@ -576,8 +576,8 @@
       "logoLabel": "Logo",
       "logoHint": "Affiché sur les fonds clairs, et partout si aucune version sombre n'est définie.",
       "darkLogoLabel": "Logo pour le mode sombre",
-      "darkLogoHint": "Facultatif — affiché lorsqu'un client consulte le portail en mode sombre.",
-      "formatsHint": "SVG, PNG, JPG ou WebP · 5 Mo max · un SVG (ou un export PNG en 2–3×) reste net sur les écrans Retina.",
+      "darkLogoHint": "Facultatif. Affiché lorsqu'un client consulte le portail en mode sombre.",
+      "formatsHint": "SVG, PNG, JPG ou WebP · 5 Mo max · un SVG (ou un export PNG en 2-3×) reste net sur les écrans Retina.",
       "replace": "Remplacer",
       "upload": "Téléverser",
       "remove": "Supprimer",
@@ -633,7 +633,7 @@
     },
     "featureVisibility": {
       "title": "Visibilité des fonctionnalités",
-      "description": "Contrôlez quelles fonctionnalités apparaissent dans votre barre latérale et vos pages de sortie. Les fonctionnalités masquées ne sont pas supprimées — vous pouvez les réactiver à tout moment.",
+      "description": "Contrôlez quelles fonctionnalités apparaissent dans votre barre latérale et vos pages de sortie. Les fonctionnalités masquées ne sont pas supprimées. Vous pouvez les réactiver à tout moment.",
       "clientBusiness": "Client et affaires",
       "releaseAudio": "Sortie et audio"
     },
@@ -701,7 +701,7 @@
       "description": "Connect your Stripe account to collect payments directly from clients.",
       "descriptionConnected": "Your Stripe account is connected and ready to collect payments.",
       "notConnected": "Not connected",
-      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record — funds go straight to your Stripe account.",
+      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record. Funds go straight to your Stripe account.",
       "connect": "Connect Stripe Account",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
@@ -710,7 +710,7 @@
       "businessName": "Business",
       "connectedDate": "Connected",
       "status": "Status",
-      "statusActive": "Active — ready to accept payments",
+      "statusActive": "Active, ready to accept payments",
       "statusPending": "Setup incomplete",
       "statusPendingHelp": "Complete your Stripe account setup to start accepting payments.",
       "completeSetup": "Complete setup in Stripe",
@@ -791,7 +791,7 @@
     "searchPlaceholder": "Rechercher des articles...",
     "whatsNew": "Nouveautés",
     "whatsNewDesc": "Dernières mises à jour et améliorations de Mix Architect.",
-    "noChangelog": "Pas encore de mises à jour — revenez bientôt !",
+    "noChangelog": "Pas encore de mises à jour. Revenez bientôt !",
     "viewAllChangelog": "Voir toutes les mises à jour",
     "systemStatus": "État du système",
     "systemStatusTitle": "État du système",
@@ -895,6 +895,7 @@
     "save": "Enregistrer"
   },
   "landing": {
+    "navAbout": "À propos",
     "aboutEyebrow": "À propos",
     "aboutHeadline": "Pourquoi j'ai créé Mix Architect",
     "aboutBody1": "J'ai commencé à la fin des années 90 en enregistrant des groupes locaux du sud de la Californie sur un Boss BR-8. Depuis, j'ai rejoint Surf City Studios, obtenu mon diplôme du Berklee College of Music, étudié le mixage et le mastering auprès de certains des ingénieurs les plus respectés du métier, et fondé la société de hardware Vermilion Audio. La musique est la seule constante.",

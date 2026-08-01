@@ -152,11 +152,11 @@
       "create-submit": "点击按钮创建您的发行。您可以立即开始探索。",
       "release-tabs": "这些选项卡用于整理您的发行：歌曲、全局、发行和财务。每个部分帮助管理项目的不同方面。",
       "release-sidebar": "在这里上传封面艺术、查看发行信息，并添加内部或客户备注。",
-      "release-track-link": "点击进入歌曲查看详情——混音意图、规格、音频版本等。",
+      "release-track-link": "点击进入歌曲查看详情：：混音意图、规格、音频版本等。",
       "track-tabs": "每个选项卡记录不同方面：意图（您的愿景）、规格（技术要求）、音频（上传和版本）等。",
-      "track-intent": "描述此混音的愿景——情绪、参考和方向。这是您简报的核心。",
+      "track-intent": "描述此混音的愿景：：情绪、参考和方向。这是您简报的核心。",
       "dashboard-card": "每个发行一目了然地显示状态、歌曲进度和关键信息。点击可深入查看。",
-      "dashboard-nav": "侧边栏让您快速访问所有部分——发行、艺人、模板、付款和分析。"
+      "dashboard-nav": "侧边栏让您快速访问所有部分：：发行、艺人、模板、付款和分析。"
     }
   },
   "dashboard": {
@@ -576,8 +576,8 @@
       "logoLabel": "徽标",
       "logoHint": "显示在浅色背景上；如果未设置深色版本，则在所有位置显示。",
       "darkLogoLabel": "深色模式徽标",
-      "darkLogoHint": "可选 — 当客户以深色模式查看门户时显示。",
-      "formatsHint": "SVG、PNG、JPG 或 WebP · 最大 5MB · SVG（或 2–3× 的 PNG 导出）在视网膜屏上依然清晰。",
+      "darkLogoHint": "可选。当客户以深色模式查看门户时显示。",
+      "formatsHint": "SVG、PNG、JPG 或 WebP · 最大 5MB · SVG（或 2-3× 的 PNG 导出）在视网膜屏上依然清晰。",
       "replace": "替换",
       "upload": "上传",
       "remove": "移除",
@@ -701,7 +701,7 @@
       "description": "Connect your Stripe account to collect payments directly from clients.",
       "descriptionConnected": "Your Stripe account is connected and ready to collect payments.",
       "notConnected": "Not connected",
-      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record — funds go straight to your Stripe account.",
+      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record。funds go straight to your Stripe account.",
       "connect": "Connect Stripe Account",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
@@ -710,7 +710,7 @@
       "businessName": "Business",
       "connectedDate": "Connected",
       "status": "Status",
-      "statusActive": "Active — ready to accept payments",
+      "statusActive": "Active、ready to accept payments",
       "statusPending": "Setup incomplete",
       "statusPendingHelp": "Complete your Stripe account setup to start accepting payments.",
       "completeSetup": "Complete setup in Stripe",
@@ -895,6 +895,7 @@
     "save": "保存"
   },
   "landing": {
+    "navAbout": "关于",
     "aboutEyebrow": "关于",
     "aboutHeadline": "我为什么做了 Mix Architect",
     "aboutBody1": "我从 90 年代末开始，用一台 Boss BR-8 给南加州的本地乐队录音。之后我加入了 Surf City Studios，从 Berklee College of Music 毕业，跟随业内几位备受尊敬的工程师学习混音与母带，并创办了硬件公司 Vermilion Audio。一直没变的只有音乐。",

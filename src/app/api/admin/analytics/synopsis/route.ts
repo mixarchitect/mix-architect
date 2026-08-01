@@ -53,7 +53,7 @@ function buildPrompt(data: Awaited<ReturnType<typeof getAllGA4TrafficData>>, ran
 Analyze the following site traffic data for ${label} and write a concise 3-5 sentence synopsis. Focus on:
 - What stands out (traffic trends, unusual referrers, notable pages)
 - Conversion signals (pricing page visits, signup events, checkout events)
-- Portal traffic as a percentage of total (paths starting with /portal are client delivery portals — this is our viral loop)
+- Portal traffic as a percentage of total (paths starting with /portal are client delivery portals; this is our viral loop)
 - Anything that might need attention (high bounce rates, drop-offs, zero events where there should be activity)
 
 Be direct, specific with numbers, and actionable. No filler. Write in a natural, conversational tone. Do not use bullet points or headers. Do not start with "Here's" or "Based on". Just give me the analysis as a short paragraph.

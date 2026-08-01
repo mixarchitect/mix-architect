@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!entry) return { title: "Not Found" };
 
   return {
-    title: `${entry.title} — Mix Architect Changelog`,
+    title: `${entry.title} | Mix Architect Changelog`,
     description: entry.summary,
   };
 }

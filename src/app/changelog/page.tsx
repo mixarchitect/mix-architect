@@ -9,11 +9,11 @@ import { ChangelogFeed } from "./changelog-feed";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "What's New — Mix Architect",
+  title: "What's New | Mix Architect",
   description:
-    "The latest features, improvements, and updates to Mix Architect — release management for independent artists and audio engineers.",
+    "The latest features, improvements, and updates to Mix Architect: release management for independent artists and audio engineers.",
   openGraph: {
-    title: "What's New — Mix Architect",
+    title: "What's New | Mix Architect",
     description:
       "See what we've been building. The latest features and improvements to Mix Architect.",
     url: "https://mixarchitect.com/changelog",

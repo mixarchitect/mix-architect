@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     || "Mix Architect";
 
   return {
-    title: `${quote.document_type === "invoice" ? "Invoice" : "Quote"} ${quote.quote_number} — ${engineerName}`,
+    title: `${quote.document_type === "invoice" ? "Invoice" : "Quote"} ${quote.quote_number} | ${engineerName}`,
     robots: { index: false, follow: false },
   };
 }

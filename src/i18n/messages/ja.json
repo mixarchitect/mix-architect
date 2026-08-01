@@ -152,11 +152,11 @@
       "create-submit": "ボタンを押してリリースを作成しましょう。すぐに確認できます。",
       "release-tabs": "これらのタブでリリースを整理します：トラック、グローバル、ディストリビューション、ファイナンシャル。各セクションがプロジェクトの異なる側面を管理します。",
       "release-sidebar": "カバーアートのアップロード、リリース情報の確認、内部メモやクライアントメモの追加ができます。",
-      "release-track-link": "トラックをクリックして詳細を確認——ミックス意図、仕様、オーディオバージョンなど。",
+      "release-track-link": "トラックをクリックして詳細を確認：：ミックス意図、仕様、オーディオバージョンなど。",
       "track-tabs": "各タブは異なる側面を記録します：意図（ビジョン）、仕様（技術要件）、オーディオ（アップロード＆バージョン）など。",
-      "track-intent": "このミックスのビジョンを記述します——ムード、リファレンス、方向性。ブリーフの核心です。",
+      "track-intent": "このミックスのビジョンを記述します：：ムード、リファレンス、方向性。ブリーフの核心です。",
       "dashboard-card": "各リリースのステータス、トラック進捗、主要情報が一目で確認できます。クリックで詳細へ。",
-      "dashboard-nav": "サイドバーからすべてのセクションにすばやくアクセス——リリース、アーティスト、テンプレート、支払い、アナリティクス。"
+      "dashboard-nav": "サイドバーからすべてのセクションにすばやくアクセス：：リリース、アーティスト、テンプレート、支払い、アナリティクス。"
     }
   },
   "dashboard": {
@@ -576,7 +576,7 @@
       "logoLabel": "ロゴ",
       "logoHint": "明るい背景で表示されます。ダークバージョンが未設定の場合はすべての場所で使われます。",
       "darkLogoLabel": "ダークモード用ロゴ",
-      "darkLogoHint": "任意 — クライアントがポータルをダークモードで表示したときに使われます。",
+      "darkLogoHint": "任意。クライアントがポータルをダークモードで表示したときに使われます。",
       "formatsHint": "SVG、PNG、JPG、WebP · 最大5MB · SVG（または2〜3倍のPNG書き出し）ならRetinaでも鮮明です。",
       "replace": "置き換え",
       "upload": "アップロード",
@@ -701,7 +701,7 @@
       "description": "Connect your Stripe account to collect payments directly from clients.",
       "descriptionConnected": "Your Stripe account is connected and ready to collect payments.",
       "notConnected": "Not connected",
-      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record — funds go straight to your Stripe account.",
+      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record。funds go straight to your Stripe account.",
       "connect": "Connect Stripe Account",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
@@ -710,7 +710,7 @@
       "businessName": "Business",
       "connectedDate": "Connected",
       "status": "Status",
-      "statusActive": "Active — ready to accept payments",
+      "statusActive": "Active、ready to accept payments",
       "statusPending": "Setup incomplete",
       "statusPendingHelp": "Complete your Stripe account setup to start accepting payments.",
       "completeSetup": "Complete setup in Stripe",
@@ -895,6 +895,7 @@
     "save": "保存"
   },
   "landing": {
+    "navAbout": "紹介",
     "aboutEyebrow": "あいさつ",
     "aboutHeadline": "Mix Architect をつくった理由",
     "aboutBody1": "90年代後半、南カリフォルニアのローカルバンドを Boss BR-8 で録音するところから始めました。その後 Surf City Studios に参加し、Berklee College of Music を卒業、業界で高く評価されるエンジニアたちのもとでミキシングとマスタリングを学び、ハードウェアメーカーの Vermilion Audio を立ち上げました。変わらなかったのは音楽だけです。",

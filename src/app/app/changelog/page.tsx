@@ -3,7 +3,7 @@ import { getPublishedEntries } from "@/lib/services/changelog";
 import { ChangelogFeed } from "./changelog-feed";
 
 export const metadata: Metadata = {
-  title: "What's New — Mix Architect",
+  title: "What's New | Mix Architect",
 };
 
 export default async function AppChangelogPage() {

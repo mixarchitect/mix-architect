@@ -766,7 +766,7 @@ export function TrackDetailClient({
                       <textarea
                         value={mixVision}
                         onChange={(e) => setMixVision(e.target.value)}
-                        placeholder="Describe the sonic direction — mood, energy, spatial qualities, any specifics about the mix."
+                        placeholder="Describe the sonic direction: mood, energy, spatial qualities, any specifics about the mix."
                         className="input min-h-[160px] resize-y text-sm leading-relaxed"
                         autoFocus
                       />

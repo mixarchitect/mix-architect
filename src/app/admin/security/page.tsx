@@ -174,8 +174,8 @@ export default function SecurityPage() {
                   <p className="text-lg font-semibold text-text">
                     {result.totalPassed}/{result.totalTests} passed
                     {allPassed
-                      ? " — All Clear"
-                      : ` — ${result.failures.length} failure(s)`}
+                      ? ", All Clear"
+                      : `, ${result.failures.length} failure(s)`}
                   </p>
                   <p className="text-sm text-muted">
                     Last run: {new Date(result.date).toLocaleString()}

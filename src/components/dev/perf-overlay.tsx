@@ -394,7 +394,7 @@ export function PerfOverlay() {
           <div style={{ padding: 8 }}>
             {fpsSnapshots.length === 0 && (
               <div style={{ color: "#999", padding: 12, textAlign: "center" }}>
-                No FPS data yet — play audio to record
+                No FPS data yet. Play audio to record
               </div>
             )}
             {fpsSnapshots.map((snap, i) => {

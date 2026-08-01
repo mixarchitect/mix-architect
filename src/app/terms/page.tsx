@@ -252,8 +252,8 @@ export default async function TermsPage() {
           <Section title="8. Intellectual Property">
             <SubSection title="8.1 Our Intellectual Property">
               <p>
-                The Services — including all software, design, user
-                interfaces, documentation, branding, logos, and trademarks —
+                The Services, including all software, design, user
+                interfaces, documentation, branding, logos, and trademarks,
                 are owned by Mix Architect or our licensors and are protected
                 by copyright, trademark, and other intellectual property laws.
                 We grant you a limited, non-exclusive, non-transferable,
@@ -372,7 +372,7 @@ export default async function TermsPage() {
               These limitations apply regardless of the legal theory (contract,
               tort, statute, or otherwise) and apply even if a limited remedy
               fails of its essential purpose. Some jurisdictions do not allow
-              limitation of certain damages — in those jurisdictions, our
+              limitation of certain damages. In those jurisdictions, our
               liability is limited to the maximum extent permitted by
               applicable law.
             </p>
@@ -415,7 +415,7 @@ export default async function TermsPage() {
                 "Your access to the Services ends.",
                 "Outstanding paid subscription fees are not refunded except as expressly stated in Section 4.4.",
                 "Your User Content may be deleted after a reasonable grace period.",
-                "Sections that by their nature should survive — including ownership of User Content, the license you granted in Section 6.3 for content already distributed to authorized collaborators, indemnification, limitation of liability, governing law, and these termination provisions — survive.",
+                "Sections that by their nature should survive (including ownership of User Content, the license you granted in Section 6.3 for content already distributed to authorized collaborators, indemnification, limitation of liability, governing law, and these termination provisions) survive.",
               ]}
             />
           </Section>

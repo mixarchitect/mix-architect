@@ -367,7 +367,7 @@ export function buildCompGrantedEmail({
       ? [
           "Unlimited releases and tracks",
           "Team workspace with unlimited seats",
-          "Full white-label portal — your logo, colors, and custom domain",
+          "Full white-label portal: your logo, colors, and custom domain",
           "Branded client emails from your own domain",
           "Priority support",
         ]
@@ -382,7 +382,7 @@ export function buildCompGrantedEmail({
     html: wrap(
       `
       ${heading(`Complimentary ${planLabel} unlocked`)}
-      ${paragraph(`Hi ${escapeHtml(displayName)}, we've upgraded your account to Mix Architect ${planLabel} — on us. Here's what's now unlocked:`)}
+      ${paragraph(`Hi ${escapeHtml(displayName)}, we've upgraded your account to Mix Architect ${planLabel}, on us. Here's what's now unlocked:`)}
       <ul style="margin:8px 0 16px;padding-left:20px;font-size:14px;color:#666;line-height:1.8">
         ${features.map((f) => `<li>${f}</li>`).join("\n        ")}
       </ul>

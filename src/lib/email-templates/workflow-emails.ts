@@ -28,7 +28,7 @@ export function buildThankYouEmail(
   brand: EmailBrand = DEFAULT_BRAND,
 ) {
   return {
-    subject: `Thank you — ${releaseTitle}`,
+    subject: `Thank you: ${releaseTitle}`,
     html: brandedWrap(
       `
       ${heading(`Thank you, ${escapeHtml(clientName)}!`)}
@@ -55,13 +55,13 @@ export function buildTestimonialRequestEmail(
   brand: EmailBrand = DEFAULT_BRAND,
 ) {
   return {
-    subject: `How was your experience? — ${releaseTitle}`,
+    subject: `How was your experience with ${releaseTitle}?`,
     html: brandedWrap(
       `
       ${heading("How was your experience?")}
       ${paragraph(`Hi ${escapeHtml(clientName)},`)}
       ${paragraph(`Now that <strong>${escapeHtml(releaseTitle)}</strong> is complete, we'd love to hear your feedback. How was your experience working with ${escapeHtml(engineerName)}?`)}
-      ${paragraph("A quick testimonial would mean the world — just reply to this email with your thoughts!")}
+      ${paragraph("A quick testimonial would mean the world. Just reply to this email with your thoughts!")}
     `,
       brand,
     ),
@@ -103,7 +103,7 @@ export function buildPaymentReminderWorkflowEmail(
     : "";
 
   return {
-    subject: `Payment reminder — Quote ${quoteNumber}`,
+    subject: `Payment reminder: Quote ${quoteNumber}`,
     html: brandedWrap(
       `
       ${heading("Payment Reminder")}

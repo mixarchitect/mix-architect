@@ -152,11 +152,11 @@
       "create-submit": "Pulsa el botón para crear tu lanzamiento. Podrás explorarlo de inmediato.",
       "release-tabs": "Estas pestañas organizan tu lanzamiento: Temas, Globales, Distribución y Finanzas. Cada sección ayuda a gestionar un aspecto diferente de tu proyecto.",
       "release-sidebar": "Sube la portada, consulta la información del lanzamiento y añade notas internas o del cliente aquí.",
-      "release-track-link": "Haz clic en un tema para ver sus detalles — intención de la mezcla, especificaciones, versiones de audio y más.",
+      "release-track-link": "Haz clic en un tema para ver sus detalles: intención de la mezcla, especificaciones, versiones de audio y más.",
       "track-tabs": "Cada pestaña captura un aspecto diferente: Intención (tu visión), Especificaciones (requisitos técnicos), Audio (subidas y versiones) y más.",
-      "track-intent": "Describe la visión para esta mezcla — ambiente, referencias y dirección. Este es el corazón de tu brief.",
+      "track-intent": "Describe la visión para esta mezcla: ambiente, referencias y dirección. Este es el corazón de tu brief.",
       "dashboard-card": "Cada lanzamiento muestra su estado, progreso de temas e información clave de un vistazo. Haz clic para volver a explorarlo.",
-      "dashboard-nav": "La barra lateral te da acceso rápido a todas las secciones — Lanzamientos, Artistas, Plantillas, Pagos y Analíticas."
+      "dashboard-nav": "La barra lateral te da acceso rápido a todas las secciones: Lanzamientos, Artistas, Plantillas, Pagos y Analíticas."
     }
   },
   "dashboard": {
@@ -577,7 +577,7 @@
       "logoHint": "Se muestra sobre fondos claros y en todas partes si no hay una versión oscura.",
       "darkLogoLabel": "Logo para modo oscuro",
       "darkLogoHint": "Opcional: se muestra cuando un cliente ve el portal en modo oscuro.",
-      "formatsHint": "SVG, PNG, JPG o WebP · máx. 5 MB · un SVG (o una exportación PNG a 2–3×) se ve nítido en pantallas retina.",
+      "formatsHint": "SVG, PNG, JPG o WebP · máx. 5 MB · un SVG (o una exportación PNG a 2-3×) se ve nítido en pantallas retina.",
       "replace": "Reemplazar",
       "upload": "Subir",
       "remove": "Eliminar",
@@ -633,7 +633,7 @@
     },
     "featureVisibility": {
       "title": "Visibilidad de funciones",
-      "description": "Controla qué funciones aparecen en tu barra lateral y en las páginas de lanzamientos. Las funciones ocultas no se eliminan — puedes volver a activarlas en cualquier momento.",
+      "description": "Controla qué funciones aparecen en tu barra lateral y en las páginas de lanzamientos. Las funciones ocultas no se eliminan. Puedes volver a activarlas en cualquier momento.",
       "clientBusiness": "Clientes y negocio",
       "releaseAudio": "Lanzamiento y audio"
     },
@@ -701,7 +701,7 @@
       "description": "Connect your Stripe account to collect payments directly from clients.",
       "descriptionConnected": "Your Stripe account is connected and ready to collect payments.",
       "notConnected": "Not connected",
-      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record — funds go straight to your Stripe account.",
+      "notConnectedHelp": "Connect Stripe to send quotes and collect payments directly from clients. You'll be the merchant of record. Funds go straight to your Stripe account.",
       "connect": "Connect Stripe Account",
       "connecting": "Connecting...",
       "disconnect": "Disconnect",
@@ -710,7 +710,7 @@
       "businessName": "Business",
       "connectedDate": "Connected",
       "status": "Status",
-      "statusActive": "Active — ready to accept payments",
+      "statusActive": "Active, ready to accept payments",
       "statusPending": "Setup incomplete",
       "statusPendingHelp": "Complete your Stripe account setup to start accepting payments.",
       "completeSetup": "Complete setup in Stripe",
@@ -791,7 +791,7 @@
     "searchPlaceholder": "Buscar artículos...",
     "whatsNew": "Novedades",
     "whatsNewDesc": "Últimas actualizaciones y mejoras de Mix Architect.",
-    "noChangelog": "Aún no hay actualizaciones — ¡vuelve pronto!",
+    "noChangelog": "Aún no hay actualizaciones. ¡vuelve pronto!",
     "viewAllChangelog": "Ver todas las actualizaciones",
     "systemStatus": "Estado del sistema",
     "systemStatusTitle": "Estado del sistema",
@@ -895,6 +895,7 @@
     "save": "Guardar"
   },
   "landing": {
+    "navAbout": "Sobre mí",
     "aboutEyebrow": "Sobre mí",
     "aboutHeadline": "Por qué creé Mix Architect",
     "aboutBody1": "Empecé a finales de los 90 grabando bandas locales del sur de California en un Boss BR-8. Desde entonces me uní a Surf City Studios, me gradué del Berklee College of Music, estudié mezcla y masterización con algunos de los ingenieros más respetados de la industria y fundé la empresa de hardware Vermilion Audio. La música ha sido la constante.",
