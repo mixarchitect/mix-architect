@@ -73,6 +73,17 @@
     "dismiss": "Dismiss"
   },
   "onboarding": {
+    "restoreReleases": {
+      "title": "Welcome back",
+      "subtitle": "You have {count} previous release(s) saved. What would you like to do with them?",
+      "restoreTitle": "Bring them back",
+      "restoreDesc": "Restore all {count} release(s) exactly as you left them.",
+      "discardTitle": "Start fresh",
+      "discardDesc": "Begin with an empty workspace.",
+      "recoverNote": "Starting fresh does not erase anything permanently. Contact support if you want them back later.",
+      "saving": "Saving your choice...",
+      "back": "Back"
+    },
     "persona": {
       "title": "How will you use Mix Architect?",
       "artist": "Artist",

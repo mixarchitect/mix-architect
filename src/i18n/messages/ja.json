@@ -73,6 +73,17 @@
     "dismiss": "非表示"
   },
   "onboarding": {
+    "restoreReleases": {
+      "title": "おかえりなさい",
+      "subtitle": "以前のリリースが{count}件保存されています。どうしますか？",
+      "restoreTitle": "元に戻す",
+      "restoreDesc": "{count}件のリリースを、そのままの状態で復元します。",
+      "discardTitle": "新しく始める",
+      "discardDesc": "空のワークスペースから始めます。",
+      "recoverNote": "新しく始めても、完全に削除されるわけではありません。あとで戻したい場合はサポートにご連絡ください。",
+      "saving": "選択を保存しています...",
+      "back": "戻る"
+    },
     "persona": {
       "title": "Mix Architectをどのように使いますか？",
       "artist": "アーティスト",

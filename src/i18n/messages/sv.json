@@ -73,6 +73,17 @@
     "dismiss": "Avfärda"
   },
   "onboarding": {
+    "restoreReleases": {
+      "title": "Välkommen tillbaka",
+      "subtitle": "Du har {count} tidigare releaser sparade. Vad vill du göra med dem?",
+      "restoreTitle": "Hämta tillbaka dem",
+      "restoreDesc": "Återställ alla {count} releaser precis som du lämnade dem.",
+      "discardTitle": "Börja om",
+      "discardDesc": "Börja med en tom arbetsyta.",
+      "recoverNote": "Att börja om raderar inget permanent. Kontakta supporten om du vill ha tillbaka dem senare.",
+      "saving": "Sparar ditt val...",
+      "back": "Tillbaka"
+    },
     "persona": {
       "title": "Hur kommer du att använda Mix Architect?",
       "artist": "Artist",

@@ -73,6 +73,17 @@
     "dismiss": "Ignorer"
   },
   "onboarding": {
+    "restoreReleases": {
+      "title": "Bon retour",
+      "subtitle": "Vous avez {count} sorties précédentes enregistrées. Que voulez-vous en faire ?",
+      "restoreTitle": "Les récupérer",
+      "restoreDesc": "Restaurez les {count} sorties exactement comme vous les aviez laissées.",
+      "discardTitle": "Repartir de zéro",
+      "discardDesc": "Commencez avec un espace de travail vide.",
+      "recoverNote": "Repartir de zéro n'efface rien définitivement. Contactez le support si vous les voulez plus tard.",
+      "saving": "Enregistrement de votre choix...",
+      "back": "Retour"
+    },
     "persona": {
       "title": "Comment utiliserez-vous Mix Architect ?",
       "artist": "Artiste",
