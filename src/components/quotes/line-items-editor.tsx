@@ -276,6 +276,10 @@ export function LineItemsEditor({
         )}
       </div>
 
+      {/* Fixed grid tracks total ~550px min — scroll on narrow screens instead
+          of clipping against the shell's overflow-x-hidden */}
+      <div className="overflow-x-auto">
+      <div className="min-w-[540px]">
       {/* Column headers */}
       {lineItems.length > 0 && (
         <div className={`grid ${gridCols} gap-x-2 items-center mb-1`}>
@@ -447,6 +451,8 @@ export function LineItemsEditor({
             )}
           </div>
         ))}
+      </div>
+      </div>
       </div>
 
       {/* Add buttons */}

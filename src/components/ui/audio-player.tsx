@@ -1166,8 +1166,8 @@ export function AudioPlayer({
         </div>
 
         {/* Version metadata lines */}
-        <div className="px-5 pt-2 flex items-center gap-2">
-          <span className="text-[10px] text-faint uppercase tracking-wider">
+        <div className="px-5 pt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-[10px] text-faint uppercase tracking-wider whitespace-nowrap">
             v{activeVersion?.version_number} ·{" "}
             {activeVersion?.created_at
               ? new Date(activeVersion.created_at).toLocaleDateString("en-US", {
@@ -1176,7 +1176,7 @@ export function AudioPlayer({
                 })
               : ""}
           </span>
-          <span className="text-[10px] text-faint">
+          <span className="text-[10px] text-faint whitespace-nowrap">
             · {versionComments.length} comment
             {versionComments.length !== 1 ? "s" : ""}
           </span>
@@ -1251,7 +1251,7 @@ export function AudioPlayer({
           {(measuredLufs != null ||
             measuredTruePeak != null ||
             (qualitySnapshot != null && qualitySnapshot.issues.length > 0)) && (
-            <span className="ml-auto inline-flex items-center gap-3 text-[10px]">
+            <span className="ml-auto inline-flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[10px]">
               {measuredLufs != null && (() => {
                 const delta = measuredLufs - LUFS_REFERENCE;
                 return (
