@@ -125,7 +125,7 @@ export function TourTooltip({
       ref={tooltipRef}
       role="dialog"
       aria-label="Tour step"
-      className="fixed z-[9999] w-80 rounded-xl border border-signal/30 shadow-xl"
+      className="fixed z-[9999] w-80 max-w-[calc(100vw-16px)] rounded-xl border border-signal/30 shadow-xl"
       style={{
         top: coords.top,
         left: coords.left,

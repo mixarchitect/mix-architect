@@ -527,8 +527,10 @@ export function QuoteBuilder({
                 onImportTrackFees={importFromTrackFees}
               />
 
-              {/* Totals — same grid template as line items so Amount column aligns */}
-              <div className={`grid ${isReadonly ? "grid-cols-[20px_1fr_72px_112px_96px]" : "grid-cols-[20px_1fr_72px_112px_96px_32px]"} gap-x-2 gap-y-1 items-center mt-3 border-t border-border pt-3`}>
+              {/* Totals — same grid template as line items so Amount column aligns.
+                  Fixed tracks can't shrink → scroll on narrow screens */}
+              <div className="overflow-x-auto">
+              <div className={`grid min-w-[540px] ${isReadonly ? "grid-cols-[20px_1fr_72px_112px_96px]" : "grid-cols-[20px_1fr_72px_112px_96px_32px]"} gap-x-2 gap-y-1 items-center mt-3 border-t border-border pt-3`}>
                 {/* Subtotal */}
                 <div className="col-span-4 text-sm text-muted text-right py-2">
                   {t("builder.subtotal")}
@@ -582,6 +584,7 @@ export function QuoteBuilder({
                 </div>
                 {!isReadonly && <div />}
               </div>
+              </div>
             </PanelBody>
           </Panel>
         )}
@@ -617,7 +620,9 @@ export function QuoteBuilder({
                 </div>
               </div>
 
-              <div className="space-y-3">
+              {/* Fixed tracks + date input ≈ 590px min — scroll on narrow screens */}
+              <div className="overflow-x-auto">
+              <div className="space-y-3 min-w-[540px]">
                 {installments.map((inst, idx) => (
                   <div
                     key={idx}
@@ -661,6 +666,7 @@ export function QuoteBuilder({
                     )}
                   </div>
                 ))}
+              </div>
               </div>
 
               <button

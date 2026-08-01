@@ -42,8 +42,18 @@ export async function LandingFooter() {
             >
               {t("navChangelog")}
             </Link>
-            <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navHelpCenter")}</span>
-            <span className="min-h-[44px] inline-flex items-center cursor-default">{t("navContact")}</span>
+            <Link
+              href="/app/help"
+              className="min-h-[44px] inline-flex items-center hover:text-white/70 transition-colors"
+            >
+              {t("navHelpCenter")}
+            </Link>
+            <a
+              href="mailto:support@mixarchitect.com"
+              className="min-h-[44px] inline-flex items-center hover:text-white/70 transition-colors"
+            >
+              {t("navContact")}
+            </a>
           </nav>
 
           <div className="flex items-center gap-4 text-xs text-zinc-400">
