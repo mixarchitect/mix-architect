@@ -15,6 +15,7 @@ import { notFound } from "next/navigation";
 import { AdminToggleButton } from "@/components/admin/AdminToggleButton";
 import { TestAccountToggle } from "@/components/admin/UserDetailHeader";
 import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
+import { ResetAccountButton } from "@/components/admin/ResetAccountButton";
 import { SubscriptionPlanControl } from "@/components/admin/SubscriptionPlanControl";
 
 export const dynamic = "force-dynamic";
@@ -53,7 +54,7 @@ export default async function UserDetailPage({ params }: Props) {
         .order("created_at", { ascending: false }),
       supabase
         .from("releases")
-        .select("id, title, artist, release_type, created_at, updated_at")
+        .select("id, title, artist, release_type, created_at, updated_at, deleted_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false }),
     ]);
@@ -213,6 +214,14 @@ export default async function UserDetailPage({ params }: Props) {
                       subscription.cancel_at_period_end ?? null,
                   }
                 : null
+            }
+          />
+          <ResetAccountButton
+            userId={userId}
+            releaseCount={
+              releases.filter(
+                (r) => !(r as { deleted_at?: string | null }).deleted_at,
+              ).length
             }
           />
           <DeleteUserButton userId={userId} />

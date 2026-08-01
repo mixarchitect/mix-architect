@@ -73,6 +73,17 @@
     "dismiss": "Dispensar"
   },
   "onboarding": {
+    "restoreReleases": {
+      "title": "Bem-vindo de volta",
+      "subtitle": "Você tem {count} lançamentos anteriores salvos. O que deseja fazer com eles?",
+      "restoreTitle": "Trazer de volta",
+      "restoreDesc": "Restaure os {count} lançamentos exatamente como você deixou.",
+      "discardTitle": "Começar do zero",
+      "discardDesc": "Comece com um espaço de trabalho vazio.",
+      "recoverNote": "Começar do zero não apaga nada permanentemente. Fale com o suporte se quiser os arquivos de volta depois.",
+      "saving": "Salvando sua escolha...",
+      "back": "Voltar"
+    },
     "persona": {
       "title": "Como você usará o Mix Architect?",
       "artist": "Artista",

@@ -73,6 +73,17 @@
     "dismiss": "Verwerfen"
   },
   "onboarding": {
+    "restoreReleases": {
+      "title": "Willkommen zurück",
+      "subtitle": "Du hast {count} frühere Releases gespeichert. Was möchtest du damit machen?",
+      "restoreTitle": "Zurückholen",
+      "restoreDesc": "Alle {count} Releases genau so wiederherstellen, wie du sie verlassen hast.",
+      "discardTitle": "Neu anfangen",
+      "discardDesc": "Mit einem leeren Workspace starten.",
+      "recoverNote": "Ein Neuanfang löscht nichts endgültig. Melde dich beim Support, wenn du sie später zurückhaben möchtest.",
+      "saving": "Auswahl wird gespeichert...",
+      "back": "Zurück"
+    },
     "persona": {
       "title": "Wie wirst du Mix Architect verwenden?",
       "artist": "Künstler",

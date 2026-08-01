@@ -73,6 +73,17 @@
     "dismiss": "关闭"
   },
   "onboarding": {
+    "restoreReleases": {
+      "title": "欢迎回来",
+      "subtitle": "你有 {count} 个此前保存的发行。要如何处理它们？",
+      "restoreTitle": "找回它们",
+      "restoreDesc": "将这 {count} 个发行按原样恢复。",
+      "discardTitle": "重新开始",
+      "discardDesc": "从一个空白工作区开始。",
+      "recoverNote": "重新开始不会永久删除任何内容。以后想找回，请联系客服。",
+      "saving": "正在保存你的选择...",
+      "back": "返回"
+    },
     "persona": {
       "title": "您将如何使用 Mix Architect？",
       "artist": "艺人",

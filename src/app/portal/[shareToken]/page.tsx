@@ -81,11 +81,14 @@ export default async function PortalPage({ params }: Props) {
 
   const { data: release, error: releaseErr } = await supabase
     .from("releases")
-    .select("id, user_id, workspace_id, title, artist, release_type, format, cover_art_url, global_direction, payment_status, fee_total, fee_currency, paid_amount, client_name, client_email, delivery_notes, status, target_date, genre_tags, payment_notes, pinned, distributor, record_label, upc, copyright_holder, copyright_year, phonogram_copyright, catalog_number, created_at, updated_at")
+    .select("id, user_id, workspace_id, title, artist, release_type, format, cover_art_url, global_direction, payment_status, fee_total, fee_currency, paid_amount, client_name, client_email, delivery_notes, status, target_date, genre_tags, payment_notes, pinned, distributor, record_label, upc, copyright_holder, copyright_year, phonogram_copyright, catalog_number, created_at, updated_at, deleted_at")
     .eq("id", portalShare.release_id)
     .maybeSingle();
 
-  if (releaseErr || !release) notFound();
+  // This page reads with the service client (portal visitors are anonymous),
+  // so RLS does not hide parked releases here. Check explicitly: a release
+  // soft-deleted by an account reset must not keep serving its public portal.
+  if (releaseErr || !release || release.deleted_at) notFound();
 
   /* ── 3. Fetch tracks ────────────────────────────────────────────── */
 

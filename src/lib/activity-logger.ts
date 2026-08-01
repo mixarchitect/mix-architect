@@ -15,7 +15,10 @@ export type ActivityEventType =
   | "comp_account_granted"
   | "comp_account_revoked"
   | "attribution_click"
-  | "attribution_signup";
+  | "attribution_signup"
+  | "account_reset"
+  | "reset_releases_restored"
+  | "reset_releases_discarded";
 
 /**
  * Log a user activity event. Fire-and-forget on the server side.

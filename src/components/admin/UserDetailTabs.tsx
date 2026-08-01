@@ -66,6 +66,9 @@ const eventConfig: Record<
   conversion_completed: { label: "Converted audio", icon: Shuffle, color: "text-purple-400" },
   comp_account_granted: { label: "Comp granted", icon: Gift, color: "text-amber-400" },
   comp_account_revoked: { label: "Comp revoked", icon: Gift, color: "text-red-400" },
+  account_reset: { label: "Account reset by admin", icon: RefreshCcw, color: "text-amber-400" },
+  reset_releases_restored: { label: "Restored releases after reset", icon: RefreshCcw, color: "text-emerald-400" },
+  reset_releases_discarded: { label: "Discarded releases after reset", icon: XCircle, color: "text-red-400" },
 };
 
 const signalConfig: Record<string, { label: string; icon: typeof AlertTriangle }> = {

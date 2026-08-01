@@ -8,15 +8,18 @@ import { localeCurrencyMap, type Locale } from "@/i18n/config";
 import { getDefaultVisibility } from "@/lib/features/feature-registry";
 import { PersonaStep } from "./steps/persona-step";
 import { LocaleStep } from "./steps/locale-step";
+import { RestoreReleasesStep } from "./steps/restore-releases-step";
 import { ConfirmationStep } from "./steps/confirmation-step";
 
 type Persona = "artist" | "engineer" | "both" | "other";
 
 type Props = {
   userId: string;
+  /** Releases parked by an admin account reset. 0 for a normal first run. */
+  parkedReleaseCount?: number;
 };
 
-export function OnboardingFlow({ userId }: Props) {
+export function OnboardingFlow({ userId, parkedReleaseCount = 0 }: Props) {
   const [step, setStep] = useState(1);
   const [persona, setPersona] = useState<Persona>("artist");
   const [locale, setLocale] = useState<Locale>("en-US");
@@ -38,6 +41,38 @@ export function OnboardingFlow({ userId }: Props) {
     setLocale(l);
     setStep(3);
   }, []);
+
+  // Only reset users see the restore-or-discard step, so it sits at position 3
+  // and pushes confirmation to 4 when present.
+  const hasRestoreStep = parkedReleaseCount > 0;
+  const confirmStep = hasRestoreStep ? 4 : 3;
+  const totalSteps = confirmStep;
+
+  const handleRestoreDecision = useCallback(
+    async (decision: "restore" | "discard") => {
+      setSaving(true);
+      try {
+        const res = await fetch("/api/onboarding/reset-releases", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ decision }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          console.error("Reset-releases decision failed:", data.error);
+          setSaving(false);
+          return;
+        }
+      } catch (err) {
+        console.error("Reset-releases decision failed:", err);
+        setSaving(false);
+        return;
+      }
+      setSaving(false);
+      setStep(4);
+    },
+    [],
+  );
 
   const handleComplete = useCallback(
     async (destination: "release" | "dashboard") => {
@@ -99,7 +134,7 @@ export function OnboardingFlow({ userId }: Props) {
 
       {/* Step indicator */}
       <div className="flex items-center gap-2 mb-8">
-        {[1, 2, 3].map((s) => (
+        {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
           <button
             key={s}
             type="button"
@@ -132,14 +167,22 @@ export function OnboardingFlow({ userId }: Props) {
             onBack={() => setStep(1)}
           />
         )}
-        {step === 3 && (
+        {step === 3 && hasRestoreStep && (
+          <RestoreReleasesStep
+            count={parkedReleaseCount}
+            saving={saving}
+            onDecide={handleRestoreDecision}
+            onBack={() => setStep(2)}
+          />
+        )}
+        {step === confirmStep && (
           <ConfirmationStep
             persona={persona}
             locale={locale}
             currency={defaultCurrency}
             saving={saving}
             onComplete={handleComplete}
-            onBack={() => setStep(2)}
+            onBack={() => setStep(hasRestoreStep ? 3 : 2)}
           />
         )}
       </div>
