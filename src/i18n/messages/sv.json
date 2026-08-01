@@ -160,11 +160,23 @@
     }
   },
   "dashboard": {
+    "checklist": {
+      "title": "Kom igång",
+      "subtitle": "Fyra snabba steg till din första delade mix.",
+      "stepRelease": "Skapa en release",
+      "stepTrack": "Lägg till en låt",
+      "stepAudio": "Ladda upp ditt ljud",
+      "stepShare": "Dela för feedback",
+      "progress": "{done} av {total}",
+      "continue": "Fortsätt",
+      "takeTour": "Ta rundturen",
+      "dismiss": "Avfärda"
+    },
     "title": "Releaser",
     "newRelease": "Ny release",
     "upgrade": "Uppgradera",
     "noReleases": "Inga releaser ännu",
-    "noReleasesDesc": "Skapa din första release för att börja bygga spårinstruktioner, hantera specifikationer och organisera ditt mixarbetsflöde.",
+    "noReleasesDesc": "Skapa en release, lägg till dina låtar och dela dem för feedback.",
     "createFirst": "Skapa din första release",
     "noFilteredReleases": "Inga {filter} releaser",
     "noFilteredReleasesDesc": "Försök justera din sökning eller filter.",
@@ -199,8 +211,8 @@
       "setupNote": "Konfigurera ditt projekt. Du kan alltid redigera dessa detaljer senare.",
       "releaseTitle": "Releasetitel *",
       "releaseTitlePlaceholder": "Midnight Drive EP",
-      "artistClient": "Artist / Klient",
-      "artistPlaceholder": "Artist- eller klientnamn",
+      "artistClient": "Artistnamn",
+      "artistPlaceholder": "Ditt artist- eller bandnamn",
       "releaseType": "Releasetyp",
       "format": "Format",
       "genreTags": "Genretaggar",
@@ -769,6 +781,7 @@
     }
   },
   "help": {
+    "takeTour": "Ta rundturen",
     "title": "Hjälpcenter",
     "description": "Dokumentation, buggrapporter, funktionsförfrågningar och kontakt.",
     "articles": "Hjälpartiklar",

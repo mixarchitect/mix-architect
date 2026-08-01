@@ -160,11 +160,23 @@
     }
   },
   "dashboard": {
+    "checklist": {
+      "title": "开始设置",
+      "subtitle": "四个简单步骤，分享你的第一首混音。",
+      "stepRelease": "创建一个发行",
+      "stepTrack": "添加一首歌",
+      "stepAudio": "上传你的音频",
+      "stepShare": "分享以获取反馈",
+      "progress": "{total} 项中的 {done} 项",
+      "continue": "继续",
+      "takeTour": "查看导览",
+      "dismiss": "关闭"
+    },
     "title": "发行追踪器",
     "newRelease": "新建发行",
     "upgrade": "升级",
     "noReleases": "暂无发行",
-    "noReleasesDesc": "创建您的第一个发行，开始构建歌曲简介、管理规格并整理您的混音工作流程。",
+    "noReleasesDesc": "创建一个发行，添加你的歌曲，然后分享获取反馈。",
     "createFirst": "创建您的首个发行",
     "noFilteredReleases": "没有 {filter} 发行",
     "noFilteredReleasesDesc": "尝试调整您的搜索或过滤条件。",
@@ -199,8 +211,8 @@
       "setupNote": "设置您的项目。您随时可以编辑这些详细信息。",
       "releaseTitle": "发行标题 *",
       "releaseTitlePlaceholder": "Midnight Drive EP",
-      "artistClient": "艺人 / 客户",
-      "artistPlaceholder": "艺人或客户名称",
+      "artistClient": "艺人名称",
+      "artistPlaceholder": "你的艺人或乐队名称",
       "releaseType": "发行类型",
       "format": "格式",
       "genreTags": "风格标签",
@@ -769,6 +781,7 @@
     }
   },
   "help": {
+    "takeTour": "查看导览",
     "title": "帮助中心",
     "description": "文档、问题反馈、功能请求和联系方式。",
     "articles": "帮助文章",

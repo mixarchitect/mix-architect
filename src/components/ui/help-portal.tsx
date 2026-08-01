@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Mail, Search, Megaphone, Activity, CheckCircle, AlertTriangle, XCircle } from "lucide-react";
+import { Mail, Search, Megaphone, Activity, CheckCircle, AlertTriangle, XCircle, PlayCircle } from "lucide-react";
 import Link from "next/link";
 import { KnowledgeBase } from "@/components/ui/knowledge-base";
 import { BugReportForm } from "@/components/ui/bug-report-form";
@@ -68,11 +68,22 @@ export function HelpPortal() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold h2">{t("title")}</h1>
-        <p className="text-muted text-sm mt-1">
-          {t("description")}
-        </p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold h2">{t("title")}</h1>
+          <p className="text-muted text-sm mt-1">
+            {t("description")}
+          </p>
+        </div>
+        {/* The tour used to be reachable only from the onboarding
+            confirmation screen — this is its permanent re-entry point. */}
+        <Link
+          href="/app/releases/new?tour=true"
+          className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-md border border-border text-text hover:bg-panel2 transition-colors shrink-0"
+        >
+          <PlayCircle size={14} />
+          {t("takeTour")}
+        </Link>
       </div>
 
       {/* Tab bar */}

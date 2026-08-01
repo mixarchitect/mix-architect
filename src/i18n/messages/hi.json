@@ -160,11 +160,23 @@
     }
   },
   "dashboard": {
+    "checklist": {
+      "title": "सेटअप करें",
+      "subtitle": "आपके पहले साझा मिक्स तक चार आसान कदम।",
+      "stepRelease": "एक रिलीज़ बनाएँ",
+      "stepTrack": "एक गाना जोड़ें",
+      "stepAudio": "अपना ऑडियो अपलोड करें",
+      "stepShare": "फीडबैक के लिए साझा करें",
+      "progress": "{total} में से {done}",
+      "continue": "जारी रखें",
+      "takeTour": "टूर देखें",
+      "dismiss": "बंद करें"
+    },
     "title": "रिलीज़",
     "newRelease": "नई रिलीज़",
     "upgrade": "अपग्रेड करें",
     "noReleases": "अभी तक कोई रिलीज़ नहीं",
-    "noReleasesDesc": "ट्रैक ब्रीफ बनाने, स्पेसिफिकेशन मैनेज करने और अपने मिक्स वर्कफ्लो को ऑर्गनाइज़ करने के लिए अपनी पहली रिलीज़ बनाएं।",
+    "noReleasesDesc": "एक रिलीज़ शुरू करें, अपने गाने जोड़ें और फीडबैक के लिए साझा करें।",
     "createFirst": "अपनी पहली रिलीज़ बनाएं",
     "noFilteredReleases": "कोई {filter} रिलीज़ नहीं",
     "noFilteredReleasesDesc": "अपने सर्च या फिल्टर को एडजस्ट करने की कोशिश करें।",
@@ -199,8 +211,8 @@
       "setupNote": "अपना प्रोजेक्ट सेटअप करें। आप इन डिटेल्स को बाद में हमेशा एडिट कर सकते हैं।",
       "releaseTitle": "रिलीज़ टाइटल *",
       "releaseTitlePlaceholder": "Midnight Drive EP",
-      "artistClient": "आर्टिस्ट / क्लाइंट",
-      "artistPlaceholder": "आर्टिस्ट या क्लाइंट का नाम",
+      "artistClient": "कलाकार का नाम",
+      "artistPlaceholder": "आपका कलाकार या बैंड नाम",
       "releaseType": "रिलीज़ टाइप",
       "format": "फॉर्मेट",
       "genreTags": "जॉनर टैग्स",
@@ -769,6 +781,7 @@
     }
   },
   "help": {
+    "takeTour": "टूर देखें",
     "title": "हेल्प सेंटर",
     "description": "डॉक्स, बग रिपोर्ट्स, फीचर रिक्वेस्ट और कॉन्टैक्ट।",
     "articles": "हेल्प आर्टिकल",
