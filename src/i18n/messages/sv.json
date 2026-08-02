@@ -345,7 +345,11 @@
     "portalPaymentStatus": "Betalningsstatus",
     "portalDistribution": "Distribution",
     "portalLyrics": "Låttext",
-    "portalRequirePayment": "Kräv betalning"
+    "portalRequirePayment": "Kräv betalning",
+    "dropOrClick": "Dra en bild hit, eller klicka för att bläddra",
+    "dropToUpload": "Släpp för att ladda upp",
+    "imageFormats": "PNG, JPG, WebP eller GIF, upp till 5 MB",
+    "removeCoverArt": "Ta bort"
   },
   "releaseSettings": {
     "title": "Releaseinställningar",

@@ -345,7 +345,11 @@
     "portalPaymentStatus": "付款状态",
     "portalDistribution": "发行",
     "portalLyrics": "歌词",
-    "portalRequirePayment": "需要付款"
+    "portalRequirePayment": "需要付款",
+    "dropOrClick": "将图片拖到此处，或点击浏览",
+    "dropToUpload": "松开即可上传",
+    "imageFormats": "PNG、JPG、WebP 或 GIF，最大 5MB",
+    "removeCoverArt": "移除"
   },
   "releaseSettings": {
     "title": "发行设置",

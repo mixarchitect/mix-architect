@@ -345,7 +345,11 @@
     "noFinancialDataTitle": "Aucune donnée financière",
     "noFinancialDataDesc": "Créez un devis ou enregistrez du temps pour commencer à suivre les finances de cette sortie.",
     "newQuote": "Nouveau devis",
-    "logTime": "Enregistrer le temps"
+    "logTime": "Enregistrer le temps",
+    "dropOrClick": "Glissez une image ici ou cliquez pour parcourir",
+    "dropToUpload": "Relâchez pour envoyer",
+    "imageFormats": "PNG, JPG, WebP ou GIF, jusqu'à 5 Mo",
+    "removeCoverArt": "Retirer"
   },
   "releaseSettings": {
     "title": "Paramètres de sortie",

@@ -29,12 +29,15 @@ import { PortalTrackEditor } from "./portal-track-editor";
 import { MobileInspector } from "@/components/ui/mobile-inspector";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
 
+// Audio leads: it is what people open a track to do. The rest is reference.
 const ALL_TABS = [
-  { id: "brief", label: "Brief" },
   { id: "audio", label: "Audio" },
+  { id: "brief", label: "Brief" },
   { id: "delivery", label: "Delivery" },
   { id: "notes", label: "Notes" },
 ];
+
+const DEFAULT_TAB = ALL_TABS[0].id;
 
 const EMOTIONAL_SUGGESTIONS = [
   "aggressive", "intimate", "spacious", "gritty", "polished", "warm",
@@ -179,12 +182,12 @@ export function TrackDetailClient({
 
   const TAB_IDS = TABS.map((t) => t.id);
   const [activeTab, setActiveTab] = useState(() => {
-    if (typeof window === "undefined") return "intent";
+    if (typeof window === "undefined") return DEFAULT_TAB;
     const hash = window.location.hash.replace("#", "");
     // Support old hash values for backwards compat
     if (hash === "intent" || hash === "specs") return "brief";
     if (hash === "distribution" || hash === "portal") return "delivery";
-    return TAB_IDS.includes(hash) ? hash : "brief";
+    return TAB_IDS.includes(hash) ? hash : DEFAULT_TAB;
   });
 
   const handleTabChange = useCallback((tab: string) => {
