@@ -163,7 +163,7 @@ function ArtistNameEditor({
               setError("");
             }}
             className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-md text-muted hover:text-text transition-colors shrink-0"
-            style={{ background: "var(--panel2)" }}
+            style={{ background: "var(--panel-2)" }}
           >
             <X size={12} />
           </button>
@@ -298,7 +298,7 @@ function ContactInfoEditor({
                   setEditing(false);
                 }}
                 className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md text-muted hover:text-text transition-colors"
-                style={{ background: "var(--panel2)" }}
+                style={{ background: "var(--panel-2)" }}
               >
                 <X size={12} />
                 Cancel

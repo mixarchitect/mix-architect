@@ -129,8 +129,8 @@ export function TourChecklist({
                         ? "var(--signal)"
                         : isActive
                           ? "var(--signal)"
-                          : "var(--panel2)",
-                      color: isSeen || isActive ? "var(--signal-on)" : "var(--text-muted)",
+                          : "var(--panel-2)",
+                      color: isSeen || isActive ? "var(--signal-on)" : "var(--muted)",
                       opacity: isSeen ? 0.7 : 1,
                     }}
                   >
@@ -148,7 +148,7 @@ export function TourChecklist({
                     <div
                       className="text-xs font-medium truncate"
                       style={{
-                        color: isActive ? "var(--text)" : "var(--text-muted)",
+                        color: isActive ? "var(--text)" : "var(--muted)",
                       }}
                     >
                       {topic.label}

@@ -386,7 +386,7 @@ export default function SettingsPage() {
               <p className="text-xs text-muted">{t("regionCurrency.defaultCurrencyHelp")}</p>
             </div>
 
-            <div className="rounded-lg px-3 py-2" style={{ background: "var(--panel2)" }}>
+            <div className="rounded-lg px-3 py-2" style={{ background: "var(--panel-2)" }}>
               <span className="text-xs text-muted">{t("regionCurrency.preview")}: </span>
               <span className="text-sm font-medium text-text">
                 {formatCurrency(1234.56, defaultCurrency, locale)}
@@ -665,7 +665,7 @@ export default function SettingsPage() {
                     style={
                       format === opt.value
                         ? { background: "var(--signal)", color: "var(--signal-on)" }
-                        : { background: "var(--panel2)", color: "var(--text-muted)" }
+                        : { background: "var(--panel-2)", color: "var(--muted)" }
                     }
                   >
                     {opt.label}
@@ -1142,7 +1142,7 @@ function CalendarPanel() {
               </div>
             </div>
 
-            <div className="rounded-lg px-3 py-2 space-y-1.5" style={{ background: "var(--panel2)" }}>
+            <div className="rounded-lg px-3 py-2 space-y-1.5" style={{ background: "var(--panel-2)" }}>
               <p className="text-xs font-medium text-text">{t("setupTitle")}</p>
               <ul className="text-xs text-muted space-y-1 list-disc list-inside">
                 <li>{t("setupGoogle")}</li>

@@ -421,7 +421,7 @@ export default async function DashboardPage({ searchParams }: Props) {
       {paymentsEnabled && hasAnyFees && (
         <div
           className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5 rounded-lg text-xs mb-6"
-          style={{ background: "var(--panel2)" }}
+          style={{ background: "var(--panel-2)" }}
         >
           <span className="text-muted">
             {t("outstanding")}:{" "}

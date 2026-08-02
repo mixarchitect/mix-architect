@@ -151,7 +151,7 @@ export function ReleaseCard({
         >
           <div
             className="w-10 h-10 rounded-md flex-shrink-0 overflow-hidden flex items-center justify-center"
-            style={{ background: "var(--panel2)" }}
+            style={{ background: "var(--panel-2)" }}
           >
             {navigating ? (
               <span className="w-4 h-4 border-2 border-muted/40 border-t-muted rounded-full animate-spin" />

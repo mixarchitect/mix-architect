@@ -108,7 +108,7 @@ export function ArtistPhotoUploader({
         {/* Preview */}
         <div
           className="w-full aspect-square flex items-center justify-center"
-          style={{ background: "var(--panel2)" }}
+          style={{ background: "var(--panel-2)" }}
         >
           {displayUrl ? (
             <img src={displayUrl} alt={artistName} className="w-full h-full object-cover" />
@@ -124,7 +124,7 @@ export function ArtistPhotoUploader({
           <div className="flex items-center gap-2">
             <label
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md cursor-pointer transition-colors"
-              style={{ background: "var(--panel2)", color: "var(--text-muted)" }}
+              style={{ background: "var(--panel-2)", color: "var(--muted)" }}
             >
               <Upload size={14} />
               {uploading ? "Uploading\u2026" : "Upload"}

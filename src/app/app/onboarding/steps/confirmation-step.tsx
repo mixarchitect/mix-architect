@@ -57,15 +57,15 @@ export function ConfirmationStep({
 
       {/* Summary */}
       <div className="inline-flex items-center gap-2 text-sm text-text mb-8 flex-wrap justify-center">
-        <span className="px-2.5 py-1 rounded-md text-xs font-medium" style={{ background: "var(--panel2)" }}>
+        <span className="px-2.5 py-1 rounded-md text-xs font-medium" style={{ background: "var(--panel-2)" }}>
           {t(personaKeys[persona])}
         </span>
         <span className="text-muted">&middot;</span>
-        <span className="px-2.5 py-1 rounded-md text-xs font-medium" style={{ background: "var(--panel2)" }}>
+        <span className="px-2.5 py-1 rounded-md text-xs font-medium" style={{ background: "var(--panel-2)" }}>
           {localeFlagEmojis[locale]} {localeDisplayNames[locale]}
         </span>
         <span className="text-muted">&middot;</span>
-        <span className="px-2.5 py-1 rounded-md text-xs font-medium" style={{ background: "var(--panel2)" }}>
+        <span className="px-2.5 py-1 rounded-md text-xs font-medium" style={{ background: "var(--panel-2)" }}>
           {getSymbol(currency)} {currency}
         </span>
       </div>
