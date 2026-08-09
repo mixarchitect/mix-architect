@@ -32,6 +32,7 @@
     "quotes": "Angebote",
     "money": "Geld",
     "analytics": "Analytik",
+    "studio": "Studio",
     "settings": "Einstellungen",
     "help": "Hilfe",
     "helpCenter": "Hilfe-Center",
@@ -41,6 +42,10 @@
     "search": "Suchen",
     "more": "Mehr",
     "menu": "Menü"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "Verwalte Team, Portal-Branding, Kunden-E-Mails und eigene Domain an einem Ort."
   },
   "theme": {
     "light": "Hell",

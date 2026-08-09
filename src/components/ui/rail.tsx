@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
-import { Home, Users, DollarSign, LayoutTemplate, BarChart3 } from "lucide-react";
+import { Home, Users, DollarSign, LayoutTemplate, BarChart3, Building2 } from "lucide-react";
 import { useFeatureVisible } from "@/hooks/use-feature-visible";
 
 const MONEY_QUOTES = [
@@ -30,6 +30,7 @@ export function Rail() {
   const isTemplates = pathname?.startsWith("/app/templates");
   const isMoney = pathname?.startsWith("/app/money") || pathname?.startsWith("/app/payments") || pathname?.startsWith("/app/quotes");
   const isAnalytics = pathname?.startsWith("/app/analytics");
+  const isStudio = pathname?.startsWith("/app/studio");
 
   return (
     <nav
@@ -52,6 +53,7 @@ export function Rail() {
         <NavItem href="/app/money" icon={DollarSign} label={t("money")} active={isMoney} easterEgg />
       )}
       <NavItem href="/app/analytics" icon={BarChart3} label={t("analytics")} active={isAnalytics} />
+      <NavItem href="/app/studio" icon={Building2} label={t("studio")} active={isStudio} />
     </nav>
   );
 }

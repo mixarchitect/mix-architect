@@ -32,6 +32,7 @@
     "quotes": "見積",
     "money": "マネー",
     "analytics": "アナリティクス",
+    "studio": "Studio",
     "settings": "設定",
     "help": "ヘルプ",
     "helpCenter": "ヘルプセンター",
@@ -41,6 +42,10 @@
     "search": "検索",
     "more": "その他",
     "menu": "メニュー"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "チーム、ポータルのブランディング、クライアントメール、カスタムドメインをまとめて管理できます。"
   },
   "theme": {
     "light": "ライト",
