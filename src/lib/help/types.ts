@@ -4,6 +4,7 @@ export type ArticleCategory =
   | "audio"
   | "tasks"
   | "timeline"
+  | "studio"
   | "account"
   | "billing";
 

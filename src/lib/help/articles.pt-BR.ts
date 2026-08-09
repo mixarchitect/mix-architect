@@ -716,5 +716,48 @@ export const articles: HelpArticle[] = [
         "mockup": "resubscribe"
       }
     ]
+  },
+  {
+    "id": "studio-workspace",
+    "title": "A Aba Studio: Equipe, Marca e Domínios",
+    "category": "studio",
+    "summary": "Gerencie sua equipe, a marca do portal, emails com marca para clientes e o domínio personalizado do portal a partir da aba Studio.",
+    "tags": [
+      "studio",
+      "equipe",
+      "workspace",
+      "papéis",
+      "marca",
+      "white label",
+      "domínio personalizado",
+      "email com marca",
+      "colaboração",
+      "convite"
+    ],
+    "updatedAt": "2026-08-09",
+    "content": [
+      {
+        "heading": "O que Fica na Aba Studio",
+        "body": "A [aba Studio](/app/studio) na barra lateral reúne os recursos de workspace do plano Studio em um só lugar: Membros da Equipe, Marca do Portal, Email com Marca e Domínio Personalizado do Portal. Os mesmos cartões também aparecem nas [Configurações](/app/settings), então você pode gerenciá-los de qualquer um dos dois lugares. Nos planos Free e Pro, a maioria dos cartões mostra o que o recurso faz junto com uma sugestão de upgrade; a Marca do Portal é a exceção, já que também está incluída no Pro."
+      },
+      {
+        "heading": "Membros da Equipe e Projetos Compartilhados",
+        "body": "Convide colegas de equipe para o seu workspace por email e atribua um papel a cada um. Todos no workspace compartilham o catálogo inteiro: qualquer membro pode abrir e trabalhar em qualquer lançamento do grupo do estúdio, sem convites por lançamento. Os papéis controlam o que cada um pode fazer. Administradores e Engenheiros podem editar lançamentos, fazer upload de áudio e gerenciar briefs. Visualizadores têm acesso somente leitura. Apenas o dono do workspace e os Administradores podem excluir lançamentos. Quando um colega convidado faz login com o endereço de email do convite, o convite é resgatado automaticamente e os lançamentos compartilhados aparecem no dashboard dele.",
+        "tip": "Use o papel de Visualizador para clientes ou partes interessadas que devem acompanhar o progresso sem poder alterar nada."
+      },
+      {
+        "heading": "Marca do Portal",
+        "body": "Faça upload do seu logotipo e escolha uma cor de destaque, e cada portal de cliente que você compartilhar carregará a identidade do seu estúdio. Você pode adicionar um logotipo opcional para modo escuro, exibido quando um cliente visualiza o portal no modo escuro. Uploads em SVG (ou uma exportação PNG em 2-3x) permanecem nítidos em telas de alta resolução. No plano Studio, o portal é totalmente white-label: o rodapé \"Powered by Mix Architect\" é removido. A Marca do Portal está disponível tanto no Pro quanto no Studio."
+      },
+      {
+        "heading": "Email com Marca para Clientes",
+        "body": "No Studio, os emails para seus clientes (convites de portal, orçamentos e atualizações) são enviados com o nome do seu estúdio e carregam seu logotipo e cor de destaque. Defina um endereço de Reply-To para que as respostas dos clientes cheguem à sua caixa de entrada; se você deixar em branco, as respostas vão para o email da sua conta."
+      },
+      {
+        "heading": "Domínio Personalizado do Portal",
+        "body": "Sirva os portais de clientes a partir do seu próprio domínio, como portal.yourstudio.com, em vez de mixarchitect.com. Adicione o domínio no cartão Domínio Personalizado do Portal e depois aponte-o para a Vercel usando os registros DNS exibidos (um CNAME para subdomínios, ou um registro A para domínios raiz, além de um registro de verificação quando necessário). O cartão mostra DNS Pendente até os registros propagarem, então muda para Verificado, e seus portais entram no ar no novo domínio automaticamente, com SSL incluído.",
+        "tip": "Um subdomínio como portal.yourstudio.com é a configuração mais fácil: um registro CNAME e pronto."
+      }
+    ]
   }
 ];

@@ -32,6 +32,7 @@
     "quotes": "Devis",
     "money": "Argent",
     "analytics": "Analytique",
+    "studio": "Studio",
     "settings": "Paramètres",
     "help": "Aide",
     "helpCenter": "Centre d'aide",
@@ -41,6 +42,10 @@
     "search": "Rechercher",
     "more": "Plus",
     "menu": "Menu"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "Gérez votre équipe, l'image de marque du portail, les e-mails clients et le domaine personnalisé au même endroit."
   },
   "theme": {
     "light": "Clair",
@@ -828,6 +833,7 @@
       "releases": "Sorties",
       "audio": "Audio",
       "timeline": "Chronologie",
+      "studio": "Studio",
       "account": "Compte",
       "billing": "Facturation"
     }

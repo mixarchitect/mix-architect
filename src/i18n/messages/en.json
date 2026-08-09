@@ -32,6 +32,7 @@
     "quotes": "Quotes",
     "money": "Money",
     "analytics": "Analytics",
+    "studio": "Studio",
     "settings": "Settings",
     "help": "Help",
     "helpCenter": "Help Center",
@@ -41,6 +42,10 @@
     "search": "Search",
     "more": "More",
     "menu": "Menu"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "Manage your team, portal branding, client email, and custom domain in one place."
   },
   "theme": {
     "light": "Light",
@@ -828,6 +833,7 @@
       "releases": "Releases",
       "audio": "Audio",
       "timeline": "Timeline",
+      "studio": "Studio",
       "account": "Account",
       "billing": "Billing"
     }

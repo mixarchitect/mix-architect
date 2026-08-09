@@ -699,5 +699,48 @@ export const articles: HelpArticle[] = [
         "mockup": "resubscribe"
       }
     ]
+  },
+  {
+    "id": "studio-workspace",
+    "title": "Studio टैब: टीम, ब्रांडिंग और डोमेन",
+    "category": "studio",
+    "summary": "Studio टैब से अपनी टीम, पोर्टल ब्रांडिंग, ब्रांडेड क्लाइंट ईमेल, और कस्टम पोर्टल डोमेन प्रबंधित करें।",
+    "tags": [
+      "studio",
+      "टीम",
+      "वर्कस्पेस",
+      "भूमिकाएँ",
+      "ब्रांडिंग",
+      "white label",
+      "कस्टम डोमेन",
+      "ब्रांडेड ईमेल",
+      "सहयोग",
+      "आमंत्रण"
+    ],
+    "updatedAt": "2026-08-09",
+    "content": [
+      {
+        "heading": "Studio टैब में क्या है",
+        "body": "साइडबार में मौजूद [Studio टैब](/app/studio) Studio plan के workspace features को एक जगह इकट्ठा करता है: Team Members, Portal Branding, Branded Email, और Custom Portal Domain। यही cards [Settings](/app/settings) में भी दिखते हैं, इसलिए आप इन्हें दोनों में से किसी भी जगह से प्रबंधित कर सकते हैं। Free और Pro plans पर अधिकांश cards यह दिखाते हैं कि feature क्या करता है, साथ में एक upgrade prompt होता है; Portal Branding इसका अपवाद है, क्योंकि यह Pro में भी शामिल है।"
+      },
+      {
+        "heading": "Team Members और साझा Projects",
+        "body": "अपने workspace में teammates को ईमेल से invite करें और हर एक को एक role assign करें। Workspace में हर कोई पूरा catalog साझा करता है: कोई भी member, studio group की किसी भी रिलीज़ को खोलकर उस पर काम कर सकता है, बिना per-release invites के। Roles नियंत्रित करते हैं कि वे क्या कर सकते हैं। Admins और Engineers releases edit कर सकते हैं, ऑडियो अपलोड कर सकते हैं, और briefs प्रबंधित कर सकते हैं। Viewers के पास read-only access होता है। सिर्फ़ workspace owner और Admins ही releases delete कर सकते हैं। जब कोई invited teammate उसी invited ईमेल address से sign in करता है, तो invite अपने आप claim हो जाता है और साझा releases उनके dashboard पर दिखने लगती हैं।",
+        "tip": "ऐसे clients या stakeholders के लिए Viewer role का उपयोग करें जिन्हें कुछ भी बदले बिना progress follow करनी हो।"
+      },
+      {
+        "heading": "Portal Branding",
+        "body": "अपना logo अपलोड करें और एक accent color चुनें, और आपका share किया हुआ हर client portal आपके studio की पहचान के साथ दिखेगा। आप एक वैकल्पिक dark-mode logo भी जोड़ सकते हैं, जो तब दिखता है जब client portal को dark mode में देखता है। SVG अपलोड (या 2-3x PNG export) high-resolution स्क्रीन पर crisp बने रहते हैं। Studio plan पर portal पूरी तरह white-label होता है: \"Powered by Mix Architect\" footer हटा दिया जाता है। Portal Branding, Pro और Studio दोनों पर उपलब्ध है।"
+      },
+      {
+        "heading": "Branded Client Email",
+        "body": "Studio पर, आपके clients को भेजे जाने वाले ईमेल (portal invitations, quotes, और updates) आपके studio के नाम से भेजे जाते हैं और उनमें आपका logo और accent color होता है। एक Reply-To address सेट करें ताकि client के replies आपके inbox में पहुँचें; अगर आप इसे खाली छोड़ते हैं, तो replies आपके account ईमेल पर जाते हैं।"
+      },
+      {
+        "heading": "Custom Portal Domain",
+        "body": "Client portals को mixarchitect.com के बजाय अपने खुद के domain से serve करें, जैसे portal.yourstudio.com। Custom Portal Domain card में domain जोड़ें, फिर दिखाए गए DNS records का उपयोग करके उसे Vercel की ओर point करें (subdomains के लिए एक CNAME, या apex domains के लिए एक A record, और ज़रूरत होने पर एक verification record)। Records के propagate होने तक card Pending DNS दिखाता है, फिर Verified में बदल जाता है, और आपके portals नए domain पर अपने आप live हो जाते हैं, SSL भी शामिल है।",
+        "tip": "portal.yourstudio.com जैसा subdomain सबसे आसान setup है: बस एक CNAME record और काम पूरा।"
+      }
+    ]
   }
 ];

@@ -32,6 +32,7 @@
     "quotes": "Orçamentos",
     "money": "Dinheiro",
     "analytics": "Análises",
+    "studio": "Studio",
     "settings": "Configurações",
     "help": "Ajuda",
     "helpCenter": "Central de Ajuda",
@@ -41,6 +42,10 @@
     "search": "Pesquisar",
     "more": "Mais",
     "menu": "Menu"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "Gerencie sua equipe, a marca do portal, o e-mail para clientes e o domínio personalizado em um só lugar."
   },
   "theme": {
     "light": "Claro",
@@ -828,6 +833,7 @@
       "releases": "Lançamentos",
       "audio": "Áudio",
       "timeline": "Linha do tempo",
+      "studio": "Studio",
       "account": "Conta",
       "billing": "Faturamento"
     }

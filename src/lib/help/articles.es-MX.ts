@@ -714,5 +714,51 @@ export const articles: HelpArticle[] = [
         "mockup": "resubscribe"
       }
     ]
+  },
+  /* ──────────────────────────────────────────────────────
+     STUDIO
+     ────────────────────────────────────────────────────── */
+  {
+    "id": "studio-workspace",
+    "title": "La Pestaña Studio: Equipo, Marca y Dominios",
+    "category": "studio",
+    "summary": "Gestiona tu equipo, la marca del portal, el correo con marca para clientes y el dominio personalizado del portal desde la pestaña Studio.",
+    "tags": [
+      "studio",
+      "equipo",
+      "espacio de trabajo",
+      "roles",
+      "marca",
+      "marca blanca",
+      "dominio personalizado",
+      "correo con marca",
+      "colaboración",
+      "invitar"
+    ],
+    "updatedAt": "2026-08-09",
+    "content": [
+      {
+        "heading": "Qué Encuentras en la Pestaña Studio",
+        "body": "La [pestaña Studio](/app/studio) en la barra lateral reúne las funciones de espacio de trabajo del plan Studio en un solo lugar: Miembros del Equipo, Marca del Portal, Correo con Marca y Dominio Personalizado del Portal. Las mismas tarjetas también aparecen en [Configuración](/app/settings), así que puedes gestionarlas desde cualquiera de los dos lugares. En los planes Free y Pro, la mayoría de las tarjetas muestran lo que hace la función junto con una invitación a actualizar; Marca del Portal es la excepción, ya que también está incluida en Pro."
+      },
+      {
+        "heading": "Miembros del Equipo y Proyectos Compartidos",
+        "body": "Invita a compañeros de equipo a tu espacio de trabajo por correo electrónico y asigna un rol a cada uno. Todos en el espacio de trabajo comparten el catálogo completo: cualquier miembro puede abrir y trabajar en cualquier lanzamiento del grupo del estudio, sin invitaciones por lanzamiento. Los roles controlan lo que pueden hacer. Los Administradores y los Ingenieros pueden editar lanzamientos, subir audio y gestionar briefs. Los Visualizadores tienen acceso de solo lectura. Solo el propietario del espacio de trabajo y los Administradores pueden eliminar lanzamientos. Cuando un compañero invitado inicia sesión con la dirección de correo electrónico invitada, la invitación se reclama automáticamente y los lanzamientos compartidos aparecen en su panel.",
+        "tip": "Usa el rol de Visualizador para clientes o partes interesadas que deban seguir el progreso sin poder cambiar nada."
+      },
+      {
+        "heading": "Marca del Portal",
+        "body": "Sube tu logotipo y elige un color de acento, y cada portal de cliente que compartas llevará la identidad de tu estudio. Puedes agregar un logotipo opcional para modo oscuro que se muestra cuando un cliente ve el portal en modo oscuro. Las subidas en SVG (o una exportación PNG a 2-3x) se mantienen nítidas en pantallas de alta resolución. En el plan Studio el portal es completamente de marca blanca: se elimina el pie de página \"Powered by Mix Architect\". Marca del Portal está disponible tanto en Pro como en Studio."
+      },
+      {
+        "heading": "Correo con Marca para Clientes",
+        "body": "En Studio, los correos electrónicos a tus clientes (invitaciones al portal, cotizaciones y actualizaciones) se envían bajo el nombre de tu estudio y llevan tu logotipo y color de acento. Configura una dirección de respuesta (Reply-To) para que las respuestas de los clientes lleguen a tu bandeja de entrada; si la dejas en blanco, las respuestas van al correo electrónico de tu cuenta."
+      },
+      {
+        "heading": "Dominio Personalizado del Portal",
+        "body": "Sirve los portales de cliente desde tu propio dominio, como portal.yourstudio.com, en lugar de mixarchitect.com. Agrega el dominio en la tarjeta Dominio Personalizado del Portal, luego apúntalo a Vercel usando los registros DNS mostrados (un CNAME para subdominios, o un A record para dominios raíz, más un registro de verificación cuando se requiera). La tarjeta muestra DNS Pendiente hasta que los registros se propaguen, luego cambia a Verificado, y tus portales se activan en el nuevo dominio automáticamente con SSL incluido.",
+        "tip": "Un subdominio como portal.yourstudio.com es la configuración más sencilla: un registro CNAME y listo."
+      }
+    ]
   }
 ];

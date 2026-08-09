@@ -862,4 +862,41 @@ export const articles: HelpArticle[] = [
       },
     ],
   },
+
+  /* ──────────────────────────────────────────────────────
+     STUDIO
+     ────────────────────────────────────────────────────── */
+  {
+    id: "studio-workspace",
+    title: "The Studio Tab: Team, Branding & Domains",
+    category: "studio",
+    summary:
+      "Manage your team, portal branding, branded client email, and custom portal domain from the Studio tab.",
+    tags: ["studio", "team", "workspace", "roles", "branding", "white label", "custom domain", "branded email", "collaboration", "invite"],
+    updatedAt: "2026-08-09",
+    content: [
+      {
+        heading: "What Lives in the Studio Tab",
+        body: "The [Studio tab](/app/studio) in the sidebar collects the workspace features of the Studio plan in one place: Team Members, Portal Branding, Branded Email, and Custom Portal Domain. The same cards also appear in [Settings](/app/settings), so you can manage them from either location. On the Free and Pro plans, most cards show what the feature does along with an upgrade prompt; Portal Branding is the exception, since it is included on Pro as well.",
+      },
+      {
+        heading: "Team Members & Shared Projects",
+        body: "Invite teammates to your workspace by email and assign each one a role. Everyone in the workspace shares the entire catalog: any member can open and work on any release in the studio group, without per-release invites. Roles control what they can do. Admins and Engineers can edit releases, upload audio, and manage briefs. Viewers have read-only access. Only the workspace owner and Admins can delete releases. When an invited teammate signs in with the invited email address, the invite is claimed automatically and the shared releases appear on their dashboard.",
+        tip: "Use the Viewer role for clients or stakeholders who should follow progress without being able to change anything.",
+      },
+      {
+        heading: "Portal Branding",
+        body: "Upload your logo and pick an accent color, and every client portal you share carries your studio's identity. You can add an optional dark-mode logo that is shown when a client views the portal in dark mode. SVG uploads (or a 2-3x PNG export) stay crisp on high-resolution screens. On the Studio plan the portal is fully white-label: the \"Powered by Mix Architect\" footer is removed. Portal Branding is available on both Pro and Studio.",
+      },
+      {
+        heading: "Branded Client Email",
+        body: "On Studio, emails to your clients (portal invitations, quotes, and updates) are sent under your studio name and carry your logo and accent color. Set a Reply-To address so client replies land in your inbox; if you leave it blank, replies go to your account email.",
+      },
+      {
+        heading: "Custom Portal Domain",
+        body: "Serve client portals from your own domain, such as portal.yourstudio.com, instead of mixarchitect.com. Add the domain in the Custom Portal Domain card, then point it at Vercel using the DNS records shown (a CNAME for subdomains, or an A record for apex domains, plus a verification record when required). The card shows Pending DNS until the records propagate, then flips to Verified, and your portals go live on the new domain automatically with SSL included.",
+        tip: "A subdomain like portal.yourstudio.com is the easiest setup: one CNAME record and you are done.",
+      },
+    ],
+  },
 ];

@@ -714,5 +714,48 @@ export const articles: HelpArticle[] = [
         "mockup": "resubscribe"
       }
     ]
+  },
+  {
+    "id": "studio-workspace",
+    "title": "La Pestaña Studio: Equipo, Marca y Dominios",
+    "category": "studio",
+    "summary": "Gestiona tu equipo, la marca del portal, el correo de cliente con marca y el dominio de portal personalizado desde la pestaña Studio.",
+    "tags": [
+      "studio",
+      "equipo",
+      "espacio de trabajo",
+      "roles",
+      "marca",
+      "marca blanca",
+      "dominio personalizado",
+      "correo con marca",
+      "colaboración",
+      "invitar"
+    ],
+    "updatedAt": "2026-08-09",
+    "content": [
+      {
+        "heading": "Qué hay en la pestaña Studio",
+        "body": "La [pestaña Studio](/app/studio) de la barra lateral reúne en un solo lugar las funciones de espacio de trabajo del plan Studio: Miembros del equipo, Marca del portal, Correo con marca y Dominio de portal personalizado. Las mismas tarjetas aparecen también en [Configuración](/app/settings), así que puedes gestionarlas desde cualquiera de los dos sitios. En los planes Free y Pro, la mayoría de las tarjetas muestran qué hace la función junto con un aviso para actualizar; Marca del portal es la excepción, ya que también está incluida en Pro."
+      },
+      {
+        "heading": "Miembros del equipo y proyectos compartidos",
+        "body": "Invita a compañeros a tu espacio de trabajo por correo electrónico y asigna un rol a cada uno. Todos los miembros del espacio de trabajo comparten el catálogo completo: cualquier miembro puede abrir y trabajar en cualquier lanzamiento del grupo del estudio, sin invitaciones por lanzamiento. Los roles controlan lo que pueden hacer. Los Administradores y los Ingenieros pueden editar lanzamientos, subir audio y gestionar briefs. Los Visualizadores tienen acceso de solo lectura. Solo el propietario del espacio de trabajo y los Administradores pueden eliminar lanzamientos. Cuando un compañero invitado inicia sesión con la dirección de correo invitada, la invitación se reclama automáticamente y los lanzamientos compartidos aparecen en su panel de control.",
+        "tip": "Usa el rol Visualizador para clientes o partes interesadas que deban seguir el progreso sin poder cambiar nada."
+      },
+      {
+        "heading": "Marca del portal",
+        "body": "Sube tu logotipo y elige un color de acento, y cada portal de cliente que compartas llevará la identidad de tu estudio. Puedes añadir un logotipo opcional para modo oscuro que se muestra cuando un cliente ve el portal en modo oscuro. Las subidas en SVG (o una exportación PNG a 2-3x) se mantienen nítidas en pantallas de alta resolución. En el plan Studio el portal es totalmente de marca blanca: se elimina el pie de página \"Powered by Mix Architect\". Marca del portal está disponible tanto en Pro como en Studio."
+      },
+      {
+        "heading": "Correo de cliente con marca",
+        "body": "En Studio, los correos a tus clientes (invitaciones al portal, presupuestos y actualizaciones) se envían con el nombre de tu estudio y llevan tu logotipo y color de acento. Configura una dirección de respuesta (Reply-To) para que las respuestas de los clientes lleguen a tu bandeja de entrada; si la dejas en blanco, las respuestas van al correo de tu cuenta."
+      },
+      {
+        "heading": "Dominio de portal personalizado",
+        "body": "Sirve los portales de cliente desde tu propio dominio, como portal.yourstudio.com, en lugar de mixarchitect.com. Añade el dominio en la tarjeta Dominio de portal personalizado y luego apúntalo a Vercel usando los registros DNS que se muestran (un CNAME para subdominios, o un A record para dominios raíz, más un registro de verificación cuando sea necesario). La tarjeta muestra DNS pendiente hasta que los registros se propagan, luego cambia a Verificado, y tus portales se activan automáticamente en el nuevo dominio con SSL incluido.",
+        "tip": "Un subdominio como portal.yourstudio.com es la configuración más sencilla: un registro CNAME y listo."
+      }
+    ]
   }
 ];

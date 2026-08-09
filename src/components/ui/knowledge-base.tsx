@@ -15,6 +15,7 @@ const CATEGORIES: ArticleCategory[] = [
   "releases",
   "audio",
   "timeline",
+  "studio",
   "account",
   "billing",
 ];

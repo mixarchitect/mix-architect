@@ -32,6 +32,7 @@
     "quotes": "कोटेशन",
     "money": "पैसा",
     "analytics": "एनालिटिक्स",
+    "studio": "Studio",
     "settings": "सेटिंग्स",
     "help": "हेल्प",
     "helpCenter": "हेल्प सेंटर",
@@ -41,6 +42,10 @@
     "search": "सर्च",
     "more": "और",
     "menu": "मेन्यू"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "अपनी टीम, पोर्टल ब्रांडिंग, क्लाइंट ईमेल और कस्टम डोमेन एक ही जगह प्रबंधित करें।"
   },
   "theme": {
     "light": "लाइट",
@@ -828,6 +833,7 @@
       "releases": "रिलीज़",
       "audio": "ऑडियो",
       "timeline": "टाइमलाइन",
+      "studio": "Studio",
       "account": "खाता",
       "billing": "बिलिंग"
     }

@@ -32,6 +32,7 @@
     "quotes": "Offerter",
     "money": "Pengar",
     "analytics": "Analys",
+    "studio": "Studio",
     "settings": "Inställningar",
     "help": "Hjälp",
     "helpCenter": "Hjälpcenter",
@@ -41,6 +42,10 @@
     "search": "Sök",
     "more": "Mer",
     "menu": "Meny"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "Hantera ditt team, portalens varumärke, kundmejl och egen domän på ett och samma ställe."
   },
   "theme": {
     "light": "Ljust",
@@ -828,6 +833,7 @@
       "releases": "Releaser",
       "audio": "Ljud",
       "timeline": "Tidslinje",
+      "studio": "Studio",
       "account": "Konto",
       "billing": "Fakturering"
     }

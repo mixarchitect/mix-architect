@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import {
   Home, Users, Search, Menu, X, DollarSign,
   Sun, Moon, Monitor, LayoutTemplate, HelpCircle,
-  Settings, LogOut, Bug, Download, Shield, BarChart3,
+  Settings, LogOut, Bug, Download, Shield, BarChart3, Building2,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
@@ -211,6 +211,10 @@ function MobileDrawer({
           <Link href="/app/analytics" className={linkClass(pathname?.startsWith("/app/analytics"))} onClick={onClose}>
             <BarChart3 size={18} strokeWidth={1.5} />
             {tNav("analytics")}
+          </Link>
+          <Link href="/app/studio" className={linkClass(pathname?.startsWith("/app/studio"))} onClick={onClose}>
+            <Building2 size={18} strokeWidth={1.5} />
+            {tNav("studio")}
           </Link>
 
           <div className="border-t border-border my-2" />

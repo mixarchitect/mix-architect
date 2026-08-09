@@ -714,5 +714,48 @@ export const articles: HelpArticle[] = [
         "mockup": "resubscribe"
       }
     ]
+  },
+  {
+    "id": "studio-workspace",
+    "title": "Der Studio-Tab: Team, Branding und Domains",
+    "category": "studio",
+    "summary": "Verwalten Sie Ihr Team, das Portal-Branding, gebrandete Kunden-E-Mails und Ihre eigene Portal-Domain über den Studio-Tab.",
+    "tags": [
+      "studio",
+      "team",
+      "arbeitsbereich",
+      "rollen",
+      "branding",
+      "white label",
+      "eigene domain",
+      "gebrandete e-mail",
+      "zusammenarbeit",
+      "einladen"
+    ],
+    "updatedAt": "2026-08-09",
+    "content": [
+      {
+        "heading": "Was der Studio-Tab enthält",
+        "body": "Der [Studio-Tab](/app/studio) in der Seitenleiste bündelt die Arbeitsbereich-Funktionen des Studio-Tarifs an einem Ort: Teammitglieder, Portal-Branding, Gebrandete E-Mail (Branded Email) und Eigene Portal-Domain (Custom Portal Domain). Dieselben Karten erscheinen auch in den [Einstellungen](/app/settings), Sie können sie also von beiden Orten aus verwalten. In den Tarifen Free und Pro zeigen die meisten Karten, was die Funktion leistet, zusammen mit einer Upgrade-Aufforderung; das Portal-Branding ist die Ausnahme, da es auch im Pro-Tarif enthalten ist."
+      },
+      {
+        "heading": "Teammitglieder und gemeinsame Projekte",
+        "body": "Laden Sie Teamkollegen per E-Mail in Ihren Arbeitsbereich ein und weisen Sie jedem eine Rolle zu. Alle Mitglieder des Arbeitsbereichs teilen sich den gesamten Katalog: Jedes Mitglied kann jede Veröffentlichung der Studio-Gruppe öffnen und daran arbeiten, ohne Einladungen pro Veröffentlichung. Die Rollen steuern, was die Mitglieder tun können. Admins und Ingenieure können Veröffentlichungen bearbeiten, Audio hochladen und Briefs verwalten. Betrachter (Viewer) haben nur Lesezugriff. Nur der Inhaber des Arbeitsbereichs und Admins können Veröffentlichungen löschen. Wenn sich ein eingeladener Teamkollege mit der eingeladenen E-Mail-Adresse anmeldet, wird die Einladung automatisch eingelöst und die geteilten Veröffentlichungen erscheinen auf seinem Dashboard.",
+        "tip": "Verwenden Sie die Rolle Betrachter für Kunden oder Beteiligte, die den Fortschritt verfolgen sollen, ohne etwas ändern zu können."
+      },
+      {
+        "heading": "Portal-Branding",
+        "body": "Laden Sie Ihr Logo hoch und wählen Sie eine Akzentfarbe, und jedes Kundenportal, das Sie teilen, trägt die Identität Ihres Studios. Sie können ein optionales Logo für den Dunkelmodus hinzufügen, das angezeigt wird, wenn ein Kunde das Portal im Dunkelmodus betrachtet. SVG-Uploads (oder ein PNG-Export in 2- bis 3-facher Größe) bleiben auf hochauflösenden Bildschirmen gestochen scharf. Im Studio-Tarif ist das Portal vollständig White-Label: Die Fußzeile \"Powered by Mix Architect\" wird entfernt. Das Portal-Branding ist sowohl im Pro- als auch im Studio-Tarif verfügbar."
+      },
+      {
+        "heading": "Gebrandete Kunden-E-Mails",
+        "body": "Im Studio-Tarif werden E-Mails an Ihre Kunden (Portal-Einladungen, Angebote und Updates) unter Ihrem Studionamen versendet und tragen Ihr Logo und Ihre Akzentfarbe. Legen Sie eine Reply-To-Adresse fest, damit Kundenantworten in Ihrem Posteingang landen; wenn Sie das Feld leer lassen, gehen Antworten an Ihre Konto-E-Mail-Adresse."
+      },
+      {
+        "heading": "Eigene Portal-Domain",
+        "body": "Stellen Sie Kundenportale über Ihre eigene Domain bereit, etwa portal.yourstudio.com, statt über mixarchitect.com. Fügen Sie die Domain in der Karte Eigene Portal-Domain hinzu und richten Sie sie dann mit den angezeigten DNS-Einträgen auf Vercel aus (ein CNAME für Subdomains oder ein A record für Apex-Domains, plus ein Verifizierungseintrag, falls erforderlich). Die Karte zeigt DNS ausstehend (Pending DNS), bis sich die Einträge verbreitet haben, und wechselt dann zu Verifiziert (Verified). Ihre Portale gehen automatisch unter der neuen Domain live, SSL inklusive.",
+        "tip": "Eine Subdomain wie portal.yourstudio.com ist die einfachste Einrichtung: ein CNAME-Eintrag und Sie sind fertig."
+      }
+    ]
   }
 ];

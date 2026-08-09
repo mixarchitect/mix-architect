@@ -32,6 +32,7 @@
     "quotes": "견적",
     "money": "수익",
     "analytics": "분석",
+    "studio": "Studio",
     "settings": "설정",
     "help": "도움말",
     "helpCenter": "도움말 센터",
@@ -41,6 +42,10 @@
     "search": "검색",
     "more": "더보기",
     "menu": "메뉴"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "팀, 포털 브랜딩, 클라이언트 이메일, 커스텀 도메인을 한곳에서 관리하세요."
   },
   "theme": {
     "light": "라이트",
@@ -828,6 +833,7 @@
       "releases": "릴리스",
       "audio": "오디오",
       "timeline": "타임라인",
+      "studio": "Studio",
       "account": "계정",
       "billing": "결제"
     }

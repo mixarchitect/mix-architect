@@ -32,6 +32,7 @@
     "quotes": "报价",
     "money": "收入",
     "analytics": "分析",
+    "studio": "Studio",
     "settings": "设置",
     "help": "帮助",
     "helpCenter": "帮助中心",
@@ -41,6 +42,10 @@
     "search": "搜索",
     "more": "更多",
     "menu": "菜单"
+  },
+  "studio": {
+    "title": "Studio",
+    "subtitle": "在一个地方管理团队、门户品牌、客户邮件和自定义域名。"
   },
   "theme": {
     "light": "浅色",
@@ -828,6 +833,7 @@
       "releases": "发行",
       "audio": "音频",
       "timeline": "时间线",
+      "studio": "Studio",
       "account": "账户",
       "billing": "账单"
     }
