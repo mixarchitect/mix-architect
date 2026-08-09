@@ -18,8 +18,6 @@ export type LoudnessResult = {
   truePeakDbtp: number | null;
   /** DC offset as a fraction of full scale (abs value across channels). */
   dcOffset: number | null;
-  /** Number of samples at exactly ±full-scale (strict digital clipping). */
-  clipSampleCount: number | null;
 };
 
 /* ------------------------------------------------------------------ */
@@ -75,7 +73,6 @@ export function parseLoudnessOutput(stderr: string): LoudnessResult {
     samplePeakDbfs: extractEbur128("Sample peak", "Peak", "dBFS", stderr),
     truePeakDbtp: extractEbur128("True peak", "Peak", "dBFS", stderr),
     dcOffset: extractAstatsOverallAbsDcOffset(stderr),
-    clipSampleCount: extractAstatsOverallPeakCount(stderr),
   };
 }
 
@@ -131,16 +128,10 @@ function extractAstatsOverallAbsDcOffset(stderr: string): number | null {
   return Math.abs(value);
 }
 
-function extractAstatsOverallPeakCount(stderr: string): number | null {
-  const block = getAstatsOverallBlock(stderr);
-  if (!block) return null;
-  // Peak count is the number of samples at exactly ±full-scale.
-  // Format: "Peak count: 0" or "Peak count: 1247"
-  const match = block.match(/Peak count:\s+(\d+)/);
-  if (!match) return null;
-  const value = parseInt(match[1], 10);
-  return Number.isFinite(value) ? value : null;
-}
+// Clipped-sample counting used to parse astats "Peak count" here, but that
+// field counts occurrences of the channel's OWN min/max (not full scale),
+// so every non-silent stereo file reported exactly 2. Real counting now
+// lives in clip.ts, on actual PCM.
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */

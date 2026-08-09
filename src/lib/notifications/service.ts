@@ -16,7 +16,12 @@ export type NotificationType =
   | "collaborator_joined"
   | "export_complete"
   | "spec_mismatch"
-  | "distribution_live";
+  | "distribution_live"
+  | "feature_submission_approved"
+  | "feature_submission_declined"
+  | "clipping_detected"
+  | "loudness_mismatch"
+  | "true_peak_over";
 
 type CreateNotificationParams = {
   userId: string;

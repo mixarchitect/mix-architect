@@ -49,6 +49,13 @@ type SendTransactionalEmailParams = {
   html: string;
 };
 
+export type SendOutcome =
+  | "sent"
+  | "failed"
+  | "skipped_preference"
+  | "skipped_rate_limit"
+  | "not_configured";
+
 /**
  * Send a transactional email with preference checking, rate limiting, and logging.
  * This function never throws. All outcomes are logged to email_log.
@@ -59,7 +66,7 @@ export async function sendTransactionalEmail({
   category,
   subject,
   html,
-}: SendTransactionalEmailParams): Promise<void> {
+}: SendTransactionalEmailParams): Promise<SendOutcome> {
   const supabase = createSupabaseServiceClient();
 
   try {
@@ -85,7 +92,7 @@ export async function sendTransactionalEmail({
           subject,
           status: "skipped_preference",
         });
-        return;
+        return "skipped_preference";
       }
     }
 
@@ -104,14 +111,24 @@ export async function sendTransactionalEmail({
         subject,
         status: "skipped_rate_limit",
       });
-      return;
+      return "skipped_rate_limit";
     }
 
     // 3. Send via Resend
     const resend = getResend();
     if (!resend) {
+      // A missing key must still leave a trail — a silent no-op here is what
+      // hid the broken welcome flow for five days.
       console.warn("[email/service] Resend not configured, skipping email");
-      return;
+      await logEmail(supabase, {
+        userId,
+        to,
+        category,
+        subject,
+        status: "failed",
+        error: "RESEND_API_KEY not configured",
+      });
+      return "not_configured";
     }
 
     // Get unsubscribe token for the List-Unsubscribe header
@@ -149,7 +166,7 @@ export async function sendTransactionalEmail({
         status: "failed",
         error: error.message,
       });
-      return;
+      return "failed";
     }
 
     await logEmail(supabase, {
@@ -160,6 +177,7 @@ export async function sendTransactionalEmail({
       status: "sent",
       resendId: data?.id,
     });
+    return "sent";
   } catch (err) {
     console.error("[email/service] unexpected error:", err);
     await logEmail(supabase, {
@@ -172,6 +190,7 @@ export async function sendTransactionalEmail({
     }).catch(() => {
       // Last-resort: even logging failed, just swallow
     });
+    return "failed";
   }
 }
 

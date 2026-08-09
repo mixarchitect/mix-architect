@@ -586,10 +586,20 @@ export function AudioPlayer({
         duration: activeVersion.duration_seconds ?? undefined,
       });
       perf.end("wavesurfer:init");
-      perf.start("waveform:render", { trackId: activeVersion.id });
+      // "warm" = cached peaks + duration supplied, so ready fires without
+      // touching the network. "cold" = wavesurfer must fetch/decode audio
+      // (or await loadedmetadata) first — network-bound by design, and the
+      // reason a single p50 hid multi-second first renders on mobile.
+      const renderMetric =
+        activeVersion.waveform_peaks && activeVersion.duration_seconds
+          ? "waveform:render:warm"
+          : "waveform:render:cold";
+      perf.start(renderMetric, { trackId: activeVersion.id });
 
       // Error handling — retry once after a short delay.
       // Freshly uploaded files may not be available at the CDN immediately.
+      // Pass the cached peaks + duration so the retry renders from cache
+      // instead of fetching and decoding the full lossless file.
       let retried = false;
       ws.on("error", (err) => {
         console.warn("[audio-player] WaveSurfer load error:", err);
@@ -597,7 +607,11 @@ export function AudioPlayer({
           retried = true;
           retryTimeout = setTimeout(() => {
             if (!cancelled && ws && container.isConnected) {
-              ws.load(activeVersion.audio_url);
+              ws.load(
+                activeVersion.audio_url,
+                activeVersion.waveform_peaks ?? undefined,
+                activeVersion.duration_seconds ?? undefined,
+              );
             }
           }, 1500);
         }
@@ -605,7 +619,7 @@ export function AudioPlayer({
 
       ws.on("ready", () => {
         if (cancelled) return;
-        perf.end("waveform:render");
+        perf.end(renderMetric);
         perf.captureMemory("memory:after-waveform-load");
         setIsReady(true);
 

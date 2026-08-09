@@ -6,6 +6,7 @@ import { PerfOverlayLoader } from "@/components/dev/perf-overlay-loader";
 import { PerfReporterInit } from "@/components/perf-reporter-init";
 import { OpenPanelAnalytics } from "@/components/analytics/OpenPanelAnalytics";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { AttributionCapture } from "@/components/attribution-capture";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +56,7 @@ export default function RootLayout({
           {children}
           <OpenPanelAnalytics />
           <GoogleAnalytics />
+          <AttributionCapture />
           <PerfReporterInit />
           <PerfOverlayLoader />
         </ThemeWrapper>

@@ -23,10 +23,15 @@ import {
 } from "./converter.js";
 import { analyzeLoudness } from "./loudness.js";
 import { computeWaveformPeaks } from "./peaks.js";
+import { countClippedSamples } from "./clip.js";
 
 /** Current loudness analysis algorithm version. Bump when parser or
- *  FFmpeg filter chain changes in a way that should trigger reanalysis. */
-const LOUDNESS_ANALYSIS_VERSION = 1;
+ *  FFmpeg filter chain changes in a way that should trigger reanalysis.
+ *  v2: clip_sample_count now counted from real PCM (clip.ts) instead of
+ *  astats "Peak count", which pinned at 2 on every stereo file. To
+ *  re-analyze existing rows after deploying, null out their
+ *  analysis_version (the backfill selector keys on IS NULL). */
+const LOUDNESS_ANALYSIS_VERSION = 2;
 
 /**
  * Strip absolute filesystem paths + the tmpdir root from an error
@@ -437,7 +442,7 @@ async function processNextAnalysis() {
     // peaks then run in parallel (both read the same file from
     // different processes; OS page cache makes the second read cheap).
     const info = await probeSource(sourcePath);
-    const [loudness, peaks] = await Promise.all([
+    const [loudness, peaks, clipCount] = await Promise.all([
       analyzeLoudness(sourcePath),
       // Peak generation is best-effort — never fail the whole analysis
       // if it can't be computed (corrupt file, exotic codec, etc.).
@@ -448,6 +453,12 @@ async function processNextAnalysis() {
             return null as number[][] | null;
           })
         : Promise.resolve(null),
+      // Also best-effort: better a null clip count than no analysis at
+      // all. Null (unknown) must never be reported as 0 (clean).
+      countClippedSamples(sourcePath).catch((err) => {
+        console.warn(`  Clip scan failed:`, err.message);
+        return null as number | null;
+      }),
     ]);
     const format = normalizeFormat(info.formatName, info.codecName);
     const lossy = isLossyCodec(info.codecName);
@@ -460,11 +471,15 @@ async function processNextAnalysis() {
       sample_peak_dbfs: loudness.samplePeakDbfs,
       true_peak_dbtp: loudness.truePeakDbtp,
       dc_offset: loudness.dcOffset,
-      clip_sample_count: loudness.clipSampleCount,
+      clip_sample_count: clipCount,
       analysis_version: LOUDNESS_ANALYSIS_VERSION,
       // Clear the claim timestamp now that the row is no longer in
       // an in-progress state, so the reclaim sweep ignores it.
       analysis_started_at: null,
+      // Written on backfill too: legacy rows have peaks but no duration,
+      // and without it wavesurfer waits on loadedmetadata of the full
+      // file before first paint even though the peaks are cached.
+      duration_seconds: info.duration > 0 ? info.duration : null,
     };
 
     // Always populate peaks when computed — even on backfill rows so
@@ -479,7 +494,6 @@ async function processNextAnalysis() {
       update.channels = info.channels;
       update.codec = info.codecName;
       update.file_format = format;
-      update.duration_seconds = info.duration > 0 ? info.duration : null;
       update.spec_analysis_status = "complete";
     }
 
@@ -494,7 +508,7 @@ async function processNextAnalysis() {
       `  Detected: ${format}, ${info.sampleRate}Hz, ${lossy ? "lossy" : `${info.bitDepth}-bit`}, ${info.channels}ch`,
     );
     console.log(
-      `  Loudness: ${fmt(loudness.integratedLufs, "LUFS")}, true peak ${fmt(loudness.truePeakDbtp, "dBTP")}, ${loudness.clipSampleCount ?? "?"} clipped`,
+      `  Loudness: ${fmt(loudness.integratedLufs, "LUFS")}, true peak ${fmt(loudness.truePeakDbtp, "dBTP")}, ${clipCount ?? "?"} clipped`,
     );
     console.log(
       `  Peaks: ${peaks ? `${peaks[0]?.length ?? 0} buckets cached` : "skipped"}`,

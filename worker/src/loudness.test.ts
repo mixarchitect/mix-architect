@@ -98,11 +98,6 @@ test("parses astats DC offset from Overall block (not per-channel)", () => {
   assertEq(result.dcOffset, 0.00001, "dcOffset");
 });
 
-test("parses astats Peak count from Overall block", () => {
-  const result = parseLoudnessOutput(CANONICAL_OUTPUT);
-  assertEq(result.clipSampleCount, 1247, "clipSampleCount");
-});
-
 test("returns null for silence (-inf LUFS)", () => {
   const silent = `
 [Parsed_ebur128_0 @ 0x0] Summary:
@@ -170,7 +165,6 @@ test("handles missing astats (returns null, not throw)", () => {
   const result = parseLoudnessOutput(ebur128Only);
   assertEq(result.integratedLufs, -14, "integratedLufs still parses");
   assertEq(result.dcOffset, null, "dcOffset null when astats missing");
-  assertEq(result.clipSampleCount, null, "clipSampleCount null when astats missing");
 });
 
 /* ------------------------------------------------------------------ */

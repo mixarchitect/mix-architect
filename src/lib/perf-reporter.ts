@@ -31,7 +31,10 @@ interface QueuedMetric {
 /** Metrics we care about collecting in production. */
 const COLLECTED_METRICS = new Set([
   "wavesurfer:init",
+  // Legacy single-bucket name, kept so older deployed clients still report.
   "waveform:render",
+  "waveform:render:warm",
+  "waveform:render:cold",
   "waveform:seek",
   "waveform:resize",
   "playback:start:warm",

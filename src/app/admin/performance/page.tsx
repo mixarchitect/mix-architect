@@ -11,6 +11,8 @@ const PRESET_KEYS = ["today", "yesterday", "7d", "30d", "90d", "365d"] as const;
 const METRIC_BUDGETS: Record<string, number> = {
   "wavesurfer:init": 150,
   "waveform:render": 500,
+  "waveform:render:warm": 500,
+  "waveform:render:cold": 2500,
   "waveform:seek": 50,
   "waveform:resize": 100,
   "playback:start:warm": 100,

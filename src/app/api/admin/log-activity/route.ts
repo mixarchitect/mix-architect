@@ -3,48 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { logActivity, type ActivityEventType } from "@/lib/activity-logger";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { requireSameOrigin } from "@/lib/origin-check";
-import { sendTransactionalEmail, buildUnsubscribeUrl, getUserEmail } from "@/lib/email/service";
-import { buildWelcomeEmail } from "@/lib/email-templates/transactional";
-import { buildAdminEmail } from "@/lib/email-templates/admin-notification";
-import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
-
-/**
- * Email all admins that a new user signed up. Internal ops alert — sent
- * directly (not through the user-preference system), never throws.
- */
-async function notifyAdminsOfSignup(newUserEmail: string, newUserName: string) {
-  try {
-    const key = process.env.RESEND_API_KEY;
-    if (!key) return;
-    const svc = createSupabaseServiceClient();
-    const { data: admins } = await svc.from("profiles").select("id").eq("is_admin", true);
-    if (!admins || admins.length === 0) return;
-
-    const emails = (
-      await Promise.all(admins.map((a) => getUserEmail(a.id as string)))
-    ).filter((e): e is string => !!e);
-    if (emails.length === 0) return;
-
-    const { Resend } = require("resend") as typeof import("resend");
-    const resend = new Resend(key);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://mixarchitect.com";
-    const { subject, html } = buildAdminEmail({
-      subject: `New signup: ${newUserEmail}`,
-      heading: "New user signed up",
-      body: `${newUserName} (${newUserEmail}) just created a Mix Architect account.`,
-      ctaLabel: "View subscribers",
-      ctaUrl: `${appUrl}/admin/subscribers`,
-    });
-    await resend.emails.send({
-      from: "Mix Architect <team@mixarchitect.com>",
-      to: emails,
-      subject,
-      html,
-    });
-  } catch (err) {
-    console.error("[log-activity] admin signup alert failed (non-fatal):", err);
-  }
-}
+import { drainEmailOutbox } from "@/lib/email/outbox";
 
 const ALLOWED_EVENTS: Set<string> = new Set([
   "login",
@@ -89,67 +48,13 @@ export async function POST(req: NextRequest) {
 
     logActivity(user.id, eventType as ActivityEventType, metadata, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
 
-    // Signup side effects: welcome email to the user + admin alert.
-    // Awaited (not fire-and-forget) so Vercel doesn't terminate the sends
-    // when the handler returns.
-    //
-    // Replay guards — this endpoint is reachable by any signed-in user, so
-    // "signup" must not be re-fireable: (a) only within 1h of account
-    // creation, (b) only if no welcome email was ever logged for this user.
-    // Without these, a user could re-post {eventType:"signup"} in a loop and
-    // spam every admin + re-send themselves welcome mail.
-    if (eventType === "signup" && user.email) {
-      const accountAgeMs = Date.now() - new Date(user.created_at).getTime();
-      if (accountAgeMs > 60 * 60 * 1000) {
-        return NextResponse.json({ ok: true });
-      }
-
-      const dedupeSvc = createSupabaseServiceClient();
-      const { data: priorWelcome } = await dedupeSvc
-        .from("email_log")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("category", "welcome")
-        .limit(1)
-        .maybeSingle();
-      if (priorWelcome) {
-        return NextResponse.json({ ok: true });
-      }
-
-      const displayName =
-        user.user_metadata?.display_name ?? user.email.split("@")[0];
-
-      // Welcome email to the new user.
-      try {
-        const svc = createSupabaseServiceClient();
-        await svc
-          .from("email_preferences")
-          .upsert({ user_id: user.id }, { onConflict: "user_id" });
-
-        const { data: prefs } = await svc
-          .from("email_preferences")
-          .select("unsubscribe_token")
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        const unsubscribeUrl = prefs?.unsubscribe_token
-          ? buildUnsubscribeUrl(prefs.unsubscribe_token, "welcome")
-          : undefined;
-
-        const { subject, html } = buildWelcomeEmail({ displayName, unsubscribeUrl });
-        await sendTransactionalEmail({
-          userId: user.id,
-          to: user.email,
-          category: "welcome",
-          subject,
-          html,
-        });
-      } catch (err) {
-        console.error("[log-activity] welcome email error:", err);
-      }
-
-      // Alert admins that a new user joined.
-      await notifyAdminsOfSignup(user.email, displayName);
+    // Signup/login side effect: deliver any pending welcome email from the
+    // outbox seeded by handle_new_user(). Awaited (not fire-and-forget) so
+    // Vercel doesn't terminate the send when the handler returns. Re-posting
+    // the event can't re-send or spam admins — the drain only processes rows
+    // still in 'pending' for THIS user, claimed with a conditional update.
+    if (eventType === "signup" || eventType === "login") {
+      await drainEmailOutbox({ userId: user.id });
     }
 
     return NextResponse.json({ ok: true });
