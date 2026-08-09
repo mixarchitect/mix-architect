@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getSafeRedirectUrl } from "@/lib/safe-redirect";
+import { drainEmailOutbox } from "@/lib/email/outbox";
+import { recordSignupAttribution } from "@/lib/attribution-capture";
 
 /**
  * Supabase Auth callback handler.
@@ -40,9 +42,17 @@ export async function GET(request: NextRequest) {
       },
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // First authenticated server touchpoint for email-confirmation and
+      // OAuth signups — deliver any pending welcome email and record signup
+      // attribution now. Neither blocks the redirect: both helpers catch
+      // their own errors, and attribution skips accounts older than an hour.
+      if (data.user) {
+        await recordSignupAttribution(request, data.user);
+        await drainEmailOutbox({ userId: data.user.id });
+      }
       return response;
     }
   }

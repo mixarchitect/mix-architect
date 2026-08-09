@@ -132,26 +132,41 @@ function SignInPageContent() {
         });
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { full_name: fullName.trim() || undefined },
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
+        // Server-side signup: the route runs the welcome-email outbox drain
+        // and activity log before responding, so they can't be skipped by
+        // closing the tab (the old client-side path silently 401'd because
+        // confirmation-gated signUp() carries no session).
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            password,
+            fullName: fullName.trim() || undefined,
+          }),
         });
-        if (error) throw error;
-      }
-
-      // Fire-and-forget activity log
-      logActivityClient(mode === "signin" ? "login" : "signup", { method: "email" });
-      if (mode === "signup") trackGA4Event("signup_start", { source: "auth_page" });
-
-      if (mode === "signup") {
+        const payload = (await res.json()) as {
+          error?: string;
+          code?: string;
+          hasSession?: boolean;
+        };
+        if (!res.ok) {
+          throw Object.assign(new Error(payload.error ?? t("somethingWrong")), {
+            code: payload.code,
+          });
+        }
+        trackGA4Event("signup_start", { source: "auth_page" });
+        if (payload.hasSession) {
+          window.location.href = "/app";
+          return;
+        }
         setConfirmationSent(true);
         setLoading(false);
         return;
       }
+
+      // Fire-and-forget activity log (signup is logged server-side)
+      logActivityClient("login", { method: "email" });
 
       // Full page load so session cookies are ready for server-side checks
       window.location.href = "/app";
