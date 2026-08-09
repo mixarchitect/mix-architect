@@ -833,6 +833,7 @@
       "releases": "Releaser",
       "audio": "Ljud",
       "timeline": "Tidslinje",
+      "studio": "Studio",
       "account": "Konto",
       "billing": "Fakturering"
     }

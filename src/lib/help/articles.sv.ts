@@ -699,5 +699,52 @@ export const articles: HelpArticle[] = [
         "mockup": "resubscribe"
       }
     ]
+  },
+  /* ──────────────────────────────────────────────────────
+     STUDIO
+     ────────────────────────────────────────────────────── */
+  {
+    "id": "studio-workspace",
+    "title": "Fliken Studio: Team, varumärkning och domäner",
+    "category": "studio",
+    "summary":
+      "Hantera ditt team, portalvarumärkning, varumärkt klient-e-post och anpassad portaldomän från fliken Studio.",
+    "tags": [
+      "studio",
+      "team",
+      "arbetsyta",
+      "roller",
+      "varumärkning",
+      "white label",
+      "anpassad domän",
+      "varumärkt e-post",
+      "samarbete",
+      "inbjudan"
+    ],
+    "updatedAt": "2026-08-09",
+    "content": [
+      {
+        "heading": "Vad som finns i fliken Studio",
+        "body": "[Fliken Studio](/app/studio) i sidofältet samlar Studio-planens arbetsytefunktioner på ett ställe: Teammedlemmar, Portalvarumärkning, Varumärkt e-post och Anpassad portaldomän. Samma kort visas även i [Inställningar](/app/settings), så du kan hantera dem från valfri plats. På planerna Free och Pro visar de flesta korten vad funktionen gör tillsammans med en uppgraderingsuppmaning; Portalvarumärkning är undantaget, eftersom den ingår även i Pro."
+      },
+      {
+        "heading": "Teammedlemmar och delade projekt",
+        "body": "Bjud in kollegor till din arbetsyta via e-post och tilldela var och en en roll. Alla i arbetsytan delar hela katalogen: varje medlem kan öppna och arbeta med vilken release som helst i studiogruppen, utan inbjudningar per release. Rollerna styr vad de kan göra. Administratörer och Tekniker kan redigera releaser, ladda upp ljud och hantera briefer. Granskare har skrivskyddad åtkomst. Endast arbetsytans ägare och Administratörer kan radera releaser. När en inbjuden teammedlem loggar in med den inbjudna e-postadressen tas inbjudan emot automatiskt och de delade releaserna visas på deras översikt.",
+        "tip": "Använd rollen Granskare för klienter eller intressenter som ska kunna följa arbetet utan att kunna ändra något."
+      },
+      {
+        "heading": "Portalvarumärkning",
+        "body": "Ladda upp din logotyp och välj en accentfärg, så bär varje klientportal du delar din studios identitet. Du kan lägga till en valfri logotyp för mörkt läge som visas när en klient öppnar portalen i mörkt läge. SVG-uppladdningar (eller en PNG-export i 2-3x storlek) förblir skarpa på högupplösta skärmar. På Studio-planen är portalen helt white label: sidfoten \"Powered by Mix Architect\" tas bort. Portalvarumärkning är tillgänglig på både Pro och Studio."
+      },
+      {
+        "heading": "Varumärkt klient-e-post",
+        "body": "På Studio skickas e-post till dina klienter (portalinbjudningar, offerter och uppdateringar) under ditt studionamn och bär din logotyp och accentfärg. Ange en Reply-To-adress så att klienternas svar hamnar i din inkorg; om du lämnar den tom går svaren till din kontoe-postadress."
+      },
+      {
+        "heading": "Anpassad portaldomän",
+        "body": "Servera klientportaler från din egen domän, till exempel portal.yourstudio.com, istället för mixarchitect.com. Lägg till domänen i kortet Anpassad portaldomän och peka den sedan mot Vercel med DNS-posterna som visas (en CNAME för underdomäner, eller en A-post för apexdomäner, plus en verifieringspost när det krävs). Kortet visar Väntar på DNS tills posterna har propagerats och växlar sedan till Verifierad, och dina portaler går live på den nya domänen automatiskt med SSL inkluderat.",
+        "tip": "En underdomän som portal.yourstudio.com är den enklaste vägen: en CNAME-post och du är klar."
+      }
+    ]
   }
 ];

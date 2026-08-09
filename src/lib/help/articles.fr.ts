@@ -714,5 +714,48 @@ export const articles: HelpArticle[] = [
         "mockup": "resubscribe"
       }
     ]
+  },
+  {
+    "id": "studio-workspace",
+    "title": "L'onglet Studio : équipe, personnalisation et domaines",
+    "category": "studio",
+    "summary": "Gérez votre équipe, la personnalisation du portail, les e-mails de marque pour vos clients et votre domaine de portail personnalisé depuis l'onglet Studio.",
+    "tags": [
+      "studio",
+      "équipe",
+      "espace de travail",
+      "rôles",
+      "personnalisation",
+      "marque blanche",
+      "domaine personnalisé",
+      "e-mail de marque",
+      "collaboration",
+      "invitation"
+    ],
+    "updatedAt": "2026-08-09",
+    "content": [
+      {
+        "heading": "Ce que contient l'onglet Studio",
+        "body": "L'onglet [Studio](/app/studio) de la barre latérale regroupe en un seul endroit les fonctionnalités d'espace de travail du plan Studio : Membres de l'équipe, Personnalisation du portail, E-mails de marque et Domaine de portail personnalisé. Les mêmes cartes apparaissent également dans les [Paramètres](/app/settings), vous pouvez donc les gérer depuis l'un ou l'autre emplacement. Sur les plans gratuit et Pro, la plupart des cartes présentent la fonctionnalité accompagnée d'une invitation à passer au plan supérieur ; la Personnalisation du portail fait exception, puisqu'elle est également incluse avec Pro."
+      },
+      {
+        "heading": "Membres de l'équipe et projets partagés",
+        "body": "Invitez des collaborateurs dans votre espace de travail par e-mail et attribuez un rôle à chacun. Tous les membres de l'espace de travail partagent l'intégralité du catalogue : n'importe quel membre peut ouvrir et travailler sur n'importe quelle sortie du groupe studio, sans invitation par sortie. Les rôles déterminent ce qu'ils peuvent faire. Les Administrateurs et les Ingénieurs peuvent modifier les sorties, téléverser de l'audio et gérer les briefs. Les Lecteurs disposent d'un accès en lecture seule. Seuls le propriétaire de l'espace de travail et les Administrateurs peuvent supprimer des sorties. Lorsqu'un collaborateur invité se connecte avec l'adresse e-mail de l'invitation, celle-ci est acceptée automatiquement et les sorties partagées apparaissent sur son tableau de bord.",
+        "tip": "Utilisez le rôle Lecteur pour les clients ou les parties prenantes qui doivent suivre l'avancement sans pouvoir rien modifier."
+      },
+      {
+        "heading": "Personnalisation du portail",
+        "body": "Téléversez votre logo et choisissez une couleur d'accent : chaque portail client que vous partagez porte alors l'identité de votre studio. Vous pouvez ajouter un logo optionnel pour le mode sombre, affiché lorsqu'un client consulte le portail en mode sombre. Les fichiers SVG (ou un export PNG en 2-3x) restent nets sur les écrans haute résolution. Avec le plan Studio, le portail est entièrement en marque blanche : le pied de page \"Powered by Mix Architect\" est supprimé. La Personnalisation du portail est disponible avec Pro comme avec Studio."
+      },
+      {
+        "heading": "E-mails de marque pour vos clients",
+        "body": "Avec Studio, les e-mails destinés à vos clients (invitations au portail, devis et mises à jour) sont envoyés au nom de votre studio et portent votre logo et votre couleur d'accent. Définissez une adresse Reply-To pour que les réponses de vos clients arrivent dans votre boîte de réception ; si vous la laissez vide, les réponses sont envoyées à l'adresse e-mail de votre compte."
+      },
+      {
+        "heading": "Domaine de portail personnalisé",
+        "body": "Servez les portails clients depuis votre propre domaine, par exemple portal.yourstudio.com, au lieu de mixarchitect.com. Ajoutez le domaine dans la carte Domaine de portail personnalisé, puis faites-le pointer vers Vercel à l'aide des enregistrements DNS affichés (un CNAME pour les sous-domaines, ou un enregistrement A pour les domaines racine, plus un enregistrement de vérification si nécessaire). La carte affiche DNS en attente jusqu'à la propagation des enregistrements, puis passe à Vérifié, et vos portails sont automatiquement mis en ligne sur le nouveau domaine, SSL inclus.",
+        "tip": "Un sous-domaine comme portal.yourstudio.com est la configuration la plus simple : un enregistrement CNAME et c'est terminé."
+      }
+    ]
   }
 ];
