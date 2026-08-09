@@ -61,10 +61,16 @@ const TEMP_DIR = path.join(os.tmpdir(), "mix-architect-worker");
 /**
  * After this many minutes, a row stuck in 'processing'/'analyzing'/0
  * is presumed crashed and reset to its pending state so another
- * worker iteration can pick it up. Long enough that genuinely slow
- * FFmpeg jobs (5min timeout in convertAudio) finish before reclaim.
+ * worker iteration can pick it up. Must comfortably exceed the worst
+ * legitimate job: a 121 MB WAV download alone has taken ~15 min on
+ * Railway, plus FFmpeg conversion (5 min timeout in convertAudio) —
+ * 15 min nearly double-claimed a live job. A truly hung download no
+ * longer needs a tight window anyway: downloadSourceAudio aborts
+ * itself after 60s without bytes, which lands the row back in the
+ * normal failure/retry path. This sweep only covers hard crashes
+ * (SIGTERM, OOM, redeploy), where a slower retry is acceptable.
  */
-const STUCK_JOB_RECLAIM_MINUTES = 15;
+const STUCK_JOB_RECLAIM_MINUTES = 30;
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
