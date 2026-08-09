@@ -1,5 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import fs from "node:fs/promises";
+import { createWriteStream } from "node:fs";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import type { ReadableStream as WebReadableStream } from "node:stream/web";
 import path from "node:path";
 
 /* ------------------------------------------------------------------ */
@@ -26,12 +30,20 @@ function extractStoragePath(urlOrPath: string): string {
 }
 
 /**
- * Hard ceiling on the size of an audio source the worker will buffer
- * into memory. Mirrors the cover-art bucket cap from migration 058
- * (600 MB) with headroom for re-encoded versions. Beyond this the
- * worker would OOM trying to `arrayBuffer()` the whole file.
+ * Hard ceiling on the size of an audio source the worker will write
+ * to disk. Mirrors the track-audio bucket cap from migration 058
+ * (600 MB) with headroom for re-encoded versions, as a defense
+ * against bucket-cap drift. Enforced incrementally as bytes arrive.
  */
 const MAX_AUDIO_BYTES = 700 * 1024 * 1024;
+
+/**
+ * Abort a download only if NO bytes arrive for this long. Large WAVs
+ * (100 MB+) legitimately take 10+ minutes on slow storage links, so
+ * there is deliberately no overall timeout — a transfer that keeps
+ * trickling bytes is alive, one that goes silent for a minute is not.
+ */
+const DOWNLOAD_STALL_TIMEOUT_MS = 60_000;
 
 export async function downloadSourceAudio(
   audioUrlOrPath: string,
@@ -45,32 +57,97 @@ export async function downloadSourceAudio(
 
   const storagePath = extractStoragePath(audioUrlOrPath);
 
-  // Download via service role (works for both public and private buckets).
-  // We rely on the bucket's file_size_limit (600 MB, set in migration 058)
-  // to reject oversize uploads server-side before they ever reach storage.
-  // The post-download buffer.length check below is a cheap defense against
-  // bucket-cap drift. The previous version also called .info() pre-download
-  // for a HEAD-style size check, but that endpoint was slow/hanging in
-  // practice and made every analysis run take minutes. The bucket cap +
-  // post-download buffer check covers the same threat with no extra round
-  // trip.
-  const { data, error } = await supabase.storage
-    .from("track-audio")
-    .download(storagePath);
+  // Streamed download straight to disk via the storage object endpoint
+  // with service-role auth (works for both public and private buckets).
+  // supabase-js's .download() buffers the entire body in memory and
+  // gives no progress signal — a 121 MB WAV once took ~10 minutes with
+  // zero log output and nearly got the row reclaimed as stuck. Streaming
+  // keeps memory flat and lets the stall guard distinguish "slow but
+  // alive" from "hung".
+  const objectUrl = `${supabaseUrl}/storage/v1/object/track-audio/${storagePath
+    .split("/")
+    .map(encodeURIComponent)
+    .join("/")}`;
 
-  if (error || !data) {
-    throw new Error(`Download failed for ${storagePath}: ${error?.message ?? "no data"}`);
-  }
+  const controller = new AbortController();
+  let stallTimer: NodeJS.Timeout | undefined;
+  let stalledAtBytes: number | null = null;
+  let received = 0;
 
-  const buffer = Buffer.from(await data.arrayBuffer());
+  const armStallGuard = () => {
+    if (stallTimer) clearTimeout(stallTimer);
+    stallTimer = setTimeout(() => {
+      stalledAtBytes = received;
+      controller.abort();
+    }, DOWNLOAD_STALL_TIMEOUT_MS);
+  };
 
-  if (buffer.length > MAX_AUDIO_BYTES) {
-    throw new Error(
-      `Source audio too large (${buffer.length} bytes > ${MAX_AUDIO_BYTES} cap): ${storagePath}`,
+  const startedAt = Date.now();
+  console.log(`[storage] ⬇ download start: ${storagePath}`);
+
+  try {
+    armStallGuard();
+    const response = await fetch(objectUrl, {
+      headers: {
+        Authorization: `Bearer ${supabaseServiceKey}`,
+        apikey: supabaseServiceKey,
+      },
+      signal: controller.signal,
+    });
+
+    if (!response.ok || !response.body) {
+      await response.body?.cancel().catch(() => {});
+      throw new Error(
+        `Download failed for ${storagePath}: HTTP ${response.status}`,
+      );
+    }
+
+    const declaredLen = Number(response.headers.get("content-length") ?? 0);
+    if (declaredLen > 0) {
+      console.log(`[storage]   size: ${formatMb(declaredLen)} MB`);
+      if (declaredLen > MAX_AUDIO_BYTES) {
+        await response.body.cancel().catch(() => {});
+        throw new Error(
+          `Source audio too large (${declaredLen} bytes > ${MAX_AUDIO_BYTES} cap): ${storagePath}`,
+        );
+      }
+    }
+
+    await pipeline(
+      Readable.fromWeb(response.body as WebReadableStream),
+      async function* (source: AsyncIterable<Buffer>) {
+        for await (const chunk of source) {
+          armStallGuard();
+          received += chunk.length;
+          if (received > MAX_AUDIO_BYTES) {
+            throw new Error(
+              `Source audio too large (${received}+ bytes > ${MAX_AUDIO_BYTES} cap): ${storagePath}`,
+            );
+          }
+          yield chunk;
+        }
+      },
+      createWriteStream(resolved),
     );
+  } catch (err) {
+    if (stalledAtBytes !== null) {
+      throw new Error(
+        `Download stalled for ${storagePath}: no bytes for ${DOWNLOAD_STALL_TIMEOUT_MS / 1000}s after ${formatMb(stalledAtBytes)} MB`,
+      );
+    }
+    throw err;
+  } finally {
+    if (stallTimer) clearTimeout(stallTimer);
   }
 
-  await fs.writeFile(resolved, buffer);
+  const seconds = (Date.now() - startedAt) / 1000;
+  console.log(
+    `[storage] ✔ download complete: ${storagePath} — ${formatMb(received)} MB in ${seconds.toFixed(1)}s (${formatMb(received / Math.max(seconds, 0.001))} MB/s)`,
+  );
+}
+
+function formatMb(bytes: number): string {
+  return (bytes / (1024 * 1024)).toFixed(1);
 }
 
 /* ------------------------------------------------------------------ */
