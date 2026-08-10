@@ -134,15 +134,18 @@ export async function GET(req: NextRequest) {
     // Fetch GA4 data
     const data = await getAllGA4TrafficData(range);
 
-    // Generate synopsis with Claude
+    // Generate synopsis with Claude. claude-sonnet-4-20250514 was retired
+    // 2026-06-15 and began returning 404, which is why the synopsis card
+    // showed "Unable to generate synopsis" on every load.
     const anthropic = new Anthropic({ apiKey });
     const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 500,
+      model: "claude-opus-5",
+      max_tokens: 1000,
       messages: [{ role: "user", content: buildPrompt(data, range) }],
     });
 
-    const synopsis = message.content[0].type === "text" ? message.content[0].text : "";
+    const textBlock = message.content.find((b) => b.type === "text");
+    const synopsis = textBlock && textBlock.type === "text" ? textBlock.text : "";
 
     // Cache the result
     setCachedSynopsis(range, synopsis);

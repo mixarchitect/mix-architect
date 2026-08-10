@@ -42,7 +42,10 @@ export function Rail() {
         // without hovering.
         "w-14 hover:w-48 xl:w-48 overflow-hidden",
         "bg-panel border-r border-border",
-        "flex-col py-3 gap-1",
+        // Horizontal padding insets the rounded active pill from the rail
+        // edges (matching the admin sidebar) instead of letting its corners
+        // collide with the container border.
+        "flex-col py-3 px-2 gap-1",
         "transition-[width] duration-200 ease-out",
       )}
       style={{ height: "calc(100dvh - 3.5rem)" }}
@@ -102,7 +105,9 @@ function NavItem({
       <Link
         href={href}
         className={cn(
-          "flex items-center gap-3 w-full px-4 h-10 rounded-md",
+          // px-2 here + px-2 on the nav keeps the icon centered in the 56px
+          // collapsed rail (8 + 8 + 12 = 28px, the rail's midline).
+          "flex items-center gap-3 w-full px-2 h-10 rounded-md",
           "text-muted transition-all duration-150",
           "hover:text-text hover:bg-panel2",
           "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",

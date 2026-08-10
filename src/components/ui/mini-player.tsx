@@ -37,7 +37,9 @@ export function MiniPlayer() {
   const trackUrl = `/app/releases/${trackMeta.releaseId}/tracks/${trackMeta.trackId}`;
 
   return (
-    <div className="fixed bottom-16 md:bottom-0 left-0 right-0 md:left-16 z-40 bg-panel border-t border-border shadow-lg safe-bottom">
+    // Full viewport width: z-40 sits above the rail (z-20), so the bar runs
+    // edge to edge instead of starting at a stale rail-width offset.
+    <div className="fixed bottom-16 md:bottom-0 left-0 right-0 z-40 bg-panel border-t border-border shadow-lg safe-bottom">
       {/* Thin progress bar at top edge */}
       <div className="h-0.5 bg-border">
         <div
