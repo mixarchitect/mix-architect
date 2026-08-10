@@ -333,11 +333,11 @@ export function FlowSimulator({ tracks: initialTracks, hiddenCount, releaseId, o
       </div>
 
       {/* ── Keyboard hints ──────────────────────────────────────── */}
-      <div className="flex items-center gap-4 text-[10px] text-faint pt-2 border-t border-border">
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-[10px]">Space</kbd> Play/Pause</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-[10px]">←</kbd><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-[10px] ml-0.5">→</kbd> Skip</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-[10px]">⌘Z</kbd> Undo</span>
-        <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-[10px]">Esc</kbd> Close</span>
+      <div className="flex items-center gap-4 text-2xs text-faint pt-2 border-t border-border">
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-2xs">Space</kbd> Play/Pause</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-2xs">←</kbd><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-2xs ml-0.5">→</kbd> Skip</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-2xs">⌘Z</kbd> Undo</span>
+        <span><kbd className="px-1 py-0.5 rounded border border-border bg-panel text-2xs">Esc</kbd> Close</span>
       </div>
     </div>
   );

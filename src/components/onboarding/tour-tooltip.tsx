@@ -120,10 +120,19 @@ export function TourTooltip({
     };
   }, [targetSelector, updatePosition]);
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onSkip();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [onSkip]);
+
   return (
     <div
       ref={tooltipRef}
       role="dialog"
+      aria-modal="true"
       aria-label="Tour step"
       className="fixed z-[9999] w-80 max-w-[calc(100vw-16px)] rounded-xl border border-signal/30 shadow-xl"
       style={{

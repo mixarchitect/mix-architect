@@ -3,18 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
-import {
-  sendTransactionalEmail,
-  getUserDisplayName,
-  buildUnsubscribeUrl,
-} from "@/lib/email/service";
-import { buildQuoteReceivedEmail } from "@/lib/email-templates/quote-emails";
 import { sendQuoteCore } from "@/lib/quotes/send-quote-core";
-import {
-  getWorkspaceSenderFrom,
-  getWorkspaceEmailBrand,
-  getWorkspaceReplyTo,
-} from "@/lib/email/workspace-sender";
 import { syncPaymentStatus } from "@/lib/payment-sync";
 import { fireTrigger } from "@/lib/workflow-engine";
 import type { Quote, QuoteLineItem, PaymentSchedule } from "@/types/payments";

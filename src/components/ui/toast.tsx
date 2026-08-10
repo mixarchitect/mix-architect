@@ -9,6 +9,7 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { X, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -58,6 +59,9 @@ let nextId = 0;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  // Portal target only exists in the browser; render nothing during SSR.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const dismiss = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -90,15 +94,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastCtx.Provider value={value}>
       {children}
 
-      {/* Toast container — bottom-right */}
-      <div
-        aria-live="polite"
-        className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none"
-      >
-        {toasts.map((t) => (
-          <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
-        ))}
-      </div>
+      {/* Toast container — bottom-right, portaled so ancestor transforms
+          and overflow clipping can't trap or hide the viewport */}
+      {mounted &&
+        createPortal(
+          <div
+            role="status"
+            aria-live="polite"
+            className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none"
+          >
+            {toasts.map((t) => (
+              <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
+            ))}
+          </div>,
+          document.body,
+        )}
     </ToastCtx.Provider>
   );
 }

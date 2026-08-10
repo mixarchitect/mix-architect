@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Gift, X, Clock, AlertTriangle, ArrowLeftRight } from "lucide-react";
 import { isAtLeastPro, normalizePlan, type Plan } from "@/lib/entitlements";
+import { ConfirmDialog } from "@/components/ui/dialog";
 
 /**
  * Plan controls for the admin user-detail page.
@@ -42,10 +43,18 @@ type Props = {
 
 type ActionState = "idle" | "loading" | "error";
 
+type PendingAction = {
+  title: string;
+  message: string;
+  destructive: boolean;
+  run: () => void;
+};
+
 export function SubscriptionPlanControl({ userId, subscription }: Props) {
   const router = useRouter();
   const [state, setState] = useState<ActionState>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [pending, setPending] = useState<PendingAction | null>(null);
 
   const isActivePro =
     isAtLeastPro(subscription?.plan) && subscription?.status === "active";
@@ -56,12 +65,21 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
     isPaidPro && subscription?.cancel_at_period_end === true;
   const currentPlan = normalizePlan(subscription?.plan);
 
-  async function grantComp(plan: Plan, opts?: { switching?: boolean }) {
+  function grantComp(plan: Plan, opts?: { switching?: boolean }) {
     const planLabel = plan === "studio" ? "Studio" : "Pro";
     const message = opts?.switching
       ? `Switch this comp account to ${planLabel}? Their workspace plan updates immediately.`
       : `Grant this user a comp ${planLabel} subscription (indefinite)?`;
-    if (!confirm(message)) return;
+    setPending({
+      title: opts?.switching ? `Switch to ${planLabel}` : `Grant Comp ${planLabel}`,
+      message,
+      destructive: false,
+      run: () => performGrantComp(plan, opts),
+    });
+  }
+
+  async function performGrantComp(plan: Plan, opts?: { switching?: boolean }) {
+    const planLabel = plan === "studio" ? "Studio" : "Pro";
     setState("loading");
     setErrorMsg(null);
     try {
@@ -90,7 +108,7 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
     }
   }
 
-  async function cancel(mode: "immediate" | "at_period_end") {
+  function cancel(mode: "immediate" | "at_period_end") {
     const prompt =
       mode === "immediate"
         ? isComp
@@ -98,7 +116,20 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
           : "Cancel this user's Stripe subscription NOW? They lose Pro access immediately and are not charged again."
         : "Schedule cancellation at the end of the current billing period? User keeps Pro access until then.";
 
-    if (!confirm(prompt)) return;
+    setPending({
+      title:
+        mode === "immediate"
+          ? isComp
+            ? "Remove Comp"
+            : "Cancel Now"
+          : "Cancel at Period End",
+      message: prompt,
+      destructive: true,
+      run: () => performCancel(mode),
+    });
+  }
+
+  async function performCancel(mode: "immediate" | "at_period_end") {
     setState("loading");
     setErrorMsg(null);
     try {
@@ -122,6 +153,23 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
       setState("error");
     }
   }
+
+  const confirmDialog = (
+    <ConfirmDialog
+      open={pending !== null}
+      title={pending?.title ?? ""}
+      description={pending?.message}
+      confirmLabel="Confirm"
+      cancelLabel="Cancel"
+      destructive={pending?.destructive ?? false}
+      onConfirm={() => {
+        const action = pending;
+        setPending(null);
+        action?.run();
+      }}
+      onCancel={() => setPending(null)}
+    />
+  );
 
   // Free user — offer to grant a comp at either tier.
   if (!isActivePro) {
@@ -153,6 +201,7 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
             {errorMsg}
           </span>
         )}
+        {confirmDialog}
       </>
     );
   }
@@ -189,6 +238,7 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
             {errorMsg}
           </span>
         )}
+        {confirmDialog}
       </>
     );
   }
@@ -229,6 +279,7 @@ export function SubscriptionPlanControl({ userId, subscription }: Props) {
           {errorMsg}
         </span>
       )}
+      {confirmDialog}
     </>
   );
 }

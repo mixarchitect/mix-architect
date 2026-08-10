@@ -41,11 +41,11 @@ export default async function AdminFeaturedPage() {
                   {release.is_active && (
                     <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
                   )}
-                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded border border-white/10 text-zinc-500 uppercase tracking-wider">
+                  <span className="text-2xs font-medium px-1.5 py-0.5 rounded border border-white/10 text-zinc-500 uppercase tracking-wider">
                     {release.source}
                   </span>
                   {release.is_active && (
-                    <span className="text-[10px] font-medium text-green-400">
+                    <span className="text-2xs font-medium text-green-400">
                       ACTIVE
                     </span>
                   )}

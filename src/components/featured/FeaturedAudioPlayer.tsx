@@ -179,7 +179,7 @@ export function FeaturedAudioPlayer({
       </div>
 
       {/* Time display */}
-      <div className="flex justify-between text-[10px] text-zinc-500 font-mono">
+      <div className="flex justify-between text-2xs text-zinc-500 font-mono">
         <span>{formatTime(currentTime)}</span>
         <span>{duration > 0 ? formatTime(duration) : "--:--"}</span>
       </div>

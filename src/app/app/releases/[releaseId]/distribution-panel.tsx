@@ -389,7 +389,7 @@ function PlatformRow({
         {/* Distributor pill */}
         <span className="shrink-0">
           {entry.distributor ? (
-            <Pill className="text-[10px]">{entry.distributor}</Pill>
+            <Pill className="text-2xs">{entry.distributor}</Pill>
           ) : null}
         </span>
 
@@ -422,7 +422,7 @@ function PlatformRow({
               <button
                 type="button"
                 onClick={() => setShowUrlInput(!showUrlInput)}
-                className="text-[10px] text-muted hover:text-signal transition-colors opacity-0 group-hover:opacity-100"
+                className="text-2xs text-muted hover:text-signal transition-colors opacity-0 group-hover:opacity-100"
                 title={t("editUrl")}
               >
                 {t("editAction")}
@@ -456,7 +456,7 @@ function PlatformRow({
           <button
             type="button"
             onClick={onDelete}
-            className="text-[10px] text-muted hover:text-red-400 transition-colors px-1 opacity-0 group-hover:opacity-100"
+            className="text-2xs text-muted hover:text-red-400 transition-colors px-1 opacity-0 group-hover:opacity-100"
             title={t("remove")}
           >
             <Trash2 size={12} />
@@ -485,7 +485,7 @@ function PlatformRow({
               <StatusIndicator
                 color={getStatusColor(s)}
                 label={t(statusKeyMap[s] ?? "statusNotSubmitted")}
-                className="text-[10px]"
+                className="text-2xs"
               />
             </button>
           ))}

@@ -145,7 +145,7 @@ export function TimelineView({ releases }: TimelineViewProps) {
                 <StatusDot color={getStatusColor(r.status)} className="shrink-0" />
                 <div className="min-w-0 flex-1">
                   {r.artist && (
-                    <div className="text-[10px] text-muted truncate leading-tight">
+                    <div className="text-2xs text-muted truncate leading-tight">
                       {r.artist}
                     </div>
                   )}
@@ -248,7 +248,7 @@ function CountdownLabel({ targetDate }: { targetDate: string }) {
 
   if (cd.isToday) {
     return (
-      <span className="text-[10px] font-semibold leading-tight" style={{ color: "var(--signal)" }}>
+      <span className="text-2xs font-semibold leading-tight" style={{ color: "var(--signal)" }}>
         Release day!
       </span>
     );
@@ -256,14 +256,14 @@ function CountdownLabel({ targetDate }: { targetDate: string }) {
 
   if (cd.isOverdue) {
     return (
-      <span className="text-[10px] text-faint leading-tight">
+      <span className="text-2xs text-faint leading-tight">
         {cd.label}
       </span>
     );
   }
 
   return (
-    <span className="text-[10px] text-faint leading-tight">
+    <span className="text-2xs text-faint leading-tight">
       {cd.label}
     </span>
   );

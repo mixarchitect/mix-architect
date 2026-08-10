@@ -28,11 +28,12 @@
     "releases": "Releases",
     "artists": "Artists",
     "templates": "Templates",
-    "payments": "Payments",
-    "quotes": "Quotes",
+    "payments": "Money",
+    "quotes": "Money",
     "money": "Money",
     "analytics": "Analytics",
     "studio": "Studio",
+    "featured": "What we're spinning",
     "settings": "Settings",
     "help": "Help",
     "helpCenter": "Help Center",
@@ -93,7 +94,7 @@
       "title": "How will you use Mix Architect?",
       "artist": "Artist",
       "artistDesc": "I'm releasing my own music",
-      "artistFeatures": "Release planning, audio review, distribution tracking, and more",
+      "artistFeatures": "Hides invoicing and client tools. You get release planning, audio review, and distribution tracking.",
       "engineer": "Engineer / Producer",
       "engineerDesc": "I work on other people's projects",
       "engineerFeatures": "Everything included: payments, client portal, invoicing, plus all release tools",
@@ -101,7 +102,8 @@
       "bothDesc": "I release my own music and work on client projects",
       "bothFeatures": "Full suite: client tools, payments, release planning, and distribution",
       "other": "Something else? Start with full access",
-      "note": "This helps us tailor your experience. You can change this anytime in Settings."
+      "note": "This helps us tailor your experience. You can change this anytime in Settings.",
+      "continue": "Continue"
     },
     "locale": {
       "title": "Where are you based?",
@@ -139,7 +141,7 @@
     "topicDesc": {
       "create-release": "Set up your first project",
       "release-overview": "Navigate tabs and sidebar",
-      "track-detail": "Intent, specs, and audio",
+      "track-detail": "Brief, specs, and audio",
       "dashboard": "Overview and navigation"
     },
     "stepTitle": {
@@ -166,13 +168,13 @@
       "create-genres": "Tag your release with genres to help organize your catalog. You can pick from the suggestions or type in any genre you like to create your own. This step is optional.",
       "create-date": "Set a target date for your release. This helps you track your timeline and keep things on schedule.",
       "create-submit": "Hit the button to create your release. You\u2019ll be able to explore it right away.",
-      "release-tabs": "These tabs organize your release: Tracks, Globals, Distribution, and Financials. Each section helps manage a different aspect of your project.",
+      "release-tabs": "These tabs organize your release: Tracks, Globals, Distribution, and Money. Each section helps manage a different aspect of your project.",
       "release-sidebar": "Upload cover art, view release info, and add internal or client notes here.",
-      "release-track-link": "Click into a track to see its details: mix intent, specs, audio versions, and more.",
-      "track-tabs": "Each tab captures a different aspect: Intent (your vision), Specs (technical requirements), Audio (uploads & versions), and more.",
+      "release-track-link": "Click into a track to see its details: the brief, specs, audio versions, and more.",
+      "track-tabs": "Each tab captures a different aspect: Brief (your vision), Specs (technical requirements), Audio (uploads & versions), and more.",
       "track-intent": "Describe the vision for this mix: mood, references, and direction. This is the heart of your brief.",
       "dashboard-card": "Each release shows its status, track progress, and key info at a glance. Click to dive back in.",
-      "dashboard-nav": "The sidebar gives you quick access to all sections: Releases, Artists, Templates, Payments, and Analytics."
+      "dashboard-nav": "The sidebar gives you quick access to all sections: Releases, Artists, Templates, Money, and Analytics."
     }
   },
   "dashboard": {
@@ -222,7 +224,7 @@
       "upgradeToPro": "Upgrade to Pro",
       "startFromTemplate": "Start from a template",
       "templateDesc": "Pre-fill your release settings, or start from scratch.",
-      "useTemplate": "Use Template",
+      "useTemplate": "Use template",
       "startFromScratch": "Start from scratch",
       "setupNote": "Set up your project. You can always edit these details later.",
       "releaseTitle": "Release title *",
@@ -230,6 +232,7 @@
       "artistClient": "Artist name",
       "artistPlaceholder": "Your artist or band name",
       "releaseType": "Release type",
+      "typeHint": "Singles auto-create one track. EPs and albums let you add tracks after. You can change this anytime in Release settings.",
       "format": "Format",
       "genreTags": "Genre tags",
       "genreTagsPlaceholder": "Type and press Enter to add",
@@ -245,19 +248,20 @@
       "deleteConfirm": "Delete {title}? This cannot be undone.",
       "releaseOptions": "Release options",
       "tracksBriefed": "{completed} of {total} {total, plural, one {track} other {tracks}} briefed",
+      "audioWarnings": "{count, plural, one {# audio warning} other {# audio warnings}}",
       "statusReady": "Ready",
-      "statusInProgress": "In Progress",
+      "statusInProgress": "In progress",
       "statusDraft": "Draft"
     },
     "payment": {
-      "status": "Payment Status",
+      "status": "Payment status",
       "unpaid": "Unpaid",
       "partial": "Partial",
       "paid": "Paid",
       "noFee": "No fee set",
-      "fee": "Project Fee",
+      "fee": "Project fee",
       "perTrackFee": "Per-Track Fee",
-      "notes": "Payment Notes",
+      "notes": "Payment notes",
       "outstanding": "Outstanding"
     },
     "sort": {
@@ -277,7 +281,7 @@
     "name": "Name",
     "email": "Email",
     "phone": "Phone",
-    "noIntentDefined": "No intent defined",
+    "noIntentDefined": "No brief yet",
     "globalDirection": "GLOBAL MIX DIRECTION",
     "noDirection": "No global direction set yet.",
     "directionPlaceholder": "Overall sonic vision for this release...",
@@ -302,7 +306,7 @@
     "paidLabel": "Paid",
     "balanceLabel": "Balance",
     "statusDraft": "Draft",
-    "statusInProgress": "In Progress",
+    "statusInProgress": "In progress",
     "statusReady": "Ready",
     "markedStatus": "Release marked {status}",
     "paymentChanged": "Payment status changed to {status}",
@@ -313,7 +317,7 @@
     "tabFinancials": "Money",
     "tabQuotes": "Quotes",
     "breadcrumbReleases": "Releases",
-    "addTrack": "Add Track",
+    "addTrack": "Add track",
     "addATrack": "Add a track",
     "noTracksTitle": "No tracks added",
     "noTracksDescEdit": "Add tracks to start building out this release.",
@@ -333,6 +337,10 @@
     "trackNotStarted": "Not started",
     "moveUp": "Move up",
     "moveDown": "Move down",
+    "qualityNeedsAttention": "Needs attention",
+    "reorderFailed": "Couldn't save the new track order. Your tracks were restored.",
+    "viewBrief": "View mix brief",
+    "singleTypeMismatch": "This release is set to Single but has {count} tracks. Make it an EP or album in",
     "deleteTrack": "Delete track",
     "deleteTrackConfirm": "Delete {title}? This cannot be undone.",
     "portal": "Portal",
@@ -357,7 +365,7 @@
     "removeCoverArt": "Remove"
   },
   "releaseSettings": {
-    "title": "Release Settings",
+    "title": "Release settings",
     "editDescription": "Edit the details for this release.",
     "viewDescription": "View the details for this release.",
     "backToRelease": "Back to Release",
@@ -448,7 +456,7 @@
     "createFirst": "Create your first template"
   },
   "payments": {
-    "title": "Payments",
+    "title": "Money",
     "summary": "Payment Summary",
     "generated": "Generated {date}",
     "outstanding": "Outstanding",
@@ -547,7 +555,7 @@
   "settings": {
     "teamMembers": {
       "title": "Team members",
-      "gatedDesc": "Invite your team to collaborate on releases with shared access and roles. Available on Studio.",
+      "gatedDesc": "Invite your team to collaborate on releases with shared access and roles. Available on the Studio plan.",
       "upgradeCta": "Upgrade to Studio",
       "desc": "Invite teammates to your workspace. They get access to all releases, gated by role.",
       "pending": "Pending",
@@ -565,7 +573,7 @@
     },
     "customDomain": {
       "title": "Custom portal domain",
-      "gatedDesc": "Serve client portals on your own domain (portal.yourstudio.com). Available on Studio.",
+      "gatedDesc": "Serve client portals on your own domain (portal.yourstudio.com). Available on the Studio plan.",
       "upgradeCta": "Upgrade to Studio",
       "desc": "Serve client portals on your own domain instead of mixarchitect.com.",
       "domainPlaceholder": "portal.yourstudio.com",
@@ -583,7 +591,7 @@
     },
     "brandedEmail": {
       "title": "Branded email",
-      "gatedDesc": "Send client emails under your studio's name with your logo and colors. Available on Studio.",
+      "gatedDesc": "Send client emails under your studio's name with your logo and colors. Available on the Studio plan.",
       "upgradeCta": "Upgrade to Studio",
       "desc": "Client emails send under your studio name with your logo and colors. Choose where client replies should go.",
       "replyToLabel": "Reply-to email",
@@ -608,6 +616,9 @@
       "accentColor": "Accent color",
       "accentPickerLabel": "Accent color picker",
       "accentHint": "Used for buttons and highlights on the portal. Default is Mix Architect teal.",
+      "accentContrastWarning": "This color is hard to read in {theme} mode. The portal will use the default teal there instead.",
+      "accentThemeLight": "light",
+      "accentThemeDark": "dark",
       "errLogoSize": "Logo must be under 5MB.",
       "errLogoType": "Use a PNG, JPG, WebP, or SVG image.",
       "errUploadFailed": "Upload failed.",
@@ -871,7 +882,7 @@
     "title": "Something went wrong",
     "description": "We hit an unexpected error loading this page. You can try again, or head back to the dashboard.",
     "tryAgain": "Try again",
-    "goToDashboard": "Go to Dashboard"
+    "goToDashboard": "Go to dashboard"
   },
   "notFound": {
     "title": "Page not found",
@@ -982,7 +993,7 @@
     "toolComments": "Timestamped Comments",
     "toolCommentsDesc": "Drop feedback at the exact moment in the track. Color-coded markers on the timeline.",
     "toolMixBrief": "Mix Brief Export",
-    "toolMixBriefDesc": "Generate a shareable brief document from your intent, specs, and references.",
+    "toolMixBriefDesc": "Generate a shareable document from your brief, specs, and references.",
     "toolVersionControl": "Version Control",
     "toolVersionControlDesc": "Upload new versions, compare side by side, keep every revision accessible.",
 
@@ -1002,7 +1013,7 @@
     "pricingFreeDesc": "Perfect for independent artists getting started",
     "pricingProDesc": "Everything you need to run a professional operation",
     "pricingFreeF1": "1 release",
-    "pricingFreeF2": "Mix brief builder with intent & references",
+    "pricingFreeF2": "Mix brief builder with vision & references",
     "pricingFreeF3": "Release planning & timeline",
     "pricingFreeF4": "Audio review with waveform & comments",
     "pricingFreeF5": "Technical specs (LUFS, format, sample rate)",
@@ -1048,8 +1059,8 @@
     "navPrivacy": "Privacy"
   },
   "auth": {
-    "signIn": "Sign In",
-    "createAccount": "Create Account",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
     "name": "Name",
     "namePlaceholder": "Your name",
     "email": "Email",
@@ -1093,5 +1104,148 @@
     "passwordUpdated": "Password updated successfully. Redirecting...",
     "resetPasswordNoSession": "Invalid or expired reset link. Please request a new one.",
     "resetPasswordFailed": "Failed to update password. Please try again."
+  },
+  "portal": {
+    "cancel": "Cancel",
+    "status": {
+      "awaitingReview": "Awaiting Review",
+      "changesRequested": "Changes Requested",
+      "approved": "Approved",
+      "delivered": "Delivered"
+    },
+    "releaseType": {
+      "single": "Single",
+      "ep": "EP",
+      "album": "Album"
+    },
+    "format": {
+      "stereo": "Stereo",
+      "atmos": "Dolby Atmos",
+      "both": "Stereo + Atmos"
+    },
+    "approval": {
+      "approve": "Approve",
+      "requestChanges": "Request Changes",
+      "undo": "Undo",
+      "whatNeedsToChange": "What needs to change?",
+      "changePlaceholder": "e.g., Vocals too quiet in the chorus, needs more low end...",
+      "failedApprove": "Failed to approve. Please try again.",
+      "failedSubmitChanges": "Failed to submit changes. Please try again.",
+      "failedUndo": "Failed to undo. Please try again.",
+      "networkError": "Network error. Please check your connection.",
+      "approvedOn": "on {date}",
+      "sendNotes": "Send notes",
+      "sendNotesTo": "Send notes to {name}"
+    },
+    "header": {
+      "logoAlt": "{name} logo",
+      "logoAltGeneric": "Studio logo",
+      "coverArtAlt": "{title} cover art",
+      "trackCount": "{count, plural, one {# track} other {# tracks}}",
+      "byEngineer": "by {name}",
+      "approvedProgress": "{done} of {total} approved",
+      "revisionCount": "{count, plural, one {# revision} other {# revisions}}"
+    },
+    "trackCard": {
+      "noAudioYet": "No audio shared yet",
+      "noAudioYetNamed": "{name} hasn’t shared audio for this track yet",
+      "details": "Details",
+      "mixDirection": "Mix Direction",
+      "avoid": "Avoid:",
+      "specs": "Specs",
+      "loudness": "Loudness:",
+      "lufsTooltip": "How loud this mix is overall, measured in LUFS",
+      "format": "Format:",
+      "references": "References",
+      "identifiers": "Track identifiers",
+      "producer": "Producer:",
+      "composers": "Composers:",
+      "language": "Language:",
+      "lyrics": "Lyrics"
+    },
+    "identifiers": {
+      "isrc": "ISRC",
+      "isrcTooltip": "International Standard Recording Code, a unique ID for this recording",
+      "iswc": "ISWC",
+      "iswcTooltip": "International Standard Musical Work Code, a unique ID for the underlying song",
+      "upc": "UPC",
+      "upcTooltip": "Universal Product Code, the barcode number for this release",
+      "phonogram": "Phonogram",
+      "phonogramTooltip": "Phonogram copyright, the owner of this recording",
+      "catalogNumber": "Catalog #",
+      "catalogTooltip": "The label’s internal catalog number for this release"
+    },
+    "footer": {
+      "payment": "Payment",
+      "of": "of",
+      "paid": "Paid",
+      "partial": "Partial",
+      "unpaid": "Unpaid",
+      "outstanding": "Outstanding:",
+      "paymentGateNote": "Final downloads will be available once payment is confirmed.",
+      "paymentGateNoteNamed": "Final downloads will be available once payment is confirmed by {name}.",
+      "releaseIdentifiers": "Release identifiers",
+      "recordLabel": "Label",
+      "distributor": "Distributor",
+      "copyright": "Copyright",
+      "isrcCodes": "ISRC codes"
+    },
+    "reference": {
+      "artworkAlt": "{title} artwork",
+      "openLink": "Open link"
+    },
+    "player": {
+      "noVersions": "No audio versions available for this track yet.",
+      "paymentPending": "Payment pending",
+      "downloadFile": "Download {name}",
+      "versionN": "Version {number}",
+      "commentCount": "{count, plural, one {# comment} other {# comments}}",
+      "loudnessReady": "Loudness: ready for streaming",
+      "audioCheckNeedsAttention": "Audio check: needs attention",
+      "technicalDetails": "Technical details",
+      "streamingTooltip": "How streaming services will adjust this loudness",
+      "truePeakTooltip": "Peak level compared with platform limits",
+      "qualityTooltip": "Show audio quality details",
+      "belowCeiling": "{amount} dB below the {ceiling} dBTP ceiling",
+      "overCeiling": "{amount} dB over the {ceiling} dBTP ceiling",
+      "issueCount": "{count, plural, one {# issue} other {# issues}}",
+      "clippingDetected": "Clipping detected",
+      "peakAtFullScale": "Peak at full scale",
+      "dcOffsetDetected": "DC offset detected",
+      "noChange": "no change",
+      "dbOver": "+{amount} dB over",
+      "dbHeadroom": "{amount} dB headroom",
+      "qualityCheck": "Quality check",
+      "clippingTitle": "Clipping",
+      "clippingDesc": "{count} clipped samples detected. Reduce output gain or check your limiter ceiling.",
+      "fullScaleTitle": "Sample peak at full scale",
+      "fullScaleDesc": "Peak: {peak}. Leave at least 0.3 dB of headroom for processing.",
+      "dcOffsetTitle": "DC offset",
+      "dcOffsetValue": "Offset of {value} detected.",
+      "dcOffsetFix": "Apply a high-pass filter at 20 Hz or lower to remove it.",
+      "doubleClickHint": "Double-click the waveform to add a comment",
+      "seekPosition": "Seek position",
+      "returnToStart": "Return to start",
+      "skipBack": "Back 10 seconds",
+      "skipForward": "Forward 10 seconds",
+      "play": "Play",
+      "pause": "Pause",
+      "loop": "Loop",
+      "loopOn": "Loop (on)",
+      "stopPlayback": "Stop playback",
+      "whatsYourName": "What’s your name?",
+      "yourName": "Your name",
+      "postComment": "Post comment",
+      "commentAt": "Comment at {time}",
+      "asName": "as {name}",
+      "feedbackPlaceholder": "Add your feedback…",
+      "addComment": "Add Comment",
+      "noCommentsYet": "No comments on this version yet",
+      "deleteComment": "Delete comment",
+      "justNow": "just now",
+      "minutesAgo": "{count}m ago",
+      "hoursAgo": "{count}h ago",
+      "daysAgo": "{count}d ago"
+    }
   }
 }

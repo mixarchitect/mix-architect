@@ -26,7 +26,7 @@ export function UserDetailHeader({ userId, name, email, persona, isTestAccount }
       <EditableField userId={userId} field="display_name" label="Name" value={name} />
       <EditableField userId={userId} field="email" label="Email" value={email ?? ""} />
       <EditablePersona userId={userId} value={persona} />
-      <div className="flex items-center gap-2 text-[10px] text-faint">{userId}</div>
+      <div className="flex items-center gap-2 text-2xs text-faint">{userId}</div>
     </div>
   );
 }
@@ -76,7 +76,7 @@ function EditableField({
   if (editing) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-[10px] text-faint uppercase tracking-wider w-12 shrink-0">{label}</span>
+        <span className="text-2xs text-faint uppercase tracking-wider w-12 shrink-0">{label}</span>
         <input
           type={field === "email" ? "email" : "text"}
           value={draft}
@@ -107,7 +107,7 @@ function EditableField({
 
   return (
     <div className="flex items-center gap-2 group">
-      <span className="text-[10px] text-faint uppercase tracking-wider w-12 shrink-0">{label}</span>
+      <span className="text-2xs text-faint uppercase tracking-wider w-12 shrink-0">{label}</span>
       <span className={cn("text-sm", field === "display_name" ? "font-bold text-text text-lg" : "text-muted")}>
         {value || <span className="text-faint italic">Not set</span>}
       </span>
@@ -149,7 +149,7 @@ function EditablePersona({ userId, value }: { userId: string; value: string | nu
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[10px] text-faint uppercase tracking-wider w-12 shrink-0">Type</span>
+      <span className="text-2xs text-faint uppercase tracking-wider w-12 shrink-0">Type</span>
       <div className="flex gap-1">
         {PERSONA_OPTIONS.map((opt) => (
           <button

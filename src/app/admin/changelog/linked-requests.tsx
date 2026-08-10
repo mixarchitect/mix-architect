@@ -120,7 +120,7 @@ export function LinkedFeatureRequests({
                   <span className="text-xs text-zinc-300 truncate flex-1">
                     {r.title}
                   </span>
-                  <span className="text-[10px] text-zinc-500 shrink-0">
+                  <span className="text-2xs text-zinc-500 shrink-0">
                     {r.total_votes} votes
                   </span>
                 </button>
@@ -158,7 +158,7 @@ export function LinkedFeatureRequests({
               </button>
             </div>
           ))}
-          <p className="text-[10px] text-zinc-500 mt-1">
+          <p className="text-2xs text-zinc-500 mt-1">
             These users will be credited as &ldquo;Suggested by&rdquo; in the
             public changelog.
           </p>

@@ -187,7 +187,7 @@ export function TimelineLane({
 
         {/* Target date label — pushed to the right end of the bar */}
         {showDateLabel && release.target_date && (
-          <span className="text-[10px] opacity-50 ml-auto shrink-0">
+          <span className="text-2xs opacity-50 ml-auto shrink-0">
             {formatShortDate(release.target_date)}
           </span>
         )}

@@ -399,14 +399,14 @@ function MetricCard({
 
   return (
     <div className={`rounded-md border px-3 py-2 ${statusColor}`}>
-      <div className="text-[10px] text-muted uppercase tracking-wider">
+      <div className="text-2xs text-muted uppercase tracking-wider">
         {label}
       </div>
       <div className="text-lg font-semibold text-text mt-0.5 font-mono">
         {value}
       </div>
       {hint && (
-        <div className="text-[10px] text-faint mt-0.5">{hint}</div>
+        <div className="text-2xs text-faint mt-0.5">{hint}</div>
       )}
     </div>
   );

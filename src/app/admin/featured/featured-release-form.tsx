@@ -46,7 +46,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
 
       {/* ── Release Info ── */}
       <fieldset className="space-y-4">
-        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-faint mb-2">
           Release Info
         </legend>
 
@@ -87,7 +87,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
             required
             className="input font-mono text-xs"
           />
-          <p className="text-[10px] text-zinc-600 mt-1">
+          <p className="text-2xs text-faint mt-1">
             URL: /featured/{slug || "..."}
           </p>
         </Field>
@@ -106,25 +106,25 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
 
         <Field label="Source" required>
           <div className="flex gap-4">
-            <label className="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
               <input
                 type="radio"
                 name="source"
                 value="external"
                 checked={source === "external"}
                 onChange={() => setSource("external")}
-                className="accent-teal-500"
+                className="accent-[var(--signal)]"
               />
               External
             </label>
-            <label className="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
               <input
                 type="radio"
                 name="source"
                 value="platform"
                 checked={source === "platform"}
                 onChange={() => setSource("platform")}
-                className="accent-teal-500"
+                className="accent-[var(--signal)]"
               />
               Platform
             </label>
@@ -146,7 +146,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
 
       {/* ── Author ── */}
       <fieldset className="space-y-4">
-        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-faint mb-2">
           Author / Byline
         </legend>
 
@@ -182,7 +182,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
 
       {/* ── Content ── */}
       <fieldset className="space-y-4">
-        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-faint mb-2">
           Content
         </legend>
 
@@ -226,10 +226,10 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
             type="file"
             accept="image/*"
             required={!release}
-            className="text-sm text-zinc-400 file:mr-3 file:px-3 file:py-1.5 file:text-xs file:font-medium file:rounded-full file:border file:border-white/10 file:bg-panel file:text-zinc-300 file:cursor-pointer hover:file:bg-white/5"
+            className="text-sm text-muted file:mr-3 file:px-3 file:py-1.5 file:text-xs file:font-medium file:rounded-full file:border file:border-white/10 file:bg-panel file:text-text file:cursor-pointer hover:file:bg-white/5"
           />
           {release && (
-            <p className="text-[10px] text-zinc-600 mt-1">
+            <p className="text-2xs text-faint mt-1">
               Leave empty to keep existing image.
             </p>
           )}
@@ -238,7 +238,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
 
       {/* ── Streaming Links ── */}
       <fieldset className="space-y-4">
-        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-faint mb-2">
           Streaming Links
         </legend>
 
@@ -270,7 +270,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
 
       {/* ── Bandcamp Embed ── */}
       <fieldset className="space-y-4">
-        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-faint mb-2">
           Bandcamp Embed
         </legend>
         <Field label="Embed Code">
@@ -282,7 +282,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
             className="input resize-y font-mono text-xs"
             onKeyDown={handleTabInTextarea}
           />
-          <p className="text-[10px] text-zinc-600 mt-1">
+          <p className="text-2xs text-faint mt-1">
             On Bandcamp, go to Share / Embed → copy the iframe code. When present, this replaces the auto-detected embed.
           </p>
         </Field>
@@ -290,7 +290,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
 
       {/* ── Audio Preview ── */}
       <fieldset className="space-y-4">
-        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-faint mb-2">
           Audio Preview
         </legend>
         <Field label="Audio File">
@@ -298,9 +298,9 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
             name="audio_file"
             type="file"
             accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/aac,audio/flac,audio/mp4"
-            className="text-sm text-zinc-400 file:mr-3 file:px-3 file:py-1.5 file:text-xs file:font-medium file:rounded-full file:border file:border-white/10 file:bg-panel file:text-zinc-300 file:cursor-pointer hover:file:bg-white/5"
+            className="text-sm text-muted file:mr-3 file:px-3 file:py-1.5 file:text-xs file:font-medium file:rounded-full file:border file:border-white/10 file:bg-panel file:text-text file:cursor-pointer hover:file:bg-white/5"
           />
-          <p className="text-[10px] text-zinc-600 mt-1">
+          <p className="text-2xs text-faint mt-1">
             MP3, WAV, AAC, or FLAC. Max 50MB. Plays on the blog page.
             {release?.audio_file_name && (
               <> Current: {release.audio_file_name}</>
@@ -311,7 +311,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
 
       {/* ── Metadata ── */}
       <fieldset className="space-y-4">
-        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-faint mb-2">
           Metadata
         </legend>
 
@@ -356,12 +356,12 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
         </Field>
 
         <Field label="Active">
-          <label className="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-text cursor-pointer">
             <input
               type="checkbox"
               name="is_active"
               defaultChecked={release?.is_active ?? false}
-              className="accent-teal-500"
+              className="accent-[var(--signal)]"
             />
             Set as the current featured release
           </label>
@@ -370,7 +370,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
 
       {/* ── SEO ── */}
       <fieldset className="space-y-4">
-        <legend className="text-xs font-semibold tracking-widest uppercase text-zinc-500 mb-2">
+        <legend className="text-xs font-semibold tracking-widest uppercase text-faint mb-2">
           SEO Overrides
         </legend>
 
@@ -404,7 +404,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
         </Button>
         <a
           href="/admin/featured"
-          className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="text-sm text-muted hover:text-text transition-colors"
         >
           Cancel
         </a>
@@ -424,9 +424,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+      <label className="block text-xs font-medium text-muted mb-1.5">
         {label}
-        {required && <span className="text-red-400 ml-0.5">*</span>}
+        {required && <span className="text-danger ml-0.5">*</span>}
       </label>
       {children}
     </div>

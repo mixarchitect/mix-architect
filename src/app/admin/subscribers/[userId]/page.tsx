@@ -17,6 +17,7 @@ import { TestAccountToggle } from "@/components/admin/UserDetailHeader";
 import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
 import { ResetAccountButton } from "@/components/admin/ResetAccountButton";
 import { SubscriptionPlanControl } from "@/components/admin/SubscriptionPlanControl";
+import { formatAdminTime, formatAdminTimeTitle } from "@/lib/format-admin-time";
 
 export const dynamic = "force-dynamic";
 
@@ -95,16 +96,16 @@ export default async function UserDetailPage({ params }: Props) {
   if (subscription) {
     if (isComp && subscription.plan === "pro" && subscription.status === "active") {
       status = "Comp";
-      statusColor = "text-amber-400 bg-amber-500/10 border-amber-500/20";
+      statusColor = "text-warning bg-warning/10 border-warning/20";
     } else if (subscription.plan === "pro" && subscription.status === "active") {
       status = "Pro";
-      statusColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+      statusColor = "text-success bg-success/10 border-success/20";
     } else if (subscription.status === "canceled") {
       status = "Cancelled";
-      statusColor = "text-red-400 bg-red-500/10 border-red-500/20";
+      statusColor = "text-danger bg-danger/10 border-danger/20";
     } else if (subscription.status === "past_due") {
       status = "Past Due";
-      statusColor = "text-amber-400 bg-amber-500/10 border-amber-500/20";
+      statusColor = "text-warning bg-warning/10 border-warning/20";
     }
   }
 
@@ -144,7 +145,10 @@ export default async function UserDetailPage({ params }: Props) {
 
         <div className="flex flex-wrap gap-4 text-xs text-muted">
           {profile.created_at && (
-            <span className="flex items-center gap-1.5">
+            <span
+              className="flex items-center gap-1.5"
+              title={formatAdminTimeTitle(String(profile.created_at))}
+            >
               <Calendar size={12} />
               Joined{" "}
               {new Date(String(profile.created_at)).toLocaleDateString("en-US", {
@@ -156,15 +160,12 @@ export default async function UserDetailPage({ params }: Props) {
           )}
 
           {lastActive && (
-            <span className="flex items-center gap-1.5">
+            <span
+              className="flex items-center gap-1.5"
+              title={formatAdminTimeTitle(lastActive)}
+            >
               <Calendar size={12} />
-              Last active{" "}
-              {new Date(lastActive).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })}
+              Last active {formatAdminTime(lastActive)}
             </span>
           )}
 
@@ -176,7 +177,7 @@ export default async function UserDetailPage({ params }: Props) {
           )}
 
           {isComp && (
-            <span className="flex items-center gap-1.5 text-amber-500">
+            <span className="flex items-center gap-1.5 text-warning">
               <Gift size={12} />
               Comp account
             </span>
@@ -228,7 +229,10 @@ export default async function UserDetailPage({ params }: Props) {
         </div>
 
         {subscription?.current_period_end && (
-          <div className="mt-3 text-xs text-faint">
+          <div
+            className="mt-3 text-xs text-faint"
+            title={formatAdminTimeTitle(subscription.current_period_end)}
+          >
             Current period ends{" "}
             {new Date(subscription.current_period_end).toLocaleDateString("en-US", {
               month: "short",
@@ -236,7 +240,7 @@ export default async function UserDetailPage({ params }: Props) {
               year: "numeric",
             })}
             {subscription.cancel_at_period_end && (
-              <span className="text-amber-400 ml-2">
+              <span className="text-warning ml-2">
                 (cancels at period end)
               </span>
             )}

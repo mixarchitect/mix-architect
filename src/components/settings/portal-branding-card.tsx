@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Upload, X, Check, ImageIcon, Lock, Loader2 } from "lucide-react";
+import { Upload, X, Check, ImageIcon, Lock, Loader2, AlertTriangle } from "lucide-react";
+import { accentUsableOn } from "@/lib/color-contrast";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { useSubscription } from "@/lib/subscription-context";
 import { getEntitlements } from "@/lib/entitlements";
@@ -83,7 +84,7 @@ function LogoSlot({
               <X size={12} /> {t("remove")}
             </button>
           )}
-          <span className="text-[10px] text-faint">{hint}</span>
+          <span className="text-2xs text-faint">{hint}</span>
         </div>
       </div>
     </div>
@@ -294,7 +295,7 @@ export function PortalBrandingCard() {
               onPick={(f) => handleUpload(f, "dark")}
               onRemove={() => handleRemoveLogo("dark")}
             />
-            <p className="text-[10px] text-faint">{t("formatsHint")}</p>
+            <p className="text-2xs text-faint">{t("formatsHint")}</p>
           </div>
 
           {/* Accent color */}
@@ -327,7 +328,19 @@ export function PortalBrandingCard() {
                 {tc("save")}
               </button>
             </div>
-            <p className="text-[10px] text-faint">{t("accentHint")}</p>
+            <p className="text-2xs text-faint">{t("accentHint")}</p>
+            {HEX_RE.test(accent) &&
+              (!accentUsableOn(accent, "#ffffff") ||
+                !accentUsableOn(accent, "#1e1e1e")) && (
+                <p className="text-xs text-warning flex items-center gap-1.5">
+                  <AlertTriangle size={12} className="shrink-0" />
+                  {t("accentContrastWarning", {
+                    theme: accentUsableOn(accent, "#ffffff")
+                      ? t("accentThemeDark")
+                      : t("accentThemeLight"),
+                  })}
+                </p>
+              )}
           </div>
         </>
       )}

@@ -11,7 +11,7 @@ export function TagBadge({
         "inline-flex items-center rounded-full",
         "border border-border bg-panel2",
         "px-2 py-0.5",
-        "text-[10px] font-semibold tracking-[0.18em] uppercase",
+        "text-2xs font-semibold tracking-[0.18em] uppercase",
         "text-faint",
         className
       )}

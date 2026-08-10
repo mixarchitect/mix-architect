@@ -4,8 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import {
+  normalizeBitDepthLabel,
+  normalizeSampleRateLabel,
+} from "@/lib/spec-validation";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
 import { Rule } from "@/components/ui/rule";
 import { cn } from "@/lib/cn";
 import { ArrowLeft } from "lucide-react";
@@ -30,13 +35,28 @@ export function NewTrackForm({ releaseId }: Props) {
     setLoading(true);
 
     try {
-      const { data: maxTrack } = await supabase
-        .from("tracks")
-        .select("track_number")
-        .eq("release_id", releaseId)
-        .order("track_number", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      const [{ data: maxTrack }, { data: defaults }] = await Promise.all([
+        supabase
+          .from("tracks")
+          .select("track_number")
+          .eq("release_id", releaseId)
+          .order("track_number", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("user_defaults")
+          .select("default_sample_rate, default_bit_depth")
+          .maybeSingle(),
+      ]);
+
+      // Seed the track's target specs from the user's Mix Defaults so the
+      // upload validator has a target from day one (labels normalized: the
+      // settings store spells them without spaces).
+      const specSeed: Record<string, unknown> = {};
+      const seedRate = normalizeSampleRateLabel(defaults?.default_sample_rate);
+      const seedDepth = normalizeBitDepthLabel(defaults?.default_bit_depth);
+      if (seedRate) specSeed.sample_rate = seedRate;
+      if (seedDepth) specSeed.bit_depth = seedDepth;
 
       let nextNumber = (maxTrack?.track_number ?? 0) + 1;
 
@@ -55,7 +75,7 @@ export function NewTrackForm({ releaseId }: Props) {
 
         await Promise.all([
           supabase.from("track_intent").insert({ track_id: track.id }),
-          supabase.from("track_specs").insert({ track_id: track.id }),
+          supabase.from("track_specs").insert({ track_id: track.id, ...specSeed }),
         ]);
 
         router.push(`/app/releases/${releaseId}/tracks/${track.id}`);
@@ -81,7 +101,9 @@ export function NewTrackForm({ releaseId }: Props) {
           if (track) {
             await Promise.all([
               supabase.from("track_intent").insert({ track_id: track.id }),
-              supabase.from("track_specs").insert({ track_id: track.id }),
+              supabase
+                .from("track_specs")
+                .insert({ track_id: track.id, ...specSeed }),
             ]);
           }
         }
@@ -109,7 +131,7 @@ export function NewTrackForm({ releaseId }: Props) {
 
       <Panel>
         <PanelHeader>
-          <h1 className="text-2xl font-semibold h2 text-text">Add Track</h1>
+          <h1 className="text-2xl font-semibold h2 text-text">Add a track</h1>
           <p className="mt-1 text-sm text-muted">
             Add one track or paste a tracklist to add multiple at once.
           </p>
@@ -145,32 +167,34 @@ export function NewTrackForm({ releaseId }: Props) {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {mode === "single" ? (
-              <div className="space-y-1.5">
-                <label className="label text-muted">Track title</label>
-                <input
-                  type="text"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="input"
-                  placeholder="Track name"
-                />
-              </div>
+              <Field label="Track title">
+                {(a11y) => (
+                  <input
+                    {...a11y}
+                    type="text"
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="input"
+                    placeholder="Track name"
+                  />
+                )}
+              </Field>
             ) : (
-              <div className="space-y-1.5">
-                <label className="label text-muted">
-                  Track titles (one per line)
-                </label>
-                <textarea
-                  required
-                  value={batchTitles}
-                  onChange={(e) => setBatchTitles(e.target.value)}
-                  className="input min-h-[160px] resize-y"
-                  placeholder={
-                    "Midnight Drive\nNeon Sunset\nCoastline\nGolden Hour\nLast Light"
-                  }
-                />
-              </div>
+              <Field label="Track titles (one per line)">
+                {(a11y) => (
+                  <textarea
+                    {...a11y}
+                    required
+                    value={batchTitles}
+                    onChange={(e) => setBatchTitles(e.target.value)}
+                    className="input min-h-[160px] resize-y"
+                    placeholder={
+                      "Midnight Drive\nNeon Sunset\nCoastline\nGolden Hour\nLast Light"
+                    }
+                  />
+                )}
+              </Field>
             )}
 
             {error && (
@@ -183,8 +207,8 @@ export function NewTrackForm({ releaseId }: Props) {
               {loading
                 ? "Adding\u2026"
                 : mode === "single"
-                  ? "Add Track"
-                  : "Add Tracks"}
+                  ? "Add track"
+                  : "Add tracks"}
             </Button>
           </form>
         </PanelBody>

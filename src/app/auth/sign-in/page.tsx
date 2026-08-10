@@ -232,9 +232,11 @@ function SignInPageContent() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {mode === "signup" && (
                 <div className="space-y-1.5">
-                  <label className="label text-muted">{t("name")}</label>
+                  <label htmlFor="auth-name" className="label text-muted">{t("name")}</label>
                   <input
+                    id="auth-name"
                     type="text"
+                    autoComplete="name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="input"
@@ -244,10 +246,12 @@ function SignInPageContent() {
               )}
 
               <div className="space-y-1.5">
-                <label className="label text-muted">{t("email")}</label>
+                <label htmlFor="auth-email" className="label text-muted">{t("email")}</label>
                 <input
+                  id="auth-email"
                   type="email"
                   required
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="input"
@@ -256,10 +260,12 @@ function SignInPageContent() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="label text-muted">{t("password")}</label>
+                <label htmlFor="auth-password" className="label text-muted">{t("password")}</label>
                 <input
+                  id="auth-password"
                   type="password"
                   required
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="input"

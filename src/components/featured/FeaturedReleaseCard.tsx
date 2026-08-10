@@ -64,7 +64,7 @@ function SpotlightCard({
               Featured Release
             </span>
             {release.source === "platform" && (
-              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">
+              <span className="text-2xs font-medium px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">
                 Made with Mix Architect
               </span>
             )}
@@ -129,7 +129,7 @@ function ArchiveCard({
           className="rounded-none ring-0"
         />
         {showNowFeatured && release.is_active && (
-          <span className="absolute top-3 right-3 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-500 text-white">
+          <span className="absolute top-3 right-3 text-2xs font-semibold px-2 py-0.5 rounded-full bg-teal-500 text-white">
             Now Featured
           </span>
         )}
@@ -148,7 +148,7 @@ function ArchiveCard({
             {release.genre_tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="text-[10px] px-1.5 py-0.5 rounded-full border border-white/8 text-zinc-500"
+                className="text-2xs px-1.5 py-0.5 rounded-full border border-white/8 text-zinc-500"
               >
                 {tag}
               </span>
@@ -156,7 +156,7 @@ function ArchiveCard({
           </div>
         )}
         {isGuest && (
-          <p className="text-[10px] text-zinc-600 mt-1">
+          <p className="text-2xs text-zinc-600 mt-1">
             By {release.author_name}
           </p>
         )}

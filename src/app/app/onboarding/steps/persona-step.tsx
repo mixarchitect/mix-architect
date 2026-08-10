@@ -8,6 +8,7 @@ type Persona = "artist" | "engineer" | "both" | "other";
 type Props = {
   selected: Persona;
   onSelect: (persona: Persona) => void;
+  onContinue: () => void;
 };
 
 const personaIds = [
@@ -28,7 +29,7 @@ const featureKeys: Record<"artist" | "engineer" | "both", string> = {
   both: "bothFeatures",
 };
 
-export function PersonaStep({ selected, onSelect }: Props) {
+export function PersonaStep({ selected, onSelect, onContinue }: Props) {
   const t = useTranslations("onboarding.persona");
 
   return (
@@ -73,11 +74,27 @@ export function PersonaStep({ selected, onSelect }: Props) {
 
       <button
         type="button"
-        onClick={() => onSelect("other")}
+        onClick={() => {
+          onSelect("other");
+          onContinue();
+        }}
         className="text-sm text-signal hover:underline transition-colors"
       >
         {t("other")}
       </button>
+
+      {/* Selecting a card no longer advances by itself: the choice sets
+          feature visibility and payment tracking, so it deserves an
+          explicit confirmation instead of firing on the first tap. */}
+      <div className="mt-8">
+        <button
+          type="button"
+          onClick={onContinue}
+          className="btn-primary"
+        >
+          {t("continue")}
+        </button>
+      </div>
     </div>
   );
 }

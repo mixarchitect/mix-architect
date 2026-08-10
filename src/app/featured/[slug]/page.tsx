@@ -183,7 +183,7 @@ export default async function FeaturedReleasePage({ params }: Props) {
                   </Link>
                 ))}
                 {release.source === "platform" && (
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                  <span className="text-2xs font-medium px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20">
                     Made with Mix Architect
                   </span>
                 )}

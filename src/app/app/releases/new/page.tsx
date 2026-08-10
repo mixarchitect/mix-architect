@@ -14,6 +14,10 @@ import { hasProAccess } from "@/lib/entitlements";
 import { logActivityClient } from "@/lib/activity-logger-client";
 import { trackGA4Event } from "@/lib/ga4-track";
 import { cn } from "@/lib/cn";
+import {
+  normalizeBitDepthLabel,
+  normalizeSampleRateLabel,
+} from "@/lib/spec-validation";
 import { DEFAULT_GENRES, getUserGenreSuggestions } from "@/lib/genre-suggestions";
 import { useTranslations } from "next-intl";
 import type { ReleaseTemplate } from "@/types/template";
@@ -324,12 +328,22 @@ export default function NewReleasePage() {
           .single();
 
         if (track) {
-          // If template has spec defaults, apply them
+          // Spec defaults: template first, then the user's Mix Defaults, so
+          // the auto-created track has a validation target from day one.
+          // Labels normalized: older stores spell "48kHz" without a space.
+          const { data: userDefaults } = await supabase
+            .from("user_defaults")
+            .select("default_sample_rate, default_bit_depth")
+            .maybeSingle();
           const specDefaults: Record<string, unknown> = { track_id: track.id };
-          if (selectedTemplate?.default_sample_rate)
-            specDefaults.sample_rate = selectedTemplate.default_sample_rate;
-          if (selectedTemplate?.default_bit_depth)
-            specDefaults.bit_depth = selectedTemplate.default_bit_depth;
+          const rate =
+            normalizeSampleRateLabel(selectedTemplate?.default_sample_rate) ??
+            normalizeSampleRateLabel(userDefaults?.default_sample_rate);
+          const depth =
+            normalizeBitDepthLabel(selectedTemplate?.default_bit_depth) ??
+            normalizeBitDepthLabel(userDefaults?.default_bit_depth);
+          if (rate) specDefaults.sample_rate = rate;
+          if (depth) specDefaults.bit_depth = depth;
           if (selectedTemplate?.delivery_formats?.length)
             specDefaults.delivery_formats = selectedTemplate.delivery_formats;
           if (selectedTemplate?.default_special_reqs)
@@ -497,6 +511,7 @@ export default function NewReleasePage() {
                   value={releaseType}
                   onChange={setReleaseType}
                 />
+                <p className="text-xs text-muted">{t("typeHint")}</p>
               </div>
 
               <div className="space-y-1.5" data-tour="format">

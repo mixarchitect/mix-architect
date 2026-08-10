@@ -239,7 +239,7 @@ export function CommandPalette({ isOpen, onClose }: Props) {
 
           {/* Footer hint */}
           {results.length > 0 && (
-            <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-[10px] text-faint">
+            <div className="flex items-center gap-4 px-4 py-2 border-t border-border text-2xs text-faint">
               <span className="inline-flex items-center gap-1">
                 <kbd className="px-1 py-0.5 border border-border rounded">&uarr;&darr;</kbd>
                 {t("navigate")}

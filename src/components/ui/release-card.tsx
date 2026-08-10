@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreVertical, Pencil, Trash2, Music, Pin } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Music, Pin, AlertTriangle } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
@@ -37,6 +37,9 @@ type Props = {
   role?: ReleaseRole;
   hasNotes?: boolean;
   submissionStatus?: "pending" | "approved" | "declined";
+  /** Tracks on this release whose latest upload has a detected audio
+   *  quality issue (clipping, full-scale peak, DC offset). */
+  audioWarnings?: number;
   className?: string;
 };
 
@@ -68,7 +71,7 @@ export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt,
   paymentStatus, feeTotal, paidAmount, balance, feeCurrency, paymentsEnabled,
-  coverArtUrl, pinned, role, hasNotes, submissionStatus, className,
+  coverArtUrl, pinned, role, hasNotes, submissionStatus, audioWarnings, className,
 }: Props) {
   const locale = useLocale();
   const tCard = useTranslations("releases.card");
@@ -147,6 +150,7 @@ export function ReleaseCard({
         <Link
           href={`/app/releases/${id}`}
           onClick={navigateToRelease}
+          aria-label={artist ? `${title} · ${artist}` : title}
           className="group min-w-0 flex-1 focus-visible:outline-none flex items-start gap-3"
         >
           <div
@@ -307,36 +311,44 @@ export function ReleaseCard({
       <Link
         href={`/app/releases/${id}`}
         onClick={navigateToRelease}
+        aria-label={artist ? `${title} · ${artist}` : title}
+        tabIndex={-1}
         className="group block focus-visible:outline-none"
       >
         <div className="mt-3 flex flex-wrap gap-1.5">
           <Pill>{typeLabel(releaseType)}</Pill>
           <Pill>{formatLabel(format)}</Pill>
           {roleLabel(role ?? null) && (
-            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700 border border-blue-200">
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-2xs font-medium bg-blue-100 text-blue-700 border border-blue-200">
               {roleLabel(role ?? null)}
             </span>
           )}
           {submissionStatus === "pending" && (
-            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-2xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
               Submitted
             </span>
           )}
           {submissionStatus === "approved" && (
-            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-teal-500/10 text-teal-500 border border-teal-500/20">
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-2xs font-medium bg-teal-500/10 text-teal-500 border border-teal-500/20">
               Featured
             </span>
           )}
         </div>
 
         <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted">
-          <span className="">
+          <span className="inline-flex items-center gap-2">
             {tCard("tracksBriefed", { completed: completedTracks, total: trackCount })}
+            {(audioWarnings ?? 0) > 0 && (
+              <span className="inline-flex items-center gap-1 text-warning font-medium">
+                <AlertTriangle size={11} />
+                {tCard("audioWarnings", { count: audioWarnings ?? 0 })}
+              </span>
+            )}
           </span>
           <div className="flex items-center gap-2">
             {paymentsEnabled && paymentStatus && paymentStatus !== "no_fee" && (
               <span className={cn(
-                "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide",
+                "inline-flex items-center px-1.5 py-0.5 rounded text-2xs font-medium uppercase tracking-wide",
                 paymentStatus === "paid" && "bg-green-500/10 text-green-400",
                 paymentStatus === "partial" && "bg-amber-500/10 text-amber-400",
                 paymentStatus === "unpaid" && "bg-zinc-500/10 text-zinc-400",

@@ -4,9 +4,9 @@ import { PortalAudioPlayer } from "@/components/portal/portal-audio-player";
 import { ApprovalControls, PortalStatusBadge } from "@/components/portal/approval-controls";
 import { PortalReferenceItem } from "@/components/portal/portal-reference-item";
 import { ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { PortalTrack, ApprovalStatus } from "@/lib/portal-types";
 import type { PromptTrigger } from "@/hooks/usePostActionPrompt";
-import { formatLabel } from "@/lib/format-labels";
 
 type PortalTrackCardProps = {
   shareToken: string;
@@ -21,6 +21,8 @@ type PortalTrackCardProps = {
   showDistribution: boolean;
   showLyrics?: boolean;
   paymentGated: boolean;
+  /** Engineer / workspace display name for client-facing copy. */
+  engineerName?: string | null;
   onStatusChange?: (newStatus: ApprovalStatus) => void;
   onPromoTrigger?: (trigger: PromptTrigger) => void;
 };
@@ -38,9 +40,11 @@ export function PortalTrackCard({
   showDistribution,
   showLyrics,
   paymentGated,
+  engineerName = null,
   onStatusChange,
   onPromoTrigger,
 }: PortalTrackCardProps) {
+  const t = useTranslations("portal");
   const hasAudio = track.versions.length > 0;
   const isApproved = track.approvalStatus === "approved";
   const isDelivered = track.approvalStatus === "delivered";
@@ -120,7 +124,11 @@ export function PortalTrackCard({
       {/* ── No audio state ── */}
       {!hasAudio && (
         <div className="px-4 md:px-6 py-6 text-center">
-          <p className="text-sm text-faint italic">No audio shared yet</p>
+          <p className="text-sm text-faint italic">
+            {engineerName
+              ? t("trackCard.noAudioYetNamed", { name: engineerName })
+              : t("trackCard.noAudioYet")}
+          </p>
         </div>
       )}
 
@@ -128,7 +136,7 @@ export function PortalTrackCard({
       {track.approvalStatus === "changes_requested" && latestChangeNote && (
         <div className="mx-4 md:mx-6 mb-4 bg-signal-muted border border-signal/20 rounded-lg p-3">
           <div className="text-[11px] text-signal font-medium mb-1">
-            Changes Requested
+            {t("status.changesRequested")}
           </div>
           <p className="text-sm text-text leading-relaxed">
             {latestChangeNote.content}
@@ -144,6 +152,7 @@ export function PortalTrackCard({
             trackId={track.id}
             initialStatus={track.approvalStatus}
             approvalDate={track.approvalDate}
+            engineerName={engineerName}
             onStatusChange={onStatusChange}
             onPromoTrigger={onPromoTrigger}
           />
@@ -158,14 +167,14 @@ export function PortalTrackCard({
               size={14}
               className="transition-transform group-open:rotate-90 shrink-0"
             />
-            Details
+            {t("trackCard.details")}
           </summary>
           <div className="px-4 md:px-6 pb-5 space-y-5">
             {/* Mix Direction */}
             {hasDirection && (
               <div>
                 <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
-                  Mix Direction
+                  {t("trackCard.mixDirection")}
                 </div>
                 <div className="space-y-2">
                   {track.intent!.mix_vision && (
@@ -188,7 +197,7 @@ export function PortalTrackCard({
                   {track.intent!.anti_references && (
                     <div>
                       <span className="text-xs text-muted font-medium">
-                        Avoid:{" "}
+                        {t("trackCard.avoid")}{" "}
                       </span>
                       <span className="text-sm text-text italic">
                         &ldquo;{track.intent!.anti_references}&rdquo;
@@ -203,21 +212,31 @@ export function PortalTrackCard({
             {hasSpecs && (
               <div>
                 <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
-                  Specs
+                  {t("trackCard.specs")}
                 </div>
                 <div className="flex flex-wrap gap-4 text-sm">
                   {measuredLufs != null && (
                     <span>
-                      <span className="text-muted">Loudness: </span>
-                      <span className="text-text">
+                      <span className="text-muted">{t("trackCard.loudness")} </span>
+                      <span
+                        className="text-text cursor-help"
+                        title={t("trackCard.lufsTooltip")}
+                      >
                         {measuredLufs.toFixed(1)} LUFS
                       </span>
                     </span>
                   )}
                   <span>
-                    <span className="text-muted">Format: </span>
+                    <span className="text-muted">{t("trackCard.format")} </span>
                     <span className="text-text">
-                      {formatLabel(track.specs?.format_override || releaseFormat)}
+                      {(() => {
+                        const f = track.specs?.format_override || releaseFormat;
+                        return f === "atmos"
+                          ? t("format.atmos")
+                          : f === "both"
+                            ? t("format.both")
+                            : t("format.stereo");
+                      })()}
                     </span>
                   </span>
                 </div>
@@ -228,7 +247,7 @@ export function PortalTrackCard({
             {hasRefs && (
               <div>
                 <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-2">
-                  References
+                  {t("trackCard.references")}
                 </div>
                 <div className="space-y-2">
                   {track.references.map((ref) => (
@@ -242,12 +261,17 @@ export function PortalTrackCard({
             {hasDist && track.distribution && (
               <div>
                 <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
-                  Distribution
+                  {t("trackCard.identifiers")}
                 </div>
                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
                   {track.distribution.isrc && (
                     <span>
-                      <span className="text-muted">ISRC: </span>
+                      <span
+                        className="text-muted cursor-help"
+                        title={t("identifiers.isrcTooltip")}
+                      >
+                        {t("identifiers.isrc")}:{" "}
+                      </span>
                       <span className="text-text">
                         {track.distribution.isrc}
                       </span>
@@ -255,7 +279,12 @@ export function PortalTrackCard({
                   )}
                   {track.distribution.iswc && (
                     <span>
-                      <span className="text-muted">ISWC: </span>
+                      <span
+                        className="text-muted cursor-help"
+                        title={t("identifiers.iswcTooltip")}
+                      >
+                        {t("identifiers.iswc")}:{" "}
+                      </span>
                       <span className="text-text">
                         {track.distribution.iswc}
                       </span>
@@ -263,7 +292,9 @@ export function PortalTrackCard({
                   )}
                   {track.distribution.producer && (
                     <span>
-                      <span className="text-muted">Producer: </span>
+                      <span className="text-muted">
+                        {t("trackCard.producer")}{" "}
+                      </span>
                       <span className="text-text">
                         {track.distribution.producer}
                       </span>
@@ -271,7 +302,9 @@ export function PortalTrackCard({
                   )}
                   {track.distribution.composers && (
                     <span>
-                      <span className="text-muted">Composers: </span>
+                      <span className="text-muted">
+                        {t("trackCard.composers")}{" "}
+                      </span>
                       <span className="text-text">
                         {track.distribution.composers}
                       </span>
@@ -279,7 +312,9 @@ export function PortalTrackCard({
                   )}
                   {track.distribution.language && (
                     <span>
-                      <span className="text-muted">Language: </span>
+                      <span className="text-muted">
+                        {t("trackCard.language")}{" "}
+                      </span>
                       <span className="text-text">
                         {track.distribution.language}
                       </span>
@@ -292,7 +327,7 @@ export function PortalTrackCard({
             {hasLyrics && (
               <div>
                 <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
-                  Lyrics
+                  {t("trackCard.lyrics")}
                 </div>
                 <pre className="text-sm whitespace-pre-wrap font-sans text-text leading-relaxed">
                   {track.lyrics}

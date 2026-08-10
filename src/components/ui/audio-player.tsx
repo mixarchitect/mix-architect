@@ -228,8 +228,10 @@ export function AudioPlayer({
   const [showStreamingInfo, setShowStreamingInfo] = useState(false);
   const [showTruePeakInfo, setShowTruePeakInfo] = useState(false);
   const [showQualityInfo, setShowQualityInfo] = useState(false);
-  const lufsBadgeRef = useRef<HTMLSpanElement | null>(null);
-  const truePeakBadgeRef = useRef<HTMLSpanElement | null>(null);
+  // Anchored to the trigger buttons since the compact delta badges were
+  // removed (the expanded popovers carry the per-platform deltas).
+  const lufsBadgeRef = useRef<HTMLButtonElement | null>(null);
+  const truePeakBadgeRef = useRef<HTMLButtonElement | null>(null);
   // qualityBadgeRef is already on the wrapper span (the quality pill
   // doesn't have a separate delta badge), so it doubles as the trigger
   // ref for click-outside — no separate qualityTriggerRef needed.
@@ -863,9 +865,14 @@ export function AudioPlayer({
         };
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) resolve();
-          else reject(new Error(`Upload failed (${xhr.status})`));
+          else
+            reject(
+              new Error(
+                `Upload failed (${xhr.status}): ${xhr.responseText?.slice(0, 300) ?? ""}`,
+              ),
+            );
         };
-        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.onerror = () => reject(new Error("Upload failed: network error"));
         xhr.send(file);
       });
 
@@ -909,7 +916,26 @@ export function AudioPlayer({
         trackGA4Event("audio_upload", { format: ext });
       }
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Upload failed");
+      // Raw message stays in the console for diagnostics; the user sees a
+      // friendly mapping keyed off the HTTP status / server error text.
+      console.error("[audio-upload] upload failed:", err);
+      const raw = err instanceof Error ? err.message : String(err);
+      const statusMatch = raw.match(/\((\d{3})\)/);
+      const status = statusMatch ? Number(statusMatch[1]) : null;
+      if (
+        status === 413 ||
+        /too large|payload.{0,10}large|max.{0,20}size|size.{0,20}exceed/i.test(raw)
+      ) {
+        setUploadError(
+          "This file is too large to upload. WAV files up to 2 GB are supported.",
+        );
+      } else if (status === 415 || /mime|file type|format|unsupported/i.test(raw)) {
+        setUploadError(
+          "This file type is not supported. Upload WAV, AIFF, or FLAC.",
+        );
+      } else {
+        setUploadError("Upload failed. Check your connection and try again.");
+      }
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -1214,7 +1240,7 @@ export function AudioPlayer({
                     window.open(activeVersion.audio_url, "_blank");
                   }
                 }}
-                className="text-signal hover:opacity-70 transition-opacity"
+                className="inline-flex items-center justify-center min-h-11 min-w-11 -my-[15px] -mx-2 text-signal hover:opacity-70 transition-opacity"
                 title={`Download ${activeVersion.file_name || `v${activeVersion.version_number}`}`}
               >
                 <Download size={14} />
@@ -1243,7 +1269,7 @@ export function AudioPlayer({
                   <button
                     type="button"
                     onClick={() => setDeleteConfirmId(activeVersion.id)}
-                    className="text-faint hover:text-signal transition-colors"
+                    className="inline-flex items-center justify-center min-h-11 min-w-11 -my-[15px] -mx-2 text-faint hover:text-signal transition-colors"
                     title={`Delete v${activeVersion.version_number}`}
                   >
                     <Trash2 size={13} />
@@ -1265,10 +1291,8 @@ export function AudioPlayer({
           {(measuredLufs != null ||
             measuredTruePeak != null ||
             (qualitySnapshot != null && qualitySnapshot.issues.length > 0)) && (
-            <span className="ml-auto inline-flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[10px]">
-              {measuredLufs != null && (() => {
-                const delta = measuredLufs - LUFS_REFERENCE;
-                return (
+            <span className="ml-auto inline-flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs">
+              {measuredLufs != null && (
                   <span ref={lufsTriggerRef} className="inline-flex items-center gap-1.5">
                     <span className="text-faint">·</span>
                     <button
@@ -1285,9 +1309,12 @@ export function AudioPlayer({
                         setShowQualityInfo(false);
                         setShowStreamingInfo((v) => !v);
                       }}
+                      ref={lufsBadgeRef}
                       className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
                       title="Show streaming normalization"
+                      aria-expanded={showStreamingInfo}
                     >
+                      <span className="text-faint font-medium">Loudness</span>
                       {measuredLufs.toFixed(1)} LUFS
                       <ChevronDown
                         size={10}
@@ -1297,22 +1324,8 @@ export function AudioPlayer({
                         )}
                       />
                     </button>
-                    <span
-                      ref={lufsBadgeRef}
-                      className={cn(
-                        "px-1.5 py-px rounded text-[10px]",
-                        Math.abs(delta) <= 0.5
-                          ? "bg-status-green/10 text-status-green"
-                          : Math.abs(delta) <= 1.5
-                            ? "bg-signal-muted text-signal"
-                            : "bg-red-500/10 text-red-500",
-                      )}
-                    >
-                      {delta > 0 ? "+" : ""}{delta.toFixed(1)} dB
-                    </span>
                   </span>
-                );
-              })()}
+              )}
               {measuredTruePeak != null && (() => {
                 // True peak is a ceiling: below common target (-1 dBTP) is safe,
                 // above it risks lossy-codec clipping, above 0 is inter-sample
@@ -1320,14 +1333,10 @@ export function AudioPlayer({
                 const headroom = TRUE_PEAK_CEILING - measuredTruePeak;
                 const colorClass =
                   measuredTruePeak > 0
-                    ? "bg-red-500/10 text-red-500"
+                    ? "text-danger"
                     : measuredTruePeak > TRUE_PEAK_CEILING
-                      ? "bg-signal-muted text-signal"
-                      : "bg-status-green/10 text-status-green";
-                const badgeText =
-                  headroom >= 0
-                    ? `${headroom.toFixed(1)} dB`
-                    : `+${Math.abs(headroom).toFixed(1)} dB`;
+                      ? "text-signal"
+                      : "text-muted";
                 return (
                   <span ref={truePeakTriggerRef} className="inline-flex items-center gap-1.5">
                     <span className="text-faint">·</span>
@@ -1345,9 +1354,19 @@ export function AudioPlayer({
                         setShowQualityInfo(false);
                         setShowTruePeakInfo((v) => !v);
                       }}
-                      className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
-                      title="Show true peak targets"
+                      ref={truePeakBadgeRef}
+                      className={cn(
+                        "inline-flex items-center gap-1 hover:text-text transition-colors",
+                        colorClass,
+                      )}
+                      title={
+                        headroom >= 0
+                          ? `${headroom.toFixed(1)} dB below the ${TRUE_PEAK_CEILING} dBTP ceiling`
+                          : `${Math.abs(headroom).toFixed(1)} dB over the ${TRUE_PEAK_CEILING} dBTP ceiling`
+                      }
+                      aria-expanded={showTruePeakInfo}
                     >
+                      <span className="text-faint font-medium">True peak</span>
                       {measuredTruePeak.toFixed(1)} dBTP
                       <ChevronDown
                         size={10}
@@ -1357,17 +1376,6 @@ export function AudioPlayer({
                         )}
                       />
                     </button>
-                    <span
-                      ref={truePeakBadgeRef}
-                      className={cn("px-1.5 py-px rounded text-[10px]", colorClass)}
-                      title={
-                        headroom >= 0
-                          ? `${headroom.toFixed(1)} dB below the ${TRUE_PEAK_CEILING} dBTP ceiling`
-                          : `${Math.abs(headroom).toFixed(1)} dB over the ${TRUE_PEAK_CEILING} dBTP ceiling`
-                      }
-                    >
-                      {badgeText}
-                    </span>
                   </span>
                 );
               })()}
@@ -1402,12 +1410,13 @@ export function AudioPlayer({
                         setShowQualityInfo((v) => !v);
                       }}
                       className={cn(
-                        "inline-flex items-center gap-1 px-1.5 py-px rounded text-[10px] transition-colors",
+                        "inline-flex items-center gap-1 px-1.5 py-px rounded text-xs transition-colors",
                         colorClass,
                       )}
                       title="Show audio quality issues"
+                      aria-expanded={showQualityInfo}
                     >
-                      <AlertTriangle size={10} />
+                      <AlertTriangle size={11} />
                       {label}
                       <ChevronDown
                         size={10}
@@ -1530,8 +1539,34 @@ export function AudioPlayer({
           <div className="relative">
             <div
               ref={containerRef}
+              role="slider"
+              tabIndex={isReady ? 0 : -1}
+              aria-label="Seek position"
+              aria-valuemin={0}
+              aria-valuemax={Math.round(duration)}
+              aria-valuenow={Math.round(currentTime)}
+              aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+              onKeyDown={(e) => {
+                if (!isReady) return;
+                if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                  e.preventDefault();
+                  const delta = e.key === "ArrowLeft" ? -5 : 5;
+                  seekToTime(
+                    Math.min(Math.max(currentTime + delta, 0), duration),
+                  );
+                } else if (e.key === "Home") {
+                  e.preventDefault();
+                  seekToTime(0);
+                } else if (e.key === "End") {
+                  e.preventDefault();
+                  seekToTime(Math.max(duration - 0.25, 0));
+                } else if (e.key === " " || e.key === "Enter") {
+                  e.preventDefault();
+                  togglePlayPause();
+                }
+              }}
               className={cn(
-                "w-full transition-opacity",
+                "w-full transition-opacity rounded-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
                 isReady ? "opacity-100" : "opacity-0 absolute inset-0",
               )}
             />
@@ -1548,7 +1583,7 @@ export function AudioPlayer({
             )}
           </div>
           {canComment && isReady && (
-            <p className="text-center text-[10px] text-faint mt-1.5 select-none">
+            <p className="text-center text-2xs text-faint mt-1.5 select-none hidden md:block">
               double-click waveform to add comment
             </p>
           )}
@@ -1562,15 +1597,17 @@ export function AudioPlayer({
           <div className="flex items-center gap-3">
             <button
               onClick={returnToStart}
-              className="text-muted hover:text-text transition-colors p-1"
+              className="text-muted hover:text-text transition-colors p-3 -m-2"
               title="Return to start"
+              aria-label="Return to start"
             >
               <RotateCcw size={14} />
             </button>
             <button
               onClick={skipBack}
-              className="text-muted hover:text-text transition-colors p-1"
+              className="text-muted hover:text-text transition-colors p-3 -m-2"
               title="Skip -10s"
+              aria-label="Skip back 10 seconds"
             >
               <SkipBack size={16} />
             </button>
@@ -1584,6 +1621,7 @@ export function AudioPlayer({
                     ? "Pause"
                     : "Play"
               }
+              aria-label={isPlaying ? "Pause" : "Play"}
               className="w-10 h-10 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md"
             >
               {isBuffering ? (
@@ -1596,15 +1634,18 @@ export function AudioPlayer({
             </button>
             <button
               onClick={skipForward}
-              className="text-muted hover:text-text transition-colors p-1"
+              className="text-muted hover:text-text transition-colors p-3 -m-2"
               title="Skip +10s"
+              aria-label="Skip forward 10 seconds"
             >
               <SkipForward size={16} />
             </button>
             <button
               onClick={audio.toggleLoop}
+              aria-label="Loop"
+              aria-pressed={audio.isLooping}
               className={cn(
-                "transition-colors p-1",
+                "transition-colors p-3 -m-2",
                 audio.isLooping
                   ? "text-signal"
                   : "text-muted hover:text-text",
@@ -1751,7 +1792,12 @@ export function AudioPlayer({
               })}
             </tbody>
           </table>
-          <div className="h-1.5" />
+          <a
+            href="/app/help?article=track-tabs"
+            className="block px-3 pt-1.5 pb-2 text-[11px] text-signal hover:underline"
+          >
+            What do these numbers mean?
+          </a>
         </div>
       )}
 
@@ -1804,7 +1850,12 @@ export function AudioPlayer({
               })}
             </tbody>
           </table>
-          <div className="h-1.5" />
+          <a
+            href="/app/help?article=track-tabs"
+            className="block px-3 pt-1.5 pb-2 text-[11px] text-signal hover:underline"
+          >
+            What do these numbers mean?
+          </a>
         </div>
       )}
 

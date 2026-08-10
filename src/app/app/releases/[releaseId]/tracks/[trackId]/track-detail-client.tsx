@@ -64,6 +64,21 @@ function parseBitDepthInt(label: string): number | null {
   return map[label] ?? null;
 }
 
+function sampleRateIntToLabel(hz: number | null): string | null {
+  const map: Record<number, string> = {
+    44100: "44.1 kHz", 48000: "48 kHz", 88200: "88.2 kHz",
+    96000: "96 kHz", 176400: "176.4 kHz", 192000: "192 kHz",
+  };
+  return hz != null ? (map[hz] ?? null) : null;
+}
+
+function bitDepthIntToLabel(bits: number | null): string | null {
+  const map: Record<number, string> = {
+    16: "16-bit", 24: "24-bit", 32: "32-bit float",
+  };
+  return bits != null ? (map[bits] ?? null) : null;
+}
+
 type TrackData = {
   id: string;
   title: string;
@@ -215,14 +230,28 @@ export function TrackDetailClient({
   const [antiRefs, setAntiRefs] = useState(intent?.anti_references ?? "");
 
   const [formatOverride, setFormatOverride] = useState(specs?.format_override ?? "");
-  const [sampleRate, setSampleRate] = useState(specs?.sample_rate ?? "48kHz");
-  const [bitDepth, setBitDepth] = useState(specs?.bit_depth ?? "24-bit");
+  const [sampleRate, setSampleRate] = useState(
+    specs?.sample_rate ?? sampleRateIntToLabel(track.target_sample_rate) ?? "48 kHz",
+  );
+  const [bitDepth, setBitDepth] = useState(
+    specs?.bit_depth ?? bitDepthIntToLabel(track.target_bit_depth) ?? "24-bit",
+  );
   const [deliveryFormats, setDeliveryFormats] = useState<string[]>(specs?.delivery_formats ?? []);
   const [specialReqs, setSpecialReqs] = useState(specs?.special_reqs ?? "");
 
   // ── Target delivery specs (validated against uploads) ──
-  const [targetSampleRate, setTargetSampleRate] = useState<number | null>(track.target_sample_rate);
-  const [targetBitDepth, setTargetBitDepth] = useState<number | null>(track.target_bit_depth);
+  // track_specs is canonical for sample rate + bit depth; tracks.target_* is a
+  // legacy mirror kept dual-written for older readers. Reading specs first is
+  // what keeps the Brief tab and the upload-mismatch banner in agreement
+  // (migration 087 re-aligns legacy rows where the two stores diverged).
+  const [targetSampleRate, setTargetSampleRate] = useState<number | null>(
+    (specs?.sample_rate != null ? parseSampleRateInt(specs.sample_rate) : null) ??
+      track.target_sample_rate,
+  );
+  const [targetBitDepth, setTargetBitDepth] = useState<number | null>(
+    (specs?.bit_depth != null ? parseBitDepthInt(specs.bit_depth) : null) ??
+      track.target_bit_depth,
+  );
   const [targetChannels, setTargetChannels] = useState<number | null>(track.target_channels);
   const [targetFormat, setTargetFormat] = useState<string | null>(track.target_format);
 
@@ -814,7 +843,7 @@ export function TrackDetailClient({
                       Click to describe the sonic direction...
                     </button>
                   ) : (
-                    <p className="text-sm text-muted italic">No sonic direction set.</p>
+                    <p className="text-sm text-muted italic">No direction set yet. Describe how this track should feel.</p>
                   )}
                 </PanelBody>
               </Panel>
@@ -935,7 +964,11 @@ export function TrackDetailClient({
                   icon={StickyNote}
                   size="sm"
                   title="No notes yet"
-                  description="Document mix decisions, client feedback, and revision history."
+                  description={
+                    canEditCreative(role)
+                      ? "Document mix decisions, client feedback, and revision history. Write your first note in the box above."
+                      : "Document mix decisions, client feedback, and revision history."
+                  }
                 />
               )}
             </div>
@@ -1051,7 +1084,15 @@ export function TrackDetailClient({
 
               <Panel>
                 <PanelBody className="py-5 space-y-5">
-                  <div className="label-sm text-muted">CODES &amp; IDENTIFIERS</div>
+                  <div className="flex items-center justify-between">
+                    <div className="label-sm text-muted">CODES &amp; IDENTIFIERS</div>
+                    <a
+                      href="/app/help?article=track-tabs"
+                      className="text-[11px] text-signal hover:underline"
+                    >
+                      What are these?
+                    </a>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-1.5">
                       <label className="label text-muted">ISRC</label>
@@ -1097,7 +1138,7 @@ export function TrackDetailClient({
                     <div className="flex items-center gap-2">
                       <label className="label text-muted">Composer / Songwriter</label>
                       {!composersManualRef.current && (
-                        <span className="text-[10px] text-faint">Auto-populated from writing splits</span>
+                        <span className="text-2xs text-faint">Auto-populated from writing splits</span>
                       )}
                     </div>
                     <input
@@ -1225,7 +1266,7 @@ export function TrackDetailClient({
               </div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Format</span>
-                <Pill className="text-[10px]">{formatLabel(formatOverride || releaseFormat)}</Pill>
+                <Pill className="text-2xs">{formatLabel(formatOverride || releaseFormat)}</Pill>
               </div>
             </PanelBody>
           </Panel>
@@ -1252,7 +1293,7 @@ export function TrackDetailClient({
                         key={p}
                         type="button"
                         onClick={() => setRefPlatform(p)}
-                        className={`flex-1 px-1.5 py-1 text-[10px] font-medium rounded transition-colors ${
+                        className={`flex-1 px-1.5 py-1 text-2xs font-medium rounded transition-colors ${
                           refPlatform === p
                             ? "bg-panel text-text border border-border-strong shadow-sm"
                             : "text-faint hover:text-muted"
@@ -1292,7 +1333,7 @@ export function TrackDetailClient({
                             )}
                             <div className="min-w-0 flex-1">
                               <div className="text-xs font-medium text-text truncate">{r.trackName}</div>
-                              <div className="text-[10px] text-muted truncate">{r.artistName}</div>
+                              <div className="text-2xs text-muted truncate">{r.artistName}</div>
                             </div>
                           </button>
                         ))}
@@ -1304,7 +1345,7 @@ export function TrackDetailClient({
                       <img src={refArtwork} alt="" className="w-10 h-10 rounded-[3px]" />
                       <div className="min-w-0 flex-1">
                         <div className="text-xs font-medium text-text truncate">{refTitle}</div>
-                        <div className="text-[10px] text-muted truncate">{refArtist}</div>
+                        <div className="text-2xs text-muted truncate">{refArtist}</div>
                       </div>
                     </div>
                   )}
@@ -1375,6 +1416,11 @@ export function TrackDetailClient({
                   size="sm"
                   title="No reference tracks"
                   description="Add tracks that capture the sound, mix, or vibe you're aiming for."
+                  action={
+                    canEditCreative(role)
+                      ? { label: "Add a reference", onClick: () => setShowRefForm(true) }
+                      : undefined
+                  }
                 />
               )}
             </PanelBody>
@@ -1468,6 +1514,7 @@ function SplitEditor({
             size="sm"
             title="No splits defined"
             description={readOnly ? "No splits configured." : "Add contributors and their ownership percentages."}
+            action={readOnly ? undefined : { label: "Add contributor", onClick: onAdd }}
           />
         ) : (
           <div className="space-y-2">
@@ -1492,7 +1539,7 @@ function SplitEditor({
               >
                 {total.toFixed(2)}%
                 {!isValid && (
-                  <span className="text-[10px] ml-2 text-signal font-normal">
+                  <span className="text-2xs ml-2 text-signal font-normal">
                     Must equal 100%
                   </span>
                 )}
@@ -1653,7 +1700,7 @@ function SplitRow({
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-text truncate">{c.person_name}</div>
                     {(c.pro_org || c.label_name) && (
-                      <div className="text-[10px] text-muted truncate">{c.pro_org || c.label_name}</div>
+                      <div className="text-2xs text-muted truncate">{c.pro_org || c.label_name}</div>
                     )}
                   </div>
                 </button>
@@ -1714,7 +1761,7 @@ function SplitRow({
         <div className="px-3 md:px-4 pb-3 grid grid-cols-1 sm:grid-cols-3 gap-2 border-t border-border pt-3">
           {splitType === "writing" && (
             <div className="space-y-1">
-              <label className="text-[10px] text-faint">PRO (ASCAP/BMI)</label>
+              <label className="text-2xs text-faint">PRO (ASCAP/BMI)</label>
               <input
                 type="text"
                 value={localPro}
@@ -1726,7 +1773,7 @@ function SplitRow({
             </div>
           )}
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">
+            <label className="text-2xs text-faint">
               {splitType === "writing" ? "Member Account #" : "Publisher Member ID"}
             </label>
             <input
@@ -1739,7 +1786,7 @@ function SplitRow({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">
+            <label className="text-2xs text-faint">
               {splitType === "writing" ? "Writer IPI" : "Publisher IPI"}
             </label>
             <input
@@ -1756,7 +1803,7 @@ function SplitRow({
       {splitType === "master" && (
         <div className="px-3 md:px-4 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-2 border-t border-border pt-3">
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">SoundExchange ID</label>
+            <label className="text-2xs text-faint">SoundExchange ID</label>
             <input
               type="text"
               value={localSeId}
@@ -1767,7 +1814,7 @@ function SplitRow({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">Label Name</label>
+            <label className="text-2xs text-faint">Label Name</label>
             <input
               type="text"
               value={localLabel}

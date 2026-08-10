@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useTranslations, useFormatter } from "next-intl";
 import { cn } from "@/lib/cn";
 import {
   useAudio,
@@ -20,6 +21,7 @@ import {
   X,
   Repeat,
   AlertTriangle,
+  Check,
 } from "lucide-react";
 import type WaveSurfer from "wavesurfer.js";
 import { loadWaveSurfer } from "@/lib/wavesurfer-loader";
@@ -73,6 +75,8 @@ function getInitials(name: string) {
 }
 
 function Timestamp({ date, className }: { date: string; className?: string }) {
+  const t = useTranslations("portal");
+  const format = useFormatter();
   const d = new Date(date);
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
@@ -81,11 +85,11 @@ function Timestamp({ date, className }: { date: string; className?: string }) {
   const diffDays = Math.floor(diffHrs / 24);
 
   let text: string;
-  if (diffMins < 1) text = "just now";
-  else if (diffMins < 60) text = `${diffMins}m ago`;
-  else if (diffHrs < 24) text = `${diffHrs}h ago`;
-  else if (diffDays < 7) text = `${diffDays}d ago`;
-  else text = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  if (diffMins < 1) text = t("player.justNow");
+  else if (diffMins < 60) text = t("player.minutesAgo", { count: diffMins });
+  else if (diffHrs < 24) text = t("player.hoursAgo", { count: diffHrs });
+  else if (diffDays < 7) text = t("player.daysAgo", { count: diffDays });
+  else text = format.dateTime(d, { month: "short", day: "numeric" });
 
   return <span className={className}>{text}</span>;
 }
@@ -140,6 +144,8 @@ export function PortalAudioPlayer({
   paymentGated,
   onPromoTrigger,
 }: PortalAudioPlayerProps) {
+  const t = useTranslations("portal");
+  const format = useFormatter();
   const { resolvedTheme } = useTheme();
   const audio = useAudio();
   const isThisTrackActive = audio.activeVersion?.track_id === trackId;
@@ -197,6 +203,13 @@ export function PortalAudioPlayer({
       activeVersion?.dc_offset,
     ],
   );
+  const hasQualityIssues =
+    qualitySnapshot != null && qualitySnapshot.issues.length > 0;
+  const hasMetrics =
+    measuredLufs != null || measuredTruePeak != null || hasQualityIssues;
+  // Clients see a single plain-language status line by default; the raw
+  // LUFS / dBTP chips live behind this "Technical details" expander.
+  const [showTechDetails, setShowTechDetails] = useState(false);
   const [showStreamingInfo, setShowStreamingInfo] = useState(false);
   const [showTruePeakInfo, setShowTruePeakInfo] = useState(false);
   const [showQualityInfo, setShowQualityInfo] = useState(false);
@@ -322,6 +335,7 @@ export function PortalAudioPlayer({
   }, [showQualityInfo]);
 
   useEffect(() => {
+    setShowTechDetails(false);
     setShowStreamingInfo(false);
     setShowTruePeakInfo(false);
     setShowQualityInfo(false);
@@ -541,6 +555,28 @@ export function PortalAudioPlayer({
     [audio],
   );
 
+  const effectiveDuration = duration || activeVersion?.duration_seconds || 0;
+
+  const handleWaveformKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (effectiveDuration <= 0) return;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        audio.seekTo(Math.max(0, currentTime - 5));
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        audio.seekTo(Math.min(effectiveDuration, currentTime + 5));
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        audio.seekTo(0);
+      } else if (e.key === "End") {
+        e.preventDefault();
+        audio.seekTo(effectiveDuration);
+      }
+    },
+    [audio, currentTime, effectiveDuration],
+  );
+
   /* ---------------------------------------------------------------- */
   /*  Download handler                                                 */
   /* ---------------------------------------------------------------- */
@@ -659,9 +695,7 @@ export function PortalAudioPlayer({
     return (
       <div className="rounded-lg border border-border bg-panel p-8 text-center">
         <div className="text-3xl mb-3 opacity-20">&#9835;</div>
-        <p className="text-sm text-muted">
-          No audio versions available for this track yet.
-        </p>
+        <p className="text-sm text-muted">{t("player.noVersions")}</p>
       </div>
     );
   }
@@ -690,8 +724,10 @@ export function PortalAudioPlayer({
                     };
                     setActiveVersionId(v.id);
                   }}
+                  aria-label={t("player.versionN", { number: v.version_number })}
+                  aria-pressed={v.id === activeVersionId}
                   className={cn(
-                    "px-3 py-1 text-xs font-medium rounded transition-colors",
+                    "relative px-3 py-1 text-xs font-medium rounded transition-colors after:absolute after:content-[''] after:inset-x-0 after:-inset-y-2.5",
                     v.id === activeVersionId
                       ? "bg-signal text-signal-on"
                       : "text-muted hover:text-text",
@@ -708,15 +744,20 @@ export function PortalAudioPlayer({
             {downloadEnabled && paymentGated && (
               <span className="inline-flex items-center gap-1 text-[10px] text-faint">
                 <Lock size={10} />
-                Payment pending
+                {t("player.paymentPending")}
               </span>
             )}
             {showDownload && activeVersion && (
               <button
                 type="button"
                 onClick={handleDownload}
-                className="text-signal hover:opacity-70 transition-opacity"
-                title={`Download ${activeVersion.file_name || `v${activeVersion.version_number}`}`}
+                className="relative text-signal hover:opacity-70 transition-opacity after:absolute after:content-[''] after:-inset-[15px]"
+                title={t("player.downloadFile", {
+                  name: `${trackTitle} · v${activeVersion.version_number}`,
+                })}
+                aria-label={t("player.downloadFile", {
+                  name: `${trackTitle} · v${activeVersion.version_number}`,
+                })}
               >
                 <Download size={14} />
               </button>
@@ -729,27 +770,70 @@ export function PortalAudioPlayer({
           <span className="text-[10px] text-faint uppercase tracking-wider whitespace-nowrap">
             v{activeVersion?.version_number} &middot;{" "}
             {activeVersion?.created_at
-              ? new Date(activeVersion.created_at).toLocaleDateString("en-US", {
+              ? format.dateTime(new Date(activeVersion.created_at), {
                   month: "short",
                   day: "numeric",
                 })
               : ""}
           </span>
           <span className="text-[10px] text-faint whitespace-nowrap">
-            &middot; {versionComments.length} comment
-            {versionComments.length !== 1 ? "s" : ""}
+            &middot; {t("player.commentCount", { count: versionComments.length })}
           </span>
-          {/* Loudness metrics */}
-          {(measuredLufs != null ||
-            measuredTruePeak != null ||
-            (qualitySnapshot != null && qualitySnapshot.issues.length > 0)) && (
+          {/* Plain-language audio status + technical-details expander. The
+              raw LUFS / dBTP chips render below only once expanded, so a
+              client never sees a bare acronym first. */}
+          {hasMetrics && (
             <span className="ml-auto inline-flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[10px]">
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1",
+                  hasQualityIssues ? "text-signal" : "text-status-green",
+                )}
+              >
+                {hasQualityIssues ? (
+                  <AlertTriangle size={10} />
+                ) : (
+                  <Check size={10} />
+                )}
+                {hasQualityIssues
+                  ? t("player.audioCheckNeedsAttention")
+                  : t("player.loudnessReady")}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (showTechDetails) {
+                    setShowStreamingInfo(false);
+                    setShowTruePeakInfo(false);
+                    setShowQualityInfo(false);
+                  }
+                  setShowTechDetails(!showTechDetails);
+                }}
+                aria-expanded={showTechDetails}
+                className="relative inline-flex items-center gap-1 text-muted hover:text-text transition-colors after:absolute after:content-[''] after:-inset-y-3.5 after:-inset-x-1"
+              >
+                {t("player.technicalDetails")}
+                <ChevronDown
+                  size={10}
+                  className={cn(
+                    "transition-transform",
+                    showTechDetails && "rotate-180",
+                  )}
+                />
+              </button>
+            </span>
+          )}
+        </div>
+
+        {/* Technical details: raw loudness / peak / quality chips with
+            their per-platform popovers, gated behind the expander above. */}
+        {hasMetrics && showTechDetails && (
+          <div className="px-5 pt-1.5 flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[10px]">
               {measuredLufs != null &&
                 (() => {
                   const delta = measuredLufs - LUFS_REFERENCE;
                   return (
                     <span ref={lufsTriggerRef} className="inline-flex items-center gap-1.5">
-                      <span className="text-faint">&middot;</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -764,8 +848,8 @@ export function PortalAudioPlayer({
                           setShowQualityInfo(false);
                           setShowStreamingInfo((v) => !v);
                         }}
-                        className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
-                        title="Show streaming normalization"
+                        className="relative inline-flex items-center gap-1 text-muted hover:text-text transition-colors after:absolute after:content-[''] after:-inset-y-3.5 after:inset-x-0"
+                        title={t("player.streamingTooltip")}
                       >
                         {measuredLufs.toFixed(1)} LUFS
                         <ChevronDown
@@ -808,7 +892,6 @@ export function PortalAudioPlayer({
                       : `+${Math.abs(headroom).toFixed(1)} dB`;
                   return (
                     <span ref={truePeakTriggerRef} className="inline-flex items-center gap-1.5">
-                      <span className="text-faint">&middot;</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -823,8 +906,8 @@ export function PortalAudioPlayer({
                           setShowQualityInfo(false);
                           setShowTruePeakInfo((v) => !v);
                         }}
-                        className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
-                        title="Show true peak targets"
+                        className="relative inline-flex items-center gap-1 text-muted hover:text-text transition-colors after:absolute after:content-[''] after:-inset-y-3.5 after:inset-x-0"
+                        title={t("player.truePeakTooltip")}
                       >
                         {measuredTruePeak.toFixed(1)} dBTP
                         <ChevronDown
@@ -840,8 +923,14 @@ export function PortalAudioPlayer({
                         className={cn("px-1.5 py-px rounded text-[10px]", colorClass)}
                         title={
                           headroom >= 0
-                            ? `${headroom.toFixed(1)} dB below the ${TRUE_PEAK_CEILING} dBTP ceiling`
-                            : `${Math.abs(headroom).toFixed(1)} dB over the ${TRUE_PEAK_CEILING} dBTP ceiling`
+                            ? t("player.belowCeiling", {
+                                amount: headroom.toFixed(1),
+                                ceiling: TRUE_PEAK_CEILING,
+                              })
+                            : t("player.overCeiling", {
+                                amount: Math.abs(headroom).toFixed(1),
+                                ceiling: TRUE_PEAK_CEILING,
+                              })
                         }
                       >
                         {badgeText}
@@ -858,15 +947,14 @@ export function PortalAudioPlayer({
                     : "bg-signal-muted text-signal";
                   const label =
                     issues.length > 1
-                      ? `${issues.length} issues`
+                      ? t("player.issueCount", { count: issues.length })
                       : issues[0] === "clipping"
-                        ? "Clipping detected"
+                        ? t("player.clippingDetected")
                         : issues[0] === "peak_at_full_scale"
-                          ? "Peak at full scale"
-                          : "DC offset detected";
+                          ? t("player.peakAtFullScale")
+                          : t("player.dcOffsetDetected");
                   return (
                     <span ref={qualityBadgeRef} className="inline-flex items-center gap-1.5">
-                      <span className="text-faint">&middot;</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -882,10 +970,10 @@ export function PortalAudioPlayer({
                           setShowQualityInfo((v) => !v);
                         }}
                         className={cn(
-                          "inline-flex items-center gap-1 px-1.5 py-px rounded text-[10px] transition-colors",
+                          "relative inline-flex items-center gap-1 px-1.5 py-px rounded text-[10px] transition-colors after:absolute after:content-[''] after:-inset-y-3 after:inset-x-0",
                           colorClass,
                         )}
-                        title="Show audio quality issues"
+                        title={t("player.qualityTooltip")}
                       >
                         <AlertTriangle size={10} />
                         {label}
@@ -900,19 +988,23 @@ export function PortalAudioPlayer({
                     </span>
                   );
                 })()}
-            </span>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* File info line */}
         {activeVersion && (
           <div className="px-5 pt-1 flex items-center gap-1 text-[10px] text-faint">
-            {activeVersion.file_name && (
-              <span className="truncate max-w-[360px]">{activeVersion.file_name}</span>
-            )}
+            {/* Clients see the track title + version; the raw uploaded
+                filename is tooltip-only. */}
+            <span
+              className="truncate max-w-[360px]"
+              title={activeVersion.file_name || undefined}
+            >
+              {trackTitle} · v{activeVersion.version_number}
+            </span>
             {activeVersion.file_format && (
               <>
-                {activeVersion.file_name && <span>·</span>}
+                <span>·</span>
                 <span>{activeVersion.file_format}</span>
               </>
             )}
@@ -974,8 +1066,19 @@ export function PortalAudioPlayer({
           <div className="relative">
             <div
               ref={containerRef}
+              tabIndex={0}
+              role="slider"
+              aria-label={t("player.seekPosition")}
+              aria-valuemin={0}
+              aria-valuemax={Math.round(effectiveDuration)}
+              aria-valuenow={Math.min(
+                Math.round(currentTime),
+                Math.round(effectiveDuration),
+              )}
+              aria-valuetext={formatTime(currentTime)}
+              onKeyDown={handleWaveformKeyDown}
               className={cn(
-                "w-full transition-opacity",
+                "w-full transition-opacity rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
                 isReady ? "opacity-100" : "opacity-0 absolute inset-0",
               )}
             />
@@ -993,9 +1096,12 @@ export function PortalAudioPlayer({
               </div>
             )}
           </div>
+          {/* Comments are added via double-click, which has no touch
+              equivalent here, so the hint hides on coarse pointers rather
+              than advertising an impossible interaction. */}
           {isReady && (
-            <p className="text-center text-[10px] text-faint mt-1.5 select-none">
-              double-click waveform to add comment
+            <p className="pointer-coarse:hidden text-center text-[10px] text-faint mt-1.5 select-none">
+              {t("player.doubleClickHint")}
             </p>
           )}
         </div>
@@ -1008,22 +1114,25 @@ export function PortalAudioPlayer({
           <div className="flex items-center gap-3">
             <button
               onClick={returnToStart}
-              className="text-muted hover:text-text transition-colors p-1"
-              title="Return to start"
+              aria-label={t("player.returnToStart")}
+              className="relative text-muted hover:text-text transition-colors p-1 after:absolute after:content-[''] after:-inset-[11px]"
+              title={t("player.returnToStart")}
             >
               <RotateCcw size={14} />
             </button>
             <button
               onClick={skipBack}
-              className="text-muted hover:text-text transition-colors p-1"
-              title="Skip -10s"
+              aria-label={t("player.skipBack")}
+              className="relative text-muted hover:text-text transition-colors p-1 after:absolute after:content-[''] after:-inset-2.5"
+              title={t("player.skipBack")}
             >
               <SkipBack size={16} />
             </button>
             <button
               onClick={togglePlayPause}
               disabled={!isReady}
-              className="w-10 h-10 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md"
+              aria-label={isPlaying ? t("player.pause") : t("player.play")}
+              className="relative w-10 h-10 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md after:absolute after:content-[''] after:-inset-0.5"
             >
               {isPlaying ? (
                 <FilledPause size={18} />
@@ -1033,20 +1142,23 @@ export function PortalAudioPlayer({
             </button>
             <button
               onClick={skipForward}
-              className="text-muted hover:text-text transition-colors p-1"
-              title="Skip +10s"
+              aria-label={t("player.skipForward")}
+              className="relative text-muted hover:text-text transition-colors p-1 after:absolute after:content-[''] after:-inset-2.5"
+              title={t("player.skipForward")}
             >
               <SkipForward size={16} />
             </button>
             <button
               onClick={audio.toggleLoop}
+              aria-label={t("player.loop")}
+              aria-pressed={audio.isLooping}
               className={cn(
-                "transition-colors p-1",
+                "relative transition-colors p-1 after:absolute after:content-[''] after:-inset-2.5",
                 audio.isLooping
                   ? "text-signal"
                   : "text-muted hover:text-text",
               )}
-              title={audio.isLooping ? "Loop (on)" : "Loop"}
+              title={audio.isLooping ? t("player.loopOn") : t("player.loop")}
             >
               <Repeat size={16} />
             </button>
@@ -1062,13 +1174,13 @@ export function PortalAudioPlayer({
           {showNameInput && (
             <div className="bg-signal-muted border border-signal/20 rounded-lg p-3 mb-2">
               <div className="text-[11px] text-signal font-medium mb-2">
-                What&apos;s your name?
+                {t("player.whatsYourName")}
               </div>
               <input
                 type="text"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
-                placeholder="Your name"
+                placeholder={t("player.yourName")}
                 className="input text-sm w-full"
                 autoFocus
                 onKeyDown={(e) => {
@@ -1085,7 +1197,7 @@ export function PortalAudioPlayer({
                   onClick={() => setShowNameInput(false)}
                   className="text-xs text-muted hover:text-text transition-colors px-3 py-1.5 border border-border rounded"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <Button
                   variant="primary"
@@ -1093,7 +1205,7 @@ export function PortalAudioPlayer({
                   disabled={!clientName.trim()}
                   className="!h-auto !py-1.5 !px-3 !text-xs"
                 >
-                  Continue
+                  {t("player.postComment")}
                 </Button>
               </div>
             </div>
@@ -1104,17 +1216,17 @@ export function PortalAudioPlayer({
             <div className="bg-signal-muted border border-signal/20 rounded-lg p-3 mb-2">
               <div className="flex items-center gap-1.5 mb-2 text-[11px] text-signal">
                 <MessageCircle size={12} />
-                Comment at {formatTime(commentInput.timecode)}
+                {t("player.commentAt", { time: formatTime(commentInput.timecode) })}
                 {clientName && (
                   <span className="ml-auto text-muted">
-                    as {clientName}
+                    {t("player.asName", { name: clientName })}
                   </span>
                 )}
               </div>
               <textarea
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
-                placeholder="Add your feedback…"
+                placeholder={t("player.feedbackPlaceholder")}
                 rows={2}
                 className="input text-sm w-full resize-none"
                 autoFocus
@@ -1137,7 +1249,7 @@ export function PortalAudioPlayer({
                   }}
                   className="text-xs text-muted hover:text-text transition-colors px-3 py-1.5 border border-border rounded"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <Button
                   variant="primary"
@@ -1145,7 +1257,7 @@ export function PortalAudioPlayer({
                   disabled={!newCommentText.trim()}
                   className="!h-auto !py-1.5 !px-3 !text-xs"
                 >
-                  Add Comment
+                  {t("player.addComment")}
                 </Button>
               </div>
             </div>
@@ -1183,7 +1295,7 @@ export function PortalAudioPlayer({
           ) : (
             !commentInput && (
               <p className="text-center py-8 text-sm text-faint">
-                No comments on this version yet
+                {t("player.noCommentsYet")}
               </p>
             )
           )}
@@ -1216,18 +1328,18 @@ export function PortalAudioPlayer({
                       {group}
                     </td>
                   </tr>,
-                  ...targets.map((t) => {
-                    const adj = measuredLufs - t.lufs;
+                  ...targets.map((target) => {
+                    const adj = measuredLufs - target.lufs;
                     return (
-                      <tr key={t.name} className="leading-6">
+                      <tr key={target.name} className="leading-6">
                         <td
                           className="pl-3 pr-4 text-muted font-sans whitespace-nowrap cursor-help"
-                          title={t.description}
+                          title={target.description}
                         >
-                          {t.name}
+                          {target.name}
                         </td>
                         <td className="pr-4 text-faint text-right whitespace-nowrap">
-                          {t.lufs}
+                          {target.lufs}
                         </td>
                         <td
                           className={cn(
@@ -1240,7 +1352,7 @@ export function PortalAudioPlayer({
                           )}
                         >
                           {Math.abs(adj) < 0.05
-                            ? "no change"
+                            ? t("player.noChange")
                             : adj > 0
                               ? `\u2212${adj.toFixed(1)} dB`
                               : `+${Math.abs(adj).toFixed(1)} dB`}
@@ -1280,8 +1392,8 @@ export function PortalAudioPlayer({
                       {group}
                     </td>
                   </tr>,
-                  ...targets.map((t) => {
-                    const headroom = t.dbtp - measuredTruePeak;
+                  ...targets.map((target) => {
+                    const headroom = target.dbtp - measuredTruePeak;
                     const over = headroom < 0;
                     const rightColor = over
                       ? Math.abs(headroom) > 1
@@ -1289,20 +1401,24 @@ export function PortalAudioPlayer({
                         : "text-signal"
                       : "text-status-green";
                     return (
-                      <tr key={`tp-${t.name}`} className="leading-6">
+                      <tr key={`tp-${target.name}`} className="leading-6">
                         <td
                           className="pl-3 pr-4 text-muted font-sans whitespace-nowrap cursor-help"
-                          title={t.description}
+                          title={target.description}
                         >
-                          {t.name}
+                          {target.name}
                         </td>
                         <td className="pr-4 text-faint text-right whitespace-nowrap">
-                          {t.dbtp}
+                          {target.dbtp}
                         </td>
                         <td className={cn("pr-3 text-right whitespace-nowrap", rightColor)}>
                           {over
-                            ? `+${Math.abs(headroom).toFixed(1)} dB over`
-                            : `${headroom.toFixed(1)} dB headroom`}
+                            ? t("player.dbOver", {
+                                amount: Math.abs(headroom).toFixed(1),
+                              })
+                            : t("player.dbHeadroom", {
+                                amount: headroom.toFixed(1),
+                              })}
                         </td>
                       </tr>
                     );
@@ -1327,31 +1443,48 @@ export function PortalAudioPlayer({
           }}
         >
           <div className="px-3 pt-2 pb-1 text-[9px] font-semibold text-faint uppercase tracking-wider font-sans">
-            Quality check
+            {t("player.qualityCheck")}
           </div>
           <div className="flex flex-col gap-2 px-3 py-2 text-[11px] font-sans">
             {qualitySnapshot.issues.includes("clipping") && (
               <div>
-                <div className="text-text font-semibold">Clipping</div>
+                <div className="text-text font-semibold">
+                  {t("player.clippingTitle")}
+                </div>
                 <div className="text-muted">
-                  {qualitySnapshot.clipSampleCount?.toLocaleString() ?? "?"} clipped samples detected. Reduce output gain or check your limiter ceiling.
+                  {t("player.clippingDesc", {
+                    count: qualitySnapshot.clipSampleCount?.toLocaleString() ?? "?",
+                  })}
                 </div>
               </div>
             )}
             {qualitySnapshot.issues.includes("peak_at_full_scale") && (
               <div>
-                <div className="text-text font-semibold">Sample peak at full scale</div>
+                <div className="text-text font-semibold">
+                  {t("player.fullScaleTitle")}
+                </div>
                 <div className="text-muted">
-                  Peak {qualitySnapshot.samplePeakDbfs != null ? `${qualitySnapshot.samplePeakDbfs.toFixed(2)} dBFS` : "at 0 dBFS"}. Leave at least 0.3 dB of headroom for DSP processing.
+                  {t("player.fullScaleDesc", {
+                    peak:
+                      qualitySnapshot.samplePeakDbfs != null
+                        ? `${qualitySnapshot.samplePeakDbfs.toFixed(2)} dBFS`
+                        : "0 dBFS",
+                  })}
                 </div>
               </div>
             )}
             {qualitySnapshot.issues.includes("dc_offset") && (
               <div>
-                <div className="text-text font-semibold">DC offset</div>
+                <div className="text-text font-semibold">
+                  {t("player.dcOffsetTitle")}
+                </div>
                 <div className="text-muted">
-                  {qualitySnapshot.dcOffset != null ? `Offset of ${qualitySnapshot.dcOffset.toFixed(4)} detected. ` : ""}
-                  Apply a high-pass filter at 20 Hz or lower to remove.
+                  {qualitySnapshot.dcOffset != null
+                    ? `${t("player.dcOffsetValue", {
+                        value: qualitySnapshot.dcOffset.toFixed(4),
+                      })} `
+                    : ""}
+                  {t("player.dcOffsetFix")}
                 </div>
               </div>
             )}
@@ -1379,6 +1512,7 @@ function CommentRow({
   onDelete?: () => void;
   onClick: () => void;
 }) {
+  const t = useTranslations("portal");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -1422,7 +1556,8 @@ function CommentRow({
             onDelete();
           }}
           className="opacity-0 group-hover:opacity-100 p-1 rounded text-muted hover:text-red-500 transition-all shrink-0 self-center"
-          title="Delete comment"
+          title={t("player.deleteComment")}
+          aria-label={t("player.deleteComment")}
         >
           <X size={12} />
         </button>

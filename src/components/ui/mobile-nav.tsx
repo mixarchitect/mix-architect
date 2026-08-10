@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import {
   Home, Users, Search, Menu, X, DollarSign,
   Sun, Moon, Monitor, LayoutTemplate, HelpCircle,
-  Settings, LogOut, Bug, Download, Shield, BarChart3, Building2,
+  Settings, LogOut, Bug, Download, Shield, BarChart3, Building2, Radio,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
@@ -50,18 +50,18 @@ export function MobileNav({ userId, userEmail, onSearchClick, isAdmin }: Props) 
       <nav aria-label="App navigation" className="fixed bottom-0 left-0 right-0 md:hidden h-16 border-t border-border bg-panel flex items-center justify-around z-50 safe-bottom">
         <Link href="/app" className={itemClass(isHome)}>
           <Home size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">{t("releases")}</span>
+          <span className="text-2xs font-medium">{t("releases")}</span>
         </Link>
 
         <Link href="/app/artists" className={itemClass(isArtists)}>
           <Users size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">{t("artists")}</span>
+          <span className="text-2xs font-medium">{t("artists")}</span>
         </Link>
 
         {showTemplates && (
           <Link href="/app/templates" className={itemClass(isTemplates)}>
             <LayoutTemplate size={20} strokeWidth={1.5} />
-            <span className="text-[10px] font-medium">{t("templates")}</span>
+            <span className="text-2xs font-medium">{t("templates")}</span>
           </Link>
         )}
 
@@ -71,7 +71,7 @@ export function MobileNav({ userId, userEmail, onSearchClick, isAdmin }: Props) 
           className="flex flex-col items-center gap-1 px-3 py-2 transition-colors text-muted min-w-[44px]"
         >
           <Search size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">{t("search")}</span>
+          <span className="text-2xs font-medium">{t("search")}</span>
         </button>
 
         {userId && <NotificationBell userId={userId} variant="mobile" />}
@@ -83,7 +83,7 @@ export function MobileNav({ userId, userEmail, onSearchClick, isAdmin }: Props) 
           aria-label="Menu"
         >
           <Menu size={20} strokeWidth={1.5} />
-          <span className="text-[10px] font-medium">{t("more")}</span>
+          <span className="text-2xs font-medium">{t("more")}</span>
         </button>
       </nav>
 
@@ -203,7 +203,7 @@ function MobileDrawer({
         {/* Nav section */}
         <div className="flex-1 overflow-y-auto py-2">
           {paymentsEnabled && (
-            <Link href="/app/payments" className={linkClass(pathname?.startsWith("/app/payments"))} onClick={onClose}>
+            <Link href="/app/money" className={linkClass(pathname?.startsWith("/app/money"))} onClick={onClose}>
               <DollarSign size={18} strokeWidth={1.5} />
               {tNav("payments")}
             </Link>
@@ -215,6 +215,10 @@ function MobileDrawer({
           <Link href="/app/studio" className={linkClass(pathname?.startsWith("/app/studio"))} onClick={onClose}>
             <Building2 size={18} strokeWidth={1.5} />
             {tNav("studio")}
+          </Link>
+          <Link href="/app/featured" className={linkClass(pathname?.startsWith("/app/featured"))} onClick={onClose}>
+            <Radio size={18} strokeWidth={1.5} />
+            {tNav("featured")}
           </Link>
 
           <div className="border-t border-border my-2" />

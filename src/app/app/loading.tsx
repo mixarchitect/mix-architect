@@ -1,6 +1,8 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
 export default function Loading() {
   return (
-    <div className="animate-pulse">
+    <div>
       {/* Loading indicator */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-10">
         <div className="flex items-center gap-2 text-muted text-sm">
@@ -11,16 +13,16 @@ export default function Loading() {
 
       {/* Page title skeleton */}
       <div className="flex items-center justify-between mb-6">
-        <div className="h-7 w-48 rounded bg-black/[0.06] dark:bg-white/[0.08]" />
-        <div className="h-10 w-36 rounded-sm bg-black/[0.06] dark:bg-white/[0.08]" />
+        <Skeleton className="h-7 w-48 rounded" />
+        <Skeleton className="h-10 w-36 rounded-sm" />
       </div>
 
       {/* KPI stats skeleton */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         {[1, 2, 3].map((i) => (
           <div key={i} className="rounded-lg border border-border bg-panel p-5">
-            <div className="h-3 w-16 rounded bg-black/[0.06] dark:bg-white/[0.08] mb-2" />
-            <div className="h-6 w-24 rounded bg-black/[0.06] dark:bg-white/[0.08]" />
+            <Skeleton className="h-3 w-16 rounded mb-2" />
+            <Skeleton className="h-6 w-24 rounded" />
           </div>
         ))}
       </div>
@@ -33,16 +35,16 @@ export default function Loading() {
             className="rounded-lg border border-border bg-panel p-5 space-y-3"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded bg-black/[0.06] dark:bg-white/[0.08]" />
+              <Skeleton className="w-10 h-10 rounded" />
               <div className="flex-1 space-y-1.5">
-                <div className="h-4 w-32 rounded bg-black/[0.06] dark:bg-white/[0.08]" />
-                <div className="h-3 w-20 rounded bg-black/[0.06] dark:bg-white/[0.08]" />
+                <Skeleton className="h-4 w-32 rounded" />
+                <Skeleton className="h-3 w-20 rounded" />
               </div>
             </div>
-            <div className="h-3 w-full rounded bg-black/[0.06] dark:bg-white/[0.08]" />
+            <Skeleton className="h-3 w-full rounded" />
             <div className="flex gap-2">
-              <div className="h-5 w-14 rounded-full bg-black/[0.06] dark:bg-white/[0.08]" />
-              <div className="h-5 w-14 rounded-full bg-black/[0.06] dark:bg-white/[0.08]" />
+              <Skeleton className="h-5 w-14 rounded-full" />
+              <Skeleton className="h-5 w-14 rounded-full" />
             </div>
           </div>
         ))}

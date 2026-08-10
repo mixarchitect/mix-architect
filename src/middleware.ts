@@ -20,9 +20,14 @@ import { NextResponse, type NextRequest } from "next/server";
  * remove 'unsafe-inline' here.
  */
 function buildCsp(): string {
+  // CSP allowance for React's development-mode stack reconstruction only.
+  // This is a header directive, not script evaluation in our code; it is
+  // never emitted in production builds.
+  const devScriptSrc =
+    process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
   return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' js.stripe.com www.googletagmanager.com",
+    `script-src 'self' 'unsafe-inline'${devScriptSrc} js.stripe.com www.googletagmanager.com`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data: sjdodeauawmuzredpxwa.supabase.co *.mzstatic.com",
     "connect-src 'self' sjdodeauawmuzredpxwa.supabase.co *.supabase.co wss://sjdodeauawmuzredpxwa.supabase.co api.stripe.com www.google-analytics.com *.google-analytics.com *.analytics.google.com",

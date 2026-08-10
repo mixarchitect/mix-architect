@@ -21,7 +21,7 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide",
+        "inline-flex items-center px-1.5 py-0.5 rounded text-2xs font-medium uppercase tracking-wide",
         status === "paid" && "bg-green-500/10 text-green-400",
         status === "partial" && "bg-amber-500/10 text-amber-400",
         status === "unpaid" && "bg-zinc-500/10 text-zinc-400",
@@ -120,6 +120,7 @@ export function PaymentsTable({ releases, currency }: Props) {
         size="md"
         title="No payments tracked"
         description="Add payment milestones to track what's owed and what's been collected."
+        action={{ label: "New quote", href: "/app/quotes/new" }}
       />
     );
   }
@@ -207,7 +208,7 @@ export function PaymentsTable({ releases, currency }: Props) {
                   {r.timeBillable > 0 ? (
                     <>
                       {formatMoney(r.timeBillable, r.feeCurrency, locale)}
-                      <span className="text-[10px] text-muted ml-1">
+                      <span className="text-2xs text-muted ml-1">
                         {r.timeHours.toFixed(1)}h
                       </span>
                     </>

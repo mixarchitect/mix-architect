@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { getSignedAudioUrls, extractStoragePath } from "@/lib/storage-urls";
+import { computeQualitySnapshot } from "@/components/ui/audio-player-shared";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button, IconButton } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { Panel, PanelBody } from "@/components/ui/panel";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
-import { Plus, Settings, ArrowLeft, ListMusic, DollarSign } from "lucide-react";
+import { Plus, Settings, ArrowLeft, ListMusic, DollarSign, FileText } from "lucide-react";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, ReleaseNotesEditor, ClientNotesEditor } from "./sidebar-editors";
 import { ExpensePanel } from "@/components/expenses/expense-panel";
@@ -145,11 +146,17 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   const trackIds = (tracks ?? []).map((t: Record<string, unknown>) => t.id as string);
   let flowTracks: FlowTrack[] = [];
   let flowHiddenCount = 0;
+  const qualityByTrack = new Map<
+    string,
+    { lufs: number | null; issueCount: number }
+  >();
 
   if (trackIds.length > 0) {
     const { data: audioVersions } = await supabase
       .from("track_audio_versions")
-      .select("id, track_id, version_number, audio_url, duration_seconds, waveform_peaks")
+      .select(
+        "id, track_id, version_number, audio_url, duration_seconds, waveform_peaks, measured_lufs, clip_sample_count, sample_peak_dbfs, dc_offset",
+      )
       .in("track_id", trackIds)
       .order("version_number", { ascending: false });
 
@@ -159,6 +166,22 @@ export default async function ReleasePage({ params, searchParams }: Props) {
       for (const av of audioVersions) {
         if (!latestByTrack.has(av.track_id)) {
           latestByTrack.set(av.track_id, av);
+        }
+      }
+
+      // Surface the latest version's worker analysis on the track list so a
+      // passing or failing upload is visible without opening each track.
+      for (const [trackId, av] of latestByTrack) {
+        const snapshot = computeQualitySnapshot({
+          clipSampleCount: av.clip_sample_count,
+          samplePeakDbfs: av.sample_peak_dbfs,
+          dcOffset: av.dc_offset,
+        });
+        if (av.measured_lufs != null || snapshot != null) {
+          qualityByTrack.set(trackId, {
+            lufs: av.measured_lufs,
+            issueCount: snapshot?.issues.length ?? 0,
+          });
         }
       }
 
@@ -277,9 +300,14 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           {release.target_date && (
             <CalendarExportButton releaseId={releaseId} />
           )}
+          <Link href={`/app/releases/${releaseId}/brief`}>
+            <IconButton size="sm" title={t("viewBrief")} aria-label={t("viewBrief")}>
+              <FileText size={14} />
+            </IconButton>
+          </Link>
           {canEdit(role) && (
             <Link href={`/app/releases/${releaseId}/settings`}>
-              <IconButton size="sm" title={t("releaseSettings")}>
+              <IconButton size="sm" title={t("releaseSettings")} aria-label={t("releaseSettings")}>
                 <Settings size={14} />
               </IconButton>
             </Link>
@@ -301,6 +329,21 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           <TabbedContent tabs={tabs} initialTab={currentTab}>
             {/* Tracks tab */}
             <div className="space-y-3">
+              {release.release_type === "single" &&
+                (tracks?.length ?? 0) > 1 &&
+                canEdit(role) && (
+                  <div className="flex items-center gap-2 rounded-md border border-warning/30 bg-warning/5 px-3 py-2 text-xs text-warning">
+                    <span>
+                      {t("singleTypeMismatch", { count: tracks?.length ?? 0 })}
+                    </span>
+                    <Link
+                      href={`/app/releases/${releaseId}/settings`}
+                      className="font-medium underline underline-offset-2 shrink-0"
+                    >
+                      {t("releaseSettings")}
+                    </Link>
+                  </div>
+                )}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <FlowSimulatorButton
@@ -342,6 +385,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                           intentPreview: intent?.mix_vision,
                           portalApprovalStatus: portalApprovalMap[t.id as string] ?? null,
                           latestAudioUrl: latestAudioByTrack.get(t.id as string) ?? null,
+                          quality: qualityByTrack.get(t.id as string) ?? null,
                         };
                       })}
                       canReorder={canEdit(role)}
@@ -506,7 +550,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                     <span className="text-muted shrink-0 mr-3">{t("genre")}</span>
                     <div className="flex flex-wrap gap-1 justify-end">
                       {(release.genre_tags as string[]).map((g: string) => (
-                        <Pill key={g} className="text-[10px]">{g}</Pill>
+                        <Pill key={g} className="text-2xs">{g}</Pill>
                       ))}
                     </div>
                   </div>

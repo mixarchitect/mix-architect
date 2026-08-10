@@ -57,11 +57,11 @@ export default async function ChurnSignalsPage() {
       <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3 sm:gap-4 mb-6">
         <div className="rounded-lg border border-border bg-panel px-4 py-3">
           <div className="text-xs text-muted uppercase tracking-wider mb-1">Open</div>
-          <div className="text-2xl font-bold text-amber-500">{openCount}</div>
+          <div className="text-2xl font-bold text-warning">{openCount}</div>
         </div>
         <div className="rounded-lg border border-border bg-panel px-4 py-3">
           <div className="text-xs text-muted uppercase tracking-wider mb-1">Resolved</div>
-          <div className="text-2xl font-bold text-emerald-500">{resolvedCount}</div>
+          <div className="text-2xl font-bold text-success">{resolvedCount}</div>
         </div>
       </div>
 

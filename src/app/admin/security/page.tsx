@@ -14,6 +14,7 @@ import {
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import type { RlsAuditResponse } from "@/app/api/admin/rls-audit/route";
+import { formatAdminTime, formatAdminTimeTitle } from "@/lib/format-admin-time";
 
 type TestResult = { name: string; passed: boolean; detail?: string };
 
@@ -145,7 +146,7 @@ export default function SecurityPage() {
       {error && (
         <Panel>
           <PanelBody>
-            <div className="flex items-center gap-3 text-red-500">
+            <div className="flex items-center gap-3 text-danger">
               <ShieldAlert size={20} />
               <div>
                 <p className="font-medium">Audit failed</p>
@@ -162,12 +163,12 @@ export default function SecurityPage() {
             <PanelBody>
               <div className="flex items-center gap-4">
                 {allPassed ? (
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/15 flex items-center justify-center">
-                    <ShieldCheck size={24} className="text-emerald-500" />
+                  <div className="w-12 h-12 rounded-full bg-success/15 flex items-center justify-center">
+                    <ShieldCheck size={24} className="text-success" />
                   </div>
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-red-500/15 flex items-center justify-center">
-                    <ShieldAlert size={24} className="text-red-500" />
+                  <div className="w-12 h-12 rounded-full bg-danger/15 flex items-center justify-center">
+                    <ShieldAlert size={24} className="text-danger" />
                   </div>
                 )}
                 <div>
@@ -175,10 +176,13 @@ export default function SecurityPage() {
                     {result.totalPassed}/{result.totalTests} passed
                     {allPassed
                       ? ", All Clear"
-                      : `, ${result.failures.length} failure(s)`}
+                      : `, ${result.failures.length} failure${result.failures.length !== 1 ? "s" : ""}`}
                   </p>
-                  <p className="text-sm text-muted">
-                    Last run: {new Date(result.date).toLocaleString()}
+                  <p
+                    className="text-sm text-muted"
+                    title={formatAdminTimeTitle(result.date)}
+                  >
+                    Last run: {formatAdminTime(result.date)}
                   </p>
                 </div>
               </div>
@@ -200,10 +204,10 @@ export default function SecurityPage() {
                       {catPassed ? (
                         <CheckCircle2
                           size={18}
-                          className="text-emerald-500"
+                          className="text-success"
                         />
                       ) : (
-                        <XCircle size={18} className="text-red-500" />
+                        <XCircle size={18} className="text-danger" />
                       )}
                       <span className="font-medium text-text">{cat.name}</span>
                       <span className="text-sm text-muted">
@@ -228,17 +232,17 @@ export default function SecurityPage() {
                           {r.passed ? (
                             <CheckCircle2
                               size={14}
-                              className="text-emerald-500 mt-0.5 shrink-0"
+                              className="text-success mt-0.5 shrink-0"
                             />
                           ) : (
                             <XCircle
                               size={14}
-                              className="text-red-500 mt-0.5 shrink-0"
+                              className="text-danger mt-0.5 shrink-0"
                             />
                           )}
                           <span
                             className={
-                              r.passed ? "text-muted" : "text-red-400"
+                              r.passed ? "text-muted" : "text-danger"
                             }
                           >
                             {r.name}

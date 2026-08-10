@@ -157,7 +157,7 @@ export function FinancialSummary({
         )}
         <Panel>
           <PanelBody className="py-5">
-            <div className="label-sm text-muted mb-3">FINANCIAL SUMMARY</div>
+            <div className="label-sm text-muted mb-3">MONEY SUMMARY</div>
             <div className="space-y-2 text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
               {/* Revenue section */}
               <Row label={totalLabel}>
@@ -319,7 +319,7 @@ export function FinancialSummary({
   return (
     <Panel>
       <PanelBody className="py-5">
-        <div className="label-sm text-muted mb-3">FINANCIAL SUMMARY</div>
+        <div className="label-sm text-muted mb-3">MONEY SUMMARY</div>
         <div className="space-y-2 text-sm" style={{ fontVariantNumeric: "tabular-nums" }}>
           {/* Project fee — editable */}
           {effectiveFee != null && (

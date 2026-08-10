@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { useToast } from "@/components/ui/toast";
 import { FileText, MoreHorizontal, Copy, Send, Ban, CheckCircle, ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -36,6 +37,7 @@ export function QuotesList({
   releases = [],
 }: Props) {
   const t = useTranslations("quotes");
+  const { toast } = useToast();
   const [quotes, setQuotes] = useState(initialQuotes);
   const [expandedSchedules, setExpandedSchedules] = useState<Set<string>>(new Set());
   const [actionMenu, setActionMenu] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export function QuotesList({
       if (result.quote) {
         setQuotes((prev) => [result.quote!, ...prev]);
       } else if (result.error) {
-        alert(result.error);
+        toast(result.error, { variant: "error" });
       }
     } else if (action === "delete") {
       setConfirmDeleteId(quoteId);
@@ -298,7 +300,7 @@ function QuoteRow({
             )}
             <span
               className={cn(
-                "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide shrink-0",
+                "inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-medium uppercase tracking-wide shrink-0",
                 STATUS_STYLES[quote.status] ?? STATUS_STYLES.draft,
               )}
             >

@@ -171,7 +171,7 @@ export function WorkspaceMembersCard() {
                   <Users size={14} className="text-muted shrink-0" />
                   <span className="text-sm text-text truncate flex-1">{m.invited_email}</span>
                   {pending && (
-                    <span className="text-[10px] font-medium uppercase tracking-wide text-amber-500">{t("pending")}</span>
+                    <span className="text-2xs font-medium uppercase tracking-wide text-amber-500">{t("pending")}</span>
                   )}
                   {isOwner ? (
                     <span className="text-xs text-muted capitalize px-2">{t("roles.owner")}</span>
@@ -234,7 +234,7 @@ export function WorkspaceMembersCard() {
               {t("invite")}
             </button>
           </form>
-          <p className="text-[10px] text-faint">{t("roleHint")}</p>
+          <p className="text-2xs text-faint">{t("roleHint")}</p>
         </>
       )}
     </div>

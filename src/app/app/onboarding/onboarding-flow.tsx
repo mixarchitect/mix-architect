@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { localeCurrencyMap, type Locale } from "@/i18n/config";
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export function OnboardingFlow({ userId, parkedReleaseCount = 0 }: Props) {
+  const tNav = useTranslations("nav");
   const [step, setStep] = useState(1);
   const [persona, setPersona] = useState<Persona>("artist");
   const [locale, setLocale] = useState<Locale>("en-US");
@@ -34,8 +36,17 @@ export function OnboardingFlow({ userId, parkedReleaseCount = 0 }: Props) {
 
   const handlePersonaSelect = useCallback((p: Persona) => {
     setPersona(p);
+  }, []);
+
+  const handlePersonaContinue = useCallback(() => {
     setStep(2);
   }, []);
+
+  const handleSignOut = useCallback(async () => {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    router.push("/auth/sign-in");
+  }, [router]);
 
   const handleLocaleSelect = useCallback((l: Locale) => {
     setLocale(l);
@@ -126,7 +137,17 @@ export function OnboardingFlow({ userId, parkedReleaseCount = 0 }: Props) {
       : "/mixarchvert1blackoutline.svg";
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-4 py-12" style={{ background: "var(--panel)" }}>
+    <div className="relative min-h-dvh flex flex-col items-center justify-center px-4 py-12" style={{ background: "var(--panel)" }}>
+      {/* The wizard suppresses the app shell, so it needs its own exit -
+          without this, a signed-in user who isn't ready to finish setup
+          is trapped on this screen. */}
+      <button
+        type="button"
+        onClick={handleSignOut}
+        className="absolute top-4 right-4 text-xs text-muted hover:text-text transition-colors"
+      >
+        {tNav("signOut")}
+      </button>
       {/* Logo */}
       <div className="mb-8">
         <img key={mounted ? resolvedTheme : "ssr"} src={logoSrc} alt="Mix Architect" className="h-7 w-auto" suppressHydrationWarning />
@@ -158,6 +179,7 @@ export function OnboardingFlow({ userId, parkedReleaseCount = 0 }: Props) {
           <PersonaStep
             selected={persona}
             onSelect={handlePersonaSelect}
+            onContinue={handlePersonaContinue}
           />
         )}
         {step === 2 && (

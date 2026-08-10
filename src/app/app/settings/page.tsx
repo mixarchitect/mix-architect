@@ -13,6 +13,7 @@ import type { StripeConnectedAccount, WorkflowTrigger } from "@/types/payments";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/dialog";
 import { Rule } from "@/components/ui/rule";
 import { TagInput } from "@/components/ui/tag-input";
 import { AutoSaveIndicator } from "@/components/ui/auto-save-indicator";
@@ -24,12 +25,7 @@ import { WorkspaceEmailCard } from "@/components/settings/workspace-email-card";
 import { WorkspaceCustomDomainCard } from "@/components/settings/workspace-custom-domain-card";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
-import {
-  FEATURE_GROUPS,
-  FEATURE_LABELS,
-  FEATURE_KEYS,
-  type FeatureKey,
-} from "@/lib/features/feature-registry";
+import { FEATURE_GROUPS, FEATURE_LABELS } from "@/lib/features/feature-registry";
 import {
   locales,
   localeDisplayNames,
@@ -1262,7 +1258,7 @@ function WorkflowsPanel() {
                     {t("then")} <span className="text-text font-medium">{ACTION_LABELS[tr.action_type] ?? tr.action_type}</span>
                   </div>
                   {tr.last_triggered_at && (
-                    <div className="text-[10px] text-muted mt-1">
+                    <div className="text-2xs text-muted mt-1">
                       {t("lastRun")}: {new Date(tr.last_triggered_at).toLocaleDateString()}
                     </div>
                   )}
@@ -1355,10 +1351,12 @@ function WorkflowsPanel() {
 
 function StripeConnectPanel() {
   const t = useTranslations("settings.stripeConnect");
+  const tCommon = useTranslations("common");
   const [account, setAccount] = useState<StripeConnectedAccount | null>(null);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState(false);
   const [disconnecting, setDisconnecting] = useState(false);
+  const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
@@ -1418,7 +1416,6 @@ function StripeConnectPanel() {
   }
 
   async function handleDisconnect() {
-    if (!confirm(t("disconnectConfirm"))) return;
     setDisconnecting(true);
     try {
       const res = await fetch("/api/stripe/connect/disconnect", {
@@ -1429,6 +1426,7 @@ function StripeConnectPanel() {
       }
     } finally {
       setDisconnecting(false);
+      setDisconnectDialogOpen(false);
     }
   }
 
@@ -1548,7 +1546,7 @@ function StripeConnectPanel() {
               </button>
               <button
                 type="button"
-                onClick={handleDisconnect}
+                onClick={() => setDisconnectDialogOpen(true)}
                 disabled={disconnecting}
                 className="flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-400 transition-colors"
               >
@@ -1559,6 +1557,17 @@ function StripeConnectPanel() {
           </div>
         )}
       </PanelBody>
+      <ConfirmDialog
+        open={disconnectDialogOpen}
+        title={t("disconnect")}
+        description={t("disconnectConfirm")}
+        confirmLabel={t("disconnect")}
+        cancelLabel={tCommon("cancel")}
+        destructive
+        busy={disconnecting}
+        onConfirm={handleDisconnect}
+        onCancel={() => setDisconnectDialogOpen(false)}
+      />
     </Panel>
   );
 }
@@ -1580,11 +1589,13 @@ type IntegrationItem = {
 
 function IntegrationsPanel() {
   const t = useTranslations("settings.integrations");
+  const tCommon = useTranslations("common");
   const [integrations, setIntegrations] = useState<IntegrationItem[]>([]);
   const [availableProviders, setAvailableProviders] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [connecting, setConnecting] = useState<string | null>(null);
   const [disconnecting, setDisconnecting] = useState<string | null>(null);
+  const [disconnectTarget, setDisconnectTarget] = useState<{ id: string; provider: string } | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -1642,10 +1653,7 @@ function IntegrationsPanel() {
     }
   }
 
-  async function handleDisconnect(id: string, provider: string) {
-    if (!confirm(t("disconnectConfirm", { provider: PROVIDER_DISPLAY[provider]?.nameKey ? t(`providers.${PROVIDER_DISPLAY[provider].nameKey}`) : provider }))) {
-      return;
-    }
+  async function handleDisconnect(id: string) {
     setDisconnecting(id);
     try {
       const res = await fetch(`/api/integrations/disconnect/${id}`, { method: "DELETE" });
@@ -1654,7 +1662,13 @@ function IntegrationsPanel() {
       }
     } finally {
       setDisconnecting(null);
+      setDisconnectTarget(null);
     }
+  }
+
+  function providerName(provider: string) {
+    const nameKey = PROVIDER_DISPLAY[provider]?.nameKey;
+    return nameKey ? t(`providers.${nameKey}`) : provider;
   }
 
   if (loading) return null;
@@ -1708,7 +1722,7 @@ function IntegrationsPanel() {
                 {connected ? (
                   <button
                     type="button"
-                    onClick={() => handleDisconnect(connected.id, provider)}
+                    onClick={() => setDisconnectTarget({ id: connected.id, provider })}
                     disabled={isDisconnecting}
                     className="flex items-center justify-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-400 transition-colors py-1.5 rounded-md"
                     style={{ background: "var(--panel)" }}
@@ -1731,6 +1745,23 @@ function IntegrationsPanel() {
           })}
         </div>
       </PanelBody>
+      <ConfirmDialog
+        open={disconnectTarget !== null}
+        title={t("disconnect")}
+        description={
+          disconnectTarget
+            ? t("disconnectConfirm", { provider: providerName(disconnectTarget.provider) })
+            : undefined
+        }
+        confirmLabel={t("disconnect")}
+        cancelLabel={tCommon("cancel")}
+        destructive
+        busy={disconnectTarget !== null && disconnecting === disconnectTarget.id}
+        onConfirm={() => {
+          if (disconnectTarget) handleDisconnect(disconnectTarget.id);
+        }}
+        onCancel={() => setDisconnectTarget(null)}
+      />
     </Panel>
   );
 }

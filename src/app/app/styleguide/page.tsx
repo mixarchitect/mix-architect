@@ -13,8 +13,14 @@ import { Toolbar, ToolbarButton } from "@/components/ui/toolbar";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SectionErrorFallback } from "@/components/error-boundary";
 import { Home, Layers, Settings, Plus, ExternalLink, Music, ListMusic, Upload, Search, StickyNote, AlertTriangle } from "lucide-react";
+import { requireAdmin } from "@/lib/admin";
+import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TokenSwatches, RadiiScale, TypeScale, DialogDemo } from "./styleguide-client";
 
-export default function StyleguidePage() {
+export default async function StyleguidePage() {
+  // Internal design-system reference; was reachable by any signed-in user.
+  await requireAdmin();
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -34,35 +40,67 @@ export default function StyleguidePage() {
       <Panel>
         <PanelHeader>
           <h2 className="text-lg font-bold h2 text-text">Color Palette</h2>
+          <p className="mt-1 text-sm text-muted">
+            Captions are read from the CSS variables at runtime and follow the active theme.
+          </p>
         </PanelHeader>
         <Rule />
         <PanelBody className="pt-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <div className="h-16 rounded-md bg-bg border border-border" />
-              <div className="text-xs text-muted">#E9E9E9 bg</div>
-            </div>
-            <div className="space-y-2">
-              <div className="h-16 rounded-md bg-panel border border-border" />
-              <div className="text-xs text-muted">#FFFFFF panel</div>
-            </div>
-            <div className="space-y-2">
-              <div className="h-16 rounded-md bg-signal" />
-              <div className="text-xs text-muted">#0D9488 signal</div>
-            </div>
-            <div className="space-y-2">
-              <div className="h-16 rounded-md bg-highlight border border-border" />
-              <div className="text-xs text-muted">#FAF5B2 highlight</div>
-            </div>
-            <div className="space-y-2">
-              <div className="h-16 rounded-md bg-charcoal" />
-              <div className="text-xs text-muted">#2E2E2E charcoal</div>
-            </div>
-            <div className="space-y-2">
-              <div className="h-16 rounded-md bg-text" />
-              <div className="text-xs text-muted">#141414 text</div>
-            </div>
+          <TokenSwatches />
+        </PanelBody>
+      </Panel>
+
+      {/* Radii */}
+      <Panel>
+        <PanelHeader>
+          <h2 className="text-lg font-bold h2 text-text">Radii</h2>
+          <p className="mt-1 text-sm text-muted">
+            Corner radius scale. Pixel values are read from the design tokens at runtime.
+          </p>
+        </PanelHeader>
+        <Rule />
+        <PanelBody className="pt-5">
+          <RadiiScale />
+        </PanelBody>
+      </Panel>
+
+      {/* Shadows */}
+      <Panel>
+        <PanelHeader>
+          <h2 className="text-lg font-bold h2 text-text">Shadows</h2>
+          <p className="mt-1 text-sm text-muted">
+            Elevation scale for panels and floating surfaces.
+          </p>
+        </PanelHeader>
+        <Rule />
+        <PanelBody className="pt-5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { label: "shadow-sm", className: "shadow-sm" },
+              { label: "shadow", className: "shadow" },
+              { label: "shadow-lg", className: "shadow-lg" },
+              { label: "shadow-float", className: "shadow-float" },
+            ].map((s) => (
+              <div key={s.label} className="space-y-2">
+                <div className={`h-24 rounded-md bg-panel border border-border ${s.className}`} />
+                <div className="font-mono text-2xs text-faint">{s.label}</div>
+              </div>
+            ))}
           </div>
+        </PanelBody>
+      </Panel>
+
+      {/* Type scale */}
+      <Panel>
+        <PanelHeader>
+          <h2 className="text-lg font-bold h2 text-text">Type Scale</h2>
+          <p className="mt-1 text-sm text-muted">
+            Font size steps with their computed pixel values.
+          </p>
+        </PanelHeader>
+        <Rule />
+        <PanelBody className="pt-5">
+          <TypeScale />
         </PanelBody>
       </Panel>
 
@@ -87,9 +125,9 @@ export default function StyleguidePage() {
             <Button variant="secondary" disabled>Secondary disabled</Button>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
-            <IconButton><Plus size={16} /></IconButton>
-            <IconButton><ExternalLink size={16} /></IconButton>
-            <IconButton variant="dark"><Settings size={16} /></IconButton>
+            <IconButton aria-label="Add"><Plus size={16} /></IconButton>
+            <IconButton aria-label="Open in new tab"><ExternalLink size={16} /></IconButton>
+            <IconButton variant="dark" aria-label="Settings"><Settings size={16} /></IconButton>
           </div>
         </PanelBody>
       </Panel>
@@ -190,7 +228,7 @@ export default function StyleguidePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <AccentPanel>
           <div className="label-sm text-white/65 mb-2">ACCENT PANEL</div>
-          <h3 className="text-2xl font-bold text-white h2">Bold Orange</h3>
+          <h3 className="text-2xl font-bold text-white h2">Signal Teal</h3>
           <p className="mt-2 text-sm text-white/70">
             Used for key highlights and calls to action.
           </p>
@@ -367,6 +405,61 @@ export default function StyleguidePage() {
               description="Upload a mix to start the review process with waveform playback, versioning, and timestamped comments."
               action={{ label: "Upload audio", href: "#", variant: "primary" }}
             />
+          </div>
+        </PanelBody>
+      </Panel>
+
+      {/* Dialogs */}
+      <Panel>
+        <PanelHeader>
+          <h2 className="text-lg font-bold h2 text-text">Dialogs</h2>
+          <p className="mt-1 text-sm text-muted">
+            ConfirmDialog on the native dialog element. Replaces window.confirm().
+          </p>
+        </PanelHeader>
+        <Rule />
+        <PanelBody className="pt-5">
+          <DialogDemo />
+        </PanelBody>
+      </Panel>
+
+      {/* Spinner + Skeleton */}
+      <Panel>
+        <PanelHeader>
+          <h2 className="text-lg font-bold h2 text-text">Spinner &amp; Skeleton</h2>
+          <p className="mt-1 text-sm text-muted">
+            Loading primitives. Spinner announces itself to screen readers; Skeleton blocks are decorative.
+          </p>
+        </PanelHeader>
+        <Rule />
+        <PanelBody className="pt-5 space-y-6">
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="flex items-center gap-2 text-muted">
+              <Spinner size="sm" />
+              <span className="font-mono text-2xs text-faint">sm</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted">
+              <Spinner size="md" />
+              <span className="font-mono text-2xs text-faint">md</span>
+            </div>
+            <div className="flex items-center gap-2 text-muted">
+              <Spinner size="lg" />
+              <span className="font-mono text-2xs text-faint">lg</span>
+            </div>
+          </div>
+          <div className="max-w-sm space-y-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="w-10 h-10 rounded" />
+              <div className="flex-1 space-y-1.5">
+                <Skeleton className="h-4 w-32 rounded" />
+                <Skeleton className="h-3 w-20 rounded" />
+              </div>
+            </div>
+            <Skeleton className="h-3 w-full rounded" />
+            <div className="flex gap-2">
+              <Skeleton className="h-5 w-14 rounded-full" />
+              <Skeleton className="h-5 w-14 rounded-full" />
+            </div>
           </div>
         </PanelBody>
       </Panel>
