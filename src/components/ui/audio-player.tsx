@@ -1539,8 +1539,34 @@ export function AudioPlayer({
           <div className="relative">
             <div
               ref={containerRef}
+              role="slider"
+              tabIndex={isReady ? 0 : -1}
+              aria-label="Seek position"
+              aria-valuemin={0}
+              aria-valuemax={Math.round(duration)}
+              aria-valuenow={Math.round(currentTime)}
+              aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+              onKeyDown={(e) => {
+                if (!isReady) return;
+                if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                  e.preventDefault();
+                  const delta = e.key === "ArrowLeft" ? -5 : 5;
+                  seekToTime(
+                    Math.min(Math.max(currentTime + delta, 0), duration),
+                  );
+                } else if (e.key === "Home") {
+                  e.preventDefault();
+                  seekToTime(0);
+                } else if (e.key === "End") {
+                  e.preventDefault();
+                  seekToTime(Math.max(duration - 0.25, 0));
+                } else if (e.key === " " || e.key === "Enter") {
+                  e.preventDefault();
+                  togglePlayPause();
+                }
+              }}
               className={cn(
-                "w-full transition-opacity",
+                "w-full transition-opacity rounded-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-signal-muted",
                 isReady ? "opacity-100" : "opacity-0 absolute inset-0",
               )}
             />
@@ -1557,7 +1583,7 @@ export function AudioPlayer({
             )}
           </div>
           {canComment && isReady && (
-            <p className="text-center text-[10px] text-faint mt-1.5 select-none">
+            <p className="text-center text-2xs text-faint mt-1.5 select-none hidden md:block">
               double-click waveform to add comment
             </p>
           )}
@@ -1571,15 +1597,17 @@ export function AudioPlayer({
           <div className="flex items-center gap-3">
             <button
               onClick={returnToStart}
-              className="text-muted hover:text-text transition-colors p-1"
+              className="text-muted hover:text-text transition-colors p-3 -m-2"
               title="Return to start"
+              aria-label="Return to start"
             >
               <RotateCcw size={14} />
             </button>
             <button
               onClick={skipBack}
-              className="text-muted hover:text-text transition-colors p-1"
+              className="text-muted hover:text-text transition-colors p-3 -m-2"
               title="Skip -10s"
+              aria-label="Skip back 10 seconds"
             >
               <SkipBack size={16} />
             </button>
@@ -1593,6 +1621,7 @@ export function AudioPlayer({
                     ? "Pause"
                     : "Play"
               }
+              aria-label={isPlaying ? "Pause" : "Play"}
               className="w-10 h-10 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50 shadow-md"
             >
               {isBuffering ? (
@@ -1605,15 +1634,18 @@ export function AudioPlayer({
             </button>
             <button
               onClick={skipForward}
-              className="text-muted hover:text-text transition-colors p-1"
+              className="text-muted hover:text-text transition-colors p-3 -m-2"
               title="Skip +10s"
+              aria-label="Skip forward 10 seconds"
             >
               <SkipForward size={16} />
             </button>
             <button
               onClick={audio.toggleLoop}
+              aria-label="Loop"
+              aria-pressed={audio.isLooping}
               className={cn(
-                "transition-colors p-1",
+                "transition-colors p-3 -m-2",
                 audio.isLooping
                   ? "text-signal"
                   : "text-muted hover:text-text",
