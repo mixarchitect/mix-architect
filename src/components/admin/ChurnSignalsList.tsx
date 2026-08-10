@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, CheckCircle, XCircle, CreditCard, ArrowDownCircle, Clock } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { resolveSignal, unresolveSignal } from "@/app/admin/churn/actions";
+import { formatAdminTime, formatAdminTimeTitle } from "@/lib/format-admin-time";
 
 interface ChurnSignal {
   id: string;
@@ -26,13 +28,14 @@ const signalConfig: Record<string, { label: string; icon: typeof AlertTriangle }
 
 const severityColors: Record<string, string> = {
   low: "text-blue-400 bg-blue-500/10 border-blue-500/20",
-  medium: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-  high: "text-red-400 bg-red-500/10 border-red-500/20",
+  medium: "text-warning bg-warning/10 border-warning/20",
+  high: "text-danger bg-danger/10 border-danger/20",
 };
 
 type FilterTab = "open" | "resolved" | "all";
 
 export function ChurnSignalsList({ signals }: { signals: ChurnSignal[] }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<FilterTab>("open");
   const [isPending, startTransition] = useTransition();
 
@@ -95,13 +98,16 @@ export function ChurnSignalsList({ signals }: { signals: ChurnSignal[] }) {
                   signal.resolved && "opacity-60",
                 )}
               >
-                <Icon size={18} className={signal.resolved ? "text-muted" : "text-amber-500"} />
+                <Icon size={18} className={signal.resolved ? "text-muted" : "text-warning"} />
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-sm font-medium text-text truncate">
+                    <button
+                      onClick={() => router.push(`/admin/subscribers/${signal.user_id}`)}
+                      className="text-sm font-medium text-text truncate hover:text-amber-500 transition-colors"
+                    >
                       {signal.user_email}
-                    </span>
+                    </button>
                     <span className={cn("text-xs px-1.5 py-0.5 rounded border", sevClass)}>
                       {signal.severity}
                     </span>
@@ -118,13 +124,11 @@ export function ChurnSignalsList({ signals }: { signals: ChurnSignal[] }) {
                   </div>
                 </div>
 
-                <div className="text-xs text-faint shrink-0">
-                  {new Date(signal.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
+                <div
+                  className="text-xs text-faint shrink-0"
+                  title={formatAdminTimeTitle(signal.created_at)}
+                >
+                  {formatAdminTime(signal.created_at)}
                 </div>
 
                 <button
@@ -134,7 +138,7 @@ export function ChurnSignalsList({ signals }: { signals: ChurnSignal[] }) {
                     "shrink-0 text-xs px-2.5 py-1 rounded-md border transition-colors",
                     signal.resolved
                       ? "border-border text-muted hover:text-text hover:bg-panel2"
-                      : "border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10",
+                      : "border-success/30 text-success hover:bg-success/10",
                     isPending && "opacity-50 cursor-not-allowed",
                   )}
                 >

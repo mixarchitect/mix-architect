@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { formatAdminTime, formatAdminTimeTitle } from "@/lib/format-admin-time";
 import {
   Activity,
   AlertTriangle,
@@ -53,22 +54,22 @@ const eventConfig: Record<
   string,
   { label: string; icon: typeof Activity; color: string }
 > = {
-  signup: { label: "Signed up", icon: UserPlus, color: "text-emerald-400" },
+  signup: { label: "Signed up", icon: UserPlus, color: "text-success" },
   login: { label: "Logged in", icon: LogIn, color: "text-blue-400" },
   release_created: { label: "Created release", icon: Disc3, color: "text-purple-400" },
   track_uploaded: { label: "Uploaded track", icon: Upload, color: "text-purple-400" },
-  collaborator_invited: { label: "Invited collaborator", icon: UserCheck, color: "text-teal-400" },
-  subscription_started: { label: "Started subscription", icon: CreditCard, color: "text-emerald-400" },
-  subscription_cancelled: { label: "Cancelled subscription", icon: XCircle, color: "text-red-400" },
-  subscription_renewed: { label: "Renewed subscription", icon: RefreshCcw, color: "text-emerald-400" },
-  payment_failed: { label: "Payment failed", icon: AlertTriangle, color: "text-amber-400" },
+  collaborator_invited: { label: "Invited collaborator", icon: UserCheck, color: "text-signal" },
+  subscription_started: { label: "Started subscription", icon: CreditCard, color: "text-success" },
+  subscription_cancelled: { label: "Cancelled subscription", icon: XCircle, color: "text-danger" },
+  subscription_renewed: { label: "Renewed subscription", icon: RefreshCcw, color: "text-success" },
+  payment_failed: { label: "Payment failed", icon: AlertTriangle, color: "text-warning" },
   export_requested: { label: "Exported data", icon: Download, color: "text-blue-400" },
   conversion_completed: { label: "Converted audio", icon: Shuffle, color: "text-purple-400" },
-  comp_account_granted: { label: "Comp granted", icon: Gift, color: "text-amber-400" },
-  comp_account_revoked: { label: "Comp revoked", icon: Gift, color: "text-red-400" },
-  account_reset: { label: "Account reset by admin", icon: RefreshCcw, color: "text-amber-400" },
-  reset_releases_restored: { label: "Restored releases after reset", icon: RefreshCcw, color: "text-emerald-400" },
-  reset_releases_discarded: { label: "Discarded releases after reset", icon: XCircle, color: "text-red-400" },
+  comp_account_granted: { label: "Comp granted", icon: Gift, color: "text-warning" },
+  comp_account_revoked: { label: "Comp revoked", icon: Gift, color: "text-danger" },
+  account_reset: { label: "Account reset by admin", icon: RefreshCcw, color: "text-warning" },
+  reset_releases_restored: { label: "Restored releases after reset", icon: RefreshCcw, color: "text-success" },
+  reset_releases_discarded: { label: "Discarded releases after reset", icon: XCircle, color: "text-danger" },
 };
 
 const signalConfig: Record<string, { label: string; icon: typeof AlertTriangle }> = {
@@ -80,8 +81,8 @@ const signalConfig: Record<string, { label: string; icon: typeof AlertTriangle }
 
 const severityColors: Record<string, string> = {
   low: "text-blue-400 bg-blue-500/10 border-blue-500/20",
-  medium: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-  high: "text-red-400 bg-red-500/10 border-red-500/20",
+  medium: "text-warning bg-warning/10 border-warning/20",
+  high: "text-danger bg-danger/10 border-danger/20",
 };
 
 export function UserDetailTabs({
@@ -164,13 +165,11 @@ function ActivityTab({ events }: { events: ActivityEvent[] }) {
                   </span>
                 )}
             </div>
-            <span className="text-xs text-faint shrink-0">
-              {new Date(event.created_at).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })}
+            <span
+              className="text-xs text-faint shrink-0"
+              title={formatAdminTimeTitle(event.created_at)}
+            >
+              {formatAdminTime(event.created_at)}
             </span>
           </div>
         );
@@ -213,7 +212,10 @@ function ReleasesTab({
               </span>
             )}
           </div>
-          <span className="text-xs text-faint shrink-0">
+          <span
+            className="text-xs text-faint shrink-0"
+            title={formatAdminTimeTitle(release.created_at)}
+          >
             {new Date(release.created_at).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
@@ -230,7 +232,7 @@ function ChurnTab({ signals }: { signals: ChurnSignal[] }) {
   if (signals.length === 0) {
     return (
       <div className="rounded-lg border border-border bg-panel p-8 text-center">
-        <CheckCircle size={24} className="mx-auto mb-2 text-emerald-500" />
+        <CheckCircle size={24} className="mx-auto mb-2 text-success" />
         <p className="text-sm text-muted">No churn signals. User is healthy.</p>
       </div>
     );
@@ -256,7 +258,7 @@ function ChurnTab({ signals }: { signals: ChurnSignal[] }) {
           >
             <Icon
               size={18}
-              className={signal.resolved ? "text-muted" : "text-amber-500"}
+              className={signal.resolved ? "text-muted" : "text-warning"}
             />
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
@@ -265,7 +267,7 @@ function ChurnTab({ signals }: { signals: ChurnSignal[] }) {
                   {signal.severity}
                 </span>
                 {signal.resolved && (
-                  <span className="text-xs text-emerald-500">Resolved</span>
+                  <span className="text-xs text-success">Resolved</span>
                 )}
               </div>
               {signal.details && Object.keys(signal.details).length > 0 && (
@@ -276,13 +278,11 @@ function ChurnTab({ signals }: { signals: ChurnSignal[] }) {
                 </div>
               )}
             </div>
-            <span className="text-xs text-faint shrink-0">
-              {new Date(signal.created_at).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "2-digit",
-              })}
+            <span
+              className="text-xs text-faint shrink-0"
+              title={formatAdminTimeTitle(signal.created_at)}
+            >
+              {formatAdminTime(signal.created_at)}
             </span>
           </div>
         );

@@ -25,6 +25,7 @@ import {
   startOfDay,
   endOfDay,
 } from "@/lib/admin-date-utils";
+import { formatAdminTimeTitle } from "@/lib/format-admin-time";
 
 export const dynamic = "force-dynamic";
 
@@ -238,10 +239,10 @@ export default async function AdminDashboard({ searchParams }: Props) {
 
   const churnColor =
     churnRate <= 5
-      ? "text-emerald-400"
+      ? "text-success"
       : churnRate <= 10
-        ? "text-amber-400"
-        : "text-red-400";
+        ? "text-warning"
+        : "text-danger";
 
   const row1: StatCard[] = [
     {
@@ -256,7 +257,7 @@ export default async function AdminDashboard({ searchParams }: Props) {
       value: String(activePro),
       icon: CreditCard,
       href: "/admin/subscribers",
-      color: "text-emerald-400",
+      color: "text-success",
     },
     {
       label: `New Signups (${periodLabel})`,
@@ -274,7 +275,7 @@ export default async function AdminDashboard({ searchParams }: Props) {
       label: "MRR",
       value: currencyFmt.format(mrr),
       icon: DollarSign,
-      color: "text-emerald-400",
+      color: "text-success",
     },
     {
       label: "Conversion Rate",
@@ -296,7 +297,7 @@ export default async function AdminDashboard({ searchParams }: Props) {
       value: String(churnRes.count ?? 0),
       icon: AlertTriangle,
       href: "/admin/churn",
-      color: "text-amber-400",
+      color: "text-warning",
     },
     {
       label: `Events (${periodLabel})`,
@@ -412,7 +413,10 @@ export default async function AdminDashboard({ searchParams }: Props) {
                       {formatEventType(event.event_type)}
                     </span>
                   </div>
-                  <span className="text-xs text-faint shrink-0">
+                  <span
+                    className="text-xs text-faint shrink-0"
+                    title={formatAdminTimeTitle(event.created_at)}
+                  >
                     {formatRelativeTime(event.created_at)}
                   </span>
                 </div>
@@ -438,7 +442,7 @@ function StatCardEl({ stat }: { stat: StatCard }) {
 
     if (prev === 0 && curr > 0) {
       deltaEl = (
-        <span className="text-[11px] text-emerald-400 flex items-center gap-0.5 mt-1">
+        <span className="text-[11px] text-success flex items-center gap-0.5 mt-1">
           <ArrowUp size={10} /> New
         </span>
       );
@@ -448,7 +452,7 @@ function StatCardEl({ stat }: { stat: StatCard }) {
         const isUp = pctChange > 0;
         deltaEl = (
           <span
-            className={`text-[11px] flex items-center gap-0.5 mt-1 ${isUp ? "text-emerald-400" : "text-red-400"}`}
+            className={`text-[11px] flex items-center gap-0.5 mt-1 ${isUp ? "text-success" : "text-danger"}`}
           >
             {isUp ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
             {isUp ? "+" : ""}

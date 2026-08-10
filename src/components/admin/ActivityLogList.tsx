@@ -19,6 +19,7 @@ import {
   Activity,
 } from "lucide-react";
 import { downloadCsv } from "@/lib/csv-export";
+import { formatAdminTime, formatAdminTimeTitle } from "@/lib/format-admin-time";
 
 interface ActivityEvent {
   id: string;
@@ -30,19 +31,19 @@ interface ActivityEvent {
 }
 
 const eventConfig: Record<string, { label: string; icon: typeof Activity; color: string }> = {
-  signup: { label: "Signed up", icon: UserPlus, color: "text-emerald-400" },
+  signup: { label: "Signed up", icon: UserPlus, color: "text-success" },
   login: { label: "Logged in", icon: LogIn, color: "text-blue-400" },
   release_created: { label: "Created release", icon: Disc3, color: "text-purple-400" },
   track_uploaded: { label: "Uploaded track", icon: Upload, color: "text-purple-400" },
-  collaborator_invited: { label: "Invited collaborator", icon: UserCheck, color: "text-teal-400" },
-  subscription_started: { label: "Started subscription", icon: CreditCard, color: "text-emerald-400" },
-  subscription_cancelled: { label: "Cancelled subscription", icon: XCircle, color: "text-red-400" },
-  subscription_renewed: { label: "Renewed subscription", icon: RefreshCcw, color: "text-emerald-400" },
-  payment_failed: { label: "Payment failed", icon: AlertTriangle, color: "text-amber-400" },
+  collaborator_invited: { label: "Invited collaborator", icon: UserCheck, color: "text-signal" },
+  subscription_started: { label: "Started subscription", icon: CreditCard, color: "text-success" },
+  subscription_cancelled: { label: "Cancelled subscription", icon: XCircle, color: "text-danger" },
+  subscription_renewed: { label: "Renewed subscription", icon: RefreshCcw, color: "text-success" },
+  payment_failed: { label: "Payment failed", icon: AlertTriangle, color: "text-warning" },
   export_requested: { label: "Exported data", icon: Download, color: "text-blue-400" },
   conversion_completed: { label: "Converted audio", icon: Shuffle, color: "text-purple-400" },
-  comp_account_granted: { label: "Comp account granted", icon: Gift, color: "text-amber-400" },
-  comp_account_revoked: { label: "Comp account revoked", icon: Gift, color: "text-red-400" },
+  comp_account_granted: { label: "Comp account granted", icon: Gift, color: "text-warning" },
+  comp_account_revoked: { label: "Comp account revoked", icon: Gift, color: "text-danger" },
 };
 
 type FilterType = "all" | "subscription" | "content" | "auth";
@@ -160,13 +161,11 @@ export function ActivityLogList({ events }: { events: ActivityEvent[] }) {
                     )}
                 </div>
 
-                <span className="text-xs text-faint shrink-0">
-                  {new Date(event.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
+                <span
+                  className="text-xs text-faint shrink-0"
+                  title={formatAdminTimeTitle(event.created_at)}
+                >
+                  {formatAdminTime(event.created_at)}
                 </span>
               </div>
             );

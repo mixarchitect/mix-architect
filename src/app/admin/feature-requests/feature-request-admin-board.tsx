@@ -15,6 +15,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { formatAdminTimeTitle } from "@/lib/format-admin-time";
 import type {
   FeatureRequestAdmin,
   FeatureStatus,
@@ -44,15 +45,15 @@ const STATUS_CONFIG: Record<
   new: { label: "New", classes: "bg-blue-900 text-blue-300" },
   under_review: {
     label: "Reviewing",
-    classes: "bg-zinc-800 text-zinc-400",
+    classes: "bg-panel2 text-muted",
   },
-  planned: { label: "Planned", classes: "bg-teal-900 text-teal-300" },
+  planned: { label: "Planned", classes: "bg-signal/15 text-signal" },
   in_progress: {
     label: "In Progress",
     classes: "bg-indigo-900 text-indigo-300",
   },
-  shipped: { label: "Shipped", classes: "bg-green-900 text-green-300" },
-  declined: { label: "Declined", classes: "bg-red-900/50 text-red-400" },
+  shipped: { label: "Shipped", classes: "bg-success/15 text-success" },
+  declined: { label: "Declined", classes: "bg-danger/15 text-danger" },
 };
 
 const ALL_STATUSES: FeatureStatus[] = [
@@ -217,7 +218,7 @@ export function FeatureRequestAdminBoard() {
               Feature Requests
             </h1>
             <p className="text-sm text-muted mt-1">
-              {requests.length} requests
+              {requests.length} request{requests.length !== 1 ? "s" : ""}
             </p>
           </div>
         </div>
@@ -278,22 +279,22 @@ export function FeatureRequestAdminBoard() {
 
         {/* Bulk actions */}
         {selected.size > 0 && (
-          <div className="flex items-center gap-2 mb-3 p-2 rounded-lg bg-zinc-800/50 border border-zinc-700 text-sm">
+          <div className="flex items-center gap-2 mb-3 p-2 rounded-lg bg-panel2/50 border border-border-strong text-sm">
             <span className="text-muted">
               {selected.size} selected
             </span>
-            <span className="text-zinc-600">|</span>
+            <span className="text-faint">|</span>
             {/* Status dropdown */}
             <div className="relative group">
-              <button className="px-2 py-1 text-xs text-zinc-300 hover:text-white transition-colors">
+              <button className="px-2 py-1 text-xs text-muted hover:text-text transition-colors">
                 Set Status ▾
               </button>
-              <div className="absolute left-0 top-full mt-1 z-20 hidden group-hover:block bg-zinc-900 border border-zinc-700 rounded-md shadow-lg py-1 min-w-[140px]">
+              <div className="absolute left-0 top-full mt-1 z-20 hidden group-hover:block bg-panel border border-border-strong rounded-md shadow-lg py-1 min-w-[140px]">
                 {ALL_STATUSES.map((s) => (
                   <button
                     key={s}
                     onClick={() => handleBulkStatus(s)}
-                    className="w-full text-left px-3 py-1.5 text-xs hover:bg-zinc-800 text-zinc-300"
+                    className="w-full text-left px-3 py-1.5 text-xs hover:bg-panel2 text-muted"
                   >
                     {STATUS_CONFIG[s].label}
                   </button>
@@ -310,18 +311,18 @@ export function FeatureRequestAdminBoard() {
                   onChange={(e) => setBulkTagInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleBulkAddTags()}
                   placeholder="tag1, tag2"
-                  className="h-7 px-2 rounded border border-zinc-700 bg-zinc-900 text-xs text-text w-32 focus:outline-none"
+                  className="h-7 px-2 rounded border border-border-strong bg-panel text-xs text-text w-32 focus:outline-none"
                   autoFocus
                 />
                 <button
                   onClick={handleBulkAddTags}
-                  className="text-teal-400 hover:text-teal-300"
+                  className="text-signal hover:text-signal/80"
                 >
                   <Check size={14} />
                 </button>
                 <button
                   onClick={() => setShowBulkTag(false)}
-                  className="text-zinc-500 hover:text-zinc-300"
+                  className="text-faint hover:text-text"
                 >
                   <X size={14} />
                 </button>
@@ -329,7 +330,7 @@ export function FeatureRequestAdminBoard() {
             ) : (
               <button
                 onClick={() => setShowBulkTag(true)}
-                className="px-2 py-1 text-xs text-zinc-300 hover:text-white transition-colors"
+                className="px-2 py-1 text-xs text-muted hover:text-text transition-colors"
               >
                 Add Tags
               </button>
@@ -348,7 +349,7 @@ export function FeatureRequestAdminBoard() {
                   )[0];
                   setMergeCanonical(highest?.id ?? null);
                 }}
-                className="px-2 py-1 text-xs text-zinc-300 hover:text-white transition-colors"
+                className="px-2 py-1 text-xs text-muted hover:text-text transition-colors"
               >
                 <GitMerge size={12} className="inline mr-1" />
                 Merge
@@ -376,7 +377,7 @@ export function FeatureRequestAdminBoard() {
                   selected.size === requests.length && requests.length > 0
                 }
                 onChange={toggleAll}
-                className="accent-teal-500"
+                className="accent-[var(--signal)]"
               />
               <span className="text-xs text-faint">Select all</span>
             </div>
@@ -501,12 +502,12 @@ function RequestRow({
           e.stopPropagation();
           onToggleSelect();
         }}
-        className="mt-1 accent-teal-500 shrink-0"
+        className="mt-1 accent-[var(--signal)] shrink-0"
       />
 
       {/* Vote count */}
       <div className="flex flex-col items-center shrink-0 w-10">
-        <ArrowUpCircle size={14} className="text-teal-500 mb-0.5" />
+        <ArrowUpCircle size={14} className="text-signal mb-0.5" />
         <span className="text-sm font-semibold text-text">
           {r.total_votes}
         </span>
@@ -527,7 +528,7 @@ function RequestRow({
             {statusCfg.label}
           </span>
           {r.merge_count > 0 && (
-            <span className="text-[10px] text-zinc-500">
+            <span className="text-[10px] text-faint">
               <GitMerge size={10} className="inline mr-0.5" />
               {r.merge_count} merged
             </span>
@@ -535,19 +536,19 @@ function RequestRow({
           {r.tags.map((tag) => (
             <span
               key={tag}
-              className="text-[10px] px-1.5 py-0.5 rounded-full bg-zinc-800 text-zinc-300"
+              className="text-[10px] px-1.5 py-0.5 rounded-full bg-panel2 text-muted"
             >
               {tag}
             </span>
           ))}
           {r.submitter_name && (
-            <span className="text-[10px] text-zinc-500">
+            <span className="text-[10px] text-faint">
               by {r.submitter_name}
             </span>
           )}
         </div>
         {r.admin_notes && (
-          <p className="text-[10px] text-zinc-500 italic mt-1 truncate">
+          <p className="text-[10px] text-faint italic mt-1 truncate">
             Admin: {r.admin_notes}
           </p>
         )}
@@ -659,7 +660,7 @@ function DetailPanel({
         </h2>
         <button
           onClick={onClose}
-          className="text-zinc-500 hover:text-zinc-300 shrink-0"
+          className="text-faint hover:text-text shrink-0"
         >
           <X size={16} />
         </button>
@@ -669,13 +670,13 @@ function DetailPanel({
       <p className="text-sm text-muted mb-4">{request.description}</p>
 
       {/* Meta */}
-      <div className="text-xs text-zinc-500 mb-4 space-y-0.5">
-        <p>
+      <div className="text-xs text-faint mb-4 space-y-0.5">
+        <p title={formatAdminTimeTitle(request.created_at)}>
           Submitted {relativeTime(request.created_at)}
           {request.submitter_name && ` by ${request.submitter_name}`}
         </p>
         <p>
-          {request.total_votes} votes · {request.category}
+          {request.total_votes} vote{request.total_votes !== 1 ? "s" : ""} · {request.category}
         </p>
       </div>
 
@@ -693,7 +694,7 @@ function DetailPanel({
                 "text-[11px] font-medium px-2 py-1 rounded transition-colors",
                 status === s
                   ? STATUS_CONFIG[s].classes
-                  : "bg-zinc-800/50 text-zinc-500 hover:text-zinc-300"
+                  : "bg-panel2/50 text-faint hover:text-text"
               )}
             >
               {STATUS_CONFIG[s].label}
@@ -741,12 +742,12 @@ function DetailPanel({
           {tags.map((tag) => (
             <span
               key={tag}
-              className="text-[11px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 flex items-center gap-1"
+              className="text-[11px] px-2 py-0.5 rounded-full bg-panel2 text-muted flex items-center gap-1"
             >
               {tag}
               <button
                 onClick={() => handleRemoveTag(tag)}
-                className="hover:text-red-400"
+                className="hover:text-danger"
               >
                 <X size={10} />
               </button>
@@ -772,7 +773,7 @@ function DetailPanel({
           </datalist>
           <button
             onClick={handleAddTag}
-            className="h-7 px-2 rounded border border-border bg-panel2 text-xs text-teal-400 hover:text-teal-300"
+            className="h-7 px-2 rounded border border-border bg-panel2 text-xs text-signal hover:text-signal/80"
           >
             <Tag size={12} />
           </button>
@@ -789,17 +790,17 @@ function DetailPanel({
             {mergedRequests.map((m: any) => (
               <div
                 key={m.id}
-                className="flex items-center justify-between text-xs p-2 rounded bg-zinc-800/50"
+                className="flex items-center justify-between text-xs p-2 rounded bg-panel2/50"
               >
                 <div className="min-w-0">
-                  <p className="text-zinc-300 truncate">{m.title}</p>
-                  <p className="text-zinc-500">
-                    {m.vote_count} votes
+                  <p className="text-muted truncate">{m.title}</p>
+                  <p className="text-faint">
+                    {m.vote_count} vote{m.vote_count !== 1 ? "s" : ""}
                   </p>
                 </div>
                 <button
                   onClick={() => handleUnmerge(m.id)}
-                  className="text-zinc-500 hover:text-zinc-300 text-[10px] shrink-0 ml-2"
+                  className="text-faint hover:text-text text-[10px] shrink-0 ml-2"
                 >
                   Unmerge
                 </button>
@@ -813,7 +814,7 @@ function DetailPanel({
       <div className="pt-3 border-t border-border">
         <button
           onClick={handleDelete}
-          className="text-xs text-zinc-600 hover:text-red-400 transition-colors flex items-center gap-1"
+          className="text-xs text-faint hover:text-danger transition-colors flex items-center gap-1"
         >
           <Trash2 size={12} />
           Delete Request
@@ -838,10 +839,26 @@ function MergeModal({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancel();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onCancel]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-6 max-w-md w-full mx-4 shadow-xl">
-        <h3 className="text-base font-semibold text-text mb-2">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="merge-modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+    >
+      <div className="bg-panel border border-border-strong rounded-xl p-6 max-w-md w-full mx-4 shadow-xl">
+        <h3 id="merge-modal-title" className="text-base font-semibold text-text mb-2">
           Merge {requests.length} Requests
         </h3>
         <p className="text-sm text-muted mb-4">
@@ -855,8 +872,8 @@ function MergeModal({
               className={cn(
                 "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
                 canonicalId === r.id
-                  ? "border-teal-600 bg-teal-900/20"
-                  : "border-zinc-700 hover:border-zinc-600"
+                  ? "border-signal bg-signal/10"
+                  : "border-border hover:border-border-strong"
               )}
             >
               <input
@@ -864,12 +881,12 @@ function MergeModal({
                 name="canonical"
                 checked={canonicalId === r.id}
                 onChange={() => onSelectCanonical(r.id)}
-                className="accent-teal-500"
+                className="accent-[var(--signal)]"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-text truncate">{r.title}</p>
                 <p className="text-xs text-muted">
-                  {r.total_votes} votes
+                  {r.total_votes} vote{r.total_votes !== 1 ? "s" : ""}
                 </p>
               </div>
             </label>
@@ -879,14 +896,14 @@ function MergeModal({
         <div className="flex justify-end gap-2">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
+            className="px-4 py-2 text-sm text-muted hover:text-text transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={!canonicalId}
-            className="px-4 py-2 text-sm bg-teal-600 text-white rounded-lg hover:bg-teal-500 transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm bg-signal text-signal-on rounded-lg hover:bg-signal/90 transition-colors disabled:opacity-50"
           >
             Merge
           </button>

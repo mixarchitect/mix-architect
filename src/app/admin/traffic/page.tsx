@@ -45,6 +45,11 @@ import {
 const PRESET_KEYS = ["today", "yesterday", "7d", "30d", "90d", "365d"];
 const COMPARE_KEYS = ["none", "previous_period", "previous_year"];
 
+const GA4_PROPERTY_ID = process.env.NEXT_PUBLIC_GA4_PROPERTY_ID;
+const GA4_DASHBOARD_URL = GA4_PROPERTY_ID
+  ? `https://analytics.google.com/analytics/web/#/p${GA4_PROPERTY_ID}/reports/reportshub`
+  : null;
+
 export default function SiteTrafficPage() {
   const searchParams = useSearchParams();
 
@@ -139,14 +144,18 @@ export default function SiteTrafficPage() {
           <h1 className="text-xl font-bold text-text">Site Traffic</h1>
           <p className="text-sm text-muted mt-0.5">
             Analytics powered by{" "}
-            <a
-              href={`https://analytics.google.com/analytics/web/#/p${process.env.NEXT_PUBLIC_GA4_PROPERTY_ID ?? ""}/reports/reportshub`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-signal hover:underline"
-            >
-              Google Analytics
-            </a>
+            {GA4_DASHBOARD_URL ? (
+              <a
+                href={GA4_DASHBOARD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-signal hover:underline"
+              >
+                Google Analytics
+              </a>
+            ) : (
+              <span>Google Analytics</span>
+            )}
           </p>
         </div>
 
@@ -186,17 +195,19 @@ export default function SiteTrafficPage() {
       ) : null}
 
       {/* GA4 link */}
-      <div className="text-center pt-2 pb-4">
-        <a
-          href={`https://analytics.google.com/analytics/web/#/p${process.env.NEXT_PUBLIC_GA4_PROPERTY_ID ?? ""}/reports/reportshub`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-text transition-colors"
-        >
-          Open GA4 Dashboard
-          <ExternalLink size={12} />
-        </a>
-      </div>
+      {GA4_DASHBOARD_URL && (
+        <div className="text-center pt-2 pb-4">
+          <a
+            href={GA4_DASHBOARD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-text transition-colors"
+          >
+            Open GA4 Dashboard
+            <ExternalLink size={12} />
+          </a>
+        </div>
+      )}
     </div>
   );
 }
@@ -240,7 +251,7 @@ function TrafficDashboard({
           label="Engagement"
           value={`${(overview.engagement_rate ?? 0).toFixed(1)}%`}
           icon={MousePointerClick}
-          color="text-teal-400"
+          color="text-signal"
           currentRaw={overview.engagement_rate}
           previousRaw={comparison?.engagement_rate}
         />
@@ -248,7 +259,7 @@ function TrafficDashboard({
           label="Avg Duration"
           value={formatDuration(overview.session_duration)}
           icon={Timer}
-          color="text-amber-400"
+          color="text-warning"
           currentRaw={overview.session_duration}
           previousRaw={comparison?.session_duration}
         />
@@ -256,7 +267,7 @@ function TrafficDashboard({
           label="Active Now"
           value={String(overview.current_visitors)}
           icon={Activity}
-          color="text-emerald-400"
+          color="text-success"
           dot
         />
       </div>
@@ -285,10 +296,10 @@ function TrafficDashboard({
           icon={LogIn}
           color={
             overview.bounce_rate > 70
-              ? "text-red-400"
+              ? "text-danger"
               : overview.bounce_rate > 50
-                ? "text-amber-400"
-                : "text-emerald-400"
+                ? "text-warning"
+                : "text-success"
           }
           currentRaw={overview.bounce_rate}
           previousRaw={comparison?.bounce_rate}
@@ -433,7 +444,7 @@ function StatCard({
 
     if (prev === 0 && curr > 0) {
       deltaEl = (
-        <span className="text-[10px] text-emerald-400 flex items-center gap-0.5 mt-1">
+        <span className="text-[10px] text-success flex items-center gap-0.5 mt-1">
           <ArrowUp size={10} /> New
         </span>
       );
@@ -445,7 +456,7 @@ function StatCard({
         const isPositive = invertDelta ? !isUp : isUp;
         deltaEl = (
           <span
-            className={`text-[10px] flex items-center gap-0.5 mt-1 ${isPositive ? "text-emerald-400" : "text-red-400"}`}
+            className={`text-[10px] flex items-center gap-0.5 mt-1 ${isPositive ? "text-success" : "text-danger"}`}
           >
             {isUp ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
             {isUp ? "+" : ""}
@@ -466,8 +477,8 @@ function StatCard({
         {dot && (
           <span className="ml-auto flex items-center gap-1">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
             </span>
           </span>
         )}
@@ -627,10 +638,10 @@ function ErrorState({
 }) {
   return (
     <div className="rounded-lg border border-border bg-panel p-8 text-center">
-      <div className="text-red-400 mb-2">
+      <div className="text-danger mb-2">
         <Loader2 size={24} className="mx-auto" />
       </div>
-      <p className="text-sm text-red-400 mb-1">Failed to load analytics</p>
+      <p className="text-sm text-danger mb-1">Failed to load analytics</p>
       <p className="text-xs text-muted mb-4">{message}</p>
       <button
         onClick={onRetry}

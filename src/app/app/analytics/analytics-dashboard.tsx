@@ -111,7 +111,10 @@ export function AnalyticsDashboard({ summary, from, to, range, compare }: Props)
           icon={Users}
           label="Clients"
           value={String(clients.filter((c) => c.clientName !== "No client").length)}
-          sub={`${clients.reduce((a, b) => a + b.releaseCount, 0)} releases total`}
+          sub={(() => {
+            const total = clients.reduce((a, b) => a + b.releaseCount, 0);
+            return `${total} release${total !== 1 ? "s" : ""} total`;
+          })()}
           href="/app/artists"
         />
       </div>

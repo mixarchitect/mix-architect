@@ -15,6 +15,7 @@ import {
   FlaskConical,
 } from "lucide-react";
 import { downloadCsv } from "@/lib/csv-export";
+import { formatAdminTime, formatAdminTimeTitle } from "@/lib/format-admin-time";
 
 interface Subscriber {
   id: string;
@@ -34,9 +35,9 @@ interface Subscriber {
 type FilterTab = "all" | "pro" | "free" | "churned";
 
 const statusColors: Record<string, string> = {
-  active: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-  past_due: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-  canceled: "text-red-400 bg-red-500/10 border-red-500/20",
+  active: "text-success bg-success/10 border-success/20",
+  past_due: "text-warning bg-warning/10 border-warning/20",
+  canceled: "text-danger bg-danger/10 border-danger/20",
   trialing: "text-blue-400 bg-blue-500/10 border-blue-500/20",
   none: "text-faint bg-panel2 border-border",
   incomplete: "text-faint bg-panel2 border-border",
@@ -224,7 +225,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
 
           {feedback && (
             <div className="w-full">
-              <span className={cn("flex items-center gap-1 text-sm", feedback.type === "success" ? "text-emerald-500" : "text-red-400")}>
+              <span className={cn("flex items-center gap-1 text-sm", feedback.type === "success" ? "text-success" : "text-danger")}>
                 {feedback.type === "success" ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
                 {feedback.msg}
               </span>
@@ -434,7 +435,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
                       {sub.display_name || sub.user_email || sub.user_id.substring(0, 8)}
                     </span>
                     {sub.granted_by_admin && (
-                      <span title="Comp account"><Gift size={12} className="text-amber-500 shrink-0" /></span>
+                      <span title="Comp account"><Gift size={12} className="text-warning shrink-0" /></span>
                     )}
                     {sub.is_test_account && (
                       <span title="Test account"><FlaskConical size={12} className="text-purple-400 shrink-0" /></span>
@@ -449,10 +450,13 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
                     <CreditCard size={12} />
                     <span className="uppercase">{sub.plan}</span>
                     {sub.cancel_at_period_end && (
-                      <span className="text-amber-400">cancels at period end</span>
+                      <span className="text-warning">cancels at period end</span>
                     )}
                     {sub.current_period_end && (
-                      <span className="text-faint">
+                      <span
+                        className="text-faint"
+                        title={formatAdminTimeTitle(sub.current_period_end)}
+                      >
                         expires{" "}
                         {new Date(sub.current_period_end).toLocaleDateString("en-US", {
                           month: "short",
@@ -474,11 +478,11 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
                 </span>
 
                 {sub.created_at && (
-                  <span className="text-xs text-faint shrink-0">
-                    {new Date(sub.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
+                  <span
+                    className="text-xs text-faint shrink-0"
+                    title={formatAdminTimeTitle(sub.created_at)}
+                  >
+                    {formatAdminTime(sub.created_at)}
                   </span>
                 )}
               </div>
