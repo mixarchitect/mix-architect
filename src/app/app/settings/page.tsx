@@ -24,12 +24,7 @@ import { WorkspaceEmailCard } from "@/components/settings/workspace-email-card";
 import { WorkspaceCustomDomainCard } from "@/components/settings/workspace-custom-domain-card";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useFeatureVisibility } from "@/lib/features/feature-visibility-context";
-import {
-  FEATURE_GROUPS,
-  FEATURE_LABELS,
-  FEATURE_KEYS,
-  type FeatureKey,
-} from "@/lib/features/feature-registry";
+import { FEATURE_GROUPS, FEATURE_LABELS } from "@/lib/features/feature-registry";
 import {
   locales,
   localeDisplayNames,
