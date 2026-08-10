@@ -865,9 +865,14 @@ export function AudioPlayer({
         };
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) resolve();
-          else reject(new Error(`Upload failed (${xhr.status})`));
+          else
+            reject(
+              new Error(
+                `Upload failed (${xhr.status}): ${xhr.responseText?.slice(0, 300) ?? ""}`,
+              ),
+            );
         };
-        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.onerror = () => reject(new Error("Upload failed: network error"));
         xhr.send(file);
       });
 
@@ -911,7 +916,26 @@ export function AudioPlayer({
         trackGA4Event("audio_upload", { format: ext });
       }
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Upload failed");
+      // Raw message stays in the console for diagnostics; the user sees a
+      // friendly mapping keyed off the HTTP status / server error text.
+      console.error("[audio-upload] upload failed:", err);
+      const raw = err instanceof Error ? err.message : String(err);
+      const statusMatch = raw.match(/\((\d{3})\)/);
+      const status = statusMatch ? Number(statusMatch[1]) : null;
+      if (
+        status === 413 ||
+        /too large|payload.{0,10}large|max.{0,20}size|size.{0,20}exceed/i.test(raw)
+      ) {
+        setUploadError(
+          "This file is too large to upload. WAV files up to 2 GB are supported.",
+        );
+      } else if (status === 415 || /mime|file type|format|unsupported/i.test(raw)) {
+        setUploadError(
+          "This file type is not supported. Upload WAV, AIFF, or FLAC.",
+        );
+      } else {
+        setUploadError("Upload failed. Check your connection and try again.");
+      }
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -1216,7 +1240,7 @@ export function AudioPlayer({
                     window.open(activeVersion.audio_url, "_blank");
                   }
                 }}
-                className="text-signal hover:opacity-70 transition-opacity"
+                className="inline-flex items-center justify-center min-h-11 min-w-11 -my-[15px] -mx-2 text-signal hover:opacity-70 transition-opacity"
                 title={`Download ${activeVersion.file_name || `v${activeVersion.version_number}`}`}
               >
                 <Download size={14} />
@@ -1245,7 +1269,7 @@ export function AudioPlayer({
                   <button
                     type="button"
                     onClick={() => setDeleteConfirmId(activeVersion.id)}
-                    className="text-faint hover:text-signal transition-colors"
+                    className="inline-flex items-center justify-center min-h-11 min-w-11 -my-[15px] -mx-2 text-faint hover:text-signal transition-colors"
                     title={`Delete v${activeVersion.version_number}`}
                   >
                     <Trash2 size={13} />

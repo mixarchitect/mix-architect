@@ -144,7 +144,7 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
               type="button"
               onClick={(e) => { e.stopPropagation(); handleShare(e); }}
               aria-label={copied ? t("copied") : t("copyPortalLink")}
-              className="inline-flex items-center cursor-pointer text-muted hover:text-text transition-colors"
+              className="inline-flex items-center justify-center min-h-11 min-w-11 -my-2 -mx-2 cursor-pointer text-muted hover:text-text transition-colors"
             >
               {copied ? <Check size={14} /> : <Share2 size={14} />}
             </button>
@@ -154,7 +154,7 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
               rel="noopener noreferrer"
               aria-label={t("openPortal")}
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center text-muted hover:text-text transition-colors"
+              className="inline-flex items-center justify-center min-h-11 min-w-11 -my-2 -mr-1 -ml-2 text-muted hover:text-text transition-colors"
             >
               <ExternalLink size={14} />
             </a>

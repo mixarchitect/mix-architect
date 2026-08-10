@@ -234,7 +234,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
     return (
       <div
         ref={ref}
-        role="dialog"
+        role="region"
         aria-label="Notifications"
         style={{ background: "var(--panel)" }}
         className={cn(

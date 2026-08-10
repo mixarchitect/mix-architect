@@ -104,8 +104,10 @@ function ForgotPasswordContent() {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="space-y-1.5">
-                    <label className="label text-muted">{t("email")}</label>
+                    <label htmlFor="forgot-email" className="label text-muted">{t("email")}</label>
                     <input
+                      id="forgot-email"
+                      autoComplete="email"
                       type="email"
                       required
                       value={email}

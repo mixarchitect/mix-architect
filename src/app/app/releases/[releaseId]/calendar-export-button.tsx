@@ -40,6 +40,7 @@ export function CalendarExportButton({ releaseId }: { releaseId: string }) {
       onClick={handleExport}
       disabled={loading}
       title={t("exportToCalendar")}
+      aria-label={t("exportToCalendar")}
     >
       <CalendarDays size={14} />
     </IconButton>

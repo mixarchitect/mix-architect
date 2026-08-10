@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Megaphone, Clock, Star, X as XIcon, ExternalLink } from "lucide-react";
 import { Button, IconButton } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import {
   checkEligibilityAction,
@@ -96,6 +98,7 @@ export function SubmitForFeatureButton({
       <IconButton
         size="sm"
         title="Submit for Feature"
+        aria-label="Submit for Feature"
         onClick={() => setModalOpen(true)}
       >
         <Megaphone size={14} strokeWidth={1.5} />
@@ -132,15 +135,19 @@ function PendingBadge({
   onWithdrawn: () => void;
 }) {
   const [withdrawing, setWithdrawing] = useState(false);
+  const [confirmingWithdraw, setConfirmingWithdraw] = useState(false);
+  const { toast } = useToast();
 
   async function handleWithdraw() {
-    if (!confirm("Withdraw your submission? You can resubmit later.")) return;
+    setConfirmingWithdraw(false);
     setWithdrawing(true);
     const result = await withdrawSubmissionAction(submission.id, releaseId);
     if (result.success) {
       onWithdrawn();
     } else {
-      alert(result.error ?? "Could not withdraw.");
+      toast(result.error ?? "Could not withdraw. Please try again.", {
+        variant: "error",
+      });
     }
     setWithdrawing(false);
   }
@@ -153,12 +160,22 @@ function PendingBadge({
       </span>
       <button
         type="button"
-        onClick={handleWithdraw}
+        onClick={() => setConfirmingWithdraw(true)}
         disabled={withdrawing}
         className="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2"
       >
         {withdrawing ? "..." : "Withdraw"}
       </button>
+      <ConfirmDialog
+        open={confirmingWithdraw}
+        title="Withdraw this submission?"
+        description="You can resubmit the release for feature later."
+        confirmLabel="Withdraw submission"
+        cancelLabel="Keep it"
+        busy={withdrawing}
+        onConfirm={handleWithdraw}
+        onCancel={() => setConfirmingWithdraw(false)}
+      />
     </div>
   );
 }

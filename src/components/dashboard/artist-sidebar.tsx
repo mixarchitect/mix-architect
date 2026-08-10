@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, Pencil, X } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Panel, PanelBody } from "@/components/ui/panel";
+import { ConfirmDialog } from "@/components/ui/dialog";
 import { ClientNotesEditor } from "@/app/app/releases/[releaseId]/sidebar-editors";
 import { ArtistPhotoUploader } from "@/components/ui/artist-photo-uploader";
 
@@ -73,21 +74,21 @@ function ArtistNameEditor({
   const [name, setName] = useState(artistName);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const router = useRouter();
 
-  async function handleSave() {
+  function handleSave() {
     const trimmed = name.trim();
     if (!trimmed || trimmed === artistName) {
       setName(artistName);
       setEditing(false);
       return;
     }
+    setConfirmOpen(true);
+  }
 
-    const confirmed = window.confirm(
-      `This will rename "${artistName}" to "${trimmed}" across all releases. Continue?`,
-    );
-    if (!confirmed) return;
-
+  async function performRename() {
+    const trimmed = name.trim();
     setSaving(true);
     setError("");
     const supabase = createSupabaseBrowserClient();
@@ -125,6 +126,7 @@ function ArtistNameEditor({
       setError("Failed to rename artist");
     } finally {
       setSaving(false);
+      setConfirmOpen(false);
     }
   }
 
@@ -172,6 +174,16 @@ function ArtistNameEditor({
           Renaming updates all releases by this artist
         </p>
         {error && <p className="text-xs text-red-500">{error}</p>}
+        <ConfirmDialog
+          open={confirmOpen}
+          title="Rename artist"
+          description={`This will rename "${artistName}" to "${name.trim()}" across all releases. Continue?`}
+          confirmLabel="Rename"
+          cancelLabel="Cancel"
+          busy={saving}
+          onConfirm={performRename}
+          onCancel={() => setConfirmOpen(false)}
+        />
       </div>
     );
   }

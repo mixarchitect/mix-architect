@@ -38,12 +38,28 @@ export function IconButton({
   size = "default",
   ...props
 }: IconButtonProps) {
+  // Icon-only buttons need an accessible name (aria-label, or title as a
+  // fallback). Enforced at runtime in dev instead of the type level only
+  // because a few call sites live in files frozen by in-flight work; make
+  // aria-label a required prop once those land.
+  if (
+    process.env.NODE_ENV !== "production" &&
+    !props["aria-label"] &&
+    !props["aria-labelledby"] &&
+    !props.title
+  ) {
+    console.warn(
+      "IconButton rendered without an accessible name: add aria-label (or title).",
+    );
+  }
   return (
     <button
       className={cn(
         size === "sm" && variant === "default" && "btn-icon-sm",
         size === "default" && variant === "default" && "btn-icon",
         variant === "dark" && "btn-icon-dark",
+        // 44x44 minimum hit area; icon size is set by the child SVG.
+        "min-h-11 min-w-11 inline-flex items-center justify-center",
         className
       )}
       {...props}

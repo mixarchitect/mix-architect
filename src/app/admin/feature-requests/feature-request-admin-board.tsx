@@ -15,6 +15,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { ConfirmDialog } from "@/components/ui/dialog";
 import { formatAdminTimeTitle } from "@/lib/format-admin-time";
 import type {
   FeatureRequestAdmin,
@@ -578,6 +579,8 @@ function DetailPanel({
   const [tags, setTags] = useState<string[]>(request.tags);
   const [tagInput, setTagInput] = useState("");
   const [mergedRequests, setMergedRequests] = useState<any[]>([]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -633,8 +636,13 @@ function DetailPanel({
   };
 
   const handleDelete = async () => {
-    if (!confirm("Delete this feature request? This cannot be undone.")) return;
-    await deleteFeatureRequest(request.id);
+    setDeleting(true);
+    try {
+      await deleteFeatureRequest(request.id);
+    } finally {
+      setDeleting(false);
+      setDeleteConfirmOpen(false);
+    }
     onClose();
     onRefresh();
   };
@@ -813,13 +821,25 @@ function DetailPanel({
       {/* Delete */}
       <div className="pt-3 border-t border-border">
         <button
-          onClick={handleDelete}
+          onClick={() => setDeleteConfirmOpen(true)}
           className="text-xs text-faint hover:text-danger transition-colors flex items-center gap-1"
         >
           <Trash2 size={12} />
           Delete Request
         </button>
       </div>
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        title="Delete this feature request?"
+        description="This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        destructive
+        busy={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteConfirmOpen(false)}
+      />
     </div>
   );
 }

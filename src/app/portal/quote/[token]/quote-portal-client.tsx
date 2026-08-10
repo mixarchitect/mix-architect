@@ -46,6 +46,7 @@ export function QuotePortalClient({
   scheduleQuotes,
 }: Props) {
   const [loading, setLoading] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
   const isPaid = quote.status === "paid";
   const isExpired = quote.status === "expired";
   const isCancelled = quote.status === "cancelled";
@@ -58,6 +59,7 @@ export function QuotePortalClient({
 
   async function handlePay() {
     setLoading(true);
+    setPayError(null);
     try {
       const res = await fetch("/api/stripe/connect/checkout", {
         method: "POST",
@@ -68,8 +70,14 @@ export function QuotePortalClient({
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert(data.error || "Failed to create checkout session");
+        setPayError(
+          `We couldn't start the payment. Please try again, or contact ${engineerName} if this keeps happening.`,
+        );
       }
+    } catch {
+      setPayError(
+        `We couldn't start the payment. Check your connection and try again, or contact ${engineerName}.`,
+      );
     } finally {
       setLoading(false);
     }
@@ -297,17 +305,27 @@ export function QuotePortalClient({
                 <span className="text-sm text-[#999]">This quote has been cancelled.</span>
               </div>
             ) : canPay ? (
-              <button
-                onClick={handlePay}
-                disabled={loading}
-                className="w-full py-3 rounded-lg font-semibold text-white text-sm transition-colors"
-                style={{ backgroundColor: loading ? "#999" : "#0D9488" }}
-              >
-                <span className="flex items-center justify-center gap-2">
-                  <CreditCard size={16} />
-                  {loading ? "Redirecting to payment..." : `Pay ${currencyFormatter.format(Number(quote.total))}`}
-                </span>
-              </button>
+              <div className="space-y-3">
+                {payError && (
+                  <div
+                    role="alert"
+                    className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
+                  >
+                    {payError}
+                  </div>
+                )}
+                <button
+                  onClick={handlePay}
+                  disabled={loading}
+                  className="w-full py-3 rounded-lg font-semibold text-white text-sm transition-colors"
+                  style={{ backgroundColor: loading ? "#999" : "#0D9488" }}
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <CreditCard size={16} />
+                    {loading ? "Redirecting to payment..." : payError ? "Try again" : `Pay ${currencyFormatter.format(Number(quote.total))}`}
+                  </span>
+                </button>
+              </div>
             ) : !hasStripeConnected ? (
               <div className="text-sm text-[#666] text-center">
                 Contact {engineerName} to arrange payment.

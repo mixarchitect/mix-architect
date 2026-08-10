@@ -8,6 +8,11 @@
    whenever the chosen theme differs from the OS. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* Native <dialog> primitive (src/components/ui/dialog.tsx) */
+.dialog-reset::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
 /* Toast slide-in animation */
 @keyframes toast-slide-in {
   from { opacity: 0; transform: translateX(100%); }

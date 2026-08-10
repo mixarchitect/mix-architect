@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useToast } from "@/components/ui/toast";
 import { ArrowLeft, Plus, Trash2, Eye } from "lucide-react";
 import Link from "next/link";
 import { Panel, PanelBody } from "@/components/ui/panel";
@@ -54,6 +55,7 @@ export function QuoteBuilder({
 }: Props) {
   const router = useRouter();
   const t = useTranslations("quotes");
+  const { toast } = useToast();
   const isEditing = !!existingQuote;
 
   // ── Form State ──
@@ -279,14 +281,14 @@ export function QuoteBuilder({
           })),
         });
         if (result.error) {
-          alert(result.error);
+          toast(result.error, { variant: "error" });
           return;
         }
         router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
       } else if (isEditing && existingQuote) {
         const result = await updateQuote(existingQuote.id, getFormData());
         if (result.error) {
-          alert(result.error);
+          toast(result.error, { variant: "error" });
           return;
         }
         dirtyRef.current = false;
@@ -305,7 +307,7 @@ export function QuoteBuilder({
           })),
         });
         if (result.error) {
-          alert(result.error);
+          toast(result.error, { variant: "error" });
           return;
         }
         router.push(releaseId ? `/app/releases/${releaseId}?tab=financials` : "/app/quotes");
@@ -317,7 +319,7 @@ export function QuoteBuilder({
 
   async function handleSend() {
     if (!clientEmail) {
-      alert(t("builder.emailRequired"));
+      toast(t("builder.emailRequired"), { variant: "error" });
       return;
     }
     setSending(true);
@@ -336,7 +338,9 @@ export function QuoteBuilder({
           })),
         });
         if (result.error || !result.quote) {
-          alert(result.error);
+          toast(result.error ?? "Could not save the quote. Please try again.", {
+            variant: "error",
+          });
           return;
         }
         await sendQuote(result.quote.id);
@@ -345,7 +349,7 @@ export function QuoteBuilder({
         if (dirtyRef.current) {
           const saveResult = await updateQuote(existingQuote.id, getFormData());
           if (saveResult.error) {
-            alert(saveResult.error);
+            toast(saveResult.error, { variant: "error" });
             return;
           }
           dirtyRef.current = false;
