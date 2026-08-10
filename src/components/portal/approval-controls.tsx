@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations, useFormatter } from "next-intl";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 import { Check, MessageCircle, RefreshCw, Package } from "lucide-react";
@@ -12,28 +13,28 @@ const CLIENT_NAME_KEY = "portal_client_name";
 
 export const STATUS_CONFIG: Record<
   ApprovalStatus,
-  { label: string; color: string; bg: string; dot: string }
+  { labelKey: string; color: string; bg: string; dot: string }
 > = {
   awaiting_review: {
-    label: "Awaiting Review",
+    labelKey: "awaitingReview",
     color: "text-muted",
     bg: "bg-black/[0.04] dark:bg-white/[0.06]",
     dot: "bg-muted",
   },
   changes_requested: {
-    label: "Changes Requested",
+    labelKey: "changesRequested",
     color: "text-signal",
     bg: "bg-signal-muted",
     dot: "bg-signal",
   },
   approved: {
-    label: "Approved",
+    labelKey: "approved",
     color: "text-status-green",
     bg: "bg-status-green/10",
     dot: "bg-status-green",
   },
   delivered: {
-    label: "Delivered",
+    labelKey: "delivered",
     color: "text-status-blue",
     bg: "bg-status-blue/10",
     dot: "bg-status-blue",
@@ -45,6 +46,7 @@ export const STATUS_CONFIG: Record<
 /* ------------------------------------------------------------------ */
 
 export function PortalStatusBadge({ status }: { status: ApprovalStatus }) {
+  const t = useTranslations("portal");
   const config = STATUS_CONFIG[status];
   return (
     <span
@@ -55,7 +57,7 @@ export function PortalStatusBadge({ status }: { status: ApprovalStatus }) {
       )}
     >
       <span className={cn("w-1.5 h-1.5 rounded-full", config.dot)} />
-      {config.label}
+      {t(`status.${config.labelKey}`)}
     </span>
   );
 }
@@ -69,6 +71,8 @@ type ApprovalControlsProps = {
   trackId: string;
   initialStatus: ApprovalStatus;
   approvalDate: string | null;
+  /** Engineer / workspace display name, used for the "Send notes to {name}" CTA. */
+  engineerName?: string | null;
   onStatusChange?: (newStatus: ApprovalStatus) => void;
   onPromoTrigger?: (trigger: PromptTrigger) => void;
 };
@@ -78,9 +82,12 @@ export function ApprovalControls({
   trackId,
   initialStatus,
   approvalDate,
+  engineerName = null,
   onStatusChange,
   onPromoTrigger,
 }: ApprovalControlsProps) {
+  const t = useTranslations("portal");
+  const format = useFormatter();
   const [status, setStatus] = useState<ApprovalStatus>(initialStatus);
   const clientName = typeof window !== "undefined" ? localStorage.getItem(CLIENT_NAME_KEY) || "Client" : "Client";
   const [showRequestForm, setShowRequestForm] = useState(false);
@@ -108,10 +115,10 @@ export function ApprovalControls({
         onPromoTrigger?.("approval");
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Failed to approve. Please try again");
+        setError(data.error || t("approval.failedApprove"));
       }
     } catch {
-      setError("Network error. Please check your connection");
+      setError(t("approval.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -141,10 +148,10 @@ export function ApprovalControls({
         setShowRequestForm(false);
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Failed to submit changes. Please try again");
+        setError(data.error || t("approval.failedSubmitChanges"));
       }
     } catch {
-      setError("Network error. Please check your connection");
+      setError(t("approval.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -169,10 +176,10 @@ export function ApprovalControls({
         onStatusChange?.("awaiting_review");
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.error || "Failed to undo. Please try again");
+        setError(data.error || t("approval.failedUndo"));
       }
     } catch {
-      setError("Network error. Please check your connection");
+      setError(t("approval.networkError"));
     } finally {
       setSubmitting(false);
     }
@@ -195,7 +202,7 @@ export function ApprovalControls({
             className="!h-9 !text-xs !bg-status-green hover:!bg-status-green/90"
           >
             <Check size={14} />
-            Approve
+            {t("approval.approve")}
           </Button>
           <button
             onClick={() => setShowRequestForm(!showRequestForm)}
@@ -203,7 +210,7 @@ export function ApprovalControls({
             className="inline-flex items-center gap-1.5 h-9 px-3.5 text-xs font-medium text-muted hover:text-text border border-border rounded-md transition-colors"
           >
             <MessageCircle size={14} />
-            Request Changes
+            {t("approval.requestChanges")}
           </button>
         </div>
       )}
@@ -213,13 +220,14 @@ export function ApprovalControls({
         <div className="flex items-center gap-3 bg-status-green/[0.06] rounded-lg px-4 py-3">
           <div className="flex items-center gap-1.5 text-sm text-status-green font-medium">
             <Check size={14} />
-            Approved
+            {t("status.approved")}
             {approvalDate && (
               <span className="text-status-green/70 font-normal ml-1">
-                on{" "}
-                {new Date(approvalDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
+                {t("approval.approvedOn", {
+                  date: format.dateTime(new Date(approvalDate), {
+                    month: "short",
+                    day: "numeric",
+                  }),
                 })}
               </span>
             )}
@@ -229,7 +237,7 @@ export function ApprovalControls({
             disabled={submitting}
             className="text-xs text-muted hover:text-text transition-colors ml-auto underline underline-offset-2"
           >
-            Undo
+            {t("approval.undo")}
           </button>
         </div>
       )}
@@ -243,12 +251,12 @@ export function ApprovalControls({
       {showRequestForm && (
         <div className="bg-signal-muted border border-signal/20 rounded-lg p-3">
           <div className="text-[11px] text-signal font-medium mb-2">
-            What needs to change?
+            {t("approval.whatNeedsToChange")}
           </div>
           <textarea
             value={changeNote}
             onChange={(e) => setChangeNote(e.target.value)}
-            placeholder="e.g., Vocals too quiet in the chorus, needs more low end..."
+            placeholder={t("approval.changePlaceholder")}
             rows={3}
             className="input text-sm w-full resize-none"
             autoFocus
@@ -267,7 +275,7 @@ export function ApprovalControls({
               }}
               className="text-xs text-muted hover:text-text transition-colors px-3 py-1.5 border border-border rounded"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <Button
               variant="primary"
@@ -275,7 +283,9 @@ export function ApprovalControls({
               disabled={!changeNote.trim() || submitting}
               className="!h-auto !py-1.5 !px-3 !text-xs"
             >
-              Submit
+              {engineerName
+                ? t("approval.sendNotesTo", { name: engineerName })
+                : t("approval.sendNotes")}
             </Button>
           </div>
         </div>

@@ -172,6 +172,7 @@ export function PortalClient({
               track={track}
               releaseId={release.id}
               releaseTitle={release.title}
+              engineerName={release.engineer_name}
               releaseFormat={release.format}
               coverArtUrl={release.cover_art_url}
               showDirection={share.show_direction}

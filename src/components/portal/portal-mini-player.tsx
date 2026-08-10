@@ -1,6 +1,7 @@
 "use client";
 
 import { X, Repeat } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { FilledPlay, FilledPause } from "@/components/ui/filled-icon";
 import {
@@ -16,6 +17,7 @@ function formatTime(seconds: number): string {
 }
 
 export function PortalMiniPlayer() {
+  const t = useTranslations("portal");
   const {
     activeVersion,
     trackMeta,
@@ -75,7 +77,8 @@ export function PortalMiniPlayer() {
         {/* Play / Pause */}
         <button
           onClick={togglePlayPause}
-          className="w-9 h-9 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm shrink-0"
+          aria-label={isPlaying ? t("player.pause") : t("player.play")}
+          className="relative w-9 h-9 rounded-full bg-signal text-signal-on flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm shrink-0 after:absolute after:content-[''] after:-inset-1"
         >
           {isPlaying ? (
             <FilledPause size={16} />
@@ -87,11 +90,13 @@ export function PortalMiniPlayer() {
         {/* Loop toggle */}
         <button
           onClick={toggleLoop}
+          aria-label={t("player.loop")}
+          aria-pressed={isLooping}
           className={cn(
-            "p-2 transition-colors shrink-0",
+            "relative p-2 transition-colors shrink-0 after:absolute after:content-[''] after:-inset-[7px]",
             isLooping ? "text-signal" : "text-muted hover:text-text",
           )}
-          title={isLooping ? "Loop (on)" : "Loop"}
+          title={isLooping ? t("player.loopOn") : t("player.loop")}
         >
           <Repeat size={14} />
         </button>
@@ -99,8 +104,9 @@ export function PortalMiniPlayer() {
         {/* Stop / Close */}
         <button
           onClick={stop}
-          className="p-2 text-muted hover:text-text transition-colors shrink-0"
-          title="Stop playback"
+          aria-label={t("player.stopPlayback")}
+          className="relative p-2 text-muted hover:text-text transition-colors shrink-0 after:absolute after:content-[''] after:-inset-1.5"
+          title={t("player.stopPlayback")}
         >
           <X size={16} />
         </button>

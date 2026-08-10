@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { BriefReference } from "@/lib/db-types";
 
 type Props = {
@@ -6,6 +7,7 @@ type Props = {
 };
 
 export function PortalReferenceItem({ reference }: Props) {
+  const t = useTranslations("portal");
   const { song_title, artist, note, url, artwork_url } = reference;
 
   return (
@@ -14,7 +16,7 @@ export function PortalReferenceItem({ reference }: Props) {
       {artwork_url ? (
         <img
           src={artwork_url}
-          alt={`${song_title} artwork`}
+          alt={t("reference.artworkAlt", { title: song_title })}
           className="w-9 h-9 rounded-[3px] shrink-0 object-cover"
         />
       ) : (
@@ -44,8 +46,9 @@ export function PortalReferenceItem({ reference }: Props) {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 p-1.5 text-muted hover:text-signal transition-colors"
-          title="Open link"
+          className="relative shrink-0 p-1.5 text-muted hover:text-signal transition-colors after:absolute after:content-[''] after:-inset-3"
+          title={t("reference.openLink")}
+          aria-label={t("reference.openLink")}
         >
           <ExternalLink size={13} />
         </a>

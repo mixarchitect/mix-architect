@@ -51,6 +51,7 @@ export function Dialog({
   }
 
   return (
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events -- backdrop click dismissal is pointer-only sugar; keyboard users close via Escape (onCancel)
     <dialog
       ref={(el) => {
         ref.current = el;

@@ -1,8 +1,8 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import type { PortalRelease } from "@/lib/portal-types";
-import { formatLabel } from "@/lib/format-labels";
 
 type ApprovalCounts = {
   approved: number;
@@ -30,15 +30,26 @@ export function PortalHeader({
   logoUrl = null,
   logoUrlDark = null,
 }: PortalHeaderProps) {
+  const t = useTranslations("portal");
   // Letterhead logo: pick per-theme variants, each falling back to the other
   // so a single uploaded logo still shows in both light and dark.
   const lightLogo = logoUrl ?? logoUrlDark;
   const darkLogo = logoUrlDark ?? logoUrl;
   const typeLabel =
     release.release_type === "ep"
-      ? "EP"
-      : release.release_type.charAt(0).toUpperCase() +
-        release.release_type.slice(1);
+      ? t("releaseType.ep")
+      : release.release_type === "album"
+        ? t("releaseType.album")
+        : release.release_type === "single"
+          ? t("releaseType.single")
+          : release.release_type.charAt(0).toUpperCase() +
+            release.release_type.slice(1);
+  const formatText =
+    release.format === "atmos"
+      ? t("format.atmos")
+      : release.format === "both"
+        ? t("format.both")
+        : t("format.stereo");
 
   const total = approvalCounts.approved + approvalCounts.awaiting + approvalCounts.changesRequested + approvalCounts.delivered;
   const doneCount = approvalCounts.approved + approvalCounts.delivered;
@@ -100,13 +111,21 @@ export function PortalHeader({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={lightLogo}
-              alt={engineerName ? `${engineerName} logo` : "Studio logo"}
+              alt={
+                engineerName
+                  ? t("header.logoAlt", { name: engineerName })
+                  : t("header.logoAltGeneric")
+              }
               className="h-10 max-w-[180px] object-contain mx-auto block dark:hidden"
             />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={darkLogo}
-              alt={engineerName ? `${engineerName} logo` : "Studio logo"}
+              alt={
+                engineerName
+                  ? t("header.logoAlt", { name: engineerName })
+                  : t("header.logoAltGeneric")
+              }
               className="h-10 max-w-[180px] object-contain mx-auto hidden dark:block"
             />
           </div>
@@ -114,7 +133,7 @@ export function PortalHeader({
         {release.cover_art_url && (
           <img
             src={release.cover_art_url}
-            alt={`${release.title} cover art`}
+            alt={t("header.coverArtAlt", { title: release.title })}
             className="w-[200px] h-[200px] rounded-xl object-cover mx-auto mb-6 shadow-lg"
           />
         )}
@@ -125,15 +144,15 @@ export function PortalHeader({
         <div className="flex items-center justify-center gap-2 mt-3 text-xs text-faint flex-wrap">
           <span>{typeLabel}</span>
           <span>&middot;</span>
-          <span>{formatLabel(release.format)}</span>
+          <span>{formatText}</span>
           <span>&middot;</span>
-          <span>
-            {trackCount} track{trackCount !== 1 ? "s" : ""}
-          </span>
+          <span>{t("header.trackCount", { count: trackCount })}</span>
           {engineerName && (
             <>
               <span>&middot;</span>
-              <span className="text-muted">by {engineerName}</span>
+              <span className="text-muted">
+                {t("header.byEngineer", { name: engineerName })}
+              </span>
             </>
           )}
         </div>
@@ -171,6 +190,7 @@ function ProgressBar({
   awaiting: number;
   compact?: boolean;
 }) {
+  const t = useTranslations("portal");
   const total = approved + delivered + changesRequested + awaiting;
   const doneCount = approved + delivered;
 
@@ -207,11 +227,11 @@ function ProgressBar({
     <div className="w-full max-w-xs">
       <div className="flex items-center justify-between text-xs text-muted mb-2">
         <span>
-          {doneCount} of {total} approved
+          {t("header.approvedProgress", { done: doneCount, total })}
         </span>
         {changesRequested > 0 && (
           <span className="text-signal">
-            {changesRequested} revision{changesRequested !== 1 ? "s" : ""}
+            {t("header.revisionCount", { count: changesRequested })}
           </span>
         )}
       </div>
