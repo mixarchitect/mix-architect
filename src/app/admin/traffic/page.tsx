@@ -21,6 +21,7 @@ import {
   LogIn,
   BarChart3,
   MonitorSmartphone,
+  Download,
 } from "lucide-react";
 import type { TrafficData, OverviewMetrics, BreakdownEntry } from "@/lib/openpanel-api";
 import { AISynopsis } from "@/components/admin/traffic/AISynopsis";
@@ -179,6 +180,26 @@ export default function SiteTrafficPage() {
           >
             <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
           </button>
+
+          {/* Export report (Markdown with the AI summary) */}
+          <a
+            href={(() => {
+              const params = new URLSearchParams();
+              if (!rawFrom && !rawTo && rawRange) {
+                params.set("range", rawRange);
+              } else {
+                params.set("from", formatDateISO(periodFrom));
+                params.set("to", formatDateISO(periodTo));
+              }
+              return `/api/admin/analytics/export?${params.toString()}`;
+            })()}
+            download
+            className="p-2 rounded-md border border-border text-muted hover:text-text hover:bg-panel2 transition-colors"
+            aria-label="Export analytics report"
+            title="Export report (includes the AI summary)"
+          >
+            <Download size={14} />
+          </a>
         </div>
       </div>
 
