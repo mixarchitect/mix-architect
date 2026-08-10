@@ -97,28 +97,41 @@ function detectLocaleFromHeader(
   return geoLocale ?? defaultLocale;
 }
 
-export default getRequestConfig(async () => {
+/**
+ * Resolve the request locale: NEXT_LOCALE cookie, then Accept-Language,
+ * then the default. Shared by the next-intl request config and the root
+ * layout's <html lang> so the document language can't drift from the
+ * language of the rendered content. An unknown cookie value falls back to
+ * header detection instead of breaking the messages import.
+ *
+ * Reads cookies()/headers(), so callers render dynamically. Every page
+ * route is already dynamic (ThemeWrapper awaits headers() under the root
+ * layout, and localized pages call getLocale()), so this changes nothing.
+ */
+export async function resolveLocale(): Promise<Locale> {
   const cookieStore = await cookies();
   const cookieLocale = cookieStore.get("NEXT_LOCALE")?.value;
   // Ignore unknown cookie values so a stale/hand-edited cookie can't
   // point getMessageFile at a message file that doesn't exist
-  let locale: string | undefined = locales.includes(cookieLocale as Locale)
-    ? cookieLocale
-    : undefined;
+  if (cookieLocale && (locales as readonly string[]).includes(cookieLocale)) {
+    return cookieLocale as Locale;
+  }
 
   // No explicit choice: browser Accept-Language decides the language,
   // with the geo country (Vercel sets x-vercel-ip-country in prod;
   // absent in local dev) refining the regional variant and serving as
   // the fallback when the browser language is unsupported or missing
-  if (!locale) {
-    const headerStore = await headers();
-    const country = headerStore.get("x-vercel-ip-country")?.toUpperCase();
-    const geoLocale = country ? countryToLocale[country] : undefined;
-    const acceptLanguage = headerStore.get("accept-language");
-    locale = acceptLanguage
-      ? detectLocaleFromHeader(acceptLanguage, geoLocale)
-      : geoLocale ?? defaultLocale;
-  }
+  const headerStore = await headers();
+  const country = headerStore.get("x-vercel-ip-country")?.toUpperCase();
+  const geoLocale = country ? countryToLocale[country] : undefined;
+  const acceptLanguage = headerStore.get("accept-language");
+  return acceptLanguage
+    ? detectLocaleFromHeader(acceptLanguage, geoLocale)
+    : geoLocale ?? defaultLocale;
+}
+
+export default getRequestConfig(async () => {
+  const locale = await resolveLocale();
 
   const messageFile = getMessageFile(locale);
 
