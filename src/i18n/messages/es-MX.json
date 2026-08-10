@@ -245,6 +245,7 @@
       "deleteConfirm": "¿Eliminar {title}? Esto no se puede deshacer.",
       "releaseOptions": "Opciones de lanzamiento",
       "tracksBriefed": "{completed} de {total} {total, plural, one {pista briefeada} other {pistas briefeadas}}",
+      "audioWarnings": "{count, plural, one {# aviso de audio} other {# avisos de audio}}",
       "statusReady": "Listo",
       "statusInProgress": "En Progreso",
       "statusDraft": "Borrador"
@@ -333,6 +334,8 @@
     "trackNotStarted": "Sin iniciar",
     "moveUp": "Mover arriba",
     "moveDown": "Mover abajo",
+    "qualityNeedsAttention": "Requiere atención",
+    "reorderFailed": "No se pudo guardar el nuevo orden. Se restauraron tus pistas.",
     "deleteTrack": "Eliminar track",
     "deleteTrackConfirm": "¿Eliminar {title}? No se puede deshacer.",
     "portal": "Portal",

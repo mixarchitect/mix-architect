@@ -245,6 +245,7 @@
       "deleteConfirm": "Delete {title}? This cannot be undone.",
       "releaseOptions": "Release options",
       "tracksBriefed": "{completed} of {total} {total, plural, one {track} other {tracks}} briefed",
+      "audioWarnings": "{count, plural, one {# audio warning} other {# audio warnings}}",
       "statusReady": "Ready",
       "statusInProgress": "In Progress",
       "statusDraft": "Draft"
@@ -333,6 +334,8 @@
     "trackNotStarted": "Not started",
     "moveUp": "Move up",
     "moveDown": "Move down",
+    "qualityNeedsAttention": "Needs attention",
+    "reorderFailed": "Couldn't save the new track order. Your tracks were restored.",
     "deleteTrack": "Delete track",
     "deleteTrackConfirm": "Delete {title}? This cannot be undone.",
     "portal": "Portal",

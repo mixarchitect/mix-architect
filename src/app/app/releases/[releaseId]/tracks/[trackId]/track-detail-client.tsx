@@ -1080,7 +1080,15 @@ export function TrackDetailClient({
 
               <Panel>
                 <PanelBody className="py-5 space-y-5">
-                  <div className="label-sm text-muted">CODES &amp; IDENTIFIERS</div>
+                  <div className="flex items-center justify-between">
+                    <div className="label-sm text-muted">CODES &amp; IDENTIFIERS</div>
+                    <a
+                      href="/app/help?article=track-tabs"
+                      className="text-[11px] text-signal hover:underline"
+                    >
+                      What are these?
+                    </a>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-1.5">
                       <label className="label text-muted">ISRC</label>

@@ -245,6 +245,7 @@
       "deleteConfirm": "Excluir {title}? Isso não pode ser desfeito.",
       "releaseOptions": "Opções do lançamento",
       "tracksBriefed": "{completed} de {total} {total, plural, one {faixa briefada} other {faixas briefadas}}",
+      "audioWarnings": "{count, plural, one {# alerta de áudio} other {# alertas de áudio}}",
       "statusReady": "Pronto",
       "statusInProgress": "Em Progresso",
       "statusDraft": "Rascunho"
@@ -333,6 +334,8 @@
     "trackNotStarted": "Não iniciada",
     "moveUp": "Mover para cima",
     "moveDown": "Mover para baixo",
+    "qualityNeedsAttention": "Requer atenção",
+    "reorderFailed": "Não foi possível salvar a nova ordem. Suas faixas foram restauradas.",
     "deleteTrack": "Excluir faixa",
     "deleteTrackConfirm": "Excluir {title}? Esta ação não pode ser desfeita.",
     "portal": "Portal",

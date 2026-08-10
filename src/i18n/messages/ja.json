@@ -245,6 +245,7 @@
       "deleteConfirm": "{title}を削除しますか？これは取り消せません。",
       "releaseOptions": "リリースオプション",
       "tracksBriefed": "{total, plural, one {#トラック} other {#トラック}}中{completed}件概要済み",
+      "audioWarnings": "{count, plural, other {オーディオ警告#件}}",
       "statusReady": "準備完了",
       "statusInProgress": "進行中",
       "statusDraft": "ドラフト"
@@ -337,6 +338,8 @@
     "trackNotStarted": "未着手",
     "moveUp": "上に移動",
     "moveDown": "下に移動",
+    "qualityNeedsAttention": "要確認",
+    "reorderFailed": "新しい曲順を保存できませんでした。元の順序に戻しました。",
     "deleteTrack": "トラックを削除",
     "deleteTrackConfirm": "{title}を削除しますか？この操作は元に戻せません。",
     "portal": "ポータル",

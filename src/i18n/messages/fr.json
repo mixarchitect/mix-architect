@@ -245,6 +245,7 @@
       "deleteConfirm": "Supprimer {title} ? Cette action ne peut pas être annulée.",
       "releaseOptions": "Options de sortie",
       "tracksBriefed": "{completed} sur {total} {total, plural, one {piste briefée} other {pistes briefées}}",
+      "audioWarnings": "{count, plural, one {# alerte audio} other {# alertes audio}}",
       "statusReady": "Prêt",
       "statusInProgress": "En cours",
       "statusDraft": "Brouillon"
@@ -333,6 +334,8 @@
     "trackNotStarted": "Non commencée",
     "moveUp": "Déplacer vers le haut",
     "moveDown": "Déplacer vers le bas",
+    "qualityNeedsAttention": "À vérifier",
+    "reorderFailed": "Impossible d'enregistrer le nouvel ordre. Vos pistes ont été restaurées.",
     "deleteTrack": "Supprimer la piste",
     "deleteTrackConfirm": "Supprimer {title} ? Cette action est irréversible.",
     "portal": "Portail",

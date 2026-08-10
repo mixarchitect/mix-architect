@@ -245,6 +245,7 @@
       "deleteConfirm": "删除 {title}？此操作无法撤销。",
       "releaseOptions": "发行选项",
       "tracksBriefed": "{completed} / {total} {total, plural, one {首歌曲} other {首歌曲}}已简介",
+      "audioWarnings": "{count, plural, other {#个音频警告}}",
       "statusReady": "就绪",
       "statusInProgress": "进行中",
       "statusDraft": "草稿"
@@ -337,6 +338,8 @@
     "trackNotStarted": "未开始",
     "moveUp": "上移",
     "moveDown": "下移",
+    "qualityNeedsAttention": "需要注意",
+    "reorderFailed": "无法保存新的曲目顺序，已恢复原有顺序。",
     "deleteTrack": "删除曲目",
     "deleteTrackConfirm": "删除 {title}？此操作无法撤销。",
     "portal": "门户",

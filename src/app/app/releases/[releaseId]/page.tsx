@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
 import { getSignedAudioUrls, extractStoragePath } from "@/lib/storage-urls";
+import { computeQualitySnapshot } from "@/components/ui/audio-player-shared";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button, IconButton } from "@/components/ui/button";
@@ -145,11 +146,17 @@ export default async function ReleasePage({ params, searchParams }: Props) {
   const trackIds = (tracks ?? []).map((t: Record<string, unknown>) => t.id as string);
   let flowTracks: FlowTrack[] = [];
   let flowHiddenCount = 0;
+  const qualityByTrack = new Map<
+    string,
+    { lufs: number | null; issueCount: number }
+  >();
 
   if (trackIds.length > 0) {
     const { data: audioVersions } = await supabase
       .from("track_audio_versions")
-      .select("id, track_id, version_number, audio_url, duration_seconds, waveform_peaks")
+      .select(
+        "id, track_id, version_number, audio_url, duration_seconds, waveform_peaks, measured_lufs, clip_sample_count, sample_peak_dbfs, dc_offset",
+      )
       .in("track_id", trackIds)
       .order("version_number", { ascending: false });
 
@@ -159,6 +166,22 @@ export default async function ReleasePage({ params, searchParams }: Props) {
       for (const av of audioVersions) {
         if (!latestByTrack.has(av.track_id)) {
           latestByTrack.set(av.track_id, av);
+        }
+      }
+
+      // Surface the latest version's worker analysis on the track list so a
+      // passing or failing upload is visible without opening each track.
+      for (const [trackId, av] of latestByTrack) {
+        const snapshot = computeQualitySnapshot({
+          clipSampleCount: av.clip_sample_count,
+          samplePeakDbfs: av.sample_peak_dbfs,
+          dcOffset: av.dc_offset,
+        });
+        if (av.measured_lufs != null || snapshot != null) {
+          qualityByTrack.set(trackId, {
+            lufs: av.measured_lufs,
+            issueCount: snapshot?.issues.length ?? 0,
+          });
         }
       }
 
@@ -342,6 +365,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                           intentPreview: intent?.mix_vision,
                           portalApprovalStatus: portalApprovalMap[t.id as string] ?? null,
                           latestAudioUrl: latestAudioByTrack.get(t.id as string) ?? null,
+                          quality: qualityByTrack.get(t.id as string) ?? null,
                         };
                       })}
                       canReorder={canEdit(role)}

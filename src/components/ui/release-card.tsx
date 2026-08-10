@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MoreVertical, Pencil, Trash2, Music, Pin } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Music, Pin, AlertTriangle } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { StatusIndicator } from "@/components/ui/status-dot";
 import { Pill } from "@/components/ui/pill";
@@ -37,6 +37,9 @@ type Props = {
   role?: ReleaseRole;
   hasNotes?: boolean;
   submissionStatus?: "pending" | "approved" | "declined";
+  /** Tracks on this release whose latest upload has a detected audio
+   *  quality issue (clipping, full-scale peak, DC offset). */
+  audioWarnings?: number;
   className?: string;
 };
 
@@ -68,7 +71,7 @@ export function ReleaseCard({
   id, title, artist, releaseType, format, status,
   trackCount, completedTracks, updatedAt,
   paymentStatus, feeTotal, paidAmount, balance, feeCurrency, paymentsEnabled,
-  coverArtUrl, pinned, role, hasNotes, submissionStatus, className,
+  coverArtUrl, pinned, role, hasNotes, submissionStatus, audioWarnings, className,
 }: Props) {
   const locale = useLocale();
   const tCard = useTranslations("releases.card");
@@ -330,8 +333,14 @@ export function ReleaseCard({
         </div>
 
         <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted">
-          <span className="">
+          <span className="inline-flex items-center gap-2">
             {tCard("tracksBriefed", { completed: completedTracks, total: trackCount })}
+            {(audioWarnings ?? 0) > 0 && (
+              <span className="inline-flex items-center gap-1 text-warning font-medium">
+                <AlertTriangle size={11} />
+                {tCard("audioWarnings", { count: audioWarnings ?? 0 })}
+              </span>
+            )}
           </span>
           <div className="flex items-center gap-2">
             {paymentsEnabled && paymentStatus && paymentStatus !== "no_fee" && (

@@ -245,6 +245,7 @@
       "deleteConfirm": "{title} löschen? Dies kann nicht rückgängig gemacht werden.",
       "releaseOptions": "Release-Optionen",
       "tracksBriefed": "{completed} von {total} {total, plural, one {Track} other {Tracks}} mit Briefing",
+      "audioWarnings": "{count, plural, one {# Audio-Warnung} other {# Audio-Warnungen}}",
       "statusReady": "Bereit",
       "statusInProgress": "In Bearbeitung",
       "statusDraft": "Entwurf"
@@ -333,6 +334,8 @@
     "trackNotStarted": "Nicht begonnen",
     "moveUp": "Nach oben",
     "moveDown": "Nach unten",
+    "qualityNeedsAttention": "Prüfung nötig",
+    "reorderFailed": "Die neue Reihenfolge konnte nicht gespeichert werden. Deine Tracks wurden wiederhergestellt.",
     "deleteTrack": "Titel löschen",
     "deleteTrackConfirm": "{title} löschen? Dies kann nicht rückgängig gemacht werden.",
     "portal": "Portal",

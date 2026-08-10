@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabaseServerClient";
+import { computeQualitySnapshot } from "@/components/ui/audio-player-shared";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
@@ -197,6 +198,45 @@ export default async function DashboardPage({ searchParams }: Props) {
     }
   }
 
+  // Count audio-quality warnings per release (latest version per track) so
+  // the worker's upload analysis is visible from the dashboard, not just
+  // buried on the track's Audio tab.
+  const audioWarningsByRelease = new Map<string, number>();
+  {
+    const releaseByTrack = new Map<string, string>();
+    for (const r of releases ?? []) {
+      for (const tr of (r.tracks as { id: string }[] | null) ?? []) {
+        releaseByTrack.set(tr.id, r.id as string);
+      }
+    }
+    if (releaseByTrack.size > 0) {
+      const { data: versions } = await supabase
+        .from("track_audio_versions")
+        .select(
+          "track_id, version_number, clip_sample_count, sample_peak_dbfs, dc_offset",
+        )
+        .in("track_id", [...releaseByTrack.keys()])
+        .order("version_number", { ascending: false });
+      const seenTracks = new Set<string>();
+      for (const v of versions ?? []) {
+        if (seenTracks.has(v.track_id)) continue;
+        seenTracks.add(v.track_id);
+        const snapshot = computeQualitySnapshot({
+          clipSampleCount: v.clip_sample_count,
+          samplePeakDbfs: v.sample_peak_dbfs,
+          dcOffset: v.dc_offset,
+        });
+        if (snapshot && snapshot.issues.length > 0) {
+          const rid = releaseByTrack.get(v.track_id)!;
+          audioWarningsByRelease.set(
+            rid,
+            (audioWarningsByRelease.get(rid) ?? 0) + 1,
+          );
+        }
+      }
+    }
+  }
+
   let outstandingTotal = 0;
   let outstandingCount = 0;
   let earnedTotal = 0;
@@ -342,6 +382,7 @@ export default async function DashboardPage({ searchParams }: Props) {
               role="owner"
               hasNotes={!!r.internal_notes}
               submissionStatus={submissionStatusByRelease.get(r.id as string)}
+              audioWarnings={audioWarningsByRelease.get(r.id as string) ?? 0}
             />
             </div>
           );
@@ -528,6 +569,7 @@ export default async function DashboardPage({ searchParams }: Props) {
                   pinned={r.pinned as boolean}
                   role={(memberRole as "collaborator" | "client") ?? "client"}
                   submissionStatus={submissionStatusByRelease.get(r.id as string)}
+                  audioWarnings={audioWarningsByRelease.get(r.id as string) ?? 0}
                 />
               );
             })}

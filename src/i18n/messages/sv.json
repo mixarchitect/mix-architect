@@ -245,6 +245,7 @@
       "deleteConfirm": "Ta bort {title}? Detta kan inte ångras.",
       "releaseOptions": "Releasealternativ",
       "tracksBriefed": "{completed} av {total} {total, plural, one {spår} other {spår}} instruerade",
+      "audioWarnings": "{count, plural, one {# ljudvarning} other {# ljudvarningar}}",
       "statusReady": "Klar",
       "statusInProgress": "Pågår",
       "statusDraft": "Utkast"
@@ -337,6 +338,8 @@
     "trackNotStarted": "Ej påbörjad",
     "moveUp": "Flytta upp",
     "moveDown": "Flytta ner",
+    "qualityNeedsAttention": "Behöver ses över",
+    "reorderFailed": "Den nya ordningen kunde inte sparas. Dina spår återställdes.",
     "deleteTrack": "Ta bort spår",
     "deleteTrackConfirm": "Ta bort {title}? Detta kan inte ångras.",
     "portal": "Portal",

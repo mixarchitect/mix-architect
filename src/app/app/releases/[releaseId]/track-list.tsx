@@ -4,8 +4,9 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { GripVertical, ChevronUp, ChevronDown, Trash2, Check, MessageCircle, Package } from "lucide-react";
+import { GripVertical, ChevronUp, ChevronDown, Trash2, Check, MessageCircle, Package, AlertTriangle } from "lucide-react";
 import { StatusDot } from "@/components/ui/status-dot";
+import { useToast } from "@/components/ui/toast";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { cn } from "@/lib/cn";
 
@@ -20,6 +21,10 @@ type TrackItem = {
    *  hover/focus warms up the browser HTTP cache so the audio is
    *  ready to play by the time the user clicks through. */
   latestAudioUrl?: string | null;
+  /** Worker-measured quality of the latest audio version. Surfaces the
+   *  analysis upstream of the track page so a passing or failing upload
+   *  is visible from the release without opening every track. */
+  quality?: { lufs: number | null; issueCount: number } | null;
 };
 
 type Props = {
@@ -64,6 +69,7 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
   const prefetchedRef = useRef<Set<string>>(new Set());
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const router = useRouter();
+  const { toast } = useToast();
 
   // Hover/focus prefetch: warm the browser's HTTP cache for the
   // track's audio file as soon as the user signals interest. By the
@@ -130,6 +136,7 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
       if (results.some((r) => r.error)) throw new Error("Reorder failed");
     } catch {
       setLocalTracks(prevTracks);
+      toast(t("reorderFailed"), { variant: "error" });
     }
   }
 
@@ -159,6 +166,7 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
       if (r1.error || r2.error) throw new Error("Reorder failed");
     } catch {
       setLocalTracks(prevTracks);
+      toast(t("reorderFailed"), { variant: "error" });
     }
   }
 
@@ -248,6 +256,20 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
               <div className="font-semibold text-text text-sm group-hover:text-signal transition-colors truncate">
                 {track.title}
               </div>
+              {track.quality &&
+                (track.quality.lufs != null || track.quality.issueCount > 0) && (
+                  <div className="flex items-center gap-2 text-xs text-faint mt-0.5">
+                    {track.quality.lufs != null && (
+                      <span>{track.quality.lufs.toFixed(1)} LUFS</span>
+                    )}
+                    {track.quality.issueCount > 0 && (
+                      <span className="inline-flex items-center gap-1 text-warning font-medium">
+                        <AlertTriangle size={11} />
+                        {t("qualityNeedsAttention")}
+                      </span>
+                    )}
+                  </div>
+                )}
             </div>
             {track.portalApprovalStatus && track.portalApprovalStatus !== "awaiting_review" && (
               <PortalApprovalBadge status={track.portalApprovalStatus} />

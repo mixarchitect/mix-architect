@@ -245,6 +245,7 @@
       "deleteConfirm": "{title}을(를) 삭제하시겠습니까? 이는 되돌릴 수 없습니다.",
       "releaseOptions": "릴리스 옵션",
       "tracksBriefed": "{total, plural, one {트랙} other {트랙}} {total}개 중 {completed}개 브리프 완료",
+      "audioWarnings": "{count, plural, other {오디오 경고 #개}}",
       "statusReady": "준비 완료",
       "statusInProgress": "진행 중",
       "statusDraft": "초안"
@@ -337,6 +338,8 @@
     "trackNotStarted": "미시작",
     "moveUp": "위로 이동",
     "moveDown": "아래로 이동",
+    "qualityNeedsAttention": "확인 필요",
+    "reorderFailed": "새 트랙 순서를 저장하지 못했습니다. 트랙이 원래대로 복원되었습니다.",
     "deleteTrack": "트랙 삭제",
     "deleteTrackConfirm": "{title}을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
     "portal": "포털",

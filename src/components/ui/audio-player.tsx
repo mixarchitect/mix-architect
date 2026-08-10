@@ -228,8 +228,10 @@ export function AudioPlayer({
   const [showStreamingInfo, setShowStreamingInfo] = useState(false);
   const [showTruePeakInfo, setShowTruePeakInfo] = useState(false);
   const [showQualityInfo, setShowQualityInfo] = useState(false);
-  const lufsBadgeRef = useRef<HTMLSpanElement | null>(null);
-  const truePeakBadgeRef = useRef<HTMLSpanElement | null>(null);
+  // Anchored to the trigger buttons since the compact delta badges were
+  // removed (the expanded popovers carry the per-platform deltas).
+  const lufsBadgeRef = useRef<HTMLButtonElement | null>(null);
+  const truePeakBadgeRef = useRef<HTMLButtonElement | null>(null);
   // qualityBadgeRef is already on the wrapper span (the quality pill
   // doesn't have a separate delta badge), so it doubles as the trigger
   // ref for click-outside — no separate qualityTriggerRef needed.
@@ -1265,10 +1267,8 @@ export function AudioPlayer({
           {(measuredLufs != null ||
             measuredTruePeak != null ||
             (qualitySnapshot != null && qualitySnapshot.issues.length > 0)) && (
-            <span className="ml-auto inline-flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[10px]">
-              {measuredLufs != null && (() => {
-                const delta = measuredLufs - LUFS_REFERENCE;
-                return (
+            <span className="ml-auto inline-flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs">
+              {measuredLufs != null && (
                   <span ref={lufsTriggerRef} className="inline-flex items-center gap-1.5">
                     <span className="text-faint">·</span>
                     <button
@@ -1285,9 +1285,12 @@ export function AudioPlayer({
                         setShowQualityInfo(false);
                         setShowStreamingInfo((v) => !v);
                       }}
+                      ref={lufsBadgeRef}
                       className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
                       title="Show streaming normalization"
+                      aria-expanded={showStreamingInfo}
                     >
+                      <span className="text-faint font-medium">Loudness</span>
                       {measuredLufs.toFixed(1)} LUFS
                       <ChevronDown
                         size={10}
@@ -1297,22 +1300,8 @@ export function AudioPlayer({
                         )}
                       />
                     </button>
-                    <span
-                      ref={lufsBadgeRef}
-                      className={cn(
-                        "px-1.5 py-px rounded text-[10px]",
-                        Math.abs(delta) <= 0.5
-                          ? "bg-status-green/10 text-status-green"
-                          : Math.abs(delta) <= 1.5
-                            ? "bg-signal-muted text-signal"
-                            : "bg-red-500/10 text-red-500",
-                      )}
-                    >
-                      {delta > 0 ? "+" : ""}{delta.toFixed(1)} dB
-                    </span>
                   </span>
-                );
-              })()}
+              )}
               {measuredTruePeak != null && (() => {
                 // True peak is a ceiling: below common target (-1 dBTP) is safe,
                 // above it risks lossy-codec clipping, above 0 is inter-sample
@@ -1320,14 +1309,10 @@ export function AudioPlayer({
                 const headroom = TRUE_PEAK_CEILING - measuredTruePeak;
                 const colorClass =
                   measuredTruePeak > 0
-                    ? "bg-red-500/10 text-red-500"
+                    ? "text-danger"
                     : measuredTruePeak > TRUE_PEAK_CEILING
-                      ? "bg-signal-muted text-signal"
-                      : "bg-status-green/10 text-status-green";
-                const badgeText =
-                  headroom >= 0
-                    ? `${headroom.toFixed(1)} dB`
-                    : `+${Math.abs(headroom).toFixed(1)} dB`;
+                      ? "text-signal"
+                      : "text-muted";
                 return (
                   <span ref={truePeakTriggerRef} className="inline-flex items-center gap-1.5">
                     <span className="text-faint">·</span>
@@ -1345,9 +1330,19 @@ export function AudioPlayer({
                         setShowQualityInfo(false);
                         setShowTruePeakInfo((v) => !v);
                       }}
-                      className="inline-flex items-center gap-1 text-muted hover:text-text transition-colors"
-                      title="Show true peak targets"
+                      ref={truePeakBadgeRef}
+                      className={cn(
+                        "inline-flex items-center gap-1 hover:text-text transition-colors",
+                        colorClass,
+                      )}
+                      title={
+                        headroom >= 0
+                          ? `${headroom.toFixed(1)} dB below the ${TRUE_PEAK_CEILING} dBTP ceiling`
+                          : `${Math.abs(headroom).toFixed(1)} dB over the ${TRUE_PEAK_CEILING} dBTP ceiling`
+                      }
+                      aria-expanded={showTruePeakInfo}
                     >
+                      <span className="text-faint font-medium">True peak</span>
                       {measuredTruePeak.toFixed(1)} dBTP
                       <ChevronDown
                         size={10}
@@ -1357,17 +1352,6 @@ export function AudioPlayer({
                         )}
                       />
                     </button>
-                    <span
-                      ref={truePeakBadgeRef}
-                      className={cn("px-1.5 py-px rounded text-[10px]", colorClass)}
-                      title={
-                        headroom >= 0
-                          ? `${headroom.toFixed(1)} dB below the ${TRUE_PEAK_CEILING} dBTP ceiling`
-                          : `${Math.abs(headroom).toFixed(1)} dB over the ${TRUE_PEAK_CEILING} dBTP ceiling`
-                      }
-                    >
-                      {badgeText}
-                    </span>
                   </span>
                 );
               })()}
@@ -1402,12 +1386,13 @@ export function AudioPlayer({
                         setShowQualityInfo((v) => !v);
                       }}
                       className={cn(
-                        "inline-flex items-center gap-1 px-1.5 py-px rounded text-[10px] transition-colors",
+                        "inline-flex items-center gap-1 px-1.5 py-px rounded text-xs transition-colors",
                         colorClass,
                       )}
                       title="Show audio quality issues"
+                      aria-expanded={showQualityInfo}
                     >
-                      <AlertTriangle size={10} />
+                      <AlertTriangle size={11} />
                       {label}
                       <ChevronDown
                         size={10}
@@ -1751,7 +1736,12 @@ export function AudioPlayer({
               })}
             </tbody>
           </table>
-          <div className="h-1.5" />
+          <a
+            href="/app/help?article=track-tabs"
+            className="block px-3 pt-1.5 pb-2 text-[11px] text-signal hover:underline"
+          >
+            What do these numbers mean?
+          </a>
         </div>
       )}
 
@@ -1804,7 +1794,12 @@ export function AudioPlayer({
               })}
             </tbody>
           </table>
-          <div className="h-1.5" />
+          <a
+            href="/app/help?article=track-tabs"
+            className="block px-3 pt-1.5 pb-2 text-[11px] text-signal hover:underline"
+          >
+            What do these numbers mean?
+          </a>
         </div>
       )}
 

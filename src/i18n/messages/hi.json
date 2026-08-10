@@ -245,6 +245,7 @@
       "deleteConfirm": "{title} डिलीट करें? यह अंडू नहीं हो सकता।",
       "releaseOptions": "रिलीज़ ऑप्शन",
       "tracksBriefed": "{total} में से {completed} {total, plural, one {ट्रैक} other {ट्रैक}} ब्रीफ किए गए",
+      "audioWarnings": "{count, plural, one {# ऑडियो चेतावनी} other {# ऑडियो चेतावनियां}}",
       "statusReady": "रेडी",
       "statusInProgress": "प्रोग्रेस में",
       "statusDraft": "ड्राफ्ट"
@@ -337,6 +338,8 @@
     "trackNotStarted": "शुरू नहीं हुआ",
     "moveUp": "ऊपर ले जाएँ",
     "moveDown": "नीचे ले जाएँ",
+    "qualityNeedsAttention": "ध्यान दें",
+    "reorderFailed": "नया क्रम सहेजा नहीं जा सका। आपके ट्रैक पहले जैसे कर दिए गए।",
     "deleteTrack": "ट्रैक डिलीट करें",
     "deleteTrackConfirm": "{title} डिलीट करें? यह पूर्ववत नहीं किया जा सकता।",
     "portal": "पोर्टल",
