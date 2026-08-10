@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { ThemeProvider } from "@/lib/theme-provider";
 
 /**
- * Async Server Component that reads the CSP nonce from middleware
+ * Async Server Component that reads the CSP nonce from the proxy
  * and passes it to the client-side ThemeProvider.
  *
  * Awaiting headers() here opts every route into dynamic rendering (the

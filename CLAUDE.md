@@ -39,7 +39,7 @@ A public unauthenticated read should use the anon client + RLS policies, not the
 
 ## Auth & access control
 
-- Middleware (`src/middleware.ts`) gates `/app/**` and sets the CSP.
+- The proxy (`src/proxy.ts`, Next.js 16's rename of middleware) gates `/app/**` and sets the CSP.
 - `/admin/**` gates via `requireAdmin()` in `src/app/admin/layout.tsx`.
 - API routes that mutate state (admin POSTs, etc.) MUST use `requireSameOrigin(req)` from `src/lib/origin-check.ts`.
 - Sensitive admin POSTs also rate-limit via `rateLimit(...)` from `src/lib/rate-limit.ts`.

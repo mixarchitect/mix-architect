@@ -52,7 +52,7 @@ function buildCsp(): string {
   ].join("; ");
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = NextResponse.next({ request });
 
   // Expose pathname so server components (e.g. app layout) can read it
