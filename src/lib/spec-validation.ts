@@ -95,6 +95,43 @@ export function formatChannels(channels: number): string {
   return `${channels}ch`;
 }
 
+/**
+ * Normalize the sample-rate label variants that grew across stores
+ * ("48kHz" in user_defaults, "48 kHz" in track_specs) to the canonical
+ * track_specs spelling. Returns null for unrecognized input.
+ */
+export function normalizeSampleRateLabel(
+  value: string | null | undefined,
+): string | null {
+  if (!value) return null;
+  const compact = value.replace(/\s+/g, "").toLowerCase();
+  const map: Record<string, string> = {
+    "44.1khz": "44.1 kHz",
+    "48khz": "48 kHz",
+    "88.2khz": "88.2 kHz",
+    "96khz": "96 kHz",
+    "176.4khz": "176.4 kHz",
+    "192khz": "192 kHz",
+  };
+  return map[compact] ?? null;
+}
+
+export function normalizeBitDepthLabel(
+  value: string | null | undefined,
+): string | null {
+  if (!value) return null;
+  const compact = value.replace(/\s+/g, "").toLowerCase();
+  const map: Record<string, string> = {
+    "16-bit": "16-bit",
+    "16bit": "16-bit",
+    "24-bit": "24-bit",
+    "24bit": "24-bit",
+    "32-bitfloat": "32-bit float",
+    "32bitfloat": "32-bit float",
+  };
+  return map[compact] ?? null;
+}
+
 /** Check whether any target specs are configured on a track. */
 export function hasTargetSpecs(target: TrackTargetSpecs): boolean {
   return (

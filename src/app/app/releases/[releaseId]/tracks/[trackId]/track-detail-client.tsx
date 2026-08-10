@@ -64,6 +64,21 @@ function parseBitDepthInt(label: string): number | null {
   return map[label] ?? null;
 }
 
+function sampleRateIntToLabel(hz: number | null): string | null {
+  const map: Record<number, string> = {
+    44100: "44.1 kHz", 48000: "48 kHz", 88200: "88.2 kHz",
+    96000: "96 kHz", 176400: "176.4 kHz", 192000: "192 kHz",
+  };
+  return hz != null ? (map[hz] ?? null) : null;
+}
+
+function bitDepthIntToLabel(bits: number | null): string | null {
+  const map: Record<number, string> = {
+    16: "16-bit", 24: "24-bit", 32: "32-bit float",
+  };
+  return bits != null ? (map[bits] ?? null) : null;
+}
+
 type TrackData = {
   id: string;
   title: string;
@@ -215,14 +230,28 @@ export function TrackDetailClient({
   const [antiRefs, setAntiRefs] = useState(intent?.anti_references ?? "");
 
   const [formatOverride, setFormatOverride] = useState(specs?.format_override ?? "");
-  const [sampleRate, setSampleRate] = useState(specs?.sample_rate ?? "48kHz");
-  const [bitDepth, setBitDepth] = useState(specs?.bit_depth ?? "24-bit");
+  const [sampleRate, setSampleRate] = useState(
+    specs?.sample_rate ?? sampleRateIntToLabel(track.target_sample_rate) ?? "48 kHz",
+  );
+  const [bitDepth, setBitDepth] = useState(
+    specs?.bit_depth ?? bitDepthIntToLabel(track.target_bit_depth) ?? "24-bit",
+  );
   const [deliveryFormats, setDeliveryFormats] = useState<string[]>(specs?.delivery_formats ?? []);
   const [specialReqs, setSpecialReqs] = useState(specs?.special_reqs ?? "");
 
   // ── Target delivery specs (validated against uploads) ──
-  const [targetSampleRate, setTargetSampleRate] = useState<number | null>(track.target_sample_rate);
-  const [targetBitDepth, setTargetBitDepth] = useState<number | null>(track.target_bit_depth);
+  // track_specs is canonical for sample rate + bit depth; tracks.target_* is a
+  // legacy mirror kept dual-written for older readers. Reading specs first is
+  // what keeps the Brief tab and the upload-mismatch banner in agreement
+  // (migration 087 re-aligns legacy rows where the two stores diverged).
+  const [targetSampleRate, setTargetSampleRate] = useState<number | null>(
+    (specs?.sample_rate != null ? parseSampleRateInt(specs.sample_rate) : null) ??
+      track.target_sample_rate,
+  );
+  const [targetBitDepth, setTargetBitDepth] = useState<number | null>(
+    (specs?.bit_depth != null ? parseBitDepthInt(specs.bit_depth) : null) ??
+      track.target_bit_depth,
+  );
   const [targetChannels, setTargetChannels] = useState<number | null>(track.target_channels);
   const [targetFormat, setTargetFormat] = useState<string | null>(track.target_format);
 

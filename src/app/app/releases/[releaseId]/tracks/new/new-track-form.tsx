@@ -4,6 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import {
+  normalizeBitDepthLabel,
+  normalizeSampleRateLabel,
+} from "@/lib/spec-validation";
 import { Panel, PanelBody, PanelHeader } from "@/components/ui/panel";
 import { Button } from "@/components/ui/button";
 import { Rule } from "@/components/ui/rule";
@@ -30,13 +34,28 @@ export function NewTrackForm({ releaseId }: Props) {
     setLoading(true);
 
     try {
-      const { data: maxTrack } = await supabase
-        .from("tracks")
-        .select("track_number")
-        .eq("release_id", releaseId)
-        .order("track_number", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      const [{ data: maxTrack }, { data: defaults }] = await Promise.all([
+        supabase
+          .from("tracks")
+          .select("track_number")
+          .eq("release_id", releaseId)
+          .order("track_number", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("user_defaults")
+          .select("default_sample_rate, default_bit_depth")
+          .maybeSingle(),
+      ]);
+
+      // Seed the track's target specs from the user's Mix Defaults so the
+      // upload validator has a target from day one (labels normalized: the
+      // settings store spells them without spaces).
+      const specSeed: Record<string, unknown> = {};
+      const seedRate = normalizeSampleRateLabel(defaults?.default_sample_rate);
+      const seedDepth = normalizeBitDepthLabel(defaults?.default_bit_depth);
+      if (seedRate) specSeed.sample_rate = seedRate;
+      if (seedDepth) specSeed.bit_depth = seedDepth;
 
       let nextNumber = (maxTrack?.track_number ?? 0) + 1;
 
@@ -55,7 +74,7 @@ export function NewTrackForm({ releaseId }: Props) {
 
         await Promise.all([
           supabase.from("track_intent").insert({ track_id: track.id }),
-          supabase.from("track_specs").insert({ track_id: track.id }),
+          supabase.from("track_specs").insert({ track_id: track.id, ...specSeed }),
         ]);
 
         router.push(`/app/releases/${releaseId}/tracks/${track.id}`);
@@ -81,7 +100,9 @@ export function NewTrackForm({ releaseId }: Props) {
           if (track) {
             await Promise.all([
               supabase.from("track_intent").insert({ track_id: track.id }),
-              supabase.from("track_specs").insert({ track_id: track.id }),
+              supabase
+                .from("track_specs")
+                .insert({ track_id: track.id, ...specSeed }),
             ]);
           }
         }
