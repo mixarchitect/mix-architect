@@ -37,7 +37,10 @@ export function Rail() {
       aria-label="App navigation"
       className={cn(
         "group/rail hidden md:flex fixed left-0 top-14 z-20",
-        "w-14 hover:w-48 overflow-hidden",
+        // Icon-only with hover-expand on mid-size screens; labels are
+        // permanent from xl up so the six destinations are identifiable
+        // without hovering.
+        "w-14 hover:w-48 xl:w-48 overflow-hidden",
         "bg-panel border-r border-border",
         "flex-col py-3 gap-1",
         "transition-[width] duration-200 ease-out",
@@ -109,7 +112,7 @@ function NavItem({
         <span className="w-6 h-10 grid place-items-center shrink-0">
           <Icon size={20} strokeWidth={1.5} />
         </span>
-        <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover/rail:opacity-100 transition-opacity duration-150 delay-75">
+        <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover/rail:opacity-100 xl:opacity-100 transition-opacity duration-150 delay-75">
           {label}
         </span>
       </Link>

@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useCallback, type CSSProperties } from "react";
+import { useState, useCallback, useEffect, type CSSProperties } from "react";
+import { useTheme } from "next-themes";
+import { accentUsableOn } from "@/lib/color-contrast";
 import { PortalHeader } from "@/components/portal/portal-header";
 import { PortalTrackCard } from "@/components/portal/portal-track-card";
 import { PortalFooter } from "@/components/portal/portal-footer";
@@ -87,6 +89,20 @@ export function PortalClient({
     (share.show_direction && globalDirection) ||
     (share.show_references && globalRefs.length > 0);
 
+  // Contrast guard: the accent cascades into text and buttons, so a
+  // too-dark or too-light workspace color can render the client's portal
+  // unreadable (a real workspace picked #14465C, which sits at 1.36:1 on
+  // the dark panel). Below the 3:1 UI floor for the viewer's theme, keep
+  // the default teal instead of the branded color.
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const surface = resolvedTheme === "dark" ? "#1e1e1e" : "#ffffff";
+  const appliedAccent =
+    mounted && accentColor && accentUsableOn(accentColor, surface)
+      ? accentColor
+      : null;
+
   return (
     <main
       id="main-content"
@@ -95,7 +111,7 @@ export function PortalClient({
       // Override the teal accent with the workspace's color (Pro/Studio
       // branding). Cascades to every `bg-signal` / `text-signal` /
       // var(--signal) descendant on the portal.
-      style={accentColor ? ({ "--signal": accentColor } as CSSProperties) : undefined}
+      style={appliedAccent ? ({ "--signal": appliedAccent } as CSSProperties) : undefined}
     >
       <div className="max-w-3xl mx-auto">
         {/* ═══ Zone 1: Release Header ═══ */}

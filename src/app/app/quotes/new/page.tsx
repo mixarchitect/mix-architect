@@ -21,12 +21,15 @@ export default async function NewQuotePage({
     getTranslations("quotes"),
   ]);
 
-  // Get user defaults for currency
+  // Same access rule as /app/money: invoicing is part of payment tracking,
+  // so the nav-hidden state and the route agree instead of the URL quietly
+  // bypassing the persona configuration.
   const { data: defaults } = await supabase
     .from("user_defaults")
-    .select("default_currency")
+    .select("default_currency, payments_enabled")
     .eq("user_id", user.id)
     .maybeSingle();
+  if (!defaults?.payments_enabled) redirect("/app");
 
   // Get releases for dropdown
   const { data: releases } = await supabase

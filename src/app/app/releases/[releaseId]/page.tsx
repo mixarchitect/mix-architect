@@ -8,7 +8,7 @@ import { Panel, PanelBody } from "@/components/ui/panel";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TrackList } from "./track-list";
-import { Plus, Settings, ArrowLeft, ListMusic, DollarSign } from "lucide-react";
+import { Plus, Settings, ArrowLeft, ListMusic, DollarSign, FileText } from "lucide-react";
 import { PortalToggle } from "./portal-toggle";
 import { CoverArtEditor, GlobalDirectionEditor, GlobalReferencesEditor, StatusEditor, ReleaseNotesEditor, ClientNotesEditor } from "./sidebar-editors";
 import { ExpensePanel } from "@/components/expenses/expense-panel";
@@ -300,9 +300,14 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           {release.target_date && (
             <CalendarExportButton releaseId={releaseId} />
           )}
+          <Link href={`/app/releases/${releaseId}/brief`}>
+            <IconButton size="sm" title={t("viewBrief")} aria-label={t("viewBrief")}>
+              <FileText size={14} />
+            </IconButton>
+          </Link>
           {canEdit(role) && (
             <Link href={`/app/releases/${releaseId}/settings`}>
-              <IconButton size="sm" title={t("releaseSettings")}>
+              <IconButton size="sm" title={t("releaseSettings")} aria-label={t("releaseSettings")}>
                 <Settings size={14} />
               </IconButton>
             </Link>
@@ -324,6 +329,21 @@ export default async function ReleasePage({ params, searchParams }: Props) {
           <TabbedContent tabs={tabs} initialTab={currentTab}>
             {/* Tracks tab */}
             <div className="space-y-3">
+              {release.release_type === "single" &&
+                (tracks?.length ?? 0) > 1 &&
+                canEdit(role) && (
+                  <div className="flex items-center gap-2 rounded-md border border-warning/30 bg-warning/5 px-3 py-2 text-xs text-warning">
+                    <span>
+                      {t("singleTypeMismatch", { count: tracks?.length ?? 0 })}
+                    </span>
+                    <Link
+                      href={`/app/releases/${releaseId}/settings`}
+                      className="font-medium underline underline-offset-2 shrink-0"
+                    >
+                      {t("releaseSettings")}
+                    </Link>
+                  </div>
+                )}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <FlowSimulatorButton

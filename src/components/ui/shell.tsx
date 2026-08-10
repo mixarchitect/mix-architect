@@ -78,7 +78,7 @@ export function Shell({ userId, userEmail, displayName, paymentsEnabled = false,
           {/* Below top bar: sidebar + content */}
           <div className="flex flex-1 min-h-0">
             {/* Spacer for fixed-position Rail (desktop) */}
-            <div className="hidden md:block w-14 shrink-0" />
+            <div className="hidden md:block w-14 xl:w-48 shrink-0" />
             <Rail />
             <MobileNav userId={userId} userEmail={userEmail} onSearchClick={open} isAdmin={isAdmin} />
             <MainContent>{children}</MainContent>

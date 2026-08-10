@@ -150,6 +150,7 @@ export function ReleaseCard({
         <Link
           href={`/app/releases/${id}`}
           onClick={navigateToRelease}
+          aria-label={artist ? `${title} · ${artist}` : title}
           className="group min-w-0 flex-1 focus-visible:outline-none flex items-start gap-3"
         >
           <div
@@ -310,6 +311,8 @@ export function ReleaseCard({
       <Link
         href={`/app/releases/${id}`}
         onClick={navigateToRelease}
+        aria-label={artist ? `${title} · ${artist}` : title}
+        tabIndex={-1}
         className="group block focus-visible:outline-none"
       >
         <div className="mt-3 flex flex-wrap gap-1.5">

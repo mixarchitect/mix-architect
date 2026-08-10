@@ -13,8 +13,11 @@ import { Toolbar, ToolbarButton } from "@/components/ui/toolbar";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SectionErrorFallback } from "@/components/error-boundary";
 import { Home, Layers, Settings, Plus, ExternalLink, Music, ListMusic, Upload, Search, StickyNote, AlertTriangle } from "lucide-react";
+import { requireAdmin } from "@/lib/admin";
 
-export default function StyleguidePage() {
+export default async function StyleguidePage() {
+  // Internal design-system reference; was reachable by any signed-in user.
+  await requireAdmin();
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -87,9 +90,9 @@ export default function StyleguidePage() {
             <Button variant="secondary" disabled>Secondary disabled</Button>
           </div>
           <div className="flex flex-wrap gap-3 items-center">
-            <IconButton><Plus size={16} /></IconButton>
-            <IconButton><ExternalLink size={16} /></IconButton>
-            <IconButton variant="dark"><Settings size={16} /></IconButton>
+            <IconButton aria-label="Add"><Plus size={16} /></IconButton>
+            <IconButton aria-label="Open in new tab"><ExternalLink size={16} /></IconButton>
+            <IconButton variant="dark" aria-label="Settings"><Settings size={16} /></IconButton>
           </div>
         </PanelBody>
       </Panel>
