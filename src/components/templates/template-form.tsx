@@ -810,7 +810,7 @@ function RightsHolderRow({
       <div className="px-4 pb-3 border-t border-border pt-3 space-y-2">
         <div className="grid grid-cols-3 gap-2">
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">PRO (ASCAP/BMI)</label>
+            <label className="text-2xs text-faint">PRO (ASCAP/BMI)</label>
             <input
               type="text"
               value={holder.pro_org}
@@ -820,7 +820,7 @@ function RightsHolderRow({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">Member Account #</label>
+            <label className="text-2xs text-faint">Member Account #</label>
             <input
               type="text"
               value={holder.member_account}
@@ -830,7 +830,7 @@ function RightsHolderRow({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">Writer IPI</label>
+            <label className="text-2xs text-faint">Writer IPI</label>
             <input
               type="text"
               value={holder.writer_ipi}
@@ -842,7 +842,7 @@ function RightsHolderRow({
         </div>
         <div className="grid grid-cols-3 gap-2">
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">Publisher Name</label>
+            <label className="text-2xs text-faint">Publisher Name</label>
             <input
               type="text"
               value={holder.publisher_name}
@@ -852,7 +852,7 @@ function RightsHolderRow({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">Publisher Member ID</label>
+            <label className="text-2xs text-faint">Publisher Member ID</label>
             <input
               type="text"
               value={holder.publisher_member_id}
@@ -862,7 +862,7 @@ function RightsHolderRow({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">Publisher IPI</label>
+            <label className="text-2xs text-faint">Publisher IPI</label>
             <input
               type="text"
               value={holder.publisher_ipi}
@@ -874,7 +874,7 @@ function RightsHolderRow({
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">SoundExchange ID</label>
+            <label className="text-2xs text-faint">SoundExchange ID</label>
             <input
               type="text"
               value={holder.sound_exchange_id}
@@ -884,7 +884,7 @@ function RightsHolderRow({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">Label Name</label>
+            <label className="text-2xs text-faint">Label Name</label>
             <input
               type="text"
               value={holder.label_name}

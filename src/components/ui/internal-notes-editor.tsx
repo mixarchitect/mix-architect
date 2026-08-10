@@ -60,13 +60,13 @@ export function InternalNotesEditor({ label, initialValue, onSave, placeholder }
             <Lock size={11} className="text-amber-500" />
             {label}
           </div>
-          <span className="text-[10px] text-muted">
+          <span className="text-2xs text-muted">
             {saveState === "saving" && "Saving..."}
             {saveState === "saved" && "Saved"}
             {saveState === "error" && "Error"}
           </span>
         </div>
-        <p className="text-[10px] text-amber-500/70 mb-2">Only visible to you</p>
+        <p className="text-2xs text-amber-500/70 mb-2">Only visible to you</p>
         <textarea
           value={value}
           onChange={(e) => handleChange(e.target.value)}

@@ -1138,7 +1138,7 @@ export function TrackDetailClient({
                     <div className="flex items-center gap-2">
                       <label className="label text-muted">Composer / Songwriter</label>
                       {!composersManualRef.current && (
-                        <span className="text-[10px] text-faint">Auto-populated from writing splits</span>
+                        <span className="text-2xs text-faint">Auto-populated from writing splits</span>
                       )}
                     </div>
                     <input
@@ -1266,7 +1266,7 @@ export function TrackDetailClient({
               </div>
               <div className="flex justify-between text-sm items-center">
                 <span className="text-muted">Format</span>
-                <Pill className="text-[10px]">{formatLabel(formatOverride || releaseFormat)}</Pill>
+                <Pill className="text-2xs">{formatLabel(formatOverride || releaseFormat)}</Pill>
               </div>
             </PanelBody>
           </Panel>
@@ -1293,7 +1293,7 @@ export function TrackDetailClient({
                         key={p}
                         type="button"
                         onClick={() => setRefPlatform(p)}
-                        className={`flex-1 px-1.5 py-1 text-[10px] font-medium rounded transition-colors ${
+                        className={`flex-1 px-1.5 py-1 text-2xs font-medium rounded transition-colors ${
                           refPlatform === p
                             ? "bg-panel text-text border border-border-strong shadow-sm"
                             : "text-faint hover:text-muted"
@@ -1333,7 +1333,7 @@ export function TrackDetailClient({
                             )}
                             <div className="min-w-0 flex-1">
                               <div className="text-xs font-medium text-text truncate">{r.trackName}</div>
-                              <div className="text-[10px] text-muted truncate">{r.artistName}</div>
+                              <div className="text-2xs text-muted truncate">{r.artistName}</div>
                             </div>
                           </button>
                         ))}
@@ -1345,7 +1345,7 @@ export function TrackDetailClient({
                       <img src={refArtwork} alt="" className="w-10 h-10 rounded-[3px]" />
                       <div className="min-w-0 flex-1">
                         <div className="text-xs font-medium text-text truncate">{refTitle}</div>
-                        <div className="text-[10px] text-muted truncate">{refArtist}</div>
+                        <div className="text-2xs text-muted truncate">{refArtist}</div>
                       </div>
                     </div>
                   )}
@@ -1539,7 +1539,7 @@ function SplitEditor({
               >
                 {total.toFixed(2)}%
                 {!isValid && (
-                  <span className="text-[10px] ml-2 text-signal font-normal">
+                  <span className="text-2xs ml-2 text-signal font-normal">
                     Must equal 100%
                   </span>
                 )}
@@ -1700,7 +1700,7 @@ function SplitRow({
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-text truncate">{c.person_name}</div>
                     {(c.pro_org || c.label_name) && (
-                      <div className="text-[10px] text-muted truncate">{c.pro_org || c.label_name}</div>
+                      <div className="text-2xs text-muted truncate">{c.pro_org || c.label_name}</div>
                     )}
                   </div>
                 </button>
@@ -1761,7 +1761,7 @@ function SplitRow({
         <div className="px-3 md:px-4 pb-3 grid grid-cols-1 sm:grid-cols-3 gap-2 border-t border-border pt-3">
           {splitType === "writing" && (
             <div className="space-y-1">
-              <label className="text-[10px] text-faint">PRO (ASCAP/BMI)</label>
+              <label className="text-2xs text-faint">PRO (ASCAP/BMI)</label>
               <input
                 type="text"
                 value={localPro}
@@ -1773,7 +1773,7 @@ function SplitRow({
             </div>
           )}
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">
+            <label className="text-2xs text-faint">
               {splitType === "writing" ? "Member Account #" : "Publisher Member ID"}
             </label>
             <input
@@ -1786,7 +1786,7 @@ function SplitRow({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">
+            <label className="text-2xs text-faint">
               {splitType === "writing" ? "Writer IPI" : "Publisher IPI"}
             </label>
             <input
@@ -1803,7 +1803,7 @@ function SplitRow({
       {splitType === "master" && (
         <div className="px-3 md:px-4 pb-3 grid grid-cols-1 sm:grid-cols-2 gap-2 border-t border-border pt-3">
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">SoundExchange ID</label>
+            <label className="text-2xs text-faint">SoundExchange ID</label>
             <input
               type="text"
               value={localSeId}
@@ -1814,7 +1814,7 @@ function SplitRow({
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] text-faint">Label Name</label>
+            <label className="text-2xs text-faint">Label Name</label>
             <input
               type="text"
               value={localLabel}

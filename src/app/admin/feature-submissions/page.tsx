@@ -56,7 +56,7 @@ export default async function AdminFeatureSubmissionsPage({
                     <StatusPill status={sub.status} />
                   </div>
                   <p className="text-xs text-muted">{sub.artist_name}</p>
-                  <p className="text-[10px] text-zinc-500 mt-0.5">
+                  <p className="text-2xs text-zinc-500 mt-0.5">
                     {sub.track_count} {sub.track_count === 1 ? "track" : "tracks"} &middot;{" "}
                     {sub.release_type === "ep" ? "EP" : sub.release_type.charAt(0).toUpperCase() + sub.release_type.slice(1)}
                     {sub.submitter_name && <> &middot; Submitted by {sub.submitter_name}</>}
@@ -75,7 +75,7 @@ export default async function AdminFeatureSubmissionsPage({
                       {sub.genre_tags.slice(0, 5).map((tag) => (
                         <span
                           key={tag}
-                          className="text-[10px] px-1.5 py-0.5 rounded-full border border-white/8 text-zinc-500"
+                          className="text-2xs px-1.5 py-0.5 rounded-full border border-white/8 text-zinc-500"
                         >
                           {tag}
                         </span>
@@ -153,7 +153,7 @@ function StatusPill({ status }: { status: string }) {
 
   return (
     <span
-      className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full border ${colors[status] ?? ""}`}
+      className={`text-2xs font-medium px-1.5 py-0.5 rounded-full border ${colors[status] ?? ""}`}
     >
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>

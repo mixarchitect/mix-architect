@@ -113,14 +113,14 @@ export function QuotePortalClient({
           <div className="px-8 py-6 border-b border-[#e5e5e5]">
             <div className="grid grid-cols-2 gap-6 mb-5">
               <div>
-                <div className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1">From</div>
-                <div className="text-sm font-semibold text-[#0D9488] tracking-wide uppercase">
+                <div className="text-2xs font-semibold text-[#999] uppercase tracking-wider mb-1">From</div>
+                <div className="text-sm font-semibold text-signal tracking-wide uppercase">
                   {engineerName}
                 </div>
               </div>
               {(quote.client_name || quote.client_email) && (
                 <div>
-                  <div className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1">To</div>
+                  <div className="text-2xs font-semibold text-[#999] uppercase tracking-wider mb-1">To</div>
                   {quote.client_name && (
                     <div className="text-sm font-semibold text-[#1a1a1a]">{quote.client_name}</div>
                   )}
@@ -174,20 +174,20 @@ export function QuotePortalClient({
                     <div key={sq.id} className="flex items-center gap-1 flex-1">
                       <div className="flex flex-col items-center flex-1">
                         <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-2xs font-bold ${
                             isPaidStep
                               ? "bg-green-500 text-white"
                               : isCurrent
-                                ? "bg-[#0D9488] text-white"
+                                ? "bg-signal text-white"
                                 : "bg-[#e5e5e5] text-[#999]"
                           }`}
                         >
                           {isPaidStep ? "✓" : idx + 1}
                         </div>
-                        <div className="text-[10px] text-[#666] mt-1 text-center truncate max-w-[80px]">
+                        <div className="text-2xs text-[#666] mt-1 text-center truncate max-w-[80px]">
                           {sq.schedule_label ?? `Payment ${idx + 1}`}
                         </div>
-                        <div className="text-[10px] text-[#999]">
+                        <div className="text-2xs text-[#999]">
                           {currencyFormatter.format(Number(sq.total))}
                         </div>
                       </div>
@@ -318,7 +318,7 @@ export function QuotePortalClient({
                   onClick={handlePay}
                   disabled={loading}
                   className="w-full py-3 rounded-lg font-semibold text-white text-sm transition-colors"
-                  style={{ backgroundColor: loading ? "#999" : "#0D9488" }}
+                  style={{ backgroundColor: loading ? "#999" : "var(--signal)" }}
                 >
                   <span className="flex items-center justify-center gap-2">
                     <CreditCard size={16} />
@@ -336,7 +336,7 @@ export function QuotePortalClient({
 
         {/* Footer */}
         <div className="text-center mt-6 text-xs text-[#999]">
-          Powered by <a href="https://mixarchitect.com" className="text-[#0D9488] hover:underline">Mix Architect</a>
+          Powered by <a href="https://mixarchitect.com" className="text-signal hover:underline">Mix Architect</a>
         </div>
       </div>
     </div>

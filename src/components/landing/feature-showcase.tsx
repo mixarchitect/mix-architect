@@ -51,8 +51,8 @@ function FeatureSection({
 }) {
   const badgeColors = {
     teal: "bg-[#14B8A6]/15 text-[#5eead4] border-[#14B8A6]/20",
-    blue: "bg-[#3B82F6]/15 text-[#60A5FA] border-[#3B82F6]/20",
-    orange: "bg-[#FE5E0E]/15 text-[#FF6D22] border-[#FE5E0E]/20",
+    blue: "bg-status-blue/15 text-[#60A5FA] border-status-blue/20",
+    orange: "bg-status-orange/15 text-[#FF6D22] border-status-orange/20",
   };
 
   return (
@@ -118,7 +118,7 @@ function ReleasePlanningMock() {
               <span className="text-sm text-white/80">{t.title}</span>
             </div>
             <span
-              className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
+              className="text-2xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
               style={{
                 color: t.color,
                 background: `${t.color}15`,
@@ -165,7 +165,7 @@ function WebPortalMock() {
           >
             <div className="flex items-center gap-3">
               {t.approved ? (
-                <CheckCircle2 size={16} className="text-[#22C55E]" />
+                <CheckCircle2 size={16} className="text-status-green" />
               ) : (
                 <Clock size={16} className="text-white/60" />
               )}
@@ -173,7 +173,7 @@ function WebPortalMock() {
             </div>
             <span
               className={`text-xs font-medium ${
-                t.approved ? "text-[#22C55E]" : "text-white/60"
+                t.approved ? "text-status-green" : "text-white/60"
               }`}
             >
               {t.approved ? "Approved" : "Pending review"}
@@ -182,11 +182,11 @@ function WebPortalMock() {
         ))}
       </div>
       {/* Download gating notice */}
-      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#FE5E0E]/8 border border-[#FE5E0E]/15 mb-3">
+      <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-status-orange/8 border border-status-orange/15 mb-3">
         <span className="text-xs text-[#FF6D22]">
           Downloads available after payment
         </span>
-        <DollarSign size={12} className="text-[#FE5E0E]" />
+        <DollarSign size={12} className="text-status-orange" />
       </div>
       {/* Footer */}
       <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#14B8A6]/8 border border-[#14B8A6]/15">
@@ -243,13 +243,13 @@ function AudioReviewMock() {
         {/* Comment markers */}
         <div
           className="la-anim-marker absolute top-1 rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-bold"
-          style={{ left: "25%", background: "#FE5E0E", color: "#fff", animationDelay: "0ms" }}
+          style={{ left: "25%", background: "var(--status-orange)", color: "#fff", animationDelay: "0ms" }}
         >
           1
         </div>
         <div
           className="la-anim-marker absolute top-1 rounded-full w-4 h-4 flex items-center justify-center text-[8px] font-bold"
-          style={{ left: "58%", background: "#3B82F6", color: "#fff", animationDelay: "400ms" }}
+          style={{ left: "58%", background: "var(--status-blue)", color: "#fff", animationDelay: "400ms" }}
         >
           2
         </div>
@@ -257,7 +257,7 @@ function AudioReviewMock() {
       {/* Comments */}
       <div className="space-y-2">
         <div className="flex items-start gap-3 py-2 px-3 rounded-lg bg-white/4">
-          <MessageSquare size={14} className="text-[#FE5E0E] shrink-0 mt-0.5" />
+          <MessageSquare size={14} className="text-status-orange shrink-0 mt-0.5" />
           <div>
             <div className="text-xs text-white/60">
               0:47 &middot; Aria Voss
@@ -268,7 +268,7 @@ function AudioReviewMock() {
           </div>
         </div>
         <div className="flex items-start gap-3 py-2 px-3 rounded-lg bg-white/4">
-          <MessageSquare size={14} className="text-[#3B82F6] shrink-0 mt-0.5" />
+          <MessageSquare size={14} className="text-status-blue shrink-0 mt-0.5" />
           <div>
             <div className="text-xs text-white/60">
               1:32 &middot; Marcus Chen
@@ -345,7 +345,7 @@ function PaymentsMock() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/stripe-wordmark-white.png" alt="Stripe" className="h-5 w-auto opacity-70" />
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#635BFF]/15 text-[#a5a0ff]">
+        <span className="text-2xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#635BFF]/15 text-[#a5a0ff]">
           Connect
         </span>
       </div>
@@ -384,7 +384,7 @@ function TemplatesMock() {
         <div className="text-sm font-semibold text-white">
           Saved Templates
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#14B8A6]/15 text-[#5eead4]">
+        <span className="text-2xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#14B8A6]/15 text-[#5eead4]">
           PRO
         </span>
       </div>
@@ -404,19 +404,19 @@ function TemplatesMock() {
                   <div className="text-xs text-white/60">{t.artist}</div>
                 </div>
               </div>
-              <button className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/60 hover:bg-white/12 transition-colors flex items-center gap-1">
+              <button className="text-2xs font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/60 hover:bg-white/12 transition-colors flex items-center gap-1">
                 <Copy size={10} />
                 Apply
               </button>
             </div>
             <div className="flex gap-2 ml-[42px]">
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/60">
+              <span className="text-2xs px-2 py-0.5 rounded-full bg-white/6 text-white/60">
                 {t.tracks} {t.tracks === 1 ? "track" : "tracks"}
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/60">
+              <span className="text-2xs px-2 py-0.5 rounded-full bg-white/6 text-white/60">
                 {t.specs}
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#14B8A6]/12 text-[#14B8A6]">
+              <span className="text-2xs px-2 py-0.5 rounded-full bg-[#14B8A6]/12 text-[#14B8A6]">
                 {t.tier}
               </span>
             </div>
@@ -443,7 +443,7 @@ function DataExportMock() {
             <div className="text-xs text-white/60">24.8 MB</div>
           </div>
         </div>
-        <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#22C55E]/15 text-[#22C55E]">
+        <span className="text-2xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-status-green/15 text-status-green">
           Ready
         </span>
       </div>
@@ -508,7 +508,7 @@ function FlowSimulatorMock() {
           {["Condensed", "Full"].map((m, i) => (
             <span
               key={m}
-              className={`text-[10px] px-2 py-0.5 rounded-full ${
+              className={`text-2xs px-2 py-0.5 rounded-full ${
                 i === 0
                   ? "bg-[#14B8A6] text-[#1a1a1a] font-semibold"
                   : "bg-white/8 text-white/60"
@@ -566,7 +566,7 @@ function FlowSimulatorMock() {
           >
             <GripVertical size={12} className="text-white/60 shrink-0" />
             <div
-              className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold shrink-0"
+              className="w-5 h-5 rounded flex items-center justify-center text-2xs font-bold shrink-0"
               style={{ background: `${t.color}20`, color: t.color }}
             >
               {i + 1}
@@ -630,7 +630,7 @@ function DistributionTrackerMock() {
             Distribution Tracker
           </span>
         </div>
-        <button className="text-[10px] font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/60">
+        <button className="text-2xs font-medium px-2.5 py-1 rounded-lg bg-white/8 text-white/60">
           + Add Platform
         </button>
       </div>
@@ -658,12 +658,12 @@ function DistributionTrackerMock() {
             </div>
             <div className="flex items-center gap-2">
               {p.distributor && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/6 text-white/60">
+                <span className="text-2xs px-2 py-0.5 rounded-full bg-white/6 text-white/60">
                   {p.distributor}
                 </span>
               )}
               <span
-                className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                className="text-2xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
                 style={{
                   color: p.color,
                   background: `${p.color}15`,
@@ -729,7 +729,7 @@ function AnalyticsMock() {
               style={{ color: kpi.color }}
             />
             <div className="text-lg font-bold text-white">{kpi.value}</div>
-            <div className="text-[10px] text-white/60">{kpi.label}</div>
+            <div className="text-2xs text-white/60">{kpi.label}</div>
           </div>
         ))}
       </div>
@@ -774,10 +774,10 @@ function AnalyticsMock() {
           >
             <span className="text-xs text-white/70">{c.name}</span>
             <div className="flex items-center gap-3">
-              <span className="text-[10px] text-white/60">
+              <span className="text-2xs text-white/60">
                 {c.releases} releases
               </span>
-              <span className="text-xs font-medium text-[#22C55E]">
+              <span className="text-xs font-medium text-status-green">
                 {c.revenue}
               </span>
             </div>

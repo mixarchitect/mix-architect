@@ -162,7 +162,7 @@ function PendingBadge({
         type="button"
         onClick={() => setConfirmingWithdraw(true)}
         disabled={withdrawing}
-        className="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2"
+        className="text-2xs text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-2"
       >
         {withdrawing ? "..." : "Withdraw"}
       </button>
@@ -293,7 +293,7 @@ function SubmissionModal({
                   {releaseTitle}
                 </p>
                 <p className="text-xs text-muted truncate">{artist}</p>
-                <p className="text-[10px] text-zinc-500">
+                <p className="text-2xs text-zinc-500">
                   {trackCount} {trackCount === 1 ? "track" : "tracks"} &middot; {typeLabel}
                 </p>
               </div>
@@ -312,7 +312,7 @@ function SubmissionModal({
                 className="w-full bg-panel2 border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-teal-500/50 resize-none"
                 placeholder="Share what makes this release special..."
               />
-              <p className="text-[10px] text-zinc-600 text-right mt-1">
+              <p className="text-2xs text-zinc-600 text-right mt-1">
                 {pitchNote.length}/500
               </p>
             </div>
@@ -357,7 +357,7 @@ function SubmissionModal({
               </Button>
             </div>
 
-            <p className="text-[10px] text-zinc-600 text-center">
+            <p className="text-2xs text-zinc-600 text-center">
               Your submission will be reviewed by the Mix Architect team.
               We feature new releases on our blog weekly.
             </p>

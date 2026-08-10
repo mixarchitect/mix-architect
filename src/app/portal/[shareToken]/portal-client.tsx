@@ -139,7 +139,7 @@ export function PortalClient({
             <div className="border-t border-border px-5 py-5 space-y-4">
               {share.show_direction && globalDirection && (
                 <div>
-                  <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
+                  <div className="text-2xs text-faint font-medium uppercase tracking-wider mb-1.5">
                     Direction
                   </div>
                   <p className="text-sm text-text leading-relaxed italic">
@@ -149,7 +149,7 @@ export function PortalClient({
               )}
               {share.show_references && globalRefs.length > 0 && (
                 <div>
-                  <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1.5">
+                  <div className="text-2xs text-faint font-medium uppercase tracking-wider mb-1.5">
                     References
                   </div>
                   <div className="space-y-2">

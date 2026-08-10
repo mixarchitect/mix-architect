@@ -300,7 +300,7 @@ function QuoteRow({
             )}
             <span
               className={cn(
-                "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide shrink-0",
+                "inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-medium uppercase tracking-wide shrink-0",
                 STATUS_STYLES[quote.status] ?? STATUS_STYLES.draft,
               )}
             >

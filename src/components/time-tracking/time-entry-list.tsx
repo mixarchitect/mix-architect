@@ -167,7 +167,7 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
           <div className="rounded-lg border border-border p-3 space-y-2 mb-3">
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[10px] text-faint uppercase">Hours *</label>
+                <label className="text-2xs text-faint uppercase">Hours *</label>
                 <input
                   type="number"
                   step="0.25"
@@ -182,7 +182,7 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
                 />
               </div>
               <div>
-                <label className="text-[10px] text-faint uppercase">Rate/hr</label>
+                <label className="text-2xs text-faint uppercase">Rate/hr</label>
                 <input
                   type="number"
                   step="0.01"
@@ -246,7 +246,7 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
                 <div key={entry.id} className="rounded-lg border border-border p-3 space-y-2">
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[10px] text-faint uppercase">Hours</label>
+                      <label className="text-2xs text-faint uppercase">Hours</label>
                       <input
                         type="number"
                         step="0.25"
@@ -258,7 +258,7 @@ export function TimeEntryList({ releaseId, timeEntries: initialEntries, currency
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] text-faint uppercase">Rate/hr</label>
+                      <label className="text-2xs text-faint uppercase">Rate/hr</label>
                       <input
                         type="number"
                         step="0.01"

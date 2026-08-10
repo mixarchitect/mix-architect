@@ -1258,7 +1258,7 @@ function WorkflowsPanel() {
                     {t("then")} <span className="text-text font-medium">{ACTION_LABELS[tr.action_type] ?? tr.action_type}</span>
                   </div>
                   {tr.last_triggered_at && (
-                    <div className="text-[10px] text-muted mt-1">
+                    <div className="text-2xs text-muted mt-1">
                       {t("lastRun")}: {new Date(tr.last_triggered_at).toLocaleDateString()}
                     </div>
                   )}

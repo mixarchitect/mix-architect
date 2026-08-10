@@ -89,7 +89,7 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
         >
           <Search size={16} strokeWidth={1.5} />
           <span className="flex-1 text-left">Search...</span>
-          <kbd className="text-[10px] font-medium text-muted bg-panel border border-border rounded px-1.5 py-0.5">⌘K</kbd>
+          <kbd className="text-2xs font-medium text-muted bg-panel border border-border rounded px-1.5 py-0.5">⌘K</kbd>
         </button>
 
         {/* What we're spinning */}
@@ -208,7 +208,7 @@ function AccountMenu({ userEmail, displayName }: { userEmail: string | null; dis
         aria-label="Account menu"
         aria-haspopup="true"
         aria-expanded={open}
-        className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold text-white transition-opacity hover:opacity-80"
+        className="w-7 h-7 rounded-full flex items-center justify-center text-2xs font-semibold text-white transition-opacity hover:opacity-80"
         style={{ background: "var(--signal)" }}
       >
         {initial}

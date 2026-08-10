@@ -1,8 +1,8 @@
-const sk = "rounded bg-black/[0.06] dark:bg-white/[0.08]";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <div className="animate-pulse">
+    <div>
       {/* Loading indicator */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-10">
         <div className="flex items-center gap-2 text-muted text-sm">
@@ -13,20 +13,20 @@ export default function Loading() {
 
       {/* Back link + title */}
       <div className="flex items-center gap-3 mb-6">
-        <div className={`w-8 h-8 ${sk}`} />
-        <div className={`h-7 w-56 ${sk}`} />
+        <Skeleton className="w-8 h-8 rounded" />
+        <Skeleton className="h-7 w-56 rounded" />
       </div>
 
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className={`h-5 w-16 rounded-full bg-black/[0.06] dark:bg-white/[0.08]`} />
-          <div className={`h-5 w-16 rounded-full bg-black/[0.06] dark:bg-white/[0.08]`} />
-          <div className={`h-5 w-20 rounded-full bg-black/[0.06] dark:bg-white/[0.08]`} />
+          <Skeleton className="h-5 w-16 rounded-full" />
+          <Skeleton className="h-5 w-16 rounded-full" />
+          <Skeleton className="h-5 w-20 rounded-full" />
         </div>
         <div className="flex items-center gap-2">
-          <div className={`h-9 w-24 rounded-sm bg-black/[0.06] dark:bg-white/[0.08]`} />
-          <div className={`h-9 w-9 rounded-sm bg-black/[0.06] dark:bg-white/[0.08]`} />
+          <Skeleton className="h-9 w-24 rounded-sm" />
+          <Skeleton className="h-9 w-9 rounded-sm" />
         </div>
       </div>
 
@@ -39,12 +39,12 @@ export default function Loading() {
               key={i}
               className="rounded-lg border border-border bg-panel p-4 flex items-center gap-3"
             >
-              <div className={`w-8 h-8 ${sk}`} />
+              <Skeleton className="w-8 h-8 rounded" />
               <div className="flex-1 space-y-1.5">
-                <div className={`h-4 w-40 ${sk}`} />
-                <div className={`h-3 w-24 ${sk}`} />
+                <Skeleton className="h-4 w-40 rounded" />
+                <Skeleton className="h-3 w-24 rounded" />
               </div>
-              <div className={`h-5 w-16 rounded-full bg-black/[0.06] dark:bg-white/[0.08]`} />
+              <Skeleton className="h-5 w-16 rounded-full" />
             </div>
           ))}
         </div>
@@ -52,16 +52,16 @@ export default function Loading() {
         {/* Sidebar */}
         <div className="space-y-4">
           <div className="rounded-lg border border-border bg-panel p-5">
-            <div className={`w-full aspect-square ${sk} mb-4`} />
-            <div className={`h-3 w-20 ${sk}`} />
+            <Skeleton className="w-full aspect-square rounded mb-4" />
+            <Skeleton className="h-3 w-20 rounded" />
           </div>
           <div className="rounded-lg border border-border bg-panel p-5 space-y-3">
-            <div className={`h-3 w-24 ${sk}`} />
-            <div className={`h-12 w-full ${sk}`} />
+            <Skeleton className="h-3 w-24 rounded" />
+            <Skeleton className="h-12 w-full rounded" />
           </div>
           <div className="rounded-lg border border-border bg-panel p-5 space-y-3">
-            <div className={`h-3 w-20 ${sk}`} />
-            <div className={`h-8 w-full ${sk}`} />
+            <Skeleton className="h-3 w-20 rounded" />
+            <Skeleton className="h-8 w-full rounded" />
           </div>
         </div>
       </div>

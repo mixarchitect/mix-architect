@@ -15,7 +15,7 @@ export function TimelineHeader({ months, todayX, totalWidth }: TimelineHeaderPro
       <div className="relative h-4">
         {todayX >= 0 && todayX <= totalWidth && (
           <span
-            className="absolute text-[10px] font-medium select-none whitespace-nowrap pointer-events-none"
+            className="absolute text-2xs font-medium select-none whitespace-nowrap pointer-events-none"
             style={{
               left: todayX + 4,
               top: 2,

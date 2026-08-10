@@ -550,7 +550,7 @@ export default async function ReleasePage({ params, searchParams }: Props) {
                     <span className="text-muted shrink-0 mr-3">{t("genre")}</span>
                     <div className="flex flex-wrap gap-1 justify-end">
                       {(release.genre_tags as string[]).map((g: string) => (
-                        <Pill key={g} className="text-[10px]">{g}</Pill>
+                        <Pill key={g} className="text-2xs">{g}</Pill>
                       ))}
                     </div>
                   </div>

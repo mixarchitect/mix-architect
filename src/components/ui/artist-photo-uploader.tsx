@@ -151,7 +151,7 @@ export function ArtistPhotoUploader({
           </div>
 
           <div className="space-y-1">
-            <span className="text-[10px] text-muted uppercase tracking-wider">or paste URL</span>
+            <span className="text-2xs text-muted uppercase tracking-wider">or paste URL</span>
             <div className="flex gap-1.5">
               <input
                 type="url"

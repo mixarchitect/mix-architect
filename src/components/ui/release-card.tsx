@@ -319,17 +319,17 @@ export function ReleaseCard({
           <Pill>{typeLabel(releaseType)}</Pill>
           <Pill>{formatLabel(format)}</Pill>
           {roleLabel(role ?? null) && (
-            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700 border border-blue-200">
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-2xs font-medium bg-blue-100 text-blue-700 border border-blue-200">
               {roleLabel(role ?? null)}
             </span>
           )}
           {submissionStatus === "pending" && (
-            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-2xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
               Submitted
             </span>
           )}
           {submissionStatus === "approved" && (
-            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-medium bg-teal-500/10 text-teal-500 border border-teal-500/20">
+            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-2xs font-medium bg-teal-500/10 text-teal-500 border border-teal-500/20">
               Featured
             </span>
           )}
@@ -348,7 +348,7 @@ export function ReleaseCard({
           <div className="flex items-center gap-2">
             {paymentsEnabled && paymentStatus && paymentStatus !== "no_fee" && (
               <span className={cn(
-                "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide",
+                "inline-flex items-center px-1.5 py-0.5 rounded text-2xs font-medium uppercase tracking-wide",
                 paymentStatus === "paid" && "bg-green-500/10 text-green-400",
                 paymentStatus === "partial" && "bg-amber-500/10 text-amber-400",
                 paymentStatus === "unpaid" && "bg-zinc-500/10 text-zinc-400",

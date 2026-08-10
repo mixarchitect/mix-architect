@@ -420,13 +420,13 @@ export function MoneyDashboard({ quotes, releases, currency, range, from, to }: 
                       <td className="px-4 py-2.5 text-muted">{q.client_name ?? "\u2014"}</td>
                       <td className="px-4 py-2.5">
                         <span className={cn(
-                          "inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide",
+                          "inline-flex px-2 py-0.5 rounded-full text-2xs font-medium uppercase tracking-wide",
                           STATUS_STYLES[q.status] ?? "bg-zinc-500/10 text-zinc-400",
                         )}>
                           {q.status}
                         </span>
                         {isOverdue && (
-                          <span className="ml-1.5 text-[10px] font-medium text-red-400">Overdue</span>
+                          <span className="ml-1.5 text-2xs font-medium text-red-400">Overdue</span>
                         )}
                       </td>
                       <td className="px-4 py-2.5 text-right text-text font-medium tabular-nums">
@@ -487,7 +487,7 @@ function StatCard({
     <div className="px-4 py-3 rounded-lg border border-border bg-panel">
       <div className="flex items-center gap-2 mb-1">
         <Icon size={14} strokeWidth={1.5} className="text-muted" />
-        <span className="text-[10px] uppercase tracking-wide text-faint font-medium">{label}</span>
+        <span className="text-2xs uppercase tracking-wide text-faint font-medium">{label}</span>
       </div>
       <div className={cn("text-lg font-semibold", color ?? "text-text")}>{value}</div>
       <div className="text-xs text-muted mt-0.5">{sub}</div>

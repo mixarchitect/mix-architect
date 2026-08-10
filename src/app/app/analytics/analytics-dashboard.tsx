@@ -265,7 +265,7 @@ export function AnalyticsDashboard({ summary, from, to, range, compare }: Props)
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-[10px] uppercase tracking-wide text-faint">
+                <tr className="text-left text-2xs uppercase tracking-wide text-faint">
                   <th className="px-4 py-2 font-medium">Client</th>
                   <th className="px-4 py-2 font-medium text-right">Releases</th>
                   <th className="px-4 py-2 font-medium text-right">Revenue</th>
@@ -333,7 +333,7 @@ function StatCard({
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <Icon size={14} strokeWidth={1.5} className="text-muted" />
-          <span className="text-[10px] uppercase tracking-wide text-faint font-medium">
+          <span className="text-2xs uppercase tracking-wide text-faint font-medium">
             {label}
           </span>
         </div>

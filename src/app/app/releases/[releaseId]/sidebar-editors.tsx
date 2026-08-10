@@ -344,7 +344,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
                   key={p}
                   type="button"
                   onClick={() => setRefPlatform(p)}
-                  className={`flex-1 px-1.5 py-1 text-[10px] font-medium rounded transition-colors ${
+                  className={`flex-1 px-1.5 py-1 text-2xs font-medium rounded transition-colors ${
                     refPlatform === p
                       ? "bg-panel text-text border border-border-strong shadow-sm"
                       : "text-faint hover:text-muted"
@@ -384,7 +384,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="text-xs font-medium text-text truncate">{r.trackName}</div>
-                        <div className="text-[10px] text-muted truncate">{r.artistName}</div>
+                        <div className="text-2xs text-muted truncate">{r.artistName}</div>
                       </div>
                     </button>
                   ))}
@@ -396,7 +396,7 @@ export function GlobalReferencesEditor({ releaseId, initialRefs, initialStatus, 
                 <img src={refArtwork} alt="" className="w-10 h-10 rounded-[3px]" />
                 <div className="min-w-0 flex-1">
                   <div className="text-xs font-medium text-text truncate">{refTitle}</div>
-                  <div className="text-[10px] text-muted truncate">{refArtist}</div>
+                  <div className="text-2xs text-muted truncate">{refArtist}</div>
                 </div>
               </div>
             )}

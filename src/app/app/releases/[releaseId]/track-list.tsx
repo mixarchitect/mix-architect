@@ -351,7 +351,7 @@ function PortalApprovalBadge({ status }: { status: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0",
+        "inline-flex items-center gap-1 text-2xs font-medium px-2 py-0.5 rounded-full shrink-0",
         config.color,
       )}
     >

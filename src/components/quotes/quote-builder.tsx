@@ -714,7 +714,7 @@ export function QuoteBuilder({
                 placeholder={t("builder.internalNotesPlaceholder")}
                 disabled={isReadonly}
               />
-              <p className="text-[10px] text-muted">{t("builder.internalNotesHelp")}</p>
+              <p className="text-2xs text-muted">{t("builder.internalNotesHelp")}</p>
             </div>
             {mode === "single" && (
               <div className="space-y-1.5 max-w-xs">

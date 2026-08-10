@@ -154,7 +154,7 @@ export function WorkspaceEmailCard() {
               {tc("save")}
             </button>
           </div>
-          <p className="text-[10px] text-faint">{t("replyToHelp")}</p>
+          <p className="text-2xs text-faint">{t("replyToHelp")}</p>
         </div>
       )}
     </div>

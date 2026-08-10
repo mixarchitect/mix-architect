@@ -496,11 +496,11 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
                         disabled={uploading}
                       />
                     </label>
-                    <p className="text-[10px] text-muted mt-1">PNG, JPG, WebP, or GIF</p>
+                    <p className="text-2xs text-muted mt-1">PNG, JPG, WebP, or GIF</p>
                   </div>
 
                   <div className="space-y-1">
-                    <span className="text-[10px] text-muted uppercase tracking-wider">{t("pasteUrl")}</span>
+                    <span className="text-2xs text-muted uppercase tracking-wider">{t("pasteUrl")}</span>
                     <input
                       type="url"
                       value={coverArtMode === "preview" && !coverArtUrl.startsWith("http") ? "" : coverArtUrl}
@@ -907,25 +907,25 @@ export function SettingsForm({ releaseId, role, initialMembers, hasQuotes = fals
                         <div className="text-sm text-text font-medium truncate">
                           {m.invited_email}
                         </div>
-                        <div className="text-[10px] text-faint mt-0.5">
+                        <div className="text-2xs text-faint mt-0.5">
                           {m.accepted_at ? t("active") : t("pendingInvite")}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <Pill className="text-[10px]">
+                      <Pill className="text-2xs">
                         {m.role === "collaborator" ? t("collaborator") : t("client")}
                       </Pill>
                       {!m.accepted_at && (
                         <>
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-100 text-amber-700">
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-2xs font-medium bg-amber-100 text-amber-700">
                             {t("pending")}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleResendInvite(m)}
                             disabled={resendingId === m.id}
-                            className="text-[10px] text-muted hover:text-text transition-colors px-1.5 py-0.5 disabled:opacity-50"
+                            className="text-2xs text-muted hover:text-text transition-colors px-1.5 py-0.5 disabled:opacity-50"
                           >
                             {resentId === m.id
                               ? t("sent")

@@ -134,7 +134,7 @@ function AccountMenu({ userEmail, displayName }: { userEmail: string | null; dis
         aria-label="Account menu"
         aria-haspopup="true"
         aria-expanded={open}
-        className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold text-white transition-opacity hover:opacity-80"
+        className="w-7 h-7 rounded-full flex items-center justify-center text-2xs font-semibold text-white transition-opacity hover:opacity-80"
         style={{ background: "var(--signal)" }}
       >
         {initial}

@@ -522,14 +522,14 @@ function RequestRow({
           <span className="text-xs text-muted">{r.category}</span>
           <span
             className={cn(
-              "text-[10px] font-medium px-1.5 py-0.5 rounded",
+              "text-2xs font-medium px-1.5 py-0.5 rounded",
               statusCfg.classes
             )}
           >
             {statusCfg.label}
           </span>
           {r.merge_count > 0 && (
-            <span className="text-[10px] text-faint">
+            <span className="text-2xs text-faint">
               <GitMerge size={10} className="inline mr-0.5" />
               {r.merge_count} merged
             </span>
@@ -537,19 +537,19 @@ function RequestRow({
           {r.tags.map((tag) => (
             <span
               key={tag}
-              className="text-[10px] px-1.5 py-0.5 rounded-full bg-panel2 text-muted"
+              className="text-2xs px-1.5 py-0.5 rounded-full bg-panel2 text-muted"
             >
               {tag}
             </span>
           ))}
           {r.submitter_name && (
-            <span className="text-[10px] text-faint">
+            <span className="text-2xs text-faint">
               by {r.submitter_name}
             </span>
           )}
         </div>
         {r.admin_notes && (
-          <p className="text-[10px] text-faint italic mt-1 truncate">
+          <p className="text-2xs text-faint italic mt-1 truncate">
             Admin: {r.admin_notes}
           </p>
         )}
@@ -808,7 +808,7 @@ function DetailPanel({
                 </div>
                 <button
                   onClick={() => handleUnmerge(m.id)}
-                  className="text-faint hover:text-text text-[10px] shrink-0 ml-2"
+                  className="text-faint hover:text-text text-2xs shrink-0 ml-2"
                 >
                   Unmerge
                 </button>

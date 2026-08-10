@@ -123,7 +123,7 @@ export function TourChecklist({
                 >
                   {/* Status icon */}
                   <div
-                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold"
+                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-2xs font-bold"
                     style={{
                       background: isSeen
                         ? "var(--signal)"
@@ -153,7 +153,7 @@ export function TourChecklist({
                     >
                       {topic.label}
                     </div>
-                    <div className="text-[10px] text-faint truncate">
+                    <div className="text-2xs text-faint truncate">
                       {topic.description}
                     </div>
                   </div>
@@ -183,7 +183,7 @@ export function TourChecklist({
 
           {/* Footer */}
           <div className="px-4 py-2.5 border-t text-center" style={{ borderColor: "var(--border)" }}>
-            <span className="text-[10px] text-faint">
+            <span className="text-2xs text-faint">
               {t("completedCount", { seen: seenCount, total: totalTopics })}
             </span>
           </div>

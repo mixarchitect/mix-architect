@@ -1139,6 +1139,16 @@ select.input-table {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Global kill switch: near-zero durations preserve animation/transition
+     end states (unlike `animation: none`), so nothing gets stuck mid-flight.
+     :where() keeps specificity at zero; !important carries the override. */
+  :where(*, *::before, *::after) {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
   .la-hover-anim,
   .la-hover-anim * {
     animation: none !important;

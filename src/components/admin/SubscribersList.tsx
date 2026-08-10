@@ -444,7 +444,7 @@ export function SubscribersList({ subscribers }: { subscribers: Subscriber[] }) 
                   {sub.user_email && (
                     <div className="text-xs text-muted truncate">{sub.user_email}</div>
                   )}
-                  <div className="text-[10px] text-faint truncate">{sub.user_id}</div>
+                  <div className="text-2xs text-faint truncate">{sub.user_id}</div>
                   {sub.has_subscription ? (
                   <div className="flex items-center gap-2 text-xs text-muted mt-0.5">
                     <CreditCard size={12} />

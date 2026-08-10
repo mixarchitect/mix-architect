@@ -364,7 +364,7 @@ function StatCard({
 }) {
   return (
     <div className="rounded-lg border border-border bg-panel p-4">
-      <div className="text-[10px] text-faint font-medium uppercase tracking-wider mb-1">
+      <div className="text-2xs text-faint font-medium uppercase tracking-wider mb-1">
         {label}
       </div>
       <div

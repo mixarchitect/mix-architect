@@ -15,7 +15,7 @@ import { getTranslations } from "next-intl/server";
 function LufsMeter() {
   return (
     <div className="mt-4 rounded-lg bg-white/4 p-3">
-      <div className="flex items-center justify-between text-[10px] text-white/60 mb-2">
+      <div className="flex items-center justify-between text-2xs text-white/60 mb-2">
         <span>-24</span>
         <span>-14</span>
         <span>-6</span>
@@ -35,8 +35,8 @@ function LufsMeter() {
         />
       </div>
       <div className="flex items-center justify-between mt-2">
-        <span className="text-[10px] text-[#14B8A6] font-semibold">-14.2 LUFS</span>
-        <span className="text-[10px] text-white/60">Spotify target</span>
+        <span className="text-2xs text-[#14B8A6] font-semibold">-14.2 LUFS</span>
+        <span className="text-2xs text-white/60">Spotify target</span>
       </div>
     </div>
   );
@@ -48,7 +48,7 @@ function FormatConversion() {
       {["WAV", "AIFF", "FLAC", "MP3"].map((fmt, i) => (
         <div key={fmt} className="flex items-center gap-2">
           <span
-            className={`text-[10px] font-semibold px-2 py-1 rounded ${
+            className={`text-2xs font-semibold px-2 py-1 rounded ${
               i === 0
                 ? "bg-[#14B8A6]/15 text-[#5eead4]"
                 : "bg-white/6 text-white/60"
@@ -58,7 +58,7 @@ function FormatConversion() {
             {fmt}
           </span>
           {i < 3 && (
-            <span className="text-white/60 text-[10px]">&rarr;</span>
+            <span className="text-white/60 text-2xs">&rarr;</span>
           )}
         </div>
       ))}
@@ -147,7 +147,7 @@ function VersionTabs() {
       {["v1", "v2", "v3"].map((v, i) => (
         <span
           key={v}
-          className={`${pillAnim[i]} text-[10px] px-2.5 py-1 rounded-full font-medium ${
+          className={`${pillAnim[i]} text-2xs px-2.5 py-1 rounded-full font-medium ${
             i === 2
               ? "bg-[#14B8A6] text-[#1a1a1a] font-semibold"
               : "bg-white/8 text-white/60"
@@ -156,7 +156,7 @@ function VersionTabs() {
           {v}
         </span>
       ))}
-      <span className="ml-auto text-[10px] text-white/60">Latest</span>
+      <span className="ml-auto text-2xs text-white/60">Latest</span>
     </div>
   );
 }

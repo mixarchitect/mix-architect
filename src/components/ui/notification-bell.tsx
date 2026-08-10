@@ -77,7 +77,7 @@ export function NotificationBell({ userId, variant }: Props) {
         >
           <Bell size={20} strokeWidth={1.5} />
           {unreadCount > 0 && <Badge count={unreadCount} />}
-          <span className="text-[10px] font-medium">{t("alerts")}</span>
+          <span className="text-2xs font-medium">{t("alerts")}</span>
         </button>
         {open && (
           <NotificationPanel
@@ -173,7 +173,7 @@ export function NotificationBell({ userId, variant }: Props) {
 
 function Badge({ count }: { count: number }) {
   return (
-    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-signal text-[10px] font-semibold text-white px-1 leading-none">
+    <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-signal text-2xs font-semibold text-white px-1 leading-none">
       {count > 99 ? "99+" : count}
     </span>
   );
@@ -315,7 +315,7 @@ const NotificationPanel = forwardRef<HTMLDivElement, PanelProps>(
                   {n.body && (
                     <p className="text-xs text-muted mt-0.5 line-clamp-2">{n.body}</p>
                   )}
-                  <p className="text-[10px] text-muted/60 mt-1">
+                  <p className="text-2xs text-muted/60 mt-1">
                     {n.actor_name ? `${n.actor_name} \u00b7 ` : ""}
                     {relativeTime(n.created_at)}
                   </p>

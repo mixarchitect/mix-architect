@@ -170,7 +170,7 @@ function ArtistNameEditor({
             <X size={12} />
           </button>
         </div>
-        <p className="text-[10px] text-muted">
+        <p className="text-2xs text-muted">
           Renaming updates all releases by this artist
         </p>
         {error && <p className="text-xs text-red-500">{error}</p>}
@@ -287,7 +287,7 @@ function ContactInfoEditor({
               placeholder="Client phone"
               type="tel"
             />
-            <p className="text-[10px] text-muted">
+            <p className="text-2xs text-muted">
               Saves to all releases by {artistName}
             </p>
             <div className="flex gap-2">

@@ -444,7 +444,7 @@ function StatCard({
 
     if (prev === 0 && curr > 0) {
       deltaEl = (
-        <span className="text-[10px] text-success flex items-center gap-0.5 mt-1">
+        <span className="text-2xs text-success flex items-center gap-0.5 mt-1">
           <ArrowUp size={10} /> New
         </span>
       );
@@ -456,7 +456,7 @@ function StatCard({
         const isPositive = invertDelta ? !isUp : isUp;
         deltaEl = (
           <span
-            className={`text-[10px] flex items-center gap-0.5 mt-1 ${isPositive ? "text-success" : "text-danger"}`}
+            className={`text-2xs flex items-center gap-0.5 mt-1 ${isPositive ? "text-success" : "text-danger"}`}
           >
             {isUp ? <ArrowUp size={10} /> : <ArrowDown size={10} />}
             {isUp ? "+" : ""}
@@ -471,7 +471,7 @@ function StatCard({
     <div className="rounded-lg border border-border bg-panel p-4">
       <div className="flex items-center gap-2 mb-2">
         <Icon size={14} className={color} />
-        <span className="text-[10px] text-faint font-medium uppercase tracking-wider">
+        <span className="text-2xs text-faint font-medium uppercase tracking-wider">
           {label}
         </span>
         {dot && (

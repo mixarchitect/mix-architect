@@ -87,7 +87,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
             required
             className="input font-mono text-xs"
           />
-          <p className="text-[10px] text-faint mt-1">
+          <p className="text-2xs text-faint mt-1">
             URL: /featured/{slug || "..."}
           </p>
         </Field>
@@ -229,7 +229,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
             className="text-sm text-muted file:mr-3 file:px-3 file:py-1.5 file:text-xs file:font-medium file:rounded-full file:border file:border-white/10 file:bg-panel file:text-text file:cursor-pointer hover:file:bg-white/5"
           />
           {release && (
-            <p className="text-[10px] text-faint mt-1">
+            <p className="text-2xs text-faint mt-1">
               Leave empty to keep existing image.
             </p>
           )}
@@ -282,7 +282,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
             className="input resize-y font-mono text-xs"
             onKeyDown={handleTabInTextarea}
           />
-          <p className="text-[10px] text-faint mt-1">
+          <p className="text-2xs text-faint mt-1">
             On Bandcamp, go to Share / Embed → copy the iframe code. When present, this replaces the auto-detected embed.
           </p>
         </Field>
@@ -300,7 +300,7 @@ export function FeaturedReleaseForm({ action, release, submissionId }: Props) {
             accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/aac,audio/flac,audio/mp4"
             className="text-sm text-muted file:mr-3 file:px-3 file:py-1.5 file:text-xs file:font-medium file:rounded-full file:border file:border-white/10 file:bg-panel file:text-text file:cursor-pointer hover:file:bg-white/5"
           />
-          <p className="text-[10px] text-faint mt-1">
+          <p className="text-2xs text-faint mt-1">
             MP3, WAV, AAC, or FLAC. Max 50MB. Plays on the blog page.
             {release?.audio_file_name && (
               <> Current: {release.audio_file_name}</>

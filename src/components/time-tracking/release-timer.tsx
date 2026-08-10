@@ -297,7 +297,7 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[10px] text-faint uppercase">Hours</label>
+              <label className="text-2xs text-faint uppercase">Hours</label>
               <input
                 type="number"
                 step="0.25"
@@ -309,7 +309,7 @@ export function ReleaseTimer({ releaseId, defaultRate, currency, locale }: Props
               />
             </div>
             <div>
-              <label className="text-[10px] text-faint uppercase">Rate/hr</label>
+              <label className="text-2xs text-faint uppercase">Rate/hr</label>
               <input
                 type="number"
                 step="0.01"
