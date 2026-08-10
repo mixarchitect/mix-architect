@@ -10,7 +10,10 @@ import { NextResponse, type NextRequest } from "next/server";
  * had no nonce, and the policy was effectively security theater on the
  * verge of silently breaking under any future Next.js streaming
  * change. To wire a working nonce we'd have to make RootLayout dynamic
- * (kills static optimization on marketing/changelog/featured pages).
+ * (at the time, that would have killed static optimization on
+ * marketing/changelog/featured pages; since then, per-request locale
+ * resolution and ThemeWrapper's headers() read made every page dynamic
+ * anyway, so a nonce is viable again if we ever want it).
  *
  * Trade-off taken: drop the nonce, keep the tight origin allowlist,
  * accept 'unsafe-inline' for script-src so the GA init script works.
