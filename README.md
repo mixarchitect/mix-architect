@@ -15,7 +15,7 @@ src/
   actions/            Server actions ("use server")
   components/         UI components (kebab-case files; PascalCase exports)
   lib/                Utilities, Supabase clients, integrations
-  middleware.ts       CSP + auth gate for /app/*
+  proxy.ts            CSP + auth gate for /app/*
 worker/               Standalone Node audio worker (Docker)
   src/
     index.ts          Polling loop: conversion + analysis

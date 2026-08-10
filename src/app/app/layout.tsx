@@ -16,7 +16,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     error,
   } = await supabase.auth.getUser();
 
-  // Defense-in-depth: middleware should catch this, but guard here too
+  // Defense-in-depth: the proxy should catch this, but guard here too
   if (error || !user) {
     redirect("/auth/sign-in");
   }
@@ -125,7 +125,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               .eq("id", user.id)
           : Promise.resolve(),
       ]);
-      // Cookie will be cleared on next response via middleware or naturally expires
+      // Cookie will be cleared on next response via the proxy or naturally expires
     } catch {
       // Non-fatal: attribution failure should never block app load
     }

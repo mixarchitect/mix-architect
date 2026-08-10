@@ -3,8 +3,8 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-// Content Security Policy is now set dynamically in middleware with per-request
-// nonces. See src/middleware.ts for the policy definition.
+// Content Security Policy is set dynamically in the proxy. See src/proxy.ts
+// for the policy definition.
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
