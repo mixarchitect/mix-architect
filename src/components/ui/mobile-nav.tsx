@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import {
   Home, Users, Search, Menu, X, DollarSign,
   Sun, Moon, Monitor, LayoutTemplate, HelpCircle,
-  Settings, LogOut, Bug, Download, Shield, BarChart3, Building2,
+  Settings, LogOut, Bug, Download, Shield, BarChart3, Building2, Radio,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
@@ -203,7 +203,7 @@ function MobileDrawer({
         {/* Nav section */}
         <div className="flex-1 overflow-y-auto py-2">
           {paymentsEnabled && (
-            <Link href="/app/payments" className={linkClass(pathname?.startsWith("/app/payments"))} onClick={onClose}>
+            <Link href="/app/money" className={linkClass(pathname?.startsWith("/app/money"))} onClick={onClose}>
               <DollarSign size={18} strokeWidth={1.5} />
               {tNav("payments")}
             </Link>
@@ -215,6 +215,10 @@ function MobileDrawer({
           <Link href="/app/studio" className={linkClass(pathname?.startsWith("/app/studio"))} onClick={onClose}>
             <Building2 size={18} strokeWidth={1.5} />
             {tNav("studio")}
+          </Link>
+          <Link href="/app/featured" className={linkClass(pathname?.startsWith("/app/featured"))} onClick={onClose}>
+            <Radio size={18} strokeWidth={1.5} />
+            {tNav("featured")}
           </Link>
 
           <div className="border-t border-border my-2" />

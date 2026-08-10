@@ -843,7 +843,7 @@ export function TrackDetailClient({
                       Click to describe the sonic direction...
                     </button>
                   ) : (
-                    <p className="text-sm text-muted italic">No sonic direction set.</p>
+                    <p className="text-sm text-muted italic">No direction set yet. Describe how this track should feel.</p>
                   )}
                 </PanelBody>
               </Panel>
@@ -964,7 +964,11 @@ export function TrackDetailClient({
                   icon={StickyNote}
                   size="sm"
                   title="No notes yet"
-                  description="Document mix decisions, client feedback, and revision history."
+                  description={
+                    canEditCreative(role)
+                      ? "Document mix decisions, client feedback, and revision history. Write your first note in the box above."
+                      : "Document mix decisions, client feedback, and revision history."
+                  }
                 />
               )}
             </div>
@@ -1412,6 +1416,11 @@ export function TrackDetailClient({
                   size="sm"
                   title="No reference tracks"
                   description="Add tracks that capture the sound, mix, or vibe you're aiming for."
+                  action={
+                    canEditCreative(role)
+                      ? { label: "Add a reference", onClick: () => setShowRefForm(true) }
+                      : undefined
+                  }
                 />
               )}
             </PanelBody>
@@ -1505,6 +1514,7 @@ function SplitEditor({
             size="sm"
             title="No splits defined"
             description={readOnly ? "No splits configured." : "Add contributors and their ownership percentages."}
+            action={readOnly ? undefined : { label: "Add contributor", onClick: onAdd }}
           />
         ) : (
           <div className="space-y-2">

@@ -444,7 +444,13 @@ export function MoneyDashboard({ quotes, releases, currency, range, from, to }: 
         ) : (
           <div className="px-4 py-12 text-center">
             <p className="text-sm text-muted">No quotes or invoices yet</p>
-            <p className="text-xs text-faint mt-1">Create your first quote from any release&apos;s Money tab</p>
+            <Link
+              href="/app/quotes/new"
+              className="mt-2 inline-flex items-center gap-1 text-xs text-signal hover:text-text transition-colors"
+            >
+              <Plus size={12} />
+              New quote
+            </Link>
           </div>
         )}
       </div>

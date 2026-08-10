@@ -511,6 +511,7 @@ export default function NewReleasePage() {
                   value={releaseType}
                   onChange={setReleaseType}
                 />
+                <p className="text-xs text-muted">{t("typeHint")}</p>
               </div>
 
               <div className="space-y-1.5" data-tour="format">

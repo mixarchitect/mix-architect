@@ -573,8 +573,8 @@ export function TemplateForm({ initialData }: Props) {
 
           <Rule />
 
-          {/* ── Intent Defaults ── */}
-          <Section title="Intent Defaults" configured={hasIntent} defaultOpen={false}>
+          {/* ── Brief defaults ── */}
+          <Section title="Brief defaults" configured={hasIntent} defaultOpen={false}>
             <div className="space-y-1.5">
               <label className="label text-muted">Default emotional tags</label>
               <TagInput

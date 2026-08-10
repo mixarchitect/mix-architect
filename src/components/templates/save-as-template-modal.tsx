@@ -267,7 +267,7 @@ export function SaveAsTemplateModal({ releaseId, releaseTitle, onClose }: Props)
                   onChange={setIncludeTechSpecs}
                 />
                 <Checkbox
-                  label="Intent defaults"
+                  label="Brief defaults"
                   detail="Emotional tags"
                   checked={includeIntent}
                   onChange={setIncludeIntent}

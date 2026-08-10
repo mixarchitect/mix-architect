@@ -120,6 +120,7 @@ export function PaymentsTable({ releases, currency }: Props) {
         size="md"
         title="No payments tracked"
         description="Add payment milestones to track what's owed and what's been collected."
+        action={{ label: "New quote", href: "/app/quotes/new" }}
       />
     );
   }
