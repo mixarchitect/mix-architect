@@ -12,7 +12,7 @@ export function Panel({ className, variant = "default", ...props }: PanelProps) 
     <section
       className={cn(
         "relative bg-panel border border-border rounded-lg",
-        variant === "default" && "shadow-DEFAULT",
+        variant === "default" && "shadow",
         variant === "float" && "shadow-float",
         variant === "inset" && "bg-panel2 shadow-none",
         variant === "flat" && "shadow-none border-transparent",
