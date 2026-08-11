@@ -9,6 +9,7 @@ import { KnowledgeBase } from "@/components/ui/knowledge-base";
 import { BugReportForm } from "@/components/ui/bug-report-form";
 import { FeatureBoard } from "@/components/ui/feature-board";
 import { Panel, PanelBody } from "@/components/ui/panel";
+import { markChangelogSeen } from "@/lib/changelog-seen";
 import { useTranslations } from "next-intl";
 
 type Tab = "articles" | "bug" | "feature" | "changelog" | "status" | "contact";
@@ -142,8 +143,6 @@ export function HelpPortal() {
 
 /* ── What's New / Changelog Section ── */
 
-const CHANGELOG_STORAGE_KEY = "ma_last_seen_changelog";
-
 function ChangelogSection() {
   const t = useTranslations("help");
   const [entries, setEntries] = useState<{ slug: string; title: string; summary: string; category: string; published_at: string; version_tag: string | null }[]>([]);
@@ -155,7 +154,7 @@ function ChangelogSection() {
         const res = await fetch("/api/changelog/latest");
         const data = await res.json();
         if (data.published_at) {
-          localStorage.setItem(CHANGELOG_STORAGE_KEY, new Date().toISOString());
+          markChangelogSeen();
         }
       } catch {
         // non-critical

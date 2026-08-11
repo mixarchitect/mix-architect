@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { NotificationBell } from "@/components/ui/notification-bell";
 import { Tooltip } from "@/components/ui/tooltip";
+import { WhatsNewButton } from "@/components/ui/whats-new-button";
 
 type Props = {
   userId?: string;
@@ -91,6 +92,9 @@ export function TopBar({ userId, userEmail, displayName, onSearchClick, isAdmin 
           <span className="flex-1 text-left">Search...</span>
           <kbd className="text-2xs font-medium text-muted bg-panel border border-border rounded px-1.5 py-0.5">⌘K</kbd>
         </button>
+
+        {/* Version / What's New */}
+        <WhatsNewButton />
 
         {/* What we're spinning */}
         <Tooltip label="What we're spinning" align="right">
