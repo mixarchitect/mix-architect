@@ -17,15 +17,18 @@ const categoryLabels: Record<ChangelogCategory, string> = {
 
 export function ChangelogCategoryBadge({
   category,
+  compact = false,
   className,
 }: {
   category: ChangelogCategory;
+  compact?: boolean;
   className?: string;
 }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
+        "inline-flex items-center rounded-full border font-semibold uppercase tracking-wide",
+        compact ? "px-1.5 py-px text-[9px]" : "px-2.5 py-0.5 text-[11px]",
         categoryStyles[category],
         className,
       )}

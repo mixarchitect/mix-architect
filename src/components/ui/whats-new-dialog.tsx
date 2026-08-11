@@ -80,16 +80,14 @@ export function WhatsNewDialog({
                     </span>
                     <span className="text-xs text-faint">{formatDate(group.publishedAt)}</span>
                   </div>
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {group.entries.map((entry) => (
-                      <li key={entry.slug} className="flex items-start gap-2.5">
-                        <ChangelogCategoryBadge category={entry.category} className="mt-0.5 shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-text">{entry.title}</p>
-                          {entry.summary && (
-                            <p className="text-sm text-muted line-clamp-2">{entry.summary}</p>
-                          )}
-                        </div>
+                      <li key={entry.slug}>
+                        <ChangelogCategoryBadge category={entry.category} compact className="mb-1" />
+                        <p className="text-sm font-medium text-text">{entry.title}</p>
+                        {entry.summary && (
+                          <p className="text-sm text-muted line-clamp-2">{entry.summary}</p>
+                        )}
                       </li>
                     ))}
                   </ul>

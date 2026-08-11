@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { Home, Users, DollarSign, LayoutTemplate, BarChart3, Building2 } from "lucide-react";
 import { useFeatureVisible } from "@/hooks/use-feature-visible";
+import { WhatsNewButton } from "@/components/ui/whats-new-button";
 
 const MONEY_QUOTES = [
   "That\u2019s what I want",
@@ -60,6 +61,9 @@ export function Rail() {
       )}
       <NavItem href="/app/analytics" icon={BarChart3} label={t("analytics")} active={isAnalytics} />
       <NavItem href="/app/studio" icon={Building2} label={t("studio")} active={isStudio} />
+      <div className="mt-auto">
+        <WhatsNewButton />
+      </div>
     </nav>
   );
 }
