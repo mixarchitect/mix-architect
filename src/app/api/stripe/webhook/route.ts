@@ -34,6 +34,28 @@ function getPeriodEnd(sub: Stripe.Subscription): string | null {
   return null;
 }
 
+function getBillingInterval(sub: Stripe.Subscription): "month" | "year" | null {
+  const interval = sub.items?.data?.[0]?.price?.recurring?.interval;
+  return interval === "month" || interval === "year" ? interval : null;
+}
+
+/** In Stripe API v2025+, the invoice's subscription moved under parent.subscription_details. */
+function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+  const sub = invoice.parent?.subscription_details?.subscription;
+  return typeof sub === "string" ? sub : sub?.id ?? null;
+}
+
+const SUBSCRIPTION_STATUS_MAP: Record<string, string> = {
+  active: "active",
+  past_due: "past_due",
+  canceled: "canceled",
+  trialing: "trialing",
+  incomplete: "incomplete",
+  incomplete_expired: "canceled",
+  unpaid: "past_due",
+  paused: "canceled",
+};
+
 /**
  * POST /api/stripe/webhook
  * Handles Stripe webhook events to sync subscription state.
@@ -238,13 +260,15 @@ export async function POST(req: NextRequest) {
         // session so existing behavior is preserved.
         const checkoutPlan = session.metadata?.plan === "studio" ? "studio" : "pro";
 
-        // Fetch the subscription to get period end
+        // Fetch the subscription to get period end + billing interval
         let periodEnd: string | null = null;
+        let billingInterval: "month" | "year" | null = null;
         if (subscriptionId) {
           const sub = await stripe.subscriptions.retrieve(subscriptionId, {
             expand: ["items"],
           });
           periodEnd = getPeriodEnd(sub);
+          billingInterval = getBillingInterval(sub);
         }
 
         const { error } = await supabase.from("subscriptions").upsert(
@@ -255,6 +279,7 @@ export async function POST(req: NextRequest) {
             plan: checkoutPlan,
             status: "active",
             current_period_end: periodEnd,
+            billing_interval: billingInterval,
             cancel_at_period_end: false,
             granted_by_admin: false,
           },
@@ -263,7 +288,20 @@ export async function POST(req: NextRequest) {
 
         if (error) {
           console.error("[stripe/webhook] upsert failed:", error);
+          // Throw so the outer catch releases the idempotency row and
+          // Stripe retries; returning 200 here would grant nothing and
+          // never try again.
+          throw new Error(`subscription upsert failed: ${error.message}`);
         } else {
+          // Test-mode checkouts (Stripe test clocks, sk_test keys) must
+          // not count as revenue. Flag the profile so admin MRR excludes it.
+          if (!event.livemode) {
+            await supabase
+              .from("profiles")
+              .update({ is_test_account: true })
+              .eq("id", userId);
+            console.log("[stripe/webhook] test-mode checkout: flagged is_test_account for", userId);
+          }
           console.log("[stripe/webhook] subscription activated for user:", userId, checkoutPlan);
           logActivity(userId, "subscription_started", { plan: checkoutPlan });
 
@@ -301,18 +339,7 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        const statusMap: Record<string, string> = {
-          active: "active",
-          past_due: "past_due",
-          canceled: "canceled",
-          trialing: "trialing",
-          incomplete: "incomplete",
-          incomplete_expired: "canceled",
-          unpaid: "past_due",
-          paused: "canceled",
-        };
-
-        const mappedStatus = statusMap[subscription.status] || "active";
+        const mappedStatus = SUBSCRIPTION_STATUS_MAP[subscription.status] || "active";
         const periodEnd = getPeriodEnd(subscription);
 
         // Resolve the plan from the subscription's current price (robust
@@ -333,12 +360,14 @@ export async function POST(req: NextRequest) {
             status: mappedStatus,
             plan: subscription.status === "canceled" ? "free" : resolvedPlan,
             current_period_end: periodEnd,
+            billing_interval: getBillingInterval(subscription),
             cancel_at_period_end: subscription.cancel_at_period_end,
           })
           .eq("id", existingSub.id);
 
         if (error) {
           console.error("[stripe/webhook] subscription update failed:", error);
+          throw new Error(`subscription update failed: ${error.message}`);
         } else {
           console.log("[stripe/webhook] subscription updated:", customerId, mappedStatus);
           if (existingSub.user_id) {
@@ -397,6 +426,7 @@ export async function POST(req: NextRequest) {
 
         if (error) {
           console.error("[stripe/webhook] subscription delete update failed:", error);
+          throw new Error(`subscription delete update failed: ${error.message}`);
         } else {
           console.log("[stripe/webhook] subscription canceled:", customerId);
           if (existingSub.user_id) {
@@ -437,7 +467,12 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      case "invoice.payment_succeeded": {
+      case "invoice.paid": {
+        // NOTE: the webhook endpoint delivers `invoice.paid`, not
+        // `invoice.payment_succeeded` — the previous branch listened for
+        // the latter and never fired, which is why renewals never
+        // advanced current_period_end (the row's updated_at sat frozen
+        // at creation while two renewals came and went).
         const invoice = event.data.object as Stripe.Invoice;
         const customerId =
           typeof invoice.customer === "string"
@@ -448,20 +483,50 @@ export async function POST(req: NextRequest) {
 
         const { data: sub } = await supabase
           .from("subscriptions")
-          .select("user_id, granted_by_admin, current_period_end")
+          .select("id, user_id, plan, granted_by_admin, current_period_end")
           .eq("stripe_customer_id", customerId)
           .maybeSingle();
 
         if (!sub?.user_id || sub.granted_by_admin) break;
+
+        // Advance the billing period from the source of truth. The
+        // invoice's own period fields describe the invoice line, not the
+        // subscription, so re-read the subscription itself.
+        let nextPeriodEnd: string | null = sub.current_period_end;
+        const invoiceSubId = getInvoiceSubscriptionId(invoice);
+        if (invoiceSubId) {
+          const stripeSub = await stripe.subscriptions.retrieve(invoiceSubId, {
+            expand: ["items"],
+          });
+          nextPeriodEnd = getPeriodEnd(stripeSub) ?? sub.current_period_end;
+
+          const { error } = await supabase
+            .from("subscriptions")
+            .update({
+              status: SUBSCRIPTION_STATUS_MAP[stripeSub.status] || "active",
+              current_period_end: nextPeriodEnd,
+              billing_interval: getBillingInterval(stripeSub),
+              cancel_at_period_end: stripeSub.cancel_at_period_end,
+            })
+            .eq("id", sub.id);
+
+          if (error) {
+            console.error("[stripe/webhook] invoice.paid period update failed:", error);
+            throw new Error(`invoice.paid period update failed: ${error.message}`);
+          }
+          console.log(
+            "[stripe/webhook] period advanced for", customerId, "->", nextPeriodEnd,
+          );
+        }
 
         // Format amount
         const amount = invoice.amount_paid
           ? `$${(invoice.amount_paid / 100).toFixed(2)}`
           : "$0.00";
 
-        // Format period end
-        const nextBilling = sub.current_period_end
-          ? new Date(sub.current_period_end).toLocaleDateString("en-US", {
+        // Format period end (freshly advanced above, not the stale row)
+        const nextBilling = nextPeriodEnd
+          ? new Date(nextPeriodEnd).toLocaleDateString("en-US", {
               month: "long",
               day: "numeric",
               year: "numeric",
@@ -669,6 +734,14 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     console.error("[stripe/webhook] handler error:", err);
+    // Release the idempotency row so Stripe's retry actually re-runs the
+    // branch. Without this, a failed event is marked processed and the
+    // retry short-circuits at the duplicate check — a transient DB blip
+    // would permanently drop the event.
+    await supabase
+      .from("stripe_processed_events")
+      .delete()
+      .eq("event_id", event.id);
     return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
   }
 
