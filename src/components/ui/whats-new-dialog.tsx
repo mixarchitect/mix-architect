@@ -86,7 +86,7 @@ export function WhatsNewDialog({
                         <ChangelogCategoryBadge category={entry.category} compact className="mb-1" />
                         <p className="text-sm font-medium text-text">{entry.title}</p>
                         {entry.summary && (
-                          <p className="text-sm text-muted line-clamp-2">{entry.summary}</p>
+                          <p className="text-sm text-muted">{entry.summary}</p>
                         )}
                       </li>
                     ))}
