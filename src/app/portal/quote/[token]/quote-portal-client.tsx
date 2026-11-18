@@ -84,7 +84,7 @@ export function QuotePortalClient({
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
+    <div className="min-h-dvh bg-[#f5f5f5]" style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" }}>
       <div className="max-w-2xl mx-auto px-4 py-10">
         {/* Payment result banner */}
         {paymentResult === "success" && (

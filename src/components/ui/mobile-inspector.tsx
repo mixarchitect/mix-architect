@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Info } from "lucide-react";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
+import { useAudio } from "@/lib/audio-context";
+import { cn } from "@/lib/cn";
 
 type Props = {
   title?: string;
@@ -16,6 +18,7 @@ type Props = {
  */
 export function MobileInspector({ title = "Release Info", children }: Props) {
   const [open, setOpen] = useState(false);
+  const miniPlayerActive = !!useAudio().activeVersion;
 
   return (
     <>
@@ -30,7 +33,12 @@ export function MobileInspector({ title = "Release Info", children }: Props) {
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Show release info"
-          className="fixed right-4 bottom-20 z-30 w-12 h-12 rounded-full bg-signal text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+          className={cn(
+            "fixed right-4 z-30 w-12 h-12 rounded-full bg-signal text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform",
+            // Sit above the mini player once audio is loaded; it would
+            // otherwise cover this button completely on phones.
+            miniPlayerActive ? "bottom-36" : "bottom-20",
+          )}
         >
           <Info size={20} strokeWidth={1.5} />
         </button>

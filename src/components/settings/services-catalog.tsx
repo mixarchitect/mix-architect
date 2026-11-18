@@ -208,7 +208,8 @@ export function ServicesCatalog({ currency, locale }: Props) {
             </Button>
           </div>
         ) : (
-          <>
+          <div className="overflow-x-auto -mx-1 px-1">
+            <div className="min-w-[460px]">
             {/* Column headers */}
             <div className="grid grid-cols-[20px_1fr_112px_132px_32px] gap-x-2 items-center mb-1">
               <div /> {/* grip spacer */}
@@ -292,7 +293,7 @@ export function ServicesCatalog({ currency, locale }: Props) {
                     <button
                       type="button"
                       onClick={() => handleDeleteService(svc.id)}
-                      className="p-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                      className="p-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -300,7 +301,8 @@ export function ServicesCatalog({ currency, locale }: Props) {
                 </div>
               ))}
             </div>
-          </>
+            </div>
+          </div>
         )}
 
         {services.length > 0 && (

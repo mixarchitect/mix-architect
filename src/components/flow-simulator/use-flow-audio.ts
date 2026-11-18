@@ -184,6 +184,12 @@ export function useFlowAudio(
   const preloadListenerRef = useRef<(() => void) | null>(null);
   // Guard: true during an element swap to prevent spurious 'ended' events
   const swappingRef = useRef(false);
+  // Removes the pending post-load seek listener on the active element
+  const pendingLoadCleanupRef = useRef<(() => void) | null>(null);
+  // iOS only lets an element play without a tap after a user gesture has
+  // touched it once. The standby element is only ever driven from timers,
+  // so it gets unlocked alongside the first tap on play.
+  const standbyUnlockedRef = useRef(false);
 
   // When tracks array changes (reorder), remap currentTrackIndex by ID
   useEffect(() => {
@@ -215,8 +221,13 @@ export function useFlowAudio(
     b.preload = "auto";
     elementB.current = b;
 
-    const handleError = () =>
+    const handleError = (e: Event) => {
+      // Emptying an element (removeAttribute("src") + load()) can surface a
+      // spurious error on WebKit; only a failure on a real source counts.
+      const el = e.currentTarget as HTMLAudioElement;
+      if (!el.getAttribute("src")) return;
       setError("Playback failed. The audio file may be unavailable.");
+    };
     a.addEventListener("error", handleError);
     b.addEventListener("error", handleError);
 
@@ -312,6 +323,15 @@ export function useFlowAudio(
     [],
   );
 
+  /** A play() the browser refused (iOS without a gesture) must not leave
+   *  the transport showing "playing" over silence. Interrupted plays
+   *  (AbortError from a newer load) are expected and ignored. */
+  const handlePlayRejected = useCallback((err: unknown) => {
+    if (!(err instanceof DOMException) || err.name !== "NotAllowedError") return;
+    cancelAnimationFrame(rafRef.current);
+    setState((prev) => ({ ...prev, isPlaying: false }));
+  }, []);
+
   /** Load a track into the active audio element and seek to a position, then optionally play.
    *  If the inactive element is preloaded with the right URL, swap instead. */
   const loadAndSeek = useCallback(
@@ -327,6 +347,7 @@ export function useFlowAudio(
         const preloaded = getInactive();
         const oldActive = getActive();
         oldActive.pause();
+        pendingLoadCleanupRef.current?.();
 
         preloaded.currentTime = seekTo;
         swapElements();
@@ -343,7 +364,7 @@ export function useFlowAudio(
         preloadListenerRef.current = null;
         swappingRef.current = false;
 
-        if (shouldPlay) preloaded.play().catch(() => {});
+        if (shouldPlay) preloaded.play().catch(handlePlayRejected);
         return;
       }
 
@@ -353,22 +374,36 @@ export function useFlowAudio(
       if (isSame) {
         // Same file — just seek
         active.currentTime = seekTo;
-        if (shouldPlay) active.play().catch(() => {});
+        if (shouldPlay) active.play().catch(handlePlayRejected);
       } else {
-        // Different file — load first, then seek in canplay
+        // Different file. play() is issued right away rather than from a
+        // `canplay` listener: iOS does not buffer (so never fires canplay)
+        // until playback is requested, and it only honours a play() made
+        // inside the tap. The seek is applied up front as the start
+        // position and re-checked once metadata arrives.
         loadedUrlRef.current = audioUrl;
-        const handleCanPlay = () => {
-          active.removeEventListener("canplay", handleCanPlay);
-          active.currentTime = seekTo;
-          if (shouldPlay) active.play().catch(() => {});
+        pendingLoadCleanupRef.current?.();
+        const handleMetadata = () => {
+          cleanup();
+          if (Math.abs(active.currentTime - seekTo) > 0.25) {
+            active.currentTime = seekTo;
+          }
         };
-        // Add listener BEFORE setting src to avoid missing a synchronous canplay
-        active.addEventListener("canplay", handleCanPlay);
+        const cleanup = () => {
+          active.removeEventListener("loadedmetadata", handleMetadata);
+          if (pendingLoadCleanupRef.current === cleanup) {
+            pendingLoadCleanupRef.current = null;
+          }
+        };
+        pendingLoadCleanupRef.current = cleanup;
+        active.addEventListener("loadedmetadata", handleMetadata);
         active.src = audioUrl;
         active.load();
+        if (seekTo > 0) active.currentTime = seekTo;
+        if (shouldPlay) active.play().catch(handlePlayRejected);
       }
     },
-    [getActive, getInactive, swapElements],
+    [getActive, getInactive, swapElements, handlePlayRejected],
   );
 
   /* ---- Play a condensed segment ---- */
@@ -582,6 +617,12 @@ export function useFlowAudio(
       setError(null);
       const active = getActive();
 
+      if (!standbyUnlockedRef.current) {
+        standbyUnlockedRef.current = true;
+        const standby = getInactive();
+        if (!standby.getAttribute("src")) standby.load();
+      }
+
       if (modeRef.current === "condensed") {
         // Find the first segment for this track
         const segments = buildCondensedSegments(tracksRef.current, transitionWindowRef.current);
@@ -597,7 +638,7 @@ export function useFlowAudio(
       // Full mode (or condensed fallback)
       // If resuming same track
       if (idx === stateRef.current.currentTrackIndex && active.src && !active.ended) {
-        active.play().catch(() => {});
+        active.play().catch(handlePlayRejected);
         setState((prev) => ({ ...prev, isPlaying: true }));
         startRAFLoop();
         return;
@@ -614,7 +655,7 @@ export function useFlowAudio(
       }));
       startRAFLoop();
     },
-    [getActive, playSegment, startRAFLoop, loadAndSeek],
+    [getActive, getInactive, playSegment, startRAFLoop, loadAndSeek, handlePlayRejected],
   );
 
   const pause = useCallback(() => {
@@ -765,6 +806,7 @@ export function useFlowAudio(
       b.removeAttribute("src");
       b.load();
     }
+    pendingLoadCleanupRef.current?.();
     loadedUrlRef.current = "";
     preloadedUrlRef.current = "";
     preloadReadyRef.current = false;

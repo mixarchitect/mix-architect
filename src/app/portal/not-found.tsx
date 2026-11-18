@@ -7,7 +7,7 @@ import { Link2Off } from "lucide-react";
  */
 export default function PortalNotFound() {
   return (
-    <main className="min-h-screen bg-bg flex items-center justify-center px-4">
+    <main className="min-h-dvh bg-bg flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center bg-panel border border-border rounded-lg shadow p-8">
         <div className="mx-auto w-12 h-12 rounded-full bg-panel2 flex items-center justify-center text-muted mb-4">
           <Link2Off size={22} />

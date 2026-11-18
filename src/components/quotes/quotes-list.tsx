@@ -326,7 +326,7 @@ function QuoteRow({
             e.preventDefault();
             onActionMenu(isOpen ? null : quote.id);
           }}
-          className="p-1.5 rounded-md text-muted hover:text-text hover:bg-panel transition-colors opacity-0 group-hover:opacity-100"
+          className="p-1.5 rounded-md text-muted hover:text-text hover:bg-panel transition-colors opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100"
         >
           <MoreHorizontal size={14} />
         </button>

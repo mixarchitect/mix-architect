@@ -61,6 +61,8 @@ A public unauthenticated read should use the anon client + RLS policies, not the
 ## Audio pipeline
 
 - The audio element is **persistent** (lives for the session) on `AudioContext`. `currentTime` is NOT in context — it's exposed via `useAudioCurrentTime()` so non-time consumers don't re-render 4×/sec.
+- Never use `el.currentTime` directly as a `useSyncExternalStore` snapshot. WebKit (Safari and every iOS browser) extrapolates it from the wall clock, so it differs on every read and React loops into "Maximum update depth exceeded" the moment playback starts. `useAudioCurrentTime()` / `useAudioDuration()` read a cached store that only refreshes on media events; keep it that way.
+- iOS only allows `play()` from inside a tap until an element has played once, and does not buffer until playback is requested. Start playback in the tap handler (not from a `canplay` or WaveSurfer `ready` callback).
 - Audio is streamed **losslessly** (WAV). Don't introduce a lossy proxy; the buffering chip on the player explains the brief wait.
 - Waveform peaks are computed by the worker at upload time and cached on `track_audio_versions.waveform_peaks`. Browser-side computation is a fallback only.
 

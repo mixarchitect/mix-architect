@@ -52,7 +52,62 @@ type AudioContextValue = {
   stop: () => void;
   /** Toggle loop on/off */
   toggleLoop: () => void;
+  /** Event-driven playhead/duration snapshots; read via the hooks below */
+  timeStore: MediaTimeStore;
 };
+
+/* ------------------------------------------------------------------ */
+/*  Media time store                                                   */
+/* ------------------------------------------------------------------ */
+
+// useSyncExternalStore requires getSnapshot to return the same value until
+// the store notifies. `el.currentTime` does not satisfy that on WebKit
+// (Safari, and every browser on iOS): during playback it is extrapolated
+// from the wall clock, so two reads in the same task differ. Reading it
+// directly as the snapshot sends React into an endless re-render that ends
+// in "Maximum update depth exceeded" the moment playback starts. The store
+// below caches the values and only refreshes them from media events.
+type MediaTimeStore = {
+  getTime: () => number;
+  getDuration: () => number;
+  subscribe: (listener: () => void) => () => void;
+  sync: (el: HTMLAudioElement) => void;
+};
+
+function createMediaTimeStore(): MediaTimeStore {
+  let time = 0;
+  let duration = 0;
+  const listeners = new Set<() => void>();
+  return {
+    getTime: () => time,
+    getDuration: () => duration,
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+    sync(el) {
+      const nextTime = el.currentTime;
+      const nextDuration = Number.isFinite(el.duration) ? el.duration : 0;
+      if (nextTime === time && nextDuration === duration) return;
+      time = nextTime;
+      duration = nextDuration;
+      listeners.forEach((listener) => listener());
+    },
+  };
+}
+
+const TIME_SYNC_EVENTS = [
+  "timeupdate",
+  "seeking",
+  "seeked",
+  "pause",
+  "ended",
+  "durationchange",
+  "loadedmetadata",
+  "emptied",
+] as const;
 
 /* ------------------------------------------------------------------ */
 /*  Note: currentTime and duration are NOT in the context value above. */
@@ -94,6 +149,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     el.preload = "auto";
     audioRef.current = el;
   }
+  const [timeStore] = useState(createMediaTimeStore);
 
   const [activeVersion, setActiveVersion] = useState<AudioVersionData | null>(null);
   const [trackMeta, setTrackMeta] = useState<AudioTrackMeta | null>(null);
@@ -177,8 +233,11 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     el.addEventListener("waiting", onWaiting);
     el.addEventListener("canplay", onCanPlay);
     el.addEventListener("ended", onEnded);
+    const syncTime = () => timeStore.sync(el);
+    TIME_SYNC_EVENTS.forEach((evt) => el.addEventListener(evt, syncTime));
 
     return () => {
+      TIME_SYNC_EVENTS.forEach((evt) => el.removeEventListener(evt, syncTime));
       el.removeEventListener("play", onPlay);
       el.removeEventListener("playing", onPlaying);
       el.removeEventListener("pause", onPause);
@@ -190,8 +249,15 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         fpsMonitorRef.current.stop();
         fpsMonitorRef.current = null;
       }
+      // A detached Audio element keeps playing for as long as it has a
+      // source. If this provider unmounts (an error boundary above the
+      // shell, sign-out), silence it so it can't play on with no controls
+      // while a remount creates a second element next to it.
+      el.pause();
+      el.removeAttribute("src");
+      el.load();
     };
-  }, []);
+  }, [timeStore]);
 
   /* ---- Actions ---- */
 
@@ -263,8 +329,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const seekTo = useCallback((time: number) => {
     const el = audioRef.current;
     if (!el) return;
-    // Setting currentTime triggers a `seeked` event on the element,
-    // which the time-subscription hooks below pick up automatically.
+    // Setting currentTime triggers `seeking`/`seeked` on the element,
+    // which refresh the time store the hooks below read from.
     el.currentTime = time;
   }, []);
 
@@ -302,8 +368,9 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       seekTo,
       stop,
       toggleLoop,
+      timeStore,
     }),
-    [activeVersion, trackMeta, isPlaying, isLooping, isBuffering, loadVersion, togglePlayPause, seekTo, stop, toggleLoop],
+    [activeVersion, trackMeta, isPlaying, isLooping, isBuffering, loadVersion, togglePlayPause, seekTo, stop, toggleLoop, timeStore],
   );
 
   // SSR guard — render nothing useful on server
@@ -334,6 +401,12 @@ const SSR_FALLBACK: AudioContextValue = {
   seekTo: () => {},
   stop: () => {},
   toggleLoop: () => {},
+  timeStore: {
+    getTime: () => 0,
+    getDuration: () => 0,
+    subscribe: () => () => {},
+    sync: () => {},
+  },
 };
 
 export function useAudio() {
@@ -348,66 +421,57 @@ export function useAudio() {
 /* ------------------------------------------------------------------ */
 
 /**
- * Subscribe to the audio element's currentTime via useSyncExternalStore.
- * Re-renders the calling component on `timeupdate` (~4×/sec during
- * playback) and `seeked`. Only components that actually need the
- * playhead position should call this.
+ * Resume playback on an element whose source was just swapped.
+ *
+ * play() is issued immediately because iOS ignores `preload` and only starts
+ * fetching once playback is requested, so waiting for `canplay` first can
+ * wait forever there. The one-shot `canplay` retry stays for engines that
+ * drop a play() issued before the new source has data.
+ */
+export function playWhenReady(
+  el: HTMLAudioElement,
+  isCancelled: () => boolean = () => false,
+) {
+  const attempt = () => {
+    if (isCancelled() || !el.paused) return;
+    el.play().catch(() => {});
+  };
+  attempt();
+  if (el.readyState >= 3 /* HAVE_FUTURE_DATA */) return;
+  const onCanPlay = () => {
+    el.removeEventListener("canplay", onCanPlay);
+    attempt();
+  };
+  el.addEventListener("canplay", onCanPlay);
+}
+
+const getZero = () => 0;
+const subscribeNoop = () => () => {};
+
+/**
+ * Playhead position in seconds. Re-renders the calling component on
+ * `timeupdate` (~4x/sec during playback) and on seeks. Only components
+ * that actually need the playhead should call this.
  */
 export function useAudioCurrentTime(): number {
-  const ctx = useContext(AudioContext);
-  const el = ctx?.audioElement;
-
-  const subscribe = useCallback(
-    (notify: () => void) => {
-      if (!el) return () => {};
-      el.addEventListener("timeupdate", notify);
-      el.addEventListener("seeked", notify);
-      return () => {
-        el.removeEventListener("timeupdate", notify);
-        el.removeEventListener("seeked", notify);
-      };
-    },
-    [el],
+  const store = useContext(AudioContext)?.timeStore;
+  return useSyncExternalStore(
+    store?.subscribe ?? subscribeNoop,
+    store?.getTime ?? getZero,
+    getZero,
   );
-
-  const getSnapshot = useCallback(() => (el ? el.currentTime : 0), [el]);
-  // SSR: no element yet, just return 0.
-  const getServerSnapshot = useCallback(() => 0, []);
-
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 /**
- * Subscribe to the audio element's duration. Updates on
- * `loadedmetadata` and `durationchange`. Stable during playback, so
- * components that only need duration don't re-render at all once the
- * track is loaded.
+ * Duration of the loaded audio in seconds (0 until metadata arrives).
+ * Stable during playback, so components that only need duration don't
+ * re-render on `timeupdate`.
  */
 export function useAudioDuration(): number {
-  const ctx = useContext(AudioContext);
-  const el = ctx?.audioElement;
-
-  const subscribe = useCallback(
-    (notify: () => void) => {
-      if (!el) return () => {};
-      el.addEventListener("durationchange", notify);
-      el.addEventListener("loadedmetadata", notify);
-      el.addEventListener("emptied", notify);
-      return () => {
-        el.removeEventListener("durationchange", notify);
-        el.removeEventListener("loadedmetadata", notify);
-        el.removeEventListener("emptied", notify);
-      };
-    },
-    [el],
+  const store = useContext(AudioContext)?.timeStore;
+  return useSyncExternalStore(
+    store?.subscribe ?? subscribeNoop,
+    store?.getDuration ?? getZero,
+    getZero,
   );
-
-  const getSnapshot = useCallback(() => {
-    if (!el) return 0;
-    const d = el.duration;
-    return Number.isFinite(d) ? d : 0;
-  }, [el]);
-  const getServerSnapshot = useCallback(() => 0, []);
-
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

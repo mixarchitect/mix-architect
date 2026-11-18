@@ -103,8 +103,8 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
         setConfirmDeleteId(null);
       }
     }
-    if (confirmDeleteId) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    if (confirmDeleteId) document.addEventListener("pointerdown", handleClickOutside);
+    return () => document.removeEventListener("pointerdown", handleClickOutside);
   }, [confirmDeleteId]);
 
   const sorted = [...localTracks].sort((a, b) => a.track_number - b.track_number);
@@ -281,7 +281,7 @@ export function TrackList({ releaseId, tracks: initialTracks, canReorder, canDel
 
           {/* Delete track */}
           {canDelete && (
-            <div className={cn("relative shrink-0 transition-opacity duration-150", confirmDeleteId === track.id ? "opacity-100" : "md:opacity-0 md:group-hover/row:opacity-100 md:group-focus-within/row:opacity-100")} ref={confirmDeleteId === track.id ? confirmRef : undefined}>
+            <div className={cn("relative shrink-0 transition-opacity duration-150", confirmDeleteId === track.id ? "opacity-100" : "md:opacity-0 pointer-coarse:opacity-100! md:group-hover/row:opacity-100 md:group-focus-within/row:opacity-100")} ref={confirmDeleteId === track.id ? confirmRef : undefined}>
               <button
                 type="button"
                 onClick={(e) => {

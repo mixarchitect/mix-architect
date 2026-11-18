@@ -87,9 +87,9 @@ export function LineItemsEditor({
       }
     }
     if (activeAutoIdx !== null) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("pointerdown", handleClickOutside);
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("pointerdown", handleClickOutside);
   }, [activeAutoIdx]);
 
   useEffect(() => {
@@ -99,9 +99,9 @@ export function LineItemsEditor({
       }
     }
     if (showServicesPicker) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("pointerdown", handleClickOutside);
     }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("pointerdown", handleClickOutside);
   }, [showServicesPicker]);
 
   // ── Line item handlers ──
@@ -325,7 +325,7 @@ export function LineItemsEditor({
                 className={`text-zinc-600 cursor-grab active:cursor-grabbing transition-opacity ${
                   isReadonly
                     ? "invisible"
-                    : "opacity-0 group-hover/row:opacity-100 max-sm:opacity-100"
+                    : "opacity-0 group-hover/row:opacity-100 pointer-coarse:opacity-100 max-sm:opacity-100"
                 }`}
               />
             </div>
@@ -440,7 +440,7 @@ export function LineItemsEditor({
                   <button
                     type="button"
                     onClick={() => removeLineItem(idx)}
-                    className="p-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover/row:opacity-100 max-sm:opacity-100"
+                    className="p-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover/row:opacity-100 pointer-coarse:opacity-100 max-sm:opacity-100"
                   >
                     <Trash2 size={14} />
                   </button>

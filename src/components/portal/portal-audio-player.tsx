@@ -7,9 +7,11 @@ import {
   useAudio,
   useAudioCurrentTime,
   useAudioDuration,
+  playWhenReady,
   type AudioTrackMeta,
 } from "@/lib/audio-context";
 import { useTheme } from "next-themes";
+import { downloadFromUrl } from "@/lib/download-file";
 import {
   SkipBack,
   SkipForward,
@@ -364,8 +366,8 @@ export function PortalAudioPlayer({
         setShowQualityInfo(false);
       }
     }
-    document.addEventListener("mousedown", handleMouseDown);
-    return () => document.removeEventListener("mousedown", handleMouseDown);
+    document.addEventListener("pointerdown", handleMouseDown);
+    return () => document.removeEventListener("pointerdown", handleMouseDown);
   }, [showStreamingInfo, showTruePeakInfo, showQualityInfo]);
 
   // Fire warning-shown analytics event once per version when the quality
@@ -477,19 +479,7 @@ export function PortalAudioPlayer({
             audioElement.currentTime = restore.seekTime;
           }
           if (restore.shouldPlay) {
-            // On a version switch, audio.loadVersion() may have just called
-            // el.load() on a new src, so the element isn't ready to play
-            // yet. Calling play() now silently no-ops; wait for the browser
-            // to buffer enough data (canplay) before starting.
-            if (audioElement.readyState >= 3 /* HAVE_FUTURE_DATA */) {
-              audioElement.play().catch(() => {});
-            } else {
-              const onCanPlay = () => {
-                audioElement.removeEventListener("canplay", onCanPlay);
-                audioElement.play().catch(() => {});
-              };
-              audioElement.addEventListener("canplay", onCanPlay);
-            }
+            playWhenReady(audioElement, () => cancelled);
           }
         }
       });
@@ -531,6 +521,10 @@ export function PortalAudioPlayer({
     if (!isThisTrackActive && activeVersion) {
       pendingPlayRef.current = true;
       audio.loadVersion(activeVersion, trackMeta);
+      // Start playback inside the tap itself. iOS only allows play() from a
+      // user gesture until the element has played once, so deferring it to
+      // the WaveSurfer "ready" callback left a first tap silent there.
+      audio.togglePlayPause();
       return;
     }
     audio.togglePlayPause();
@@ -581,22 +575,11 @@ export function PortalAudioPlayer({
   /*  Download handler                                                 */
   /* ---------------------------------------------------------------- */
 
-  async function handleDownload() {
+  function handleDownload() {
     if (!activeVersion) return;
     const fileName =
       activeVersion.file_name || `v${activeVersion.version_number}`;
-    try {
-      const res = await fetch(activeVersion.audio_url);
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      window.open(activeVersion.audio_url, "_blank");
-    }
+    downloadFromUrl(activeVersion.audio_url, fileName);
     onPromoTrigger?.("download");
   }
 
@@ -1096,13 +1079,27 @@ export function PortalAudioPlayer({
               </div>
             )}
           </div>
-          {/* Comments are added via double-click, which has no touch
-              equivalent here, so the hint hides on coarse pointers rather
-              than advertising an impossible interaction. */}
           {isReady && (
             <p className="pointer-coarse:hidden text-center text-[10px] text-faint mt-1.5 select-none">
               {t("player.doubleClickHint")}
             </p>
+          )}
+          {/* Double-click has no touch equivalent (a double-tap zooms the
+              page), so touch devices get an explicit button instead. */}
+          {isReady && !commentInput && (
+            <div className="hidden pointer-coarse:flex justify-center mt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setCommentInput({ timecode: currentTime });
+                  setHighlightedCommentId(null);
+                }}
+                className="inline-flex items-center gap-1.5 min-h-11 px-3 text-xs font-medium text-signal"
+              >
+                <MessageCircle size={14} />
+                {t("player.commentAt", { time: formatTime(currentTime) })}
+              </button>
+            </div>
           )}
         </div>
 
@@ -1555,7 +1552,7 @@ function CommentRow({
             e.stopPropagation();
             onDelete();
           }}
-          className="opacity-0 group-hover:opacity-100 p-1 rounded text-muted hover:text-red-500 transition-all shrink-0 self-center"
+          className="opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 p-1 rounded text-muted hover:text-red-500 transition-all shrink-0 self-center"
           title={t("player.deleteComment")}
           aria-label={t("player.deleteComment")}
         >

@@ -422,7 +422,7 @@ function PlatformRow({
               <button
                 type="button"
                 onClick={() => setShowUrlInput(!showUrlInput)}
-                className="text-2xs text-muted hover:text-signal transition-colors opacity-0 group-hover:opacity-100"
+                className="text-2xs text-muted hover:text-signal transition-colors opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100"
                 title={t("editUrl")}
               >
                 {t("editAction")}
@@ -456,7 +456,7 @@ function PlatformRow({
           <button
             type="button"
             onClick={onDelete}
-            className="text-2xs text-muted hover:text-red-400 transition-colors px-1 opacity-0 group-hover:opacity-100"
+            className="text-2xs text-muted hover:text-red-400 transition-colors px-1 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100"
             title={t("remove")}
           >
             <Trash2 size={12} />

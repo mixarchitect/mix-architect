@@ -340,7 +340,7 @@ function StatCard({
         <ChevronRight
           size={14}
           strokeWidth={1.5}
-          className="text-faint opacity-0 group-hover:opacity-100 transition-opacity -mr-1"
+          className="text-faint opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity -mr-1"
         />
       </div>
       <div className="text-lg font-semibold text-text">{value}</div>

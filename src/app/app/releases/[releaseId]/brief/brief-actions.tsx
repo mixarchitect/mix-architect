@@ -5,17 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Download, Link as LinkIcon } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { canEdit, type ReleaseRole } from "@/lib/permissions";
+import { useToast } from "@/components/ui/toast";
 
 type Props = { releaseId: string; role?: ReleaseRole };
 
 export function BriefActions({ releaseId, role }: Props) {
   const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   function handlePrint() {
     window.print();
   }
 
-  async function handleCopyLink() {
+  async function getShareLink(): Promise<string> {
     const supabase = createSupabaseBrowserClient();
 
     const { data: existing } = await supabase
@@ -35,16 +37,30 @@ export function BriefActions({ releaseId, role }: Props) {
       token = data?.share_token;
     }
 
-    if (token) {
-      try {
-        await navigator.clipboard.writeText(
-          `${window.location.origin}/portal/${token}`,
-        );
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch {
-        // Clipboard API may fail without user gesture or in insecure contexts
+    if (!token) throw new Error("Could not create a share link");
+    return `${window.location.origin}/portal/${token}`;
+  }
+
+  async function handleCopyLink() {
+    try {
+      // Safari (and so every iOS browser) only allows a clipboard write
+      // started synchronously inside the tap. Handing ClipboardItem a
+      // promise keeps the write inside the gesture while the token loads.
+      if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+        const link = getShareLink();
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/plain": link.then((l) => new Blob([l], { type: "text/plain" })),
+          }),
+        ]);
+      } else {
+        await navigator.clipboard.writeText(await getShareLink());
       }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("[brief] copy link failed:", err);
+      toast("Could not copy the link. Please try again.", { variant: "error" });
     }
   }
 

@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/toast";
 import { getFormatExtension } from "@/lib/conversion-formats";
+import { downloadFromUrl } from "@/lib/download-file";
 import { trackGA4Event } from "@/lib/ga4-track";
 
 /* ------------------------------------------------------------------ */
@@ -52,30 +53,13 @@ export function useConversion() {
     };
   }, []);
 
-  // ── Download helper (fetch + blob, same pattern as audio-player.tsx) ──
+  // ── Download helper ──
 
   const triggerDownload = useCallback(
     (url: string, fileName: string, targetFormat: string) => {
       const ext = getFormatExtension(targetFormat);
       const baseName = fileName.replace(/\.[^.]+$/, "");
-      const downloadName = `${baseName}.${ext}`;
-
-      fetch(url)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const blobUrl = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = blobUrl;
-          a.download = downloadName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(blobUrl);
-        })
-        .catch(() => {
-          // Fallback: open in a new tab
-          window.open(url, "_blank");
-        });
+      downloadFromUrl(url, `${baseName}.${ext}`);
     },
     [],
   );
