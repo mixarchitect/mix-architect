@@ -107,10 +107,10 @@ export function ReleaseCard({
         setConfirming(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("pointerdown", handleClickOutside);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("pointerdown", handleClickOutside);
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [menuOpen]);
@@ -188,7 +188,7 @@ export function ReleaseCard({
                 "w-9 h-9 grid place-items-center rounded transition-colors disabled:opacity-50",
                 pinned
                   ? "text-signal"
-                  : "text-transparent hover:text-faint",
+                  : "text-transparent hover:text-faint pointer-coarse:text-faint",
               )}
               title={pinned ? tCard("unpinRelease") : tCard("pinToTop")}
             >
@@ -211,7 +211,7 @@ export function ReleaseCard({
                 setConfirming(false);
               }}
               className={cn(
-                "w-7 h-7 grid place-items-center rounded-md transition-colors",
+                "w-7 h-7 pointer-coarse:w-9 pointer-coarse:h-9 grid place-items-center rounded-md transition-colors",
                 menuOpen ? "bg-panel2 text-text" : "text-faint hover:text-text hover:bg-panel2",
               )}
             >

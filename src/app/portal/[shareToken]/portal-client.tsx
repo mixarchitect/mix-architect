@@ -107,7 +107,7 @@ export function PortalClient({
     <main
       id="main-content"
       tabIndex={-1}
-      className="portal-page min-h-screen bg-bg py-12 px-4 md:px-6 pb-24 focus:outline-none"
+      className="portal-page min-h-dvh bg-bg py-12 px-4 md:px-6 pb-24 focus:outline-none"
       // Override the teal accent with the workspace's color (Pro/Studio
       // branding). Cascades to every `bg-signal` / `text-signal` /
       // var(--signal) descendant on the portal.

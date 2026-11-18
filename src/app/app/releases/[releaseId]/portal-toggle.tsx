@@ -47,8 +47,8 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
         setOpen(false);
       }
     }
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
   }, [open]);
 
   async function handleToggle(e: React.MouseEvent) {

@@ -148,10 +148,10 @@ export function DateRangeSelector({
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
     }
-    document.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("pointerdown", handleMouseDown);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("pointerdown", handleMouseDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [open]);

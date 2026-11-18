@@ -52,7 +52,7 @@ const statusColors: Record<string, string> = {
 
 function ActionIcons({ onEdit, onClear }: { onEdit: () => void; onClear: () => void }) {
   return (
-    <div className="flex items-center gap-0.5 shrink-0 w-[34px] justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+    <div className="flex items-center gap-0.5 shrink-0 w-[34px] justify-end opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity">
       <button type="button" onClick={onEdit} className="text-faint hover:text-text transition-colors p-0.5"><Pencil size={10} /></button>
       <button type="button" onClick={onClear} className="text-faint hover:text-red-400 transition-colors p-0.5"><Trash2 size={10} /></button>
     </div>

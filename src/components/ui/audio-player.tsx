@@ -5,10 +5,12 @@ import { cn } from "@/lib/cn";
 import { Timestamp } from "@/components/ui/timestamp";
 import { Button } from "@/components/ui/button";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
+import { downloadFromUrl } from "@/lib/download-file";
 import {
   useAudio,
   useAudioCurrentTime,
   useAudioDuration,
+  playWhenReady,
   type AudioTrackMeta,
 } from "@/lib/audio-context";
 import { useTheme } from "next-themes";
@@ -139,6 +141,29 @@ const ACCEPTED_AUDIO_TYPES = [
   "audio/x-m4a",
 ];
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
+
+// Phones often hand over audio picked from the Files app with an empty or
+// non-standard MIME type (AIFF and FLAC especially), so the extension is
+// accepted as evidence too and listed in the picker's `accept`.
+const AUDIO_TYPE_BY_EXTENSION: Record<string, string> = {
+  wav: "audio/wav",
+  aif: "audio/aiff",
+  aiff: "audio/aiff",
+  flac: "audio/flac",
+  mp3: "audio/mpeg",
+  m4a: "audio/mp4",
+  aac: "audio/aac",
+};
+const AUDIO_ACCEPT_ATTR = [
+  ...ACCEPTED_AUDIO_TYPES,
+  ...Object.keys(AUDIO_TYPE_BY_EXTENSION).map((ext) => `.${ext}`),
+].join(",");
+
+function resolveAudioContentType(file: File): string | null {
+  if (ACCEPTED_AUDIO_TYPES.includes(file.type)) return file.type;
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+  return AUDIO_TYPE_BY_EXTENSION[ext] ?? null;
+}
 
 function getInitials(name: string): string {
   return name
@@ -463,8 +488,8 @@ export function AudioPlayer({
     setShowQualityInfo(false);
   }, [activeVersion?.id]);
 
-  // Click-outside to close an open metric popover. Uses mousedown (not
-  // click) so a stray drag doesn't accidentally dismiss the popover.
+  // Tap/click-outside to close an open metric popover. pointerdown, not
+  // mousedown: iOS sends no mouse events for taps on non-interactive areas.
   // Clicks on the trigger pill fall through to the pill's own onClick
   // (which toggles the open state) — the trigger-group refs below
   // include both the button and the delta badge.
@@ -489,8 +514,8 @@ export function AudioPlayer({
         setShowQualityInfo(false);
       }
     }
-    document.addEventListener("mousedown", handleMouseDown);
-    return () => document.removeEventListener("mousedown", handleMouseDown);
+    document.addEventListener("pointerdown", handleMouseDown);
+    return () => document.removeEventListener("pointerdown", handleMouseDown);
   }, [showStreamingInfo, showTruePeakInfo, showQualityInfo]);
 
   // Fire a warning-shown analytics event once per version when the quality
@@ -642,20 +667,7 @@ export function AudioPlayer({
             audioElement.currentTime = restore.seekTime;
           }
           if (restore.shouldPlay && audioElement.paused) {
-            // On a version switch, audio.loadVersion() above may have just
-            // called el.load() on a new src, so the element isn't ready to
-            // play yet. Calling play() now silently no-ops; wait for the
-            // browser to buffer enough data (canplay) before starting.
-            if (audioElement.readyState >= 3 /* HAVE_FUTURE_DATA */) {
-              audioElement.play().catch(() => {});
-            } else {
-              const onCanPlay = () => {
-                audioElement.removeEventListener("canplay", onCanPlay);
-                if (cancelled) return;
-                audioElement.play().catch(() => {});
-              };
-              audioElement.addEventListener("canplay", onCanPlay);
-            }
+            playWhenReady(audioElement, () => cancelled);
           }
         }
 
@@ -827,7 +839,8 @@ export function AudioPlayer({
   /* ---------------------------------------------------------------- */
 
   async function handleUpload(file: File) {
-    if (!ACCEPTED_AUDIO_TYPES.includes(file.type)) {
+    const contentType = resolveAudioContentType(file);
+    if (!contentType) {
       setUploadError("Unsupported format. Use WAV, AIFF, FLAC, MP3, or AAC/M4A.");
       return;
     }
@@ -856,7 +869,7 @@ export function AudioPlayer({
         const xhr = new XMLHttpRequest();
         xhr.open("POST", `${supabaseUrl}/storage/v1/object/track-audio/${path}`);
         xhr.setRequestHeader("Authorization", `Bearer ${session.access_token}`);
-        xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+        xhr.setRequestHeader("Content-Type", contentType);
         xhr.setRequestHeader("x-upsert", "true");
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
@@ -1091,7 +1104,7 @@ export function AudioPlayer({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept={ACCEPTED_AUDIO_TYPES.join(",")}
+                accept={AUDIO_ACCEPT_ATTR}
                 className="hidden"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
@@ -1224,22 +1237,12 @@ export function AudioPlayer({
             <span className="text-[10px] text-faint inline-flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={async () => {
-                  const fileName = activeVersion.file_name || `v${activeVersion.version_number}`;
-                  try {
-                    const res = await fetch(activeVersion.audio_url);
-                    const blob = await res.blob();
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = fileName;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  } catch {
-                    // Fallback: open in new tab
-                    window.open(activeVersion.audio_url, "_blank");
-                  }
-                }}
+                onClick={() =>
+                  downloadFromUrl(
+                    activeVersion.audio_url,
+                    activeVersion.file_name || `v${activeVersion.version_number}`,
+                  )
+                }
                 className="inline-flex items-center justify-center min-h-11 min-w-11 -my-[15px] -mx-2 text-signal hover:opacity-70 transition-opacity"
                 title={`Download ${activeVersion.file_name || `v${activeVersion.version_number}`}`}
               >
@@ -1583,9 +1586,26 @@ export function AudioPlayer({
             )}
           </div>
           {canComment && isReady && (
-            <p className="text-center text-2xs text-faint mt-1.5 select-none hidden md:block">
+            <p className="text-center text-2xs text-faint mt-1.5 select-none hidden md:block pointer-coarse:hidden">
               double-click waveform to add comment
             </p>
+          )}
+          {/* Double-click has no touch equivalent (a double-tap zooms the
+              page), so touch devices get an explicit button instead. */}
+          {canComment && isReady && !commentInput && (
+            <div className="hidden pointer-coarse:flex justify-center mt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setCommentInput({ timecode: currentTime });
+                  audioElement.pause();
+                }}
+                className="inline-flex items-center gap-1.5 min-h-11 px-3 text-xs font-medium text-signal"
+              >
+                <MessageCircle size={14} />
+                Comment at {formatTime(currentTime)}
+              </button>
+            </div>
           )}
         </div>
 
@@ -1734,7 +1754,7 @@ export function AudioPlayer({
               <div className="text-center py-8">
                 <MessageCircle size={24} strokeWidth={1.5} className="mx-auto text-muted mb-2" />
                 <p className="text-sm font-semibold text-text">No comments yet</p>
-                <p className="text-xs text-muted mt-1">Click anywhere on the waveform to leave a timestamped note.</p>
+                <p className="text-xs text-muted mt-1">Double-click the waveform, or tap Comment on a phone, to leave a timestamped note.</p>
               </div>
             )
           )}
@@ -1905,7 +1925,7 @@ export function AudioPlayer({
       <input
         ref={fileInputRef}
         type="file"
-        accept={ACCEPTED_AUDIO_TYPES.join(",")}
+        accept={AUDIO_ACCEPT_ATTR}
         className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];
@@ -2020,7 +2040,7 @@ function CommentRow({
             e.stopPropagation();
             onDelete();
           }}
-          className="opacity-0 group-hover:opacity-100 p-1 rounded text-muted hover:text-red-500 transition-all shrink-0 self-center"
+          className="opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 p-1 rounded text-muted hover:text-red-500 transition-all shrink-0 self-center"
           title="Delete comment"
         >
           <X size={12} />

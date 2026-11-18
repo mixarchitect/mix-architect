@@ -199,7 +199,7 @@ function ArtistNameEditor({
       </span>
       <Pencil
         size={14}
-        className="text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+        className="text-muted opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity shrink-0"
       />
     </button>
   );
