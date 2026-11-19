@@ -65,6 +65,8 @@ jobs:
           # 15 turns: 10 wasn't enough when a PR touches a long file
           # (settings/page.tsx is ~1700 lines) — Claude exhausted the
           # budget reading surrounding context before producing the
-          # summary and returned error_max_turns. Per-PR cost rises
-          # to roughly $0.20–$0.60, still bounded.
-          claude_args: "--max-turns 15 --model claude-sonnet-4-6"
+          # summary and returned error_max_turns. Per-PR cost was
+          # roughly $0.20–$0.60 on Sonnet 4.6; Opus 5.5 is priced about
+          # a third higher per token ($4/$20 vs $3/$15 per MTok), still
+          # bounded by the turn cap.
+          claude_args: "--max-turns 15 --model claude-opus-5-5"
