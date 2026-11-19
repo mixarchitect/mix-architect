@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
+import { cleanLandingPage, isAuthReferrer } from "@/lib/attribution-source";
 
 const TOUCH_COOKIE = "mix_attribution_touch";
 const REFERRAL_COOKIE = "mix_attribution_id";
@@ -48,7 +49,10 @@ export async function recordSignupAttribution(
       typeof v === "string" && v ? v.slice(0, max) : null;
 
     const utmSource = clean(touch.utm_source, 200);
-    const referrer = clean(touch.referrer, 500);
+    const rawReferrer = clean(touch.referrer, 500);
+    // Cookies written before the capture fix can still carry the sign-in
+    // provider as the referrer; that is noise, not a source.
+    const referrer = isAuthReferrer(rawReferrer) ? null : rawReferrer;
     const source = utmSource ? "utm" : referrer ? "organic" : "direct";
 
     const { error } = await svc.from("signup_attributions").insert({
@@ -58,7 +62,7 @@ export async function recordSignupAttribution(
       status: "signed_up",
       signed_up_at: new Date().toISOString(),
       referrer,
-      landing_page: clean(touch.landing_page, 500),
+      landing_page: cleanLandingPage(clean(touch.landing_page, 500)),
       utm_source: utmSource,
       utm_medium: clean(touch.utm_medium, 200),
       utm_campaign: clean(touch.utm_campaign, 200),

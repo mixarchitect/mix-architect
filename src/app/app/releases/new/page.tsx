@@ -12,6 +12,7 @@ import { ArrowLeft, Sparkles, LayoutTemplate, Star, ArrowRight } from "lucide-re
 import { useSubscription } from "@/lib/subscription-context";
 import { hasProAccess } from "@/lib/entitlements";
 import { logActivityClient } from "@/lib/activity-logger-client";
+import { trackProductEvent } from "@/lib/track-event";
 import { trackGA4Event } from "@/lib/ga4-track";
 import { cn } from "@/lib/cn";
 import {
@@ -396,6 +397,7 @@ export default function NewReleasePage() {
               type="button"
               onClick={async () => {
                 setUpgrading(true);
+                trackProductEvent("checkout_started", { from: "release_limit" });
                 try {
                   const res = await fetch("/api/stripe/checkout", { method: "POST" });
                   const data = await res.json();

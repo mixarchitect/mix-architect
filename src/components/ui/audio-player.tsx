@@ -16,6 +16,7 @@ import {
 import { useTheme } from "next-themes";
 import { sendNotification } from "@/lib/notifications/client";
 import { logActivityClient } from "@/lib/activity-logger-client";
+import { trackProductEvent } from "@/lib/track-event";
 import { trackGA4Event } from "@/lib/ga4-track";
 import { signAudioUrlsAction } from "@/lib/actions/sign-audio-urls";
 import { extractStoragePath } from "@/lib/storage-urls";
@@ -980,6 +981,7 @@ export function AudioPlayer({
       setNewCommentText("");
       setCommentInput(null);
       setHighlightedCommentId(data.id);
+      trackProductEvent("comment_added", { releaseId, trackId });
 
       // Notify + email release members about the new comment
       sendNotification({
@@ -1237,12 +1239,13 @@ export function AudioPlayer({
             <span className="text-[10px] text-faint inline-flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() =>
+                onClick={() => {
                   downloadFromUrl(
                     activeVersion.audio_url,
                     activeVersion.file_name || `v${activeVersion.version_number}`,
-                  )
-                }
+                  );
+                  trackProductEvent("audio_downloaded", { releaseId, trackId });
+                }}
                 className="inline-flex items-center justify-center min-h-11 min-w-11 -my-[15px] -mx-2 text-signal hover:opacity-70 transition-opacity"
                 title={`Download ${activeVersion.file_name || `v${activeVersion.version_number}`}`}
               >

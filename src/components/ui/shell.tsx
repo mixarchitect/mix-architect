@@ -18,6 +18,7 @@ import { MiniPlayer } from "@/components/ui/mini-player";
 import { useCommandPalette } from "@/hooks/use-command-palette";
 import { ToastProvider } from "@/components/ui/toast";
 import { TourProvider } from "@/components/onboarding/tour-provider";
+import { UsageTracker } from "@/components/usage-tracker";
 
 type ShellProps = {
   userId?: string;
@@ -85,6 +86,7 @@ export function Shell({ userId, userEmail, displayName, paymentsEnabled = false,
           </div>
         </div>
         <MiniPlayer />
+        <UsageTracker disabled={isAdmin} />
         <CommandPalette isOpen={isOpen} onClose={close} />
       </TourProvider>
       </SubscriptionProvider>
