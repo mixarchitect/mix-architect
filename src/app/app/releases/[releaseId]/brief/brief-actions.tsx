@@ -6,6 +6,7 @@ import { Download, Link as LinkIcon } from "lucide-react";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { canEdit, type ReleaseRole } from "@/lib/permissions";
 import { useToast } from "@/components/ui/toast";
+import { trackProductEvent } from "@/lib/track-event";
 
 type Props = { releaseId: string; role?: ReleaseRole };
 
@@ -57,6 +58,7 @@ export function BriefActions({ releaseId, role }: Props) {
         await navigator.clipboard.writeText(await getShareLink());
       }
       setCopied(true);
+      trackProductEvent("brief_link_copied", { releaseId });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("[brief] copy link failed:", err);

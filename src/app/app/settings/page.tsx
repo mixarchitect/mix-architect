@@ -35,6 +35,7 @@ import {
   type Locale,
 } from "@/i18n/config";
 import { formatCurrency } from "@/lib/currency";
+import { trackProductEvent } from "@/lib/track-event";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -885,6 +886,7 @@ function SubscriptionPanel() {
 
   async function handleUpgrade(plan: "pro" | "studio") {
     setUpgradingPlan(plan);
+    trackProductEvent("checkout_started", { plan, from: "settings" });
     try {
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",

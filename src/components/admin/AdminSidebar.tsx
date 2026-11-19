@@ -22,6 +22,7 @@ import {
   Gauge,
   BarChart3,
   ShieldCheck,
+  Route,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -33,6 +34,7 @@ const adminNavItems = [
   { label: "Activity Log", href: "/admin/activity", icon: Activity },
   { label: "Notifications", href: "/admin/notifications", icon: Bell },
   { label: "Audit Log", href: "/admin/audit", icon: Shield },
+  { label: "User Journeys", href: "/admin/journeys", icon: Route },
   { label: "Attributions", href: "/admin/attributions", icon: TrendingUp },
   { label: "Featured Releases", href: "/admin/featured", icon: Star },
   { label: "Submissions", href: "/admin/feature-submissions", icon: Inbox },

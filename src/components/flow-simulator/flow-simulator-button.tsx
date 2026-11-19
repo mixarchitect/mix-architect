@@ -3,6 +3,7 @@
 import { Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFlowOpen } from "./release-flow-context";
+import { trackProductEvent } from "@/lib/track-event";
 import type { FlowTrack } from "./use-flow-audio";
 
 type Props = {
@@ -19,7 +20,10 @@ export function FlowSimulatorButton({ tracks }: Props) {
     <Button
       variant="secondary"
       className="h-9 text-xs"
-      onClick={openFlow}
+      onClick={() => {
+        trackProductEvent("flow_opened");
+        openFlow();
+      }}
       title="Audition track flow and order"
     >
       <Shuffle size={14} />

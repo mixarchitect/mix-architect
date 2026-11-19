@@ -1,6 +1,8 @@
 import { createSupabaseServiceClient } from "@/lib/supabaseServiceClient";
+import type { ProductEvent } from "@/lib/product-events";
 
 export type ActivityEventType =
+  | ProductEvent
   | "signup"
   | "login"
   | "release_created"

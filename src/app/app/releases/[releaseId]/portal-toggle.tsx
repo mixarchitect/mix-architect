@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { trackGA4Event } from "@/lib/ga4-track";
+import { trackProductEvent } from "@/lib/track-event";
 import { createSupabaseBrowserClient } from "@/lib/supabaseBrowserClient";
 import { Globe, Share2, Check, ExternalLink } from "lucide-react";
 
@@ -70,13 +71,17 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
           .update({ active: true })
           .eq("id", share.id);
         setShare((prev) => (prev ? { ...prev, active: true } : prev));
+        trackProductEvent("portal_enabled", { releaseId });
       } else {
         const { data } = await supabase
           .from("brief_shares")
           .insert({ release_id: releaseId, active: true })
           .select("*")
           .single();
-        if (data) setShare(data);
+        if (data) {
+          setShare(data);
+          trackProductEvent("portal_enabled", { releaseId });
+        }
       }
       router.refresh();
     } finally {
@@ -91,6 +96,7 @@ export function PortalToggle({ releaseId, initialShare }: PortalToggleProps) {
     try {
       await navigator.clipboard.writeText(url);
       trackGA4Event("portal_share");
+      trackProductEvent("portal_link_copied", { releaseId });
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {

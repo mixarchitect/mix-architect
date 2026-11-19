@@ -11,6 +11,7 @@ import { PersonaStep } from "./steps/persona-step";
 import { LocaleStep } from "./steps/locale-step";
 import { RestoreReleasesStep } from "./steps/restore-releases-step";
 import { ConfirmationStep } from "./steps/confirmation-step";
+import { trackProductEvent } from "@/lib/track-event";
 
 type Persona = "artist" | "engineer" | "both" | "other";
 
@@ -121,6 +122,8 @@ export function OnboardingFlow({ userId, parkedReleaseCount = 0 }: Props) {
           return;
         }
       }
+
+      trackProductEvent("onboarding_completed", { persona, destination });
 
       // Set the locale cookie for next-intl
       document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=${60 * 60 * 24 * 365};samesite=lax`;

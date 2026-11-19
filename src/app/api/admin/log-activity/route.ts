@@ -4,6 +4,7 @@ import { logActivity, type ActivityEventType } from "@/lib/activity-logger";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { requireSameOrigin } from "@/lib/origin-check";
 import { drainEmailOutbox } from "@/lib/email/outbox";
+import { describeDevice, isProductEvent, sanitizeEventMetadata } from "@/lib/product-events";
 
 const ALLOWED_EVENTS: Set<string> = new Set([
   "login",
@@ -42,8 +43,18 @@ export async function POST(req: NextRequest) {
       metadata?: Record<string, unknown>;
     };
 
-    if (!eventType || !ALLOWED_EVENTS.has(eventType)) {
+    if (!eventType || (!ALLOWED_EVENTS.has(eventType) && !isProductEvent(eventType))) {
       return NextResponse.json({ error: "Invalid event type" }, { status: 400 });
+    }
+
+    // Product usage events are deliberately low-identity: no IP address,
+    // a coarse device label instead of the raw User-Agent, and metadata
+    // limited to short primitive values.
+    if (isProductEvent(eventType)) {
+      logActivity(user.id, eventType, sanitizeEventMetadata(metadata), {
+        userAgent: describeDevice(req.headers.get("user-agent")) ?? undefined,
+      });
+      return NextResponse.json({ ok: true });
     }
 
     logActivity(user.id, eventType as ActivityEventType, metadata, { ip: getClientIp(req), userAgent: req.headers.get("user-agent") ?? undefined });
